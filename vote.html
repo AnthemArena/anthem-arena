@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote: Warriors vs RISE | League Music Tournament</title>
+    <meta name="description" content="Watch and vote for your favorite League of Legends music video in this epic showdown.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/vote.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <script src="/js/navigation.js"></script>
+
+   <!-- VOTE HEADER -->
+<section class="vote-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/brackets.html">Worlds Anthems 2025</a>
+            <span class="separator">›</span>
+            <span id="breadcrumb-round">Loading...</span>
+        </div>
+        
+        <h1 class="match-title" id="match-title">Vote for Your Favorite Music Video</h1>
+        
+        <div class="match-info">
+            <div class="info-badge tournament" id="tournament-badge">🏆 Loading...</div>
+            <div class="info-badge time" id="time-remaining">⏰ Loading...</div>
+            <div class="info-badge votes" id="total-votes">📊 Loading...</div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- VOTING ARENA -->
+<section class="voting-arena">
+    <div class="container-wide">
+        <div class="competitors-grid">
+            
+            <!-- Competitor 1: DYNAMIC -->
+            <div class="competitor-column" id="competitor-1-column">
+                <div class="competitor-header">
+                    <div class="seed-badge" id="competitor1-seed">#? Seed</div>
+                    <h2 class="competitor-name" id="competitor1-name">Loading...</h2>
+                    <p class="competitor-source" id="competitor1-source">Loading...</p>
+                </div>
+
+               <!-- Video Container -->
+<div class="video-container">
+    <div class="video-wrapper" id="competitor1-wrapper">
+        
+        <!-- ⭐ YouTube Thumbnail Fallback (hidden by default) -->
+        <a href="" id="competitor1-youtube-fallback" class="youtube-thumbnail-fallback" target="_blank" rel="noopener" style="display: none;">
+            <img src="" alt="Video thumbnail" class="thumbnail-img" id="competitor1-thumbnail">
+            <div class="play-button-overlay">
+                <svg width="68" height="48" viewBox="0 0 68 48">
+                    <path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path>
+                    <path d="M 45,24 27,14 27,34" fill="#fff"></path>
+                </svg>
+            </div>
+            <div class="unavailable-badge">Embed Disabled. Click to watch on YouTube</div>
+        </a>
+        
+        <!-- Regular iframe -->
+        <iframe 
+            id="competitor1-video"
+            src="" 
+            title="Competitor 1"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+    <div class="video-controls">
+        <!-- Competitor 1 Controls -->
+        <button class="control-btn replay-btn" data-video="competitor1">
+            🔄 Replay
+        </button>
+        <button class="control-btn fullscreen-btn" data-video="competitor1">
+            ⛶ Fullscreen
+        </button>
+    </div>
+</div>
+
+              <!-- Vote Button -->
+<div class="vote-section">
+    <div class="vote-percentage">
+        <span class="percentage-number" id="competitor1-percentage">50</span>%
+    </div>
+    <button 
+        class="vote-btn" 
+        id="vote-btn-competitor1"
+        data-competitor="song1">
+        <span class="vote-icon">🎵</span>
+        <span class="vote-text">Vote for This Music Video</span>
+    </button>
+    <p class="vote-count" id="competitor1-votes">0 votes</p>
+</div>
+
+                <!-- Music Video Details -->
+                <div class="moment-details">
+                    <h3 class="details-title">About This Music Video</h3>
+                    <p class="details-description" id="competitor1-description">
+                        Loading match details...
+                    </p>
+                    <div class="details-meta" id="competitor1-meta">
+                        <span class="meta-item">📅 Loading...</span>
+                        <span class="meta-item">🎮 Loading...</span>
+                        <span class="meta-item">⏱️ Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS Divider -->
+            <div class="vs-divider">
+                <div class="vs-circle">
+                    <span class="vs-text">VS</span>
+                </div>
+            </div>
+
+            <!-- Competitor 2: DYNAMIC -->
+            <div class="competitor-column" id="competitor-2-column">
+                <div class="competitor-header">
+                    <div class="seed-badge" id="competitor2-seed">#? Seed</div>
+                    <h2 class="competitor-name" id="competitor2-name">Loading...</h2>
+                    <p class="competitor-source" id="competitor2-source">Loading...</p>
+                </div>
+
+                <!-- Video Container -->
+<div class="video-container">
+    <div class="video-wrapper" id="competitor2-wrapper">
+        
+        <!-- ⭐ YouTube Thumbnail Fallback (hidden by default) -->
+        <a href="" id="competitor2-youtube-fallback" class="youtube-thumbnail-fallback" target="_blank" rel="noopener" style="display: none;">
+            <img src="" alt="Video thumbnail" class="thumbnail-img" id="competitor2-thumbnail">
+            <div class="play-button-overlay">
+                <svg width="68" height="48" viewBox="0 0 68 48">
+                    <path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path>
+                    <path d="M 45,24 27,14 27,34" fill="#fff"></path>
+                </svg>
+            </div>
+            <div class="unavailable-badge">Embed Disabled. Click to watch on YouTube</div>
+        </a>
+        
+        <!-- Regular iframe -->
+        <iframe 
+            id="competitor2-video"
+            src="" 
+            title="Competitor 2"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+    <div class="video-controls">
+        <!-- Competitor 2 Controls -->
+        <button class="control-btn replay-btn" data-video="competitor2">
+            🔄 Replay
+        </button>
+        <button class="control-btn fullscreen-btn" data-video="competitor2">
+            ⛶ Fullscreen
+        </button>
+    </div>
+</div>
+
+                <!-- Vote Button -->
+<div class="vote-section">
+    <div class="vote-percentage">
+        <span class="percentage-number" id="competitor2-percentage">50</span>%
+    </div>
+    <button 
+        class="vote-btn" 
+        id="vote-btn-competitor2"
+        data-competitor="song2">
+        <span class="vote-icon">🔥</span>
+        <span class="vote-text">Vote for This Music Video</span>
+    </button>
+    <p class="vote-count" id="competitor2-votes">0 votes</p>
+</div>
+
+                <!-- Music Video Details -->
+                <div class="moment-details">
+                    <h3 class="details-title">About This Music Video</h3>
+                    <p class="details-description" id="competitor2-description">
+                        Loading match details...
+                    </p>
+                    <div class="details-meta" id="competitor2-meta">
+                        <span class="meta-item">📅 Loading...</span>
+                        <span class="meta-item">🎮 Loading...</span>
+                        <span class="meta-item">⏱️ Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+    <!-- SHARE SECTION -->
+    <section class="share-section">
+        <div class="container">
+            <h3 class="share-title">Share This Matchup</h3>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareOnTwitter()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                    </svg>
+                    Twitter
+                </button>
+                <button class="share-btn facebook" onclick="shareOnFacebook()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                    </svg>
+                    Facebook
+                </button>
+                <button class="share-btn reddit" onclick="shareOnReddit()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                    </svg>
+                    Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyLink()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                    Copy Link
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- VOTING RULES -->
+    <section class="rules-section">
+        <div class="container">
+            <div class="rules-card">
+                <h3 class="rules-title">📜 Voting Rules</h3>
+                <ul class="rules-list">
+                    <li>✅ One vote per person per match</li>
+                    <li>✅ You can change your vote until voting closes</li>
+                    <li>✅ Voting ends in 1 day, 18 hours</li>
+                    <li>✅ Winner becomes the tournament champion</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- VOTE CONFIRMATION MODAL -->
+    <div id="vote-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">✓</div>
+            <h2 class="modal-title">Vote Cast Successfully!</h2>
+            <p class="modal-message">Your vote for <strong id="voted-moment"></strong> has been recorded.</p>
+            <div class="modal-actions">
+                <button class="modal-btn primary" onclick="closeModal()">Continue Watching</button>
+                <a href="/brackets.html" class="modal-btn secondary">View Bracket</a>
+            </div>
+            <p class="modal-note">You can change your vote until voting closes.</p>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+<script type="module" src="/js/vote.js"></script>
+</body>
+</html>

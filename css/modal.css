@@ -1,0 +1,604 @@
+/* ========================================
+   MATCH DETAILS MODAL
+======================================== */
+
+.match-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.match-modal.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-overlay {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.modal-container {
+    background: #1a1a1a;
+    border: 2px solid #C8AA6E;
+    border-radius: 12px;
+    max-width: 1400px;
+    width: 100%;
+    position: relative;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Close Button */
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(200, 170, 110, 0.2);
+    border: 2px solid rgba(200, 170, 110, 0.4);
+    border-radius: 50%;
+    color: #C8AA6E;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    background: #C8AA6E;
+    color: #0a0a0a;
+    transform: rotate(90deg);
+}
+
+/* Modal Header */
+.modal-header {
+    padding: 2rem 3rem 1.5rem;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+}
+
+.modal-match-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.modal-badge {
+    padding: 0.5rem 1rem;
+    background: rgba(200, 170, 110, 0.2);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: #C8AA6E;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.modal-badge.completed {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.4);
+    color: #4CAF50;
+}
+
+.modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.modal-meta {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    color: #999;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 2rem 3rem 3rem;
+}
+
+.modal-competitors {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
+}
+
+/* Competitor Column */
+.modal-competitor {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.competitor-header-modal {
+    text-align: center;
+}
+
+.competitor-seed-modal {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(200, 170, 110, 0.2);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+}
+
+.competitor-name-modal {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.competitor-source-modal {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #999;
+}
+
+/* Video Section */
+.modal-video-container {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: border-color 0.3s;
+}
+
+.modal-video-container:hover {
+    border-color: rgba(200, 170, 110, 0.6);
+}
+
+.modal-video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #000;
+        z-index: 10; /* Add explicit z-index */
+
+}
+
+.modal-video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+        z-index: 11; /* Ensure iframe is above wrapper */
+
+}
+
+/* Result Section */
+.modal-result {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+}
+
+.result-percentage {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.result-label {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #999;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.result-votes {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Winner Styling */
+.modal-competitor.winner .modal-video-container {
+    border-color: rgba(200, 170, 110, 0.6);
+    background: rgba(200, 170, 110, 0.05);
+}
+
+.modal-competitor.winner .result-percentage {
+    color: #C8AA6E;
+}
+
+.modal-competitor.winner .competitor-name-modal::after {
+    content: ' ✓';
+    color: #C8AA6E;
+}
+
+/* VS Divider */
+.modal-vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 6rem;
+}
+
+.modal-vs-circle {
+    width: 70px;
+    height: 70px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 3px solid #C8AA6E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    letter-spacing: 0.2em;
+}
+
+/* Description Section */
+.modal-description {
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 8px;
+}
+
+.description-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+}
+
+.description-text {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #ccc;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 1200px) {
+    .modal-competitors {
+        gap: 2rem;
+    }
+
+    .competitor-name-modal {
+        font-size: 1.5rem;
+    }
+
+    .result-percentage {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 968px) {
+    .modal-competitors {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .modal-vs {
+        padding-top: 0;
+        transform: rotate(90deg);
+        margin: 1rem 0;
+    }
+
+    .modal-header {
+        padding: 1.5rem 2rem 1rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem 2rem 2rem;
+    }
+
+    .modal-close {
+        top: 1rem;
+        right: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 1rem;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .competitor-name-modal {
+        font-size: 1.25rem;
+    }
+
+    .result-percentage {
+        font-size: 2rem;
+    }
+
+    .modal-header {
+        padding: 1.25rem 1.5rem 1rem;
+    }
+
+    .modal-body {
+        padding: 1.25rem 1.5rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-match-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+    }
+
+    .competitor-name-modal {
+        font-size: 1.1rem;
+    }
+}
+/* Vote button in modal */
+.modal-vote-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-vote-btn.primary {
+    background: linear-gradient(135deg, #c89b3c, #8b6914);
+    color: #0a0a0a;
+    box-shadow: 0 4px 15px rgba(200, 155, 60, 0.4);
+}
+
+.modal-vote-btn.primary:hover {
+    background: linear-gradient(135deg, #d4a747, #9c7520);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 155, 60, 0.6);
+}
+
+.modal-vote-btn.disabled,
+.modal-vote-btn.completed-badge {
+    background: rgba(100, 100, 110, 0.3);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+}
+
+/* Modal buttons (secondary) */
+.modal-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border: none;
+}
+
+.modal-btn.secondary {
+    background: rgba(40, 40, 50, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(200, 170, 110, 0.4);
+}
+
+.modal-btn.secondary:hover {
+    background: rgba(60, 60, 70, 0.9);
+    border-color: rgba(200, 170, 110, 0.6);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-btn.secondary:active {
+    transform: translateY(0);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(200, 155, 60, 0.2);
+}
+
+/* Result bars */
+.result-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(100, 100, 110, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.result-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #c89b3c, #d4a747);
+    transition: width 0.5s ease;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Leading indicator */
+.modal-competitor.leading {
+    border: 2px solid rgba(200, 155, 60, 0.6);
+}
+
+.result-leading-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(200, 155, 60, 0.2), rgba(139, 105, 20, 0.2));
+    border: 1px solid rgba(200, 155, 60, 0.4);
+    color: #c89b3c;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.user-voted-indicator {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(200, 155, 60, 0.1);
+    border-radius: 8px;
+}
+/* ========================================
+   MODAL VIDEO THUMBNAILS
+   ======================================== */
+
+.modal-video-thumbnail {
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #000;
+}
+
+.modal-video-thumbnail:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.3);
+}
+
+.modal-video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 10, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.modal-video-thumbnail:hover .play-overlay {
+    background: rgba(10, 10, 10, 0.4);
+}
+
+.play-icon {
+    font-size: 3rem;
+    color: var(--gold);
+    background: rgba(10, 10, 10, 0.8);
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    transition: all 0.3s ease;
+}
+
+.modal-video-thumbnail:hover .play-icon {
+    transform: scale(1.1);
+    background: var(--gold);
+    color: #0a0a0a;
+}
+
+.play-text {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.modal-video-thumbnail:hover .play-text {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .play-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+    
+    .play-text {
+        font-size: 0.75rem;
+    }
+}

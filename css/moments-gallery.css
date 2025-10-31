@@ -1,0 +1,710 @@
+/* Moments Gallery Styles - Adapted from Roster Page */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lora', serif;
+    background: #0a0a0a;
+    color: #d0d0d0;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Page Hero */
+.roster-hero {
+    position: relative;
+    height: 350px;
+    background: url('/images/moments-hero.jpg') center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9));
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.page-title {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    color: #C8AA6E;
+    margin-bottom: 15px;
+    letter-spacing: 0.1em;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: #d0d0d0;
+}
+
+/* Gallery Section */
+.roster-section {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 50px;
+    padding: 80px 20px;
+}
+
+/* Filter Panel */
+.filter-panel {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    padding: 30px;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.filter-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #C8AA6E;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.filter-group {
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+}
+
+.filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.filter-label {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #C8AA6E;
+    display: block;
+    margin-bottom: 15px;
+    letter-spacing: 0.05em;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #d0d0d0;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #C8AA6E;
+}
+
+.search-input::placeholder {
+    color: #666;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #d0d0d0;
+    transition: color 0.3s ease;
+}
+
+.filter-checkbox:hover {
+    color: #C8AA6E;
+}
+
+.filter-input {
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #C8AA6E;
+}
+
+.reset-filters {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #C8AA6E;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.05em;
+}
+
+.reset-filters:hover {
+    background: #C8AA6E;
+    color: #0a0a0a;
+}
+
+/* Gallery Content */
+.roster-content {
+    width: 100%;
+}
+
+.roster-stats {
+    margin-bottom: 30px;
+    font-size: 1rem;
+    color: #999;
+}
+
+.roster-stats span {
+    color: #C8AA6E;
+    font-weight: 600;
+}
+
+/* Moment Grid */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.character-card {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.character-card:hover {
+    transform: translateY(-10px);
+    border-color: #C8AA6E;
+}
+
+/* Eliminated Moments */
+.character-card.eliminated-moment {
+    opacity: 0.7;
+}
+
+.character-card.eliminated-moment:hover {
+    opacity: 1;
+}
+
+.eliminated-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(180, 50, 50, 0.95);
+    color: #fff;
+    padding: 6px 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    z-index: 10;
+    text-transform: uppercase;
+}
+
+/* Video Thumbnail Container */
+.character-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.character-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+/* Play Button Overlay - Shows on hover of thumbnail */
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.video-thumbnail:hover .play-overlay {
+    opacity: 1;
+}
+
+.play-button {
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.video-thumbnail:hover .play-button {
+    transform: scale(1.1);
+}
+
+/* View Details Overlay - Shows on hover of CARD (not thumbnail) */
+.character-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(200, 170, 110, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.character-card:hover .character-overlay {
+    opacity: 0; /* Don't show by default */
+}
+
+/* Show "View Details" only when hovering OUTSIDE the video thumbnail */
+.character-card:hover .character-info:hover ~ .character-image-wrapper .character-overlay,
+.character-card .character-info:hover ~ .character-image-wrapper .character-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.view-profile {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: #0a0a0a;
+    font-weight: 600;
+}
+
+/* Moment Info */
+.character-info {
+    padding: 25px;
+    cursor: pointer;
+}
+
+.character-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #C8AA6E;
+    margin-bottom: 8px;
+}
+
+.character-title {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 15px;
+}
+
+.character-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tag-expansion {
+    background: rgba(100, 150, 200, 0.2);
+    color: #8ab4d4;
+    border: 1px solid rgba(100, 150, 200, 0.3);
+}
+
+.tag-emotion {
+    background: rgba(200, 100, 100, 0.2);
+    color: #d48a8a;
+    border: 1px solid rgba(200, 100, 100, 0.3);
+}
+
+.tag-type {
+    background: rgba(200, 170, 110, 0.2);
+    color: #C8AA6E;
+    border: 1px solid rgba(200, 170, 110, 0.3);
+}
+
+.tag-status {
+    background: rgba(180, 50, 50, 0.2);
+    color: #d46060;
+    border: 1px solid rgba(180, 50, 50, 0.3);
+}
+
+/* Video Modal */
+.video-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+}
+
+.video-modal-content {
+    position: relative;
+    margin: 5% auto;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: #C8AA6E;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.video-modal-close:hover {
+    color: #fff;
+}
+
+.video-modal iframe {
+    width: 100%;
+    height: 70vh;
+    border: 2px solid #C8AA6E;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.no-results h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #C8AA6E;
+    margin-bottom: 15px;
+}
+
+.no-results p {
+    font-size: 1.1rem;
+    color: #999;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .roster-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2.5rem;
+    }
+    
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .video-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .video-modal iframe {
+        height: 50vh;
+    }
+}
+/* Tournament Stats Badge (overlay on thumbnail) */
+.tournament-stats-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    padding: 8px 12px;
+    z-index: 10;
+    font-size: 0.75rem;
+    backdrop-filter: blur(5px);
+}
+
+.stats-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.stats-row:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    color: #999;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    color: #C8AA6E;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* Tournament Stats Detail Section (below card title) */
+.tournament-stats-detail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(200, 170, 110, 0.15);
+    border-radius: 4px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+}
+
+.stat-icon {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-number {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: #C8AA6E;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.stat-desc {
+    font-size: 0.7rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Eliminated/Special Status Variants */
+.character-card.eliminated-moment .tournament-stats-badge {
+    border-color: rgba(180, 50, 50, 0.5);
+}
+
+.character-card.eliminated-moment .stat-value {
+    color: #d46060;
+}
+
+.character-card.champion-moment .tournament-stats-badge {
+    border-color: rgba(255, 215, 0, 0.6);
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.character-card.champion-moment .stat-value {
+    color: #FFD700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tournament-stats-detail {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .stat-content {
+        flex-direction: row;
+        gap: 6px;
+        align-items: center;
+    }
+}
+/* Seed tag - Gold/Bronze */
+.tag-seed {
+    background: linear-gradient(135deg, #c89b3c 0%, #8b6914 100%);
+    color: #0a0a0a;
+    font-weight: 700;
+}
+
+/* Category tag - Blue/Teal */
+.tag-category {
+    background: linear-gradient(135deg, #0ac8b9 0%, #0397ab 100%);
+    color: #0a0a0a;
+}
+
+/* Accolade tag - Varies by status */
+.tag-accolade {
+    background: linear-gradient(135deg, #785a28 0%, #463714 100%);
+    color: #c8a355;
+}
+
+/* Champion gets special gold */
+.tag-accolade:has-text("Champion"),
+.tag-accolade:has-text("Legend") {
+    background: linear-gradient(135deg, #ffd700 0%, #c89b3c 100%);
+    color: #0a0a0a;
+    font-weight: 700;
+}
+/* Make play overlay cover entire card */
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Let clicks pass through to card */
+    z-index: 10;
+    border-radius: 12px; /* Match card border radius */
+}
+
+.character-card:hover .play-overlay {
+    opacity: 1;
+}
+/* ========================================
+   BOOK RECOMMENDATIONS ON CARDS
+   ======================================== */
+
+.card-book-recommendation {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.book-rec-compact {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(0, 200, 150, 0.05);
+    border: 1px solid rgba(0, 200, 150, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.book-rec-compact:hover {
+    background: rgba(0, 200, 150, 0.1);
+    border-color: rgba(0, 200, 150, 0.4);
+}
+
+.book-icon-small {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.book-rec-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.book-rec-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.book-rec-link {
+    color: #00c896;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.book-rec-link:hover {
+    color: #00ffb3;
+    gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .book-rec-compact {
+        padding: 0.5rem;
+    }
+    
+    .book-rec-label {
+        font-size: 0.7rem;
+    }
+    
+    .book-rec-link {
+        font-size: 0.85rem;
+    }
+}
+.book-rec-compact {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(0, 200, 150, 0.05);
+    border: 1px solid rgba(0, 200, 150, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer; /* ✅ Show it's clickable */
+}
+
+.book-rec-compact:hover {
+    background: rgba(0, 200, 150, 0.1);
+    border-color: rgba(0, 200, 150, 0.4);
+}

@@ -1,0 +1,232 @@
+/* Footer Styles */
+.main-footer {
+    background: rgba(0, 0, 0, 0.95);
+    border-top: 1px solid rgba(200, 170, 110, 0.3);
+    padding: 80px 0 40px;
+    margin-top: 0; /* ✅ FIXED - No gap before footer */
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 60px;
+    margin-bottom: 60px;
+}
+
+.footer-column {
+    color: #d0d0d0;
+}
+
+.footer-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #C8AA6E;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+}
+
+.footer-heading {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #C8AA6E;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.footer-text {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #b0b0b0;
+}
+
+.footer-small {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #d0d0d0;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: #C8AA6E;
+    padding-left: 5px;
+}
+
+/* Social Links */
+.footer-social {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: #C8AA6E;
+    color: #0a0a0a;
+    border-color: #C8AA6E;
+    transform: translateY(-3px);
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    padding-top: 40px;
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+    text-align: center;
+}
+
+.footer-copyright {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: #C8AA6E;
+    letter-spacing: 0.1em;
+    margin-bottom: 15px;
+}
+
+.footer-legal-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+    color: #C8AA6E;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.footer-legal-links a:hover {
+    color: #fff;
+}
+
+.footer-legal-links .separator {
+    color: #666;
+}
+
+.footer-disclaimer {
+    font-size: 0.85rem;
+    color: #888;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 15px auto 0;
+}
+
+/* Responsive Footer */
+@media (max-width: 1200px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 60px 0 30px;
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .footer-container {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer-legal-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .footer-legal-links .separator {
+        display: none;
+    }
+}
+/* Footer Logo */
+.footer-logo-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.footer-logo-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.footer-logo {
+    height: 50px;
+    width: auto;
+        filter: brightness(1.1); /* Slightly brighter */
+
+}
+
+/* Adjust title margin if logo is present */
+.footer-column .footer-logo-link + .footer-title {
+    margin-top: 0.5rem;
+}
+/* Footer Logo - Centered */
+.footer-logo-link {
+    display: block; /* Changed from inline-block */
+    text-align: center; /* Center the image */
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.footer-logo-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.footer-logo {
+    height: 65px;
+    width: auto;
+    display: inline-block; /* Needed for centering */
+}
+
+/* Center the title too */
+.footer-column .footer-title {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* And center the description text */
+.footer-column .footer-text {
+    text-align: center;
+}

@@ -1,0 +1,764 @@
+/* ========================================
+   MY VOTES PAGE STYLES
+   ======================================== */
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.header-content {
+    text-align: center;
+}
+
+.breadcrumb {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.breadcrumb a {
+    color: #C8AA6E;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+    color: #d4b876;
+}
+
+.breadcrumb .separator {
+    margin: 0 0.5rem;
+}
+
+.page-title {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.02em;
+}
+
+.page-subtitle {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Stats Overview */
+.stats-overview {
+    padding: 3rem 0;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.2);
+}
+
+.stat-card.primary {
+    border-color: #C8AA6E;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1), rgba(180, 150, 90, 0.05));
+}
+
+.stat-card.success {
+    border-color: #00c896;
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.1), rgba(0, 180, 130, 0.05));
+}
+
+.stat-card.accent {
+    border-color: #4a9eff;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.1), rgba(50, 130, 220, 0.05));
+}
+
+.stat-card.fire {
+    border-color: #ff6b35;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(230, 80, 30, 0.05));
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Achievement Badge */
+.achievement-badge {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+.badge-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.badge-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFD700;
+    margin-bottom: 0.25rem;
+}
+
+.badge-description {
+    font-family: 'Lora', serif;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(255, 215, 0, 0.5);
+    }
+}
+
+/* Filters Section */
+.filters-section {
+    padding: 2rem 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(200, 170, 110, 0.1);
+    border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-btn:hover {
+    background: rgba(200, 170, 110, 0.1);
+    border-color: #C8AA6E;
+    color: #C8AA6E;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #C8AA6E, #b49a5e);
+    border-color: #C8AA6E;
+    color: #1a1a2e;
+    font-weight: 700;
+}
+
+.filter-count {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.filter-btn.active .filter-count {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Votes Section */
+.votes-section {
+    padding: 3rem 0 5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+}
+
+.share-stats-btn {
+    background: linear-gradient(135deg, #C8AA6E, #b49a5e);
+    border: none;
+    color: #1a1a2e;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.share-stats-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.4);
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(200, 170, 110, 0.2);
+    border-top-color: #C8AA6E;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    font-family: 'Lora', serif;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* No Votes State */
+.no-votes-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.no-votes-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.no-votes-state h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+}
+
+.no-votes-state p {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2rem;
+}
+
+/* Votes Grid */
+.votes-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Vote Card */
+.vote-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.vote-card:hover {
+    transform: translateX(4px);
+    border-color: #C8AA6E;
+    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.2);
+}
+
+.vote-card.correct {
+    border-color: #00c896;
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.05), rgba(0, 180, 130, 0.02));
+}
+
+.vote-card.incorrect {
+    border-color: #ff4444;
+    background: linear-gradient(135deg, rgba(255, 68, 68, 0.05), rgba(230, 50, 50, 0.02));
+}
+
+.vote-card.pending {
+    border-color: #4a9eff;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.05), rgba(50, 130, 220, 0.02));
+}
+
+.vote-status {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.vote-matchup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex: 1;
+}
+
+.vote-thumbnail {
+    width: 120px;
+    height: 68px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.vote-details {
+    flex: 1;
+}
+
+.vote-round {
+    font-family: 'Lora', serif;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.25rem;
+}
+
+.vote-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+}
+
+.vote-choice {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.vote-choice strong {
+    color: #C8AA6E;
+}
+
+.vote-result {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.vote-percentage {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.25rem;
+}
+
+.vote-outcome {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.vote-card.correct .vote-outcome {
+    color: #00c896;
+}
+
+.vote-card.incorrect .vote-outcome {
+    color: #ff4444;
+}
+
+.vote-card.pending .vote-outcome {
+    color: #4a9eff;
+}
+
+.vote-timestamp {
+    font-family: 'Lora', serif;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+}
+
+/* Share Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.share-modal-content {
+    position: relative;
+    background: #1a1a2e;
+    border: 2px solid #C8AA6E;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #C8AA6E;
+}
+
+.share-modal-content h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: #C8AA6E;
+    margin-bottom: 1.5rem;
+}
+
+.share-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Lora', serif;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+}
+
+.share-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.share-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+}
+
+.share-btn.twitter:hover {
+    background: #1DA1F2;
+    border-color: #1DA1F2;
+}
+
+.share-btn.facebook:hover {
+    background: #4267B2;
+    border-color: #4267B2;
+}
+
+.share-btn.copy:hover {
+    background: #C8AA6E;
+    border-color: #C8AA6E;
+    color: #1a1a2e;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .vote-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .vote-matchup {
+        width: 100%;
+    }
+    
+    .vote-result {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .filters {
+        justify-content: flex-start;
+    }
+    
+    .filter-btn {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+}
+/* Vote Card */
+.vote-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.vote-card:hover {
+    transform: translateX(4px);
+    border-color: #C8AA6E;
+    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.2);
+}
+
+.vote-card.won {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 165, 0, 0.02));
+}
+
+.vote-card.lost {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(200, 200, 200, 0.01));
+    opacity: 0.8;
+}
+
+.vote-card.pending {
+    border-color: #4a9eff;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.05), rgba(50, 130, 220, 0.02));
+}
+
+/* ... rest of CSS stays the same ... */
+
+.vote-card.won .vote-outcome {
+    color: #FFD700;
+}
+
+.vote-card.lost .vote-outcome {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.vote-card.pending .vote-outcome {
+    color: #4a9eff;
+}
+/* Update stat card colors */
+.stat-card.rebel {
+    border-color: #9d4edd;
+    background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(140, 60, 200, 0.05));
+}
+
+.stat-card.mainstream {
+    border-color: #4a9eff;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.1), rgba(50, 130, 220, 0.05));
+}
+
+/* Vote Card Updates */
+.vote-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.vote-card:hover {
+    transform: translateX(4px);
+    border-color: #C8AA6E;
+    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.2);
+}
+
+.vote-card.underdog {
+    border-color: #9d4edd;
+    background: linear-gradient(135deg, rgba(157, 78, 221, 0.05), rgba(140, 60, 200, 0.02));
+}
+
+.vote-card.mainstream {
+    border-color: #4a9eff;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.05), rgba(50, 130, 220, 0.02));
+}
+
+.vote-card.closeCall {
+    border-color: #00c896;
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.05), rgba(0, 180, 130, 0.02));
+}
+
+.vote-card.live {
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.15);
+}
+
+.vote-card.completed {
+    opacity: 0.85;
+}
+
+/* Vote Type Label */
+.vote-type-label {
+    font-size: 0.9rem;
+    font-family: 'Lora', serif;
+    margin-top: 0.25rem;
+    font-weight: 600;
+}
+
+.vote-card.underdog .vote-type-label {
+    color: #9d4edd;
+}
+
+.vote-card.mainstream .vote-type-label {
+    color: #4a9eff;
+}
+
+.vote-card.closeCall .vote-type-label {
+    color: #00c896;
+}
+
+/* Vote Status Label */
+.vote-status-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+    opacity: 0.6;
+}
+
+.vote-card.live .vote-status-label {
+    color: #C8AA6E;
+    opacity: 1;
+}
+
+/* View Match Button */
+.view-match-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #C8AA6E;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-family: 'Lora', serif;
+    transition: all 0.2s ease;
+}
+
+.view-match-btn:hover {
+    color: #FFD700;
+    transform: translateX(4px);
+}
+
+/* Vote Result Section */
+.vote-result {
+    text-align: right;
+    min-width: 120px;
+}
+
+.vote-percentage {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Lora', serif;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}

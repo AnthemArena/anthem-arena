@@ -1,0 +1,41 @@
+/* ========================================
+   CUSTOM SCROLLBAR - SITE THEME
+   ======================================== */
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #C8AA6E rgba(20, 25, 35, 0.8);
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(10, 15, 25, 0.95);
+    border-left: 1px solid rgba(200, 170, 110, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #C8AA6E, #B89A5E);
+    border-radius: 6px;
+    border: 2px solid rgba(10, 15, 25, 0.95);
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #D4B87A, #C8AA6E);
+    box-shadow: 0 0 10px rgba(200, 170, 110, 0.4);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #E0C490, #D4B87A);
+}
+
+/* Horizontal scrollbar (if needed) */
+::-webkit-scrollbar-corner {
+    background: rgba(10, 15, 25, 0.95);
+}

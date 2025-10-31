@@ -1,0 +1,50 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tournament Admin - League Music</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>🏆 Tournament Admin Panel</h1>
+            <p>All Music Championship 2025</p>
+        </header>
+
+        <!-- Round Controls -->
+        <section class="round-controls">
+            <h2>Round Control</h2>
+            <div class="button-group">
+                <button onclick="openRound(1)" class="btn-primary">Open Round 1</button>
+                <button onclick="closeRound(1)" class="btn-danger">Close Round 1</button>
+                <button onclick="openRound(2)" class="btn-primary">Open Round 2</button>
+            </div>
+        </section>
+
+        <!-- Match Management -->
+        <section class="match-management">
+            <h2>Round 1 Matches</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Song 1</th>
+                        <th>Votes</th>
+                        <th>Song 2</th>
+                        <th>Votes</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="matches-table">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+<script type="module" src="/js/admin.js"></script>
+</body>
+</html>

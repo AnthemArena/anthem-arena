@@ -1,0 +1,89 @@
+/* ========================================
+   CSS RESET & BASE STYLES
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+       margin: 0;
+    padding: 0;
+    background: #0a0a0a; /* ✅ Match body background */
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #0a0a0a;
+    color: #f0f0f0;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Remove default margins from all sections */
+section {
+    margin: 0;
+    width: 100%;
+}
+
+/* Ensure no gaps between sections */
+.hero,
+.featured-matchup,
+.recent-results,
+.champions,
+.how-it-works,
+.youtube-cta,
+.newsletter,
+.main-footer {
+    margin: 0;
+    width: 100%;
+}
+
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Typography */
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #C8AA6E;
+    text-align: center;
+    margin-bottom: 60px;
+    letter-spacing: 0.1em;
+}
+
+/* CTA Button */
+.cta-button {
+    display: inline-block;
+    padding: 15px 50px;
+    border: 2px solid #C8AA6E;
+    color: #C8AA6E;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    background: #C8AA6E;
+    color: #0a0a0a;
+}
+
+/* Responsive Base */
+@media (max-width: 968px) {
+    .container {
+        padding: 0 20px;
+    }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Archive | League Music Tournament</title>
+    <meta name="description" content="Browse the complete archive of League Music Tournament matchups, results, and voting history.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/matches.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <script src="/js/navigation.js"></script>
+
+    <!-- MATCHES HEADER -->
+    <section class="matches-header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="page-title">Match Archive</h1>
+                <p class="page-subtitle">Browse every epic showdown in tournament history</p>
+            </div>
+
+           <!-- Stats Overview -->
+<div class="archive-stats">
+    <div class="stat-item">
+        <span class="stat-number" id="total-matches">0</span>
+        <span class="stat-label">Total Matches</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="total-votes">0</span>
+        <span class="stat-label">Total Votes Cast</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="tournaments">1</span>
+        <span class="stat-label">Tournaments</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="unique-videos">0</span>
+        <span class="stat-label">Unique Videos</span>
+    </div>
+</div>
+        </div>
+    </section>
+
+    <!-- FILTERS & SEARCH -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-container">
+                
+                <!-- Search Bar -->
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        class="search-input" 
+                        placeholder="Search music videos, artists, categories..."
+                        onkeyup="filterMatches()"
+                    >
+                    <button class="search-button">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="filter-group">
+                    <label class="filter-label">Tournament:</label>
+                    <select id="tournament-filter" class="filter-select" onchange="filterMatches()">
+                        <option value="all">All Tournaments</option>
+                        <option value="worlds-anthems-2025">Worlds Anthems 2025</option>
+                        <option value="all-music-summer-2025">All Music Summer 2025</option>
+                        <option value="virtual-groups-spring-2025">Virtual Groups Spring 2025</option>
+                        <option value="cinematics-winter-2024">Cinematics Winter 2024</option>
+                        <option value="all-music-fall-2024">All Music Fall 2024</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Round:</label>
+                    <select id="round-filter" class="filter-select" onchange="filterMatches()">
+                        <option value="all">All Rounds</option>
+                        <option value="finals">Finals</option>
+                        <option value="semifinals">Semifinals</option>
+                        <option value="quarterfinals">Quarterfinals</option>
+                        <option value="round-1">Round 1</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Status:</label>
+                    <select id="status-filter" class="filter-select" onchange="filterMatches()">
+                        <option value="all">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="live">Live Now</option>
+                        <option value="upcoming">Upcoming</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Sort By:</label>
+                    <select id="sort-filter" class="filter-select" onchange="sortMatches()">
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="votes-desc">Most Votes</option>
+                        <option value="close">Closest Match</option>
+                    </select>
+                </div>
+
+                <!-- Clear Filters -->
+                <button class="clear-filters-btn" onclick="clearFilters()">
+                    Clear Filters
+                </button>
+            </div>
+
+            <!-- Results Count -->
+            <div class="results-info">
+                <span id="results-count">Showing 248 matches</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- MATCHES GRID -->
+    <section class="matches-section">
+        <div class="container">
+          <div class="matches-grid" id="matches-grid">
+    <!-- Loading state -->
+    <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading matches from tournament...</p>
+    </div>
+</div>
+
+                 <div class="match-footer">
+    <div class="match-stats">
+        <span class="stat"><i class="far fa-calendar"></i> Starts Nov 1, 2025</span>
+    </div>
+    <button class="remind-btn">
+        <i class="far fa-bell"></i> Remind Me
+    </button>
+</div>
+
+                <!-- More match cards would be dynamically loaded here -->
+                
+            </div>
+
+           <!-- Load More Button -->
+            <div class="load-more-container" style="display: none;">
+                <button class="load-more-btn" onclick="loadMoreMatches()">
+                    Load More Matches
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+<script type="module" src="/js/matches.js"></script>
+</body>
+</html>

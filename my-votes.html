@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vote History | League Music Tournament</title>
+    <meta name="description" content="View your complete voting history, stats, and prediction accuracy in the League Music Tournament.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/matches.css">
+    <link rel="stylesheet" href="/css/my-votes.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <script src="/js/navigation.js"></script>
+
+    <!-- ========================================
+         HEADER SECTION
+         ======================================== -->
+    <section class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="/">Home</a>
+                    <span class="separator">›</span>
+                    <span class="current">My Votes</span>
+                </div>
+                <h1 class="page-title">My Vote History</h1>
+                <p class="page-subtitle">Track your predictions and voting stats</p>
+            </div>
+        </div>
+    </section>
+
+  <!-- ========================================
+     STATS OVERVIEW
+     ======================================== -->
+<section class="stats-overview">
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            
+            <div class="stat-card primary">
+                <div class="stat-icon">🗳️</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="totalVotes">0</span>
+                    <span class="stat-label">Total Votes</span>
+                </div>
+            </div>
+
+            <div class="stat-card rebel">
+                <div class="stat-icon">🎭</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="underdogPicks">0</span>
+                    <span class="stat-label">Underdog Picks</span>
+                </div>
+            </div>
+
+            <div class="stat-card mainstream">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="mainstreamPicks">0</span>
+                    <span class="stat-label">Mainstream Picks</span>
+                </div>
+            </div>
+
+            <div class="stat-card fire">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="votingStreak">0</span>
+                    <span class="stat-label">Day Streak</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Achievement Badge -->
+        <div class="achievement-badge" id="achievementBadge" style="display: none;">
+            <div class="badge-icon">🏆</div>
+            <div class="badge-content">
+                <h3 class="badge-title" id="badgeTitle">Achievement</h3>
+                <p class="badge-description" id="badgeDescription">Description here</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FILTERS
+     ======================================== -->
+<section class="filters-section">
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">
+                All Votes <span class="filter-count" id="countAll">0</span>
+            </button>
+            <button class="filter-btn" data-filter="underdog">
+                🎭 Underdog <span class="filter-count" id="countUnderdog">0</span>
+            </button>
+            <button class="filter-btn" data-filter="mainstream">
+                🎯 Mainstream <span class="filter-count" id="countMainstream">0</span>
+            </button>
+            <button class="filter-btn" data-filter="live">
+                ⏳ Live <span class="filter-count" id="countLive">0</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+    <!-- ========================================
+         VOTE HISTORY
+         ======================================== -->
+    <section class="votes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Your Votes</h2>
+                <button class="share-stats-btn" onclick="shareStats()">
+                    <i class="fas fa-share-alt"></i> Share Stats
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="loader"></div>
+                <p>Loading your vote history...</p>
+            </div>
+
+            <!-- No Votes State -->
+            <div class="no-votes-state" id="noVotesState" style="display: none;">
+                <div class="no-votes-icon">🗳️</div>
+                <h3>No Votes Yet</h3>
+                <p>Start voting in matches to build your history!</p>
+                <a href="/matches.html" class="btn-primary">View Live Matches</a>
+            </div>
+
+            <!-- Votes Grid -->
+            <div class="votes-grid" id="votesGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         SHARE MODAL
+         ======================================== -->
+    <div id="shareModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeShareModal()"></div>
+        <div class="modal-content share-modal-content">
+            <button class="modal-close" onclick="closeShareModal()">×</button>
+            <h3>Share Your Stats</h3>
+            <div class="share-preview" id="sharePreview">
+                <!-- Generated by JavaScript -->
+            </div>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter()">
+                    <i class="fab fa-twitter"></i> Twitter
+                </button>
+                <button class="share-btn facebook" onclick="shareToFacebook()">
+                    <i class="fab fa-facebook"></i> Facebook
+                </button>
+                <button class="share-btn copy" onclick="copyShareText()">
+                    <i class="fas fa-copy"></i> Copy Text
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+    <script type="module" src="/js/my-votes.js"></script>
+</body>
+</html>
