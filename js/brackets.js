@@ -88,7 +88,7 @@ async function generateBracketFromFirebase(firebaseMatches) {
         // Convert Firebase format to modal format
         window.matchDatabase[match.matchId] = {
             id: match.matchId,
-            tournament: 'Worlds Anthems Tournament',
+            tournament: 'Anthem Arena Championship S1',
             round: getRoundName(match.round),
             date: match.date || 'TBD',
             status: match.status,

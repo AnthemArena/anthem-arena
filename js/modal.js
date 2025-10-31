@@ -116,7 +116,7 @@ function createModalHTML(match) {
     // Vote button logic
     const voteButton = match.status === 'live' 
         ? `<a href="vote.html?match=${match.id}" class="modal-vote-btn primary">
-             ${hasVoted ? '🔄 Change Your Vote' : '🎵 Cast Your Vote'}
+             ${hasVoted ? '🔄 Thanks For Voting' : '🎵 Cast Your Vote'}
            </a>`
         : match.status === 'upcoming'
         ? `<div class="modal-vote-btn disabled">Voting Opens Soon</div>`

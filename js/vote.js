@@ -611,7 +611,7 @@ async function updatePageContent() {
     const tournamentBadge = document.getElementById('tournament-badge');
     if (tournamentBadge) {
         const roundName = getRoundName(currentMatch.round || 1);
-        tournamentBadge.innerHTML = `🏆 Worlds Anthems 2025 - ${roundName}`;
+        tournamentBadge.innerHTML = `🏆 Anthem Arena Championship - ${roundName}`;
     }
     
     // Update time remaining

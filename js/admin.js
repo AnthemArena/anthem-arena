@@ -3,8 +3,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
-import { collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 // ========================================
 // TOURNAMENT CONFIG
 // ========================================
@@ -127,7 +126,7 @@ window.closeMatch = async function(matchId) {
     
     try {
         const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId);
-        const matchSnap = await matchRef.get();
+        const matchSnap = await getDoc(matchRef);
         
         if (!matchSnap.exists()) {
             alert('Match not found!');
@@ -266,6 +265,55 @@ async function loadMatches() {
 
 window.viewMatch = function(matchId) {
     window.location.href = `/vote.html?match=${matchId}`;
+};
+
+// ========================================
+// CLEAR ALL VOTES (TESTING ONLY)
+// ========================================
+
+window.clearAllVotesForTesting = async function() {
+    const confirmation = prompt(
+        '⚠️ WARNING: This will DELETE ALL VOTES from ALL USERS!\n\n' +
+        'This action CANNOT be undone!\n\n' +
+        'Type "DELETE ALL VOTES" to confirm:'
+    );
+    
+    if (confirmation !== 'DELETE ALL VOTES') {
+        alert('❌ Action cancelled');
+        return;
+    }
+    
+    try {
+        console.log('🗑️ Clearing all votes...');
+        
+        const votesRef = collection(db, 'votes');
+        const votesSnapshot = await getDocs(votesRef);
+        
+        const voteCount = votesSnapshot.size;
+        console.log(`Found ${voteCount} votes to delete`);
+        
+        if (voteCount === 0) {
+            alert('ℹ️ No votes to clear!');
+            return;
+        }
+        
+        // Delete all vote documents
+        const deletePromises = votesSnapshot.docs.map(voteDoc => 
+            deleteDoc(doc(db, 'votes', voteDoc.id))
+        );
+        
+        await Promise.all(deletePromises);
+        
+        console.log('✅ All votes cleared');
+        alert(`✅ Successfully deleted ${voteCount} votes!`);
+        
+        // Refresh the matches table to show updated vote counts
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error clearing votes:', error);
+        alert(`❌ Error: ${error.message}`);
+    }
 };
 
 // ========================================

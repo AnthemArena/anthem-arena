@@ -109,3 +109,52 @@
     color: #c89b3c;
     font-weight: 700;
 }
+/* Development Tools Section */
+.dev-tools {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dev-tools h2 {
+    margin-top: 0;
+    color: #856404;
+}
+
+.warning-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.warning-text {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    max-width: 300px;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}

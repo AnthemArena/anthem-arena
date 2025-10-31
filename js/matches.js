@@ -104,7 +104,7 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             
             allMatches.push({
                 id: match.matchId,
-                tournament: 'all-music-2025',
+                tournament: 'Anthems Arena Championship', // ✅ Updated tournament name
                 round: roundName, // ✅ Use correct round name
                 status: match.status || 'upcoming',
                 date: match.date || '2025-11-01',
@@ -524,12 +524,8 @@ function getFooterContent(match) {
 // Format helpers
 function formatTournamentName(tournament) {
     const names = {
-        'all-music-2025': 'All Music Championship 2025',
-        'worlds-anthems-2025': 'Worlds Anthems 2025',
-        'all-music-summer-2025': 'All Music Summer 2025',
-        'virtual-groups-spring-2025': 'Virtual Groups Spring 2025',
-        'cinematics-winter-2024': 'Cinematics Winter 2024',
-        'all-music-fall-2024': 'All Music Fall 2024'
+        'anthem-arena-championship': 'Anthem Arena Championship S1',
+   
     };
     return names[tournament] || tournament;
 }
