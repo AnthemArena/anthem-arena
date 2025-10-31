@@ -13,7 +13,7 @@ import { collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7
 
 const TOURNAMENT_CONFIG = {
     id: '2025-worlds-anthems',           // ← Change for Tournament 2
-    name: 'Worlds Anthems Championship 2025',
+    name: 'Anthem Area: Season 1',
     startDate: '2025-11-01',
     endDate: '2025-12-31',
     status: 'active',
