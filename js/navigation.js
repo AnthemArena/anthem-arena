@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="/my-votes.html">My Votes</a></li>
                 <li><a href="/brackets.html">Brackets</a></li>
                 <li><a href="/music-gallery.html">Music Gallery</a></li>
-                <li><a href="/matches.html">Archive</a></li>
+                <li><a href="/matches.html">Matches</a></li>
                 <li><a href="/about.html">About</a></li>
             </ul>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">

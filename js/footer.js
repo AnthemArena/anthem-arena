@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><a href="/index.html">Home</a></li>
                     <li><a href="/brackets.html">Brackets</a></li>
                     <li><a href="/music-gallery.html">Music Gallery</a></li>
-                    <li><a href="/matches.html">Match Archive</a></li>
+                    <li><a href="/matches.html">Matches</a></li>
                     <li><a href="/about.html">About</a></li>
                     <li><a href="https://amzn.to/4ozvEDP" target="_blank" rel="noopener noreferrer nofollow">Ambessa: Chosen of the Wolf</a></li>
                 </ul>
