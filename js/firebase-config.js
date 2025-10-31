@@ -9,13 +9,13 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase
 
 // Your Firebase configuration (copied from Firebase Console)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyAZQSdl61UVgKwDz6QlCf-a4hB_QVDvQqc",
+  authDomain: "league-music-tournament.firebaseapp.com",
+  projectId: "league-music-tournament",
+  storageBucket: "league-music-tournament.firebasestorage.app",
+  messagingSenderId: "234217265735",
+  appId: "1:234217265735:web:0be63d3829a251df57af62",
+  measurementId: "G-73LGE8D3QQ"
 };
 
 // Initialize Firebase
