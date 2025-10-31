@@ -3,6 +3,8 @@
 // ========================================
 
 import { db, auth } from './firebase-config.js';
+import { initializeCompleteTournament } from './init-firebase.js';
+
 import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -377,4 +379,63 @@ window.clearAllVotesForTesting = async function() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
     // Auth state listener will handle the rest
+});
+
+// Add these event listeners with your other code
+document.getElementById('initTournamentBtn').addEventListener('click', async () => {
+    if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
+        return;
+    }
+    
+    try {
+        await initializeCompleteTournament();
+        alert('✅ Tournament initialized! Refresh to see matches.');
+        location.reload();
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+        console.error(error);
+    }
+});
+
+document.getElementById('resetTournamentBtn').addEventListener('click', async () => {
+    if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
+        return;
+    }
+    
+    if (!confirm('Are you ABSOLUTELY SURE? Type OK in next prompt.')) {
+        return;
+    }
+    
+    const confirm2 = prompt('Type OK to confirm:');
+    if (confirm2 !== 'OK') {
+        alert('Cancelled');
+        return;
+    }
+    
+    try {
+        // Delete all matches
+        const matchesRef = collection(db, 'tournaments/2025-worlds-anthems/matches');
+        const snapshot = await getDocs(matchesRef);
+        
+        let deleteCount = 0;
+        for (const docSnap of snapshot.docs) {
+            await deleteDoc(docSnap.ref);
+            deleteCount++;
+            if (deleteCount % 10 === 0) {
+                console.log(`Deleted ${deleteCount}/${snapshot.size} matches...`);
+            }
+        }
+        
+        alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
+        
+        // Regenerate
+        await initializeCompleteTournament();
+        
+        alert('✅ Tournament reset complete! Refresh page.');
+        location.reload();
+        
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+        console.error(error);
+    }
 });
