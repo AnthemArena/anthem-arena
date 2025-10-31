@@ -6,6 +6,7 @@
 // Import Firebase (using CDN - no npm needed)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';  // ← ADD THIS LINE
 
 // Your Firebase configuration (copied from Firebase Console)
 const firebaseConfig = {
@@ -21,9 +22,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-export const auth = getAuth(app);  // ← ADD THIS LINE
+const auth = getAuth(app);
 
 console.log('✅ Firebase connected!');
 
 // Make available to other files
-export { db };
+export { db, auth };
