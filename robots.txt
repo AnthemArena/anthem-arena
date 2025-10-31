@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Block admin and setup pages
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /init-tournament
+Disallow: /init-tournament.html
+
+# Block user-specific and empty pages
+Disallow: /vote
+Disallow: /vote.html
+Disallow: /my-votes
+Disallow: /my-votes.html
+
+# Sitemap location
+Sitemap: https://anthemarena.com/sitemap.xml
