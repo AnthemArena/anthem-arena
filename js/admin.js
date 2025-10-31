@@ -2,13 +2,67 @@
 // ADMIN PANEL - TOURNAMENT MANAGEMENT
 // ========================================
 
-import { db } from './firebase-config.js';
+import { db, auth } from './firebase-config.js';
 import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
 // ========================================
 // TOURNAMENT CONFIG
 // ========================================
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+
+// ========================================
+// AUTHENTICATION
+// ========================================
+
+// Check authentication state on page load
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is logged in
+        console.log('✅ Authenticated as:', user.email);
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        loadMatches();
+    } else {
+        // User is not logged in
+        console.log('❌ Not authenticated');
+        document.getElementById('login-container').style.display = 'flex';
+        document.getElementById('admin-content').style.display = 'none';
+    }
+});
+
+// Login function
+window.loginAdmin = async function(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('admin-email').value;
+    const password = document.getElementById('admin-password').value;
+    const errorDiv = document.getElementById('login-error');
+    
+    errorDiv.textContent = '';
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        console.log('✅ Login successful');
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        errorDiv.textContent = `Error: ${error.message}`;
+    }
+};
+
+// Logout function
+window.logoutAdmin = async function() {
+    if (!confirm('Logout from admin panel?')) return;
+    
+    try {
+        await signOut(auth);
+        console.log('✅ Logged out');
+    } catch (error) {
+        console.error('❌ Logout error:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
 
 // ========================================
 // OPEN A ROUND
@@ -321,6 +375,6 @@ window.clearAllVotesForTesting = async function() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🏆 Admin Panel Loaded');
-    loadMatches();
+    console.log('🏆 Admin Panel Initializing...');
+    // Auth state listener will handle the rest
 });
