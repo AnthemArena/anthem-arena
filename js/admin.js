@@ -177,8 +177,12 @@ window.openMatch = async function(matchId) {
 // CLOSE INDIVIDUAL MATCH
 // ========================================
 
+// ========================================
+// CLOSE INDIVIDUAL MATCH (with auto-advance)
+// ========================================
+
 window.closeMatch = async function(matchId) {
-    if (!confirm(`Close match ${matchId}?\n\nThis will mark it as completed and determine the winner.`)) return;
+    if (!confirm(`Close match ${matchId}?\n\nThis will determine the winner and advance them to the next round.`)) return;
     
     try {
         const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId);
@@ -191,25 +195,82 @@ window.closeMatch = async function(matchId) {
         
         const match = matchSnap.data();
         const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
+        const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
         
+        // Close the match
         await updateDoc(matchRef, {
             status: 'completed',
             winnerId: winnerId
         });
         
         console.log(`✅ Closed match: ${matchId}, Winner: ${winnerId}`);
-        alert(`✅ Match ${matchId} closed!\n\nWinner: ${match.song1.votes > match.song2.votes ? match.song1.shortTitle : match.song2.shortTitle}`);
+        
+        // ✅ Auto-advance winner to next round
+        await advanceWinnerToNextRound(match, winnerData);
+        
+        alert(`✅ Match ${matchId} closed!\n\nWinner: ${winnerData.shortTitle}\n✨ Advanced to next round!`);
         
         loadMatches();
         
     } catch (error) {
         console.error('❌ Error closing match:', error);
-        alert(`Error: ${error.message}`);
+        alert(`❌ Error: ${error.message}`);
     }
 };
 
 // ========================================
-// ADVANCE WINNERS TO NEXT ROUND
+// AUTO-ADVANCE WINNER USING sourceMatch
+// ========================================
+
+async function advanceWinnerToNextRound(completedMatch, winner) {
+    const nextRound = completedMatch.round + 1;
+    
+    console.log(`📈 Checking if ${completedMatch.matchId} winner advances to Round ${nextRound}...`);
+    
+    // Find next-round matches that reference this match
+    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+    const q = query(matchesRef, where('round', '==', nextRound));
+    const snapshot = await getDocs(q);
+    
+    let advanced = false;
+    
+    for (const nextMatchDoc of snapshot.docs) {
+        const nextMatch = nextMatchDoc.data();
+        
+        // Check if song1 should come from this match
+        if (nextMatch.song1?.sourceMatch === completedMatch.matchId) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
+                'song1': {
+                    ...winner,
+                    votes: 0,
+                    sourceMatch: completedMatch.matchId  // Keep the sourceMatch reference
+                }
+            });
+            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song1 slot)`);
+            advanced = true;
+        }
+        
+        // Check if song2 should come from this match
+        if (nextMatch.song2?.sourceMatch === completedMatch.matchId) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
+                'song2': {
+                    ...winner,
+                    votes: 0,
+                    sourceMatch: completedMatch.matchId  // Keep the sourceMatch reference
+                }
+            });
+            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song2 slot)`);
+            advanced = true;
+        }
+    }
+    
+    if (!advanced) {
+        console.log(`ℹ️ No next round found for ${completedMatch.matchId} (might be tournament winner!)`);
+    }
+}
+
+// ========================================
+// ADVANCE WINNERS TO NEXT ROUND (Bulk - for "Close Round" button)
 // ========================================
 
 async function advanceWinners(completedRound, winners) {
@@ -233,7 +294,8 @@ async function advanceWinners(completedRound, winners) {
             if (winner1) {
                 updates.song1 = {
                     ...winner1.winner,
-                    votes: 0
+                    votes: 0,
+                    sourceMatch: song1Source  // Keep the sourceMatch reference
                 };
             }
         }
@@ -243,7 +305,8 @@ async function advanceWinners(completedRound, winners) {
             if (winner2) {
                 updates.song2 = {
                     ...winner2.winner,
-                    votes: 0
+                    votes: 0,
+                    sourceMatch: song2Source  // Keep the sourceMatch reference
                 };
             }
         }
@@ -267,7 +330,7 @@ async function loadMatches() {
     const tbody = document.getElementById('matches-table');
     if (!tbody) return;
     
-    tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
     
     try {
         const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
@@ -284,6 +347,16 @@ async function loadMatches() {
         tbody.innerHTML = '';
         
         for (const match of matches) {
+            // Format date
+            const dateStr = match.date 
+                ? new Date(match.date).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                : 'Not scheduled';
+            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>R${match.round} M${match.matchNumber}</td>
@@ -291,6 +364,7 @@ async function loadMatches() {
                 <td>${match.song1.votes || 0}</td>
                 <td>${match.song2.shortTitle || match.song2.title}</td>
                 <td>${match.song2.votes || 0}</td>
+                <td>${dateStr}</td>
                 <td>
                     <span class="status-badge ${match.status}">
                         ${match.status}
@@ -311,7 +385,7 @@ async function loadMatches() {
         
     } catch (error) {
         console.error('❌ Error loading matches:', error);
-        tbody.innerHTML = `<tr><td colspan="7" style="color: #dc3232;">Error: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="color: #dc3232;">Error: ${error.message}</td></tr>`;
     }
 }
 
@@ -373,69 +447,153 @@ window.clearAllVotesForTesting = async function() {
 };
 
 // ========================================
-// PAGE LOAD
+// SCHEDULE MATCH DATES
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
-    // Auth state listener will handle the rest
-});
+    
+    // Initialize Tournament Button
+    document.getElementById('initTournamentBtn').addEventListener('click', async () => {
+        if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
+            return;
+        }
+        
+        try {
+            await initializeCompleteTournament();
+            alert('✅ Tournament initialized! Refresh to see matches.');
+            location.reload();
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+            console.error(error);
+        }
+    });
 
-// Add these event listeners with your other code
-document.getElementById('initTournamentBtn').addEventListener('click', async () => {
-    if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
+document.getElementById('scheduleDatesBtn').addEventListener('click', async () => {
+    if (!confirm('Schedule dates for all matches?\n\nThis will set matches 48 hours apart and clear TBD match dates.')) {
         return;
     }
     
     try {
-        await initializeCompleteTournament();
-        alert('✅ Tournament initialized! Refresh to see matches.');
-        location.reload();
-    } catch (error) {
-        alert('❌ Error: ' + error.message);
-        console.error(error);
-    }
-});
-
-document.getElementById('resetTournamentBtn').addEventListener('click', async () => {
-    if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
-        return;
-    }
-    
-    if (!confirm('Are you ABSOLUTELY SURE? Type OK in next prompt.')) {
-        return;
-    }
-    
-    const confirm2 = prompt('Type OK to confirm:');
-    if (confirm2 !== 'OK') {
-        alert('Cancelled');
-        return;
-    }
-    
-    try {
-        // Delete all matches
-        const matchesRef = collection(db, 'tournaments/2025-worlds-anthems/matches');
+        console.log('📅 Scheduling match dates (48 hour spacing)...');
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
         
-        let deleteCount = 0;
-        for (const docSnap of snapshot.docs) {
-            await deleteDoc(docSnap.ref);
-            deleteCount++;
-            if (deleteCount % 10 === 0) {
-                console.log(`Deleted ${deleteCount}/${snapshot.size} matches...`);
+        // Convert to array and sort
+        const matches = [];
+        snapshot.forEach(doc => {
+            matches.push({
+                id: doc.id,
+                data: doc.data()
+            });
+        });
+        
+        // Sort by round, then match number
+        matches.sort((a, b) => {
+            if (a.data.round !== b.data.round) {
+                return a.data.round - b.data.round;
+            }
+            return a.data.matchNumber - b.data.matchNumber;
+        });
+        
+        console.log(`📋 Sorted ${matches.length} matches`);
+        
+        let currentDate = new Date('2025-11-05T19:00:00Z');
+        let updateCount = 0;
+        let clearedCount = 0;
+        
+        for (const matchObj of matches) {
+            const match = matchObj.data;
+            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchObj.id);
+            
+            // Check if TBD
+            const isTBD = match.song1?.id === 'TBD' || 
+                         match.song2?.id === 'TBD' ||
+                         !match.song1?.id || 
+                         !match.song2?.id;
+            
+            if (isTBD) {
+                // ✅ CLEAR THE DATE from TBD matches
+                await updateDoc(matchRef, {
+                    date: null
+                });
+                console.log(`⏭️ Cleared date from TBD match: ${match.matchId}`);
+                clearedCount++;
+                continue;
+            }
+            
+            // ✅ SCHEDULE non-TBD matches
+            await updateDoc(matchRef, {
+                date: currentDate.toISOString()
+            });
+            
+            console.log(`  ${match.matchId} (R${match.round} M${match.matchNumber}): ${currentDate.toLocaleDateString()}`);
+            
+            // Add 48 hours for next match
+            currentDate.setHours(currentDate.getHours() + 48);
+            updateCount++;
+            
+            if (updateCount % 10 === 0) {
+                console.log(`📅 Scheduled ${updateCount} matches...`);
             }
         }
         
-        alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
+        console.log(`✅ Scheduled ${updateCount} matches`);
+        console.log(`✅ Cleared ${clearedCount} TBD matches`);
+        alert(`✅ Successfully scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n48 hours between each match.`);
         
-        // Regenerate
-        await initializeCompleteTournament();
-        
-        alert('✅ Tournament reset complete! Refresh page.');
-        location.reload();
+        loadMatches();
         
     } catch (error) {
-        alert('❌ Error: ' + error.message);
-        console.error(error);
+        console.error('❌ Error scheduling dates:', error);
+        alert(`❌ Error: ${error.message}`);
     }
+});
+
+
+
+    // Reset Tournament Button
+    document.getElementById('resetTournamentBtn').addEventListener('click', async () => {
+        if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
+            return;
+        }
+        
+        if (!confirm('Are you ABSOLUTELY SURE? Type OK in next prompt.')) {
+            return;
+        }
+        
+        const confirm2 = prompt('Type OK to confirm:');
+        if (confirm2 !== 'OK') {
+            alert('Cancelled');
+            return;
+        }
+        
+        try {
+            // Delete all matches
+            const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+            const snapshot = await getDocs(matchesRef);
+            
+            let deleteCount = 0;
+            for (const docSnap of snapshot.docs) {
+                await deleteDoc(docSnap.ref);
+                deleteCount++;
+                if (deleteCount % 10 === 0) {
+                    console.log(`Deleted ${deleteCount}/${snapshot.size} matches...`);
+                }
+            }
+            
+            alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
+            
+            // Regenerate
+            await initializeCompleteTournament();
+            
+            alert('✅ Tournament reset complete! Refresh page.');
+            location.reload();
+            
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+            console.error(error);
+        }
+    });
 });

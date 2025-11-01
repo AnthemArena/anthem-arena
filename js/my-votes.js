@@ -112,7 +112,7 @@ async function loadVoteHistory() {
             const voteData = voteDoc.data();
             
             // Get match details
-const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, voteData.matchId);
+            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, voteData.matchId);
             const matchDoc = await getDoc(matchRef);
             
             if (!matchDoc.exists()) {
@@ -146,6 +146,9 @@ const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, voteData.ma
             const isCompleted = matchData.status === 'completed';
             const status = isCompleted ? 'completed' : 'live';
             
+            // Get the song data for the one they voted for
+            const votedSong = votedForSong === 'song1' ? matchData.song1 : matchData.song2;
+            
             return {
                 id: voteDoc.id,
                 matchId: voteData.matchId,
@@ -154,6 +157,7 @@ const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, voteData.ma
                 round: voteData.round || 1,
                 votedForSeed: voteData.votedForSeed,
                 votedForName: voteData.votedForName,
+                votedForVideoId: votedSong.videoId, // ✨ NEW: Store video ID
                 match: matchData,
                 voteType: voteType,
                 votedSongPercentage: votedSongPercentage,
@@ -214,6 +218,9 @@ function updateStats() {
     const artistPreferences = getArtistPreferences();
     const favoriteArtist = artistPreferences[0];
     
+    // ✨ NEW: Get song preferences
+    const favoriteSongs = getSongPreferences();
+    
     // Update DOM
     document.getElementById('totalVotes').textContent = totalVotes;
     document.getElementById('underdogPicks').textContent = underdogPicks;
@@ -232,6 +239,9 @@ function updateStats() {
     // Show achievement badge
     showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstreamPicks, votingStreak, favoriteArtist);
     
+    // ✨ NEW: Display favorite songs
+    displayFavoriteSongs(favoriteSongs);
+    
     console.log('📊 Stats:', { 
         totalVotes, 
         underdogPicks,
@@ -240,7 +250,8 @@ function updateStats() {
         majorityAlignment, 
         votingStreak,
         tasteProfile,
-        favoriteArtist
+        favoriteArtist,
+        favoriteSongs
     });
 }
 
@@ -302,6 +313,102 @@ function getArtistPreferences() {
     return Object.entries(artistCounts)
         .sort((a, b) => b[1] - a[1])
         .map(([artist, count]) => ({ artist, count }));
+}
+
+// ========================================
+// ✨ NEW: GET SONG PREFERENCES
+// ========================================
+
+function getSongPreferences() {
+    const songCounts = {};
+    
+    allVotes.forEach(vote => {
+        const songName = vote.votedForName;
+        const songSeed = vote.votedForSeed;
+        const videoId = vote.votedForVideoId;
+        
+        if (!songCounts[songName]) {
+            songCounts[songName] = {
+                name: songName,
+                seed: songSeed,
+                videoId: videoId,
+                count: 0,
+                matches: []
+            };
+        }
+        
+        songCounts[songName].count++;
+        songCounts[songName].matches.push({
+            matchId: vote.matchId,
+            round: vote.round,
+            timestamp: vote.timestamp
+        });
+    });
+    
+    // Sort by count, then by seed
+    return Object.values(songCounts)
+        .sort((a, b) => {
+            if (b.count !== a.count) {
+                return b.count - a.count; // Most votes first
+            }
+            return a.seed - b.seed; // Then by seed
+        })
+        .slice(0, 5);  // Top 5
+}
+
+// ========================================
+// ✨ NEW: DISPLAY FAVORITE SONGS
+// ========================================
+
+function displayFavoriteSongs(songs) {
+    const container = document.getElementById('favoriteSongsSection');
+    
+    if (!container) {
+        console.warn('⚠️ Favorite songs container not found');
+        return;
+    }
+    
+    if (songs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    // Medal emojis for top 3
+    const medals = ['🥇', '🥈', '🥉'];
+    
+    container.innerHTML = `
+        <div class="favorite-songs-header">
+            <h3 class="favorite-songs-title">🎵 Your Most Voted Songs</h3>
+            <p class="favorite-songs-subtitle">Songs you've supported the most across all matches</p>
+        </div>
+        <div class="favorite-songs-list">
+            ${songs.map((song, index) => `
+                <div class="favorite-song-item">
+                    <div class="song-rank">
+                        ${index < 3 ? medals[index] : `<span class="rank-number">${index + 1}</span>`}
+                    </div>
+                    <img 
+                        src="https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg" 
+                        alt="${song.name}"
+                        class="song-thumbnail"
+                        loading="lazy">
+                    <div class="song-info">
+                        <div class="song-name">${song.name}</div>
+                        <div class="song-meta">
+                            <span class="song-seed">Seed #${song.seed}</span>
+                            <span class="song-separator">•</span>
+                            <span class="song-votes">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
+                        </div>
+                    </div>
+                    <div class="song-badge ${song.count >= 3 ? 'superfan' : song.count >= 2 ? 'fan' : 'supporter'}">
+                        ${song.count >= 3 ? '⭐ Superfan' : song.count >= 2 ? '💙 Fan' : '✓ Supporter'}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    container.style.display = 'block';
 }
 
 // ========================================
@@ -615,6 +722,10 @@ function shareStats() {
     const artistPreferences = getArtistPreferences();
     const favoriteArtist = artistPreferences[0];
     
+    // ✨ NEW: Include favorite song
+    const favoriteSongs = getSongPreferences();
+    const favoriteSong = favoriteSongs[0];
+    
     // Generate share text
     let shareText = `🎵 My League Music Tournament Profile:\n\n` +
         `🗳️ ${totalVotes} votes cast\n` +
@@ -624,8 +735,12 @@ function shareStats() {
         shareText += `🎭 ${underdogPicks} underdog picks\n`;
     }
     
+    if (favoriteSong) {
+        shareText += `🎵 Most voted: ${favoriteSong.name} (${favoriteSong.count}x)\n`;
+    }
+    
     if (favoriteArtist) {
-        shareText += `🎸 Favorite: ${favoriteArtist.artist}\n`;
+        shareText += `🎸 Favorite artist: ${favoriteArtist.artist}\n`;
     }
     
     shareText += `\nVote for your favorite League music videos!`;

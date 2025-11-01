@@ -38,12 +38,28 @@
             <header class="admin-header">
                 <div>
                     <h1>🏆 Tournament Admin Panel</h1>
-                    <p>All Music Championship 2025</p>
+                    <p>Anthem Arena Championship 2025</p>
                 </div>
                 <button onclick="logoutAdmin()" class="btn-logout">
                     Logout
                 </button>
             </header>
+
+            <!-- Tournament Setup Section -->
+            <section class="tournament-init">
+                <h2>🚀 Tournament Setup</h2>
+                <div class="button-group">
+                    <button id="initTournamentBtn" class="btn btn-primary">
+                        Initialize New Tournament (63 Matches)
+                    </button>
+                    <button id="scheduleDatesBtn" class="btn btn-info">
+                        📅 Schedule Match Dates
+                    </button>
+                    <button id="resetTournamentBtn" class="btn btn-danger">
+                        🔄 Reset & Regenerate All Matches
+                    </button>
+                </div>
+            </section>
 
             <!-- Development Tools Section -->
             <section class="dev-tools">
@@ -58,31 +74,22 @@
                 </div>
             </section>
 
-            
             <!-- Round Controls -->
             <section class="round-controls">
-                <h2>Round Control</h2>
+                <h2>Round Management</h2>
                 <div class="button-group">
                     <button onclick="openRound(1)" class="btn-primary">Open Round 1</button>
                     <button onclick="closeRound(1)" class="btn-danger">Close Round 1</button>
                     <button onclick="openRound(2)" class="btn-primary">Open Round 2</button>
+                    <button onclick="closeRound(2)" class="btn-danger">Close Round 2</button>
+                    <button onclick="openRound(3)" class="btn-primary">Open Round 3</button>
+                    <button onclick="closeRound(3)" class="btn-danger">Close Round 3</button>
                 </div>
             </section>
 
-            <!-- Add this section after your Round Management section -->
-<section class="tournament-init">
-    <h2>🚀 Tournament Setup</h2>
-    <button id="initTournamentBtn" class="btn btn-primary">
-        Initialize New Tournament (63 Matches)
-    </button>
-    <button id="resetTournamentBtn" class="btn btn-danger">
-        🔄 Reset & Regenerate All Matches
-    </button>
-</section>
-
             <!-- Match Management -->
             <section class="match-management">
-                <h2>Round 1 Matches</h2>
+                <h2>All Matches</h2>
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -91,6 +98,7 @@
                             <th>Votes</th>
                             <th>Song 2</th>
                             <th>Votes</th>
+                            <th>Scheduled Date</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
