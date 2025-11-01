@@ -1,2 +1,2 @@
 [build.environment]
-  NETLIFY_SKIP_SECRET_SCANNING = "true"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"

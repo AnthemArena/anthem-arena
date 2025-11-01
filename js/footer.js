@@ -17,12 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="footer-column">
                 <h4 class="footer-heading">Navigate</h4>
                 <ul class="footer-links">
-                    <li><a href="/index.html">Home</a></li>
-                    <li><a href="/brackets.html">Brackets</a></li>
-                    <li><a href="/music-gallery.html">Music Gallery</a></li>
-                    <li><a href="/matches.html">Matches</a></li>
-                    <li><a href="/stats.html">Stats</a></li>
-                    <li><a href="/about.html">About</a></li>
+                <li><a href="/">Home</a></li>
+<li><a href="/brackets">Brackets</a></li>
+<li><a href="/music-gallery">Music Gallery</a></li>
+<li><a href="/matches">Matches</a></li>
+<li><a href="/stats">Stats</a></li>
+<li><a href="/about">About</a></li>
                     <li><a href="https://amzn.to/4ozvEDP" target="_blank" rel="noopener noreferrer nofollow">Ambessa: Chosen of the Wolf</a></li>
                 </ul>
             </div>
