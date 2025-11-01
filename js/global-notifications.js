@@ -110,6 +110,7 @@ async function enableGlobalNotifications() {
 function updateGlobalNotificationButton(state) {
     const button = document.getElementById('enable-notifications');
     const statusText = button?.querySelector('.notification-status');
+    const hintText = document.querySelector('.notification-hint');
     
     if (!button || !statusText) return;
     
@@ -117,27 +118,39 @@ function updateGlobalNotificationButton(state) {
         button.classList.add('notifications-enabled');
         button.classList.remove('notifications-disabled');
         button.disabled = false;
+        button.style.cursor = 'pointer';
         statusText.innerHTML = `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            Notifications On
+            Notifications Enabled
         `;
         button.title = 'Click to disable notifications';
+        
+        // ✅ Update hint text for enabled state
+        if (hintText) {
+            hintText.textContent = 'Click button to turn off notifications';
+        }
+        
     } else if (state === 'disabled') {
         button.classList.remove('notifications-enabled');
         button.classList.add('notifications-disabled');
         button.disabled = false;
+        button.style.cursor = 'pointer';
         statusText.innerHTML = `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                <line x1="1" y1="1" x2="23" y2="23"></line>
             </svg>
             Enable Notifications
         `;
         button.title = 'Click to enable notifications';
+        
+        // ✅ Update hint text for disabled state
+        if (hintText) {
+            hintText.textContent = 'Receive alerts for all upcoming matches';
+        }
     }
 }
 
