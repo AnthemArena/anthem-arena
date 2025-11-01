@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     hideChampionsSection();
     initializeScrollAnimations();
-        checkNotificationStatus(); // ← ADD THIS LINE
 
 });
 
@@ -849,96 +848,8 @@ function playVideo(momentId) {
 // Make function globally available
 window.playVideo = playVideo;
 
-// ========================================
-// BROWSER NOTIFICATIONS
-// ========================================
 
-async function enableNotifications() {
-    const button = document.getElementById('enable-notifications');
-    const statusText = button.querySelector('.notification-status');
-    
-    // Check if browser supports notifications
-    if (!("Notification" in window)) {
-        showNotification('Your browser doesn\'t support notifications', 'error');
-        return;
-    }
-    
-    // Check current permission
-    if (Notification.permission === "granted") {
-        showNotification('Notifications are already enabled!', 'info');
-        updateNotificationButton('enabled');
-        return;
-    }
-    
-    if (Notification.permission === "denied") {
-        showNotification('Notifications are blocked. Please enable them in browser settings.', 'error');
-        return;
-    }
-    
-    // Request permission
-    button.disabled = true;
-    statusText.textContent = 'Requesting permission...';
-    
-    try {
-        const permission = await Notification.requestPermission();
-        
-        if (permission === "granted") {
-            // Success!
-            new Notification("🎉 Notifications Enabled!", {
-                body: "You'll be notified when new matches go live",
-                icon: "/favicon/favicon-32x32.png",
-                badge: "/favicon/favicon-32x32.png"
-            });
-            
-            // Save preference
-            localStorage.setItem('notificationsEnabled', 'true');
-            localStorage.setItem('notificationsEnabledDate', new Date().toISOString());
-            
-            showNotification('Notifications enabled successfully!', 'success');
-            updateNotificationButton('enabled');
-            
-            console.log('✅ Notifications enabled');
-            
-        } else {
-            showNotification('Notification permission denied', 'error');
-            button.disabled = false;
-            statusText.textContent = 'Enable Notifications';
-        }
-        
-    } catch (error) {
-        console.error('Error requesting notification permission:', error);
-        showNotification('Error enabling notifications', 'error');
-        button.disabled = false;
-        statusText.textContent = 'Enable Notifications';
-    }
-}
 
-function updateNotificationButton(state) {
-    const button = document.getElementById('enable-notifications');
-    const statusText = button.querySelector('.notification-status');
-    
-    if (state === 'enabled') {
-        button.classList.add('notifications-enabled');
-        button.disabled = true;
-        statusText.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            Notifications Enabled
-        `;
-    }
-}
-
-// Check notification status on page load
-function checkNotificationStatus() {
-    if (Notification.permission === "granted") {
-        updateNotificationButton('enabled');
-    }
-}
-
-// Make functions globally available
-window.enableNotifications = enableNotifications;
 
 // ========================================
 // NOTIFICATION HELPER
