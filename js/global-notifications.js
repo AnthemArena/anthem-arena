@@ -1,3 +1,8 @@
+console.log('🔔 global-notifications.js loaded');
+window.testNotifications = function() {
+    alert('Notifications script is working!');
+};
+
 // ========================================
 // GLOBAL NOTIFICATION SYSTEM
 // Notifies users when ANY match goes live
