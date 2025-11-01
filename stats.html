@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Stats | Anthem Arena</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/stats.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/navigation.css">
+
+
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="View comprehensive statistics for the Anthem Arena tournament - vote counts, song rankings, upsets, and more!">
+    <meta property="og:title" content="Tournament Stats | Anthem Arena">
+    <meta property="og:description" content="Comprehensive tournament statistics and rankings">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    
+    <!-- ========================================
+         NAVIGATION
+    ======================================== -->
+<nav class="main-nav">
+    <div class="nav-container">
+        <a href="/index.html" class="logo-link">
+            <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/my-votes.html">My Votes</a></li>
+            <li><a href="/brackets.html">Brackets</a></li>
+            <li><a href="/music-gallery.html">Music Gallery</a></li>
+            <li><a href="/matches.html">Matches</a></li>
+            <li><a href="/stats.html" class="active">Stats</a></li>
+            <li><a href="/about.html">About</a></li>
+        </ul>
+        <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span class="hamburger"></span>
+        </button>
+    </div>
+</nav>
+    
+    <!-- ========================================
+         HERO SECTION
+    ======================================== -->
+    <header class="page-hero stats-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">📊 Tournament Statistics</h1>
+            <p class="hero-subtitle">
+                Comprehensive stats, rankings, and records from the tournament
+            </p>
+        </div>
+    </header>
+    
+    <!-- ========================================
+         MAIN CONTENT
+    ======================================== -->
+    <main class="stats-page">
+        
+        <!-- Tab Navigation -->
+        <div class="stats-tabs">
+            <div class="container">
+                <div class="tabs-wrapper">
+                    <button class="tab-btn active" data-tab="overview">
+                        <span class="tab-icon">📊</span>
+                        <span class="tab-label">Overview</span>
+                    </button>
+                    <button class="tab-btn" data-tab="rankings">
+                        <span class="tab-icon">🏆</span>
+                        <span class="tab-label">Rankings</span>
+                    </button>
+                    <button class="tab-btn" data-tab="upsets">
+                        <span class="tab-icon">🎭</span>
+                        <span class="tab-label">Upsets</span>
+                    </button>
+                    <button class="tab-btn" data-tab="participation">
+                        <span class="tab-icon">👥</span>
+                        <span class="tab-label">Participation</span>
+                    </button>
+                    <button class="tab-btn" data-tab="seeds">
+                        <span class="tab-icon">🌱</span>
+                        <span class="tab-label">Seed Performance</span>
+                    </button>
+                    <button class="tab-btn" data-tab="records">
+                        <span class="tab-icon">📜</span>
+                        <span class="tab-label">Records</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="stats-content">
+            
+            <!-- ========================================
+                 OVERVIEW TAB
+            ======================================== -->
+            <div id="overview" class="tab-pane active">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">Tournament Overview</h2>
+                        <div id="overview-stats">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 RANKINGS TAB
+            ======================================== -->
+            <div id="rankings" class="tab-pane">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">All-Time Song Rankings</h2>
+                        <p class="section-description">
+                            Songs ranked by total votes, win rate, and YouTube performance
+                        </p>
+                        <div id="song-rankings">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 UPSETS TAB
+            ======================================== -->
+            <div id="upsets" class="tab-pane">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">🎭 Tournament Upsets</h2>
+                        <p class="section-description">
+                            Lower seeds that defeated higher seeds
+                        </p>
+                        <div id="upsets-list">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 PARTICIPATION TAB
+            ======================================== -->
+            <div id="participation" class="tab-pane">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">👥 Voter Participation</h2>
+                        <p class="section-description">
+                            How and when the community is voting
+                        </p>
+                        <div id="participation-stats">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 SEED PERFORMANCE TAB
+            ======================================== -->
+            <div id="seeds" class="tab-pane">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">🌱 Seed Performance</h2>
+                        <p class="section-description">
+                            How different seed ranges are performing
+                        </p>
+                        <div id="seed-performance">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 RECORDS TAB
+            ======================================== -->
+            <div id="records" class="tab-pane">
+                <div class="container">
+                    <section class="stats-section">
+                        <h2 class="section-title">📜 Tournament Records</h2>
+                        <p class="section-description">
+                            Notable achievements and milestones
+                        </p>
+                        <div id="tournament-records">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+   
+    <!-- ========================================
+         SCRIPTS
+    ======================================== -->
+    <script type="module" src="js/stats-queries.js"></script>
+    <script type="module" src="js/stats.js"></script>
+     <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+    
+</body>
+</html>

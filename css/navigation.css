@@ -1,20 +1,69 @@
-/* Navigation */
+/* ========================================
+   NAVIGATION
+======================================== */
+
 .main-nav {
     background: rgba(0, 0, 0, 0.95);
-    padding: 20px 0;
-    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
     position: sticky;
     top: 0;
     z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .nav-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 1rem 2rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+}
+
+/* ========================================
+   LOGO STYLES
+======================================== */
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.site-logo {
+    height: 65px;
+    width: auto;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.site-logo:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* Alternative logo with text */
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: transform 0.3s;
+}
+
+.nav-logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-icon {
+    font-size: 2rem;
+}
+
+.logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    letter-spacing: 0.1em;
 }
 
 .logo {
@@ -23,19 +72,45 @@
     color: #C8AA6E;
     text-decoration: none;
     letter-spacing: 0.15em;
+    transition: color 0.3s;
 }
+
+.logo:hover {
+    color: #fff;
+}
+
+/* ========================================
+   NAVIGATION LINKS
+======================================== */
 
 .nav-links {
     display: flex;
-    gap: 40px;
     list-style: none;
+    gap: 2rem;
+    align-items: center;
 }
 
 .nav-links a {
-    color: #d0d0d0;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: #999;
     text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #C8AA6E;
+    transition: width 0.3s;
 }
 
 .nav-links a:hover,
@@ -43,14 +118,13 @@
     color: #C8AA6E;
 }
 
-@media (max-width: 968px) {
-    .nav-links {
-        gap: 20px;
-        font-size: 0.9rem;
-    }
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    width: 100%;
 }
+
 /* ========================================
-   MOBILE MENU
+   MOBILE MENU TOGGLE
 ======================================== */
 
 .mobile-menu-toggle {
@@ -94,7 +168,7 @@
     top: 8px;
 }
 
-/* Animated hamburger */
+/* Animated hamburger when active */
 .mobile-menu-toggle.active .hamburger {
     background: transparent;
 }
@@ -109,10 +183,44 @@
     top: 0;
 }
 
-/* Mobile menu styles */
+/* Alternative hamburger using spans */
+.mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background: #C8AA6E;
+    transition: all 0.3s;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 968px) {
+    .nav-container {
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        gap: 1.5rem;
+    }
+    
+    .nav-links a {
+        font-size: 0.85rem;
+    }
+}
+
 @media (max-width: 768px) {
     .mobile-menu-toggle {
         display: block;
+    }
+    
+    .site-logo {
+        height: 50px;
+    }
+    
+    .logo-text {
+        font-size: 1.2rem;
     }
     
     .nav-links {
@@ -121,6 +229,7 @@
         left: 0;
         right: 0;
         background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(10px);
         border-top: 1px solid rgba(200, 170, 110, 0.3);
         border-bottom: 1px solid rgba(200, 170, 110, 0.3);
         flex-direction: column;
@@ -129,7 +238,7 @@
         opacity: 0;
         transform: translateY(-20px);
         pointer-events: none;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
         max-height: 0;
         overflow: hidden;
     }
@@ -157,6 +266,10 @@
         font-size: 1.1rem;
     }
     
+    .nav-links a::after {
+        display: none;
+    }
+    
     .nav-links a:hover,
     .nav-links a.active {
         background: rgba(200, 170, 110, 0.1);
@@ -168,9 +281,21 @@
     }
 }
 
-@media (max-width: 480px) {
-    .logo {
+@media (max-width: 640px) {
+    .nav-container {
+        padding: 0.75rem 1rem;
+    }
+    
+    .site-logo {
+        height: 45px;
+    }
+    
+    .logo-text {
         font-size: 1.1rem;
+    }
+    
+    .logo {
+        font-size: 1.2rem;
     }
     
     .nav-links a {
@@ -178,27 +303,21 @@
         padding: 0.875rem 1.5rem;
     }
 }
-/* Logo Styles */
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
 
-.site-logo {
-    height: 65px;
-    width: auto;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.site-logo:hover {
-    transform: scale(1.05);
-    filter: brightness(1.1);
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0.625rem 0.75rem;
+    }
+    
     .site-logo {
-        height: 50px;
+        height: 40px;
+    }
+    
+    .logo-text {
+        font-size: 1rem;
+    }
+    
+    .logo {
+        font-size: 1.1rem;
     }
 }

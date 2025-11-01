@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="/brackets.html">Brackets</a></li>
                 <li><a href="/music-gallery.html">Music Gallery</a></li>
                 <li><a href="/matches.html">Matches</a></li>
+                <li><a href="/stats.html">Stats</a></li>
                 <li><a href="/about.html">About</a></li>
             </ul>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             (linkPath === '/brackets.html' && currentPath.includes('/brackets')) ||
             (linkPath === '/matches.html' && currentPath.includes('/matches')) ||
             (linkPath === '/music-gallery.html' && currentPath.includes('/music-gallery')) ||
+            (linkPath === '/stats.html' && currentPath.includes('/stats')) ||
             (linkPath === '/index.html' && (currentPath === '/' || currentPath === '/index.html'))) {
             link.classList.add('active');
         }

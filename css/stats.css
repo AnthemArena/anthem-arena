@@ -1,0 +1,1352 @@
+/* ========================================
+   BASE & RESET STYLES
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lora', serif;
+    background: #0a0a0a;
+    color: #fff;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+
+/* ========================================
+   PAGE HERO (HEADER SECTION)
+======================================== */
+
+.page-hero {
+    padding: 6rem 0 4rem;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+/* Stats Hero */
+.stats-hero {
+    padding: 6rem 0 4rem;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-hero::before {
+    content: '📊';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20rem;
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(200, 170, 110, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+}
+
+.hero-subtitle {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    color: #999;
+    line-height: 1.6;
+}
+
+/* ========================================
+   TAB NAVIGATION
+======================================== */
+.stats-tabs {
+    background: #0a0a0a;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.tabs-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200, 170, 110, 0.3) transparent;
+}
+
+.tabs-wrapper::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tabs-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tabs-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(200, 170, 110, 0.3);
+    border-radius: 2px;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: transparent;
+    border: 2px solid rgba(200, 170, 110, 0.2);
+    border-radius: 6px;
+    color: #999;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    border-color: rgba(200, 170, 110, 0.4);
+    color: #C8AA6E;
+}
+
+.tab-btn.active {
+    background: rgba(200, 170, 110, 0.15);
+    border-color: #C8AA6E;
+    color: #C8AA6E;
+}
+
+.tab-icon {
+    font-size: 1.1rem;
+}
+
+/* ========================================
+   TAB CONTENT
+======================================== */
+.stats-content {
+    background: #0a0a0a;
+    min-height: 60vh;
+}
+
+.tab-pane {
+    display: none;
+    padding: 3rem 0 5rem;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stats-section {
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+.section-description {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #777;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+/* ========================================
+   STATS GRID
+======================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card.highlight {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1) 0%, rgba(200, 170, 110, 0.05) 100%);
+    border-color: #C8AA6E;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.stat-sublabel {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* ========================================
+   FEATURED STATS
+======================================== */
+.featured-stat {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.featured-stat-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #C8AA6E;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.featured-stat-content {
+    text-align: center;
+}
+
+.featured-matchup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.featured-matchup .song-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #fff;
+}
+
+.featured-matchup .song-name.winner {
+    color: #C8AA6E;
+}
+
+.featured-matchup .song-name.loser {
+    color: #777;
+}
+
+.featured-matchup .vs {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.featured-votes {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+}
+
+.featured-breakdown {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #777;
+}
+
+/* ========================================
+   RANKINGS TABLE
+======================================== */
+.rankings-controls {
+    margin-bottom: 2rem;
+}
+
+.sort-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sort-btn {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 6px;
+    color: #999;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sort-btn:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+    color: #C8AA6E;
+}
+
+.sort-btn.active {
+    background: rgba(200, 170, 110, 0.15);
+    border-color: #C8AA6E;
+    color: #C8AA6E;
+}
+
+.rankings-table {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rankings-header {
+    display: grid;
+    grid-template-columns: 80px 2fr 1.5fr 120px 180px;
+    gap: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(200, 170, 110, 0.1);
+    border-bottom: 2px solid rgba(200, 170, 110, 0.3);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #C8AA6E;
+    font-weight: 600;
+}
+
+.rankings-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.ranking-row {
+    display: grid;
+    grid-template-columns: 80px 2fr 1.5fr 120px 180px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.15);
+    transition: all 0.3s;
+    align-items: center;
+}
+
+.ranking-row:hover {
+    background: rgba(200, 170, 110, 0.05);
+}
+
+.ranking-row:last-child {
+    border-bottom: none;
+}
+
+.ranking-row.top-tier {
+    background: rgba(200, 170, 110, 0.05);
+}
+
+/* Rank Column */
+.rank-col {
+    text-align: center;
+}
+
+.rank-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: rgba(200, 170, 110, 0.15);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+}
+
+.rank-number.gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+    border-color: #FFD700;
+    color: #FFD700;
+    font-size: 1.4rem;
+}
+
+.rank-number.silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));
+    border-color: #C0C0C0;
+    color: #C0C0C0;
+    font-size: 1.3rem;
+}
+
+.rank-number.bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));
+    border-color: #CD7F32;
+    color: #CD7F32;
+    font-size: 1.2rem;
+}
+
+/* Song Column */
+.song-col {
+    display: flex;
+    align-items: center;
+}
+
+.song-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.song-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+}
+
+.song-details {
+    flex: 1;
+}
+
+.song-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.song-artist {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 0.15rem;
+}
+
+.song-seed {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Stats Column */
+.stats-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.record-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.record {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.win-rate {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.win-rate.excellent {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.win-rate.good {
+    background: rgba(74, 158, 255, 0.2);
+    color: #4a9eff;
+}
+
+.win-rate.poor {
+    background: rgba(150, 150, 150, 0.2);
+    color: #999;
+}
+
+/* Votes Column */
+.votes-col {
+    text-align: center;
+}
+
+.votes-display {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #C8AA6E;
+}
+
+/* YouTube Column */
+.youtube-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.youtube-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.yt-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.yt-icon {
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+.yt-value {
+    color: #999;
+    font-family: 'Lora', serif;
+}
+
+/* ========================================
+   UPSETS
+======================================== */
+.upsets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.upset-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.upset-card:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.upset-card.biggest-upset {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
+}
+
+.upset-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.25rem 1rem;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.upset-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.round-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: #C8AA6E;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.seed-diff {
+    font-size: 0.85rem;
+    color: #FFD700;
+    font-weight: 600;
+}
+
+.upset-matchup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.upset-winner,
+.upset-loser {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.upset-winner {
+    background: rgba(200, 170, 110, 0.15);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+}
+
+.upset-loser {
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0.7;
+}
+
+.seed-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.seed-badge.winner {
+    background: rgba(200, 170, 110, 0.2);
+    border: 2px solid rgba(200, 170, 110, 0.5);
+    color: #C8AA6E;
+}
+
+.seed-badge.loser {
+    background: rgba(100, 100, 100, 0.2);
+    border: 2px solid rgba(100, 100, 100, 0.3);
+    color: #777;
+}
+
+.upset-matchup .song-name {
+    flex: 1;
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    color: #fff;
+}
+
+.upset-vs {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.vote-percent {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.vote-percent.winner {
+    color: #C8AA6E;
+}
+
+.vote-percent.loser {
+    color: #777;
+}
+
+.upset-stats {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+    font-family: 'Lora', serif;
+}
+
+/* ========================================
+   PARTICIPATION CHART
+======================================== */
+.voting-chart {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.chart-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #C8AA6E;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.hour-chart {
+    position: relative;
+}
+
+.hour-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 200px;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+}
+
+.hour-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.hour-bar-wrapper:hover .hour-bar {
+    background: #C8AA6E;
+}
+
+.hour-bar {
+    width: 100%;
+    min-height: 2px;
+    background: rgba(200, 170, 110, 0.5);
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s;
+}
+
+.hour-label {
+    font-size: 0.7rem;
+    color: #666;
+    font-family: 'Lora', serif;
+}
+
+/* ========================================
+   SEED PERFORMANCE
+======================================== */
+.seed-performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.seed-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.seed-card:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.seed-range {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.seed-record {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.seed-winrate {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.seed-winrate.excellent {
+    color: #4CAF50;
+}
+
+.seed-winrate.good {
+    color: #4a9eff;
+}
+
+.seed-winrate.poor {
+    color: #999;
+}
+
+.seed-total {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 1rem;
+}
+
+.seed-bar {
+    height: 6px;
+    background: rgba(200, 170, 110, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.seed-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E, #FFD700);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+/* Seed Insights */
+.seed-insights {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.seed-insights h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #C8AA6E;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.insights-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.insights-list li {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #999;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+    line-height: 1.6;
+}
+
+.insights-list li:last-child {
+    border-bottom: none;
+}
+
+/* ========================================
+   RECORDS
+======================================== */
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.record-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.record-card:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.record-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.record-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.record-value {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+    line-height: 1;
+}
+
+.record-detail {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    color: #777;
+    line-height: 1.5;
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.empty-state p {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #777;
+}
+
+/* ========================================
+   LOADING STATE
+======================================== */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+    min-height: 400px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(200, 170, 110, 0.2);
+    border-top-color: #C8AA6E;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    margin-top: 1.5rem;
+    font-family: 'Lora', serif;
+    color: #777;
+    font-size: 1rem;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 1200px) {
+    .rankings-header,
+    .ranking-row {
+        grid-template-columns: 60px 2fr 1.5fr 100px 150px;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 968px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .tab-btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .tab-icon {
+        font-size: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+}
+.stat-value {
+    font-size: 2rem;
+}
+
+/* Rankings Table - Switch to Cards */
+.rankings-header {
+    display: none;
+}
+
+.rankings-body {
+    gap: 1rem;
+}
+
+.ranking-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.rank-col {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.song-col {
+    width: 100%;
+}
+
+.stats-col,
+.votes-col,
+.youtube-col {
+    width: 100%;
+}
+
+.stats-col,
+.youtube-col {
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.upsets-grid {
+    grid-template-columns: 1fr;
+}
+
+.records-grid {
+    grid-template-columns: 1fr;
+}
+
+.seed-performance-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+}
+@media (max-width: 640px) {
+.stats-hero {
+padding: 4rem 0 3rem;
+}
+.hero-title {
+    font-size: 1.8rem;
+}
+
+.hero-subtitle {
+    font-size: 0.95rem;
+}
+
+.tabs-wrapper {
+    padding: 0.75rem 0;
+}
+
+.tab-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+}
+
+.tab-label {
+    display: none;
+}
+
+.tab-icon {
+    font-size: 1.2rem;
+}
+
+.tab-pane {
+    padding: 2rem 0 3rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+}
+
+.section-description {
+    font-size: 0.95rem;
+}
+
+.stats-grid {
+    grid-template-columns: 1fr;
+}
+
+.featured-stat {
+    padding: 1.5rem;
+}
+
+.featured-matchup {
+    gap: 1rem;
+}
+
+.featured-matchup .song-name {
+    font-size: 1.1rem;
+}
+
+.featured-votes {
+    font-size: 1.5rem;
+}
+
+.sort-buttons {
+    gap: 0.5rem;
+}
+
+.sort-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+}
+
+.song-info {
+    gap: 0.75rem;
+}
+
+.song-thumbnail {
+    width: 50px;
+    height: 50px;
+}
+
+.song-name {
+    font-size: 0.95rem;
+}
+
+.song-artist {
+    font-size: 0.85rem;
+}
+
+.upset-card {
+    padding: 1.25rem;
+}
+
+.upset-matchup {
+    gap: 0.75rem;
+}
+
+.upset-winner,
+.upset-loser {
+    padding: 0.75rem;
+}
+
+.upset-matchup .song-name {
+    font-size: 0.95rem;
+}
+
+.seed-badge {
+    width: 35px;
+    height: 35px;
+    font-size: 0.85rem;
+}
+
+.vote-percent {
+    font-size: 1.1rem;
+}
+
+.voting-chart {
+    padding: 1.5rem;
+}
+
+.hour-bars {
+    height: 150px;
+    gap: 0.15rem;
+}
+
+.hour-label {
+    font-size: 0.6rem;
+}
+
+.seed-performance-grid {
+    grid-template-columns: 1fr;
+}
+
+.seed-card {
+    padding: 1.5rem;
+}
+
+.record-card {
+    padding: 1.5rem;
+}
+
+.record-icon {
+    font-size: 2.5rem;
+}
+
+.record-value {
+    font-size: 2rem;
+}
+
+.insights-list li {
+    font-size: 0.95rem;
+}
+}
+@media (max-width: 480px) {
+.hero-title {
+font-size: 1.5rem;
+}
+.stat-value {
+    font-size: 1.8rem;
+}
+
+.featured-matchup {
+    flex-direction: column;
+    text-align: center;
+}
+
+.featured-matchup .song-name {
+    font-size: 1rem;
+}
+
+.rank-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.rank-number.gold {
+    font-size: 1.2rem;
+}
+
+.rank-number.silver {
+    font-size: 1.1rem;
+}
+}
+/* ========================================
+PRINT STYLES
+======================================== */
+@media print {
+.stats-tabs,
+.main-nav,
+.main-footer,
+.sort-buttons {
+display: none;
+}
+.tab-pane {
+    display: block !important;
+    page-break-after: always;
+}
+
+.stat-card,
+.ranking-row,
+.upset-card,
+.record-card {
+    page-break-inside: avoid;
+}
+}
