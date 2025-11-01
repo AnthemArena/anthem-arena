@@ -44,11 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNoMatches();
     }
     
-    // ✨ Initialize reminder system
-    initializeReminderSystem();
-    
-    // ✨ Check reminders every 30 seconds
-    setInterval(checkReminders, 30000);
+ 
 });
 
 // Load matches from Firebase
@@ -376,7 +372,6 @@ function displayMatches(matches) {
 
     grid.innerHTML = matches.map(match => createMatchCard(match)).join('');
     updateLoadMoreButton(matches);
-        updateReminderButtons();
 
 }// Create match card HTML
 function createMatchCard(match) {
@@ -484,7 +479,6 @@ function getResultBadge(competitor, status) {
     return '';
 }
 
-// Get footer content
 function getFooterContent(match) {
     let statsHtml = '<div class="match-stats">';
     
@@ -499,7 +493,9 @@ function getFooterContent(match) {
             <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
         `;
     } else if (match.status === 'upcoming') {
-        statsHtml += `<span class="stat"><i class="far fa-calendar"></i> Starts ${formatDate(match.date)}</span>`;
+        // Show when match starts instead of remind button
+        const timeUntil = getTimeUntilMatch(match.date);
+        statsHtml += `<span class="stat"><i class="far fa-clock"></i> ${timeUntil}</span>`;
     }
     
     statsHtml += '</div>';
@@ -510,7 +506,7 @@ function getFooterContent(match) {
     } else if (match.status === 'live') {
         buttonHtml = `<button class="vote-now-btn" onclick="voteNow('${match.id}')"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
     } else if (match.status === 'upcoming') {
-        buttonHtml = `<button class="remind-btn"><i class="far fa-bell"></i> Remind Me</button>`;
+        buttonHtml = `<span class="starting-soon-badge"><i class="far fa-clock"></i> Starting Soon</span>`;
     }
 
     return `
@@ -519,6 +515,24 @@ function getFooterContent(match) {
             ${buttonHtml}
         </div>
     `;
+}
+
+// Helper function to show time until match
+function getTimeUntilMatch(dateString) {
+    if (!dateString) return 'Coming Soon';
+    
+    const matchDate = new Date(dateString);
+    const now = new Date();
+    const diff = matchDate - now;
+    
+    if (diff < 0) return 'Starting Soon';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `Starts in ${days}d ${hours}h`;
+    if (hours > 0) return `Starts in ${hours}h`;
+    return 'Starting Soon';
 }
 
 // Format helpers
@@ -626,183 +640,6 @@ function updateLoadMoreButton(matches) {
     }
 }
 
-// ========================================
-// MATCH REMINDER SYSTEM
-// ========================================
-
-/**
- * Initialize reminder system on page load
- */
-function initializeReminderSystem() {
-    // Check reminders when page loads
-    checkReminders();
-    
-    // Add event listeners to all "Remind Me" buttons
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remind-btn') || e.target.closest('.remind-btn')) {
-            const button = e.target.classList.contains('remind-btn') ? e.target : e.target.closest('.remind-btn');
-            const matchCard = button.closest('.match-card');
-            
-            if (matchCard) {
-                const matchId = matchCard.dataset.matchId;
-const matchTitle = matchCard.dataset.matchTitle || 'Match';
-                const matchDate = matchCard.dataset.date;
-                
-                setReminder(matchId, matchTitle, matchDate, button);
-            }
-        }
-    });
-}
-
-/**
- * Set a reminder for a match
- */
-async function setReminder(matchId, matchTitle, matchDate, button) {
-    // Check if browser supports notifications
-    if (!("Notification" in window)) {
-        showNotification('Your browser doesn\'t support notifications', 'error');
-        return;
-    }
-    
-    // Request permission if not already granted
-    if (Notification.permission === "default") {
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") {
-            showNotification('Please enable notifications to set reminders', 'warning');
-            return;
-        }
-    }
-    
-    if (Notification.permission !== "granted") {
-        showNotification('Notifications are blocked. Please enable them in browser settings.', 'error');
-        return;
-    }
-    
-    // Get existing reminders
-    const reminders = JSON.parse(localStorage.getItem('matchReminders') || '[]');
-    
-    // Check if reminder already exists
-    const existingIndex = reminders.findIndex(r => r.matchId === matchId);
-    
-    if (existingIndex !== -1) {
-        // Remove reminder
-        reminders.splice(existingIndex, 1);
-        localStorage.setItem('matchReminders', JSON.stringify(reminders));
-        
-        // Update button
-        button.classList.remove('active');
-        button.innerHTML = '<i class="far fa-bell"></i> Remind Me';
-        
-        showNotification('Reminder removed', 'info');
-    } else {
-        // Add new reminder
-        reminders.push({
-            matchId,
-            matchTitle,
-            matchDate,
-            notified: false,
-            createdAt: new Date().toISOString()
-        });
-        localStorage.setItem('matchReminders', JSON.stringify(reminders));
-        
-        // Update button
-        button.classList.add('active');
-        button.innerHTML = '<i class="fas fa-bell"></i> Reminder Set';
-        
-        showNotification('Reminder set! We\'ll notify you when voting opens.', 'success');
-        
-        // Show immediate test notification (optional)
-        if (reminders.length === 1) {
-            setTimeout(() => {
-                new Notification('League Music Tournament', {
-                    body: 'Reminders are working! You\'ll be notified when matches start.',
-                    icon: '/images/logo.png',
-                    tag: 'test-notification'
-                });
-            }, 1000);
-        }
-    }
-}
-
-/**
- * Check for upcoming matches and send notifications
- */
-function checkReminders() {
-    const reminders = JSON.parse(localStorage.getItem('matchReminders') || '[]');
-    const now = new Date();
-    let updated = false;
-    
-    reminders.forEach(reminder => {
-        if (reminder.notified) return;
-        
-        const matchDate = new Date(reminder.matchDate);
-        const timeDiff = matchDate - now;
-        
-        // Notify if match is starting within next 5 minutes
-        // Or if match has already started (in case they missed it)
-        if (timeDiff < 5 * 60 * 1000 && timeDiff > -60 * 60 * 1000) { // Within 5 min before or 1 hour after
-            // Send notification
-            if (Notification.permission === "granted") {
-                const notification = new Notification('🔴 Match Starting Now!', {
-                    body: `${reminder.matchTitle} - Voting is now open!`,
-                    icon: '/images/logo.png',
-                    badge: '/images/badge.png',
-                    tag: reminder.matchId,
-                    requireInteraction: true,
-                    actions: [
-                        { action: 'vote', title: 'Vote Now' }
-                    ]
-                });
-                
-                // Handle notification click
-                notification.onclick = function() {
-                    window.focus();
-                    window.location.href = `/matches.html#${reminder.matchId}`;
-                    notification.close();
-                };
-                
-                reminder.notified = true;
-                updated = true;
-            }
-        }
-    });
-    
-    // Update localStorage if any reminders were marked as notified
-    if (updated) {
-        localStorage.setItem('matchReminders', JSON.stringify(reminders));
-    }
-    
-    // Clean up old reminders (older than 7 days)
-    const cleanReminders = reminders.filter(r => {
-        const matchDate = new Date(r.matchDate);
-        const daysSince = (now - matchDate) / (1000 * 60 * 60 * 24);
-        return daysSince < 7;
-    });
-    
-    if (cleanReminders.length !== reminders.length) {
-        localStorage.setItem('matchReminders', JSON.stringify(cleanReminders));
-    }
-}
-
-/**
- * Update reminder button states based on saved reminders
- */
-function updateReminderButtons() {
-    const reminders = JSON.parse(localStorage.getItem('matchReminders') || '[]');
-    const reminderMatchIds = reminders.map(r => r.matchId);
-    
-    document.querySelectorAll('.remind-btn').forEach(button => {
-        const matchCard = button.closest('.match-card');
-        if (matchCard) {
-            const matchId = matchCard.dataset.matchId;
-            if (reminderMatchIds.includes(matchId)) {
-                button.classList.add('active');
-                button.innerHTML = '<i class="fas fa-bell"></i> Reminder Set';
-            }
-        }
-    });
-}
-
 /**
  * Show notification toast
  */
@@ -850,7 +687,6 @@ window.sortMatches = sortMatches;
 window.clearFilters = clearFilters;
 window.loadMoreMatches = loadMoreMatches;
 window.voteNow = voteNow;
-window.remindMe = remindMe;
 window.showMatchDetails = showMatchDetails;
 
 console.log('✅ Matches.js initialized - Firebase integration active');

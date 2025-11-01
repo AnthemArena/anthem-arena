@@ -1,11 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
     const footerHTML = `
+<!-- ========================================
+     BROWSER NOTIFICATIONS (Global - All Pages)
+     ======================================== -->
+<section class="newsletter">
+    <div class="container">
+        <div class="newsletter-content">
+            <div class="newsletter-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
+            <div class="newsletter-text">
+                <h3 class="newsletter-title">Never Miss a Match</h3>
+                <p class="newsletter-description">Get notified when any match goes live</p>
+            </div>
+            <div class="notification-actions">
+                <button id="enable-notifications" class="newsletter-btn" onclick="enableGlobalNotifications()">
+                    <span class="notification-status">Enable Notifications</span>
+                </button>
+                <p class="notification-hint">Receive alerts for all upcoming matches</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <footer class="main-footer">
     <div class="footer-container">
         <div class="footer-grid">
             <!-- About Column with Logo -->
             <div class="footer-column">
-                <a href="/index.html" class="footer-logo-link">
+                <a href="/" class="footer-logo-link">
                     <img src="/images/logo-header.png" alt="Anthem Arena" class="footer-logo">
                 </a>
                 <p class="footer-text">
@@ -17,12 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="footer-column">
                 <h4 class="footer-heading">Navigate</h4>
                 <ul class="footer-links">
-                <li><a href="/">Home</a></li>
-<li><a href="/brackets">Brackets</a></li>
-<li><a href="/music-gallery">Music Gallery</a></li>
-<li><a href="/matches">Matches</a></li>
-<li><a href="/stats">Stats</a></li>
-<li><a href="/about">About</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/brackets">Brackets</a></li>
+                    <li><a href="/music-gallery">Music Gallery</a></li>
+                    <li><a href="/matches">Matches</a></li>
+                    <li><a href="/stats">Stats</a></li>
+                    <li><a href="/about">About</a></li>
                     <li><a href="https://amzn.to/4ozvEDP" target="_blank" rel="noopener noreferrer nofollow">Ambessa: Chosen of the Wolf</a></li>
                 </ul>
             </div>
@@ -31,10 +57,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="footer-column">
                 <h4 class="footer-heading">Anthems Arena Championship</h4>
                 <ul class="footer-links">
-                    <li><a href="/matches.html?status=completed">View Results</a></li>
-                    <li><a href="/brackets.html">Full Bracket</a></li>
-                    <li><a href="/matches.html?tournament=worlds-anthems-2025">Cast Your Votes</a></li>
-                    <li><a href="/stats.html">Tournament Statistics</a></li>
+                    <li><a href="/matches?status=completed">View Results</a></li>
+                    <li><a href="/brackets">Full Bracket</a></li>
+                    <li><a href="/matches?tournament=worlds-anthems-2025">Cast Your Votes</a></li>
+                    <li><a href="/stats">Tournament Statistics</a></li>
                 </ul>
             </div>
             
@@ -89,13 +115,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 © 2025 Anthem Arena. A fan-made community project.
             </p>
             <div class="footer-legal-links">
-                <a href="/about.html">About</a>
+                <a href="/about">About</a>
                 <span class="separator">•</span>
-                <a href="/legal/privacy.html">Privacy</a>
+                <a href="/legal/privacy">Privacy</a>
                 <span class="separator">•</span>
-                <a href="/legal/terms.html">Terms</a>
+                <a href="/legal/terms">Terms</a>
                 <span class="separator">•</span>
-                <a href="/legal/disclosure.html">Affiliate Disclosure</a>
+                <a href="/legal/disclosure">Affiliate Disclosure</a>
             </div>
             
             <!-- Riot Games Disclaimer -->
@@ -122,4 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Insert footer into the page
     document.getElementById('footer-placeholder').innerHTML = footerHTML;
+    
+    // Check notification status after footer loads
+    setTimeout(() => {
+        if (typeof window.checkGlobalNotificationStatus === 'function') {
+            window.checkGlobalNotificationStatus();
+        }
+    }, 100);
 });

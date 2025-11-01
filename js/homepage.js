@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     hideChampionsSection();
     initializeScrollAnimations();
+        checkNotificationStatus(); // ← ADD THIS LINE
+
 });
 
 // ========================================
@@ -848,39 +850,95 @@ function playVideo(momentId) {
 window.playVideo = playVideo;
 
 // ========================================
-// NEWSLETTER SUBSCRIPTION
+// BROWSER NOTIFICATIONS
 // ========================================
 
-function subscribeNewsletter(event) {
-    event.preventDefault();
+async function enableNotifications() {
+    const button = document.getElementById('enable-notifications');
+    const statusText = button.querySelector('.notification-status');
     
-    const form = event.target;
-    const input = form.querySelector('.newsletter-input');
-    const button = form.querySelector('.newsletter-btn');
-    const email = input.value;
-    
-    if (!email || !email.includes('@')) {
-        showNotification('Please enter a valid email address', 'error');
+    // Check if browser supports notifications
+    if (!("Notification" in window)) {
+        showNotification('Your browser doesn\'t support notifications', 'error');
         return;
     }
     
-    button.disabled = true;
-    button.textContent = 'Subscribing...';
+    // Check current permission
+    if (Notification.permission === "granted") {
+        showNotification('Notifications are already enabled!', 'info');
+        updateNotificationButton('enabled');
+        return;
+    }
     
-    setTimeout(() => {
-        showNotification('Successfully subscribed! Check your email.', 'success');
-        input.value = '';
-        button.disabled = false;
-        button.textContent = 'Subscribe';
+    if (Notification.permission === "denied") {
+        showNotification('Notifications are blocked. Please enable them in browser settings.', 'error');
+        return;
+    }
+    
+    // Request permission
+    button.disabled = true;
+    statusText.textContent = 'Requesting permission...';
+    
+    try {
+        const permission = await Notification.requestPermission();
         
-        const subscribers = JSON.parse(localStorage.getItem('subscribers') || '[]');
-        subscribers.push({ email, date: new Date().toISOString() });
-        localStorage.setItem('subscribers', JSON.stringify(subscribers));
-    }, 1000);
+        if (permission === "granted") {
+            // Success!
+            new Notification("🎉 Notifications Enabled!", {
+                body: "You'll be notified when new matches go live",
+                icon: "/favicon/favicon-32x32.png",
+                badge: "/favicon/favicon-32x32.png"
+            });
+            
+            // Save preference
+            localStorage.setItem('notificationsEnabled', 'true');
+            localStorage.setItem('notificationsEnabledDate', new Date().toISOString());
+            
+            showNotification('Notifications enabled successfully!', 'success');
+            updateNotificationButton('enabled');
+            
+            console.log('✅ Notifications enabled');
+            
+        } else {
+            showNotification('Notification permission denied', 'error');
+            button.disabled = false;
+            statusText.textContent = 'Enable Notifications';
+        }
+        
+    } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        showNotification('Error enabling notifications', 'error');
+        button.disabled = false;
+        statusText.textContent = 'Enable Notifications';
+    }
 }
 
-// Make function globally available
-window.subscribeNewsletter = subscribeNewsletter;
+function updateNotificationButton(state) {
+    const button = document.getElementById('enable-notifications');
+    const statusText = button.querySelector('.notification-status');
+    
+    if (state === 'enabled') {
+        button.classList.add('notifications-enabled');
+        button.disabled = true;
+        statusText.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Notifications Enabled
+        `;
+    }
+}
+
+// Check notification status on page load
+function checkNotificationStatus() {
+    if (Notification.permission === "granted") {
+        updateNotificationButton('enabled');
+    }
+}
+
+// Make functions globally available
+window.enableNotifications = enableNotifications;
 
 // ========================================
 // NOTIFICATION HELPER

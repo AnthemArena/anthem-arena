@@ -1493,3 +1493,23 @@
     opacity: 0.2;  /* Currently 0.4, make even lighter */
     filter: grayscale(100%);
 }
+/* Notification Button States */
+.newsletter-btn.notifications-enabled {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.newsletter-btn.notifications-enabled:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+}
+
+.newsletter-btn.notifications-disabled {
+    background: linear-gradient(135deg, #C8AA6E, #B49A5E);
+    color: #0a0a0a;
+}
+
+.newsletter-btn.notifications-disabled:hover {
+    background: linear-gradient(135deg, #d4b876, #C8AA6E);
+    transform: translateY(-2px);
+}

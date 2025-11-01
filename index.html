@@ -422,36 +422,7 @@
         </div>
     </section>
 
-    <!-- ========================================
-         NEWSLETTER SIGNUP
-         ======================================== -->
-    <section class="newsletter">
-        <div class="container">
-            <div class="newsletter-content">
-                <div class="newsletter-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                        <polyline points="22,6 12,13 2,6"></polyline>
-                    </svg>
-                </div>
-                <div class="newsletter-text">
-                    <h3 class="newsletter-title">Never Miss a Matchup</h3>
-                    <p class="newsletter-description">Get notified when new tournaments start and when your favorite music videos are competing.</p>
-                </div>
-                <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
-                    <input 
-                        type="email" 
-                        placeholder="Enter your email" 
-                        class="newsletter-input"
-                        required
-                    >
-                    <button type="submit" class="newsletter-btn">
-                        Subscribe
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
+
 
     <!-- ========================================
          BOOK RECOMMENDATION MODAL
@@ -465,6 +436,8 @@
 
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
+
     <script type="module" src="/js/homepage.js"></script>
 </body>
 </html>
