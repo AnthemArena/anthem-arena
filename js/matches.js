@@ -493,9 +493,8 @@ function getFooterContent(match) {
             <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
         `;
     } else if (match.status === 'upcoming') {
-        // Show when match starts instead of remind button
-        const timeUntil = getTimeUntilMatch(match.date);
-        statsHtml += `<span class="stat"><i class="far fa-clock"></i> ${timeUntil}</span>`;
+        // ✅ Keep stats area clean for upcoming
+        statsHtml += `<span class="stat"><i class="far fa-clock"></i> Scheduled</span>`;
     }
     
     statsHtml += '</div>';
@@ -506,7 +505,17 @@ function getFooterContent(match) {
     } else if (match.status === 'live') {
         buttonHtml = `<button class="vote-now-btn" onclick="voteNow('${match.id}')"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
     } else if (match.status === 'upcoming') {
-        buttonHtml = `<span class="starting-soon-badge"><i class="far fa-clock"></i> Starting Soon</span>`;
+        // ✅ NEW: Show countdown IN the button
+        const timeUntil = getTimeUntilMatch(match.date);
+        
+        if (timeUntil === 'Starting Soon') {
+            buttonHtml = `<span class="starting-soon-badge urgent"><i class="far fa-clock"></i> Starting Soon</span>`;
+        } else if (timeUntil === 'Coming Soon') {
+            buttonHtml = `<span class="starting-soon-badge"><i class="far fa-clock"></i> Coming Soon</span>`;
+        } else {
+            // Show countdown in button (e.g., "Starts in 3d 19h")
+            buttonHtml = `<span class="starting-soon-badge countdown"><i class="far fa-clock"></i> ${timeUntil}</span>`;
+        }
     }
 
     return `
