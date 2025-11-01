@@ -423,11 +423,14 @@ function showNoResultsMessage() {
     if (!grid) return;
     
     grid.innerHTML = `
-        <div class="no-results">
-            <div class="no-results-icon">🎵</div>
-            <h3 class="no-results-title">Tournament Just Started!</h3>
-            <p class="no-results-text">Results will appear here as matches are completed.<br>Cast your vote above to help decide the winners!</p>
-        </div>
+      <div class="no-results">
+    <div class="no-results-icon">⏳</div>
+    <h3 class="no-results-title">No Results Yet</h3>
+    <p class="no-results-text">
+        The tournament hasn't started or matches are still in progress.<br>
+        Results will appear here as winners are decided. Check back soon! 🏆
+    </p>
+</div>
     `;
 }
 
