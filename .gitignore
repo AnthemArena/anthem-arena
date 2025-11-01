@@ -137,3 +137,14 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# API Keys & Secrets
+# Seed scripts with API keys
+js/update-seeds.js
+js/auto-update-seeds.js
+update-seeds.js
+auto-update-seeds.js
+
+# System files
+.DS_Store
+Thumbs.db

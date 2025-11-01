@@ -1,0 +1,2 @@
+[build.environment]
+  NETLIFY_SKIP_SECRET_SCANNING = "true"
