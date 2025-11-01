@@ -29,8 +29,6 @@ let seedPerformance = null;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📊 Stats page loaded');
     
-    // Show loading state
-    showLoadingState();
     
     // Load JSON data first (for YouTube stats)
     await loadSongData();
@@ -43,9 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup tab navigation
     setupTabs();
-    
-    // Hide loading state
-    hideLoadingState();
+   
     
     console.log('✅ Stats page ready');
 });
@@ -648,23 +644,5 @@ function formatHour(hour) {
     return `${hour - 12} PM`;
 }
 
-function showLoadingState() {
-    const main = document.querySelector('main');
-    if (main) {
-        main.innerHTML = `
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>Loading tournament statistics...</p>
-            </div>
-        `;
-    }
-}
-
-function hideLoadingState() {
-    const loadingState = document.querySelector('.loading-state');
-    if (loadingState) {
-        loadingState.remove();
-    }
-}
 
 console.log('✅ Stats.js loaded');
