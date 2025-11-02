@@ -4,6 +4,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { 
     getTournamentOverview, 
     getAllTimeSongRankings, 
@@ -23,12 +24,98 @@ let participationStats = null;
 let seedPerformance = null;
 
 // ========================================
+// MAKE FUNCTIONS GLOBAL (MUST BE EARLY!)
+// ========================================
+
+// These need to be accessible from onclick handlers in HTML
+window.showSongDetail = async function(seedNumber) {
+    try {
+        console.log('📊 Loading details for seed:', seedNumber);
+        
+        // Find song in rankings
+        const song = songRankings.find(s => s.seed === seedNumber);
+        if (!song) {
+            console.error('Song not found in rankings');
+            alert('Song not found!');
+            return;
+        }
+        
+        console.log('✅ Found song:', song.name);
+        
+        // Get all matches for this song
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const snapshot = await getDocs(matchesRef);
+        
+        console.log('📥 Total matches in database:', snapshot.size);
+        
+        const songMatches = [];
+        
+        snapshot.forEach(doc => {
+            const match = doc.data();
+            
+            // Check if this song is in the match
+            const isSong1 = match.song1?.seed === seedNumber;
+            const isSong2 = match.song2?.seed === seedNumber;
+            
+            if (isSong1 || isSong2) {
+                console.log('✅ Found match:', match.matchId, match.status);
+                const opponent = isSong1 ? match.song2 : match.song1;
+                const songData = isSong1 ? match.song1 : match.song2;
+                const isWinner = match.winnerId === songData.id;
+                
+                songMatches.push({
+                    matchId: match.matchId,
+                    round: match.round,
+                    status: match.status,
+                    opponent: opponent.shortTitle,
+                    opponentSeed: opponent.seed,
+                    votes: songData.votes || 0,
+                    opponentVotes: opponent.votes || 0,
+                    totalVotes: match.totalVotes || 0,
+                    isWinner: isWinner,
+                    date: match.date
+                });
+            }
+        });
+        
+        console.log('🎯 Total matches found for this song:', songMatches.length);
+        
+        // Sort by round
+        songMatches.sort((a, b) => a.round - b.round);
+        
+        // Render modal
+        renderSongDetailModal(song, songMatches);
+        
+        // Show modal
+        const modal = document.getElementById('songDetailModal');
+        if (!modal) {
+            console.error('❌ Modal element not found!');
+            alert('Modal not found in HTML!');
+            return;
+        }
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        console.log('✅ Modal should be visible now');
+        
+    } catch (error) {
+        console.error('❌ Error loading song details:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+window.closeSongDetail = function() {
+    document.getElementById('songDetailModal').style.display = 'none';
+    document.body.style.overflow = '';
+};
+
+// ========================================
 // INITIALIZE
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📊 Stats page loaded');
-    
     
     // Load JSON data first (for YouTube stats)
     await loadSongData();
@@ -41,7 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup tab navigation
     setupTabs();
-   
     
     console.log('✅ Stats page ready');
 });
@@ -287,7 +373,9 @@ function sortRankings(rankings, sortBy) {
 
 function renderRankingsList(rankings, sortBy) {
     return rankings.map((song, index) => `
-        <div class="ranking-row ${index < 3 ? 'top-tier' : ''}">
+        <div class="ranking-row ${index < 3 ? 'top-tier' : ''} clickable" 
+             onclick="showSongDetail(${song.seed})"
+             style="cursor: pointer;">
             <div class="rank-col">
                 <span class="rank-number ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">
                     ${index + 1}
@@ -336,8 +424,132 @@ function renderRankingsList(rankings, sortBy) {
                     </div>
                 </div>
             </div>
+            
+            <div class="click-indicator">
+                <i class="fas fa-chevron-right"></i>
+            </div>
         </div>
     `).join('');
+}
+
+// ========================================
+// RENDER SONG DETAIL MODAL
+// ========================================
+
+function renderSongDetailModal(song, matches) {
+    const header = document.getElementById('songDetailHeader');
+    const body = document.getElementById('songDetailBody');
+    
+    // Header
+    header.innerHTML = `
+        <div class="song-detail-info">
+            <img 
+                src="https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg" 
+                alt="${song.name}"
+                class="song-detail-thumbnail">
+            <div class="song-detail-meta">
+                <h2 class="song-detail-title">${song.name}</h2>
+                <p class="song-detail-artist">${song.artist}</p>
+                <div class="song-detail-stats">
+                    <span class="stat-badge">Seed #${song.seed}</span>
+                    <span class="stat-badge">${song.winRecord} Record</span>
+                    <span class="stat-badge ${song.winRate >= 70 ? 'excellent' : song.winRate >= 50 ? 'good' : 'poor'}">
+                        ${song.winRate}% Win Rate
+                    </span>
+                    <span class="stat-badge">${song.totalVotes.toLocaleString()} Total Votes</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Body - Match History
+    const completedMatches = matches.filter(m => m.status === 'completed');
+    const liveMatches = matches.filter(m => m.status === 'live');
+    const upcomingMatches = matches.filter(m => m.status === 'upcoming');
+    
+    let matchesHTML = '<div class="song-matches">';
+    
+    // Live Matches
+    if (liveMatches.length > 0) {
+        matchesHTML += `
+            <div class="matches-section">
+                <h3 class="section-title">🔴 Live Now</h3>
+                ${liveMatches.map(match => renderMatchRow(song, match)).join('')}
+            </div>
+        `;
+    }
+    
+    // Upcoming Matches
+    if (upcomingMatches.length > 0) {
+        matchesHTML += `
+            <div class="matches-section">
+                <h3 class="section-title">📅 Upcoming</h3>
+                ${upcomingMatches.map(match => renderMatchRow(song, match)).join('')}
+            </div>
+        `;
+    }
+    
+    // Completed Matches
+    if (completedMatches.length > 0) {
+        matchesHTML += `
+            <div class="matches-section">
+                <h3 class="section-title">✅ Match History</h3>
+                ${completedMatches.map(match => renderMatchRow(song, match)).join('')}
+            </div>
+        `;
+    }
+    
+    if (matches.length === 0) {
+        matchesHTML += `
+            <div class="no-matches">
+                <p>No matches yet for this song</p>
+            </div>
+        `;
+    }
+    
+    matchesHTML += '</div>';
+    
+    body.innerHTML = matchesHTML;
+}
+
+// ========================================
+// RENDER MATCH ROW
+// ========================================
+
+function renderMatchRow(song, match) {
+    const percentage = match.totalVotes > 0 
+        ? Math.round((match.votes / match.totalVotes) * 100) 
+        : 50;
+    
+    const resultClass = match.status === 'completed' 
+        ? (match.isWinner ? 'won' : 'lost')
+        : '';
+    
+    const resultIcon = match.status === 'completed'
+        ? (match.isWinner ? '✅' : '❌')
+        : (match.status === 'live' ? '🔴' : '⏰');
+    
+    return `
+        <div class="match-row ${resultClass}" onclick="window.location.href='/vote.html?match=${match.matchId}'">
+            <div class="match-round">${getRoundName(match.round)}</div>
+            <div class="match-opponent">
+                <span class="vs-label">vs</span>
+                <span class="opponent-name">#${match.opponentSeed} ${match.opponent}</span>
+            </div>
+            <div class="match-result">
+                ${match.status === 'completed' ? `
+                    <span class="result-icon">${resultIcon}</span>
+                    <span class="result-score">${match.votes}-${match.opponentVotes}</span>
+                    <span class="result-percentage">(${percentage}%)</span>
+                ` : match.status === 'live' ? `
+                    <span class="live-badge">🔴 Live</span>
+                    <span class="result-percentage">${percentage}%</span>
+                ` : `
+                    <span class="upcoming-badge">⏰ Upcoming</span>
+                `}
+            </div>
+        </div>
+    `;
 }
 
 // ========================================
@@ -579,7 +791,7 @@ function renderRecords() {
                 <div class="record-card">
                     <div class="record-icon">🎭</div>
                     <div class="record-title">Biggest Upset</div>
-                    <div class="record-value">-${upsets[0].seedDiff} seed upset</div>
+<div class="record-value">-${upsets[0].seedDiff} seed upset</div>
                     <div class="record-detail">
                         #${upsets[0].winnerSeed} ${upsets[0].winner} beat #${upsets[0].loserSeed} ${upsets[0].loser}
                     </div>
@@ -629,6 +841,7 @@ function getRoundName(roundNumber) {
 }
 
 function formatNumber(num) {
+    if (!num) return 'N/A';
     if (num >= 1000000) {
         return (num / 1000000).toFixed(1) + 'M';
     } else if (num >= 1000) {
@@ -643,6 +856,5 @@ function formatHour(hour) {
     if (hour === 12) return '12 PM';
     return `${hour - 12} PM`;
 }
-
 
 console.log('✅ Stats.js loaded');

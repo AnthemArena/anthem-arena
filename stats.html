@@ -17,8 +17,6 @@
     <link rel="stylesheet" href="css/stats.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/navigation.css">
-
-
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/images/favicon.png">
@@ -188,16 +186,32 @@
             
         </div>
     </main>
+    
+    <!-- ========================================
+         ✨ SONG DETAIL MODAL
+    ======================================== -->
+    <div id="songDetailModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeSongDetail()"></div>
+        <div class="modal-content song-detail-modal">
+            <button class="modal-close" onclick="closeSongDetail()">×</button>
+            
+            <div class="song-detail-header" id="songDetailHeader">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <div class="song-detail-body" id="songDetailBody">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
    
     <!-- ========================================
          SCRIPTS
     ======================================== -->
-
-      <div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
     <script type="module" src="js/stats-queries.js"></script>
     <script type="module" src="js/stats.js"></script>
-   
     
 </body>
 </html>

@@ -309,22 +309,89 @@ function sortMatches() {
 }
 
 // Sort matches array
+// Sort matches array
 function sortMatchesArray(matches, sortType) {
     const sorted = [...matches];
 
     switch (sortType) {
         case 'date-desc':
-            return sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // ✅ Newest/Urgent First
+            return sorted.sort((a, b) => {
+                // Priority 1: Live matches first
+                if (a.status === 'live' && b.status !== 'live') return -1;
+                if (b.status === 'live' && a.status !== 'live') return 1;
+                
+                // Priority 2: Both live - sort by most votes
+                if (a.status === 'live' && b.status === 'live') {
+                    return b.totalVotes - a.totalVotes;
+                }
+                
+                // Priority 3: Upcoming matches - sort by start date (soonest first)
+                if (a.status === 'upcoming' && b.status === 'upcoming') {
+                    const dateA = a.date ? new Date(a.date) : new Date('2099-12-31');
+                    const dateB = b.date ? new Date(b.date) : new Date('2099-12-31');
+                    return dateA - dateB; // Soonest first
+                }
+                
+                // Priority 4: Upcoming before completed
+                if (a.status === 'upcoming' && b.status === 'completed') return -1;
+                if (b.status === 'upcoming' && a.status === 'completed') return 1;
+                
+                // Priority 5: Completed matches - newest first
+                if (a.status === 'completed' && b.status === 'completed') {
+                    const dateA = a.date ? new Date(a.date) : new Date(0);
+                    const dateB = b.date ? new Date(b.date) : new Date(0);
+                    return dateB - dateA; // Newest first
+                }
+                
+                return 0;
+            });
+            
         case 'date-asc':
-            return sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+            // ✅ Oldest/Completed First
+            return sorted.sort((a, b) => {
+                // Priority 1: Completed matches first (oldest first)
+                if (a.status === 'completed' && b.status !== 'completed') return -1;
+                if (b.status === 'completed' && a.status !== 'completed') return 1;
+                
+                // Priority 2: Both completed - sort by oldest first
+                if (a.status === 'completed' && b.status === 'completed') {
+                    const dateA = a.date ? new Date(a.date) : new Date(0);
+                    const dateB = b.date ? new Date(b.date) : new Date(0);
+                    return dateA - dateB; // Oldest first
+                }
+                
+                // Priority 3: Upcoming matches - sort by start date (earliest first)
+                if (a.status === 'upcoming' && b.status === 'upcoming') {
+                    const dateA = a.date ? new Date(a.date) : new Date('2099-12-31');
+                    const dateB = b.date ? new Date(b.date) : new Date('2099-12-31');
+                    return dateA - dateB; // Earliest first
+                }
+                
+                // Priority 4: Live matches last (by fewest votes)
+                if (a.status === 'live' && b.status === 'live') {
+                    return a.totalVotes - b.totalVotes; // Fewest votes first
+                }
+                
+                // Priority 5: Completed before upcoming before live
+                if (a.status === 'completed' && b.status === 'upcoming') return -1;
+                if (b.status === 'completed' && a.status === 'upcoming') return 1;
+                if (a.status === 'upcoming' && b.status === 'live') return -1;
+                if (b.status === 'upcoming' && a.status === 'live') return 1;
+                
+                return 0;
+            });
+            
         case 'votes-desc':
             return sorted.sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0));
+            
         case 'close':
             return sorted.sort((a, b) => {
                 const diffA = Math.abs((a.competitor1.percentage || 50) - (a.competitor2.percentage || 50));
                 const diffB = Math.abs((b.competitor1.percentage || 50) - (b.competitor2.percentage || 50));
                 return diffA - diffB;
             });
+            
         default:
             return sorted;
     }

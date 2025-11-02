@@ -1370,3 +1370,339 @@ display: none;
     background: linear-gradient(135deg, #d4b876, #C8AA6E);
     transform: translateY(-2px);
 }
+/* ========================================
+   MODAL BASE STYLES
+   ======================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9998;
+    cursor: pointer;
+}
+
+.modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #0a1428 0%, #1a2332 100%);
+    border: 2px solid rgba(200, 155, 60, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(200, 155, 60, 0.2);
+    border: 1px solid rgba(200, 155, 60, 0.4);
+    color: #c89b3c;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.modal-close:hover {
+    background: rgba(200, 155, 60, 0.4);
+    transform: rotate(90deg);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   SONG DETAIL MODAL
+   ======================================== */
+
+.song-detail-modal {
+    max-width: 900px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.song-detail-header {
+    border-bottom: 2px solid rgba(200, 155, 60, 0.3);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.song-detail-info {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.song-detail-thumbnail {
+    width: 220px;
+    height: 124px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid rgba(200, 155, 60, 0.3);
+}
+
+.song-detail-meta {
+    flex: 1;
+}
+
+.song-detail-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: #c89b3c;
+    margin-bottom: 0.5rem;
+}
+
+.song-detail-artist {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+}
+
+.song-detail-stats {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Badge styles for song detail modal */
+.song-detail-stats .stat-badge {
+    padding: 0.5rem 1rem;
+    background: rgba(200, 155, 60, 0.2);
+    border: 1px solid rgba(200, 155, 60, 0.4);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #c89b3c;
+}
+
+.song-detail-stats .stat-badge.excellent {
+    background: rgba(0, 200, 150, 0.2);
+    border-color: rgba(0, 200, 150, 0.4);
+    color: #00c896;
+}
+
+.song-detail-stats .stat-badge.good {
+    background: rgba(74, 158, 255, 0.2);
+    border-color: rgba(74, 158, 255, 0.4);
+    color: #4a9eff;
+}
+
+.song-detail-stats .stat-badge.poor {
+    background: rgba(255, 68, 68, 0.2);
+    border-color: rgba(255, 68, 68, 0.4);
+    color: #ff4444;
+}
+
+/* Match History */
+.song-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.matches-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.matches-section .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: #c89b3c;
+    margin-bottom: 0.5rem;
+}
+
+.match-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(200, 155, 60, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.match-row:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(200, 155, 60, 0.4);
+    transform: translateX(5px);
+}
+
+.match-row.won {
+    border-left: 4px solid #00c896;
+}
+
+.match-row.lost {
+    border-left: 4px solid #ff4444;
+}
+
+.match-round {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    min-width: 100px;
+}
+
+.match-opponent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vs-label {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+}
+
+.opponent-name {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.match-result {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.result-icon {
+    font-size: 1.2rem;
+}
+
+.result-score {
+    color: #c89b3c;
+}
+
+.result-percentage {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.live-badge {
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, rgba(255, 68, 68, 0.3), rgba(255, 68, 68, 0.2));
+    border: 1px solid rgba(255, 68, 68, 0.5);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #ff4444;
+}
+
+.upcoming-badge {
+    padding: 0.25rem 0.75rem;
+    background: rgba(200, 155, 60, 0.2);
+    border: 1px solid rgba(200, 155, 60, 0.4);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #c89b3c;
+}
+
+.no-matches {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Clickable Rankings */
+.ranking-row.clickable {
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.ranking-row.clickable:hover {
+    background: rgba(200, 155, 60, 0.05);
+    transform: translateX(3px);
+}
+
+.click-indicator {
+    display: flex;
+    align-items: center;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+    color: #c89b3c;
+    font-size: 1.2rem;
+}
+
+.ranking-row.clickable:hover .click-indicator {
+    opacity: 1;
+}
+
+/* Modal Responsive */
+@media (max-width: 768px) {
+    .song-detail-info {
+        flex-direction: column;
+    }
+    
+    .song-detail-thumbnail {
+        width: 100%;
+        height: auto;
+    }
+    
+    .match-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .match-round {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .match-result {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+        max-width: 95%;
+    }
+}
