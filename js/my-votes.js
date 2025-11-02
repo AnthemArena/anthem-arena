@@ -148,6 +148,14 @@ async function loadVoteHistory() {
             
             // Get the song data for the one they voted for
             const votedSong = votedForSong === 'song1' ? matchData.song1 : matchData.song2;
+            const opponentSong = votedForSong === 'song1' ? matchData.song2 : matchData.song1;
+            
+            // Determine song journey status (non-competitive)
+            let songStatus = 'active'; // Default for ongoing matches
+            if (isCompleted && matchData.winnerId) {
+                const votedSongId = votedSong.id;
+                songStatus = matchData.winnerId === votedSongId ? 'advanced' : 'eliminated';
+            }
             
             return {
                 id: voteDoc.id,
@@ -157,12 +165,16 @@ async function loadVoteHistory() {
                 round: voteData.round || 1,
                 votedForSeed: voteData.votedForSeed,
                 votedForName: voteData.votedForName,
-                votedForVideoId: votedSong.videoId, // ✨ NEW: Store video ID
+                votedForVideoId: votedSong.videoId,
+                votedForArtist: votedSong.artist,
+                opponentName: opponentSong.shortTitle,
+                opponentSeed: opponentSong.seed,
                 match: matchData,
                 voteType: voteType,
                 votedSongPercentage: votedSongPercentage,
                 status: status,
-                isCompleted: isCompleted
+                isCompleted: isCompleted,
+                songStatus: songStatus // 'active', 'advanced', 'eliminated'
             };
         });
         
@@ -218,14 +230,32 @@ function updateStats() {
     const artistPreferences = getArtistPreferences();
     const favoriteArtist = artistPreferences[0];
     
-    // ✨ NEW: Get song preferences
+    // Get song preferences
     const favoriteSongs = getSongPreferences();
     
-    // Update DOM
+    // 🎯 NON-COMPETITIVE STATS
+    const journeyStats = calculateJourneyStats();
+    const supportImpact = calculateSupportImpact();
+    const tournamentCoverage = calculateTournamentCoverage();
+    
+    // ✅ SHOW STATS SECTIONS (they're hidden by default)
+    document.getElementById('statsOverview').style.display = 'block';
+    document.getElementById('filtersSection').style.display = 'block';
+    
+    // Update DOM - Basic Stats
     document.getElementById('totalVotes').textContent = totalVotes;
     document.getElementById('underdogPicks').textContent = underdogPicks;
     document.getElementById('mainstreamPicks').textContent = mainstreamPicks;
     document.getElementById('votingStreak').textContent = votingStreak;
+    
+    // Update DOM - Journey Stats
+    document.getElementById('songsStillAlive').textContent = journeyStats.songsStillAlive;
+    document.getElementById('songsAdvanced').textContent = journeyStats.songsAdvanced;
+    document.getElementById('furthestRound').textContent = getRoundName(journeyStats.furthestRound);
+    
+    // Update DOM - Impact Stats
+    document.getElementById('closeCalls').textContent = supportImpact.closeCalls;
+    document.getElementById('roundsParticipated').textContent = supportImpact.roundsParticipated;
     
     // Update filter counts
     document.getElementById('countAll').textContent = totalVotes;
@@ -237,10 +267,16 @@ function updateStats() {
     const tasteProfile = getTasteProfile(majorityAlignment, totalVotes, underdogPicks);
     
     // Show achievement badge
-    showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstreamPicks, votingStreak, favoriteArtist);
+    showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstreamPicks, votingStreak, favoriteArtist, journeyStats);
     
-    // ✨ NEW: Display favorite songs
+    // Display favorite songs
     displayFavoriteSongs(favoriteSongs);
+    
+    // Display song journeys
+    displaySongJourneys();
+    
+    // Display tournament coverage
+    displayTournamentCoverage(tournamentCoverage);
     
     console.log('📊 Stats:', { 
         totalVotes, 
@@ -251,8 +287,143 @@ function updateStats() {
         votingStreak,
         tasteProfile,
         favoriteArtist,
-        favoriteSongs
+        favoriteSongs,
+        journeyStats,
+        supportImpact,
+        tournamentCoverage
     });
+}
+
+// ========================================
+// 🎯 JOURNEY STATS (NON-COMPETITIVE)
+// ========================================
+
+function calculateJourneyStats() {
+    const uniqueSongs = new Map();
+    
+    allVotes.forEach(vote => {
+        const songId = vote.votedForSong === 'song1' ? vote.match.song1.id : vote.match.song2.id;
+        const songName = vote.votedForName;
+        
+        if (!uniqueSongs.has(songId)) {
+            uniqueSongs.set(songId, {
+                id: songId,
+                name: songName,
+                seed: vote.votedForSeed,
+                videoId: vote.votedForVideoId,
+                artist: vote.votedForArtist,
+                rounds: [],
+                highestRound: 0,
+                status: 'active' // 'active', 'advanced', 'eliminated'
+            });
+        }
+        
+        const song = uniqueSongs.get(songId);
+        song.rounds.push({
+            round: vote.round,
+            matchId: vote.matchId,
+            opponent: vote.opponentName,
+            result: vote.songStatus,
+            percentage: vote.votedSongPercentage,
+            timestamp: vote.timestamp
+        });
+        
+        song.highestRound = Math.max(song.highestRound, vote.round);
+        
+        // Update overall status (most recent decisive result)
+        if (vote.songStatus === 'eliminated') {
+            song.status = 'eliminated';
+        } else if (vote.songStatus === 'advanced' && song.status !== 'eliminated') {
+            song.status = 'advanced';
+        }
+    });
+    
+    const songs = Array.from(uniqueSongs.values());
+    
+    // Calculate stats
+    const songsStillAlive = songs.filter(s => s.status === 'active' || s.status === 'advanced').length;
+    const songsAdvanced = songs.filter(s => s.status === 'advanced').length;
+    const songsEliminated = songs.filter(s => s.status === 'eliminated').length;
+    const furthestRound = Math.max(...allVotes.map(v => v.round), 1);
+    
+    return {
+        songsStillAlive,
+        songsAdvanced,
+        songsEliminated,
+        furthestRound,
+        allSongs: songs
+    };
+}
+
+// ========================================
+// 🎯 SUPPORT IMPACT (NON-COMPETITIVE)
+// ========================================
+
+function calculateSupportImpact() {
+    // Close calls where vote really mattered (45-55%)
+    const closeCalls = allVotes.filter(v => {
+        const percentage = v.votedSongPercentage;
+        return percentage >= 45 && percentage <= 55;
+    }).length;
+    
+    // Underdog rallies (voted underdog but they got >35%)
+    const underdogRallies = allVotes.filter(v => {
+        return v.voteType === 'underdog' && v.votedSongPercentage > 35;
+    }).length;
+    
+    // Rounds participated in
+    const roundsParticipated = new Set(allVotes.map(v => v.round)).size;
+    
+    // Unique matchups voted in
+    const uniqueMatchups = new Set(allVotes.map(v => v.matchId)).size;
+    
+    return {
+        closeCalls,
+        underdogRallies,
+        roundsParticipated,
+        uniqueMatchups
+    };
+}
+
+// ========================================
+// 🎯 TOURNAMENT COVERAGE
+// ========================================
+
+function calculateTournamentCoverage() {
+    const totalMatchesByRound = {
+        1: 29, // Round 1
+        2: 16, // Round 2
+        3: 8,  // Round 3 (Sweet 16)
+        4: 4,  // Quarterfinals
+        5: 2,  // Semifinals
+        6: 1   // Finals
+    };
+    
+    const votedByRound = allVotes.reduce((acc, vote) => {
+        acc[vote.round] = (acc[vote.round] || 0) + 1;
+        return acc;
+    }, {});
+    
+    const coverage = Object.entries(totalMatchesByRound).map(([round, total]) => {
+        const voted = votedByRound[round] || 0;
+        return {
+            round: parseInt(round),
+            roundName: getRoundName(parseInt(round)),
+            voted: voted,
+            total: total,
+            percentage: total > 0 ? Math.round((voted / total) * 100) : 0
+        };
+    });
+    
+    // Calculate overall participation
+    const totalPossibleVotes = Object.values(totalMatchesByRound).reduce((a, b) => a + b, 0);
+    const totalActualVotes = Object.values(votedByRound).reduce((a, b) => a + b, 0);
+    const overallParticipation = Math.round((totalActualVotes / totalPossibleVotes) * 100);
+    
+    return {
+        byRound: coverage,
+        overallParticipation
+    };
 }
 
 // ========================================
@@ -302,10 +473,7 @@ function getArtistPreferences() {
     const artistCounts = {};
     
     allVotes.forEach(vote => {
-        const match = vote.match;
-        const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
-        const artist = votedSong.artist || 'Unknown';
-        
+        const artist = vote.votedForArtist || 'Unknown';
         artistCounts[artist] = (artistCounts[artist] || 0) + 1;
     });
     
@@ -316,7 +484,7 @@ function getArtistPreferences() {
 }
 
 // ========================================
-// ✨ NEW: GET SONG PREFERENCES
+// GET SONG PREFERENCES
 // ========================================
 
 function getSongPreferences() {
@@ -326,12 +494,14 @@ function getSongPreferences() {
         const songName = vote.votedForName;
         const songSeed = vote.votedForSeed;
         const videoId = vote.votedForVideoId;
+        const artist = vote.votedForArtist;
         
         if (!songCounts[songName]) {
             songCounts[songName] = {
                 name: songName,
                 seed: songSeed,
                 videoId: videoId,
+                artist: artist,
                 count: 0,
                 matches: []
             };
@@ -357,7 +527,7 @@ function getSongPreferences() {
 }
 
 // ========================================
-// ✨ NEW: DISPLAY FAVORITE SONGS
+// DISPLAY FAVORITE SONGS
 // ========================================
 
 function displayFavoriteSongs(songs) {
@@ -378,8 +548,8 @@ function displayFavoriteSongs(songs) {
     
     container.innerHTML = `
         <div class="favorite-songs-header">
-            <h3 class="favorite-songs-title">🎵 Your Most Voted Songs</h3>
-            <p class="favorite-songs-subtitle">Songs you've supported the most across all matches</p>
+            <h3 class="favorite-songs-title">🎵 Your Most Supported Songs</h3>
+            <p class="favorite-songs-subtitle">Songs you've voted for the most across all matches</p>
         </div>
         <div class="favorite-songs-list">
             ${songs.map((song, index) => `
@@ -395,6 +565,8 @@ function displayFavoriteSongs(songs) {
                     <div class="song-info">
                         <div class="song-name">${song.name}</div>
                         <div class="song-meta">
+                            <span class="song-artist">${song.artist}</span>
+                            <span class="song-separator">•</span>
                             <span class="song-seed">Seed #${song.seed}</span>
                             <span class="song-separator">•</span>
                             <span class="song-votes">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
@@ -403,6 +575,166 @@ function displayFavoriteSongs(songs) {
                     <div class="song-badge ${song.count >= 3 ? 'superfan' : song.count >= 2 ? 'fan' : 'supporter'}">
                         ${song.count >= 3 ? '⭐ Superfan' : song.count >= 2 ? '💙 Fan' : '✓ Supporter'}
                     </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    container.style.display = 'block';
+}
+
+// ========================================
+// 🎯 DISPLAY SONG JOURNEYS
+// ========================================
+
+function displaySongJourneys() {
+    const container = document.getElementById('songJourneysSection');
+    
+    if (!container) {
+        console.warn('⚠️ Song journeys container not found');
+        return;
+    }
+    
+    const journeyStats = calculateJourneyStats();
+    const songs = journeyStats.allSongs;
+    
+    if (songs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    // Sort by highest round reached, then by seed
+    songs.sort((a, b) => {
+        if (b.highestRound !== a.highestRound) {
+            return b.highestRound - a.highestRound;
+        }
+        return a.seed - b.seed;
+    });
+    
+    // Take top 10
+    const topSongs = songs.slice(0, 10);
+    
+    container.innerHTML = `
+        <div class="song-journeys-header">
+            <h3 class="journeys-title">🏆 Song Journeys</h3>
+            <p class="journeys-subtitle">Track how far your favorite songs have gone</p>
+        </div>
+        <div class="journeys-list">
+            ${topSongs.map(song => createSongJourneyCard(song)).join('')}
+        </div>
+    `;
+    
+    container.style.display = 'block';
+}
+
+function createSongJourneyCard(song) {
+    // Sort rounds chronologically
+    const rounds = song.rounds.sort((a, b) => a.round - b.round);
+    
+    // Status display
+    const statusConfig = {
+        'active': { icon: '🎵', label: 'Still Active', class: 'active' },
+        'advanced': { icon: '✓', label: 'Advanced', class: 'advanced' },
+        'eliminated': { icon: '○', label: 'Eliminated', class: 'eliminated' }
+    };
+    
+    const status = statusConfig[song.status] || statusConfig['active'];
+    
+    // Generate round badges
+    const roundBadges = rounds.map(r => {
+        const resultClass = r.result === 'advanced' ? 'won' : r.result === 'eliminated' ? 'lost' : 'pending';
+        const resultIcon = r.result === 'advanced' ? '✓' : r.result === 'eliminated' ? '✗' : '○';
+        
+        return `
+            <div class="round-badge ${resultClass}" title="${r.opponent} - ${r.percentage}%">
+                <span class="round-label">R${r.round}</span>
+                <span class="round-result">${resultIcon}</span>
+            </div>
+        `;
+    }).join('');
+    
+    // Journey summary
+    const lastRound = rounds[rounds.length - 1];
+    const journeySummary = song.status === 'eliminated' 
+        ? `Eliminated in ${getRoundName(song.highestRound)}`
+        : song.status === 'advanced'
+        ? `Advanced to ${getRoundName(song.highestRound + 1)}`
+        : `Currently in ${getRoundName(song.highestRound)}`;
+    
+    return `
+        <div class="song-journey-card ${status.class}">
+            <div class="journey-song-info">
+                <img 
+                    src="https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg" 
+                    alt="${song.name}"
+                    class="journey-thumbnail"
+                    loading="lazy">
+                <div class="journey-details">
+                    <div class="journey-song-name">${song.name}</div>
+                    <div class="journey-song-meta">
+                        <span>${song.artist}</span>
+                        <span class="separator">•</span>
+                        <span>Seed #${song.seed}</span>
+                        <span class="separator">•</span>
+                        <span>${rounds.length} ${rounds.length === 1 ? 'match' : 'matches'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="journey-path">
+                <div class="journey-rounds">
+                    ${roundBadges}
+                </div>
+                <div class="journey-status ${status.class}">
+                    <span class="status-icon">${status.icon}</span>
+                    <span class="status-text">${journeySummary}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
+// 🎯 DISPLAY TOURNAMENT COVERAGE
+// ========================================
+
+function displayTournamentCoverage(coverage) {
+    const container = document.getElementById('tournamentCoverageSection');
+    
+    if (!container) {
+        console.warn('⚠️ Tournament coverage container not found');
+        return;
+    }
+    
+    if (coverage.byRound.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="coverage-header">
+            <h3 class="coverage-title">📊 Tournament Participation</h3>
+            <p class="coverage-subtitle">Your engagement across all rounds</p>
+        </div>
+        
+        <div class="coverage-overall">
+            <div class="overall-stat">
+                <span class="overall-percentage">${coverage.overallParticipation}%</span>
+                <span class="overall-label">Overall Participation</span>
+            </div>
+        </div>
+        
+        <div class="coverage-breakdown">
+            ${coverage.byRound.map(round => `
+                <div class="round-coverage">
+                    <div class="round-header">
+                        <span class="round-name">${round.roundName}</span>
+                        <span class="round-stats">${round.voted}/${round.total}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${round.percentage}%"></div>
+                    </div>
+                    <div class="round-percentage">${round.percentage}%</div>
                 </div>
             `).join('')}
         </div>
@@ -464,24 +796,39 @@ function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
 // SHOW ACHIEVEMENT BADGE
 // ========================================
 
-function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstreamPicks, votingStreak, favoriteArtist) {
+function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstreamPicks, votingStreak, favoriteArtist, journeyStats) {
     const badge = document.getElementById('achievementBadge');
     const title = document.getElementById('badgeTitle');
     const description = document.getElementById('badgeDescription');
     
-    // Determine primary badge to show
+    // Determine primary badge to show (non-competitive focus)
     let badgeData = null;
     
-    // Priority: Special achievements > Taste profile
-    if (votingStreak >= 7) {
+    // Priority: Journey achievements > Participation > Taste profile
+    if (journeyStats.songsStillAlive >= 10) {
+        badgeData = {
+            title: '🌟 Champion Supporter',
+            description: `${journeyStats.songsStillAlive} songs you voted for are still competing!`
+        };
+    } else if (votingStreak >= 7) {
         badgeData = {
             title: '🔥 Week Warrior',
             description: `${votingStreak} days voting streak! You're incredibly dedicated!`
+        };
+    } else if (journeyStats.furthestRound >= 5) {
+        badgeData = {
+            title: '🏆 Deep Run Supporter',
+            description: `You've voted in matches all the way to ${getRoundName(journeyStats.furthestRound)}!`
         };
     } else if (underdogPicks >= 10) {
         badgeData = {
             title: '🎭 Underdog Champion',
             description: `You've voted for the underdog ${underdogPicks} times! True rebel!`
+        };
+    } else if (journeyStats.songsStillAlive >= 5) {
+        badgeData = {
+            title: '🎵 Song Champion',
+            description: `${journeyStats.songsStillAlive} of your picks are still in the tournament!`
         };
     } else if (votingStreak >= 5) {
         badgeData = {
@@ -598,11 +945,21 @@ function createVoteCard(vote) {
     const roundName = getRoundName(vote.round);
     
     // Get tournament name
-    const tournamentName = match.tournamentName || 'All Music Championship 2025';
+    const tournamentName = match.tournamentName || 'Anthem Arena Championship S1';
     
     // Determine card class
     const cardClass = vote.voteType;
     const statusClass = vote.isCompleted ? 'completed' : 'live';
+    
+    // Song journey indicator (non-competitive)
+    let journeyIndicator = '';
+    if (vote.songStatus === 'advanced') {
+        journeyIndicator = '<div class="journey-indicator advanced">✓ Advanced</div>';
+    } else if (vote.songStatus === 'eliminated') {
+        journeyIndicator = '<div class="journey-indicator eliminated">Eliminated</div>';
+    } else {
+        journeyIndicator = '<div class="journey-indicator active">● Active</div>';
+    }
     
     return `
         <div class="vote-card ${cardClass} ${statusClass}" data-type="${vote.voteType}">
@@ -628,6 +985,7 @@ function createVoteCard(vote) {
             </div>
             
             <div class="vote-result">
+                ${journeyIndicator}
                 <div class="vote-percentage">${percentage}%</div>
                 <div class="vote-type-label">${voteTypeLabel}</div>
                 <div class="vote-status-label">${vote.isCompleted ? 'Completed' : 'Live'}</div>
@@ -699,9 +1057,15 @@ function showNoVotesState() {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('noVotesState').style.display = 'block';
     
-    // Hide stats
-    document.querySelector('.stats-overview').style.display = 'none';
-    document.querySelector('.filters-section').style.display = 'none';
+    // Keep stats hidden (they're hidden by default now)
+    document.getElementById('statsOverview').style.display = 'none';
+    document.getElementById('filtersSection').style.display = 'none';
+    
+    // Hide section header (share button, etc.)
+    const sectionHeader = document.querySelector('.votes-section .section-header');
+    if (sectionHeader) sectionHeader.style.display = 'none';
+    
+    console.log('📭 No votes found - showing empty state');
 }
 
 // ========================================
@@ -718,25 +1082,27 @@ function shareStats() {
         : 0;
     
     const tasteProfile = getTasteProfile(majorityAlignment, totalVotes, underdogPicks);
-    
+    const journeyStats = calculateJourneyStats();
     const artistPreferences = getArtistPreferences();
     const favoriteArtist = artistPreferences[0];
-    
-    // ✨ NEW: Include favorite song
     const favoriteSongs = getSongPreferences();
     const favoriteSong = favoriteSongs[0];
     
-    // Generate share text
-    let shareText = `🎵 My League Music Tournament Profile:\n\n` +
+    // Generate share text (non-competitive framing)
+    let shareText = `🎵 My Anthem Arena Championship Profile:\n\n` +
         `🗳️ ${totalVotes} votes cast\n` +
         `${tasteProfile.icon} ${tasteProfile.title}\n`;
+    
+    if (journeyStats.songsStillAlive > 0) {
+        shareText += `✓ ${journeyStats.songsStillAlive} songs still competing\n`;
+    }
     
     if (underdogPicks > 0) {
         shareText += `🎭 ${underdogPicks} underdog picks\n`;
     }
     
     if (favoriteSong) {
-        shareText += `🎵 Most voted: ${favoriteSong.name} (${favoriteSong.count}x)\n`;
+        shareText += `🎵 Most supported: ${favoriteSong.name}\n`;
     }
     
     if (favoriteArtist) {

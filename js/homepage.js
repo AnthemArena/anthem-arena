@@ -850,7 +850,7 @@ async function loadUpcomingMatches() {
         }
         
         // Already sorted by Firestore, just limit to 4
-        const limitedMatches = upcomingMatches.slice(0, 4);
+        const limitedMatches = upcomingMatches.slice(0, 6);
         
         console.log(`✅ Displaying ${limitedMatches.length} upcoming matches`);
         limitedMatches.forEach((m, i) => {
