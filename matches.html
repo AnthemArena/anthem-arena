@@ -101,15 +101,14 @@
                     </select>
                 </div>
 
-                <div class="filter-group">
-                    <label class="filter-label">Sort By:</label>
-                    <select id="sort-filter" class="filter-select" onchange="sortMatches()">
-                        <option value="date-desc">Newest First</option>
-                        <option value="date-asc">Oldest First</option>
-                        <option value="votes-desc">Most Votes</option>
-                        <option value="close">Closest Match</option>
-                    </select>
-                </div>
+           <div class="filter-group">
+    <label class="filter-label">Sort By:</label>
+    <select id="sort-filter" class="filter-select" onchange="sortMatches()">
+        <option value="recent">Most Recent</option>
+        <option value="votes-desc">Most Voted</option>
+        <option value="close">Closest Match</option>
+    </select>
+</div>
 
                 <!-- Clear Filters -->
                 <button class="clear-filters-btn" onclick="clearFilters()">

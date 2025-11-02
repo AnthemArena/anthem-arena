@@ -27,7 +27,7 @@ let currentFilters = {
     tournament: 'all',
     round: 'all',
     status: 'all',
-    sort: 'date-desc'
+    sort: 'recent' // ← Changed from 'date-desc'
 };
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -39,6 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load tournament stats
     await loadTournamentStats();
     
+    // Populate filter dropdowns with actual data
+    populateTournamentFilter();
+    populateRoundFilter();
+    
+    // Display matches
     if (allMatches.length > 0) {
         displayMatches(allMatches);
         updateResultsCount(allMatches.length);
@@ -46,17 +51,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNoMatches();
     }
     
- 
+    // Setup filter event listeners
+    setupFilterListeners();
 });
+
+// Setup filter event listeners
+function setupFilterListeners() {
+    const searchInput = document.getElementById('search-input');
+    const tournamentFilter = document.getElementById('tournament-filter');
+    const roundFilter = document.getElementById('round-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const sortFilter = document.getElementById('sort-filter');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', filterMatches);
+    }
+    
+    if (tournamentFilter) {
+        tournamentFilter.addEventListener('change', () => {
+            console.log('🔍 Tournament filter changed to:', tournamentFilter.value);
+            filterMatches();
+        });
+    }
+    
+    if (roundFilter) {
+        roundFilter.addEventListener('change', () => {
+            console.log('🔍 Round filter changed to:', roundFilter.value);
+            filterMatches();
+        });
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', () => {
+            console.log('🔍 Status filter changed to:', statusFilter.value);
+            filterMatches();
+        });
+    }
+    
+    if (sortFilter) {
+        sortFilter.addEventListener('change', () => {
+            console.log('🔍 Sort changed to:', sortFilter.value);
+            sortMatches();
+        });
+    }
+}
 
 // Load matches from Firebase
 async function loadMatchesFromFirebase() {
     try {
         console.log('📥 Loading matches from Firebase...');
         
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
-        
+
+        console.log(`📊 Total matches found: ${snapshot.size}`);
+
         if (snapshot.empty) {
             console.error('❌ No matches found in Firebase');
             console.log('💡 Run init-matches.html to create matches');
@@ -71,6 +120,9 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         
         snapshot.forEach(doc => {
             const match = doc.data();
+            
+            // 🔍 DEBUG: Log tournament value
+            console.log('🔍 Match tournament value:', match.tournament || 'UNDEFINED');
             
             // ✨ FILTER OUT TBD MATCHES
             const song1IsTBD = !match.song1 || 
@@ -100,9 +152,13 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
             const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
             
+            // 🔧 NORMALIZE TOURNAMENT NAME
+            // Use whatever is in Firebase, or default to "Anthem Arena Championship S1"
+            const tournamentName = match.tournament || 'Anthem Arena Championship S1';
+            
             allMatches.push({
                 id: match.matchId,
-                tournament: 'Anthems Arena Championship', // ✅ Updated tournament name
+                tournament: tournamentName, // ✅ Use normalized tournament name
                 round: roundName, // ✅ Use correct round name
                 status: match.status || 'upcoming',
                 date: match.date || '2025-11-01',
@@ -133,6 +189,10 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         
         console.log(`✅ Processed ${allMatches.length} matches with confirmed competitors`);
         
+        // 🔍 DEBUG: Log unique tournament names
+        const uniqueTournaments = [...new Set(allMatches.map(m => m.tournament))];
+        console.log('🔍 Unique tournament names in matches:', uniqueTournaments);
+        
         // Export to global database for modal/vote pages
         exportToGlobalDatabase();
         
@@ -153,6 +213,79 @@ function getRoundName(roundNumber) {
         6: 'finals'
     };
     return roundNames[roundNumber] || `round-${roundNumber}`;
+}
+
+// ========================================
+// POPULATE FILTER DROPDOWNS
+// ========================================
+
+// Populate tournament filter dropdown
+function populateTournamentFilter() {
+    const tournamentFilter = document.getElementById('tournament-filter');
+    if (!tournamentFilter) return;
+    
+    // Get unique tournaments from matches (after normalization)
+    const tournaments = [...new Set(allMatches.map(m => m.tournament))];
+    
+    console.log('📋 Available tournaments after normalization:', tournaments);
+    
+    // Clear existing options (except "All")
+    tournamentFilter.innerHTML = '<option value="all">All Tournaments</option>';
+    
+    // Add tournament options
+    tournaments.forEach(tournament => {
+        if (tournament) {
+            const option = document.createElement('option');
+            option.value = tournament;
+            option.textContent = tournament;
+            tournamentFilter.appendChild(option);
+        }
+    });
+}
+
+// Populate round filter dropdown
+function populateRoundFilter() {
+    const roundFilter = document.getElementById('round-filter');
+    if (!roundFilter) return;
+    
+    // Get unique rounds from matches
+    const rounds = [...new Set(allMatches.map(m => m.round))];
+    
+    // Sort rounds in proper order
+    const roundOrder = ['round-1', 'round-2', 'round-3', 'quarterfinals', 'semifinals', 'finals'];
+    rounds.sort((a, b) => {
+        const indexA = roundOrder.indexOf(a);
+        const indexB = roundOrder.indexOf(b);
+        return indexA - indexB;
+    });
+    
+    console.log('📋 Available rounds:', rounds);
+    
+    // Clear existing options (except "All")
+    roundFilter.innerHTML = '<option value="all">All Rounds</option>';
+    
+    // Add round options with friendly names
+    rounds.forEach(round => {
+        if (round) {
+            const option = document.createElement('option');
+            option.value = round;
+            option.textContent = formatRoundNameForDisplay(round);
+            roundFilter.appendChild(option);
+        }
+    });
+}
+
+// Format round name for display
+function formatRoundNameForDisplay(round) {
+    const roundNames = {
+        'round-1': 'Round 1',
+        'round-2': 'Round 2',
+        'round-3': 'Round 3',
+        'quarterfinals': 'Quarterfinals',
+        'semifinals': 'Semifinals',
+        'finals': 'Finals'
+    };
+    return roundNames[round] || round;
 }
 
 // Export to global database
@@ -310,95 +443,48 @@ function sortMatches() {
     filterMatches();
 }
 
-// Sort matches array
-// Sort matches array
 function sortMatchesArray(matches, sortType) {
     const sorted = [...matches];
 
     switch (sortType) {
-        case 'date-desc':
-            // ✅ Newest/Urgent First
-            return sorted.sort((a, b) => {
-                // Priority 1: Live matches first
-                if (a.status === 'live' && b.status !== 'live') return -1;
-                if (b.status === 'live' && a.status !== 'live') return 1;
-                
-                // Priority 2: Both live - sort by most votes
-                if (a.status === 'live' && b.status === 'live') {
-                    return b.totalVotes - a.totalVotes;
-                }
-                
-                // Priority 3: Upcoming matches - sort by start date (soonest first)
-                if (a.status === 'upcoming' && b.status === 'upcoming') {
-                    const dateA = a.date ? new Date(a.date) : new Date('2099-12-31');
-                    const dateB = b.date ? new Date(b.date) : new Date('2099-12-31');
-                    return dateA - dateB; // Soonest first
-                }
-                
-                // Priority 4: Upcoming before completed
-                if (a.status === 'upcoming' && b.status === 'completed') return -1;
-                if (b.status === 'upcoming' && a.status === 'completed') return 1;
-                
-                // Priority 5: Completed matches - newest first
-                if (a.status === 'completed' && b.status === 'completed') {
-                    const dateA = a.date ? new Date(a.date) : new Date(0);
-                    const dateB = b.date ? new Date(b.date) : new Date(0);
-                    return dateB - dateA; // Newest first
-                }
-                
-                return 0;
-            });
-            
-        case 'date-asc':
-            // ✅ Oldest/Completed First
-            return sorted.sort((a, b) => {
-                // Priority 1: Completed matches first (oldest first)
-                if (a.status === 'completed' && b.status !== 'completed') return -1;
-                if (b.status === 'completed' && a.status !== 'completed') return 1;
-                
-                // Priority 2: Both completed - sort by oldest first
-                if (a.status === 'completed' && b.status === 'completed') {
-                    const dateA = a.date ? new Date(a.date) : new Date(0);
-                    const dateB = b.date ? new Date(b.date) : new Date(0);
-                    return dateA - dateB; // Oldest first
-                }
-                
-                // Priority 3: Upcoming matches - sort by start date (earliest first)
-                if (a.status === 'upcoming' && b.status === 'upcoming') {
-                    const dateA = a.date ? new Date(a.date) : new Date('2099-12-31');
-                    const dateB = b.date ? new Date(b.date) : new Date('2099-12-31');
-                    return dateA - dateB; // Earliest first
-                }
-                
-                // Priority 4: Live matches last (by fewest votes)
-                if (a.status === 'live' && b.status === 'live') {
-                    return a.totalVotes - b.totalVotes; // Fewest votes first
-                }
-                
-                // Priority 5: Completed before upcoming before live
-                if (a.status === 'completed' && b.status === 'upcoming') return -1;
-                if (b.status === 'completed' && a.status === 'upcoming') return 1;
-                if (a.status === 'upcoming' && b.status === 'live') return -1;
-                if (b.status === 'upcoming' && a.status === 'live') return 1;
-                
-                return 0;
-            });
+ case 'recent':
+    // Most Recent — Context-aware based on status
+    return sorted.sort((a, b) => {
+        // Priority 1: Status order (Live → Completed → Upcoming)
+        const statusOrder = { 'live': 1, 'completed': 2, 'upcoming': 3 };
+        const statusDiff = (statusOrder[a.status] || 4) - (statusOrder[b.status] || 4);
+        if (statusDiff !== 0) return statusDiff;
+        
+        // Priority 2: Within same status
+        if (a.status === 'completed' || a.status === 'live') {
+            // For completed/live: Most recent = newest date first
+            return new Date(b.date) - new Date(a.date);
+        } else if (a.status === 'upcoming') {
+            // For upcoming: Most recent = soonest date first
+            return new Date(a.date) - new Date(b.date);
+        }
+        
+        return 0;
+    });
             
         case 'votes-desc':
-            return sorted.sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0));
+            return sorted.sort((a, b) => {
+                const votesA = a.totalVotes || 0;
+                const votesB = b.totalVotes || 0;
+                return votesB - votesA || a.competitor1.name.localeCompare(b.competitor1.name);
+            });
             
         case 'close':
             return sorted.sort((a, b) => {
                 const diffA = Math.abs((a.competitor1.percentage || 50) - (a.competitor2.percentage || 50));
                 const diffB = Math.abs((b.competitor1.percentage || 50) - (b.competitor2.percentage || 50));
-                return diffA - diffB;
+                return diffA - diffB || (b.totalVotes || 0) - (a.totalVotes || 0);
             });
             
         default:
             return sorted;
     }
 }
-
 // Clear all filters
 function clearFilters() {
     const searchInput = document.getElementById('search-input');
@@ -411,14 +497,14 @@ function clearFilters() {
     if (tournamentFilter) tournamentFilter.value = 'all';
     if (roundFilter) roundFilter.value = 'all';
     if (statusFilter) statusFilter.value = 'all';
-    if (sortFilter) sortFilter.value = 'date-desc';
+    if (sortFilter) sortFilter.value = 'recent'; // ← Changed from 'date-desc'
 
     currentFilters = {
         search: '',
         tournament: 'all',
         round: 'all',
         status: 'all',
-        sort: 'date-desc'
+        sort: 'recent' // ← Changed from 'date-desc'
     };
 
     displayMatches(allMatches);
