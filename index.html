@@ -44,6 +44,8 @@
     <link rel="stylesheet" href="/css/homepage.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
 
@@ -157,6 +159,31 @@
             </div>
 
             <div class="matches-grid" id="recentResultsGrid">
+                <!-- Populated by JavaScript using .match-card -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ========================================
+         ✨ UPCOMING MATCHES (Match Cards Grid)
+         ======================================== -->
+    <section class="matches-section upcoming-matches-section">
+        <div class="container">
+            
+            <div class="section-header">
+                <div class="section-title-group">
+                    <h2 class="section-title">📅 Upcoming Matches</h2>
+                    <p class="section-subtitle">Next battles on the horizon</p>
+                </div>
+                <a href="matches.html?status=upcoming" class="view-all-link">
+                    View All Upcoming
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="matches-grid" id="upcomingMatchesGrid">
                 <!-- Populated by JavaScript using .match-card -->
             </div>
 
