@@ -777,10 +777,12 @@ function showVoteConfirmation(side) {
 async function loadUpcomingMatches() {
     try {
         const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        
+        // ✅ Get ALL upcoming matches (no limit yet)
         const upcomingQuery = query(
             matchesRef,
             where('status', '==', 'upcoming'),
-            limit(8) // Get more in case some are TBD
+            orderBy('date', 'asc')
         );
         
         const snapshot = await getDocs(upcomingQuery);
@@ -790,30 +792,25 @@ async function loadUpcomingMatches() {
             return;
         }
         
-        // Convert to match format (same as matches.js)
         const upcomingMatches = [];
         
         snapshot.forEach(doc => {
             const match = doc.data();
             
-// ✅ NEW (SAFE)
-const song1IsTBD = !match.song1?.id || 
-                  match.song1.id === 'TBD' || 
-                  String(match.song1.id).includes('TBD');
+            // Skip TBD matches
+            const song1IsTBD = !match.song1?.id || 
+                              match.song1.id === 'TBD' || 
+                              String(match.song1.id).includes('TBD');
 
-const song2IsTBD = !match.song2?.id || 
-                  match.song2.id === 'TBD' || 
-                  String(match.song2.id).includes('TBD');
+            const song2IsTBD = !match.song2?.id || 
+                              match.song2.id === 'TBD' || 
+                              String(match.song2.id).includes('TBD');
             
             if (song1IsTBD || song2IsTBD) {
-                console.log(`⏭️ Skipping TBD match: ${match.matchId}`);
-                return; // Skip this match
+                return; // Skip
             }
             
-            const totalVotes = match.totalVotes || 0;
-            const song1Votes = match.song1.votes || 0;
-            const song2Votes = match.song2.votes || 0;
-            
+            // Only add non-TBD matches
             upcomingMatches.push({
                 id: match.matchId,
                 tournament: 'Anthems Arena Championship',
@@ -845,19 +842,21 @@ const song2IsTBD = !match.song2?.id ||
             });
         });
         
-        // Only show if we have confirmed matches
+        console.log(`🔍 Found ${upcomingMatches.length} non-TBD upcoming matches`);
+        
         if (upcomingMatches.length === 0) {
             hideUpcomingSection();
             return;
         }
         
-        // Sort by date (soonest first)
-        upcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        // Limit to 4 matches
+        // Already sorted by Firestore, just limit to 4
         const limitedMatches = upcomingMatches.slice(0, 4);
         
-        console.log(`✅ Loaded ${limitedMatches.length} confirmed upcoming matches`);
+        console.log(`✅ Displaying ${limitedMatches.length} upcoming matches`);
+        limitedMatches.forEach((m, i) => {
+            console.log(`${i + 1}. ${m.competitor1.name} vs ${m.competitor2.name} | ${m.date}`);
+        });
+        
         displayUpcomingMatches(limitedMatches);
         
     } catch (error) {

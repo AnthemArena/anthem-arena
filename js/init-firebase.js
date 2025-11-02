@@ -74,6 +74,8 @@ async function generateAllMatches(allSongs) {
         
         allMatches.push({
             matchId: `round-1-match-${i + 1}`,
+             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
             round: 1,
             matchNumber: i + 1,
             status: 'upcoming',
@@ -124,6 +126,8 @@ const byeSeeds = [allSongs[0], allSongs[1], allSongs[2]]; // Seeds 1, 2, 3
 // Match 1: Seed 1 (bye) vs Winner(4 vs 61)
 allMatches.push({
     matchId: 'round-2-match-1',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 1,
     status: 'upcoming',
@@ -153,6 +157,8 @@ allMatches.push({
 // Match 2: Winner(8 vs 57) vs Winner(9 vs 56)
 allMatches.push({
     matchId: 'round-2-match-2',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 2,
     status: 'upcoming',
@@ -189,6 +195,8 @@ allMatches.push({
 // Match 3: Winner(5 vs 60) vs Winner(12 vs 53)
 allMatches.push({
     matchId: 'round-2-match-3',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 3,
     status: 'upcoming',
@@ -225,6 +233,8 @@ allMatches.push({
 // Match 4: Winner(13 vs 52) vs Winner(16 vs 49)
 allMatches.push({
     matchId: 'round-2-match-4',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 4,
     status: 'upcoming',
@@ -265,6 +275,8 @@ allMatches.push({
 // Match 5: Seed 3 (bye) vs Winner(6 vs 59)
 allMatches.push({
     matchId: 'round-2-match-5',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 5,
     status: 'upcoming',
@@ -294,6 +306,8 @@ allMatches.push({
 // Match 6: Winner(11 vs 54) vs Winner(14 vs 51)
 allMatches.push({
     matchId: 'round-2-match-6',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 6,
     status: 'upcoming',
@@ -330,6 +344,8 @@ allMatches.push({
 // Match 7: Winner(7 vs 58) vs Winner(10 vs 55)
 allMatches.push({
     matchId: 'round-2-match-7',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 7,
     status: 'upcoming',
@@ -366,6 +382,8 @@ allMatches.push({
 // Match 8: Winner(15 vs 50) vs Winner(18 vs 47)
 allMatches.push({
     matchId: 'round-2-match-8',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 8,
     status: 'upcoming',
@@ -406,6 +424,8 @@ allMatches.push({
 // Match 9: Winner(19 vs 46) vs Winner(22 vs 43)
 allMatches.push({
     matchId: 'round-2-match-9',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 9,
     status: 'upcoming',
@@ -442,6 +462,8 @@ allMatches.push({
 // Match 10: Winner(27 vs 38) vs Winner(30 vs 35)
 allMatches.push({
     matchId: 'round-2-match-10',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 10,
     status: 'upcoming',
@@ -478,6 +500,8 @@ allMatches.push({
 // Match 11: Winner(23 vs 42) vs Winner(26 vs 39)
 allMatches.push({
     matchId: 'round-2-match-11',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 11,
     status: 'upcoming',
@@ -514,6 +538,8 @@ allMatches.push({
 // Match 12: Winner(31 vs 34) vs Winner(32 vs 33)
 allMatches.push({
     matchId: 'round-2-match-12',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 12,
     status: 'upcoming',
@@ -554,6 +580,8 @@ allMatches.push({
 // Match 13: Seed 2 (bye) vs Winner(17 vs 48)
 allMatches.push({
     matchId: 'round-2-match-13',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 13,
     status: 'upcoming',
@@ -583,6 +611,8 @@ allMatches.push({
 // Match 14: Winner(24 vs 41) vs Winner(25 vs 40)
 allMatches.push({
     matchId: 'round-2-match-14',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 14,
     status: 'upcoming',
@@ -619,6 +649,8 @@ allMatches.push({
 // Match 15: Winner(20 vs 45) vs Winner(29 vs 36)
 allMatches.push({
     matchId: 'round-2-match-15',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 15,
     status: 'upcoming',
@@ -655,6 +687,8 @@ allMatches.push({
 // Match 16: Winner(21 vs 44) vs Winner(28 vs 37)
 allMatches.push({
     matchId: 'round-2-match-16',
+     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
     round: 2,
     matchNumber: 16,
     status: 'upcoming',
@@ -702,6 +736,8 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-3-match-${i}`,
+             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
             round: 3,
             matchNumber: i,
             status: 'upcoming',
@@ -750,6 +786,8 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-4-match-${i}`,
+             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
             round: 4,
             matchNumber: i,
             status: 'upcoming',
@@ -798,6 +836,8 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-5-match-${i}`,
+             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
             round: 5,
             matchNumber: i,
             status: 'upcoming',
@@ -842,6 +882,8 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
     
     allMatches.push({
         matchId: 'finals',
+         tournament: TOURNAMENT_CONFIG.id,           // ← ADD
+    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
         round: 6,
         matchNumber: 1,
         status: 'upcoming',

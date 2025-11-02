@@ -29,7 +29,6 @@ let currentFilters = {
     status: 'all',
     sort: 'recent' // ← Changed from 'date-desc'
 };
-// Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('League Music Tournament matches page loaded successfully');
     
@@ -43,16 +42,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateTournamentFilter();
     populateRoundFilter();
     
-    // Display matches
+    // Setup filter event listeners
+    setupFilterListeners();
+    
+    // ✅ FIXED: Apply initial filtering and sorting
     if (allMatches.length > 0) {
-        displayMatches(allMatches);
-        updateResultsCount(allMatches.length);
+        filterMatches(); // ← This will sort AND display!
     } else {
         showNoMatches();
     }
-    
-    // Setup filter event listeners
-    setupFilterListeners();
 });
 
 // Setup filter event listeners
@@ -449,7 +447,7 @@ function sortMatchesArray(matches, sortType) {
     switch (sortType) {
  case 'recent':
     // Most Recent — Context-aware based on status
-    return sorted.sort((a, b) => {
+    const result = sorted.sort((a, b) => {
         // Priority 1: Status order (Live → Completed → Upcoming)
         const statusOrder = { 'live': 1, 'completed': 2, 'upcoming': 3 };
         const statusDiff = (statusOrder[a.status] || 4) - (statusOrder[b.status] || 4);
@@ -466,6 +464,18 @@ function sortMatchesArray(matches, sortType) {
         
         return 0;
     });
+    
+    // 🔍 DEBUG: Log sorted results
+    console.log('🔍 SORTED MATCHES (first 10):');
+    result.slice(0, 10).forEach((m, i) => {
+        const date = new Date(m.date);
+        const now = new Date();
+        const hoursAway = Math.ceil((date - now) / (1000 * 60 * 60));
+        const daysAway = Math.floor(hoursAway / 24);
+        console.log(`${i + 1}. ${m.matchId} | Date: ${m.date} | ${daysAway}d ${hoursAway % 24}h away`);
+    });
+    
+    return result;
             
         case 'votes-desc':
             return sorted.sort((a, b) => {
@@ -497,18 +507,18 @@ function clearFilters() {
     if (tournamentFilter) tournamentFilter.value = 'all';
     if (roundFilter) roundFilter.value = 'all';
     if (statusFilter) statusFilter.value = 'all';
-    if (sortFilter) sortFilter.value = 'recent'; // ← Changed from 'date-desc'
+    if (sortFilter) sortFilter.value = 'recent';
 
     currentFilters = {
         search: '',
         tournament: 'all',
         round: 'all',
         status: 'all',
-        sort: 'recent' // ← Changed from 'date-desc'
+        sort: 'recent'
     };
 
-    displayMatches(allMatches);
-    updateResultsCount(allMatches.length);
+    // ✅ FIXED: Use filterMatches() instead of displayMatches()
+    filterMatches(); // ← This applies sorting!
 }
 
 // Display matches in grid
