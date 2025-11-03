@@ -32,24 +32,38 @@ let currentFilters = {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('League Music Tournament matches page loaded successfully');
     
-    // Load matches from Firebase
-    await loadMatchesFromFirebase();
-    
-    // Load tournament stats
-    await loadTournamentStats();
-    
-    // Populate filter dropdowns with actual data
-    populateTournamentFilter();
-    populateRoundFilter();
-    
-    // Setup filter event listeners
-    setupFilterListeners();
-    
-    // ✅ FIXED: Apply initial filtering and sorting
-    if (allMatches.length > 0) {
-        filterMatches(); // ← This will sort AND display!
-    } else {
-        showNoMatches();
+    try {
+        // ✅ Show loading state
+        showMatchesLoading();
+        
+        // Load matches from Firebase
+        await loadMatchesFromFirebase();
+        
+        // Load tournament stats
+        await loadTournamentStats();
+        
+        // Populate filter dropdowns with actual data
+        populateTournamentFilter();
+        populateRoundFilter();
+        
+        // Setup filter event listeners
+        setupFilterListeners();
+        
+        // Apply initial filtering and sorting
+        if (allMatches.length > 0) {
+            filterMatches();
+        } else {
+            showNoMatches();
+        }
+        
+        // ✅ Hide loading, show matches
+        hideMatchesLoading();
+        showMatchesSections();
+        
+    } catch (error) {
+        console.error('❌ Error initializing matches page:', error);
+        hideMatchesLoading();
+        showMatchesError(error);
     }
 });
 
@@ -656,6 +670,85 @@ function showNotification(message, type = 'info') {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
     }, 4000);
+}
+
+// ========================================
+// LOADING STATE HELPERS
+// ========================================
+
+function showMatchesLoading() {
+    const loadingState = document.getElementById('matchesLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'block';
+    }
+    
+    // Hide main sections while loading
+    hideMatchesSections();
+    
+    console.log('⏳ Showing matches loading state');
+}
+
+function hideMatchesLoading() {
+    const loadingState = document.getElementById('matchesLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    
+    console.log('✅ Hiding matches loading state');
+}
+
+function showMatchesSections() {
+    const sections = [
+        'filtersSection',
+        'matchesSection'
+    ];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'block';
+            section.classList.add('matches-fade-in');
+        }
+    });
+    
+    console.log('✅ Matches sections visible');
+}
+
+function hideMatchesSections() {
+    const sections = [
+        'filtersSection',
+        'matchesSection'
+    ];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+            section.classList.remove('matches-fade-in');
+        }
+    });
+}
+
+function showMatchesError(error) {
+    const matchesSection = document.getElementById('matchesSection');
+    if (matchesSection) {
+        matchesSection.style.display = 'block';
+        matchesSection.innerHTML = `
+            <div class="container">
+                <div class="no-results">
+                    <div class="no-results-icon">⚠️</div>
+                    <h3 class="no-results-title">Error Loading Matches</h3>
+                    <p class="no-results-text">Could not load matches. Please try refreshing the page.</p>
+                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); margin-top: 0.5rem;">
+                        Error: ${error.message}
+                    </p>
+                    <button onclick="location.reload()" class="clear-filters-btn" style="margin-top: 1rem;">
+                        Retry
+                    </button>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // ========================================

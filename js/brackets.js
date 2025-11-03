@@ -41,13 +41,17 @@ async function loadBracketData() {
     try {
         console.log('📥 Loading bracket data from Firebase...');
         
+        // ✅ SHOW LOADING STATE
+        showBracketLoading();
+        
         // Load matches from Firebase
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
         
         if (snapshot.empty) {
             console.error('❌ No matches found in Firebase!');
             console.log('💡 Run init-matches.html to create matches');
+            hideBracketLoading();
             showEmptyState();
             return;
         }
@@ -69,9 +73,111 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         // Set up real-time updates (optional but recommended)
         setupRealtimeUpdates();
         
+        // ✅ HIDE LOADING, SHOW BRACKET
+        hideBracketLoading();
+        showBracketSections();
+        
     } catch (error) {
         console.error('❌ Error loading bracket data:', error);
+        hideBracketLoading();
         showErrorState(error);
+    }
+}
+
+// ========================================
+// LOADING STATE HELPERS
+// ========================================
+
+function showBracketLoading() {
+    const loadingState = document.getElementById('bracketLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'block';
+    }
+    
+    // Hide main sections while loading
+    hideBracketSections();
+    
+    console.log('⏳ Showing bracket loading state');
+}
+
+function hideBracketLoading() {
+    const loadingState = document.getElementById('bracketLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    
+    console.log('✅ Hiding bracket loading state');
+}
+
+function showBracketSections() {
+    // Show all bracket-related sections with fade-in animation
+    const sections = [
+        'tournamentSelector',
+        'bracketNavigation', 
+        'bracketSection'
+    ];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'block';
+            section.classList.add('bracket-fade-in');
+        }
+    });
+    
+    console.log('✅ Bracket sections visible');
+}
+
+function hideBracketSections() {
+    const sections = [
+        'tournamentSelector',
+        'bracketNavigation',
+        'bracketSection'
+    ];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+            section.classList.remove('bracket-fade-in');
+        }
+    });
+}
+
+function showEmptyState() {
+    const bracketSection = document.getElementById('bracketSection');
+    if (bracketSection) {
+        bracketSection.style.display = 'block';
+        bracketSection.innerHTML = `
+            <div class="container">
+                <div class="empty-bracket-state">
+                    <div class="empty-icon">🏆</div>
+                    <h3>No Bracket Data Yet</h3>
+                    <p>The tournament bracket will appear here once matches are scheduled.</p>
+                    <a href="/admin/init-firebase.html" class="retry-btn">Initialize Tournament</a>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showErrorState(error) {
+    const bracketSection = document.getElementById('bracketSection');
+    if (bracketSection) {
+        bracketSection.style.display = 'block';
+        bracketSection.innerHTML = `
+            <div class="container">
+                <div class="empty-bracket-state error">
+                    <div class="empty-icon">⚠️</div>
+                    <h3>Error Loading Bracket</h3>
+                    <p>Could not load tournament bracket. Please try refreshing the page.</p>
+                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); margin-top: 0.5rem;">
+                        Error: ${error.message}
+                    </p>
+                    <button onclick="location.reload()" class="retry-btn">Retry</button>
+                </div>
+            </div>
+        `;
     }
 }
 
@@ -141,6 +247,8 @@ async function generateBracketFromFirebase(firebaseMatches) {
     
     console.log('✅ Bracket generation complete');
 }
+
+// ... rest of your existing functions stay the same ...
 
 // ========================================
 // CREATE MATCH CARD FROM FIREBASE DATA
@@ -1061,40 +1169,6 @@ function setupClickHandlers() {
 function showNotification(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
     // You could add a toast notification here if you want
-}
-
-// ========================================
-// ERROR STATES
-// ========================================
-
-function showEmptyState() {
-    const round1Container = document.getElementById('round-1-matches');
-    if (round1Container) {
-        round1Container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <h2 style="color: #c89b3c; margin-bottom: 1rem;">No Matches Found</h2>
-                <p style="color: #888; margin-bottom: 1.5rem;">Initialize the tournament to create matches</p>
-                <a href="init-matches.html" style="display: inline-block; padding: 1rem 2rem; background: #c89b3c; color: #0a0a0a; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                    Initialize Tournament
-                </a>
-            </div>
-        `;
-    }
-}
-
-function showErrorState(error) {
-    const round1Container = document.getElementById('round-1-matches');
-    if (round1Container) {
-        round1Container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <h2 style="color: #dc3232; margin-bottom: 1rem;">Error Loading Bracket</h2>
-                <p style="color: #888; margin-bottom: 1.5rem;">${error.message}</p>
-                <button onclick="location.reload()" style="padding: 1rem 2rem; background: #c89b3c; color: #0a0a0a; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    Retry
-                </button>
-            </div>
-        `;
-    }
 }
 
 // ========================================

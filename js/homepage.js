@@ -29,22 +29,82 @@ let musicVideos = [];
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.time('⏱️ Total Homepage Load');
     console.log('🎵 League Music Tournament loaded');
     
-    await loadMusicVideos();
-        await loadTournamentInfo(); // ← ADD THIS LINE
-
-    await loadFeaturedMatch();
-    await loadLiveMatches();
-    await loadRecentResults();
-        await loadUpcomingMatches(); // ← ADD THIS LINE
-
-    await updateHeroStats();
-    
-    hideChampionsSection();
-    initializeScrollAnimations();
-
+    try {
+        // ✅ Show loading state
+        showHomepageLoading();
+        
+        console.time('⏱️ Music Videos');
+        await loadMusicVideos();
+        console.timeEnd('⏱️ Music Videos');
+        
+        console.time('⏱️ Tournament Info');
+        await loadTournamentInfo();
+        console.timeEnd('⏱️ Tournament Info');
+        
+        console.time('⏱️ Featured Match');
+        await loadFeaturedMatch();
+        console.timeEnd('⏱️ Featured Match');
+        
+        console.time('⏱️ Live Matches');
+        await loadLiveMatches();
+        console.timeEnd('⏱️ Live Matches');
+        
+        console.time('⏱️ Recent Results');
+        await loadRecentResults();
+        console.timeEnd('⏱️ Recent Results');
+        
+        console.time('⏱️ Upcoming Matches');
+        await loadUpcomingMatches();
+        console.timeEnd('⏱️ Upcoming Matches');
+        
+        console.time('⏱️ Hero Stats');
+        await updateHeroStats();
+        console.timeEnd('⏱️ Hero Stats');
+        
+        hideChampionsSection();
+        initializeScrollAnimations();
+        
+        // ✅ Hide loading, show homepage with stagger animation
+        hideHomepageLoading();
+        showHomepageSections();
+        
+        console.timeEnd('⏱️ Total Homepage Load');
+        
+    } catch (error) {
+        console.error('❌ Error loading homepage:', error);
+        hideHomepageLoading();
+        showHomepageError(error);
+    }
 });
+
+function showHomepageError(error) {
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+        heroSection.style.display = 'block';
+        heroSection.innerHTML = `
+            <div class="container">
+                <div style="text-align: center; padding: 5rem 2rem;">
+                    <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.5;">⚠️</div>
+                    <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: #C8AA6E; margin-bottom: 1rem;">
+                        Error Loading Tournament
+                    </h2>
+                    <p style="font-family: 'Lora', serif; font-size: 1.1rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 2rem;">
+                        Could not load tournament data. Please try refreshing the page.
+                    </p>
+                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">
+                        Error: ${error.message}
+                    </p>
+                    <button onclick="location.reload()" style="margin-top: 2rem; padding: 1rem 2rem; background: linear-gradient(135deg, #C8AA6E, #b49a5e); border: none; color: #1a1a2e; font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer;">
+                        Retry
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
 
 // ========================================
 // LOAD MUSIC VIDEOS DATA
@@ -443,6 +503,71 @@ function updateLeadingVisuals() {
     } else if (voteState.rightVotes > voteState.leftVotes) {
         rightCol.setAttribute('data-leading', 'true');
     }
+}
+
+// ========================================
+// LOADING STATE HELPERS
+// ========================================
+
+function showHomepageLoading() {
+    const loadingState = document.getElementById('homepageLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'block';
+    }
+    
+    // Hide all content sections
+    hideHomepageSections();
+    
+    console.log('⏳ Showing homepage loading state');
+}
+
+function hideHomepageLoading() {
+    const loadingState = document.getElementById('homepageLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    
+    console.log('✅ Hiding homepage loading state');
+}
+
+function showHomepageSections() {
+    const sections = [
+        { id: 'heroSection', stagger: 1 },
+        { id: 'musicVideosSection', stagger: 2 },
+        { id: 'featuredMatchSection', stagger: 3 },
+        { id: 'liveMatchesSection', stagger: 4 },
+        { id: 'upcomingMatchesSection', stagger: 5 },
+        { id: 'recentResultsSection', stagger: 6 }
+    ];
+    
+    sections.forEach(({ id, stagger }) => {
+        const section = document.getElementById(id);
+        if (section) {
+            section.style.display = 'block';
+            section.classList.add('homepage-fade-in', `stagger-${stagger}`);
+        }
+    });
+    
+    console.log('✅ Homepage sections visible with stagger animation');
+}
+
+function hideHomepageSections() {
+    const sectionIds = [
+        'heroSection',
+        'musicVideosSection',
+        'featuredMatchSection',
+        'liveMatchesSection',
+        'upcomingMatchesSection',
+        'recentResultsSection'
+    ];
+    
+    sectionIds.forEach(id => {
+        const section = document.getElementById(id);
+        if (section) {
+            section.style.display = 'none';
+            section.classList.remove('homepage-fade-in');
+        }
+    });
 }
 
 // ========================================
