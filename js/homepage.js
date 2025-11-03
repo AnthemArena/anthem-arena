@@ -3,7 +3,7 @@
 // ========================================
 import { getBookForSong } from './bookMappings.js';
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, getDoc, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, updateDoc, increment, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { createMatchCard } from './match-card-renderer.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
@@ -336,7 +336,7 @@ async function loadFeaturedMatch() {
     try {
         console.log('🔍 Searching for live matches...');
         
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const liveQuery = query(
             matchesRef,
             where('status', '==', 'live')
@@ -368,6 +368,11 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         // Check if user already voted
         checkExistingVote();
         
+        // ✅ START POLLING (AFTER match is loaded!)
+        if (currentMatch && currentMatch.status === 'live') {
+            startVotePolling();
+        }
+        
     } catch (error) {
         console.error('❌ Error loading featured match:', error);
         hideFeaturedSection();
@@ -378,6 +383,48 @@ function hideFeaturedSection() {
     const section = document.querySelector('.featured-matchup');
     if (section) section.style.display = 'none';
 }
+
+// ========================================
+// REAL-TIME VOTE POLLING
+// ========================================
+
+let votePollingInterval = null;
+
+function startVotePolling() {
+    if (!currentMatch) return;
+    
+    console.log('🔄 Starting vote polling...');
+    
+    votePollingInterval = setInterval(async () => {
+        try {
+            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
+            const matchSnap = await getDoc(matchRef);
+            
+            if (matchSnap.exists()) {
+                const data = matchSnap.data();
+                
+                // Update vote counts
+                voteState.leftVotes = data.song1.votes || 0;
+                voteState.rightVotes = data.song2.votes || 0;
+                voteState.totalVotes = data.totalVotes || 0;
+                
+                // Update display
+                updateVoteDisplay();
+                updateLeadingVisuals();
+                
+            }
+        } catch (error) {
+            console.error('❌ Error polling votes:', error);
+        }
+    }, 10000); // Every 10 seconds
+}
+
+// Stop polling when user leaves page
+window.addEventListener('beforeunload', () => {
+    if (votePollingInterval) {
+        clearInterval(votePollingInterval);
+    }
+});
 
 // ========================================
 // DISPLAY FEATURED MATCH
@@ -405,6 +452,30 @@ function displayFeaturedMatch() {
         subtitle.textContent = `${voteState.totalVotes.toLocaleString()} votes • 🔴 Live Now`;
     }
     
+// ✅ ADD COUNTDOWN TIMER
+if (currentMatch.endTime) {
+    const countdownContainer = document.createElement('p');
+    countdownContainer.className = 'featured-countdown';
+    countdownContainer.id = 'featured-countdown';
+    countdownContainer.style.cssText = `
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 1rem 0 2rem 0;
+        color: #ffaa00;
+    `;
+    
+    const titleSection = document.querySelector('.featured-matchup .section-header');
+    if (titleSection) {
+        titleSection.appendChild(countdownContainer);
+        
+        // ✅ Start countdown AFTER element is in DOM
+        setTimeout(() => {
+            startFeaturedCountdown(currentMatch.endTime);
+        }, 100);
+    }
+}
+
     // Render full competitor layout (reusing vote page structure)
     const grid = document.querySelector('.competitors-grid');
     if (!grid) return;
@@ -735,8 +806,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
 function checkExistingVote() {
     if (!currentMatch) return;
     
-    const savedVote = localStorage.getItem(`vote_${currentMatch.id}`);
-    if (savedVote) {
+const savedVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);    if (savedVote) {
         voteState.userVote = savedVote;
         markButtonAsVoted(savedVote);
         console.log('✅ Found existing vote:', savedVote);
@@ -775,7 +845,19 @@ async function vote(side) {
     button.disabled = true;
     
     try {
-        // Update vote counts
+        // ✅ UPDATE FIREBASE
+        const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
+        
+        const voteField = side === 'left' ? 'song1.votes' : 'song2.votes';
+        
+        await updateDoc(matchRef, {
+            [voteField]: increment(1),
+            totalVotes: increment(1)
+        });
+        
+        console.log('✅ Vote submitted to Firebase');
+        
+        // Update local state
         if (side === 'left') {
             voteState.leftVotes++;
         } else {
@@ -784,8 +866,21 @@ async function vote(side) {
         voteState.totalVotes++;
         voteState.userVote = side;
         
-        // Save to localStorage
-        localStorage.setItem(`vote_${currentMatch.id}`, side);
+      // ✅ NEW:
+localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, side);
+
+await setDoc(voteRef, {
+    tournament: ACTIVE_TOURNAMENT,  // ✅ Add tournament
+    matchId: currentMatch.id,
+    userId: userId,
+    songId: side === 'left' ? currentMatch.song1.id : currentMatch.song2.id,
+    choice: side,  // ✅ Add which side they picked
+    timestamp: new Date().toISOString(),
+    // ✅ Add extra fields for easier querying:
+    round: currentMatch.round || 1,
+    votedForSeed: (side === 'left' ? currentMatch.song1 : currentMatch.song2).seed,
+    votedForName: (side === 'left' ? currentMatch.song1 : currentMatch.song2).shortTitle || (side === 'left' ? currentMatch.song1 : currentMatch.song2).title
+});
         
         // Update display
         updateVoteDisplay();
@@ -806,8 +901,25 @@ async function vote(side) {
     } catch (error) {
         console.error('Error casting vote:', error);
         button.classList.remove('loading');
-        showNotification('Error casting vote', 'error');
+        button.disabled = false;
+        showNotification('Error casting vote. Please try again.', 'error');
+        
+        // Revert local state
+        if (side === 'left') {
+            voteState.leftVotes--;
+        } else {
+            voteState.rightVotes--;
+        }
+        voteState.totalVotes--;
+        voteState.userVote = null;
     }
+}
+
+// Helper: Generate unique user ID
+function generateUserId() {
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9) + Date.now();
+    localStorage.setItem('userId', userId);
+    return userId;
 }
 
 // Make vote function available globally
@@ -1336,6 +1448,48 @@ console.log(
     'color: #C8AA6E; font-size: 20px; font-weight: bold; font-family: Cinzel, serif;',
     'color: #888; font-size: 14px; font-family: Lora, serif;'
 );
+
+// ========================================
+// FEATURED MATCH COUNTDOWN
+// ========================================
+
+function startFeaturedCountdown(endTime) {
+    const elem = document.getElementById('featured-countdown');
+    if (!elem) return;
+    
+    const endTimestamp = new Date(endTime).getTime();
+    
+    const interval = setInterval(() => {
+        const now = new Date().getTime();
+        const remaining = endTimestamp - now;
+        
+        if (remaining <= 0) {
+            clearInterval(interval);
+            elem.textContent = '⏱️ Voting Closed';
+            elem.style.color = '#999';
+                elem.classList.remove('urgent'); // ✅ Remove animation
+
+            return;
+        }
+        
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        
+        if (hours > 0) {
+            elem.textContent = `⏰ ${hours}h ${minutes}m left to vote`;
+            elem.style.color = '#667eea';
+        } else if (minutes > 30) {
+            elem.textContent = `⏰ ${minutes}m ${seconds}s left to vote`;
+            elem.style.color = '#ffaa00';
+      } else {
+    elem.textContent = `🚨 ${minutes}m ${seconds}s left to vote!`;
+    elem.style.color = '#ff4444';
+    elem.style.fontWeight = 'bold';
+    elem.classList.add('urgent'); // ✅ Add pulsing animation
+}
+    }, 1000);
+}
 
 // ========================================
 // ERROR HANDLING

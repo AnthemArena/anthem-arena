@@ -485,13 +485,12 @@ async function checkVoteStatus() {
             console.log('✅ User already voted:', voteData.choice);
             
             // Also store in localStorage for quick checking
-            localStorage.setItem(`vote_${currentMatch.id}`, voteData.choice);
-            
+localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);            
             // Disable vote buttons
             disableVoting(voteData.choice);
         } else {
             // Double-check localStorage as backup
-            const localVote = localStorage.getItem(`vote_${currentMatch.id}`);
+const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
             if (localVote) {
                 hasVoted = true;
                 console.log('✅ Found vote in localStorage:', localVote);
@@ -967,17 +966,18 @@ async function submitVote(songId) {
             return;
         }
         
-        // Create vote document
-        await setDoc(voteRef, {
-            matchId: currentMatch.id,
-            userId: userId,
-            choice: songId,
-            timestamp: new Date().toISOString(),
-            round: currentMatch.round,
-            // Store song details for analytics
-            votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
-            votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
-        });
+       // ✅ CHANGE TO:
+await setDoc(voteRef, {
+    tournament: ACTIVE_TOURNAMENT,  // ✅ ADD THIS
+    matchId: currentMatch.id,
+    userId: userId,
+    choice: songId,
+    timestamp: new Date().toISOString(),
+    round: currentMatch.round,
+    // Store song details for analytics
+    votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
+    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+});
         
         console.log('✅ Vote record created in Firebase');
         
@@ -992,7 +992,7 @@ const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatc
         console.log('✅ Vote counts updated in match');
         
         // Save vote locally as backup
-        localStorage.setItem(`vote_${currentMatch.id}`, songId);
+localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
         
               // Reload match data to show updated counts
         await reloadMatchData();

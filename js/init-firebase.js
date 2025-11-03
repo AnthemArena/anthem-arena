@@ -51,14 +51,18 @@ async function createTournamentInfo() {
 // GENERATE ALL 63 MATCHES
 // ========================================
 
+// ========================================
+// GENERATE ALL 63 MATCHES (with batch assignments)
+// ========================================
+
 async function generateAllMatches(allSongs) {
     const allMatches = [];
     
     // ========================================
-    // ROUND 1: 29 MATCHES
+    // ROUND 1: 29 MATCHES (5 matches per batch = 6 batches)
     // ========================================
     
-    console.log('🎯 Generating Round 1 (29 matches)...');
+    console.log('🎯 Generating Round 1 (29 matches, 6 batches)...');
     
     for (let i = 0; i < 29; i++) {
         const topSeedIndex = i + 3;      // Seeds 4-32
@@ -74,10 +78,11 @@ async function generateAllMatches(allSongs) {
         
         allMatches.push({
             matchId: `round-1-match-${i + 1}`,
-             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
+            tournament: TOURNAMENT_CONFIG.id,
+            tournamentName: TOURNAMENT_CONFIG.name,
             round: 1,
             matchNumber: i + 1,
+            batch: Math.floor(i / 5) + 1,  // Batches 1-6 (5 per batch, last batch has 4)
             status: 'upcoming',
             totalVotes: 0,
             winnerId: null,
@@ -108,627 +113,129 @@ async function generateAllMatches(allSongs) {
         });
     }
     
-    console.log(`✅ Round 1: ${allMatches.length} matches`);
-    
-// ========================================
-// ROUND 2: 16 MATCHES (with byes)
-// Proper bracket seeding: #1 and #2 in opposite halves
-// ========================================
+    console.log(`✅ Round 1: ${allMatches.length} matches in 6 batches`);
 
-console.log('🎯 Generating Round 2 (16 matches)...');
+    // ========================================
+// ✅ DEFINE BYE SEEDS (Seeds 1, 2, 3)
+// ========================================
 
 const byeSeeds = [allSongs[0], allSongs[1], allSongs[2]]; // Seeds 1, 2, 3
 
+console.log('✅ Bye seeds defined:', byeSeeds.map(s => `${s.seed}. ${s.shortTitle}`));
+    
 // ========================================
-// TOP QUARTER (Matches 1-4): Seed #1's Region
-// ========================================
-
-// Match 1: Seed 1 (bye) vs Winner(4 vs 61)
-allMatches.push({
-    matchId: 'round-2-match-1',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 1,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        ...byeSeeds[0], // Seed 1
-        votes: 0,
-        hasBye: true
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-1' // 4 vs 61
-    }
-});
-
-// Match 2: Winner(8 vs 57) vs Winner(9 vs 56)
-allMatches.push({
-    matchId: 'round-2-match-2',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 2,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-5' // 8 vs 57
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-6' // 9 vs 56
-    }
-});
-
-// Match 3: Winner(5 vs 60) vs Winner(12 vs 53)
-allMatches.push({
-    matchId: 'round-2-match-3',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 3,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-2' // 5 vs 60
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-9' // 12 vs 53
-    }
-});
-
-// Match 4: Winner(13 vs 52) vs Winner(16 vs 49)
-allMatches.push({
-    matchId: 'round-2-match-4',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 4,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-10' // 13 vs 52
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-13' // 16 vs 49
-    }
-});
-
-// ========================================
-// UPPER-MIDDLE QUARTER (Matches 5-8): Seed #3's Region
+// ROUND 2: 16 MATCHES (4 matches per batch = 4 batches)
 // ========================================
 
-// Match 5: Seed 3 (bye) vs Winner(6 vs 59)
-allMatches.push({
-    matchId: 'round-2-match-5',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 5,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        ...byeSeeds[2], // Seed 3
-        votes: 0,
-        hasBye: true
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-3' // 6 vs 59
-    }
-});
+console.log('🎯 Generating Round 2 (16 matches, 4 batches)...');
 
-// Match 6: Winner(11 vs 54) vs Winner(14 vs 51)
-allMatches.push({
-    matchId: 'round-2-match-6',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 6,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-8' // 11 vs 54
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-11' // 14 vs 51
-    }
-});
+// Helper function to add Round 2 match with batch
+const addRound2Match = (matchNum, song1Data, song2Data) => {
+    allMatches.push({
+        matchId: `round-2-match-${matchNum}`,
+        tournament: TOURNAMENT_CONFIG.id,
+        tournamentName: TOURNAMENT_CONFIG.name,
+        round: 2,
+        matchNumber: matchNum,
+        batch: Math.floor((matchNum - 1) / 4) + 1,  // Batches 1-4 (4 per batch)
+        status: 'upcoming',
+        totalVotes: 0,
+        winnerId: null,
+        song1: { ...song1Data, votes: 0 },
+        song2: { ...song2Data, votes: 0 }
+    });
+};
 
-// Match 7: Winner(7 vs 58) vs Winner(10 vs 55)
-allMatches.push({
-    matchId: 'round-2-match-7',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 7,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-4' // 7 vs 58
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-7' // 10 vs 55
-    }
-});
+// TOP QUARTER (Matches 1-4): Seed #1's Region - BATCH 1
+addRound2Match(1, 
+    { ...byeSeeds[0], hasBye: true },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-1' }
+);
 
-// Match 8: Winner(15 vs 50) vs Winner(18 vs 47)
-allMatches.push({
-    matchId: 'round-2-match-8',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 8,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-12' // 15 vs 50
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-15' // 18 vs 47
-    }
-});
+addRound2Match(2,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-5' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-6' }
+);
 
-// ========================================
-// LOWER-MIDDLE QUARTER (Matches 9-12)
-// ========================================
+addRound2Match(3,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-2' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-9' }
+);
 
-// Match 9: Winner(19 vs 46) vs Winner(22 vs 43)
-allMatches.push({
-    matchId: 'round-2-match-9',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 9,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-16' // 19 vs 46
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-19' // 22 vs 43
-    }
-});
+addRound2Match(4,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-10' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-13' }
+);
 
-// Match 10: Winner(27 vs 38) vs Winner(30 vs 35)
-allMatches.push({
-    matchId: 'round-2-match-10',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 10,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-24' // 27 vs 38
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-27' // 30 vs 35
-    }
-});
+// UPPER-MIDDLE QUARTER (Matches 5-8): Seed #3's Region - BATCH 2
+addRound2Match(5,
+    { ...byeSeeds[2], hasBye: true },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-3' }
+);
 
-// Match 11: Winner(23 vs 42) vs Winner(26 vs 39)
-allMatches.push({
-    matchId: 'round-2-match-11',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 11,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-20' // 23 vs 42
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-23' // 26 vs 39
-    }
-});
+addRound2Match(6,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-8' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-11' }
+);
 
-// Match 12: Winner(31 vs 34) vs Winner(32 vs 33)
-allMatches.push({
-    matchId: 'round-2-match-12',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 12,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-28' // 31 vs 34
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-29' // 32 vs 33
-    }
-});
+addRound2Match(7,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-4' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-7' }
+);
 
-// ========================================
-// BOTTOM QUARTER (Matches 13-16): Seed #2's Region
-// ========================================
+addRound2Match(8,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-12' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-15' }
+);
 
-// Match 13: Seed 2 (bye) vs Winner(17 vs 48)
-allMatches.push({
-    matchId: 'round-2-match-13',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 13,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        ...byeSeeds[1], // Seed 2
-        votes: 0,
-        hasBye: true
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-14' // 17 vs 48
-    }
-});
+// LOWER-MIDDLE QUARTER (Matches 9-12) - BATCH 3
+addRound2Match(9,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-16' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-19' }
+);
 
-// Match 14: Winner(24 vs 41) vs Winner(25 vs 40)
-allMatches.push({
-    matchId: 'round-2-match-14',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 14,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-21' // 24 vs 41
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-22' // 25 vs 40
-    }
-});
+addRound2Match(10,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-24' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-27' }
+);
 
-// Match 15: Winner(20 vs 45) vs Winner(29 vs 36)
-allMatches.push({
-    matchId: 'round-2-match-15',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 15,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-17' // 20 vs 45
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-26' // 29 vs 36
-    }
-});
+addRound2Match(11,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-20' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-23' }
+);
 
-// Match 16: Winner(21 vs 44) vs Winner(28 vs 37)
-allMatches.push({
-    matchId: 'round-2-match-16',
-     tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
-    round: 2,
-    matchNumber: 16,
-    status: 'upcoming',
-    totalVotes: 0,
-    winnerId: null,
-    
-    song1: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-18' // 21 vs 44
-    },
-    
-    song2: {
-        id: 'TBD',
-        seed: '?',
-        shortTitle: 'TBD',
-        title: 'To Be Determined',
-        artist: 'Pending',
-        videoId: 'dQw4w9WgXcQ',
-        year: '2024',
-        slug: 'tbd',
-        votes: 0,
-        sourceMatch: 'round-1-match-25' // 28 vs 37
-    }
-});
+addRound2Match(12,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-28' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-29' }
+);
 
-console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
-    
-    // ========================================
-    // ROUND 3: 8 MATCHES (Sweet 16)
+// BOTTOM QUARTER (Matches 13-16): Seed #2's Region - BATCH 4
+addRound2Match(13,
+    { ...byeSeeds[1], hasBye: true },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-14' }
+);
+
+addRound2Match(14,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-21' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-22' }
+);
+
+addRound2Match(15,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-17' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-26' }
+);
+
+addRound2Match(16,
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-18' },
+    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-25' }
+);
+
+console.log(`✅ Round 2: 16 matches in 4 batches (${allMatches.length} total)`);
+ // ========================================
+    // ROUND 3: 8 MATCHES (4 per batch = 2 batches)
     // ========================================
     
-    console.log('🎯 Generating Round 3 (8 matches)...');
+    console.log('🎯 Generating Round 3 (8 matches, 2 batches)...');
     
     for (let i = 1; i <= 8; i++) {
         const r2match1 = (i * 2) - 1;
@@ -736,10 +243,11 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-3-match-${i}`,
-             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
+            tournament: TOURNAMENT_CONFIG.id,
+            tournamentName: TOURNAMENT_CONFIG.name,
             round: 3,
             matchNumber: i,
+            batch: Math.floor((i - 1) / 4) + 1,  // Batches 1-2 (4 per batch)
             status: 'upcoming',
             totalVotes: 0,
             winnerId: null,
@@ -772,13 +280,13 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         });
     }
     
-    console.log(`✅ Round 3: 8 matches (${allMatches.length} total)`);
+    console.log(`✅ Round 3: 8 matches in 2 batches (${allMatches.length} total)`);
     
     // ========================================
-    // ROUND 4: 4 MATCHES (Quarterfinals)
+    // ROUND 4: 4 MATCHES (all in 1 batch - Quarterfinals)
     // ========================================
     
-    console.log('🎯 Generating Round 4 (4 matches)...');
+    console.log('🎯 Generating Round 4 (4 matches, 1 batch)...');
     
     for (let i = 1; i <= 4; i++) {
         const r3match1 = (i * 2) - 1;
@@ -786,10 +294,11 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-4-match-${i}`,
-             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
+            tournament: TOURNAMENT_CONFIG.id,
+            tournamentName: TOURNAMENT_CONFIG.name,
             round: 4,
             matchNumber: i,
+            batch: 1,  // All 4 QF matches in 1 batch
             status: 'upcoming',
             totalVotes: 0,
             winnerId: null,
@@ -822,13 +331,13 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         });
     }
     
-    console.log(`✅ Round 4: 4 matches (${allMatches.length} total)`);
+    console.log(`✅ Round 4: 4 matches in 1 batch (${allMatches.length} total)`);
     
     // ========================================
-    // ROUND 5: 2 MATCHES (Semifinals)
+    // ROUND 5: 2 MATCHES (all in 1 batch - Semifinals)
     // ========================================
     
-    console.log('🎯 Generating Round 5 (2 matches)...');
+    console.log('🎯 Generating Round 5 (2 matches, 1 batch)...');
     
     for (let i = 1; i <= 2; i++) {
         const r4match1 = (i * 2) - 1;
@@ -836,10 +345,11 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         
         allMatches.push({
             matchId: `round-5-match-${i}`,
-             tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
+            tournament: TOURNAMENT_CONFIG.id,
+            tournamentName: TOURNAMENT_CONFIG.name,
             round: 5,
             matchNumber: i,
+            batch: 1,  // Both semis in 1 batch
             status: 'upcoming',
             totalVotes: 0,
             winnerId: null,
@@ -872,20 +382,21 @@ console.log(`✅ Round 2: 16 matches (${allMatches.length} total)`);
         });
     }
     
-    console.log(`✅ Round 5: 2 matches (${allMatches.length} total)`);
+    console.log(`✅ Round 5: 2 matches in 1 batch (${allMatches.length} total)`);
     
     // ========================================
-    // ROUND 6: FINALS
+    // ROUND 6: FINALS (1 batch)
     // ========================================
     
     console.log('🎯 Generating Finals...');
     
     allMatches.push({
         matchId: 'finals',
-         tournament: TOURNAMENT_CONFIG.id,           // ← ADD
-    tournamentName: TOURNAMENT_CONFIG.name,     // ← ADD
+        tournament: TOURNAMENT_CONFIG.id,
+        tournamentName: TOURNAMENT_CONFIG.name,
         round: 6,
         matchNumber: 1,
+        batch: 1,  // Finals obviously in 1 batch
         status: 'upcoming',
         totalVotes: 0,
         winnerId: null,

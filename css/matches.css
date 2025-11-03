@@ -1028,3 +1028,30 @@
         font-size: 0.9rem;
     }
 }
+.batch-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px;
+    margin: 40px 0 20px 0;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.batch-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.batch-date {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* First batch header should have less top margin */
+.batch-header:first-child {
+    margin-top: 0;
+}

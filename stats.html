@@ -46,6 +46,18 @@
     </header>
     
     <!-- ========================================
+     AUTO-REFRESH INDICATOR
+======================================== -->
+<div id="autoRefreshIndicator" class="auto-refresh-indicator" style="display: none;">
+    <div class="refresh-icon">
+        <i class="fas fa-sync-alt"></i>
+    </div>
+    <div class="refresh-text">
+        <span class="refresh-status">Live updates active</span>
+        <span class="refresh-timer">Updated just now</span>
+    </div>
+</div>
+    <!-- ========================================
          MAIN CONTENT
     ======================================== -->
     <main class="stats-page">
@@ -85,36 +97,52 @@
         <!-- Tab Content -->
         <div class="stats-content">
             
-            <!-- ========================================
-                 OVERVIEW TAB
-            ======================================== -->
-            <div id="overview" class="tab-pane active">
-                <div class="container">
-                    <section class="stats-section">
-                        <h2 class="section-title">Tournament Overview</h2>
-                        <div id="overview-stats">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </section>
+        <!-- ========================================
+     OVERVIEW TAB
+======================================== -->
+<div id="overview" class="tab-pane active">
+    <div class="container">
+        <section class="stats-section">
+            <div class="section-header-with-controls">
+                <h2 class="section-title">Tournament Overview</h2>
+                
                 </div>
+
+            
+            <div id="overview-stats">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+</div>
+
+
+      <!-- ========================================
+     RANKINGS TAB
+======================================== -->
+<div id="rankings" class="tab-pane">
+    <div class="container">
+        <section class="stats-section">
+            <div class="section-header-with-controls">
+                <div>
+                    <h2 class="section-title">All-Time Song Rankings</h2>
+                    <p class="section-description">
+                        Songs ranked by total votes, win rate, and YouTube performance
+                    </p>
+                </div>
+                
+                <!-- ✅ ADD THIS BUTTON -->
+                <button class="compare-btn" onclick="showHeadToHead()">
+                    <i class="fas fa-balance-scale"></i> Compare Songs
+                </button>
             </div>
             
-            <!-- ========================================
-                 RANKINGS TAB
-            ======================================== -->
-            <div id="rankings" class="tab-pane">
-                <div class="container">
-                    <section class="stats-section">
-                        <h2 class="section-title">All-Time Song Rankings</h2>
-                        <p class="section-description">
-                            Songs ranked by total votes, win rate, and YouTube performance
-                        </p>
-                        <div id="song-rankings">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </section>
-                </div>
+            <div id="song-rankings">
+                <!-- Populated by JavaScript -->
             </div>
+        </section>
+    </div>
+</div>
             
             <!-- ========================================
                  UPSETS TAB
@@ -204,6 +232,45 @@
             </div>
         </div>
     </div>
+
+    <!-- ========================================
+     ✨ HEAD-TO-HEAD COMPARISON MODAL
+======================================== -->
+<div id="headToHeadModal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeHeadToHead()"></div>
+    <div class="modal-content h2h-modal">
+        <button class="modal-close" onclick="closeHeadToHead()">×</button>
+        
+        <h2 class="modal-title">⚔️ Head-to-Head Comparison</h2>
+        <p class="modal-subtitle">Compare any two songs directly</p>
+        
+        <div class="h2h-selectors">
+            <div class="h2h-selector-group">
+                <label for="h2h-song1">Song 1:</label>
+                <select id="h2h-song1" class="h2h-select">
+                    <option value="">Select first song...</option>
+                </select>
+            </div>
+            
+            <div class="h2h-vs">VS</div>
+            
+            <div class="h2h-selector-group">
+                <label for="h2h-song2">Song 2:</label>
+                <select id="h2h-song2" class="h2h-select">
+                    <option value="">Select second song...</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="compare-action-btn" onclick="compareHeadToHead()">
+            Compare →
+        </button>
+        
+        <div id="h2hResults" style="display: none;">
+            <!-- Results populated by JS -->
+        </div>
+    </div>
+</div>
    
     <!-- ========================================
          SCRIPTS

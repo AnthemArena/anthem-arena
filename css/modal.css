@@ -602,3 +602,32 @@
         font-size: 0.75rem;
     }
 }
+.modal-vote-btn.voted {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    cursor: default;
+    opacity: 0.9;
+}
+
+.modal-vote-btn.voted:hover {
+    transform: none;
+}
+.modal-countdown {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 12px 0 0 0;
+    text-align: center;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.modal-vote-btn.voted {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    cursor: default;
+    opacity: 0.9;
+}
+
+.modal-vote-btn.voted:hover {
+    transform: none;
+}

@@ -123,6 +123,15 @@
         </div>
     </div>
 
+    <!-- ✨ NEW: Vote Influence Card -->
+<div class="stat-card impact">
+    <div class="stat-icon">💥</div>
+    <div class="stat-content">
+        <span class="stat-value" id="voteInfluence">0</span>
+        <span class="stat-label">Influential Votes</span>
+    </div>
+</div>
+
 </div>
 
         <!-- Achievement Badge -->
@@ -150,6 +159,16 @@
     <!-- Populated by JavaScript -->
 </div>
 
+<!-- ✨ NEW: Upcoming Reminders Section -->
+<div class="upcoming-reminders-section" id="upcomingRemindersSection" style="display: none;">
+    <!-- Populated by JavaScript -->
+</div>
+
+<!-- ✨ NEW: Journey Map Section -->
+<div class="journey-map-section" id="journeyMapSection" style="display: none;">
+    <!-- Populated by JavaScript -->
+</div>
+
     </div>
 </section>
 
@@ -158,6 +177,17 @@
      ======================================== -->
 <section class="filters-section" id="filtersSection" style="display: none;">
     <div class="container">
+
+         <!-- Tournament Selector -->
+        <div class="tournament-filter">
+            <label for="tournament-select">Tournament:</label>
+            <select id="tournament-select" onchange="filterByTournament()">
+                <option value="all">All Tournaments</option>
+                <option value="2025-worlds-anthems" selected>Anthem Arena S1</option>
+                <!-- Add more as needed -->
+            </select>
+        </div>
+
         <div class="filters">
             <button class="filter-btn active" data-filter="all">
                 All Votes <span class="filter-count" id="countAll">0</span>

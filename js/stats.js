@@ -130,6 +130,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTabs();
     
     console.log('✅ Stats page ready');
+
+       // Start auto-refresh after data loads
+    setTimeout(() => {
+        startAutoRefresh();
+    }, 2000);
+
 });
 
 // ========================================
@@ -858,3 +864,395 @@ function formatHour(hour) {
 }
 
 console.log('✅ Stats.js loaded');
+
+// ========================================
+// HEAD-TO-HEAD COMPARISON
+// ========================================
+
+window.showHeadToHead = function() {
+    const modal = document.getElementById('headToHeadModal');
+    if (!modal) {
+        console.error('Head-to-head modal not found');
+        return;
+    }
+    
+    // Populate song selectors
+    const selector1 = document.getElementById('h2h-song1');
+    const selector2 = document.getElementById('h2h-song2');
+    
+    const options = songRankings
+        .sort((a, b) => a.seed - b.seed)
+        .map(song => `<option value="${song.seed}">#${song.seed} ${song.name}</option>`)
+        .join('');
+    
+    selector1.innerHTML = '<option value="">Select first song...</option>' + options;
+    selector2.innerHTML = '<option value="">Select second song...</option>' + options;
+    
+    // Reset results
+    document.getElementById('h2hResults').style.display = 'none';
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.compareHeadToHead = async function() {
+    const seed1 = parseInt(document.getElementById('h2h-song1').value);
+    const seed2 = parseInt(document.getElementById('h2h-song2').value);
+    
+    if (!seed1 || !seed2) {
+        alert('Please select both songs!');
+        return;
+    }
+    
+    if (seed1 === seed2) {
+        alert('Please select different songs!');
+        return;
+    }
+    
+    const song1 = songRankings.find(s => s.seed === seed1);
+    const song2 = songRankings.find(s => s.seed === seed2);
+    
+    // Check if they've ever faced each other
+    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+    const snapshot = await getDocs(matchesRef);
+    
+    let directMatchup = null;
+    
+    snapshot.forEach(doc => {
+        const match = doc.data();
+        const hasBoth = (match.song1?.seed === seed1 && match.song2?.seed === seed2) ||
+                       (match.song1?.seed === seed2 && match.song2?.seed === seed1);
+        
+        if (hasBoth && match.status === 'completed') {
+            const song1Data = match.song1.seed === seed1 ? match.song1 : match.song2;
+            const song2Data = match.song1.seed === seed2 ? match.song1 : match.song2;
+            
+            directMatchup = {
+                round: match.round,
+                song1Votes: song1Data.votes,
+                song2Votes: song2Data.votes,
+                totalVotes: match.totalVotes,
+                winner: match.winnerId === song1Data.id ? song1.name : song2.name
+            };
+        }
+    });
+    
+    renderHeadToHeadComparison(song1, song2, directMatchup);
+};
+
+function renderHeadToHeadComparison(song1, song2, directMatchup) {
+    const container = document.getElementById('h2hResults');
+    
+    container.innerHTML = `
+        <div class="h2h-comparison">
+            <!-- Song 1 -->
+            <div class="h2h-song">
+                <img src="https://img.youtube.com/vi/${song1.videoId}/mqdefault.jpg" 
+                     alt="${song1.name}"
+                     class="h2h-thumbnail">
+                <h3 class="h2h-name">${song1.name}</h3>
+                <p class="h2h-artist">${song1.artist}</p>
+                
+                <div class="h2h-stats">
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Seed</span>
+                        <span class="h2h-value">#${song1.seed}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Record</span>
+                        <span class="h2h-value">${song1.winRecord}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Win Rate</span>
+                        <span class="h2h-value ${song1.winRate >= 70 ? 'excellent' : song1.winRate >= 50 ? 'good' : 'poor'}">
+                            ${song1.winRate}%
+                        </span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Total Votes</span>
+                        <span class="h2h-value">${song1.totalVotes.toLocaleString()}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">YouTube Views</span>
+                        <span class="h2h-value">${formatNumber(song1.views)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VS Divider -->
+            <div class="h2h-divider">
+                ${directMatchup ? `
+                    <div class="h2h-matchup-result">
+                        <div class="h2h-direct-label">🔥 They Faced Off!</div>
+                        <div class="h2h-direct-round">${getRoundName(directMatchup.round)}</div>
+                        <div class="h2h-direct-score">
+                            ${directMatchup.song1Votes} - ${directMatchup.song2Votes}
+                        </div>
+                        <div class="h2h-direct-winner">
+                            Winner: <strong>${directMatchup.winner}</strong>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="h2h-no-matchup">
+                        <span class="h2h-vs">VS</span>
+                        <p class="h2h-never-met">Haven't faced each other yet</p>
+                    </div>
+                `}
+            </div>
+            
+            <!-- Song 2 -->
+            <div class="h2h-song">
+                <img src="https://img.youtube.com/vi/${song2.videoId}/mqdefault.jpg" 
+                     alt="${song2.name}"
+                     class="h2h-thumbnail">
+                <h3 class="h2h-name">${song2.name}</h3>
+                <p class="h2h-artist">${song2.artist}</p>
+                
+                <div class="h2h-stats">
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Seed</span>
+                        <span class="h2h-value">#${song2.seed}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Record</span>
+                        <span class="h2h-value">${song2.winRecord}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Win Rate</span>
+                        <span class="h2h-value ${song2.winRate >= 70 ? 'excellent' : song2.winRate >= 50 ? 'good' : 'poor'}">
+                            ${song2.winRate}%
+                        </span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">Total Votes</span>
+                        <span class="h2h-value">${song2.totalVotes.toLocaleString()}</span>
+                    </div>
+                    <div class="h2h-stat">
+                        <span class="h2h-label">YouTube Views</span>
+                        <span class="h2h-value">${formatNumber(song2.views)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Chart -->
+        <div class="h2h-chart">
+            <h4>Statistical Comparison</h4>
+            ${renderComparisonBars(song1, song2)}
+        </div>
+    `;
+    
+    container.style.display = 'block';
+}
+
+function renderComparisonBars(song1, song2) {
+    const comparisons = [
+        { label: 'Total Votes', song1: song1.totalVotes, song2: song2.totalVotes },
+        { label: 'Win Rate (%)', song1: song1.winRate, song2: song2.winRate },
+        { label: 'YouTube Views', song1: song1.views, song2: song2.views },
+        { label: 'YouTube Likes', song1: song1.likes, song2: song2.likes }
+    ];
+    
+    return comparisons.map(comp => {
+        const max = Math.max(comp.song1, comp.song2);
+        const song1Percent = max > 0 ? (comp.song1 / max) * 100 : 50;
+        const song2Percent = max > 0 ? (comp.song2 / max) * 100 : 50;
+        
+        const song1Better = comp.song1 > comp.song2;
+        
+        return `
+            <div class="comparison-bar-container">
+                <div class="comparison-label">${comp.label}</div>
+                <div class="comparison-bars">
+                    <div class="comparison-bar song1 ${song1Better ? 'winning' : ''}">
+                        <div class="comparison-fill" style="width: ${song1Percent}%"></div>
+                        <span class="comparison-value">${comp.label.includes('Rate') ? comp.song1 + '%' : formatNumber(comp.song1)}</span>
+                    </div>
+                    <div class="comparison-bar song2 ${!song1Better ? 'winning' : ''}">
+                        <div class="comparison-fill" style="width: ${song2Percent}%"></div>
+                        <span class="comparison-value">${comp.label.includes('Rate') ? comp.song2 + '%' : formatNumber(comp.song2)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.closeHeadToHead = function() {
+
+    document.getElementById('headToHeadModal').style.display = 'none';
+    document.body.style.overflow = '';
+};
+
+
+// ========================================
+// REAL-TIME AUTO-REFRESH
+// ========================================
+
+let refreshInterval = null;
+let lastRefreshTime = null;
+let isRefreshing = false;
+
+/**
+ * Start auto-refresh if there are live matches
+ */
+async function startAutoRefresh() {
+    // Check if there are any live matches
+    const hasLiveMatches = tournamentOverview?.liveMatches > 0;
+    
+    if (!hasLiveMatches) {
+        console.log('ℹ️ No live matches - auto-refresh disabled');
+        hideRefreshIndicator();
+        return;
+    }
+    
+    console.log('🔄 Starting auto-refresh (live matches detected)');
+    showRefreshIndicator();
+    
+    // Clear any existing interval
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+    
+    // Refresh every 30 seconds
+    refreshInterval = setInterval(async () => {
+        if (!isRefreshing) {
+            await refreshStats();
+        }
+    }, 30000); // 30 seconds
+    
+    // Update "last refreshed" timer every second
+    setInterval(updateRefreshTimer, 1000);
+}
+
+/**
+ * Refresh stats data
+ */
+async function refreshStats() {
+    if (isRefreshing) return;
+    
+    isRefreshing = true;
+    console.log('🔄 Refreshing stats...');
+    
+    try {
+        // Get current active tab
+        const activeTab = document.querySelector('.tab-pane.active');
+        const tabId = activeTab?.id;
+        
+        // Reload data based on active tab
+        if (tabId === 'overview') {
+            await loadOverviewTab();
+        } else if (tabId === 'rankings') {
+            await loadRankingsTab();
+        } else if (tabId === 'upsets') {
+            await loadUpsetsTab();
+        } else if (tabId === 'participation') {
+            await loadParticipationTab();
+        }
+        
+        lastRefreshTime = new Date();
+        console.log('✅ Stats refreshed');
+        
+        // Flash the refresh indicator
+        flashRefreshIndicator();
+        
+    } catch (error) {
+        console.error('❌ Error refreshing stats:', error);
+    } finally {
+        isRefreshing = false;
+    }
+}
+
+/**
+ * Show auto-refresh indicator
+ */
+function showRefreshIndicator() {
+    const indicator = document.getElementById('autoRefreshIndicator');
+    if (indicator) {
+        indicator.style.display = 'flex';
+        lastRefreshTime = new Date();
+    }
+}
+
+/**
+ * Hide auto-refresh indicator
+ */
+function hideRefreshIndicator() {
+    const indicator = document.getElementById('autoRefreshIndicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+    
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
+
+/**
+ * Flash refresh indicator when data updates
+ */
+function flashRefreshIndicator() {
+    const icon = document.querySelector('.refresh-icon i');
+    if (icon) {
+        icon.classList.add('spinning');
+        setTimeout(() => {
+            icon.classList.remove('spinning');
+        }, 1000);
+    }
+}
+
+/**
+ * Update "last refreshed" timer
+ */
+function updateRefreshTimer() {
+    if (!lastRefreshTime) return;
+    
+    const timerEl = document.querySelector('.refresh-timer');
+    if (!timerEl) return;
+    
+    const now = new Date();
+    const diff = Math.floor((now - lastRefreshTime) / 1000); // seconds
+    
+    let timeText;
+    if (diff < 10) {
+        timeText = 'Updated just now';
+    } else if (diff < 60) {
+        timeText = `Updated ${diff}s ago`;
+    } else if (diff < 3600) {
+        const mins = Math.floor(diff / 60);
+        timeText = `Updated ${mins}m ago`;
+    } else {
+        const hours = Math.floor(diff / 3600);
+        timeText = `Updated ${hours}h ago`;
+    }
+    
+    timerEl.textContent = timeText;
+}
+
+/**
+ * Stop auto-refresh (call when leaving page)
+ */
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    hideRefreshIndicator();
+}
+
+// Start auto-refresh when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for initial data to load
+    setTimeout(() => {
+        startAutoRefresh();
+    }, 2000);
+});
+
+// Stop auto-refresh when leaving page
+window.addEventListener('beforeunload', () => {
+    stopAutoRefresh();
+});
+
+// Also start auto-refresh after initial load completes
+// (Add this to your existing DOMContentLoaded handler)

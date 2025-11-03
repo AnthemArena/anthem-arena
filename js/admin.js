@@ -66,89 +66,7 @@ window.logoutAdmin = async function() {
     }
 };
 
-// ========================================
-// OPEN A ROUND
-// ========================================
 
-window.openRound = async function(roundNumber) {
-    if (!confirm(`Open Round ${roundNumber} for voting?`)) return;
-    
-    try {
-        console.log(`🚀 Opening Round ${roundNumber}...`);
-        
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const q = query(matchesRef, where('round', '==', roundNumber));
-        const snapshot = await getDocs(q);
-        
-        let updateCount = 0;
-        
-        for (const matchDoc of snapshot.docs) {
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
-                status: 'live'
-            });
-            updateCount++;
-        }
-        
-        console.log(`✅ Opened ${updateCount} matches in Round ${roundNumber}`);
-        alert(`✅ Round ${roundNumber} is now LIVE!\n\n${updateCount} matches opened for voting.`);
-        
-        loadMatches();
-        
-    } catch (error) {
-        console.error('❌ Error opening round:', error);
-        alert(`Error: ${error.message}`);
-    }
-};
-
-// ========================================
-// CLOSE A ROUND
-// ========================================
-
-window.closeRound = async function(roundNumber) {
-    if (!confirm(`Close Round ${roundNumber} and advance winners?`)) return;
-    
-    try {
-        console.log(`🔒 Closing Round ${roundNumber}...`);
-        
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const q = query(matchesRef, where('round', '==', roundNumber));
-        const snapshot = await getDocs(q);
-        
-        let closedCount = 0;
-        const winners = [];
-        
-        for (const matchDoc of snapshot.docs) {
-            const match = matchDoc.data();
-            
-            const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
-            const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
-            
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
-                status: 'completed',
-                winnerId: winnerId
-            });
-            
-            winners.push({
-                matchId: match.matchId,
-                winner: winnerData
-            });
-            
-            closedCount++;
-        }
-        
-        console.log(`✅ Closed ${closedCount} matches`);
-        
-        await advanceWinners(roundNumber, winners);
-        
-        alert(`✅ Round ${roundNumber} closed!\n\n${closedCount} matches completed.\nWinners advanced to Round ${roundNumber + 1}.`);
-        
-        loadMatches();
-        
-    } catch (error) {
-        console.error('❌ Error closing round:', error);
-        alert(`Error: ${error.message}`);
-    }
-};
 
 // ========================================
 // OPEN INDIVIDUAL MATCH
@@ -269,56 +187,7 @@ async function advanceWinnerToNextRound(completedMatch, winner) {
     }
 }
 
-// ========================================
-// ADVANCE WINNERS TO NEXT ROUND (Bulk - for "Close Round" button)
-// ========================================
 
-async function advanceWinners(completedRound, winners) {
-    console.log(`📈 Advancing winners from Round ${completedRound}...`);
-    
-    const nextRound = completedRound + 1;
-    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-    const q = query(matchesRef, where('round', '==', nextRound));
-    const nextRoundMatches = await getDocs(q);
-    
-    for (const nextMatchDoc of nextRoundMatches.docs) {
-        const nextMatch = nextMatchDoc.data();
-        
-        const song1Source = nextMatch.song1.sourceMatch;
-        const song2Source = nextMatch.song2.sourceMatch;
-        
-        let updates = {};
-        
-        if (song1Source) {
-            const winner1 = winners.find(w => w.matchId === song1Source);
-            if (winner1) {
-                updates.song1 = {
-                    ...winner1.winner,
-                    votes: 0,
-                    sourceMatch: song1Source  // Keep the sourceMatch reference
-                };
-            }
-        }
-        
-        if (song2Source) {
-            const winner2 = winners.find(w => w.matchId === song2Source);
-            if (winner2) {
-                updates.song2 = {
-                    ...winner2.winner,
-                    votes: 0,
-                    sourceMatch: song2Source  // Keep the sourceMatch reference
-                };
-            }
-        }
-        
-        if (Object.keys(updates).length > 0) {
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), updates);
-            console.log(`✅ Updated ${nextMatchDoc.id} with winners`);
-        }
-    }
-    
-    console.log(`✅ Winners advanced to Round ${nextRound}`);
-}
 
 // ========================================
 // LOAD MATCHES INTO TABLE
@@ -341,12 +210,36 @@ async function loadMatches() {
         
         matches.sort((a, b) => {
             if (a.round !== b.round) return a.round - b.round;
+            if (a.batch !== b.batch) return (a.batch || 0) - (b.batch || 0);
             return a.matchNumber - b.matchNumber;
         });
         
         tbody.innerHTML = '';
         
+        // Track batch groups for batch controls
+        let currentRound = null;
+        let currentBatch = null;
+        
         for (const match of matches) {
+            // Add batch header row when batch changes
+            if (match.round !== currentRound || match.batch !== currentBatch) {
+                currentRound = match.round;
+                currentBatch = match.batch;
+                
+                const batchHeaderRow = document.createElement('tr');
+                batchHeaderRow.className = 'batch-header';
+                batchHeaderRow.innerHTML = `
+                    <td colspan="8" style="background: #f0f0f0; font-weight: bold; padding: 12px;">
+                        📦 Round ${currentRound} - Batch ${currentBatch}
+                        <span style="float: right;">
+                            <button class="btn-open" onclick="openBatch(${currentRound}, ${currentBatch})" style="margin-right: 10px;">Open Batch</button>
+                            <button class="btn-close" onclick="closeBatch(${currentRound}, ${currentBatch})">Close Batch</button>
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(batchHeaderRow);
+            }
+            
             // Format date
             const dateStr = match.date 
                 ? new Date(match.date).toLocaleDateString('en-US', { 
@@ -359,7 +252,7 @@ async function loadMatches() {
             
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>R${match.round} M${match.matchNumber}</td>
+                <td>R${match.round}M${match.matchNumber} <span style="color: #666;">(B${match.batch})</span></td>
                 <td>${match.song1.shortTitle || match.song1.title}</td>
                 <td>${match.song1.votes || 0}</td>
                 <td>${match.song2.shortTitle || match.song2.title}</td>
@@ -447,6 +340,99 @@ window.clearAllVotesForTesting = async function() {
 };
 
 // ========================================
+// OPEN A BATCH
+// ========================================
+
+window.openBatch = async function(roundNumber, batchNumber) {
+    if (!confirm(`Open Round ${roundNumber}, Batch ${batchNumber} for voting?`)) return;
+    
+    try {
+        console.log(`🚀 Opening Round ${roundNumber}, Batch ${batchNumber}...`);
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const q = query(
+            matchesRef, 
+            where('round', '==', roundNumber),
+            where('batch', '==', batchNumber)
+        );
+        const snapshot = await getDocs(q);
+        
+        let updateCount = 0;
+        const matchList = [];
+        
+        for (const matchDoc of snapshot.docs) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
+                status: 'live'
+            });
+            matchList.push(matchDoc.data().matchId);
+            updateCount++;
+        }
+        
+        console.log(`✅ Opened ${updateCount} matches:`, matchList);
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} is now LIVE!\n\n${updateCount} matches opened:\n${matchList.join('\n')}`);
+        
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error opening batch:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
+
+// ========================================
+// CLOSE A BATCH
+// ========================================
+
+window.closeBatch = async function(roundNumber, batchNumber) {
+    if (!confirm(`Close Round ${roundNumber}, Batch ${batchNumber}?\n\nThis will:\n- Determine winners\n- Advance them to next round\n- Close voting`)) return;
+    
+    try {
+        console.log(`🔒 Closing Round ${roundNumber}, Batch ${batchNumber}...`);
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const q = query(
+            matchesRef,
+            where('round', '==', roundNumber),
+            where('batch', '==', batchNumber)
+        );
+        const snapshot = await getDocs(q);
+        
+        let closedCount = 0;
+        const results = [];
+        
+        for (const matchDoc of snapshot.docs) {
+            const match = matchDoc.data();
+            
+            const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
+            const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
+            const loserData = match.song1.votes > match.song2.votes ? match.song2 : match.song1;
+            
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
+                status: 'completed',
+                winnerId: winnerId
+            });
+            
+            // Auto-advance winner
+            await advanceWinnerToNextRound(match, winnerData);
+            
+            results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})`);
+            closedCount++;
+        }
+        
+        console.log(`✅ Closed ${closedCount} matches`);
+        console.log('Results:', results);
+        
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${closedCount} matches completed:\n\n${results.join('\n')}`);
+        
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error closing batch:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
+
+// ========================================
 // SCHEDULE MATCH DATES
 // ========================================
 
@@ -470,78 +456,117 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 document.getElementById('scheduleDatesBtn').addEventListener('click', async () => {
-    if (!confirm('Schedule dates for all matches?\n\nThis will set matches 48 hours apart and clear TBD match dates.')) {
+    if (!confirm('Schedule dates for all batches?\n\nThis will set batches 24 hours apart and clear TBD match dates.')) {
         return;
     }
     
     try {
-        console.log('📅 Scheduling match dates (48 hour spacing)...');
+        console.log('📅 Scheduling batch dates (24 hour spacing)...');
         
         const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
         
-        // Convert to array and sort
-        const matches = [];
+        // Group matches by round and batch
+        const batchGroups = {};
+        
         snapshot.forEach(doc => {
-            matches.push({
+            const match = doc.data();
+            const key = `R${match.round}B${match.batch || 0}`;
+            
+            if (!batchGroups[key]) {
+                batchGroups[key] = {
+                    round: match.round,
+                    batch: match.batch || 0,
+                    matches: []
+                };
+            }
+            
+            batchGroups[key].matches.push({
                 id: doc.id,
-                data: doc.data()
+                data: match
             });
         });
         
-        // Sort by round, then match number
-        matches.sort((a, b) => {
-            if (a.data.round !== b.data.round) {
-                return a.data.round - b.data.round;
+        // Sort batches by round, then batch number
+        const sortedBatchKeys = Object.keys(batchGroups).sort((a, b) => {
+            const groupA = batchGroups[a];
+            const groupB = batchGroups[b];
+            
+            if (groupA.round !== groupB.round) {
+                return groupA.round - groupB.round;
             }
-            return a.data.matchNumber - b.data.matchNumber;
+            return groupA.batch - groupB.batch;
         });
         
-        console.log(`📋 Sorted ${matches.length} matches`);
-        
-        let currentDate = new Date('2025-11-05T19:00:00Z');
+        let currentDate = new Date('2025-11-05T19:00:00Z'); // Starting date
         let updateCount = 0;
         let clearedCount = 0;
+        let batchSchedule = [];
         
-        for (const matchObj of matches) {
-            const match = matchObj.data;
-            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchObj.id);
+        for (const batchKey of sortedBatchKeys) {
+            const batchGroup = batchGroups[batchKey];
+            const { round, batch, matches } = batchGroup;
             
-            // Check if TBD
-            const isTBD = match.song1?.id === 'TBD' || 
-                         match.song2?.id === 'TBD' ||
-                         !match.song1?.id || 
-                         !match.song2?.id;
+            let batchHasTBD = false;
+            let scheduledInBatch = 0;
             
-            if (isTBD) {
-                // ✅ CLEAR THE DATE from TBD matches
-                await updateDoc(matchRef, {
-                    date: null
-                });
-                console.log(`⏭️ Cleared date from TBD match: ${match.matchId}`);
-                clearedCount++;
-                continue;
+            // Check if entire batch is TBD
+            for (const matchObj of matches) {
+                const match = matchObj.data;
+                const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchObj.id);
+                
+                const isTBD = match.song1?.id === 'TBD' || match.song2?.id === 'TBD';
+                
+                if (isTBD) {
+                    batchHasTBD = true;
+                    await updateDoc(matchRef, { date: null });
+                    clearedCount++;
+                } else {
+                    // Assign the same date to all non-TBD matches in this batch
+                   // When scheduling, add BOTH start and end times:
+await updateDoc(matchRef, {
+    date: currentDate.toISOString(),          // Start time
+    endTime: new Date(currentDate.getTime() + 24 * 60 * 60 * 1000).toISOString()  // +24 hours
+});
+                    scheduledInBatch++;
+                    updateCount++;
+                }
             }
             
-            // ✅ SCHEDULE non-TBD matches
-            await updateDoc(matchRef, {
-                date: currentDate.toISOString()
-            });
-            
-            console.log(`  ${match.matchId} (R${match.round} M${match.matchNumber}): ${currentDate.toLocaleDateString()}`);
-            
-            // Add 48 hours for next match
-            currentDate.setHours(currentDate.getHours() + 48);
-            updateCount++;
-            
-            if (updateCount % 10 === 0) {
-                console.log(`📅 Scheduled ${updateCount} matches...`);
+            if (scheduledInBatch > 0) {
+                batchSchedule.push({
+                    round,
+                    batch,
+                    date: currentDate.toLocaleDateString('en-US', { 
+                        weekday: 'short',
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    matchCount: scheduledInBatch
+                });
+                
+                console.log(`📅 Round ${round} Batch ${batch}: ${currentDate.toLocaleDateString()} (${scheduledInBatch} matches)`);
+                
+                // Move to next batch date (24 hours later)
+                currentDate.setHours(currentDate.getHours() + 24);
+            } else {
+                console.log(`⏭️ Round ${round} Batch ${batch}: Skipped (all TBD)`);
             }
         }
         
-        console.log(`✅ Scheduled ${updateCount} matches`);
+        // Create summary message
+        let summaryMessage = `✅ Successfully scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n📅 SCHEDULE:\n\n`;
+        
+        batchSchedule.forEach(batch => {
+            summaryMessage += `Round ${batch.round} Batch ${batch.batch}: ${batch.date} (${batch.matchCount} matches)\n`;
+        });
+        
+        console.log(`\n✅ Scheduled ${updateCount} matches across ${batchSchedule.length} batches`);
         console.log(`✅ Cleared ${clearedCount} TBD matches`);
-        alert(`✅ Successfully scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n48 hours between each match.`);
+        
+        alert(summaryMessage);
         
         loadMatches();
         

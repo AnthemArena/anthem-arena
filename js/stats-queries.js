@@ -399,3 +399,52 @@ export async function getSeedPerformance(tournamentId) {
         return null;
     }
 }
+
+// ========================================
+// HEAD-TO-HEAD MATCHUP CHECK
+// ========================================
+
+/**
+ * Check if two songs have faced each other
+ * @param {string} tournamentId - Tournament ID
+ * @param {number} seed1 - First song's seed
+ * @param {number} seed2 - Second song's seed
+ */
+export async function getHeadToHeadMatchup(tournamentId, seed1, seed2) {
+    try {
+        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
+        const matchesSnap = await getDocs(matchesRef);
+        
+        let directMatchup = null;
+        
+        matchesSnap.forEach(doc => {
+            const match = doc.data();
+            
+            // Check if both songs are in this match
+            const hasBoth = (match.song1?.seed === seed1 && match.song2?.seed === seed2) ||
+                           (match.song1?.seed === seed2 && match.song2?.seed === seed1);
+            
+            if (hasBoth && match.status === 'completed') {
+                const song1Data = match.song1.seed === seed1 ? match.song1 : match.song2;
+                const song2Data = match.song1.seed === seed2 ? match.song1 : match.song2;
+                
+                directMatchup = {
+                    round: match.round,
+                    song1Votes: song1Data.votes,
+                    song2Votes: song2Data.votes,
+                    totalVotes: match.totalVotes,
+                    winner: match.winnerId === 'song1' 
+                        ? (match.song1.seed === seed1 ? seed1 : seed2)
+                        : (match.song2.seed === seed1 ? seed1 : seed2),
+                    date: match.date
+                };
+            }
+        });
+        
+        return directMatchup;
+        
+    } catch (error) {
+        console.error('Error checking head-to-head matchup:', error);
+        return null;
+    }
+}

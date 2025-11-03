@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Load vote history
     await loadVoteHistory();
+    await checkUpcomingMatches(); // ✅ Add this
+
     
     // Setup filters
     setupFilters();
@@ -83,6 +85,18 @@ function generateBrowserFingerprint() {
     return btoa(components).substring(0, 16);
 }
 
+// Add filter function:
+function filterByTournament() {
+    const selectedTournament = document.getElementById('tournament-select').value;
+    
+    let filteredVotes = selectedTournament === 'all' 
+        ? allVotes 
+        : allVotes.filter(v => v.match.tournament === selectedTournament);
+    
+    displayVotes(filteredVotes);
+    updateStats(filteredVotes);
+}
+
 // ========================================
 // LOAD VOTE HISTORY
 // ========================================
@@ -91,11 +105,12 @@ async function loadVoteHistory() {
     try {
         console.log('📥 Loading vote history for user:', userId);
         
-        // Query votes collection for this user
+        // Query ALL votes for this user (no tournament filter)
         const votesRef = collection(db, 'votes');
         const userVotesQuery = query(
             votesRef,
             where('userId', '==', userId)
+            // ✅ No tournament filter - get everything!
         );
         
         const votesSnapshot = await getDocs(userVotesQuery);
@@ -105,7 +120,7 @@ async function loadVoteHistory() {
             return;
         }
         
-        console.log(`✅ Found ${votesSnapshot.size} votes`);
+        console.log(`✅ Found ${votesSnapshot.size} votes across ALL tournaments`);
         
         // Get all vote data with match details
         const votePromises = votesSnapshot.docs.map(async (voteDoc) => {
@@ -248,21 +263,27 @@ function updateStats() {
     document.getElementById('mainstreamPicks').textContent = mainstreamPicks;
     document.getElementById('votingStreak').textContent = votingStreak;
     
-    // Update DOM - Journey Stats
-    document.getElementById('songsStillAlive').textContent = journeyStats.songsStillAlive;
-    document.getElementById('songsAdvanced').textContent = journeyStats.songsAdvanced;
-    document.getElementById('furthestRound').textContent = getRoundName(journeyStats.furthestRound);
-    
-    // Update DOM - Impact Stats
-    document.getElementById('closeCalls').textContent = supportImpact.closeCalls;
-    document.getElementById('roundsParticipated').textContent = supportImpact.roundsParticipated;
-    
-    // Update filter counts
-    document.getElementById('countAll').textContent = totalVotes;
-    document.getElementById('countUnderdog').textContent = underdogPicks;
-    document.getElementById('countMainstream').textContent = mainstreamPicks;
-    document.getElementById('countLive').textContent = liveVotes.length;
-    
+// Update DOM - Journey Stats
+document.getElementById('songsStillAlive').textContent = journeyStats.songsStillAlive;
+document.getElementById('songsAdvanced').textContent = journeyStats.songsAdvanced;
+document.getElementById('furthestRound').textContent = getRoundName(journeyStats.furthestRound);
+
+// Update DOM - Impact Stats
+document.getElementById('closeCalls').textContent = supportImpact.closeCalls;
+document.getElementById('roundsParticipated').textContent = supportImpact.roundsParticipated;
+
+// ✅ Vote Influence (with safety check)
+const voteInfluence = calculateVoteInfluence();
+const voteInfluenceEl = document.getElementById('voteInfluence');
+if (voteInfluenceEl) {
+    voteInfluenceEl.textContent = voteInfluence;
+}
+
+// Update filter counts
+document.getElementById('countAll').textContent = totalVotes;
+document.getElementById('countUnderdog').textContent = underdogPicks;
+document.getElementById('countMainstream').textContent = mainstreamPicks;
+document.getElementById('countLive').textContent = liveVotes.length;
     // Determine taste profile
     const tasteProfile = getTasteProfile(majorityAlignment, totalVotes, underdogPicks);
     
@@ -355,6 +376,101 @@ function calculateJourneyStats() {
     };
 }
 
+// ========================================
+// CHECK FOR UPCOMING MATCHES (USER'S SONGS)
+// ========================================
+
+async function checkUpcomingMatches() {
+    if (allVotes.length === 0) return;
+    
+    // Get unique songs user has voted for
+    const votedSongIds = new Set(allVotes.map(v => {
+        return v.choice === 'song1' ? v.match.song1.id : v.match.song2.id;
+    }));
+    
+    // Query upcoming matches featuring these songs
+    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+    const upcomingQuery = query(
+        matchesRef,
+        where('status', '==', 'upcoming')
+    );
+    
+    const snapshot = await getDocs(upcomingQuery);
+    const upcomingMatches = [];
+    
+    snapshot.forEach(doc => {
+        const match = doc.data();
+        const hasSong1 = votedSongIds.has(match.song1?.id);
+        const hasSong2 = votedSongIds.has(match.song2?.id);
+        
+        if (hasSong1 || hasSong2) {
+            upcomingMatches.push({
+                id: doc.id,
+                ...match,
+                userSong: hasSong1 ? match.song1 : match.song2
+            });
+        }
+    });
+    
+    if (upcomingMatches.length === 0) return;
+    
+    // Sort by date (soonest first)
+    upcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    displayUpcomingReminders(upcomingMatches);
+}
+
+function displayUpcomingReminders(matches) {
+    const container = document.getElementById('upcomingRemindersSection');
+    if (!container) return;
+    
+    const topMatches = matches.slice(0, 3); // Show top 3
+    
+    container.innerHTML = `
+        <div class="reminders-header">
+            <h3 class="reminders-title">🔔 Your Songs Coming Up</h3>
+            <p class="reminders-subtitle">Songs you've supported have upcoming matches</p>
+        </div>
+        <div class="reminders-list">
+            ${topMatches.map(match => {
+                const timeUntil = getTimeUntilMatch(match.date);
+                return `
+                    <div class="reminder-card">
+                        <img 
+                            src="https://img.youtube.com/vi/${match.userSong.videoId}/mqdefault.jpg" 
+                            alt="${match.userSong.shortTitle}"
+                            class="reminder-thumbnail">
+                        <div class="reminder-info">
+                            <div class="reminder-song">${match.userSong.shortTitle}</div>
+                            <div class="reminder-opponent">vs ${match.song1.id === match.userSong.id ? match.song2.shortTitle : match.song1.shortTitle}</div>
+                            <div class="reminder-time">⏰ ${timeUntil}</div>
+                        </div>
+                        <a href="/vote.html?match=${match.id}" class="reminder-action">
+                            Set Reminder →
+                        </a>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    container.style.display = 'block';
+}
+
+function getTimeUntilMatch(dateString) {
+    const matchDate = new Date(dateString);
+    const now = new Date();
+    const diff = matchDate - now;
+    
+    if (diff < 0) return 'Starting soon';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `in ${days}d ${hours}h`;
+    if (hours > 0) return `in ${hours}h`;
+    return 'Starting soon';
+}
 // ========================================
 // 🎯 SUPPORT IMPACT (NON-COMPETITIVE)
 // ========================================
@@ -694,6 +810,76 @@ function createSongJourneyCard(song) {
     `;
 }
 
+function displayJourneyMap() {
+    const container = document.getElementById('journeyMapSection');
+    if (!container) return;
+    
+    const journeyStats = calculateJourneyStats();
+    const songs = journeyStats.allSongs;
+    
+    if (songs.length === 0) return;
+    
+    // Group songs by their highest round reached
+    const byRound = songs.reduce((acc, song) => {
+        const round = song.highestRound;
+        if (!acc[round]) acc[round] = [];
+        acc[round].push(song);
+        return acc;
+    }, {});
+    
+    const rounds = Object.keys(byRound).sort((a, b) => b - a); // Highest first
+    
+    container.innerHTML = `
+        <div class="journey-map-header">
+            <h3 class="map-title">🗺️ Your Tournament Journey</h3>
+            <p class="map-subtitle">Visual map of how far your songs have traveled</p>
+        </div>
+        <div class="journey-map">
+            ${rounds.map(round => `
+                <div class="map-round">
+                    <div class="map-round-label">${getRoundName(parseInt(round))}</div>
+                    <div class="map-songs">
+                        ${byRound[round].slice(0, 5).map(song => `
+                            <div class="map-song ${song.status}">
+                                <img src="https://img.youtube.com/vi/${song.videoId}/default.jpg" 
+                                     alt="${song.name}"
+                                     class="map-song-thumb">
+                                <div class="map-song-name">${song.name}</div>
+                                <div class="map-song-status">
+                                    ${song.status === 'advanced' ? '✓' : song.status === 'eliminated' ? '✗' : '○'}
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${byRound[round].length > 5 ? `<div class="map-more">+${byRound[round].length - 5} more</div>` : ''}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    container.style.display = 'block';
+}
+
+function calculateVoteInfluence() {
+    // Find matches where margin of victory was <= 5%
+    const influentialVotes = allVotes.filter(v => {
+        if (!v.isCompleted) return false;
+        
+        const song1Votes = v.match.song1.votes || 0;
+        const song2Votes = v.match.song2.votes || 0;
+        const total = song1Votes + song2Votes;
+        
+        if (total === 0) return false;
+        
+        const margin = Math.abs(song1Votes - song2Votes);
+        const marginPercentage = (margin / total) * 100;
+        
+        return marginPercentage <= 5; // Within 5% margin
+    });
+    
+    return influentialVotes.length;
+}
+
 // ========================================
 // 🎯 DISPLAY TOURNAMENT COVERAGE
 // ========================================
@@ -984,14 +1170,26 @@ function createVoteCard(vote) {
                 </div>
             </div>
             
-            <div class="vote-result">
-                ${journeyIndicator}
-                <div class="vote-percentage">${percentage}%</div>
-                <div class="vote-type-label">${voteTypeLabel}</div>
-                <div class="vote-status-label">${vote.isCompleted ? 'Completed' : 'Live'}</div>
-                <a href="/vote.html?id=${vote.matchId}" class="view-match-btn">View Match →</a>
+          <div class="vote-result">
+    ${!vote.isCompleted && match.endTime ? (() => {
+        const timeLeft = getTimeRemaining(match.endTime);
+        return `
+            <div class="vote-countdown ${timeLeft.isUrgent ? 'urgent' : ''}">
+                ${timeLeft.isUrgent ? '🚨' : '⏰'} ${timeLeft.display}
             </div>
+        `;
+    })() : ''}
+    ${journeyIndicator}
+    <div class="vote-percentage">${percentage}%</div>
+    <div class="vote-type-label">${voteTypeLabel}</div>
+    <div class="vote-status-label">${vote.isCompleted ? 'Completed' : 'Live'}</div>
+    <a href="/vote.html?id=${vote.matchId}" class="view-match-btn">View Match →</a>
+</div>
+            
         </div>
+
+
+        
     `;
 }
 
@@ -1021,6 +1219,27 @@ function getTimeAgo(date) {
     if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
     
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getTimeRemaining(endTime) {
+    const now = new Date().getTime();
+    const end = new Date(endTime).getTime();
+    const remaining = end - now;
+    
+    if (remaining <= 0) {
+        return { display: 'Voting closed', isUrgent: false };
+    }
+    
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+        return { display: `${hours}h ${minutes}m left`, isUrgent: false };
+    } else if (minutes > 30) {
+        return { display: `${minutes}m left`, isUrgent: false };
+    } else {
+        return { display: `${minutes}m left!`, isUrgent: true };
+    }
 }
 
 // ========================================

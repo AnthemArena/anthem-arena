@@ -309,9 +309,10 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced1 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                    ${isCompleted ? `
-                        <div class="vote-percentage">${song1Pct}%</div>
-                    ` : ''}
+       ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song1IsTBD ? `
+    <div class="vote-percentage">${song1Pct}%</div>
+    ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
 
                 <!-- Competitor 2 -->
@@ -331,10 +332,10 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced2 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                    ${isCompleted ? `
-                        <div class="vote-percentage">${song2Pct}%</div>
-                        ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
-                    ` : ''}
+                 ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song2IsTBD ? `
+    <div class="vote-percentage">${song2Pct}%</div>
+    ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
             </div>
 
@@ -845,10 +846,10 @@ function createRound2MatchCard(match) {
                             ${match.song1.hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                    ${isCompleted && !song1IsTBD ? `
-                        <div class="vote-percentage">${song1Percentage}%</div>
-                        ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-                    ` : ''}
+                   ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song1IsTBD ? `
+    <div class="vote-percentage">${song1Percentage}%</div>
+    ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
                 
                 <!-- Competitor 2 -->
@@ -867,10 +868,10 @@ function createRound2MatchCard(match) {
                             ${song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle}
                         </span>
                     </div>
-                    ${isCompleted && !song2IsTBD ? `
-                        <div class="vote-percentage">${song2Percentage}%</div>
-                        ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-                    ` : ''}
+                    ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song2IsTBD ? `
+    <div class="vote-percentage">${song2Percentage}%</div>
+    ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
             </div>
             
