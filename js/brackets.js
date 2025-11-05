@@ -81,7 +81,7 @@ async function loadBracketData() {
 
            // ✅ NEW: Update tournament info section
         await updateTournamentInfo();
-        
+
         
         // Set up real-time updates (optional but recommended)
         setupRealtimeUpdates();
@@ -1306,13 +1306,14 @@ function setupClickHandlers() {
                     
                     console.log(`🎯 Card clicked: ${matchId}`);
                     
-                    if (typeof window.showMatchDetails === 'function') {
-                        console.log(`🚀 Calling showMatchDetails with: ${matchId}`);
-                        window.showMatchDetails(matchId);
-                    } else {
-                        console.warn('⚠️ modal.js not loaded, redirecting to vote page');
-                        window.location.href = `vote.html?match=${matchId}`;
-                    }
+               // AFTER:
+if (typeof window.showMatchDetails === 'function') {
+    console.log(`🚀 Calling showMatchDetails with: ${matchId}`);
+    window.showMatchDetails(matchId);
+} else {
+    console.warn('⚠️ modal.js not loaded, redirecting to vote page');
+    window.location.href = `vote?match=${matchId}`;
+}
                 }
             });
             console.log(`✅ Click handler added to ${containerId}`);

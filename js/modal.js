@@ -129,14 +129,14 @@ if (userVote) {
     }
 }
     
-    // Vote button logic
-    const voteButton = match.status === 'live' 
-        ? `<a href="vote.html?match=${match.id}" class="modal-vote-btn ${hasVoted ? 'voted' : 'primary'}">
-             ${hasVoted ? `✅ You Voted: ${votedForName}` : '🎵 Cast Your Vote'}
-           </a>`
-        : match.status === 'upcoming'
-        ? `<div class="modal-vote-btn disabled">Voting Opens Soon</div>`
-        : `<a href="matches.html?match=${match.id}" class="modal-vote-btn secondary">View Full Results</a>`;
+// AFTER:
+const voteButton = match.status === 'live' 
+    ? `<a href="vote?match=${match.id}" class="modal-vote-btn ${hasVoted ? 'voted' : 'primary'}">
+         ${hasVoted ? `✅ You Voted: ${votedForName}` : '🎵 Cast Your Vote'}
+       </a>`
+    : match.status === 'upcoming'
+    ? `<div class="modal-vote-btn disabled">Voting Opens Soon</div>`
+    : `<a href="matches?match=${match.id}" class="modal-vote-btn secondary">View Full Results</a>`;
     
     // Format date nicely
     const formattedDate = match.date 
@@ -176,7 +176,7 @@ if (userVote) {
                         </div>
                         
                         <!-- Video Thumbnail (clickable link to vote page) -->
-                        <a href="vote.html?match=${match.id}" class="modal-video-thumbnail">
+<a href="vote?match=${match.id}" class="modal-video-thumbnail">
                             <img src="https://img.youtube.com/vi/${match.competitor1.videoId}/hqdefault.jpg" 
                                  alt="${match.competitor1.name}"
                                  loading="lazy">
@@ -231,7 +231,7 @@ if (userVote) {
                         </div>
                         
                         <!-- Video Thumbnail (clickable link to vote page) -->
-                        <a href="vote.html?match=${match.id}" class="modal-video-thumbnail">
+<a href="vote?match=${match.id}" class="modal-video-thumbnail">
                             <img src="https://img.youtube.com/vi/${match.competitor2.videoId}/hqdefault.jpg" 
                                  alt="${match.competitor2.name}"
                                  loading="lazy">
