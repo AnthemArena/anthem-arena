@@ -147,8 +147,10 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
                     <span class="modal-badge">${match.round}</span>
                 </div>
                 <h2 class="modal-title">${match.status === 'completed' ? 'Match Results' : 'Match Preview'}</h2>
-                <p class="modal-meta">${match.totalVotes.toLocaleString()} total votes${formattedDate ? ' • ' + formattedDate : ''}</p>
-                
+<p class="modal-meta">
+    ${match.status === 'completed' ? `${match.totalVotes.toLocaleString()} total votes` : match.status === 'live' ? `🔴 Live Now - Cast Your Vote!` : 'Coming Soon'}
+    ${formattedDate ? ' • ' + formattedDate : ''}
+</p>                
                 ${match.date && (match.status === 'upcoming' || match.status === 'live') ? `
                     <p class="modal-countdown" id="modal-countdown-${match.id}"></p>
                 ` : ''}
@@ -175,17 +177,26 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
                             </div>
                         </a>
                         
-                        <div class="modal-result">
-                            <div class="result-bar-container">
-                                <div class="result-bar" style="width: ${match.competitor1.percentage}%"></div>
-                            </div>
-                            <div class="result-stats">
-                                <span class="result-percentage">${match.competitor1.percentage}%</span>
-                                <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
-                            </div>
-                            ${match.competitor1.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
-                            ${!match.competitor1.winner && match.competitor1.percentage > match.competitor2.percentage && match.status === 'live' ? '<span class="result-leading-badge">📈 Leading</span>' : ''}
-                        </div>
+             <div class="modal-result">
+    ${match.status === 'completed' ? `
+        <div class="result-bar-container">
+            <div class="result-bar" style="width: ${match.competitor1.percentage}%"></div>
+        </div>
+        <div class="result-stats">
+            <span class="result-percentage">${match.competitor1.percentage}%</span>
+            <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
+        </div>
+        ${match.competitor1.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
+    ` : match.status === 'live' ? `
+        <div class="modal-hidden-results">
+            <p class="hidden-results-text">🔒 Vote to see results</p>
+        </div>
+    ` : `
+        <div class="modal-hidden-results">
+            <p class="hidden-results-text">⏰ Results available after voting opens</p>
+        </div>
+    `}
+</div>
                     </div>
                     
                     <!-- VS Divider -->
@@ -212,17 +223,27 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
                             </div>
                         </a>
                         
-                        <div class="modal-result">
-                            <div class="result-bar-container">
-                                <div class="result-bar" style="width: ${match.competitor2.percentage}%"></div>
-                            </div>
-                            <div class="result-stats">
-                                <span class="result-percentage">${match.competitor2.percentage}%</span>
-                                <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
-                            </div>
-                            ${match.competitor2.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
-                            ${!match.competitor2.winner && match.competitor2.percentage > match.competitor1.percentage && match.status === 'live' ? '<span class="result-leading-badge">📈 Leading</span>' : ''}
-                        </div>
+<div class="modal-result">
+    ${match.status === 'completed' ? `
+        <div class="result-bar-container">
+            <div class="result-bar" style="width: ${match.competitor2.percentage}%"></div>
+        </div>
+        <div class="result-stats">
+            <span class="result-percentage">${match.competitor2.percentage}%</span>
+            <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
+        </div>
+        ${match.competitor2.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
+    ` : match.status === 'live' ? `
+        <div class="modal-hidden-results">
+            <p class="hidden-results-text">🔒 Vote to see results</p>
+        </div>
+    ` : `
+        <div class="modal-hidden-results">
+            <p class="hidden-results-text">⏰ Results available after voting opens</p>
+        </div>
+    `}
+</div>
+</div>
                     </div>
                 </div>
                 

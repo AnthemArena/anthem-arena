@@ -501,15 +501,15 @@ if (currentMatch.endTime) {
             </div>
             
             <div class="vote-section">
-                <div class="vote-percentage">
-                    <span class="percentage-number">${calculatePercentage(voteState.leftVotes)}%</span>
-                </div>
-                <button class="vote-btn" onclick="vote('left')" data-song-id="${song1.id}">
-                    <span class="vote-icon">✓</span>
-                    <span class="vote-text">Vote for This</span>
-                </button>
-                <p class="vote-count">${voteState.leftVotes.toLocaleString()} votes</p>
-            </div>
+    <div class="vote-percentage vote-stats hidden">
+        <span class="percentage-number">${calculatePercentage(voteState.leftVotes)}%</span>
+    </div>
+    <button class="vote-btn" onclick="vote('left')" data-song-id="${song1.id}">
+        <span class="vote-icon">✓</span>
+        <span class="vote-text">Vote for This</span>
+    </button>
+    <p class="vote-count vote-stats hidden">${voteState.leftVotes.toLocaleString()} votes</p>
+</div>
         </div>
         
         <!-- VS Divider -->
@@ -538,16 +538,16 @@ if (currentMatch.endTime) {
                 </div>
             </div>
             
-            <div class="vote-section">
-                <div class="vote-percentage">
-                    <span class="percentage-number">${calculatePercentage(voteState.rightVotes)}%</span>
-                </div>
-                <button class="vote-btn" onclick="vote('right')" data-song-id="${song2.id}">
-                    <span class="vote-icon">✓</span>
-                    <span class="vote-text">Vote for This</span>
-                </button>
-                <p class="vote-count">${voteState.rightVotes.toLocaleString()} votes</p>
-            </div>
+     <div class="vote-section">
+    <div class="vote-percentage vote-stats hidden">
+        <span class="percentage-number">${calculatePercentage(voteState.rightVotes)}%</span>
+    </div>
+    <button class="vote-btn" onclick="vote('right')" data-song-id="${song2.id}">
+        <span class="vote-icon">✓</span>
+        <span class="vote-text">Vote for This</span>
+    </button>
+    <p class="vote-count vote-stats hidden">${voteState.rightVotes.toLocaleString()} votes</p>
+</div>
         </div>
     `;
     
@@ -806,9 +806,17 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
 function checkExistingVote() {
     if (!currentMatch) return;
     
-const savedVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);    if (savedVote) {
+    const savedVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
+    if (savedVote) {
         voteState.userVote = savedVote;
         markButtonAsVoted(savedVote);
+        
+        // ✅ ADD THIS: Reveal stats for returning users who already voted
+        document.querySelectorAll('.vote-stats').forEach(el => {
+            el.classList.add('revealed');
+            el.classList.remove('hidden');
+        });
+        
         console.log('✅ Found existing vote:', savedVote);
     }
 }
@@ -890,6 +898,13 @@ await setDoc(voteRef, {
         // Success state
         button.classList.remove('loading');
         button.classList.add('success');
+
+        // ✅ ADD THIS - Reveal vote statistics
+document.querySelectorAll('.vote-stats').forEach(el => {
+    el.classList.add('revealed');
+    el.classList.remove('hidden');
+});
+
         
         // Show confirmation
         showVoteConfirmation(side);

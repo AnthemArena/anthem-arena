@@ -44,9 +44,11 @@ export function createMatchCard(match) {
                         <p class="competitor-source">${match.competitor1.source}</p>
                     </div>
                     <div class="competitor-result">
-                        <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
-                        ${getResultBadge(match.competitor1, match.status)}
-                    </div>
+    ${match.status === 'completed' ? `
+        <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
+        ${getResultBadge(match.competitor1, match.status)}
+    ` : ''}
+</div>
                 </div>
 
                 <div class="vs-divider">VS</div>
@@ -63,10 +65,12 @@ export function createMatchCard(match) {
                         <h3 class="competitor-title">${match.competitor2.name}</h3>
                         <p class="competitor-source">${match.competitor2.source}</p>
                     </div>
-                    <div class="competitor-result">
-                        <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
-                        ${getResultBadge(match.competitor2, match.status)}
-                    </div>
+                 <div class="competitor-result">
+    ${match.status === 'completed' ? `
+        <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
+        ${getResultBadge(match.competitor2, match.status)}
+    ` : ''}
+</div>
                 </div>
             </div>
 
@@ -99,9 +103,8 @@ function getCompetitorClass(competitor, status) {
 function getResultBadge(competitor, status) {
     if (status === 'completed' && competitor.winner) {
         return '<span class="winner-badge">Winner</span>';
-    } else if (status === 'live' && competitor.leading) {
-        return '<span class="leading-badge">Leading</span>';
     }
+    // Don't show leading badge for live matches (hides who's winning)
     return '';
 }
 
@@ -113,11 +116,10 @@ function getFooterContent(match) {
             <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
         `;
-    } else if (match.status === 'live') {
-        statsHtml += `
-            <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
-            <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
-        `;
+ } else if (match.status === 'live') {
+    statsHtml += `
+        <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
+    `;
     } else if (match.status === 'upcoming') {
         statsHtml += `<span class="stat"><i class="far fa-clock"></i> Scheduled</span>`;
     }

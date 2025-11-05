@@ -30,12 +30,14 @@
         
         <h1 class="match-title" id="match-title">Vote for Your Favorite Music Video</h1>
         
-        <div class="match-info">
-            <div class="info-badge tournament" id="tournament-badge">🏆 Loading...</div>
-            <div class="info-badge time" id="time-remaining">⏰ Loading...</div>
-            <div class="info-badge votes" id="total-votes">📊 Loading...</div>
-        </div>
+     <div class="match-info">
+    <div class="info-badge tournament" id="tournament-badge">🏆 Loading...</div>
+    <div class="info-badge time" id="time-remaining">⏰ Loading...</div>
+    <!-- ✅ HIDE TOTAL VOTES UNTIL USER VOTES -->
+    <div class="vote-stats hidden">
+        <div class="info-badge votes" id="total-votes">📊 Loading...</div>
     </div>
+</div>
 </section>
 
 
@@ -90,11 +92,16 @@
     </div>
 </div>
 
-              <!-- Vote Button -->
+<!-- Vote Button -->
 <div class="vote-section">
-    <div class="vote-percentage">
-        <span class="percentage-number" id="competitor1-percentage">50</span>%
+    <!-- ✅ HIDE STATS UNTIL VOTED -->
+    <div class="vote-stats hidden">
+        <div class="vote-percentage">
+            <span class="percentage-number" id="competitor1-percentage">50</span>%
+        </div>
+        <p class="vote-count" id="competitor1-votes">0 votes</p>
     </div>
+    
     <button 
         class="vote-btn" 
         id="vote-btn-competitor1"
@@ -102,7 +109,6 @@
         <span class="vote-icon">🎵</span>
         <span class="vote-text">Vote for This Music Video</span>
     </button>
-    <p class="vote-count" id="competitor1-votes">0 votes</p>
 </div>
 
                 <!-- Music Video Details -->
@@ -171,11 +177,16 @@
     </div>
 </div>
 
-                <!-- Vote Button -->
+<!-- Vote Button -->
 <div class="vote-section">
-    <div class="vote-percentage">
-        <span class="percentage-number" id="competitor2-percentage">50</span>%
+    <!-- ✅ HIDE STATS UNTIL VOTED -->
+    <div class="vote-stats hidden">
+        <div class="vote-percentage">
+            <span class="percentage-number" id="competitor2-percentage">50</span>%
+        </div>
+        <p class="vote-count" id="competitor2-votes">0 votes</p>
     </div>
+    
     <button 
         class="vote-btn" 
         id="vote-btn-competitor2"
@@ -183,7 +194,6 @@
         <span class="vote-icon">🔥</span>
         <span class="vote-text">Vote for This Music Video</span>
     </button>
-    <p class="vote-count" id="competitor2-votes">0 votes</p>
 </div>
 
                 <!-- Music Video Details -->
@@ -238,20 +248,7 @@
         </div>
     </section>
 
-    <!-- VOTING RULES -->
-    <section class="rules-section">
-        <div class="container">
-            <div class="rules-card">
-                <h3 class="rules-title">📜 Voting Rules</h3>
-                <ul class="rules-list">
-                    <li>✅ One vote per person per match</li>
-                    <li>✅ You can change your vote until voting closes</li>
-                    <li>✅ Voting ends in 1 day, 18 hours</li>
-                    <li>✅ Winner becomes the tournament champion</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+
 
     <!-- VOTE CONFIRMATION MODAL -->
     <div id="vote-modal" class="modal">

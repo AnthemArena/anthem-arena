@@ -631,3 +631,18 @@
 .modal-vote-btn.voted:hover {
     transform: none;
 }
+/* Hidden results state for live matches */
+.modal-hidden-results {
+    padding: 2rem 1rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px dashed rgba(200, 155, 60, 0.3);
+}
+
+.hidden-results-text {
+    color: rgba(200, 155, 60, 0.8);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+}

@@ -458,9 +458,7 @@ const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId);
            // ========================================
         // ✨ NEW: START REAL-TIME UPDATES
         // ========================================
-        setTimeout(() => {
-            startRealTimeUpdates();
-        }, 5000); // Start after 5 seconds (give page time to settle)
+     // ✨ Real-time updates will start AFTER user votes (not before)
         
     } catch (error) {
         console.error('❌ Error loading match:', error);
@@ -581,6 +579,15 @@ function disableVoting(votedFor) {
     if (arena) {
         arena.insertBefore(indicator, arena.firstChild);
     }
+
+    // ✅ ADD THIS AT THE END:
+    // Reveal vote statistics now that user has voted
+    document.querySelectorAll('.vote-stats').forEach(el => {
+        el.classList.add('revealed');
+        el.classList.remove('hidden');
+    });
+    
+    console.log('📊 Vote statistics revealed');
 }
 // ========================================
 // UPDATE PAGE CONTENT
@@ -682,10 +689,7 @@ async function updatePageContent() {
         showThumbnailForCompetitor(2, currentMatch.competitor2.videoId);
     }
 
-     // ========================================
-    // ✨ NEW: ADD URGENCY INDICATORS
-    // ========================================
-    updateVoteUrgency();
+   
     
     
     // ========================================
@@ -714,8 +718,8 @@ function getRoundName(roundNumber) {
 }
 
 function showMatchStatus() {
-    // Don't show if already voted
-    if (hasVoted) return;
+    // ✅ ONLY show AFTER voting (reversed logic)
+    if (!hasVoted) return;
     
     const comp1Votes = currentMatch.competitor1.votes;
     const comp2Votes = currentMatch.competitor2.votes;
@@ -779,6 +783,8 @@ function showMatchStatus() {
 // ========================================
 
 function updateVoteUrgency() {
+        if (!hasVoted) return; // ✅ Don't show urgency until after voting
+
     if (currentMatch.totalVotes === 0) return;
     
     const comp1Pct = currentMatch.competitor1.percentage;
@@ -1005,15 +1011,19 @@ localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
         // Show success notification
         showNotification(`✅ Vote cast for "${songName}"!`, 'success');
         
-        // Show voted indicator
-        disableVoting(songId);
-        
-        // ✨ Show post-vote modal with book recommendation
-        setTimeout(() => {
-            showPostVoteModal(songName, songData);
-        }, 800);
-        
-        console.log('✅ Vote submitted successfully!');
+       // Show voted indicator
+disableVoting(songId);
+
+// ✨ START real-time updates now that user has voted
+startRealTimeUpdates();
+console.log('🔄 Started real-time updates (user has voted)');
+
+// ✨ Show post-vote modal with book recommendation
+setTimeout(() => {
+    showPostVoteModal(songName, songData);
+}, 800);
+
+console.log('✅ Vote submitted successfully!');
 
          // ========================================
         // ✨ NEW: STOP UPDATES AFTER VOTING

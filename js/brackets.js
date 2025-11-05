@@ -309,7 +309,9 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced1 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-       ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song1IsTBD ? `
+ ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
+    <div class="vote-count-only">${totalVotes.toLocaleString()} votes</div>
+` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
     <div class="vote-percentage">${song1Pct}%</div>
     ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
 ` : ''}
@@ -332,24 +334,24 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced2 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                 ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song2IsTBD ? `
+         ${match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
     <div class="vote-percentage">${song2Pct}%</div>
     ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
 ` : ''}
                 </div>
             </div>
 
-            <div class="match-status">
-                ${isCompleted ? `
-                    <span class="status-badge completed">Completed</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} votes</span>
-                ` : isUpcoming ? `
-                    <span class="status-badge upcoming">Upcoming</span>
-                ` : `
-                    <span class="status-badge active">Vote Now!</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} votes</span>
-                `}
-            </div>
+        <div class="match-status">
+    ${isCompleted ? `
+        <span class="status-badge completed">Final</span>
+        <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
+    ` : isUpcoming ? `
+        <span class="status-badge upcoming">Coming Soon</span>
+    ` : `
+        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
+        <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
+    `}
+</div>
         </div>
     `;
 }
@@ -846,7 +848,9 @@ function createRound2MatchCard(match) {
                             ${match.song1.hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                   ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song1IsTBD ? `
+    ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
+    <div class="vote-count-only">${totalVotes.toLocaleString()} votes</div>
+` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
     <div class="vote-percentage">${song1Percentage}%</div>
     ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
 ` : ''}
@@ -868,24 +872,24 @@ function createRound2MatchCard(match) {
                             ${song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle}
                         </span>
                     </div>
-                    ${(match.status === 'live' || match.status === 'completed') && totalVotes > 0 && !song2IsTBD ? `
+          ${match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
     <div class="vote-percentage">${song2Percentage}%</div>
     ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
 ` : ''}
                 </div>
             </div>
             
-            <div class="match-status">
-                ${match.status === 'completed' ? `
-                    <span class="status-badge completed">Completed</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} votes</span>
-                ` : match.status === 'upcoming' ? `
-                    <span class="status-badge upcoming">Upcoming</span>
-                ` : `
-                    <span class="status-badge active">Vote Now!</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} votes</span>
-                `}
-            </div>
+         <div class="match-status">
+    ${isCompleted ? `
+        <span class="status-badge completed">Final</span>
+        <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
+    ` : isUpcoming ? `
+        <span class="status-badge upcoming">Coming Soon</span>
+    ` : `
+        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
+        <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
+    `}
+</div>
         </div>
     `;
 }

@@ -1513,3 +1513,72 @@
     background: linear-gradient(135deg, #d4b876, #C8AA6E);
     transform: translateY(-2px);
 }
+/* Hide vote statistics until user has voted */
+.vote-stats {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Reveal after voting */
+.vote-stats.revealed {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Alternative: completely hide (no space taken) */
+.vote-stats.hidden {
+    display: none;
+}
+
+.vote-stats.revealed {
+    display: block;
+}
+/* ========================================
+   HIDE VOTE STATS UNTIL USER VOTES
+   ======================================== */
+
+.vote-stats {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.vote-stats.revealed {
+    display: block;
+    opacity: 1;
+}
+
+/* Alternative smooth fade-in animation */
+@keyframes fadeInStats {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vote-stats.revealed {
+    animation: fadeInStats 0.5s ease forwards;
+}
+
+/* Ensure vote button is always visible and centered */
+.vote-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vote-btn {
+    order: 2; /* Button always in middle */
+}
+
+.vote-stats {
+    order: 1; /* Stats above button when visible */
+    width: 100%;
+    text-align: center;
+}
