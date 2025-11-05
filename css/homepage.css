@@ -3128,3 +3128,38 @@ button {
         transform: translateY(0);
     }
 }
+/* Featured Match - Vote Now Button */
+.vote-now-btn {
+    display: inline-block;
+    padding: 1.25rem 3rem;
+    background: linear-gradient(135deg, #c89b3c, #8b6914);
+    color: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(200, 155, 60, 0.4);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.vote-now-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(200, 155, 60, 0.6);
+    background: linear-gradient(135deg, #d4a742, #9a7418);
+}
+
+.vote-now-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Vote stats - always visible on homepage */
+.featured-matchup .vote-percentage,
+.featured-matchup .vote-count {
+    opacity: 1 !important;
+    display: block !important;
+}

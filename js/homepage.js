@@ -350,7 +350,6 @@ async function loadFeaturedMatch() {
             return;
         }
         
-        // Get all live matches and sort by votes (most voted = featured)
         let liveMatches = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -358,17 +357,17 @@ async function loadFeaturedMatch() {
         
         liveMatches.sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0));
         
-        currentMatch = liveMatches[0]; // Most voted = featured
+        currentMatch = liveMatches[0];
         
         console.log(`✅ Featured match (most voted): ${currentMatch.totalVotes} votes`);
         
-        // Display using full competitor layout from vote page
+        // Display match
         await displayFeaturedMatch();
         
-        // Check if user already voted
-        checkExistingVote();
+        // ❌ REMOVE THIS LINE:
+        // checkExistingVote();
         
-        // ✅ START POLLING (AFTER match is loaded!)
+        // ✅ START POLLING
         if (currentMatch && currentMatch.status === 'live') {
             startVotePolling();
         }
@@ -430,6 +429,10 @@ window.addEventListener('beforeunload', () => {
 // DISPLAY FEATURED MATCH
 // ========================================
 
+// ========================================
+// DISPLAY FEATURED MATCH (VIEW-ONLY)
+// ========================================
+
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
@@ -451,32 +454,30 @@ function displayFeaturedMatch() {
     if (subtitle) {
         subtitle.textContent = `${voteState.totalVotes.toLocaleString()} votes • 🔴 Live Now`;
     }
-    
-// ✅ ADD COUNTDOWN TIMER
-if (currentMatch.endTime) {
-    const countdownContainer = document.createElement('p');
-    countdownContainer.className = 'featured-countdown';
-    countdownContainer.id = 'featured-countdown';
-    countdownContainer.style.cssText = `
-        text-align: center;
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 1rem 0 2rem 0;
-        color: #ffaa00;
-    `;
-    
-    const titleSection = document.querySelector('.featured-matchup .section-header');
-    if (titleSection) {
-        titleSection.appendChild(countdownContainer);
-        
-        // ✅ Start countdown AFTER element is in DOM
-        setTimeout(() => {
-            startFeaturedCountdown(currentMatch.endTime);
-        }, 100);
-    }
-}
 
-    // Render full competitor layout (reusing vote page structure)
+    // Add countdown timer if exists
+    if (currentMatch.endTime) {
+        const countdownContainer = document.createElement('p');
+        countdownContainer.className = 'featured-countdown';
+        countdownContainer.id = 'featured-countdown';
+        countdownContainer.style.cssText = `
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1rem 0 2rem 0;
+            color: #ffaa00;
+        `;
+        
+        const titleSection = document.querySelector('.featured-matchup .section-header');
+        if (titleSection) {
+            titleSection.appendChild(countdownContainer);
+            setTimeout(() => {
+                startFeaturedCountdown(currentMatch.endTime);
+            }, 100);
+        }
+    }
+
+    // Render competitor layout (VIEW-ONLY - no voting buttons)
     const grid = document.querySelector('.competitors-grid');
     if (!grid) return;
     
@@ -501,15 +502,11 @@ if (currentMatch.endTime) {
             </div>
             
             <div class="vote-section">
-    <div class="vote-percentage vote-stats hidden">
-        <span class="percentage-number">${calculatePercentage(voteState.leftVotes)}%</span>
-    </div>
-    <button class="vote-btn" onclick="vote('left')" data-song-id="${song1.id}">
-        <span class="vote-icon">✓</span>
-        <span class="vote-text">Vote for This</span>
-    </button>
-    <p class="vote-count vote-stats hidden">${voteState.leftVotes.toLocaleString()} votes</p>
-</div>
+                <div class="vote-percentage">
+                    <span class="percentage-number">${calculatePercentage(voteState.leftVotes)}%</span>
+                </div>
+                <p class="vote-count">${voteState.leftVotes.toLocaleString()} votes</p>
+            </div>
         </div>
         
         <!-- VS Divider -->
@@ -538,18 +535,30 @@ if (currentMatch.endTime) {
                 </div>
             </div>
             
-     <div class="vote-section">
-    <div class="vote-percentage vote-stats hidden">
-        <span class="percentage-number">${calculatePercentage(voteState.rightVotes)}%</span>
-    </div>
-    <button class="vote-btn" onclick="vote('right')" data-song-id="${song2.id}">
-        <span class="vote-icon">✓</span>
-        <span class="vote-text">Vote for This</span>
-    </button>
-    <p class="vote-count vote-stats hidden">${voteState.rightVotes.toLocaleString()} votes</p>
-</div>
+            <div class="vote-section">
+                <div class="vote-percentage">
+                    <span class="percentage-number">${calculatePercentage(voteState.rightVotes)}%</span>
+                </div>
+                <p class="vote-count">${voteState.rightVotes.toLocaleString()} votes</p>
+            </div>
         </div>
     `;
+    
+    // ✅ ADD "VOTE NOW" CTA BUTTON BELOW GRID
+    const ctaButton = document.createElement('div');
+    ctaButton.className = 'featured-cta';
+    ctaButton.innerHTML = `
+        <a href="vote.html?match=${currentMatch.id}" class="vote-now-btn">
+            🎵 Cast Your Vote
+        </a>
+    `;
+    ctaButton.style.cssText = `
+        text-align: center;
+        margin-top: 2rem;
+        padding: 2rem 0;
+    `;
+    
+    grid.parentElement.appendChild(ctaButton);
     
     // Highlight leading competitor
     updateLeadingVisuals();
@@ -799,136 +808,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
     };
 }
 
-// ========================================
-// CHECK EXISTING VOTE
-// ========================================
 
-function checkExistingVote() {
-    if (!currentMatch) return;
-    
-    const savedVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
-    if (savedVote) {
-        voteState.userVote = savedVote;
-        markButtonAsVoted(savedVote);
-        
-        // ✅ ADD THIS: Reveal stats for returning users who already voted
-        document.querySelectorAll('.vote-stats').forEach(el => {
-            el.classList.add('revealed');
-            el.classList.remove('hidden');
-        });
-        
-        console.log('✅ Found existing vote:', savedVote);
-    }
-}
-
-// ========================================
-// VOTING SYSTEM
-// ========================================
-
-async function vote(side) {
-    const button = event.currentTarget;
-    
-    if (!currentMatch) {
-        showNotification('No active match to vote on', 'error');
-        return;
-    }
-    
-    // Prevent double voting
-    if (button.classList.contains('loading')) {
-        return;
-    }
-    
-    // Check if changing vote
-    if (voteState.userVote) {
-        if (voteState.userVote === side) {
-            showNotification('You already voted for this music video!', 'info');
-            return;
-        }
-        showNotification('You can only vote once per match', 'info');
-        return;
-    }
-    
-    // Add loading state
-    button.classList.add('loading');
-    button.disabled = true;
-    
-    try {
-        // ✅ UPDATE FIREBASE
-        const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
-        
-        const voteField = side === 'left' ? 'song1.votes' : 'song2.votes';
-        
-        await updateDoc(matchRef, {
-            [voteField]: increment(1),
-            totalVotes: increment(1)
-        });
-        
-        console.log('✅ Vote submitted to Firebase');
-        
-        // Update local state
-        if (side === 'left') {
-            voteState.leftVotes++;
-        } else {
-            voteState.rightVotes++;
-        }
-        voteState.totalVotes++;
-        voteState.userVote = side;
-        
-      // ✅ NEW:
-localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, side);
-
-await setDoc(voteRef, {
-    tournament: ACTIVE_TOURNAMENT,  // ✅ Add tournament
-    matchId: currentMatch.id,
-    userId: userId,
-    songId: side === 'left' ? currentMatch.song1.id : currentMatch.song2.id,
-    choice: side,  // ✅ Add which side they picked
-    timestamp: new Date().toISOString(),
-    // ✅ Add extra fields for easier querying:
-    round: currentMatch.round || 1,
-    votedForSeed: (side === 'left' ? currentMatch.song1 : currentMatch.song2).seed,
-    votedForName: (side === 'left' ? currentMatch.song1 : currentMatch.song2).shortTitle || (side === 'left' ? currentMatch.song1 : currentMatch.song2).title
-});
-        
-        // Update display
-        updateVoteDisplay();
-        markButtonAsVoted(side);
-        updateLeadingVisuals();
-        
-        // Success state
-        button.classList.remove('loading');
-        button.classList.add('success');
-
-        // ✅ ADD THIS - Reveal vote statistics
-document.querySelectorAll('.vote-stats').forEach(el => {
-    el.classList.add('revealed');
-    el.classList.remove('hidden');
-});
-
-        
-        // Show confirmation
-        showVoteConfirmation(side);
-        
-        // Show book recommendation
-        const songId = side === 'left' ? currentMatch.song1.id : currentMatch.song2.id;
-        showBookRecommendation(songId);
-        
-    } catch (error) {
-        console.error('Error casting vote:', error);
-        button.classList.remove('loading');
-        button.disabled = false;
-        showNotification('Error casting vote. Please try again.', 'error');
-        
-        // Revert local state
-        if (side === 'left') {
-            voteState.leftVotes--;
-        } else {
-            voteState.rightVotes--;
-        }
-        voteState.totalVotes--;
-        voteState.userVote = null;
-    }
-}
 
 // Helper: Generate unique user ID
 function generateUserId() {
@@ -937,8 +817,7 @@ function generateUserId() {
     return userId;
 }
 
-// Make vote function available globally
-window.vote = vote;
+
 
 // ✅ ADD THIS HERE:
 // ========================================
@@ -979,68 +858,8 @@ function updateVoteDisplay() {
     }
 }
 
-// Mark button as voted
-function markButtonAsVoted(side) {
-    const leftButton = document.querySelector('.competitor-column[data-side="left"] .vote-btn');
-    const rightButton = document.querySelector('.competitor-column[data-side="right"] .vote-btn');
-    
-    if (!leftButton || !rightButton) return;
-    
-    // Mark voted button
-    const votedButton = side === 'left' ? leftButton : rightButton;
-    votedButton.classList.add('voted');
-    votedButton.innerHTML = `
-        <span class="vote-text">Your Vote</span>
-    `;
-    votedButton.disabled = false; // Keep clickable for "already voted" message
-}
 
-// Show vote confirmation
-function showVoteConfirmation(side) {
-    const song = side === 'left' ? currentMatch.song1 : currentMatch.song2;
-    const songName = song.shortTitle || song.title;
-    
-    const notification = document.createElement('div');
-    notification.className = 'vote-notification';
-    notification.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-        </svg>
-        <span>Vote recorded for <strong>${songName}</strong>!</span>
-    `;
-    
-    notification.style.cssText = `
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        background: linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95));
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-family: 'Lora', serif;
-        font-size: 0.95rem;
-        font-weight: 600;
-        box-shadow: 0 4px 20px rgba(200, 170, 110, 0.4);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
+
 
 async function loadUpcomingMatches() {
     try {
@@ -1158,121 +977,19 @@ function getRoundName(roundNumber) {
 }
 
 // ========================================
-// BOOK RECOMMENDATION MODAL
+// BOOK LINK TRACKING
 // ========================================
 
-function showBookRecommendation(songId) {
-    const songData = musicVideos.find(v => v.id === songId);
-    
-    if (!songData) {
-        console.log('❌ Song not found:', songId);
-        return;
-    }
-    
-    if (!songData.recommendedBook) {
-        console.log('📚 No book recommendation for:', songData.title);
-        return;
-    }
-    
-    const book = getBookForSong(songData);
-    
-    if (!book) {
-        console.log('❌ Book not found in database for:', songData.recommendedBook);
-        return;
-    }
-    
-    console.log('📚 Showing book recommendation:', book.title);
-    
-    const modal = document.getElementById('bookModal');
-    const modalBody = document.getElementById('bookModalBody');
-    
-    if (!modal || !modalBody) {
-        console.error('❌ Book modal elements not found');
-        return;
-    }
-    
-    // Build HTML
-    modalBody.innerHTML = `
-        <div class="book-recommendation">
-            <div class="book-header">
-                <span class="book-icon">📚</span>
-                <h3>Explore the Lore</h3>
-            </div>
-            
-            <div class="book-content">
-                <div class="book-cover-section">
-                    <img src="${book.coverImage}" 
-                         alt="${book.title}" 
-                         class="book-cover">
-                </div>
-                
-                <div class="book-details">
-                    <h4 class="book-title">${book.title}</h4>
-                    <p class="book-author">by ${book.author}</p>
-                    
-                    <p class="book-description">${book.description}</p>
-                    
-                    <div class="book-features">
-                        ${book.features.map(feature => `
-                            <div class="feature-item">
-                                <span class="feature-icon">✓</span>
-                                <span>${feature}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    <a href="${book.amazonLink}" 
-                       target="_blank" 
-                       rel="noopener noreferrer nofollow"
-                       class="book-cta"
-                       onclick="trackBookClick('${songData.slug}', 'homepage-featured')">
-                        View on Amazon →
-                    </a>
-                    
-                    <p class="book-disclaimer">
-                        As an Amazon Associate, we earn from qualifying purchases
-                    </p>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Show modal after delay
-    setTimeout(() => {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }, 1500);
-}
-
-function closeBookModal() {
-    const modal = document.getElementById('bookModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-}
-
-// Make function available globally
-window.closeBookModal = closeBookModal;
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('bookModal');
-    if (event.target === modal) {
-        closeBookModal();
-    }
-}
-
-// Close with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeBookModal();
-    }
-});
-
-// Track book clicks
 window.trackBookClick = function(songSlug, location) {
     console.log(`📊 Book clicked: ${songSlug} from ${location}`);
+    
+    // Optional: Send to analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'book_click', {
+            song: songSlug,
+            location: location
+        });
+    }
 };
 
 // ========================================
