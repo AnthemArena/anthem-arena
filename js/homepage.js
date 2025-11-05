@@ -940,6 +940,22 @@ function generateUserId() {
 // Make vote function available globally
 window.vote = vote;
 
+// ✅ ADD THIS HERE:
+// ========================================
+// VOTE NOW NAVIGATION
+// ========================================
+
+window.voteNow = function(matchId) {
+    if (!matchId) {
+        console.error('❌ voteNow: No match ID provided');
+        showNotification('Unable to load match. Please try again.', 'error');
+        return;
+    }
+    
+    console.log(`✅ Navigating to vote page for match: ${matchId}`);
+    window.location.href = `vote.html?match=${matchId}`;
+};
+
 // Update vote display
 function updateVoteDisplay() {
     // Update percentages in vote sections
