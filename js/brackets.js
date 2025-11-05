@@ -78,6 +78,10 @@ async function loadBracketData() {
         
         // Generate bracket HTML with Firebase data
         await generateBracketFromFirebase(firebaseMatches);
+
+           // ✅ NEW: Update tournament info section
+        await updateTournamentInfo();
+        
         
         // Set up real-time updates (optional but recommended)
         setupRealtimeUpdates();
@@ -257,8 +261,134 @@ async function generateBracketFromFirebase(firebaseMatches) {
     console.log('✅ Bracket generation complete');
 }
 
-// ... rest of your existing functions stay the same ...
+// ========================================
+// UPDATE TOURNAMENT INFO SECTION
+// ========================================
 
+async function updateTournamentInfo() {
+    console.log('📊 Updating tournament info section...');
+    
+    try {
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const snapshot = await getDocs(matchesRef);
+        
+        const allMatches = [];
+        snapshot.forEach(doc => {
+            allMatches.push(doc.data());
+        });
+        
+        if (allMatches.length === 0) {
+            console.warn('⚠️ No matches found');
+            return;
+        }
+        
+        // Calculate stats
+        const totalMatches = allMatches.length;
+        const completedMatches = allMatches.filter(m => m.status === 'completed').length;
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        const upcomingMatches = allMatches.filter(m => m.status === 'upcoming').length;
+        
+        // Count total songs (64 songs in the tournament)
+        const totalSongs = 64;
+        const byeCount = 3; // Your tournament has 3 byes
+        
+        // Determine current status
+        let statusText = '';
+        let statusClass = '';
+        
+        if (completedMatches === totalMatches) {
+            // Tournament complete
+            const finalsMatch = allMatches.find(m => m.matchId === 'finals');
+            const winner = finalsMatch?.winnerId === finalsMatch?.song1.id 
+                ? finalsMatch.song1 
+                : finalsMatch.song2;
+            
+            statusText = `🏆 Champion: ${winner?.shortTitle || 'TBD'}`;
+            statusClass = 'status-completed';
+            
+        } else if (liveMatches.length > 0) {
+            // Live matches happening
+            const liveRound = Math.max(...liveMatches.map(m => m.round));
+            const roundName = getRoundName(liveRound);
+            
+            statusText = `🔴 ${roundName} - ${liveMatches.length} Live ${liveMatches.length === 1 ? 'Match' : 'Matches'}`;
+            statusClass = 'status-live';
+            
+        } else if (upcomingMatches > 0) {
+            // Upcoming matches
+            const nextRound = Math.min(...allMatches.filter(m => m.status === 'upcoming').map(m => m.round));
+            const roundName = getRoundName(nextRound);
+            
+            // Try to get date from first upcoming match
+            const nextMatch = allMatches.find(m => m.status === 'upcoming' && m.round === nextRound);
+            const dateText = nextMatch?.date ? formatDate(nextMatch.date) : 'Coming Soon';
+            
+            statusText = `📅 ${roundName} Opens ${dateText}`;
+            statusClass = 'status-upcoming';
+            
+        } else {
+            statusText = '⏰ Starting Soon';
+            statusClass = 'status-upcoming';
+        }
+        
+        // Format for display
+        const formatText = 'Single Elimination';
+        
+        // Update the HTML
+        const infoGrid = document.querySelector('.tournament-info .info-grid');
+        if (infoGrid) {
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Status</span>
+                    <span class="info-value ${statusClass}">${statusText}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Total Songs</span>
+                    <span class="info-value">${totalSongs} (${totalSongs - byeCount} + ${byeCount} bye${byeCount !== 1 ? 's' : ''})</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Progress</span>
+                    <span class="info-value">${completedMatches} / ${totalMatches} Matches</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Format</span>
+                    <span class="info-value">${formatText}</span>
+                </div>
+            `;
+            
+            console.log('✅ Tournament info updated:', {
+                status: statusText,
+                completed: completedMatches,
+                total: totalMatches
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Error updating tournament info:', error);
+    }
+}
+
+// Helper: Format date nicely
+function formatDate(dateString) {
+    if (!dateString) return 'TBD';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    // Check if date is today
+    const isToday = date.toDateString() === now.toDateString();
+    if (isToday) return 'Today';
+    
+    // Check if date is tomorrow
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = date.toDateString() === tomorrow.toDateString();
+    if (isTomorrow) return 'Tomorrow';
+    
+    // Format as "Nov 5"
+    const options = { month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
 // ========================================
 // CREATE MATCH CARD FROM FIREBASE DATA
 // ========================================

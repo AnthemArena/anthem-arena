@@ -160,9 +160,9 @@ if (userVote) {
     ${match.status === 'completed' ? `${match.totalVotes.toLocaleString()} total votes` : match.status === 'live' ? `🔴 Live Now - Cast Your Vote!` : 'Coming Soon'}
     ${formattedDate ? ' • ' + formattedDate : ''}
 </p>                
-                ${match.date && (match.status === 'upcoming' || match.status === 'live') ? `
-                    <p class="modal-countdown" id="modal-countdown-${match.id}"></p>
-                ` : ''}
+              ${match.date && match.status === 'upcoming' ? `
+    <p class="modal-countdown" id="modal-countdown-${match.id}"></p>
+` : ''}
             </div>
             
             <div class="modal-body">

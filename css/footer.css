@@ -392,3 +392,42 @@
     cursor: pointer !important;
     opacity: 1;
 }
+/* Footer email styling */
+.footer-email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin: 1rem 0;
+    transition: color 0.3s ease;
+}
+
+.footer-email-link:hover {
+    color: #c89b3c;
+}
+
+.footer-email-link svg {
+    opacity: 0.7;
+}
+
+.footer-contact {
+    margin: 1rem 0 1.5rem 0;
+}
+
+/* Inline contact style (Option 3) */
+.footer-contact-inline {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.5rem;
+}
+
+.footer-contact-inline a {
+    color: #c89b3c;
+    text-decoration: none;
+}
+
+.footer-contact-inline a:hover {
+    text-decoration: underline;
+}

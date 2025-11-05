@@ -1375,3 +1375,28 @@
     border-color: #c89b3c;
     font-size: 1.1em;
 }
+/* Dynamic tournament status styling */
+.info-value.status-live {
+    color: #ff4444 !important;
+    font-weight: 700;
+    animation: livePulse 2s ease-in-out infinite;
+}
+
+.info-value.status-upcoming {
+    color: #667eea !important;
+}
+
+.info-value.status-completed {
+    color: #00ff88 !important;
+    font-weight: 700;
+}
+
+@keyframes livePulse {
+    0%, 100% { 
+        opacity: 0.8;
+    }
+    50% { 
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+    }
+}
