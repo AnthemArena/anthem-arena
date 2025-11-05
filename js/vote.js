@@ -7,6 +7,8 @@
     import { doc, updateDoc, increment, getDoc, collection, query, where, getDocs, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getAllTournamentStats } from './music-gallery.js';
     import { getBookForSong } from './bookMappings.js';
+    import { checkGlobalNotificationStatus } from './global-notifications.js';
+
 
     // ✅ ADD THIS LINE:
     const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
@@ -59,18 +61,19 @@
     // ========================================
     // PAGE INITIALIZATION
     // ========================================
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        console.log('🎵 Vote page loaded');
-        
-        // ⭐ NEW: Get user ID first
-        userId = await getUserId();
-        console.log('👤 User ID:', userId);
-        
-        // Get match ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-    // Line 68 - Accept both 'id' and 'match' parameters for backwards compatibility
-    const matchId = urlParams.get('id') || urlParams.get('match');    
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🎵 Vote page loaded');
+    
+    // ⭐ NEW: Get user ID first
+    userId = await getUserId();
+    console.log('👤 User ID:', userId);
+    
+    // ✅ ADD THIS: Check notification status
+    await checkGlobalNotificationStatus();
+    
+    // Get match ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || urlParams.get('match');   
         if (!matchId) {
             showNotification('No match specified', 'error');
             console.error('❌ No match ID in URL');
@@ -1225,102 +1228,49 @@
     // NOTIFICATION SYSTEM
     // ========================================
 
-    function showNotification(message, type = 'info') {
-        // Remove existing notifications
-        const existing = document.querySelector('.notification');
-        if (existing) {
-            existing.remove();
-        }
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        
-        // Style based on type
-        const colors = {
-            success: '#00c896',
-            error: '#ff4444',
-            info: '#4a9eff',
-            warning: '#ffaa00'
-        };
-        
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            background: ${colors[type] || colors.info};
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            font-weight: 500;
-            max-width: 400px;
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Auto-remove after 4 seconds
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 4000);
-    }
+    // ========================================
+// NOTIFICATION SYSTEM (Standardized)
+// ========================================
 
-    // Add animation styles
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        .meta-item.winning {
-            color: #00c896;
-            font-weight: 600;
-        }
-        
-        .meta-item.hot-streak {
-            color: #ff6b35;
-            font-weight: 600;
-        }
-        
-        .meta-item.debut {
-            color: #4a9eff;
-            font-weight: 600;
-        }
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    const bgColor = {
+        'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+        'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
+        'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+    }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
+    
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     `;
-    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
 
     // ========================================
     // THUMBNAIL FALLBACK FOR NON-EMBEDDABLE VIDEOS
