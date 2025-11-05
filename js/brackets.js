@@ -759,7 +759,16 @@ function getRoundName(round) {
 // CREATE ROUND 2 MATCH CARD FROM FIREBASE
 // ========================================
 
+// ========================================
+// CREATE ROUND 2 MATCH CARD FROM FIREBASE
+// ========================================
+
 function createRound2MatchCard(match) {
+    // ✅ Define status checks FIRST
+    const isUpcoming = match.status === 'upcoming';
+    const isLive = match.status === 'live';
+    const isCompleted = match.status === 'completed';
+    
     const totalVotes = match.totalVotes || 0;
     const song1Votes = match.song1.votes || 0;
     const song2Votes = match.song2.votes || 0;
@@ -771,8 +780,6 @@ function createRound2MatchCard(match) {
     const song2IsWinner = match.winnerId === match.song2.id;
     const song1IsLeading = song1Votes > song2Votes && totalVotes > 0 && !match.winnerId;
     const song2IsLeading = song2Votes > song1Votes && totalVotes > 0 && !match.winnerId;
-    
-    const isCompleted = match.status === 'completed'; // ✨ ADD THIS
     
     // Check if TBD
     const song1IsTBD = match.song1.id === 'TBD';
@@ -791,9 +798,9 @@ function createRound2MatchCard(match) {
     
     let cardClasses = 'matchup-card clickable';
     if (hasBye) cardClasses += ' bye';
-    if (match.status === 'upcoming') cardClasses += ' upcoming';
-    if (match.status === 'live') cardClasses += ' live';
-    if (match.status === 'completed') cardClasses += ' completed';
+    if (isUpcoming) cardClasses += ' upcoming';
+    if (isLive) cardClasses += ' live';
+    if (isCompleted) cardClasses += ' completed';
     
     window.matchDatabase[match.matchId] = {
         id: match.matchId,
@@ -826,7 +833,7 @@ function createRound2MatchCard(match) {
         <div class="${cardClasses}" data-match-id="${match.matchId}">
             <div class="matchup-number">
                 R${match.round} M${match.matchNumber}
-                ${match.status === 'live' ? ' <span class="live-indicator">🔴 LIVE</span>' : ''}
+                ${isLive ? ' <span class="live-indicator">🔴 LIVE</span>' : ''}
             </div>
             
             <div class="matchup-competitors">
@@ -847,11 +854,12 @@ function createRound2MatchCard(match) {
                             ${match.song1.hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-    ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
-` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
-    <div class="vote-percentage">${song1Percentage}%</div>
-    ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
+                    ${isLive && totalVotes > 0 && !song1IsTBD ? `
+                        <div class="vote-percentage">${song1Percentage}%</div>
+                    ` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
+                        <div class="vote-percentage">${song1Percentage}%</div>
+                        ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+                    ` : ''}
                 </div>
                 
                 <!-- Competitor 2 -->
@@ -870,24 +878,24 @@ function createRound2MatchCard(match) {
                             ${song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle}
                         </span>
                     </div>
-          ${match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
-    <div class="vote-percentage">${song2Percentage}%</div>
-    ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
+                    ${isCompleted && totalVotes > 0 && !song2IsTBD ? `
+                        <div class="vote-percentage">${song2Percentage}%</div>
+                        ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+                    ` : ''}
                 </div>
             </div>
             
-         <div class="match-status">
-    ${isCompleted ? `
-        <span class="status-badge completed">Final</span>
-        <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
-    ` : isUpcoming ? `
-        <span class="status-badge upcoming">Coming Soon</span>
-    ` : `
-        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
-        <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
-    `}
-</div>
+            <div class="match-status">
+                ${isCompleted ? `
+                    <span class="status-badge completed">Final</span>
+                    <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
+                ` : isUpcoming ? `
+                    <span class="status-badge upcoming">Coming Soon</span>
+                ` : `
+                    <span class="status-badge active">🔴 LIVE - Vote Now!</span>
+                    <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
+                `}
+            </div>
         </div>
     `;
 }
