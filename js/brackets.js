@@ -310,7 +310,6 @@ function createMatchCardFromFirebase(match) {
                         </span>
                     </div>
  ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
-    <div class="vote-count-only">${totalVotes.toLocaleString()} votes</div>
 ` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
     <div class="vote-percentage">${song1Pct}%</div>
     ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
@@ -849,7 +848,6 @@ function createRound2MatchCard(match) {
                         </span>
                     </div>
     ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
-    <div class="vote-count-only">${totalVotes.toLocaleString()} votes</div>
 ` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
     <div class="vote-percentage">${song1Percentage}%</div>
     ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
