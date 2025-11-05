@@ -100,25 +100,34 @@ function createModalHTML(match) {
     
     // Check if user has voted
 // ✅ NEW:
+// Check if user has voted
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
-    const hasVoted = !!userVote;
-    
-    // Determine which competitor user voted for
-    let votedForName = '';
-    if (userVote) {
+const hasVoted = !!userVote;
+
+// Determine which competitor user voted for
+let votedForName = '';
+if (userVote) {
+    // userVote will be "song1" or "song2"
+    if (userVote === 'song1') {
+        votedForName = match.competitor1.name;
+    } else if (userVote === 'song2') {
+        votedForName = match.competitor2.name;
+    } else {
+        // Fallback: try to match by song ID format
         const comp1Id = match.competitor1.name.toLowerCase().replace(/\s+/g, '-');
         const comp2Id = match.competitor2.name.toLowerCase().replace(/\s+/g, '-');
         
-        if (userVote === comp1Id) {
+        if (userVote === comp1Id || userVote.includes('song1')) {
             votedForName = match.competitor1.name;
-        } else if (userVote === comp2Id) {
+        } else if (userVote === comp2Id || userVote.includes('song2')) {
             votedForName = match.competitor2.name;
         } else {
-            // Fallback: try matching directly
+            // Last resort - just show the vote value
             votedForName = userVote;
         }
     }
+}
     
     // Vote button logic
     const voteButton = match.status === 'live' 
@@ -177,7 +186,7 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
                             </div>
                         </a>
                         
-             <div class="modal-result">
+          <div class="modal-result">
     ${match.status === 'completed' ? `
         <div class="result-bar-container">
             <div class="result-bar" style="width: ${match.competitor1.percentage}%"></div>
@@ -187,6 +196,15 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
             <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
         </div>
         ${match.competitor1.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
+    ` : match.status === 'live' && hasVoted ? `
+        <div class="result-bar-container">
+            <div class="result-bar live-result" style="width: ${match.competitor1.percentage}%"></div>
+        </div>
+        <div class="result-stats">
+            <span class="result-percentage live-percentage">${match.competitor1.percentage}%</span>
+            <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
+        </div>
+        ${match.competitor1.percentage > match.competitor2.percentage ? '<span class="leading-badge">📈 Leading</span>' : ''}
     ` : match.status === 'live' ? `
         <div class="modal-hidden-results">
             <p class="hidden-results-text">🔒 Vote to see results</p>
@@ -233,6 +251,15 @@ const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
             <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
         </div>
         ${match.competitor2.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
+    ` : match.status === 'live' && hasVoted ? `
+        <div class="result-bar-container">
+            <div class="result-bar live-result" style="width: ${match.competitor2.percentage}%"></div>
+        </div>
+        <div class="result-stats">
+            <span class="result-percentage live-percentage">${match.competitor2.percentage}%</span>
+            <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
+        </div>
+        ${match.competitor2.percentage > match.competitor1.percentage ? '<span class="leading-badge">📈 Leading</span>' : ''}
     ` : match.status === 'live' ? `
         <div class="modal-hidden-results">
             <p class="hidden-results-text">🔒 Vote to see results</p>

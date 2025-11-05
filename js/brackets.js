@@ -10,6 +10,15 @@ import { collection, getDocs, onSnapshot } from 'https://www.gstatic.com/firebas
 // ✅ ADD THIS LINE:
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
+// ========================================
+// HELPER: CHECK IF USER VOTED IN MATCH
+// ========================================
+
+function checkUserVoted(matchId) {
+    const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${matchId}`);
+    return !!userVote; // Returns true if user has voted
+}
+
 // Initialize global match database
 if (typeof window.matchDatabase === 'undefined') {
     window.matchDatabase = {};
@@ -309,7 +318,8 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced1 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
- ${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
+${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
+    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Pct}%</div>` : ''}
 ` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
     <div class="vote-percentage">${song1Pct}%</div>
     ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
@@ -333,7 +343,9 @@ function createMatchCardFromFirebase(match) {
                             ${isBye && autoAdvanced2 ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-         ${match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
+       ${match.status === 'live' && totalVotes > 0 && !song2IsTBD ? `
+    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Pct}%</div>` : ''}
+` : match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
     <div class="vote-percentage">${song2Pct}%</div>
     ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
 ` : ''}
@@ -854,12 +866,12 @@ function createRound2MatchCard(match) {
                             ${match.song1.hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-                    ${isLive && totalVotes > 0 && !song1IsTBD ? `
-                        <div class="vote-percentage">${song1Percentage}%</div>
-                    ` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
-                        <div class="vote-percentage">${song1Percentage}%</div>
-                        ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-                    ` : ''}
+               ${isLive && totalVotes > 0 && !song1IsTBD ? `
+    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Percentage}%</div>` : ''}
+` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
+    <div class="vote-percentage">${song1Percentage}%</div>
+    ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
                 
                 <!-- Competitor 2 -->
@@ -878,10 +890,12 @@ function createRound2MatchCard(match) {
                             ${song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle}
                         </span>
                     </div>
-                    ${isCompleted && totalVotes > 0 && !song2IsTBD ? `
-                        <div class="vote-percentage">${song2Percentage}%</div>
-                        ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-                    ` : ''}
+               ${isLive && totalVotes > 0 && !song2IsTBD ? `
+    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Percentage}%</div>` : ''}
+` : isCompleted && totalVotes > 0 && !song2IsTBD ? `
+    <div class="vote-percentage">${song2Percentage}%</div>
+    ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
+` : ''}
                 </div>
             </div>
             
