@@ -593,13 +593,13 @@ function loadMoreMatches() {
     showNotification('All matches loaded', 'info');
 }
 
-// Vote now (redirect to voting page)
+// AFTER:
 function voteNow(matchId) {
     console.log('Vote on match:', matchId);
     showNotification('Redirecting to voting page...', 'info');
     
     setTimeout(() => {
-        window.location.href = `vote.html?match=${matchId}`;
+        window.location.href = `vote?match=${matchId}`;
     }, 500);
 }
 
@@ -609,7 +609,7 @@ function remindMe(matchId) {
     showNotification('Reminder set! We\'ll notify you when voting opens.', 'success');
 }
 
-// Show match details (navigate to vote page)
+// AFTER:
 function showMatchDetails(matchId) {
     console.log('Show details for match:', matchId);
     
@@ -617,7 +617,7 @@ function showMatchDetails(matchId) {
     
     // Navigate to vote page after brief delay
     setTimeout(() => {
-        window.location.href = `vote.html?match=${matchId}`;
+        window.location.href = `vote?match=${matchId}`;
     }, 500);
 }
 

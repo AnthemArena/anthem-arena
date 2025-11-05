@@ -367,10 +367,7 @@ async function loadFeaturedMatch() {
         // ❌ REMOVE THIS LINE:
         // checkExistingVote();
         
-        // ✅ START POLLING
-        if (currentMatch && currentMatch.status === 'live') {
-            startVotePolling();
-        }
+   
         
     } catch (error) {
         console.error('❌ Error loading featured match:', error);
@@ -387,43 +384,7 @@ function hideFeaturedSection() {
 // REAL-TIME VOTE POLLING
 // ========================================
 
-let votePollingInterval = null;
 
-function startVotePolling() {
-    if (!currentMatch) return;
-    
-    console.log('🔄 Starting vote polling...');
-    
-    votePollingInterval = setInterval(async () => {
-        try {
-            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
-            const matchSnap = await getDoc(matchRef);
-            
-            if (matchSnap.exists()) {
-                const data = matchSnap.data();
-                
-                // Update vote counts
-                voteState.leftVotes = data.song1.votes || 0;
-                voteState.rightVotes = data.song2.votes || 0;
-                voteState.totalVotes = data.totalVotes || 0;
-                
-                // Update display
-                updateVoteDisplay();
-                updateLeadingVisuals();
-                
-            }
-        } catch (error) {
-            console.error('❌ Error polling votes:', error);
-        }
-    }, 10000); // Every 10 seconds
-}
-
-// Stop polling when user leaves page
-window.addEventListener('beforeunload', () => {
-    if (votePollingInterval) {
-        clearInterval(votePollingInterval);
-    }
-});
 
 // ========================================
 // DISPLAY FEATURED MATCH
@@ -544,14 +505,15 @@ function displayFeaturedMatch() {
         </div>
     `;
     
-    // ✅ ADD "VOTE NOW" CTA BUTTON BELOW GRID
-    const ctaButton = document.createElement('div');
-    ctaButton.className = 'featured-cta';
-    ctaButton.innerHTML = `
-        <a href="vote.html?match=${currentMatch.id}" class="vote-now-btn">
-            🎵 Cast Your Vote
-        </a>
-    `;
+   // AFTER:
+// ✅ ADD "VOTE NOW" CTA BUTTON BELOW GRID
+const ctaButton = document.createElement('div');
+ctaButton.className = 'featured-cta';
+ctaButton.innerHTML = `
+    <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
+        🎵 Cast Your Vote
+    </a>
+`;
     ctaButton.style.cssText = `
         text-align: center;
         margin-top: 2rem;
@@ -824,6 +786,7 @@ function generateUserId() {
 // VOTE NOW NAVIGATION
 // ========================================
 
+// AFTER:
 window.voteNow = function(matchId) {
     if (!matchId) {
         console.error('❌ voteNow: No match ID provided');
@@ -832,7 +795,7 @@ window.voteNow = function(matchId) {
     }
     
     console.log(`✅ Navigating to vote page for match: ${matchId}`);
-    window.location.href = `vote.html?match=${matchId}`;
+    window.location.href = `vote?match=${matchId}`;
 };
 
 // Update vote display
