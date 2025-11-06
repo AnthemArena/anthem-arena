@@ -57,7 +57,8 @@ async function loadBracketData() {
         showBracketLoading();
         
         // ✅ NEW: Load matches from API (edge cached)
-        const firebaseMatches = await getAllMatches();
+const firebaseMatches = await getAllMatches(true); // ← FORCE BYPASS
+
         
         if (!firebaseMatches || firebaseMatches.length === 0) {
             console.error('❌ No matches found!');

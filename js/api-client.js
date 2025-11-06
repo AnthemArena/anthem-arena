@@ -8,13 +8,17 @@ const API_BASE = '/api';
 /**
  * Fetch all matches (cached at Netlify edge)
  */
-export async function getAllMatches() {
+export async function getAllMatches(bypassCache = false) {
     try {
-        console.log('📡 Fetching matches from edge cache...');
+        console.log('Fetching matches from edge cache...');
         
-        const response = await fetch(`${API_BASE}/matches`, {
+        const cacheBuster = bypassCache ? `?_refresh=${Date.now()}` : '';
+        const url = `${API_BASE}/matches${cacheBuster}`;
+        
+        const response = await fetch(url, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...(bypassCache && { 'Cache-Control': 'no-cache' })
             }
         });
         
@@ -23,15 +27,13 @@ export async function getAllMatches() {
         }
         
         const data = await response.json();
-        
-        // Check if served from cache
         const cacheStatus = response.headers.get('X-Cache');
-        console.log(`✅ Matches loaded (Cache: ${cacheStatus || 'UNKNOWN'})`);
+        console.log(`Matches loaded (Cache: ${cacheStatus || 'UNKNOWN'})`);
         
         return Array.isArray(data) ? data : [];
         
     } catch (error) {
-        console.error('❌ Error fetching matches:', error);
+        console.error('Error fetching matches:', error);
         throw error;
     }
 }
