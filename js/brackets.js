@@ -211,7 +211,8 @@ async function generateBracketFromFirebase(firebaseMatches) {
                 source: `${match.song1.artist} • ${match.song1.year}`,
                 videoId: match.song1.videoId,
                 votes: match.song1.votes || 0,
-                percentage: match.totalVotes > 0 ? Math.round((match.song1.votes / match.totalVotes) * 100) : 0,
+percentage: match.totalVotes > 0 ? Math.round((match.song1.votes / match.totalVotes) * 100) : 50,
+
                 winner: match.winnerId === match.song1.id
             },
             competitor2: {
@@ -220,7 +221,8 @@ async function generateBracketFromFirebase(firebaseMatches) {
                 source: `${match.song2.artist} • ${match.song2.year}`,
                 videoId: match.song2.videoId,
                 votes: match.song2.votes || 0,
-                percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVotes) * 100) : 0,
+percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVotes) * 100) : 50,
+
                 winner: match.winnerId === match.song2.id
             },
             totalVotes: match.totalVotes || 0
@@ -390,32 +392,26 @@ function formatDate(dateString) {
 function createMatchCardFromFirebase(match) {
     const isBye = match.matchType === 'bye';
     const isCompleted = match.status === 'completed';
+    const isLive = match.status === 'live';
     const isUpcoming = match.status === 'upcoming';
     
     const song1IsTBD = match.song1.id === 'TBD';
     const song2IsTBD = match.song2.id === 'TBD';
-    
-    // Generate thumbnail URLs
-    const song1Thumbnail = song1IsTBD 
-        ? '' 
-        : `https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg`;
-    const song2Thumbnail = song2IsTBD 
-        ? '' 
-        : `https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg`;
-    
+
     const totalVotes = match.totalVotes || 0;
     const song1Votes = match.song1.votes || 0;
     const song2Votes = match.song2.votes || 0;
-    
-    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 0;
-    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 0;
-    
+
+    // CLEAN & CONSISTENT percentage calc
+    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+
     const isWinner1 = isCompleted && match.winnerId === match.song1.id;
     const isWinner2 = isCompleted && match.winnerId === match.song2.id;
-    
-    const autoAdvanced1 = isBye && match.song1.id !== 'TBD';
-    const autoAdvanced2 = isBye && match.song2.id !== 'TBD';
-    
+
+    const song1Thumbnail = song1IsTBD ? '' : `https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg`;
+    const song2Thumbnail = song2IsTBD ? '' : `https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg`;
+
     return `
         <div class="matchup-card ${isBye ? 'bye' : ''} ${match.status}" 
              data-match-id="${match.matchId}"
@@ -426,67 +422,57 @@ function createMatchCardFromFirebase(match) {
             
             <div class="matchup-competitors">
                 <!-- Competitor 1 -->
-                <div class="competitor ${autoAdvanced1 ? 'auto-advanced' : ''} ${isWinner1 ? 'winner' : ''}">
-                    ${song1IsTBD ? `
-                        <div class="song-thumbnail tbd"></div>
-                    ` : `
-                        <img src="${song1Thumbnail}" 
-                             alt="${match.song1.shortTitle}" 
-                             class="song-thumbnail"
-                             loading="lazy">
+                <div class="competitor ${isWinner1 ? 'winner' : ''}">
+                    ${song1IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
+                        <img src="${song1Thumbnail}" alt="${match.song1.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
                     <div class="competitor-info">
                         <span class="seed-badge">#${match.song1.seed || '?'}</span>
                         <span class="song-title">
                             ${song1IsTBD ? 'TBD' : match.song1.shortTitle}
-                            ${isBye && autoAdvanced1 ? '<span class="bye-badge">BYE</span>' : ''}
+                            ${isBye && match.song1.id !== 'TBD' ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-${match.status === 'live' && totalVotes > 0 && !song1IsTBD ? `
-    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Pct}%</div>` : ''}
-` : match.status === 'completed' && totalVotes > 0 && !song1IsTBD ? `
-    <div class="vote-percentage">${song1Pct}%</div>
-    ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
+                    ${isLive && totalVotes > 0 && !song1IsTBD ? `
+                        ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Pct}%</div>` : ''}
+                    ` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
+                        <div class="vote-percentage">${song1Pct}%</div>
+                        ${isWinner1 ? '<span class="winner-icon">Crown</span>' : ''}
+                    ` : ''}
                 </div>
 
                 <!-- Competitor 2 -->
-                <div class="competitor ${autoAdvanced2 ? 'auto-advanced' : ''} ${isWinner2 ? 'winner' : ''}">
-                    ${song2IsTBD ? `
-                        <div class="song-thumbnail tbd"></div>
-                    ` : `
-                        <img src="${song2Thumbnail}" 
-                             alt="${match.song2.shortTitle}" 
-                             class="song-thumbnail"
-                             loading="lazy">
+                <div class="competitor ${isWinner2 ? 'winner' : ''}">
+                    ${song2IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
+                        <img src="${song2Thumbnail}" alt="${match.song2.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
                     <div class="competitor-info">
                         <span class="seed-badge">#${match.song2.seed || '?'}</span>
                         <span class="song-title">
                             ${song2IsTBD ? 'TBD' : match.song2.shortTitle}
-                            ${isBye && autoAdvanced2 ? '<span class="bye-badge">BYE</span>' : ''}
+                            ${isBye && match.song2.id !== 'TBD' ? '<span class="bye-badge">BYE</span>' : ''}
                         </span>
                     </div>
-       ${match.status === 'live' && totalVotes > 0 && !song2IsTBD ? `
-    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Pct}%</div>` : ''}
-` : match.status === 'completed' && totalVotes > 0 && !song2IsTBD ? `
-    <div class="vote-percentage">${song2Pct}%</div>
-    ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
+                    ${isLive && totalVotes > 0 && !song2IsTBD ? `
+                        ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Pct}%</div>` : ''}
+                    ` : isCompleted && totalVotes > 0 && !song2IsTBD ? `
+                        <div class="vote-percentage">${song2Pct}%</div>
+                        ${isWinner2 ? '<span class="winner-icon">Crown</span>' : ''}
+                    ` : ''}
                 </div>
             </div>
 
-        <div class="match-status">
-    ${isCompleted ? `
-        <span class="status-badge completed">Final</span>
-        <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
-    ` : isUpcoming ? `
-        <span class="status-badge upcoming">Coming Soon</span>
-    ` : `
-        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
-        <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
-    `}
-</div>
+            <div class="match-status">
+                ${isCompleted ? `
+                    <span class="status-badge completed">Final</span>
+                    <span class="vote-count">${totalVotes.toLocaleString()} total vote${totalVotes === 1 ? '' : 's'}</span>
+                ` : isUpcoming ? `
+                    <span class="status-badge upcoming">Coming Soon</span>
+                ` : `
+                    <span class="status-badge active">LIVE - Vote Now!</span>
+                    <span class="vote-count">${totalVotes.toLocaleString()} vote${totalVotes === 1 ? '' : 's'} so far</span>
+                `}
+            </div>
         </div>
     `;
 }
