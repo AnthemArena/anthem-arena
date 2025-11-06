@@ -229,17 +229,17 @@ function addVoteCountsToMatch(match, votes) {
   
   console.log(`📊 Match ${match.id}: Song1=${song1Votes}(${song1Percentage}%), Song2=${song2Votes}(${song2Percentage}%)`);
   
-  // Return match with vote data attached
+  // ✅ FIX: Attach to song1/song2, not competitor1/competitor2
   return {
     ...match,
     totalVotes,
-    competitor1: {
-      ...(match.competitor1 || match.song1 || {}),
+    song1: {
+      ...(match.song1 || {}),
       votes: song1Votes,
       percentage: song1Percentage
     },
-    competitor2: {
-      ...(match.competitor2 || match.song2 || {}),
+    song2: {
+      ...(match.song2 || {}),
       votes: song2Votes,
       percentage: song2Percentage
     }
