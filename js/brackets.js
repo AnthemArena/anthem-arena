@@ -402,7 +402,7 @@ function createMatchCardFromFirebase(match) {
     const song1Votes = match.song1.votes || 0;
     const song2Votes = match.song2.votes || 0;
 
-    // CLEAN & CONSISTENT percentage calc
+    // USE SAME LOGIC AS window.matchDatabase
     const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
     const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
 
