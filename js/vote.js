@@ -426,29 +426,29 @@ currentMatch = {
 
     competitor1: {
         id: 'song1',
-        seed: matchData.competitor1?.seed ?? matchData.song1?.seed,
-        name: matchData.competitor1?.shortTitle ?? matchData.song1?.shortTitle,
-        source: `${matchData.competitor1?.artist ?? matchData.song1?.artist} • ${matchData.competitor1?.year ?? matchData.song1?.year}`,
-        videoId: matchData.competitor1?.videoId ?? matchData.song1?.videoId,
-        votes: matchData.competitor1?.votes ?? 0,
-        percentage: 50
+        seed: matchData.song1?.seed ?? matchData.competitor1?.seed,
+        name: matchData.song1?.shortTitle ?? matchData.competitor1?.shortTitle,
+        source: `${matchData.song1?.artist ?? matchData.competitor1?.artist} • ${matchData.song1?.year ?? matchData.competitor1?.year}`,
+        videoId: matchData.song1?.videoId ?? matchData.competitor1?.videoId,
+        votes: matchData.song1?.votes ?? 0,  // ✅ FIX: Read from song1
+        percentage: matchData.song1?.percentage ?? 50  // ✅ FIX: Use edge-calculated percentage
     },
     competitor2: {
         id: 'song2',
-        seed: matchData.competitor2?.seed ?? matchData.song2?.seed,
-        name: matchData.competitor2?.shortTitle ?? matchData.song2?.shortTitle,
-        source: `${matchData.competitor2?.artist ?? matchData.song2?.artist} • ${matchData.competitor2?.year ?? matchData.song2?.year}`,
-        videoId: matchData.competitor2?.videoId ?? matchData.song2?.videoId,
-        votes: matchData.competitor2?.votes ?? 0,
-        percentage: 50
+        seed: matchData.song2?.seed ?? matchData.competitor2?.seed,
+        name: matchData.song2?.shortTitle ?? matchData.competitor2?.shortTitle,
+        source: `${matchData.song2?.artist ?? matchData.competitor2?.artist} • ${matchData.song2?.year ?? matchData.competitor2?.year}`,
+        videoId: matchData.song2?.videoId ?? matchData.competitor2?.videoId,
+        votes: matchData.song2?.votes ?? 0,  // ✅ FIX: Read from song2
+        percentage: matchData.song2?.percentage ?? 50  // ✅ FIX: Use edge-calculated percentage
     }
 };
-            
-            // Calculate percentages
-            if (currentMatch.totalVotes > 0) {
-                currentMatch.competitor1.percentage = Math.round((currentMatch.competitor1.votes / currentMatch.totalVotes) * 100);
-                currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
-            }
+
+// Calculate percentages if not provided by edge
+if (currentMatch.totalVotes > 0 && !matchData.song1?.percentage) {
+    currentMatch.competitor1.percentage = Math.round((currentMatch.competitor1.votes / currentMatch.totalVotes) * 100);
+    currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
+}
             
          // ⭐ Check if user already voted (using new system)
 await checkVoteStatus();
@@ -1084,43 +1084,43 @@ setTimeout(async () => {
     try {
         console.log(`🔄 Reloading match data${bypassCache ? ' (BYPASSING CACHE)' : ''}...`);
         
-        // ✅ Reload from edge cache or bypass it for fresh data
         const matchData = await getMatch(currentMatch.id, bypassCache);
             
-            if (matchData) {
-                console.log('📥 Received match data:', {
-                    totalVotes: matchData.totalVotes,
-                    song1Votes: matchData.song1.votes,
-                    song2Votes: matchData.song2.votes
-                });
-                
-         currentMatch.competitor1.votes = matchData.competitor1?.votes ?? 0;
-currentMatch.competitor2.votes = matchData.competitor2?.votes ?? 0;
-currentMatch.totalVotes       = matchData.totalVotes ?? 0;
+        if (matchData) {
+            console.log('📥 Received match data:', {
+                totalVotes: matchData.totalVotes,
+                song1Votes: matchData.song1?.votes,  // ✅ Check song1
+                song2Votes: matchData.song2?.votes   // ✅ Check song2
+            });
+            
+            // ✅ FIX: Read from song1/song2, not competitor1/competitor2
+            currentMatch.competitor1.votes = matchData.song1?.votes ?? 0;
+            currentMatch.competitor2.votes = matchData.song2?.votes ?? 0;
+            currentMatch.totalVotes = matchData.totalVotes ?? 0;
 
-// Recalculate percentages (same clean formula)
-if (currentMatch.totalVotes > 0) {
-    currentMatch.competitor1.percentage = Math.round(currentMatch.competitor1.votes / currentMatch.totalVotes * 100);
-    currentMatch.competitor2.percentage = Math.round(currentMatch.competitor2.votes / currentMatch.totalVotes * 100);
-} else {
-    currentMatch.competitor1.percentage = 50;
-    currentMatch.competitor2.percentage = 50;
-}
-                
-           // Update UI with new counts
-                updateVoteCountsUI();
-                
-                console.log('✅ Match data reloaded:', {
-                    totalVotes: currentMatch.totalVotes,
-                    percentages: `${currentMatch.competitor1.percentage}% - ${currentMatch.competitor2.percentage}%`
-                });
+            // Recalculate percentages
+            if (currentMatch.totalVotes > 0) {
+                currentMatch.competitor1.percentage = Math.round(currentMatch.competitor1.votes / currentMatch.totalVotes * 100);
+                currentMatch.competitor2.percentage = Math.round(currentMatch.competitor2.votes / currentMatch.totalVotes * 100);
             } else {
-                console.warn('⚠️ No match data returned from getMatch()');
+                currentMatch.competitor1.percentage = 50;
+                currentMatch.competitor2.percentage = 50;
             }
-        } catch (error) {
-            console.error('⚠️ Error reloading match data:', error);
+            
+            // Update UI with new counts
+            updateVoteCountsUI();
+            
+            console.log('✅ Match data reloaded:', {
+                totalVotes: currentMatch.totalVotes,
+                percentages: `${currentMatch.competitor1.percentage}% - ${currentMatch.competitor2.percentage}%`
+            });
+        } else {
+            console.warn('⚠️ No match data returned from getMatch()');
         }
+    } catch (error) {
+        console.error('⚠️ Error reloading match data:', error);
     }
+}
 
 // ========================================
     // UPDATE VOTE COUNTS UI
