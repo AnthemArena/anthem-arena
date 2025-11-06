@@ -475,41 +475,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ⭐ UPDATED: CHECK VOTE STATUS (FIREBASE)
     // ========================================
 
-    async function checkVoteStatus() {
-        try {
-            // Check Firebase votes collection
-            const voteId = `${currentMatch.id}_${userId}`;
-            const voteRef = doc(db, 'votes', voteId);
-            const voteDoc = await getDoc(voteRef);
+async function checkVoteStatus() {
+    try {
+        // Check Firebase votes collection
+        const voteId = `${currentMatch.id}_${userId}`;
+        const voteRef = doc(db, 'votes', voteId);
+        const voteDoc = await getDoc(voteRef);
+        
+        if (voteDoc.exists()) {
+            hasVoted = true;
+            const voteData = voteDoc.data();
+            console.log('✅ User already voted:', voteData.choice);
             
-            if (voteDoc.exists()) {
-                hasVoted = true;
-                const voteData = voteDoc.data();
-                console.log('✅ User already voted:', voteData.choice);
-                
-                // Also store in localStorage for quick checking
-    localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);            
-                // Disable vote buttons
-                disableVoting(voteData.choice);
-            } else {
-                // Double-check localStorage as backup
-    const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
-                if (localVote) {
-                    hasVoted = true;
-                    console.log('✅ Found vote in localStorage:', localVote);
-                    disableVoting(localVote);
-                }
-            }
-        } catch (error) {
-            console.error('⚠️ Error checking vote status:', error);
-            // Fallback to localStorage only
-            const localVote = localStorage.getItem(`vote_${currentMatch.id}`);
+            // Store in localStorage
+            localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
+            
+            // ✅ NEW: Update UI with current vote counts FIRST
+            updateVoteCountsUI();
+            
+            // Then disable voting and show stats
+            disableVoting(voteData.choice);
+            
+        } else {
+            // Double-check localStorage as backup
+            const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
             if (localVote) {
                 hasVoted = true;
+                console.log('✅ Found vote in localStorage:', localVote);
+                
+                // ✅ NEW: Update UI here too
+                updateVoteCountsUI();
+                
                 disableVoting(localVote);
             }
         }
+    } catch (error) {
+        console.error('⚠️ Error checking vote status:', error);
+        // Fallback to localStorage only
+        const localVote = localStorage.getItem(`vote_${currentMatch.id}`);
+        if (localVote) {
+            hasVoted = true;
+            
+            // ✅ NEW: Update UI here too
+            updateVoteCountsUI();
+            
+            disableVoting(localVote);
+        }
     }
+}
 
     /**
      * ⭐ UPDATED: Disable voting UI after user has voted
