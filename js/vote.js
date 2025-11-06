@@ -1001,32 +1001,41 @@ await submitVoteToAPI(currentMatch.id, songId);
             // Save vote locally as backup
     localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
             
-                // Reload match data to show updated counts
-            await reloadMatchData();
-
-            // ✅ Get full song data for modal (not just slug)
+     // ✅ Get full song data for modal BEFORE reload (we need the song info)
             const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
             const songName = votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name;
             const songData = allSongsData.find(s => s.seed === songSeed);
             
+            // First reload to update counts immediately
+            await reloadMatchData();
+            
             // Show success notification
             showNotification(`✅ Vote cast for "${songName}"!`, 'success');
             
-        // Show voted indicator
-    disableVoting(songId);
+            // Show voted indicator
+            disableVoting(songId);
 
-  
+            // ✨ Wait for cache to update, then show modal with accurate vote counts
+            setTimeout(async () => {
+                console.log('🔄 Reloading match data for modal...');
+                
+                // Force a second reload to get fresh data from Firebase
+                await reloadMatchData();
+                
+                console.log('📊 Modal will show:');
+                console.log('   Total votes:', currentMatch.totalVotes);
+                console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
+                console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
+                
+                // Now show modal with updated counts
+                showPostVoteModal(songName, songData);
+            }, 2000);  // 2 second delay to ensure cache updates
 
-    // ✨ Show post-vote modal with book recommendation
-    setTimeout(() => {
-        showPostVoteModal(songName, songData);
-    }, 800);
-
-    console.log('✅ Vote submitted successfully!');
+            console.log('✅ Vote submitted successfully!');
 
             // ========================================
             // ✨ NEW: STOP UPDATES AFTER VOTING
- 
+            // (Updates will stop automatically since hasVoted = true)
             
         } catch (error) {
             console.error('❌ Error submitting vote:', error);
@@ -1047,12 +1056,19 @@ await submitVoteToAPI(currentMatch.id, songId);
     // ========================================
     // RELOAD MATCH DATA
     // ========================================
-async function reloadMatchData() {
-    try {
-        // ✅ NEW: Reload from edge cache
-        const matchData = await getMatch(currentMatch.id);
-        
-        if (matchData) {
+    async function reloadMatchData() {
+        try {
+            console.log('🔄 Reloading match data...');
+            
+            // ✅ NEW: Reload from edge cache (with cache-busting for fresh data)
+            const matchData = await getMatch(currentMatch.id);
+            
+            if (matchData) {
+                console.log('📥 Received match data:', {
+                    totalVotes: matchData.totalVotes,
+                    song1Votes: matchData.song1.votes,
+                    song2Votes: matchData.song2.votes
+                });
                 
                 // Update vote counts
                 currentMatch.competitor1.votes = matchData.song1.votes || 0;
@@ -1063,6 +1079,9 @@ async function reloadMatchData() {
                 if (currentMatch.totalVotes > 0) {
                     currentMatch.competitor1.percentage = Math.round((currentMatch.competitor1.votes / currentMatch.totalVotes) * 100);
                     currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
+                } else {
+                    currentMatch.competitor1.percentage = 50;
+                    currentMatch.competitor2.percentage = 50;
                 }
                 
                 // Update UI
@@ -1078,13 +1097,17 @@ async function reloadMatchData() {
                 if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
                 if (totalVotesEl) totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} votes cast`;
                 
-                console.log('✅ Match data reloaded');
+                console.log('✅ Match data reloaded:', {
+                    totalVotes: currentMatch.totalVotes,
+                    percentages: `${currentMatch.competitor1.percentage}% - ${currentMatch.competitor2.percentage}%`
+                });
+            } else {
+                console.warn('⚠️ No match data returned from getMatch()');
             }
         } catch (error) {
             console.error('⚠️ Error reloading match data:', error);
         }
     }
-
 
 
 
@@ -1396,71 +1419,76 @@ const modal = document.getElementById('vote-modal');
         document.body.style.overflow = 'hidden';
     }
 
-    // ========================================
-    // SHARE FUNCTIONS
-    // ========================================
+  // ========================================
+// SHARE FUNCTIONS
+// ========================================
 
-    window.shareToTwitter = function(songName, context) {
-        const matchUrl = window.location.href;
-        let tweetText = '';
-        
-        switch(context) {
-            case 'losing':
-                tweetText = `🚨 "${songName}" is being eliminated in the League Music Tournament! Help save it!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
-                break;
-            case 'close':
-                tweetText = `🔥 NAIL-BITER! "${songName}" vs "${currentMatch.competitor1.seed === getSongData(songName).seed ? currentMatch.competitor2.name : currentMatch.competitor1.name}" is TOO CLOSE!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
-                break;
-            case 'competitive':
-                tweetText = `⚔️ I just voted for "${songName}" in the League Music Tournament!\n\nCast your vote: ${matchUrl}\n\n#LeagueMusicTournament`;
-                break;
-            default:
-                tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
-        }
-        
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-        window.open(twitterUrl, '_blank', 'width=550,height=420');
-    };
+window.shareToTwitter = function(songName, context) {
+    const matchUrl = window.location.href;
+    let tweetText = '';
+    
+    // Get opponent name
+    const opponentName = songName === currentMatch.competitor1.name 
+        ? currentMatch.competitor2.name 
+        : currentMatch.competitor1.name;
+    
+    switch(context) {
+        case 'losing':
+            tweetText = `🚨 "${songName}" is being eliminated in the League Music Tournament! Help save it!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'close':
+            tweetText = `🔥 NAIL-BITER! "${songName}" vs "${opponentName}" is TOO CLOSE!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'competitive':
+            tweetText = `⚔️ I just voted for "${songName}" in the League Music Tournament!\n\nCast your vote: ${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        default:
+            tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+    }
+    
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+};
 
-    window.shareToReddit = function(songName, context) {
-        const matchUrl = window.location.href;
-        let title = '';
-        let text = '';
-        
-        switch(context) {
-            case 'losing':
-                title = `"${songName}" is being eliminated! Rally to save it!`;
-                text = `"${songName}" is currently losing in the League Music Tournament. If you love this song, vote now to keep it alive!\n\nVote here: ${matchUrl}`;
-                break;
-            case 'close':
-                title = `NAIL-BITER: "${songName}" matchup is too close to call!`;
-                text = `This matchup is separated by just a few votes! Every vote matters.\n\nCast your vote: ${matchUrl}`;
-                break;
-            default:
-                title = `League Music Tournament - Vote for your favorite songs!`;
-                text = `I just voted in the League Music Tournament! Come vote for your favorites.\n\n${matchUrl}`;
-        }
-        
-        const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
-        window.open(redditUrl, '_blank', 'width=800,height=600');
-    };
+window.shareToReddit = function(songName, context) {
+    const matchUrl = window.location.href;
+    let title = '';
+    let text = '';
+    
+    switch(context) {
+        case 'losing':
+            title = `"${songName}" is being eliminated! Rally to save it!`;
+            text = `"${songName}" is currently losing in the League Music Tournament. If you love this song, vote now to keep it alive!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'close':
+            title = `NAIL-BITER: "${songName}" matchup is too close to call!`;
+            text = `This matchup is separated by just a few votes! Every vote matters.\n\nCast your vote: ${matchUrl}`;
+            break;
+        default:
+            title = `League Music Tournament - Vote for your favorite songs!`;
+            text = `I just voted in the League Music Tournament! Come vote for your favorites.\n\n${matchUrl}`;
+    }
+    
+    const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
+    window.open(redditUrl, '_blank', 'width=800,height=600');
+};
 
-    window.copyMatchLink = function() {
-        const matchUrl = window.location.href;
-        
-        navigator.clipboard.writeText(matchUrl).then(() => {
-            showNotification('Link copied to clipboard! 🔗', 'success');
-        }).catch(() => {
-            // Fallback for older browsers
-            const tempInput = document.createElement('input');
-            tempInput.value = matchUrl;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            showNotification('Link copied! 🔗', 'success');
-        });
-    };
+window.copyMatchLink = function() {
+    const matchUrl = window.location.href;
+    
+    navigator.clipboard.writeText(matchUrl).then(() => {
+        showNotification('Link copied to clipboard! 🔗', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const tempInput = document.createElement('input');
+        tempInput.value = matchUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showNotification('Link copied! 🔗', 'success');
+    });
+};
 
     /**
      * Close post-vote modal
