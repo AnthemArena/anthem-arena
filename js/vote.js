@@ -497,6 +497,10 @@ async function checkVoteStatus() {
             
             // Store in localStorage
             localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
+
+            // ✅ NEW: Also save in userVotes format
+saveVoteForOtherPages(currentMatch.id, voteData.choice);
+
             
             // ✅ NEW: Update UI with current vote counts FIRST
             updateVoteCountsUI();
@@ -1021,6 +1025,10 @@ await submitVoteToAPI(currentMatch.id, songId);
             
             // Save vote locally as backup
     localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
+
+    // ✅ NEW: Also save in userVotes format for homepage/matches pages
+saveVoteForOtherPages(currentMatch.id, songId);
+
             
      // ✅ Get full song data for modal BEFORE reload (we need the song info)
             const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
@@ -1076,6 +1084,18 @@ setTimeout(async () => {
         }
     }
 
+/**
+ * ✅ NEW: Save vote to userVotes format for homepage/matches pages
+ */
+function saveVoteForOtherPages(matchId, songId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    userVotes[matchId] = {
+        songId: songId,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('userVotes', JSON.stringify(userVotes));
+    console.log('✅ Vote saved to userVotes for other pages:', matchId, songId);
+}
 
     // ========================================
     // RELOAD MATCH DATA
