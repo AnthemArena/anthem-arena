@@ -417,30 +417,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Match data loaded from edge cache:', matchData);
             
             // Convert Firebase format to page format
-            currentMatch = {
-                id: matchData.matchId,
-                round: matchData.round || 1, // ⭐ ADDED: Store round number
-                status: matchData.status,
-                totalVotes: matchData.totalVotes || 0,
-                competitor1: {
-                    id: 'song1',
-                    seed: matchData.song1.seed,
-                    name: matchData.song1.shortTitle,
-                    source: `${matchData.song1.artist} • ${matchData.song1.year}`,
-                    videoId: matchData.song1.videoId,
-                    votes: matchData.song1.votes || 0,
-                    percentage: 50
-                },
-                competitor2: {
-                    id: 'song2',
-                    seed: matchData.song2.seed,
-                    name: matchData.song2.shortTitle,
-                    source: `${matchData.song2.artist} • ${matchData.song2.year}`,
-                    videoId: matchData.song2.videoId,
-                    votes: matchData.song2.votes || 0,
-                    percentage: 50
-                }
-            };
+          // ---- REPLACEMENT (paste over the old block) ----
+currentMatch = {
+    id: matchData.id || matchData.matchId,
+    round: matchData.round || 1,
+    status: matchData.status,
+    totalVotes: matchData.totalVotes || 0,
+
+    competitor1: {
+        id: 'song1',
+        seed: matchData.competitor1?.seed ?? matchData.song1?.seed,
+        name: matchData.competitor1?.shortTitle ?? matchData.song1?.shortTitle,
+        source: `${matchData.competitor1?.artist ?? matchData.song1?.artist} • ${matchData.competitor1?.year ?? matchData.song1?.year}`,
+        videoId: matchData.competitor1?.videoId ?? matchData.song1?.videoId,
+        votes: matchData.competitor1?.votes ?? 0,
+        percentage: 50
+    },
+    competitor2: {
+        id: 'song2',
+        seed: matchData.competitor2?.seed ?? matchData.song2?.seed,
+        name: matchData.competitor2?.shortTitle ?? matchData.song2?.shortTitle,
+        source: `${matchData.competitor2?.artist ?? matchData.song2?.artist} • ${matchData.competitor2?.year ?? matchData.song2?.year}`,
+        videoId: matchData.competitor2?.videoId ?? matchData.song2?.videoId,
+        votes: matchData.competitor2?.votes ?? 0,
+        percentage: 50
+    }
+};
             
             // Calculate percentages
             if (currentMatch.totalVotes > 0) {
@@ -1092,19 +1094,18 @@ setTimeout(async () => {
                     song2Votes: matchData.song2.votes
                 });
                 
-                // Update vote counts
-                currentMatch.competitor1.votes = matchData.song1.votes || 0;
-                currentMatch.competitor2.votes = matchData.song2.votes || 0;
-                currentMatch.totalVotes = matchData.totalVotes || 0;
-                
-                // Recalculate percentages
-                if (currentMatch.totalVotes > 0) {
-                    currentMatch.competitor1.percentage = Math.round((currentMatch.competitor1.votes / currentMatch.totalVotes) * 100);
-                    currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
-                } else {
-                    currentMatch.competitor1.percentage = 50;
-                    currentMatch.competitor2.percentage = 50;
-                }
+         currentMatch.competitor1.votes = matchData.competitor1?.votes ?? 0;
+currentMatch.competitor2.votes = matchData.competitor2?.votes ?? 0;
+currentMatch.totalVotes       = matchData.totalVotes ?? 0;
+
+// Recalculate percentages (same clean formula)
+if (currentMatch.totalVotes > 0) {
+    currentMatch.competitor1.percentage = Math.round(currentMatch.competitor1.votes / currentMatch.totalVotes * 100);
+    currentMatch.competitor2.percentage = Math.round(currentMatch.competitor2.votes / currentMatch.totalVotes * 100);
+} else {
+    currentMatch.competitor1.percentage = 50;
+    currentMatch.competitor2.percentage = 50;
+}
                 
            // Update UI with new counts
                 updateVoteCountsUI();
@@ -1124,71 +1125,88 @@ setTimeout(async () => {
 // ========================================
     // UPDATE VOTE COUNTS UI
     // ========================================
+// ========================================
+// UPDATE VOTE COUNTS UI
+// ========================================
 function updateVoteCountsUI() {
-    // ✅ ADD: Safety check
+    // Safety check
     if (!currentMatch || !currentMatch.competitor1 || !currentMatch.competitor2) {
-        console.error('❌ Cannot update UI: currentMatch not ready:', currentMatch);
+        console.error('Cannot update UI: currentMatch not ready:', currentMatch);
         return;
     }
-    
-    console.log('🔄 Updating UI with:', {
-        song1: `${currentMatch.competitor1.percentage}% (${currentMatch.competitor1.votes} votes)`,
-        song2: `${currentMatch.competitor2.percentage}% (${currentMatch.competitor2.votes} votes)`,
-        total: currentMatch.totalVotes
+
+    // Recalculate percentages cleanly (NO double-100 hack!)
+    const total = currentMatch.totalVotes || 0;
+    const comp1Votes = currentMatch.competitor1.votes || 0;
+    const comp2Votes = currentMatch.competitor2.votes || 0;
+
+    const comp1Percent = total > 0 ? Math.round((comp1Votes / total) * 100) : 50;
+    const comp2Percent = total > 0 ? Math.round((comp2Votes / total) * 100) : 50;
+
+    // Update currentMatch percentages for consistency
+    currentMatch.competitor1.percentage = comp1Percent;
+    currentMatch.competitor2.percentage = comp2Percent;
+
+    console.log('Updating UI with:', {
+        song1: `${comp1Percent}% (${comp1Votes} vote${comp1Votes === 1 ? '' : 's'})`,
+        song2: `${comp2Percent}% (${comp2Votes} vote${comp2Votes === 1 ? '' : 's'})`,
+        total: total
     });
-    
-    // Update percentages and vote counts
+
+    // DOM elements
     const comp1Percentage = document.getElementById('competitor1-percentage');
-    const comp1Votes = document.getElementById('competitor1-votes');
+    const comp1VotesEl = document.getElementById('competitor1-votes');
     const comp2Percentage = document.getElementById('competitor2-percentage');
-    const comp2Votes = document.getElementById('competitor2-votes');
+    const comp2VotesEl = document.getElementById('competitor2-votes');
     const totalVotesEl = document.getElementById('total-votes');
-    
-    // ✅ ADD: Debug logging
-    console.log('📍 DOM Elements found:', {
+
+    console.log('DOM Elements found:', {
         comp1Percentage: !!comp1Percentage,
-        comp1Votes: !!comp1Votes,
+        comp1VotesEl: !!comp1VotesEl,
         comp2Percentage: !!comp2Percentage,
-        comp2Votes: !!comp2Votes,
+        comp2VotesEl: !!comp2VotesEl,
         totalVotesEl: !!totalVotesEl
     });
-    
+
+    // Update Competitor 1
     if (comp1Percentage) {
-        comp1Percentage.textContent = currentMatch.competitor1.percentage;
-        console.log('✅ Set comp1 percentage to:', currentMatch.competitor1.percentage);
+        comp1Percentage.textContent = comp1Percent;
+        console.log('Set comp1 percentage to:', comp1Percent);
     } else {
-        console.error('❌ Element not found: competitor1-percentage');
+        console.error('Element not found: competitor1-percentage');
     }
-    
-    if (comp1Votes) {
-        comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} vote${currentMatch.competitor1.votes === 1 ? '' : 's'}`;
-        console.log('✅ Set comp1 votes to:', currentMatch.competitor1.votes);
+
+    if (comp1VotesEl) {
+        comp1VotesEl.textContent = `${comp1Votes.toLocaleString()} vote${comp1Votes === 1 ? '' : 's'}`;
+        console.log('Set comp1 votes to:', comp1Votes);
     } else {
-        console.error('❌ Element not found: competitor1-votes');
+        console.error('Element not found: competitor1-votes');
     }
-    
+
+    // Update Competitor 2
     if (comp2Percentage) {
-        comp2Percentage.textContent = currentMatch.competitor2.percentage;
-        console.log('✅ Set comp2 percentage to:', currentMatch.competitor2.percentage);
+        comp2Percentage.textContent = comp2Percent;
+        console.log('Set comp2 percentage to:', comp2Percent);
     } else {
-        console.error('❌ Element not found: competitor2-percentage');
+        console.error('Element not found: competitor2-percentage');
     }
-    
-    if (comp2Votes) {
-        comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} vote${currentMatch.competitor2.votes === 1 ? '' : 's'}`;
-        console.log('✅ Set comp2 votes to:', currentMatch.competitor2.votes);
+
+    if (comp2VotesEl) {
+        comp2VotesEl.textContent = `${comp2Votes.toLocaleString()} vote${comp2Votes === 1 ? '' : 's'}`;
+        console.log('Set comp2 votes to:', comp2Votes);
     } else {
-        console.error('❌ Element not found: competitor2-votes');
+        console.error('Element not found: competitor2-votes');
     }
-    
+
+    // Update total
     if (totalVotesEl) {
-        totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} vote${currentMatch.totalVotes === 1 ? '' : 's'} cast`;
-        console.log('✅ Set total votes to:', currentMatch.totalVotes);
+        totalVotesEl.innerHTML = `Total: ${total.toLocaleString()} vote${total === 1 ? '' : 's'} cast`;
+        console.log('Set total votes to:', total);
     } else {
-        console.error('❌ Element not found: total-votes');
+        console.error('Element not found: total-votes');
     }
-    
-    console.log('✅ UI updated with current vote counts');
+
+    console.log('UI updated with current vote counts');
 }
 
     // ========================================
