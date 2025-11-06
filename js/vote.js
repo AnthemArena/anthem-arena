@@ -1361,7 +1361,7 @@ function showNotification(message, type = 'success') {
         // ========================================
         // MODAL HTML
         // ========================================
-        const modal = document.getElementById('postVoteModal');
+const modal = document.getElementById('vote-modal');
         modal.innerHTML = `
             <div class="modal-overlay" onclick="closePostVoteModal()"></div>
             <div class="modal-content post-vote-content">
@@ -1391,6 +1391,8 @@ function showNotification(message, type = 'success') {
         `;
         
         modal.classList.add('active');
+        modal.style.display = 'flex';  // ✅ ADD THIS LINE
+
         document.body.style.overflow = 'hidden';
     }
 
@@ -1463,13 +1465,14 @@ function showNotification(message, type = 'success') {
     /**
      * Close post-vote modal
      */
-    function closePostVoteModal() {
-        const modal = document.getElementById('post-vote-modal');
-        if (modal) {
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
-        }
+ function closePostVoteModal() {
+    const modal = document.getElementById('vote-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
     }
+}
 
     /**
      * Track book clicks for analytics
