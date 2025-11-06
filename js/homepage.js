@@ -83,6 +83,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// ========================================
+// VOTE TRACKING HELPERS
+// ========================================
+
+function hasUserVoted(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return !!userVotes[matchId];
+}
+
+function getUserVotedSongId(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return userVotes[matchId]?.songId || null;
+}
+
+
 function showHomepageError(error) {
     const heroSection = document.getElementById('heroSection');
     if (heroSection) {
@@ -627,8 +642,12 @@ function displayLiveMatchesGrid(matches) {
     const grid = document.getElementById('liveMatchesGrid');
     if (!grid) return;
     
-    // Convert Firebase format to display format
-    const convertedMatches = matches.map(m => convertFirebaseMatchToDisplayFormat(m));
+    // ✅ Convert matches and check vote status for each
+    const convertedMatches = matches.map(m => {
+        const hasVoted = hasUserVoted(m.matchId);
+        return convertFirebaseMatchToDisplayFormat(m, hasVoted);
+    });
+    
     grid.innerHTML = convertedMatches.map(match => createMatchCard(match)).join('');
 }
 
@@ -697,13 +716,16 @@ function showNoResultsMessage() {
 // CONVERT FIREBASE MATCH TO DISPLAY FORMAT
 // ========================================
 
-function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
+function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false) {
     const totalVotes = firebaseMatch.totalVotes || 0;
     const song1Votes = firebaseMatch.song1?.votes || 0;
     const song2Votes = firebaseMatch.song2?.votes || 0;
     
     const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
     const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+    
+    // ✅ Check which song user voted for
+    const userVotedSongId = hasVoted ? getUserVotedSongId(firebaseMatch.matchId) : null;
     
     return {
         id: firebaseMatch.matchId || firebaseMatch.id,
@@ -713,6 +735,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
         date: firebaseMatch.date || '2025-11-01',
         totalVotes: totalVotes,
         timeLeft: firebaseMatch.status === 'live' ? 'Voting Open' : 'Not Started',
+        hasVoted: hasVoted, // ✅ Pass this to match card
         competitor1: {
             seed: firebaseMatch.song1.seed,
             name: firebaseMatch.song1.shortTitle || firebaseMatch.song1.title,
@@ -721,7 +744,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
             votes: song1Votes,
             percentage: song1Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
-            leading: song1Votes > song2Votes && totalVotes > 0
+            leading: song1Votes > song2Votes && totalVotes > 0,
+            userVoted: userVotedSongId === firebaseMatch.song1.id // ✅ Mark user's choice
         },
         competitor2: {
             seed: firebaseMatch.song2.seed,
@@ -731,7 +755,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch) {
             votes: song2Votes,
             percentage: song2Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
-            leading: song2Votes > song1Votes && totalVotes > 0
+            leading: song2Votes > song1Votes && totalVotes > 0,
+            userVoted: userVotedSongId === firebaseMatch.song2.id // ✅ Mark user's choice
         }
     };
 }

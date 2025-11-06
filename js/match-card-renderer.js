@@ -8,6 +8,9 @@ export function createMatchCard(match) {
     const statusBadge = getStatusBadge(match);
     const footerContent = getFooterContent(match);
     
+    // ✅ Show percentages if user voted OR match is completed
+    const showPercentages = match.hasVoted || match.status === 'completed';
+    
     // Generate thumbnail URLs
     const comp1Thumbnail = match.competitor1.videoId 
         ? `https://img.youtube.com/vi/${match.competitor1.videoId}/mqdefault.jpg`
@@ -17,7 +20,7 @@ export function createMatchCard(match) {
         : '';
 
     return `
-        <div class="match-card ${statusClass}" 
+        <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
              data-tournament="${match.tournament}" 
              data-round="${match.round}" 
              data-status="${match.status}"
@@ -44,11 +47,14 @@ export function createMatchCard(match) {
                         <p class="competitor-source">${match.competitor1.source}</p>
                     </div>
                     <div class="competitor-result">
-    ${match.status === 'completed' ? `
-        <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
-        ${getResultBadge(match.competitor1, match.status)}
-    ` : ''}
-</div>
+                        ${showPercentages ? `
+                            <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
+                            ${match.competitor1.userVoted ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
+                        ` : match.status === 'completed' ? `
+                            <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
+                            ${getResultBadge(match.competitor1, match.status)}
+                        ` : ''}
+                    </div>
                 </div>
 
                 <div class="vs-divider">VS</div>
@@ -65,12 +71,15 @@ export function createMatchCard(match) {
                         <h3 class="competitor-title">${match.competitor2.name}</h3>
                         <p class="competitor-source">${match.competitor2.source}</p>
                     </div>
-                 <div class="competitor-result">
-    ${match.status === 'completed' ? `
-        <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
-        ${getResultBadge(match.competitor2, match.status)}
-    ` : ''}
-</div>
+                    <div class="competitor-result">
+                        ${showPercentages ? `
+                            <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
+                            ${match.competitor2.userVoted ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
+                        ` : match.status === 'completed' ? `
+                            <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
+                            ${getResultBadge(match.competitor2, match.status)}
+                        ` : ''}
+                    </div>
                 </div>
             </div>
 
@@ -116,10 +125,11 @@ function getFooterContent(match) {
             <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
         `;
- } else if (match.status === 'live') {
-    statsHtml += `
-        <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
-    `;
+    } else if (match.status === 'live') {
+        statsHtml += `
+            <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
+            <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
+        `;
     } else if (match.status === 'upcoming') {
         statsHtml += `<span class="stat"><i class="far fa-clock"></i> Scheduled</span>`;
     }
@@ -130,7 +140,12 @@ function getFooterContent(match) {
     if (match.status === 'completed') {
         buttonHtml = `<button class="view-details-btn" onclick="showMatchDetails('${match.id}')"><i class="fas fa-eye"></i> View Details</button>`;
     } else if (match.status === 'live') {
-        buttonHtml = `<button class="vote-now-btn" onclick="voteNow('${match.id}')"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
+        // ✅ Check if user voted
+        if (match.hasVoted) {
+            buttonHtml = `<button class="view-results-btn voted" onclick="voteNow('${match.id}')"><i class="fas fa-check-circle"></i> View Results</button>`;
+        } else {
+            buttonHtml = `<button class="vote-now-btn" onclick="voteNow('${match.id}')"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
+        }
     } else if (match.status === 'upcoming') {
         const timeUntil = getTimeUntilMatch(match.date);
         

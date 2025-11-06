@@ -1144,24 +1144,29 @@ function createVoteCard(vote) {
         <div class="vote-card ${cardClass} ${statusClass}" data-type="${vote.voteType}">
             <div class="vote-status">${statusIcon}</div>
             
-            <div class="vote-matchup">
-                <img 
-                    src="https://img.youtube.com/vi/${votedSong.videoId}/mqdefault.jpg" 
-                    alt="${votedSong.shortTitle}" 
-                    class="vote-thumbnail"
-                    loading="lazy">
-                
-                <div class="vote-details">
-                    <div class="vote-round">${tournamentName} • ${roundName}</div>
-                    <h3 class="vote-title">
-                        ${song1.shortTitle} <span style="color: rgba(255,255,255,0.4);">vs</span> ${song2.shortTitle}
-                    </h3>
-                    <p class="vote-choice">
-                        You voted for: <strong>${votedSong.shortTitle}</strong>
-                    </p>
-                    <div class="vote-timestamp">${timeAgo}</div>
-                </div>
-            </div>
+          <div class="vote-matchup">
+    <img 
+        src="https://img.youtube.com/vi/${votedSong.videoId}/mqdefault.jpg" 
+        alt="${votedSong.shortTitle}" 
+        class="vote-thumbnail ${vote.choice === 'song1' ? 'your-pick' : ''}"
+        loading="lazy">
+    
+    <div class="vote-details">
+        <div class="vote-round">${tournamentName} • ${roundName}</div>
+        <h3 class="vote-title">
+            ${song1.shortTitle} 
+            ${vote.choice === 'song1' ? '<span class="your-vote-inline">✓</span>' : ''}
+            <span style="color: rgba(255,255,255,0.4);">vs</span> 
+            ${song2.shortTitle}
+            ${vote.choice === 'song2' ? '<span class="your-vote-inline">✓</span>' : ''}
+        </h3>
+        <p class="vote-choice">
+            You voted for: <strong>${votedSong.shortTitle}</strong> 
+            <span class="your-vote-badge-inline">✓ Your Pick</span>
+        </p>
+        <div class="vote-timestamp">${timeAgo}</div>
+    </div>
+</div>
             
           <div class="vote-result">
     ${!vote.isCompleted && match.endTime ? (() => {

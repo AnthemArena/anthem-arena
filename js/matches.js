@@ -10,6 +10,20 @@ import { db } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { createMatchCard } from './match-card-renderer.js';
 
+// ========================================
+// VOTE TRACKING HELPERS
+// ========================================
+
+function hasUserVoted(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return !!userVotes[matchId];
+}
+
+function getUserVotedSongId(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return userVotes[matchId]?.songId || null;
+}
+
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 
@@ -160,46 +174,53 @@ async function loadMatchesFromFirebase() {
             const roundName = getRoundName(match.round);
             
             // Calculate percentages
-            const totalVotes = match.totalVotes || 0;
-            const song1Votes = match.song1.votes || 0;
-            const song2Votes = match.song2.votes || 0;
-            
-            const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
-            const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
-            
-            // 🔧 NORMALIZE TOURNAMENT NAME
-            // Use whatever is in Firebase, or default to "Anthem Arena Championship S1"
-            const tournamentName = match.tournament || 'Anthem Arena Championship S1';
-            
-            allMatches.push({
-                id: match.matchId,
-                tournament: tournamentName, // ✅ Use normalized tournament name
-                round: roundName, // ✅ Use correct round name
-                status: match.status || 'upcoming',
-                date: match.date || '2025-11-01',
-                totalVotes: totalVotes,
-                timeLeft: match.status === 'live' ? 'Voting Open' : 'Not Started',
-                competitor1: {
-                    seed: match.song1.seed,
-                    name: match.song1.shortTitle,
-                    source: `${match.song1.artist} • ${match.song1.year}`,
-                    videoId: match.song1.videoId,
-                    votes: song1Votes,
-                    percentage: song1Percentage,
-                    winner: match.winnerId === match.song1.id,
-                    leading: song1Votes > song2Votes && totalVotes > 0
-                },
-                competitor2: {
-                    seed: match.song2.seed,
-                    name: match.song2.shortTitle,
-                    source: `${match.song2.artist} • ${match.song2.year}`,
-                    videoId: match.song2.videoId,
-                    votes: song2Votes,
-                    percentage: song2Percentage,
-                    winner: match.winnerId === match.song2.id,
-                    leading: song2Votes > song1Votes && totalVotes > 0
-                }
-            });
+      // Calculate percentages
+const totalVotes = match.totalVotes || 0;
+const song1Votes = match.song1.votes || 0;
+const song2Votes = match.song2.votes || 0;
+
+const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+
+// 🔧 NORMALIZE TOURNAMENT NAME
+const tournamentName = match.tournament || 'Anthem Arena Championship S1';
+
+// ✅ CHECK IF USER VOTED
+const hasVoted = hasUserVoted(match.matchId);
+const userVotedSongId = hasVoted ? getUserVotedSongId(match.matchId) : null;
+
+allMatches.push({
+    id: match.matchId,
+    tournament: tournamentName,
+    round: roundName,
+    status: match.status || 'upcoming',
+    date: match.date || '2025-11-01',
+    totalVotes: totalVotes,
+    timeLeft: match.status === 'live' ? 'Voting Open' : 'Not Started',
+    hasVoted: hasVoted, // ✅ Add this
+    competitor1: {
+        seed: match.song1.seed,
+        name: match.song1.shortTitle,
+        source: `${match.song1.artist} • ${match.song1.year}`,
+        videoId: match.song1.videoId,
+        votes: song1Votes,
+        percentage: song1Percentage,
+        winner: match.winnerId === match.song1.id,
+        leading: song1Votes > song2Votes && totalVotes > 0,
+        userVoted: userVotedSongId === match.song1.id // ✅ Add this
+    },
+    competitor2: {
+        seed: match.song2.seed,
+        name: match.song2.shortTitle,
+        source: `${match.song2.artist} • ${match.song2.year}`,
+        videoId: match.song2.videoId,
+        votes: song2Votes,
+        percentage: song2Percentage,
+        winner: match.winnerId === match.song2.id,
+        leading: song2Votes > song1Votes && totalVotes > 0,
+        userVoted: userVotedSongId === match.song2.id // ✅ Add this
+    }
+});
         });
         
         console.log(`✅ Processed ${allMatches.length} matches with confirmed competitors`);
