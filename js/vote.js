@@ -3,8 +3,9 @@
     // ========================================
 
  // Import API Client (uses Netlify Edge cache for reads)
-import { getMatch, submitVote } from './api-client.js';
-
+// Import API Client (uses Netlify Edge cache for reads)
+import { getMatch, submitVote as submitVoteToAPI } from './api-client.js';
+//                   ^^^^^^^^^^^^^^^^^^^^^^^^^ Rename to avoid conflict
 // Keep Firebase for direct writes and checks
 import { db } from './firebase-config.js';
 import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -992,8 +993,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('✅ Vote record created in Firebase');
             
          // ✅ NEW: Use API client to submit vote (updates match counts)
-            await submitVote(currentMatch.id, songId);
-            
+// ✅ NEW: Use API client to submit vote (updates match counts)
+await submitVoteToAPI(currentMatch.id, songId);
+//    ^^^^^^^^^^^^^^^ Use the renamed import            
             console.log('✅ Vote submitted via API client');
             
             // Save vote locally as backup
