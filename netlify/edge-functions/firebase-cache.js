@@ -163,22 +163,44 @@ async function attachVoteCounts(matchData, specificMatchId = null) {
 async function fetchVotesForMatch(matchId) {
   if (!matchId) return [];
   
-  const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/votes?pageSize=1000`;
+  // ✅ Query votes collection with matchId filter using structured query
+  const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
   
   console.log(`🗳️ Fetching votes for match: ${matchId}`);
   
   try {
-    const response = await fetch(votesUrl);
+    const response = await fetch(votesUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        structuredQuery: {
+          from: [{
+            collectionId: 'votes'
+          }],
+          where: {
+            fieldFilter: {
+              field: { fieldPath: 'matchId' },
+              op: 'EQUAL',
+              value: { stringValue: matchId }
+            }
+          }
+        }
+      })
+    });
+    
     if (!response.ok) {
       console.error(`❌ Failed to fetch votes: ${response.status}`);
       return [];
     }
     
     const data = await response.json();
-    const allVotes = transformFirestoreData(data);
     
-    // Filter votes for this specific match
-    const matchVotes = allVotes.filter(vote => vote.matchId === matchId);
+    // Transform query results
+    const matchVotes = data
+      .filter(item => item.document) // Filter out empty responses
+      .map(item => convertDocument(item.document));
     
     console.log(`✅ Found ${matchVotes.length} votes for ${matchId}`);
     
