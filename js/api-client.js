@@ -39,13 +39,19 @@ export async function getAllMatches() {
 /**
  * Fetch single match (cached at edge)
  */
-export async function getMatch(matchId) {
+export async function getMatch(matchId, bypassCache = false) {
     try {
-        console.log(`📡 Fetching match ${matchId} from edge cache...`);
+        console.log(`📡 Fetching match ${matchId} from edge cache${bypassCache ? ' (BYPASS)' : ''}...`);
         
-        const response = await fetch(`${API_BASE}/match/${matchId}`, {
+        // Add cache-busting timestamp if bypassing cache
+        const cacheBuster = bypassCache ? `&_refresh=${Date.now()}` : '';
+        
+        const response = await fetch(`/api/matches?matchId=${matchId}${cacheBuster}`, {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                // Force fresh data if bypassing cache
+                ...(bypassCache && { 'Cache-Control': 'no-cache' })
             }
         });
         

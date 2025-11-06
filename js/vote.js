@@ -1015,13 +1015,12 @@ await submitVoteToAPI(currentMatch.id, songId);
             // Show voted indicator
             disableVoting(songId);
 
-            // ✨ Wait for cache to update, then show modal with accurate vote counts
 // ✨ Wait for cache to update, then show modal with accurate vote counts
 setTimeout(async () => {
-    console.log('🔄 Reloading match data for modal...');
+    console.log('🔄 Reloading match data for modal (BYPASSING CACHE)...');
     
-    // Force a second reload to get fresh data from Firebase
-    await reloadMatchData();
+    // Force a second reload with cache bypass to get fresh data from Firebase
+    await reloadMatchData(true);  // ← Pass true to bypass cache
     
     // ✅ FIX: Update the UI elements again with fresh data
     updateVoteCountsUI();
@@ -1060,12 +1059,12 @@ setTimeout(async () => {
     // ========================================
     // RELOAD MATCH DATA
     // ========================================
-    async function reloadMatchData() {
-        try {
-            console.log('🔄 Reloading match data...');
-            
-            // ✅ NEW: Reload from edge cache (with cache-busting for fresh data)
-            const matchData = await getMatch(currentMatch.id);
+ async function reloadMatchData(bypassCache = false) {
+    try {
+        console.log(`🔄 Reloading match data${bypassCache ? ' (BYPASSING CACHE)' : ''}...`);
+        
+        // ✅ Reload from edge cache or bypass it for fresh data
+        const matchData = await getMatch(currentMatch.id, bypassCache);
             
             if (matchData) {
                 console.log('📥 Received match data:', {

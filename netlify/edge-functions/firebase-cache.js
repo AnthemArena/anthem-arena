@@ -4,7 +4,7 @@
 // ========================================
 
 const CACHE_DURATION = 300; // 5 minutes in seconds
-const FIREBASE_PROJECT = "league-music-tournament"; // ✅ Your project ID
+const FIREBASE_PROJECT = "league-music-tournament";
 const TOURNAMENT = "2025-worlds-anthems";
 
 // Edge cache storage
@@ -16,43 +16,57 @@ const edgeCache = new Map();
 
 export default async (request, context) => {
   const url = new URL(request.url);
-  const cacheKey = url.pathname;
+  const pathname = url.pathname;
+  const matchId = url.searchParams.get('matchId'); // ✅ Get matchId from query param
   
-  console.log(`📡 Edge request: ${cacheKey}`);
+  // ✅ NEW: Check for cache bypass (after voting)
+  const bypassCache = url.searchParams.get('_refresh') !== null;
   
-  // Check edge cache
-  const cached = edgeCache.get(cacheKey);
-  const now = Date.now();
+  // Create cache key including matchId if present
+  const cacheKey = matchId ? `${pathname}?matchId=${matchId}` : pathname;
   
-  if (cached && (now - cached.timestamp) < CACHE_DURATION * 1000) {
-    console.log(`✅ CACHE HIT: ${cacheKey}`);
+  console.log(`📡 Edge request: ${cacheKey}${bypassCache ? ' (BYPASS)' : ''}`);
+  
+  // ✅ NEW: Skip cache check if bypass requested
+  if (!bypassCache) {
+    // Check edge cache
+    const cached = edgeCache.get(cacheKey);
+    const now = Date.now();
     
-    return new Response(JSON.stringify(cached.data), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": `public, max-age=${CACHE_DURATION}`,
-        "X-Cache": "HIT",
-        "Access-Control-Allow-Origin": "*"
-      }
-    });
+    if (cached && (now - cached.timestamp) < CACHE_DURATION * 1000) {
+      console.log(`✅ CACHE HIT: ${cacheKey}`);
+      
+      return new Response(JSON.stringify(cached.data), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+          "X-Cache": "HIT",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
   }
   
-  // Cache miss - fetch from Firebase
-  console.log(`❌ CACHE MISS: ${cacheKey} - fetching from Firebase`);
+  // Cache miss or bypass - fetch from Firebase
+  console.log(`${bypassCache ? '🔄 CACHE BYPASS' : '❌ CACHE MISS'}: ${cacheKey} - fetching from Firebase`);
   
   try {
     let firebaseUrl = "";
     
     // Route to correct Firebase endpoint
-    if (url.pathname === "/api/matches") {
-      // Get all matches
-      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
-      
-    } else if (url.pathname.startsWith("/api/match/")) {
-      // Get single match
-      const matchId = url.pathname.replace("/api/match/", "");
-      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${matchId}`;
+    if (pathname === "/api/matches") {
+      if (matchId) {
+        // ✅ Get single match by ID
+        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${matchId}`;
+      } else {
+        // Get all matches
+        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
+      }
+    } else if (pathname.startsWith("/api/match/")) {
+      // Alternative route: Get single match
+      const pathMatchId = pathname.replace("/api/match/", "");
+      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${pathMatchId}`;
     }
     
     if (!firebaseUrl) {
@@ -61,6 +75,8 @@ export default async (request, context) => {
         headers: { "Content-Type": "application/json" }
       });
     }
+    
+    console.log(`🔥 Fetching from Firebase: ${firebaseUrl}`);
     
     // Fetch from Firebase REST API
     const response = await fetch(firebaseUrl, {
@@ -78,8 +94,8 @@ export default async (request, context) => {
     // Transform Firestore format to your app format
     const transformed = transformFirestoreData(firestoreData);
     
-    // Store in edge cache
-    edgeCache.set(cacheKey, { data: transformed, timestamp: now });
+    // ✅ Store in edge cache (even if it was a bypass, cache for next time)
+    edgeCache.set(cacheKey, { data: transformed, timestamp: Date.now() });
     
     console.log(`✅ Cached at edge: ${cacheKey}`);
     
@@ -88,7 +104,7 @@ export default async (request, context) => {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": `public, max-age=${CACHE_DURATION}`,
-        "X-Cache": "MISS",
+        "X-Cache": bypassCache ? "REFRESH" : "MISS",
         "Access-Control-Allow-Origin": "*"
       }
     });
@@ -98,7 +114,8 @@ export default async (request, context) => {
     
     return new Response(JSON.stringify({ 
       error: error.message,
-      endpoint: url.pathname 
+      endpoint: pathname,
+      matchId: matchId 
     }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
