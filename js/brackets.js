@@ -82,9 +82,7 @@ async function loadBracketData() {
            // ✅ NEW: Update tournament info section
         await updateTournamentInfo();
 
-        
-        // Set up real-time updates (optional but recommended)
-        setupRealtimeUpdates();
+ 
         
         // ✅ HIDE LOADING, SHOW BRACKET
         hideBracketLoading();
@@ -1211,26 +1209,6 @@ function generateFinals() {
     console.log('✅ Finals generated');
 }
 
-// ========================================
-// REAL-TIME UPDATES (OPTIONAL)
-// ========================================
-
-function setupRealtimeUpdates() {
-    console.log('🔄 Setting up real-time vote updates...');
-    
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-    
-    // Listen for changes
-    onSnapshot(matchesRef, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === 'modified') {
-                const match = change.doc.data();
-                updateMatchCard(match);
-                console.log(`🔄 Updated: ${match.matchId}`);
-            }
-        });
-    });
-}
 
 // Update a specific match card with new data
 function updateMatchCard(match) {

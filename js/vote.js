@@ -1017,9 +1017,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Show voted indicator
     disableVoting(songId);
 
-    // ✨ START real-time updates now that user has voted
-    startRealTimeUpdates();
-    console.log('🔄 Started real-time updates (user has voted)');
+  
 
     // ✨ Show post-vote modal with book recommendation
     setTimeout(() => {
@@ -1030,9 +1028,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // ========================================
             // ✨ NEW: STOP UPDATES AFTER VOTING
-            // ========================================
-            stopRealTimeUpdates();
-            console.log('⏹️ Stopped real-time updates (user has voted)');
+ 
             
         } catch (error) {
             console.error('❌ Error submitting vote:', error);
@@ -1093,135 +1089,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ========================================
-    // ✨ NEW: REAL-TIME VOTE UPDATES
-    // ========================================
 
-    let updateInterval = null;
-
-    /**
-     * Start polling for vote updates every 10 seconds
-     */
-    function startRealTimeUpdates() {
-
-            // ✅ ADD THIS CHECK FIRST (prevents the error)
-        if (!currentMatch) {
-            console.log('⏸️ No match loaded yet, skipping real-time updates');
-            return;
-        }
-
-        if (currentMatch.status !== 'live') {
-            console.log('⏸️ Match not live, skipping real-time updates');
-            return;
-        }
-        
-        if (updateInterval) {
-            console.log('⏸️ Real-time updates already running');
-            return;
-        }
-        
-        console.log('🔄 Starting real-time vote updates...');
-        
-        // ✨ Show live indicator
-        showLiveIndicator();
-        
-        updateInterval = setInterval(async () => {
-            try {
-                console.log('🔄 Fetching latest votes...');
-                await reloadMatchData();
-                
-                if (!hasVoted) {
-                    updateVoteUrgency();
-                }
-                
-            } catch (error) {
-                console.error('❌ Error during real-time update:', error);
-            }
-        }, 10000);
-        
-        console.log('✅ Real-time updates started');
-    }
-
-    /**
-     * Show visual indicator that updates are running
-     */
-    function showLiveIndicator() {
-        // Check if already exists
-        if (document.getElementById('live-update-indicator')) return;
-        
-        const indicator = document.createElement('div');
-        indicator.id = 'live-update-indicator';
-        indicator.innerHTML = `
-            <span class="live-dot"></span>
-            <span class="live-text">LIVE</span>
-        `;
-        
-        indicator.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 68, 68, 0.1);
-            border: 2px solid #ff4444;
-            color: #ff4444;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 9999;
-            animation: fadeIn 0.3s ease;
-        `;
-        
-        document.body.appendChild(indicator);
-        
-        // Add pulsing dot
-        const style = document.createElement('style');
-        style.textContent = `
-            .live-dot {
-                width: 8px;
-                height: 8px;
-                background: #ff4444;
-                border-radius: 50%;
-                animation: livePulse 2s ease-in-out infinite;
-            }
-            
-            @keyframes livePulse {
-                0%, 100% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.5; transform: scale(0.8); }
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    /**
-     * Remove live indicator
-     */
-    function hideLiveIndicator() {
-        const indicator = document.getElementById('live-update-indicator');
-        if (indicator) {
-            indicator.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => indicator.remove(), 300);
-        }
-    }
-
-    /**
-     * Stop polling for updates
-     */
-    function stopRealTimeUpdates() {
-        if (updateInterval) {
-            clearInterval(updateInterval);
-            updateInterval = null;
-            hideLiveIndicator(); // ✨ Hide indicator
-            console.log('⏹️ Real-time updates stopped');
-        }
-    }
 
 
     // ========================================
@@ -1734,31 +1602,4 @@ function showNotification(message, type = 'success') {
 
     console.log('✅ Vote.js loaded with IP + Fingerprint security');
 
-    // ========================================
-    // CLEANUP: STOP UPDATES ON PAGE UNLOAD
-    // ========================================
-
-    window.addEventListener('beforeunload', () => {
-        stopRealTimeUpdates();
-        console.log('👋 Page unloading, stopped real-time updates');
-    });
-
-    // Also stop if user navigates away via browser buttons
-    window.addEventListener('pagehide', () => {
-        stopRealTimeUpdates();
-    });
-
-    // Stop updates if user switches tabs (optional - saves resources)
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            console.log('👁️ Tab hidden, pausing updates');
-            stopRealTimeUpdates();
-        } else {
-            console.log('👁️ Tab visible, resuming updates');
-            
-            // ✅ CHANGE THIS LINE - only restart if match loaded
-            if (currentMatch) {
-                startRealTimeUpdates();
-            }
-        }
-    });
+   
