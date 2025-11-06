@@ -392,20 +392,21 @@ function formatDate(dateString) {
 
 function createMatchCardFromFirebase(match) {
     const isBye = match.matchType === 'bye';
-    const isLive = match.status === 'live';
+    const isLive = match.status === 'live' || (match.totalVotes > 0 && match.status !== 'completed');
     const isCompleted = match.status === 'completed';
-    const isUpcoming = match.status === 'upcoming';
+    const isUpcoming = !isLive && !isCompleted;
 
     const song1IsTBD = match.song1.id === 'TBD';
     const song2IsTBD = match.song2.id === 'TBD';
 
+    // Use merged totalVotes & votes from edge function (votes collection + match doc)
     const totalVotes = match.totalVotes || 0;
-    const song1Votes = match.song1.votes || 0;
-    const song2Votes = match.song2.votes || 0;
+    const song1Votes = match.song1?.votes || 0;
+    const song2Votes = match.song2?.votes || 0;
 
-    // USE THE SAME FORMULA AS EDGE & window.matchDatabase
-    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
-    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+    // Use pre-calculated percentage from edge, fallback to local calc
+    const song1Pct = match.song1?.percentage ?? (totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50);
+    const song2Pct = match.song2?.percentage ?? (totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50);
 
     const isWinner1 = isCompleted && match.winnerId === match.song1.id;
     const isWinner2 = isCompleted && match.winnerId === match.song2.id;
@@ -423,7 +424,7 @@ function createMatchCardFromFirebase(match) {
             
             <div class="matchup-competitors">
                 <!-- Song 1 -->
-                <div class="competitor ${isWinner1 ? 'winner' : ''}">
+                <div class="competitor ${isWinner1 ? 'winner' : ''} ${song1Votes > song2Votes && totalVotes > 0 ? 'leading' : ''}">
                     ${song1IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song1Thumbnail}" alt="${match.song1.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
@@ -431,16 +432,14 @@ function createMatchCardFromFirebase(match) {
                         <span class="seed-badge">#${match.song1.seed || '?'}</span>
                         <span class="song-title">${song1IsTBD ? 'TBD' : match.song1.shortTitle}</span>
                     </div>
-                    ${isLive && totalVotes > 0 && !song1IsTBD ? `
+                    ${totalVotes > 0 && !song1IsTBD ? `
                         <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song1Pct}%</div>
-                    ` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
-                        <div class="vote-percentage">${song1Pct}%</div>
                         ${isWinner1 ? '<span class="winner-icon">Crown</span>' : ''}
                     ` : ''}
                 </div>
 
                 <!-- Song 2 -->
-                <div class="competitor ${isWinner2 ? 'winner' : ''}">
+                <div class="competitor ${isWinner2 ? 'winner' : ''} ${song2Votes > song1Votes && totalVotes > 0 ? 'leading' : ''}">
                     ${song2IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song2Thumbnail}" alt="${match.song2.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
@@ -448,10 +447,8 @@ function createMatchCardFromFirebase(match) {
                         <span class="seed-badge">#${match.song2.seed || '?'}</span>
                         <span class="song-title">${song2IsTBD ? 'TBD' : match.song2.shortTitle}</span>
                     </div>
-                    ${isLive && totalVotes > 0 && !song2IsTBD ? `
+                    ${totalVotes > 0 && !song2IsTBD ? `
                         <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song2Pct}%</div>
-                    ` : isCompleted && totalVotes > 0 && !song2IsTBD ? `
-                        <div class="vote-percentage">${song2Pct}%</div>
                         ${isWinner2 ? '<span class="winner-icon">Crown</span>' : ''}
                     ` : ''}
                 </div>
