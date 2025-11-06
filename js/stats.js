@@ -3,6 +3,7 @@
 // Main stats page controller
 // ========================================
 
+import { getAllMatches } from './api-client.js';
 import { db } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { 
@@ -42,16 +43,14 @@ window.showSongDetail = async function(seedNumber) {
         
         console.log('✅ Found song:', song.name);
         
-        // Get all matches for this song
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        console.log('📥 Total matches in database:', snapshot.size);
+ // ✅ NEW: Get all matches from edge cache
+const allMatches = await getAllMatches();
+
+console.log('📥 Total matches in database:', allMatches.length);
         
         const songMatches = [];
         
-        snapshot.forEach(doc => {
-            const match = doc.data();
+    allMatches.forEach(match => {
             
             // Check if this song is in the match
             const isSong1 = match.song1?.seed === seedNumber;
@@ -912,14 +911,12 @@ window.compareHeadToHead = async function() {
     const song1 = songRankings.find(s => s.seed === seed1);
     const song2 = songRankings.find(s => s.seed === seed2);
     
-    // Check if they've ever faced each other
-    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-    const snapshot = await getDocs(matchesRef);
+  // ✅ NEW: Get matches from edge cache
+const allMatches = await getAllMatches();
     
     let directMatchup = null;
     
-    snapshot.forEach(doc => {
-        const match = doc.data();
+  allMatches.forEach(match => {
         const hasBoth = (match.song1?.seed === seed1 && match.song2?.seed === seed2) ||
                        (match.song1?.seed === seed2 && match.song2?.seed === seed1);
         

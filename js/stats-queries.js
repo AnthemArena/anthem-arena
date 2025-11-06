@@ -2,9 +2,9 @@
 // STATS QUERIES - LEAGUE MUSIC TOURNAMENT
 // All Firebase queries for the stats page
 // ========================================
-
+import { getAllMatches } from './api-client.js';
 import { db } from './firebase-config.js';
-import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
 // TOURNAMENT OVERVIEW STATS
@@ -16,8 +16,8 @@ import { collection, getDocs, query, where, orderBy, limit } from 'https://www.g
  */
 export async function getTournamentOverview(tournamentId) {
     try {
-        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
-        const matchesSnap = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         let totalVotes = 0;
         let completedMatches = 0;
@@ -27,9 +27,7 @@ export async function getTournamentOverview(tournamentId) {
         let closestMatch = null;
         let biggestBlowout = null;
         
-        matchesSnap.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             // Count votes
             totalVotes += match.totalVotes || 0;
             
@@ -94,7 +92,7 @@ export async function getTournamentOverview(tournamentId) {
             completedMatches,
             liveMatches,
             upcomingMatches,
-            totalMatches: matchesSnap.size,
+            totalMatches: allMatches.length,
             highestVoteMatch,
             closestMatch,
             biggestBlowout
@@ -116,15 +114,13 @@ export async function getTournamentOverview(tournamentId) {
  */
 export async function getAllTimeSongRankings(tournamentId) {
     try {
-        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
-        const matchesSnap = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         const songStats = {};
         
         // Aggregate stats for each song
-        matchesSnap.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             // Process song1
             if (match.song1.id !== 'TBD') {
                 const id = match.song1.id;
@@ -207,14 +203,12 @@ export async function getAllTimeSongRankings(tournamentId) {
  */
 export async function getUpsets(tournamentId) {
     try {
-        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
-        const matchesSnap = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         const upsets = [];
         
-        matchesSnap.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             // Only completed matches
             if (match.status !== 'completed' || !match.winnerId) return;
             
@@ -226,13 +220,11 @@ export async function getUpsets(tournamentId) {
             let upsetWinner, upsetLoser, seedDiff;
             
             if (match.winnerId === 'song1' && song1Seed > song2Seed) {
-                // Song1 won but was lower seed (higher number)
                 isUpset = true;
                 upsetWinner = match.song1;
                 upsetLoser = match.song2;
                 seedDiff = song1Seed - song2Seed;
             } else if (match.winnerId === 'song2' && song2Seed > song1Seed) {
-                // Song2 won but was lower seed
                 isUpset = true;
                 upsetWinner = match.song2;
                 upsetLoser = match.song1;
@@ -349,8 +341,8 @@ export async function getParticipationStats() {
  */
 export async function getSeedPerformance(tournamentId) {
     try {
-        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
-        const matchesSnap = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         const seedRanges = {
             '1-10': { wins: 0, losses: 0 },
@@ -366,9 +358,7 @@ export async function getSeedPerformance(tournamentId) {
             return '41-64';
         }
         
-        matchesSnap.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             if (match.status !== 'completed' || !match.winnerId) return;
             
             const song1Range = getSeedRange(match.song1.seed);
@@ -412,14 +402,12 @@ export async function getSeedPerformance(tournamentId) {
  */
 export async function getHeadToHeadMatchup(tournamentId, seed1, seed2) {
     try {
-        const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
-        const matchesSnap = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         let directMatchup = null;
         
-        matchesSnap.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             // Check if both songs are in this match
             const hasBoth = (match.song1?.seed === seed1 && match.song2?.seed === seed2) ||
                            (match.song1?.seed === seed2 && match.song2?.seed === seed1);

@@ -2,9 +2,12 @@
     // VOTE PAGE FUNCTIONALITY - LEAGUE MUSIC TOURNAMENT
     // ========================================
 
-    // Import Firebase
-    import { db } from './firebase-config.js';
-    import { doc, updateDoc, increment, getDoc, collection, query, where, getDocs, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ // Import API Client (uses Netlify Edge cache for reads)
+import { getMatch, submitVote } from './api-client.js';
+
+// Keep Firebase for direct writes and checks
+import { db } from './firebase-config.js';
+import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getAllTournamentStats } from './music-gallery.js';
     import { getBookForSong } from './bookMappings.js';
     import { checkGlobalNotificationStatus } from './global-notifications.js';
@@ -393,26 +396,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========================================
 
     async function loadMatchData(matchId) {
-        try {
-            console.log('📥 Loading match data from Firebase...');
+    try {
+        console.log('📥 Loading match data from edge cache...');
 
-            // ⭐ Load song data from JSON first
-            if (allSongsData.length === 0) {
-                await loadSongData();
-            }
-            
-            // Get match from Firebase
-    const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId);
-            const matchDoc = await getDoc(matchRef);
-            
-            if (!matchDoc.exists()) {
-                console.error('❌ Match not found in Firebase:', matchId);
-                showNotification('Match not found', 'error');
-                return;
-            }
-            
-            const matchData = matchDoc.data();
-            console.log('✅ Match data loaded:', matchData);
+        // ⭐ Load song data from JSON first
+        if (allSongsData.length === 0) {
+            await loadSongData();
+        }
+        
+        // ✅ NEW: Get match from edge-cached API
+        const matchData = await getMatch(matchId);
+        
+        if (!matchData) {
+            console.error('❌ Match not found:', matchId);
+            showNotification('Match not found', 'error');
+            return;
+        }
+        
+        console.log('✅ Match data loaded from edge cache:', matchData);
             
             // Convert Firebase format to page format
             currentMatch = {
@@ -990,15 +991,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             console.log('✅ Vote record created in Firebase');
             
-            // Update match vote counts
-    const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
+         // ✅ NEW: Use API client to submit vote (updates match counts)
+            await submitVote(currentMatch.id, songId);
             
-            await updateDoc(matchRef, {
-                totalVotes: increment(1),
-                [`song${votedForSong1 ? '1' : '2'}.votes`]: increment(1)
-            });
-            
-            console.log('✅ Vote counts updated in match');
+            console.log('✅ Vote submitted via API client');
             
             // Save vote locally as backup
     localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
@@ -1049,14 +1045,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========================================
     // RELOAD MATCH DATA
     // ========================================
-
-    async function reloadMatchData() {
-        try {
-    const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, currentMatch.id);
-            const matchDoc = await getDoc(matchRef);
-            
-            if (matchDoc.exists()) {
-                const matchData = matchDoc.data();
+async function reloadMatchData() {
+    try {
+        // ✅ NEW: Reload from edge cache
+        const matchData = await getMatch(currentMatch.id);
+        
+        if (matchData) {
                 
                 // Update vote counts
                 currentMatch.competitor1.votes = matchData.song1.votes || 0;

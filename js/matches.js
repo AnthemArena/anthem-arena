@@ -2,7 +2,10 @@
 // MATCHES PAGE FUNCTIONALITY - LEAGUE MUSIC TOURNAMENT
 // ========================================
 
-// Import Firebase
+// Import API Client (uses Netlify Edge cache)
+import { getAllMatches } from './api-client.js';
+
+// Keep Firebase for stats only
 import { db } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { createMatchCard } from './match-card-renderer.js';
@@ -111,27 +114,27 @@ function setupFilterListeners() {
 // Load matches from Firebase
 async function loadMatchesFromFirebase() {
     try {
-        console.log('📥 Loading matches from Firebase...');
+        console.log('📥 Loading matches from edge cache...');
         
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
+        // ✅ NEW: Use edge-cached API
+        const firebaseMatches = await getAllMatches();
 
-        console.log(`📊 Total matches found: ${snapshot.size}`);
+        console.log(`📊 Total matches found: ${firebaseMatches.length}`);
 
-        if (snapshot.empty) {
-            console.error('❌ No matches found in Firebase');
+        if (!firebaseMatches || firebaseMatches.length === 0) {
+            console.error('❌ No matches found');
             console.log('💡 Run init-matches.html to create matches');
             allMatches = [];
             return;
         }
         
-        console.log(`✅ Loaded ${snapshot.size} matches from Firebase`);
+        console.log(`✅ Loaded ${firebaseMatches.length} matches from edge cache`);
         
-        // Convert Firebase docs to match array
+        // Convert to match array
         allMatches = [];
         
-        snapshot.forEach(doc => {
-            const match = doc.data();
+        firebaseMatches.forEach(match => {
+            // Note: 'match' is already the data object, no need for doc.data()
             
             // 🔍 DEBUG: Log tournament value
             console.log('🔍 Match tournament value:', match.tournament || 'UNDEFINED');

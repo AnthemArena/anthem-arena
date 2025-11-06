@@ -1,11 +1,10 @@
 // music-gallery.js - League of Legends Music Tournament
+import { getAllMatches } from './api-client.js';
+import { getBookForSong } from './bookMappings.js';
 
-// ========================================
-// FIREBASE IMPORTS (Add at top of file)
-// ========================================
+// Keep Firebase imports for backward compatibility if needed elsewhere
 import { db } from './firebase-config.js';
-import { collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getBookForSong } from './bookMappings.js'; // ✅ ADD THIS
+
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 let allVideos = []; // Store all video data
@@ -26,16 +25,15 @@ const videoModalClose = document.querySelector('.video-modal-close');
 // ========================================
 async function getAllTournamentStats() {
     try {
-        console.log('📊 Loading tournament stats from Firebase...');
+        console.log('📊 Loading tournament stats from edge cache...');
         
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
         // Create stats object for all songs
         const statsMap = {};
         
-        snapshot.forEach(doc => {
-            const match = doc.data();
+        allMatches.forEach(match => {
             
             // Only count completed matches
             if (match.status !== 'completed') return;

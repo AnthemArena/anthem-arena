@@ -2,8 +2,11 @@
 // IMPORTS
 // ========================================
 import { getBookForSong } from './bookMappings.js';
+import { getAllMatches } from './api-client.js';
+
+// Keep Firebase for direct operations if needed
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, updateDoc, increment, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { createMatchCard } from './match-card-renderer.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
@@ -132,17 +135,15 @@ async function updateHeroStats() {
             totalVideosEl.textContent = musicVideos.length;
         }
         
-        // Get total votes and live matches from Firebase
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const allMatchesSnapshot = await getDocs(matchesRef);
+        // ✅ NEW: Get all matches from edge cache
+        const allMatches = await getAllMatches();
         
         let totalVotes = 0;
         let activeMatches = 0;
         
-        allMatchesSnapshot.forEach(doc => {
-            const data = doc.data();
-            totalVotes += (data.totalVotes || 0);
-            if (data.status === 'live') activeMatches++;
+        allMatches.forEach(match => {
+            totalVotes += (match.totalVotes || 0);
+            if (match.status === 'live') activeMatches++;
         });
         
         // Update DOM
@@ -173,18 +174,14 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
 
 async function loadTournamentInfo() {
     try {
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        // ✅ NEW: Get all matches from edge cache
+        const allMatches = await getAllMatches();
         
-        // Get live matches
-        const liveQuery = query(matchesRef, where('status', '==', 'live'));
-        const liveSnapshot = await getDocs(liveQuery);
+        // Filter live matches
+        const liveMatches = allMatches.filter(m => m.status === 'live');
         
-        // Get upcoming matches (sorted by date)
-        const upcomingQuery = query(
-            matchesRef, 
-            where('status', '==', 'upcoming')
-        );
-        const upcomingSnapshot = await getDocs(upcomingQuery);
+        // Filter upcoming matches
+        const upcomingMatches = allMatches.filter(m => m.status === 'upcoming');
         
         const tournamentNameEl = document.getElementById('tournamentName');
         const tournamentStatusEl = document.getElementById('tournamentStatus');
@@ -193,19 +190,14 @@ async function loadTournamentInfo() {
         if (!tournamentNameEl || !tournamentStatusEl) return;
         
         // SCENARIO 1: Live matches exist
-        if (!liveSnapshot.empty) {
-            const liveCount = liveSnapshot.size;
-            
+      // SCENARIO 1: Live matches exist
+        if (liveMatches.length > 0) {
             // Find actual live matches (skip TBD)
-            const actualLiveMatches = [];
-            liveSnapshot.forEach(doc => {
-                const match = doc.data();
-                const isTBD = !match.song1?.id || !match.song2?.id ||
+            const actualLiveMatches = liveMatches.filter(match => {
+           const isTBD = !match.song1?.id || !match.song2?.id ||
                              String(match.song1.id).includes('TBD') ||
                              String(match.song2.id).includes('TBD');
-                if (!isTBD) {
-                    actualLiveMatches.push(match);
-                }
+                return !isTBD;
             });
             
             if (actualLiveMatches.length === 1) {
@@ -235,22 +227,17 @@ async function loadTournamentInfo() {
             }
         }
         
-        // SCENARIO 2: No live matches - show next upcoming match
-        if (!upcomingSnapshot.empty) {
-            // Find non-TBD upcoming matches and sort by date
-            const validUpcomingMatches = [];
-            
-            upcomingSnapshot.forEach(doc => {
-                const match = doc.data();
+       // SCENARIO 2: No live matches - show next upcoming match
+        if (upcomingMatches.length > 0) {
+            // Find non-TBD upcoming matches
+            const validUpcomingMatches = upcomingMatches.filter(match => {
                 
-                // Skip TBD matches
+            // Skip TBD matches
                 const isTBD = !match.song1?.id || !match.song2?.id ||
                              String(match.song1.id).includes('TBD') ||
                              String(match.song2.id).includes('TBD');
                 
-                if (!isTBD && match.date) {
-                    validUpcomingMatches.push(match);
-                }
+                return !isTBD && match.date;
             });
             
             if (validUpcomingMatches.length > 0) {
@@ -336,24 +323,17 @@ async function loadFeaturedMatch() {
     try {
         console.log('🔍 Searching for live matches...');
         
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const liveQuery = query(
-            matchesRef,
-            where('status', '==', 'live')
-        );
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
-        const querySnapshot = await getDocs(liveQuery);
+        // Filter live matches
+        let liveMatches = allMatches.filter(m => m.status === 'live');
         
-        if (querySnapshot.empty) {
+        if (liveMatches.length === 0) {
             console.log('❌ No live matches found');
             hideFeaturedSection();
             return;
         }
-        
-        let liveMatches = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
         
         liveMatches.sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0));
         
@@ -618,23 +598,17 @@ function hideHomepageSections() {
 
 async function loadLiveMatches() {
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const liveQuery = query(
-            matchesRef,
-            where('status', '==', 'live')
-        );
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
-        const querySnapshot = await getDocs(liveQuery);
+        // Filter live matches (exclude featured match)
+        let liveMatches = allMatches
+            .filter(m => m.status === 'live' && m.matchId !== currentMatch?.id);
         
-        if (querySnapshot.empty) {
+        if (liveMatches.length === 0) {
             hideLiveMatchesSection();
             return;
         }
-        
-        // Get all live matches except featured
-        let liveMatches = querySnapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .filter(match => match.id !== currentMatch?.id);
         
         if (liveMatches.length === 0) {
             hideLiveMatchesSection();
@@ -669,24 +643,16 @@ function hideLiveMatchesSection() {
 
 async function loadRecentResults() {
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const completedQuery = query(
-            matchesRef,
-            where('status', '==', 'completed'),
-            limit(8)
-        );
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
-        const querySnapshot = await getDocs(completedQuery);
+        // Filter completed matches
+        let results = allMatches.filter(m => m.status === 'completed');
         
-        if (querySnapshot.empty) {
+        if (results.length === 0) {
             showNoResultsMessage();
             return;
         }
-        
-        let results = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
         
         // Sort by end date (newest first)
         results.sort((a, b) => {
@@ -826,26 +792,15 @@ function updateVoteDisplay() {
 
 async function loadUpcomingMatches() {
     try {
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        // ✅ NEW: Get matches from edge cache
+        const allMatches = await getAllMatches();
         
-        // ✅ Get ALL upcoming matches (no limit yet)
-        const upcomingQuery = query(
-            matchesRef,
-            where('status', '==', 'upcoming'),
-            orderBy('date', 'asc')
-        );
-        
-        const snapshot = await getDocs(upcomingQuery);
-        
-        if (snapshot.empty) {
-            hideUpcomingSection();
-            return;
-        }
-        
+        // Filter upcoming matches
         const upcomingMatches = [];
         
-        snapshot.forEach(doc => {
-            const match = doc.data();
+        allMatches
+            .filter(m => m.status === 'upcoming')
+            .forEach(match => {
             
             // Skip TBD matches
             const song1IsTBD = !match.song1?.id || 

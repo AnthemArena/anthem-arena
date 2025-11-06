@@ -1,2 +1,60 @@
+# ========================================
+# NETLIFY CONFIGURATION
+# ========================================
+
+[build]
+  publish = "."
+  
 [build.environment]
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+
+# ========================================
+# EDGE FUNCTIONS
+# ========================================
+
+[[edge_functions]]
+  path = "/api/*"
+  function = "firebase-cache"
+
+# ========================================
+# CDN CACHING HEADERS
+# ========================================
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=60"
+    Access-Control-Allow-Origin = "*"
+
+# ========================================
+# CLEAN URL REDIRECTS
+# ========================================
+
+[[redirects]]
+  from = "/vote"
+  to = "/vote.html"
+  status = 200
+
+[[redirects]]
+  from = "/brackets"
+  to = "/brackets.html"
+  status = 200
+
+[[redirects]]
+  from = "/matches"
+  to = "/matches.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+# ========================================
+# CATCH-ALL (SPA FALLBACK)
+# ========================================
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

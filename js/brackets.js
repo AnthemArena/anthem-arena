@@ -3,9 +3,12 @@
 // Complete 64-Song Single Elimination Bracket
 // ========================================
 
-// Import Firebase
+// Import API Client (uses Netlify Edge cache)
+import { getAllMatches } from './api-client.js';
+
+// Keep Firebase imports for tournament info updates only
 import { db } from './firebase-config.js';
-import { collection, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ✅ ADD THIS LINE:
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
@@ -48,30 +51,23 @@ function formatMatchReference(sourceMatch) {
 
 async function loadBracketData() {
     try {
-        console.log('📥 Loading bracket data from Firebase...');
+        console.log('📥 Loading bracket data from edge cache...');
         
         // ✅ SHOW LOADING STATE
         showBracketLoading();
         
-        // Load matches from Firebase
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
+        // ✅ NEW: Load matches from API (edge cached)
+        const firebaseMatches = await getAllMatches();
         
-        if (snapshot.empty) {
-            console.error('❌ No matches found in Firebase!');
+        if (!firebaseMatches || firebaseMatches.length === 0) {
+            console.error('❌ No matches found!');
             console.log('💡 Run init-matches.html to create matches');
             hideBracketLoading();
             showEmptyState();
             return;
         }
         
-        console.log(`✅ Loaded ${snapshot.size} matches from Firebase`);
-        
-        // Convert Firebase docs to match objects
-        const firebaseMatches = [];
-        snapshot.forEach(doc => {
-            firebaseMatches.push(doc.data());
-        });
+        console.log(`✅ Loaded ${firebaseMatches.length} matches from edge cache`);
         
         // Sort by match number
         firebaseMatches.sort((a, b) => a.matchNumber - b.matchNumber);

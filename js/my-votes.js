@@ -2,8 +2,9 @@
 // MY VOTES PAGE - LEAGUE MUSIC TOURNAMENT
 // ========================================
 
+import { getAllMatches, getMatch } from './api-client.js';
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, getDoc, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, query, where, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
@@ -126,16 +127,13 @@ async function loadVoteHistory() {
         const votePromises = votesSnapshot.docs.map(async (voteDoc) => {
             const voteData = voteDoc.data();
             
-            // Get match details
-            const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, voteData.matchId);
-            const matchDoc = await getDoc(matchRef);
-            
-            if (!matchDoc.exists()) {
-                console.warn('⚠️ Match not found:', voteData.matchId);
-                return null;
-            }
-            
-            const matchData = matchDoc.data();
+      // ✅ NEW: Get match details from edge cache
+const matchData = await getMatch(voteData.matchId);
+
+if (!matchData) {
+    console.warn('⚠️ Match not found:', voteData.matchId);
+    return null;
+}
             
             // Determine if this was an underdog pick or mainstream pick
             const votedForSong = voteData.choice; // 'song1' or 'song2'
@@ -388,24 +386,19 @@ async function checkUpcomingMatches() {
         return v.choice === 'song1' ? v.match.song1.id : v.match.song2.id;
     }));
     
-    // Query upcoming matches featuring these songs
-    const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-    const upcomingQuery = query(
-        matchesRef,
-        where('status', '==', 'upcoming')
-    );
-    
-    const snapshot = await getDocs(upcomingQuery);
-    const upcomingMatches = [];
-    
-    snapshot.forEach(doc => {
-        const match = doc.data();
+ // ✅ NEW: Get matches from edge cache
+const allMatches = await getAllMatches();
+const upcomingMatches = [];
+
+allMatches
+    .filter(match => match.status === 'upcoming')
+    .forEach(match => {
         const hasSong1 = votedSongIds.has(match.song1?.id);
         const hasSong2 = votedSongIds.has(match.song2?.id);
         
-        if (hasSong1 || hasSong2) {
+  if (hasSong1 || hasSong2) {
             upcomingMatches.push({
-                id: doc.id,
+                id: match.matchId,
                 ...match,
                 userSong: hasSong1 ? match.song1 : match.song2
             });
