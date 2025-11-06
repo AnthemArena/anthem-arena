@@ -344,48 +344,81 @@ async function loadTournamentStats() {
     try {
         console.log('📊 Loading tournament stats from Firebase...');
         
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
         
         let totalMatches = 0;
+        let completedMatches = 0;
+        let liveMatches = 0;
+        let upcomingMatches = 0;
         let totalVotes = 0;
         let uniqueSongs = new Set();
+        let uniqueTournaments = new Set();
         
         snapshot.forEach(doc => {
             const match = doc.data();
-
-
-    // Only count completed matches
-    if (match.status === 'completed') {
-        totalMatches++;
-    }            
+            
+            // Count all matches
+            totalMatches++;
+            
+            // Count by status
+            if (match.status === 'completed') {
+                completedMatches++;
+            } else if (match.status === 'live') {
+                liveMatches++;
+            } else if (match.status === 'upcoming') {
+                upcomingMatches++;
+            }
+            
             // Add vote counts (from all matches)
-    const song1Votes = match.song1?.votes || 0;
-    const song2Votes = match.song2?.votes || 0;
-    totalVotes += song1Votes + song2Votes;
+            const song1Votes = match.song1?.votes || 0;
+            const song2Votes = match.song2?.votes || 0;
+            totalVotes += song1Votes + song2Votes;
             
             // Track unique songs (only if they're real, not TBD)
-            if (match.song1?.id && match.song1.id !== 'TBD') {
+            if (match.song1?.id && match.song1.id !== 'TBD' && !String(match.song1.id).includes('TBD')) {
                 uniqueSongs.add(match.song1.id);
             }
-            if (match.song2?.id && match.song2.id !== 'TBD') {
+            if (match.song2?.id && match.song2.id !== 'TBD' && !String(match.song2.id).includes('TBD')) {
                 uniqueSongs.add(match.song2.id);
+            }
+            
+            // Track unique tournaments
+            if (match.tournament) {
+                uniqueTournaments.add(match.tournament);
             }
         });
         
         // Update the DOM
         updateStatDisplay('total-matches', totalMatches);
         updateStatDisplay('total-votes', totalVotes.toLocaleString());
+        updateStatDisplay('tournaments', uniqueTournaments.size || 1); // Default to 1 if none found
         updateStatDisplay('unique-videos', uniqueSongs.size);
+        
+        // ✅ BONUS: Update the subtitle text with real stats
+        const statsSubtitle = document.querySelector('.archive-stats-header .section-subtitle');
+        if (statsSubtitle) {
+            statsSubtitle.textContent = `${completedMatches} completed • ${liveMatches} live • ${upcomingMatches} upcoming`;
+        }
         
         console.log('✅ Tournament stats loaded:', {
             totalMatches,
+            completedMatches,
+            liveMatches,
+            upcomingMatches,
             totalVotes,
-            uniqueSongs: uniqueSongs.size
+            uniqueSongs: uniqueSongs.size,
+            uniqueTournaments: uniqueTournaments.size
         });
         
     } catch (error) {
         console.error('❌ Error loading tournament stats:', error);
+        
+        // Show error state in stats
+        updateStatDisplay('total-matches', '—');
+        updateStatDisplay('total-votes', '—');
+        updateStatDisplay('tournaments', '—');
+        updateStatDisplay('unique-videos', '—');
     }
 }
 

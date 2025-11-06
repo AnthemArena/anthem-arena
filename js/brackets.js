@@ -457,18 +457,22 @@ function createMatchCardFromFirebase(match) {
                 </div>
             </div>
 
-            <div class="match-status">
-                ${isCompleted ? `
-                    <span class="status-badge completed">Final</span>
-                    <span class="vote-count">${totalVotes} total vote${totalVotes === 1 ? '' : 's'}</span>
-                ` : isUpcoming ? `
-                    <span class="status-badge upcoming">Coming Soon</span>
-                ` : `
-                    <span class="status-badge active">LIVE - Vote Now!</span>
-                    ${/* ✅ Only show vote count if user voted */ ''}
-                    ${userHasVoted ? `<span class="vote-count">${totalVotes} vote${totalVotes === 1 ? '' : 's'} so far</span>` : ''}
-                `}
-            </div>
+         <div class="match-status">
+    ${isCompleted ? `
+        <span class="status-badge completed">Final</span>
+        <span class="vote-count">${totalVotes} total vote${totalVotes === 1 ? '' : 's'}</span>
+    ` : isUpcoming ? `
+        <span class="status-badge upcoming">Coming Soon</span>
+    ` : `
+        ${/* ✅ Show different text based on vote status */ ''}
+      ${userHasVoted ? `
+    <span class="status-badge voted">✓ View Match</span>
+    <span class="vote-count">${totalVotes} vote${totalVotes === 1 ? '' : 's'} so far</span>
+` : `
+    <span class="status-badge active">🔴 LIVE - Vote Now!</span>
+`}
+    `}
+</div>
         </div>
     `;
 }

@@ -1400,3 +1400,7 @@
         text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
     }
 }
+.status-badge.voted {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}

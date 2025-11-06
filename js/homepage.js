@@ -500,15 +500,37 @@ function displayFeaturedMatch() {
         </div>
     `;
     
-   // AFTER:
-// ✅ ADD "VOTE NOW" CTA BUTTON BELOW GRID
+// ✅ CHECK IF USER VOTED
+const userHasVoted = hasUserVoted(currentMatch.matchId || currentMatch.id);
+const userVotedSongId = userHasVoted ? getUserVotedSongId(currentMatch.matchId || currentMatch.id) : null;
+
+// ✅ SHOW DIFFERENT CTA BASED ON VOTE STATUS
 const ctaButton = document.createElement('div');
 ctaButton.className = 'featured-cta';
-ctaButton.innerHTML = `
-    <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
-        🎵 Cast Your Vote
-    </a>
-`;
+
+if (userHasVoted) {
+    // User already voted - show "View Results" button
+    const votedSongName = userVotedSongId === song1.id 
+        ? (song1.shortTitle || song1.title)
+        : (song2.shortTitle || song2.title);
+    
+    ctaButton.innerHTML = `
+        <div class="featured-voted-message">
+            <span class="voted-icon">✓</span>
+            <span class="voted-text">You voted for <strong>${votedSongName}</strong></span>
+        </div>
+        <a href="vote?match=${currentMatch.id}" class="view-results-btn">
+            📊 View Full Results
+        </a>
+    `;
+} else {
+    // User hasn't voted - show "Cast Your Vote" button
+    ctaButton.innerHTML = `
+        <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
+            🎵 Cast Your Vote
+        </a>
+    `;
+}
     ctaButton.style.cssText = `
         text-align: center;
         margin-top: 2rem;
