@@ -1106,27 +1106,34 @@ function setupClickHandlers() {
                 const matchCard = e.target.closest('.matchup-card');
                 if (matchCard) {
                     const matchId = matchCard.dataset.matchId;
+                    const matchStatus = matchCard.dataset.status || matchCard.classList.contains('completed') ? 'completed' : matchCard.classList.contains('live') ? 'live' : 'upcoming';
                     
                     // Check if match has TBD competitors
                     const hasTBD = matchCard.querySelector('.competitor.tbd');
                     
                     if (hasTBD) {
                         console.log(`⏸️ Match ${matchId} not ready (TBD competitors)`);
-                        // Optional: Show a subtle notification
                         showNotification('This match will be available after the previous round completes', 'info');
                         return;
                     }
                     
-                    console.log(`🎯 Card clicked: ${matchId}`);
+                    console.log(`🎯 Card clicked: ${matchId} (${matchStatus})`);
                     
-               // AFTER:
-if (typeof window.showMatchDetails === 'function') {
-    console.log(`🚀 Calling showMatchDetails with: ${matchId}`);
-    window.showMatchDetails(matchId);
-} else {
-    console.warn('⚠️ modal.js not loaded, redirecting to vote page');
-    window.location.href = `vote?match=${matchId}`;
-}
+                    // ✅ COMPLETED: Show modal for quick results view
+                    if (matchStatus === 'completed') {
+                        if (typeof window.showMatchDetails === 'function') {
+                            console.log(`📊 Opening results modal: ${matchId}`);
+                            window.showMatchDetails(matchId);
+                        } else {
+                            console.warn('⚠️ modal.js not loaded, redirecting to vote page');
+                            window.location.href = `vote?match=${matchId}`;
+                        }
+                    } 
+                    // ✅ LIVE/UPCOMING: Direct to vote page
+                    else {
+                        console.log(`🗳️ Direct navigation to vote page: ${matchId}`);
+                        window.location.href = `vote?match=${matchId}`;
+                    }
                 }
             });
             console.log(`✅ Click handler added to ${containerId}`);

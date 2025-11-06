@@ -27,11 +27,14 @@ export function createMatchCard(match) {
              data-match-id="${match.id}"
              data-date="${match.date || ''}"
              data-match-title="${match.competitor1.name} vs ${match.competitor2.name}">
-            <div class="match-header">
-                <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
-                <span class="match-round">${formatRoundName(match.round)}</span>
-                ${statusBadge}
-            </div>
+        <div class="match-header">
+    <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
+    <span class="match-round">${formatRoundName(match.round)}</span>
+    ${match.hasVoted && match.status === 'live' 
+        ? '<span class="voted-badge">✓ Voted</span>' 
+        : statusBadge
+    }
+</div>
             
             <div class="match-competitors">
                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">
