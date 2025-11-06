@@ -1124,22 +1124,72 @@ setTimeout(async () => {
 // ========================================
     // UPDATE VOTE COUNTS UI
     // ========================================
-    function updateVoteCountsUI() {
-        // Update percentages and vote counts in the UI
-        const comp1Percentage = document.getElementById('competitor1-percentage');
-        const comp1Votes = document.getElementById('competitor1-votes');
-        const comp2Percentage = document.getElementById('competitor2-percentage');
-        const comp2Votes = document.getElementById('competitor2-votes');
-        const totalVotesEl = document.getElementById('total-votes');
-        
-        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}%`;
-        if (comp1Votes) comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} votes`;
-        if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}%`;
-        if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
-        if (totalVotesEl) totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} vote${currentMatch.totalVotes === 1 ? '' : 's'} cast`;
-        
-        console.log('✅ UI updated with current vote counts');
+function updateVoteCountsUI() {
+    // ✅ ADD: Safety check
+    if (!currentMatch || !currentMatch.competitor1 || !currentMatch.competitor2) {
+        console.error('❌ Cannot update UI: currentMatch not ready:', currentMatch);
+        return;
     }
+    
+    console.log('🔄 Updating UI with:', {
+        song1: `${currentMatch.competitor1.percentage}% (${currentMatch.competitor1.votes} votes)`,
+        song2: `${currentMatch.competitor2.percentage}% (${currentMatch.competitor2.votes} votes)`,
+        total: currentMatch.totalVotes
+    });
+    
+    // Update percentages and vote counts
+    const comp1Percentage = document.getElementById('competitor1-percentage');
+    const comp1Votes = document.getElementById('competitor1-votes');
+    const comp2Percentage = document.getElementById('competitor2-percentage');
+    const comp2Votes = document.getElementById('competitor2-votes');
+    const totalVotesEl = document.getElementById('total-votes');
+    
+    // ✅ ADD: Debug logging
+    console.log('📍 DOM Elements found:', {
+        comp1Percentage: !!comp1Percentage,
+        comp1Votes: !!comp1Votes,
+        comp2Percentage: !!comp2Percentage,
+        comp2Votes: !!comp2Votes,
+        totalVotesEl: !!totalVotesEl
+    });
+    
+    if (comp1Percentage) {
+        comp1Percentage.textContent = currentMatch.competitor1.percentage;
+        console.log('✅ Set comp1 percentage to:', currentMatch.competitor1.percentage);
+    } else {
+        console.error('❌ Element not found: competitor1-percentage');
+    }
+    
+    if (comp1Votes) {
+        comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} vote${currentMatch.competitor1.votes === 1 ? '' : 's'}`;
+        console.log('✅ Set comp1 votes to:', currentMatch.competitor1.votes);
+    } else {
+        console.error('❌ Element not found: competitor1-votes');
+    }
+    
+    if (comp2Percentage) {
+        comp2Percentage.textContent = currentMatch.competitor2.percentage;
+        console.log('✅ Set comp2 percentage to:', currentMatch.competitor2.percentage);
+    } else {
+        console.error('❌ Element not found: competitor2-percentage');
+    }
+    
+    if (comp2Votes) {
+        comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} vote${currentMatch.competitor2.votes === 1 ? '' : 's'}`;
+        console.log('✅ Set comp2 votes to:', currentMatch.competitor2.votes);
+    } else {
+        console.error('❌ Element not found: competitor2-votes');
+    }
+    
+    if (totalVotesEl) {
+        totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} vote${currentMatch.totalVotes === 1 ? '' : 's'} cast`;
+        console.log('✅ Set total votes to:', currentMatch.totalVotes);
+    } else {
+        console.error('❌ Element not found: total-votes');
+    }
+    
+    console.log('✅ UI updated with current vote counts');
+}
 
     // ========================================
     // NOTIFICATION SYSTEM
