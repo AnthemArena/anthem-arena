@@ -448,16 +448,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
             }
             
-            // ⭐ UPDATED: Check if user already voted (using new system)
-            await checkVoteStatus();
-            
-            // Update page content
-            await updatePageContent();
-            
-            // ✨ NEW: Add dynamic stats and descriptions
-            await updateCompetitorInfo(currentMatch);
-            
-            // Initialize YouTube players
+         // ⭐ Check if user already voted (using new system)
+await checkVoteStatus();
+
+// Update page content
+await updatePageContent();
+
+// ✅ NEW: Update vote counts UI AFTER page content is set
+if (hasVoted) {
+    updateVoteCountsUI();
+    console.log('✅ Vote counts refreshed after page update');
+}
+
+// ✨ Add dynamic stats and descriptions
+await updateCompetitorInfo(currentMatch);
+
+// Initialize YouTube players
             initializeYouTubePlayers();
 
             // ========================================
