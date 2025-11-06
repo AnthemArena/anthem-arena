@@ -391,10 +391,10 @@ function formatDate(dateString) {
 
 function createMatchCardFromFirebase(match) {
     const isBye = match.matchType === 'bye';
-    const isCompleted = match.status === 'completed';
     const isLive = match.status === 'live';
+    const isCompleted = match.status === 'completed';
     const isUpcoming = match.status === 'upcoming';
-    
+
     const song1IsTBD = match.song1.id === 'TBD';
     const song2IsTBD = match.song2.id === 'TBD';
 
@@ -402,7 +402,7 @@ function createMatchCardFromFirebase(match) {
     const song1Votes = match.song1.votes || 0;
     const song2Votes = match.song2.votes || 0;
 
-    // CRITICAL: Same logic as window.matchDatabase — use 50 if no votes
+    // USE THE SAME FORMULA AS EDGE & window.matchDatabase
     const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
     const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
 
@@ -421,40 +421,34 @@ function createMatchCardFromFirebase(match) {
             <div class="matchup-number">Match ${match.matchNumber}</div>
             
             <div class="matchup-competitors">
-                <!-- Competitor 1 -->
+                <!-- Song 1 -->
                 <div class="competitor ${isWinner1 ? 'winner' : ''}">
                     ${song1IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song1Thumbnail}" alt="${match.song1.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
                     <div class="competitor-info">
                         <span class="seed-badge">#${match.song1.seed || '?'}</span>
-                        <span class="song-title">
-                            ${song1IsTBD ? 'TBD' : match.song1.shortTitle}
-                            ${isBye && match.song1.id !== 'TBD' ? '<span class="bye-badge">BYE</span>' : ''}
-                        </span>
+                        <span class="song-title">${song1IsTBD ? 'TBD' : match.song1.shortTitle}</span>
                     </div>
                     ${isLive && totalVotes > 0 && !song1IsTBD ? `
-                        ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Pct}%</div>` : ''}
+                        <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song1Pct}%</div>
                     ` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
                         <div class="vote-percentage">${song1Pct}%</div>
                         ${isWinner1 ? '<span class="winner-icon">Crown</span>' : ''}
                     ` : ''}
                 </div>
 
-                <!-- Competitor 2 -->
+                <!-- Song 2 -->
                 <div class="competitor ${isWinner2 ? 'winner' : ''}">
                     ${song2IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song2Thumbnail}" alt="${match.song2.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
                     <div class="competitor-info">
                         <span class="seed-badge">#${match.song2.seed || '?'}</span>
-                        <span class="song-title">
-                            ${song2IsTBD ? 'TBD' : match.song2.shortTitle}
-                            ${isBye && match.song2.id !== 'TBD' ? '<span class="bye-badge">BYE</span>' : ''}
-                        </span>
+                        <span class="song-title">${song2IsTBD ? 'TBD' : match.song2.shortTitle}</span>
                     </div>
                     ${isLive && totalVotes > 0 && !song2IsTBD ? `
-                        ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Pct}%</div>` : ''}
+                        <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song2Pct}%</div>
                     ` : isCompleted && totalVotes > 0 && !song2IsTBD ? `
                         <div class="vote-percentage">${song2Pct}%</div>
                         ${isWinner2 ? '<span class="winner-icon">Crown</span>' : ''}
@@ -465,12 +459,12 @@ function createMatchCardFromFirebase(match) {
             <div class="match-status">
                 ${isCompleted ? `
                     <span class="status-badge completed">Final</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} total vote${totalVotes === 1 ? '' : 's'}</span>
+                    <span class="vote-count">${totalVotes} total vote${totalVotes === 1 ? '' : 's'}</span>
                 ` : isUpcoming ? `
                     <span class="status-badge upcoming">Coming Soon</span>
                 ` : `
                     <span class="status-badge active">LIVE - Vote Now!</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} vote${totalVotes === 1 ? '' : 's'} so far</span>
+                    <span class="vote-count">${totalVotes} vote${totalVotes === 1 ? '' : 's'} so far</span>
                 `}
             </div>
         </div>
