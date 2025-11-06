@@ -512,7 +512,7 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         
         // Generate HTML from Firebase data
         round2Container.innerHTML = round2Matches.map(match => 
-            createRound2MatchCard(match)
+            createMatchCardFromFirebase(match)
         ).join('');
         
         console.log(`✅ Round 2 generated (${round2Matches.length} matches from Firebase)`);
@@ -558,7 +558,7 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         round3Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round3Container.innerHTML = round3Matches.map(match => 
-            createRound2MatchCard(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match) // Reuse R2 card function
         ).join('');
         
         console.log(`✅ Round 3 generated (${round3Matches.length} matches from Firebase)`);
@@ -600,7 +600,7 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         round4Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round4Container.innerHTML = round4Matches.map(match => 
-            createRound2MatchCard(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match) // Reuse R2 card function
         ).join('');
         
         console.log(`✅ Round 4 generated (${round4Matches.length} matches from Firebase)`);
@@ -642,7 +642,7 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         round5Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round5Container.innerHTML = round5Matches.map(match => 
-            createRound2MatchCard(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match) // Reuse R2 card function
         ).join('');
         
         console.log(`✅ Round 5 generated (${round5Matches.length} matches from Firebase)`);
@@ -682,7 +682,8 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         }
         
         // Use the same card function as other rounds!
-        finalsContainer.innerHTML = createRound2MatchCard(finalsMatch);
+finalsContainer.innerHTML = createMatchCardFromFirebase(finalsMatch);
+
         
         console.log('✅ Finals generated from Firebase');
         
@@ -871,152 +872,7 @@ function getRoundName(round) {
     };
     return roundNames[round] || `Round ${round}`;
 }
-// ========================================
-// CREATE ROUND 2 MATCH CARD FROM FIREBASE
-// ========================================
 
-// ========================================
-// CREATE ROUND 2 MATCH CARD FROM FIREBASE
-// ========================================
-
-function createRound2MatchCard(match) {
-    // ✅ Define status checks FIRST
-    const isUpcoming = match.status === 'upcoming';
-    const isLive = match.status === 'live';
-    const isCompleted = match.status === 'completed';
-    
-    const totalVotes = match.totalVotes || 0;
-    const song1Votes = match.song1.votes || 0;
-    const song2Votes = match.song2.votes || 0;
-    
-    const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
-    const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
-    
-    const song1IsWinner = match.winnerId === match.song1.id;
-    const song2IsWinner = match.winnerId === match.song2.id;
-    const song1IsLeading = song1Votes > song2Votes && totalVotes > 0 && !match.winnerId;
-    const song2IsLeading = song2Votes > song1Votes && totalVotes > 0 && !match.winnerId;
-    
-    // Check if TBD
-    const song1IsTBD = match.song1.id === 'TBD';
-    const song2IsTBD = match.song2.id === 'TBD';
-    
-    // Generate thumbnail URLs
-    const song1Thumbnail = song1IsTBD 
-        ? '' 
-        : `https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg`;
-    const song2Thumbnail = song2IsTBD 
-        ? '' 
-        : `https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg`;
-    
-    // Check if bye
-    const hasBye = match.song1.hasBye || match.song2.hasBye;
-    
-    let cardClasses = 'matchup-card clickable';
-    if (hasBye) cardClasses += ' bye';
-    if (isUpcoming) cardClasses += ' upcoming';
-    if (isLive) cardClasses += ' live';
-    if (isCompleted) cardClasses += ' completed';
-    
-    window.matchDatabase[match.matchId] = {
-        id: match.matchId,
-        tournament: 'All Music Championship 2025',
-        round: getRoundName(match.round),
-        status: match.status || 'upcoming',
-        date: new Date().toISOString().split('T')[0],
-        totalVotes: totalVotes,
-        competitor1: {
-            seed: match.song1.seed,
-            name: song1IsTBD ? formatMatchReference(match.song1.sourceMatch) : match.song1.shortTitle,
-            source: song1IsTBD ? 'TBD' : `${match.song1.artist} • ${match.song1.year}`,
-            videoId: match.song1.videoId,
-            votes: song1Votes,
-            percentage: song1Percentage,
-            winner: song1IsWinner
-        },
-        competitor2: {
-            seed: match.song2.seed,
-            name: song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle,
-            source: song2IsTBD ? 'TBD' : `${match.song2.artist} • ${match.song2.year}`,
-            videoId: match.song2.videoId,
-            votes: song2Votes,
-            percentage: song2Percentage,
-            winner: song2IsWinner
-        }
-    };
-    
-    return `
-        <div class="${cardClasses}" data-match-id="${match.matchId}">
-            <div class="matchup-number">
-                R${match.round} M${match.matchNumber}
-                ${isLive ? ' <span class="live-indicator">🔴 LIVE</span>' : ''}
-            </div>
-            
-            <div class="matchup-competitors">
-                <!-- Competitor 1 -->
-                <div class="competitor ${song1IsLeading ? 'leading' : ''} ${song1IsWinner ? 'winner' : ''} ${song1IsTBD ? 'tbd' : ''} ${match.song1.hasBye ? 'auto-advanced' : ''}">
-                    ${song1IsTBD ? `
-                        <div class="song-thumbnail tbd"></div>
-                    ` : `
-                        <img src="${song1Thumbnail}" 
-                             alt="${match.song1.shortTitle}" 
-                             class="song-thumbnail"
-                             loading="lazy">
-                    `}
-                    <div class="competitor-info">
-                        <span class="seed-badge">#${song1IsTBD ? '?' : match.song1.seed}</span>
-                        <span class="song-title">
-                            ${song1IsTBD ? formatMatchReference(match.song1.sourceMatch) : match.song1.shortTitle}
-                            ${match.song1.hasBye ? '<span class="bye-badge">BYE</span>' : ''}
-                        </span>
-                    </div>
-               ${isLive && totalVotes > 0 && !song1IsTBD ? `
-    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song1Percentage}%</div>` : ''}
-` : isCompleted && totalVotes > 0 && !song1IsTBD ? `
-    <div class="vote-percentage">${song1Percentage}%</div>
-    ${song1IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
-                </div>
-                
-                <!-- Competitor 2 -->
-                <div class="competitor ${song2IsLeading ? 'leading' : ''} ${song2IsWinner ? 'winner' : ''} ${song2IsTBD ? 'tbd' : ''}">
-                    ${song2IsTBD ? `
-                        <div class="song-thumbnail tbd"></div>
-                    ` : `
-                        <img src="${song2Thumbnail}" 
-                             alt="${match.song2.shortTitle}" 
-                             class="song-thumbnail"
-                             loading="lazy">
-                    `}
-                    <div class="competitor-info">
-                        <span class="seed-badge">#${song2IsTBD ? '?' : match.song2.seed}</span>
-                        <span class="song-title">
-                            ${song2IsTBD ? formatMatchReference(match.song2.sourceMatch) : match.song2.shortTitle}
-                        </span>
-                    </div>
-               ${isLive && totalVotes > 0 && !song2IsTBD ? `
-    ${checkUserVoted(match.matchId) ? `<div class="vote-percentage live-voted">${song2Percentage}%</div>` : ''}
-` : isCompleted && totalVotes > 0 && !song2IsTBD ? `
-    <div class="vote-percentage">${song2Percentage}%</div>
-    ${song2IsWinner ? '<span class="winner-icon">👑</span>' : ''}
-` : ''}
-                </div>
-            </div>
-            
-            <div class="match-status">
-                ${isCompleted ? `
-                    <span class="status-badge completed">Final</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} total votes</span>
-                ` : isUpcoming ? `
-                    <span class="status-badge upcoming">Coming Soon</span>
-                ` : `
-                    <span class="status-badge active">🔴 LIVE - Vote Now!</span>
-                    <span class="vote-count">${totalVotes.toLocaleString()} votes so far</span>
-                `}
-            </div>
-        </div>
-    `;
-}
 
 // ========================================
 // GENERATE ROUND 3 (SWEET 16)
