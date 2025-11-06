@@ -1312,212 +1312,345 @@ function showNotification(message, type = 'success') {
     };
 
 
-    // ========================================
-    // POST-VOTE MODAL WITH BOOK RECOMMENDATIONS
-    // ========================================
+ // ========================================
+// POST-VOTE MODAL WITH BOOK RECOMMENDATIONS
+// ========================================
 
-    /**
-     * Show post-vote modal with book recommendation
-     * @param {string} songName - Name of the song voted for
-     * @param {object} songData - Full song data from JSON
-     */
-    function showPostVoteModal(songName, songData) {
-        const book = songData ? getBookForSong(songData) : null;
-        
-        // ✨ Calculate if they saved a losing song
-        const votedFor = songData.seed === currentMatch.competitor1.seed ? 'song1' : 'song2';
-        const comp1Pct = currentMatch.competitor1.percentage;
-        const comp2Pct = currentMatch.competitor2.percentage;
-        const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-        
-        const wasLosing = (votedFor === 'song1' && comp1Pct < comp2Pct) || 
-                        (votedFor === 'song2' && comp2Pct < comp1Pct);
-        
-        const wasTied = Math.abs(comp1Pct - comp2Pct) <= 2;
-        const isClose = Math.abs(comp1Pct - comp2Pct) <= 10;
-        
-        // ========================================
-        // DYNAMIC SUCCESS MESSAGE
-        // ========================================
-        let successMessage = '';
-        let shareMessage = '';
-        
-        if (wasLosing) {
-            // They voted for the LOSING song - rally support!
-            successMessage = `
-                <p class="modal-message special">
-                    🔥 You voted to save <strong>"${songName}"</strong> from elimination!<br>
-                    <span class="stakes-text">But it's still losing ${Math.abs(comp1Pct - comp2Pct)}% to ${comp1Pct < comp2Pct ? currentMatch.competitor2.name : currentMatch.competitor1.name}</span>
+/**
+ * Show post-vote modal with book recommendation
+ * @param {string} songName - Name of the song voted for
+ * @param {object} songData - Full song data from JSON
+ */
+function showPostVoteModal(songName, songData) {
+    const book = songData ? getBookForSong(songData) : null;
+    
+    // ✨ Calculate voting situation
+    const votedFor = songData.seed === currentMatch.competitor1.seed ? 'song1' : 'song2';
+    const userVotes = votedFor === 'song1' ? currentMatch.competitor1.votes : currentMatch.competitor2.votes;
+    const opponentVotes = votedFor === 'song1' ? currentMatch.competitor2.votes : currentMatch.competitor1.votes;
+    const userPct = votedFor === 'song1' ? currentMatch.competitor1.percentage : currentMatch.competitor2.percentage;
+    const opponentPct = votedFor === 'song1' ? currentMatch.competitor2.percentage : currentMatch.competitor1.percentage;
+    const opponentName = votedFor === 'song1' ? currentMatch.competitor2.name : currentMatch.competitor1.name;
+    const voteDiff = Math.abs(userVotes - opponentVotes);
+    const totalVotes = currentMatch.totalVotes;
+    const pctDiff = Math.abs(userPct - opponentPct);
+    
+    // ========================================
+    // DETERMINE VOTING SITUATION
+    // ========================================
+    let situationType = '';
+    let modalIcon = '';
+    let modalTitle = '';
+    let successMessage = '';
+    let shareMessage = '';
+    let shareContext = '';
+    
+    // Early voting (< 5 votes total)
+    if (totalVotes < 5) {
+        situationType = 'early';
+        modalIcon = '🌟';
+        modalTitle = 'Early Voter!';
+        successMessage = `
+            <p class="modal-message early">
+                You voted for <strong>"${songName}"</strong><br>
+                <span class="stakes-text">Only ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} so far — this match needs more voters!</span>
+            </p>
+        `;
+        shareContext = 'early';
+        shareMessage = `
+            <div class="share-cta urgent">
+                <div class="share-header">
+                    <span class="share-icon">🚀</span>
+                    <strong>Be a Pioneer!</strong>
+                </div>
+                <p class="share-text">
+                    This match just started! Help shape the results from the beginning.
                 </p>
-            `;
-            shareMessage = `
-                <div class="share-cta urgent">
-                    <div class="share-header">
-                        <span class="share-icon">📢</span>
-                        <strong>Rally Support!</strong>
-                    </div>
-                    <p class="share-text">
-                        "${songName}" needs more votes to survive. Share this match to rally the community!
-                    </p>
-                    <div class="share-buttons">
-                        <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing')">
-                            <span class="btn-icon">🐦</span> Tweet
-                        </button>
-                        <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing')">
-                            <span class="btn-icon">🔶</span> Reddit
-                        </button>
-                        <button class="share-btn copy" onclick="copyMatchLink()">
-                            <span class="btn-icon">🔗</span> Copy Link
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else if (wasTied) {
-            // NAIL-BITER
-            successMessage = `
-                <p class="modal-message special">
-                    ⚖️ You voted in a <strong>nail-biter</strong>!<br>
-                    <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
-                </p>
-            `;
-            shareMessage = `
-                <div class="share-cta close">
-                    <div class="share-header">
-                        <span class="share-icon">🔥</span>
-                        <strong>This Race is TOO CLOSE!</strong>
-                    </div>
-                    <p class="share-text">
-                        Help decide this matchup! Every vote matters.
-                    </p>
-                    <div class="share-buttons">
-                        <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'close')">
-                            <span class="btn-icon">🐦</span> Tweet
-                        </button>
-                        <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'close')">
-                            <span class="btn-icon">🔶</span> Reddit
-                        </button>
-                        <button class="share-btn copy" onclick="copyMatchLink()">
-                            <span class="btn-icon">🔗</span> Copy Link
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else if (isClose) {
-            // COMPETITIVE but not tied
-            successMessage = `
-                <p class="modal-message">
-                    Thanks for voting for <strong>"${songName}"</strong>!<br>
-                    <span class="stakes-text">This is a close race - every vote counts!</span>
-                </p>
-            `;
-            shareMessage = `
-                <div class="share-cta">
-                    <div class="share-header">
-                        <span class="share-icon">📊</span>
-                        <strong>Keep the Momentum Going!</strong>
-                    </div>
-                    <p class="share-text">
-                        Share this match to bring more voters!
-                    </p>
-                    <div class="share-buttons">
-                        <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'competitive')">
-                            <span class="btn-icon">🐦</span> Tweet
-                        </button>
-                        <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'competitive')">
-                            <span class="btn-icon">🔶</span> Reddit
-                        </button>
-                        <button class="share-btn copy" onclick="copyMatchLink()">
-                            <span class="btn-icon">🔗</span> Copy Link
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else {
-            // BLOWOUT - less urgent
-            successMessage = `
-                <p class="modal-message">
-                    Thanks for voting for <strong>"${songName}"</strong>!
-                </p>
-            `;
-            shareMessage = `
-                <div class="share-cta calm">
-                    <p class="share-text">
-                        Share this tournament with the community:
-                    </p>
-                    <div class="share-buttons">
-                        <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'voted')">
-                            <span class="btn-icon">🐦</span> Tweet
-                        </button>
-                        <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'voted')">
-                            <span class="btn-icon">🔶</span> Reddit
-                        </button>
-                        <button class="share-btn copy" onclick="copyMatchLink()">
-                            <span class="btn-icon">🔗</span> Copy Link
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ========================================
-        // BUILD BOOK SECTION (existing code)
-        // ========================================
-        let bookSection = '';
-        if (book) {
-            bookSection = `
-                <div class="book-earned-section">
-                    <div class="book-icon">${book.icon || '📖'}</div>
-                    <div class="book-info">
-                        <h3 class="book-title">${book.title}</h3>
-                        <p class="book-description">${book.description}</p>
-                        <div class="book-stats">
-                            <span class="book-rarity ${book.rarity}">${book.rarity.toUpperCase()}</span>
-                            <span class="book-points">+${book.points} pts</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ========================================
-        // MODAL HTML
-        // ========================================
-const modal = document.getElementById('vote-modal');
-        modal.innerHTML = `
-            <div class="modal-overlay" onclick="closePostVoteModal()"></div>
-            <div class="modal-content post-vote-content">
-                <button class="modal-close" onclick="closePostVoteModal()">×</button>
-                
-                <div class="modal-success-icon ${wasLosing ? 'save-icon' : wasTied ? 'tied-icon' : ''}">
-                    ${wasLosing ? '🛡️' : wasTied ? '⚖️' : '✓'}
-                </div>
-                <h2 class="modal-title">
-                    ${wasLosing ? 'Clutch Vote!' : wasTied ? 'Nail-Biter!' : 'Vote Recorded!'}
-                </h2>
-                ${successMessage}
-                
-                ${bookSection}
-                
-                ${shareMessage}
-                
-                <div class="modal-actions">
-                    <button class="modal-btn primary" onclick="closePostVoteModal()">
-                        Continue Voting
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
+                        <span class="btn-icon">🐦</span> Tweet
                     </button>
-                    <a href="/matches.html" class="modal-btn secondary">
-                        View All Matches
-                    </a>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
                 </div>
             </div>
         `;
-        
-        modal.classList.add('active');
-        modal.style.display = 'flex';  // ✅ ADD THIS LINE
-
-        document.body.style.overflow = 'hidden';
     }
+    // Perfect tie
+    else if (voteDiff === 0) {
+        situationType = 'tied';
+        modalIcon = '⚖️';
+        modalTitle = 'Perfect Tie!';
+        successMessage = `
+            <p class="modal-message special">
+                You just broke the deadlock!<br>
+                <span class="stakes-text">"${songName}" and "${opponentName}" were exactly ${userVotes}-${opponentVotes}</span>
+            </p>
+        `;
+        shareContext = 'tied';
+        shareMessage = `
+            <div class="share-cta extreme">
+                <div class="share-header">
+                    <span class="share-icon">⚖️</span>
+                    <strong>This is INSANE!</strong>
+                </div>
+                <p class="share-text">
+                    These songs were PERFECTLY TIED! Every single vote decides the winner.
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    // Nail-biter (within 2 votes)
+    else if (voteDiff <= 2) {
+        situationType = 'nailbiter';
+        modalIcon = '🔥';
+        modalTitle = 'Nail-Biter!';
+        successMessage = `
+            <p class="modal-message special">
+                You voted for <strong>"${songName}"</strong><br>
+                <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
+            </p>
+        `;
+        shareContext = 'nailbiter';
+        shareMessage = `
+            <div class="share-cta extreme">
+                <div class="share-header">
+                    <span class="share-icon">🔥</span>
+                    <strong>TOO CLOSE TO CALL!</strong>
+                </div>
+                <p class="share-text">
+                    Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs. Your vote could decide everything!
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    // Losing but salvageable (behind by 3-5 votes)
+    else if (userPct < opponentPct && voteDiff <= 5) {
+        situationType = 'losing-close';
+        modalIcon = '⚔️';
+        modalTitle = 'Fighting for It!';
+        successMessage = `
+            <p class="modal-message special">
+                You're fighting for <strong>"${songName}"</strong>!<br>
+                <span class="stakes-text">Behind by just ${voteDiff} votes (${userPct}% vs ${opponentPct}%)</span>
+            </p>
+        `;
+        shareContext = 'losing-close';
+        shareMessage = `
+            <div class="share-cta urgent">
+                <div class="share-header">
+                    <span class="share-icon">⚔️</span>
+                    <strong>Comeback Time!</strong>
+                </div>
+                <p class="share-text">
+                    "${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-close')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-close')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    // Losing badly (behind by 6+ votes)
+    else if (userPct < opponentPct) {
+        situationType = 'losing-bad';
+        modalIcon = '🆘';
+        modalTitle = 'Save It!';
+        successMessage = `
+            <p class="modal-message special">
+                You voted to save <strong>"${songName}"</strong>!<br>
+                <span class="stakes-text">But it's losing ${userPct}% to ${opponentPct}% — it needs a miracle!</span>
+            </p>
+        `;
+        shareContext = 'losing-bad';
+        shareMessage = `
+            <div class="share-cta urgent">
+                <div class="share-header">
+                    <span class="share-icon">📢</span>
+                    <strong>EMERGENCY: Rally the Community!</strong>
+                </div>
+                <p class="share-text">
+                    "${songName}" is down ${pctDiff}% and needs your help to survive. Share now to rally supporters!
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-bad')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-bad')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    // Winning but close (within 10%)
+    else if (pctDiff <= 10) {
+        situationType = 'winning-close';
+        modalIcon = '📊';
+        modalTitle = 'Leading!';
+        successMessage = `
+            <p class="modal-message">
+                Great choice! <strong>"${songName}"</strong> is leading!<br>
+                <span class="stakes-text">Currently ${userPct}% to ${opponentPct}% — but it's still competitive!</span>
+            </p>
+        `;
+        shareContext = 'winning-close';
+        shareMessage = `
+            <div class="share-cta">
+                <div class="share-header">
+                    <span class="share-icon">📊</span>
+                    <strong>Maintain the Lead!</strong>
+                </div>
+                <p class="share-text">
+                    "${songName}" is ahead but the race is still close. Help secure the victory!
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'winning-close')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'winning-close')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    // Dominating (winning by 10%+)
+    else {
+        situationType = 'dominating';
+        modalIcon = '🎯';
+        modalTitle = 'Dominating!';
+        successMessage = `
+            <p class="modal-message victory">
+                "${songName}" is crushing it at ${userPct}%!<br>
+                <span class="stakes-text">Keep the momentum going!</span>
+            </p>
+        `;
+        shareContext = 'dominating';
+        shareMessage = `
+            <div class="share-cta calm">
+                <div class="share-header">
+                    <span class="share-icon">🎯</span>
+                    <strong>Victory Lap!</strong>
+                </div>
+                <p class="share-text">
+                    "${songName}" is dominating! Share the tournament with the community:
+                </p>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')">
+                        <span class="btn-icon">🐦</span> Tweet
+                    </button>
+                    <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')">
+                        <span class="btn-icon">🔶</span> Reddit
+                    </button>
+                    <button class="share-btn copy" onclick="copyMatchLink()">
+                        <span class="btn-icon">🔗</span> Copy Link
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========================================
+    // BUILD BOOK SECTION (existing code)
+    // ========================================
+    let bookSection = '';
+    if (book) {
+        bookSection = `
+            <div class="book-earned-section">
+                <div class="book-icon">${book.icon || '📖'}</div>
+                <div class="book-info">
+                    <h3 class="book-title">${book.title}</h3>
+                    <p class="book-description">${book.description}</p>
+                    <div class="book-stats">
+                        <span class="book-rarity ${book.rarity}">${book.rarity.toUpperCase()}</span>
+                        <span class="book-points">+${book.points} pts</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========================================
+    // MODAL HTML
+    // ========================================
+    const modal = document.getElementById('vote-modal');
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closePostVoteModal()"></div>
+        <div class="modal-content post-vote-content ${situationType}">
+            <button class="modal-close" onclick="closePostVoteModal()">×</button>
+            
+            <div class="modal-success-icon ${situationType}">
+                ${modalIcon}
+            </div>
+            <h2 class="modal-title">
+                ${modalTitle}
+            </h2>
+            ${successMessage}
+            
+            ${bookSection}
+            
+            ${shareMessage}
+            
+            <div class="modal-actions">
+                <button class="modal-btn primary" onclick="closePostVoteModal()">
+                    Continue Voting
+                </button>
+                <a href="/matches.html" class="modal-btn secondary">
+                    View All Matches
+                </a>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    console.log(`✅ Post-vote modal shown (${situationType})`);
+}
 
-  // ========================================
+// ========================================
 // SHARE FUNCTIONS
 // ========================================
 
@@ -1530,22 +1663,48 @@ window.shareToTwitter = function(songName, context) {
         ? currentMatch.competitor2.name 
         : currentMatch.competitor1.name;
     
+    // Get vote difference for context
+    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
+    
     switch(context) {
-        case 'losing':
-            tweetText = `🚨 "${songName}" is being eliminated in the League Music Tournament! Help save it!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+        case 'early':
+            tweetText = `🌟 Just cast an early vote for "${songName}" in the League Music Tournament! Be part of the action:\n\n${matchUrl}\n\n#LeagueMusicTournament`;
             break;
-        case 'close':
-            tweetText = `🔥 NAIL-BITER! "${songName}" vs "${opponentName}" is TOO CLOSE!\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+        case 'tied':
+            tweetText = `⚖️ PERFECT TIE! "${songName}" vs "${opponentName}" in the League Tournament! Cast the deciding vote!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
             break;
-        case 'competitive':
-            tweetText = `⚔️ I just voted for "${songName}" in the League Music Tournament!\n\nCast your vote: ${matchUrl}\n\n#LeagueMusicTournament`;
+        case 'nailbiter':
+            tweetText = `🔥 NAIL-BITER! "${songName}" needs your vote! Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'losing-close':
+            tweetText = `⚔️ "${songName}" is behind by ${voteDiff} votes but can still win! Help with a comeback!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'losing-bad':
+            tweetText = `🆘 EMERGENCY! "${songName}" is losing badly in the League Music Tournament! Rally support now!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'winning-close':
+            tweetText = `📊 "${songName}" is leading in the League Tournament, but it's still close! Help secure the victory!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'dominating':
+            tweetText = `🎯 "${songName}" is DOMINATING in the League Music Tournament! Join the winning side!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'losing': // Legacy fallback
+            tweetText = `🚨 "${songName}" is being eliminated! Help save it!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'close': // Legacy fallback
+            tweetText = `🔥 "${songName}" vs "${opponentName}" is TOO CLOSE!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
+            break;
+        case 'competitive': // Legacy fallback
+            tweetText = `⚔️ I just voted for "${songName}" in the League Music Tournament!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
             break;
         default:
-            tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\nVote now: ${matchUrl}\n\n#LeagueMusicTournament`;
+            tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\n${matchUrl}\n\n#LeagueMusicTournament`;
     }
     
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
+    
+    console.log(`📤 Shared to Twitter (${context})`);
 };
 
 window.shareToReddit = function(songName, context) {
@@ -1553,14 +1712,47 @@ window.shareToReddit = function(songName, context) {
     let title = '';
     let text = '';
     
+    const opponentName = songName === currentMatch.competitor1.name 
+        ? currentMatch.competitor2.name 
+        : currentMatch.competitor1.name;
+    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
+    
     switch(context) {
-        case 'losing':
-            title = `"${songName}" is being eliminated! Rally to save it!`;
-            text = `"${songName}" is currently losing in the League Music Tournament. If you love this song, vote now to keep it alive!\n\nVote here: ${matchUrl}`;
+        case 'early':
+            title = `Early voting is open for "${songName}" in the League Music Tournament!`;
+            text = `Just cast one of the first votes in this matchup! Be part of shaping the results from the start.\n\nVote here: ${matchUrl}`;
             break;
-        case 'close':
+        case 'tied':
+            title = `[PERFECT TIE] "${songName}" vs "${opponentName}" - Cast the deciding vote!`;
+            text = `These songs are EXACTLY tied! Every single vote matters right now.\n\nVote here: ${matchUrl}`;
+            break;
+        case 'nailbiter':
+            title = `[NAIL-BITER] "${songName}" matchup separated by just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'}!`;
+            text = `This is as close as it gets! Come cast your vote in this insane matchup.\n\nVote here: ${matchUrl}`;
+            break;
+        case 'losing-close':
+            title = `"${songName}" is behind but can still win with your help!`;
+            text = `"${songName}" is only ${voteDiff} votes behind. A comeback is totally possible!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'losing-bad':
+            title = `[URGENT] "${songName}" needs a miracle comeback in the League Tournament!`;
+            text = `"${songName}" is being eliminated! If you love this song, vote now to rally support!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'winning-close':
+            title = `"${songName}" is leading but the race is still close!`;
+            text = `Help maintain the lead and secure the victory for "${songName}"!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'dominating':
+            title = `"${songName}" is dominating in the League Music Tournament!`;
+            text = `Come vote in the League Music Tournament and see the results!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'losing': // Legacy fallback
+            title = `"${songName}" is being eliminated! Rally to save it!`;
+            text = `"${songName}" is currently losing. If you love this song, vote now!\n\nVote here: ${matchUrl}`;
+            break;
+        case 'close': // Legacy fallback
             title = `NAIL-BITER: "${songName}" matchup is too close to call!`;
-            text = `This matchup is separated by just a few votes! Every vote matters.\n\nCast your vote: ${matchUrl}`;
+            text = `This matchup is separated by just a few votes! Every vote matters.\n\nVote here: ${matchUrl}`;
             break;
         default:
             title = `League Music Tournament - Vote for your favorite songs!`;
@@ -1569,6 +1761,8 @@ window.shareToReddit = function(songName, context) {
     
     const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
     window.open(redditUrl, '_blank', 'width=800,height=600');
+    
+    console.log(`📤 Shared to Reddit (${context})`);
 };
 
 window.copyMatchLink = function() {
@@ -1586,12 +1780,14 @@ window.copyMatchLink = function() {
         document.body.removeChild(tempInput);
         showNotification('Link copied! 🔗', 'success');
     });
+    
+    console.log('📋 Match link copied to clipboard');
 };
 
-    /**
-     * Close post-vote modal
-     */
- function closePostVoteModal() {
+/**
+ * Close post-vote modal
+ */
+function closePostVoteModal() {
     const modal = document.getElementById('vote-modal');
     if (modal) {
         modal.classList.remove('active');
@@ -1600,19 +1796,19 @@ window.copyMatchLink = function() {
     }
 }
 
-    /**
-     * Track book clicks for analytics
-     * @param {string} songSlug - Song identifier
-     * @param {string} location - Where the click occurred
-     */
-    function trackBookClick(songSlug, location) {
-        console.log(`📊 Book clicked: ${songSlug} from ${location}`);
-        // Add analytics tracking here if needed (Google Analytics, etc.)
-    }
+/**
+ * Track book clicks for analytics
+ * @param {string} songSlug - Song identifier
+ * @param {string} location - Where the click occurred
+ */
+function trackBookClick(songSlug, location) {
+    console.log(`📊 Book clicked: ${songSlug} from ${location}`);
+    // Add analytics tracking here if needed (Google Analytics, etc.)
+}
 
-    // Make functions available globally
-    window.closePostVoteModal = closePostVoteModal;
-    window.trackBookClick = trackBookClick;
+// Make functions available globally
+window.closePostVoteModal = closePostVoteModal;
+window.trackBookClick = trackBookClick;
     // ========================================
     // EVENT LISTENERS
     // ========================================
