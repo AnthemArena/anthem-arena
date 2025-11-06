@@ -1016,20 +1016,24 @@ await submitVoteToAPI(currentMatch.id, songId);
             disableVoting(songId);
 
             // ✨ Wait for cache to update, then show modal with accurate vote counts
-            setTimeout(async () => {
-                console.log('🔄 Reloading match data for modal...');
-                
-                // Force a second reload to get fresh data from Firebase
-                await reloadMatchData();
-                
-                console.log('📊 Modal will show:');
-                console.log('   Total votes:', currentMatch.totalVotes);
-                console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
-                console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
-                
-                // Now show modal with updated counts
-                showPostVoteModal(songName, songData);
-            }, 2000);  // 2 second delay to ensure cache updates
+// ✨ Wait for cache to update, then show modal with accurate vote counts
+setTimeout(async () => {
+    console.log('🔄 Reloading match data for modal...');
+    
+    // Force a second reload to get fresh data from Firebase
+    await reloadMatchData();
+    
+    // ✅ FIX: Update the UI elements again with fresh data
+    updateVoteCountsUI();
+    
+    console.log('📊 Modal will show:');
+    console.log('   Total votes:', currentMatch.totalVotes);
+    console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
+    console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
+    
+    // Now show modal with updated counts
+    showPostVoteModal(songName, songData);
+}, 2000);
 
             console.log('✅ Vote submitted successfully!');
 
@@ -1084,18 +1088,8 @@ await submitVoteToAPI(currentMatch.id, songId);
                     currentMatch.competitor2.percentage = 50;
                 }
                 
-                // Update UI
-                const comp1Percentage = document.getElementById('competitor1-percentage');
-                const comp1Votes = document.getElementById('competitor1-votes');
-                const comp2Percentage = document.getElementById('competitor2-percentage');
-                const comp2Votes = document.getElementById('competitor2-votes');
-                const totalVotesEl = document.getElementById('total-votes');
-                
-                if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}%`;
-                if (comp1Votes) comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} votes`;
-                if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}%`;
-                if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
-                if (totalVotesEl) totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} votes cast`;
+           // Update UI with new counts
+                updateVoteCountsUI();
                 
                 console.log('✅ Match data reloaded:', {
                     totalVotes: currentMatch.totalVotes,
@@ -1109,7 +1103,25 @@ await submitVoteToAPI(currentMatch.id, songId);
         }
     }
 
-
+// ========================================
+    // UPDATE VOTE COUNTS UI
+    // ========================================
+    function updateVoteCountsUI() {
+        // Update percentages and vote counts in the UI
+        const comp1Percentage = document.getElementById('competitor1-percentage');
+        const comp1Votes = document.getElementById('competitor1-votes');
+        const comp2Percentage = document.getElementById('competitor2-percentage');
+        const comp2Votes = document.getElementById('competitor2-votes');
+        const totalVotesEl = document.getElementById('total-votes');
+        
+        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}%`;
+        if (comp1Votes) comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} votes`;
+        if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}%`;
+        if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
+        if (totalVotesEl) totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} vote${currentMatch.totalVotes === 1 ? '' : 's'} cast`;
+        
+        console.log('✅ UI updated with current vote counts');
+    }
 
     // ========================================
     // NOTIFICATION SYSTEM
