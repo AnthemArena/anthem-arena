@@ -118,6 +118,9 @@ function getResultBadge(competitor, status) {
 }
 
 function getFooterContent(match) {
+    // ✅ Determine if we should show vote counts
+    const showVoteData = match.hasVoted || match.status === 'completed';
+    
     let statsHtml = '<div class="match-stats">';
     
     if (match.status === 'completed') {
@@ -126,15 +129,24 @@ function getFooterContent(match) {
             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
         `;
     } else if (match.status === 'live') {
-        statsHtml += `
-            <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
-            <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
-        `;
+        // ✅ Only show vote count if user already voted
+        if (showVoteData) {
+            statsHtml += `
+                <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
+                <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
+            `;
+        } else {
+            // ✅ Show generic "Voting open" message without counts
+            statsHtml += `
+                <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
+            `;
+        }
     } else if (match.status === 'upcoming') {
         statsHtml += `<span class="stat"><i class="far fa-clock"></i> Scheduled</span>`;
     }
     
     statsHtml += '</div>';
+
 
     let buttonHtml = '';
     if (match.status === 'completed') {

@@ -625,11 +625,6 @@ async function loadLiveMatches() {
             return;
         }
         
-        if (liveMatches.length === 0) {
-            hideLiveMatchesSection();
-            return;
-        }
-        
         console.log(`✅ Found ${liveMatches.length} other live match(es)`);
         displayLiveMatchesGrid(liveMatches);
         
@@ -644,8 +639,9 @@ function displayLiveMatchesGrid(matches) {
     
     // ✅ Convert matches and check vote status for each
     const convertedMatches = matches.map(m => {
-        const hasVoted = hasUserVoted(m.matchId);
-        return convertFirebaseMatchToDisplayFormat(m, hasVoted);
+        const hasVoted = hasUserVoted(m.matchId); // ✅ Check for EACH match
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        return convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
     });
     
     grid.innerHTML = convertedMatches.map(match => createMatchCard(match)).join('');
@@ -692,8 +688,13 @@ function displayRecentResultsGrid(matches) {
     const grid = document.getElementById('recentResultsGrid');
     if (!grid) return;
     
-    // Convert Firebase format to display format
-    const convertedMatches = matches.map(m => convertFirebaseMatchToDisplayFormat(m));
+    // ✅ Convert matches and check vote status for each
+    const convertedMatches = matches.map(m => {
+        const hasVoted = hasUserVoted(m.matchId); // ✅ Always true for completed, but for consistency
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        return convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+    });
+    
     grid.innerHTML = convertedMatches.map(match => createMatchCard(match)).join('');
 }
 function showNoResultsMessage() {
@@ -716,7 +717,7 @@ function showNoResultsMessage() {
 // CONVERT FIREBASE MATCH TO DISPLAY FORMAT
 // ========================================
 
-function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false) {
+function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, userVotedSongId = null) {
     const totalVotes = firebaseMatch.totalVotes || 0;
     const song1Votes = firebaseMatch.song1?.votes || 0;
     const song2Votes = firebaseMatch.song2?.votes || 0;
@@ -724,8 +725,10 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false) {
     const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
     const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
     
-    // ✅ Check which song user voted for
-    const userVotedSongId = hasVoted ? getUserVotedSongId(firebaseMatch.matchId) : null;
+    // ✅ Use passed userVotedSongId or fall back to checking localStorage
+    if (!userVotedSongId && hasVoted) {
+        userVotedSongId = getUserVotedSongId(firebaseMatch.matchId);
+    }
     
     return {
         id: firebaseMatch.matchId || firebaseMatch.id,

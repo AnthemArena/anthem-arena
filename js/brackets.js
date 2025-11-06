@@ -399,12 +399,13 @@ function createMatchCardFromFirebase(match) {
     const song1IsTBD = match.song1.id === 'TBD';
     const song2IsTBD = match.song2.id === 'TBD';
 
-    // Use merged totalVotes & votes from edge function (votes collection + match doc)
+    // ✅ Check if user voted
+    const userHasVoted = checkUserVoted(match.matchId);
+
     const totalVotes = match.totalVotes || 0;
     const song1Votes = match.song1?.votes || 0;
     const song2Votes = match.song2?.votes || 0;
 
-    // Use pre-calculated percentage from edge, fallback to local calc
     const song1Pct = match.song1?.percentage ?? (totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50);
     const song2Pct = match.song2?.percentage ?? (totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50);
 
@@ -415,7 +416,7 @@ function createMatchCardFromFirebase(match) {
     const song2Thumbnail = song2IsTBD ? '' : `https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg`;
 
     return `
-        <div class="matchup-card ${isBye ? 'bye' : ''} ${match.status}" 
+        <div class="matchup-card ${isBye ? 'bye' : ''} ${match.status} ${userHasVoted ? 'user-voted' : ''}" 
              data-match-id="${match.matchId}"
              data-round="${match.round}"
              data-match-number="${match.matchNumber}">
@@ -432,9 +433,10 @@ function createMatchCardFromFirebase(match) {
                         <span class="seed-badge">#${match.song1.seed || '?'}</span>
                         <span class="song-title">${song1IsTBD ? 'TBD' : match.song1.shortTitle}</span>
                     </div>
-                    ${totalVotes > 0 && !song1IsTBD ? `
-                        <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song1Pct}%</div>
-                        ${isWinner1 ? '<span class="winner-icon">Crown</span>' : ''}
+                    ${/* ✅ Only show percentage if user voted OR completed */ ''}
+                    ${(userHasVoted || isCompleted) && !song1IsTBD && totalVotes > 0 ? `
+                        <div class="vote-percentage">${song1Pct}%</div>
+                        ${isWinner1 ? '<span class="winner-icon">👑</span>' : ''}
                     ` : ''}
                 </div>
 
@@ -447,9 +449,10 @@ function createMatchCardFromFirebase(match) {
                         <span class="seed-badge">#${match.song2.seed || '?'}</span>
                         <span class="song-title">${song2IsTBD ? 'TBD' : match.song2.shortTitle}</span>
                     </div>
-                    ${totalVotes > 0 && !song2IsTBD ? `
-                        <div class="vote-percentage ${checkUserVoted(match.matchId) ? 'live-voted' : ''}">${song2Pct}%</div>
-                        ${isWinner2 ? '<span class="winner-icon">Crown</span>' : ''}
+                    ${/* ✅ Only show percentage if user voted OR completed */ ''}
+                    ${(userHasVoted || isCompleted) && !song2IsTBD && totalVotes > 0 ? `
+                        <div class="vote-percentage">${song2Pct}%</div>
+                        ${isWinner2 ? '<span class="winner-icon">👑</span>' : ''}
                     ` : ''}
                 </div>
             </div>
@@ -462,12 +465,14 @@ function createMatchCardFromFirebase(match) {
                     <span class="status-badge upcoming">Coming Soon</span>
                 ` : `
                     <span class="status-badge active">LIVE - Vote Now!</span>
-                    <span class="vote-count">${totalVotes} vote${totalVotes === 1 ? '' : 's'} so far</span>
+                    ${/* ✅ Only show vote count if user voted */ ''}
+                    ${userHasVoted ? `<span class="vote-count">${totalVotes} vote${totalVotes === 1 ? '' : 's'} so far</span>` : ''}
                 `}
             </div>
         </div>
     `;
 }
+
 
 // ========================================
 // GENERATE ROUND 2 (FROM FIREBASE)

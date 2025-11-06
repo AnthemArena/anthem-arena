@@ -3194,3 +3194,175 @@ button {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
 }
+/* ========================================
+   VIEW RESULTS BUTTON (After Voting)
+   ======================================== */
+
+.view-results-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.view-results-btn.voted {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle animated shine effect */
+.view-results-btn.voted::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.view-results-btn.voted:hover::before {
+    left: 100%;
+}
+
+.view-results-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.view-results-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.view-results-btn i {
+    font-size: 1rem;
+    filter: brightness(1.2);
+}
+
+/* Disabled state (just in case) */
+.view-results-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .view-results-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-results-btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   CONTRAST WITH VOTE NOW BUTTON
+   ======================================== */
+
+/* Make sure Vote Now button stays distinct */
+.vote-now-btn {
+    background: linear-gradient(135deg, #c8aa6e 0%, #8b7355 100%);
+    color: #1a1614;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.25);
+}
+
+.vote-now-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(200, 170, 110, 0.4);
+    border-color: rgba(200, 170, 110, 0.5);
+}
+
+.vote-now-btn i {
+    font-size: 1rem;
+}
+
+/* ========================================
+   VISUAL FEEDBACK ON MATCH CARDS
+   ======================================== */
+
+/* Add subtle green glow to cards where user voted */
+.match-card.user-voted {
+    border: 2px solid rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+}
+
+.match-card.user-voted:hover {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.25);
+}
+
+/* Optional: Add a small "Voted" indicator badge */
+.match-card.user-voted::after {
+    content: '✓ Voted';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Make sure match card has position relative for the badge */
+.match-card {
+    position: relative;
+}
+/* Show "Your Vote" badge on the competitor user voted for */
+.your-vote-badge {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.your-vote-badge::before {
+    content: '✓';
+    font-size: 13px;
+}
