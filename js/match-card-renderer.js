@@ -215,7 +215,9 @@ function getTimeUntilMatch(dateString) {
 function formatTournamentName(tournament) {
     const names = {
         'anthem-arena-championship': 'Anthem Arena Championship S1',
-        'Anthems Arena Championship': 'Anthem Arena Championship S1'
+        '2025-worlds-anthems': 'Anthem Arena Championship S1',
+        'Anthems Arena Championship': 'Anthem Arena Championship S1',
+        'Anthem Arena Championship': 'Anthem Arena Championship S1'
     };
     return names[tournament] || tournament;
 }
