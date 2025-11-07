@@ -531,37 +531,52 @@ async function loadOtherLiveMatches() {
         // Check which matches user has voted on
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         
-        // ✅ NEW: Transform match data to include song details
-        const enhancedMatches = await Promise.all(
-            otherLiveMatches.map(async (match) => {
-                const userVote = userVotes[match.id];
-                const hasVoted = !!userVote;
-                
-                // Get song data for both competitors
-                const song1Data = await getSongData(match.song1?.songId);
-                const song2Data = await getSongData(match.song2?.songId);
-                
-                return {
-                    ...match,
-                    hasVoted: hasVoted,
-                    competitor1: {
-                        name: song1Data?.title || match.song1?.name || 'Unknown Song',
-                        hashtag: song1Data?.hashtag || match.song1?.hashtag || '#unknown',
-                        votes: match.song1?.votes || 0,
-                        percentage: match.song1?.percentage || 50,
-                        userVoted: hasVoted && userVote.songId === 'song1'
-                    },
-                    competitor2: {
-                        name: song2Data?.title || match.song2?.name || 'Unknown Song',
-                        hashtag: song2Data?.hashtag || match.song2?.hashtag || '#unknown',
-                        votes: match.song2?.votes || 0,
-                        percentage: match.song2?.percentage || 50,
-                        userVoted: hasVoted && userVote.songId === 'song2'
-                    },
-                    totalVotes: match.totalVotes || 0
-                };
-            })
-        );
+        // ✅ Transform match data (matches.js pattern)
+        const enhancedMatches = otherLiveMatches.map(match => {
+            const userVote = userVotes[match.id];
+            const hasVoted = !!userVote;
+            
+            // Calculate vote percentages
+            const totalVotes = match.totalVotes || 0;
+            const song1Votes = match.song1?.votes || 0;
+            const song2Votes = match.song2?.votes || 0;
+            
+            const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+            const song2Percentage = totalVotes > 0 ? 100 - song1Percentage : 50;
+            
+            return {
+                id: match.matchId || match.id,
+                tournament: match.tournament || '2025-worlds-anthems',
+                round: match.round || 'round-1',
+                status: match.status || 'live',
+                date: match.date || new Date().toISOString(),
+                totalVotes: totalVotes,
+                timeLeft: 'Voting Open',
+                hasVoted: hasVoted,
+                competitor1: {
+                    seed: match.song1?.seed || 1,
+                    name: match.song1?.shortTitle || match.song1?.title || 'Unknown Song',
+                    source: `${match.song1?.artist || 'Unknown'} • ${match.song1?.year || '2024'}`,
+                    videoId: match.song1?.videoId || '',
+                    votes: song1Votes,
+                    percentage: song1Percentage,
+                    winner: false,
+                    leading: song1Votes > song2Votes && totalVotes > 0,
+                    userVoted: hasVoted && userVote.songId === 'song1'
+                },
+                competitor2: {
+                    seed: match.song2?.seed || 2,
+                    name: match.song2?.shortTitle || match.song2?.title || 'Unknown Song',
+                    source: `${match.song2?.artist || 'Unknown'} • ${match.song2?.year || '2024'}`,
+                    videoId: match.song2?.videoId || '',
+                    votes: song2Votes,
+                    percentage: song2Percentage,
+                    winner: false,
+                    leading: song2Votes > song1Votes && totalVotes > 0,
+                    userVoted: hasVoted && userVote.songId === 'song2'
+                }
+            };
+        });
         
         // Render match cards
         const grid = document.getElementById('other-matches-grid');
