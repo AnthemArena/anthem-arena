@@ -6,7 +6,7 @@ import { getUserXPFromStorage, getUserRank, calculateUserXP } from './rank-syste
 import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
-const ACTIVE_TOURNAMENT = 'league-music-2024';
+const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 document.addEventListener('DOMContentLoaded', function() {
     const navHTML = `
