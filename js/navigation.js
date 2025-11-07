@@ -3,7 +3,7 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank, calculateUserXP } from './rank-system.js';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
 const ACTIVE_TOURNAMENT = 'league-music-2024';
