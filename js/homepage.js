@@ -338,11 +338,16 @@ async function loadFeaturedMatch() {
     try {
         console.log('🔍 Searching for live matches...');
         
-        // ✅ NEW: Get matches from edge cache
         const allMatches = await getAllMatches();
         
-        // Filter live matches
-        let liveMatches = allMatches.filter(m => m.status === 'live');
+        // Filter live, non-TBD matches
+        let liveMatches = allMatches.filter(m => {
+            if (m.status !== 'live') return false;
+            const isTBD = !m.song1?.id || !m.song2?.id ||
+                         String(m.song1.id).includes('TBD') ||
+                         String(m.song2.id).includes('TBD');
+            return !isTBD;
+        });
         
         if (liveMatches.length === 0) {
             console.log('❌ No live matches found');
@@ -350,24 +355,44 @@ async function loadFeaturedMatch() {
             return;
         }
         
-        liveMatches.sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0));
+        // ✅ SELECT DAILY FEATURED MATCH WITH SMART ROTATION
+        currentMatch = selectDailyFeaturedMatch(liveMatches);
         
-        currentMatch = liveMatches[0];
+        console.log(`✅ Featured match of the day: ${currentMatch.matchId}`);
+        console.log(`   ${liveMatches.length} total live matches rotating daily`);
         
-        console.log(`✅ Featured match (most voted): ${currentMatch.totalVotes} votes`);
-        
-        // Display match
         await displayFeaturedMatch();
-        
-        // ❌ REMOVE THIS LINE:
-        // checkExistingVote();
-        
-   
         
     } catch (error) {
         console.error('❌ Error loading featured match:', error);
         hideFeaturedSection();
     }
+}
+
+function selectDailyFeaturedMatch(liveMatches) {
+    if (liveMatches.length === 0) return null;
+    if (liveMatches.length === 1) return liveMatches[0];
+    
+    // Use today's date as deterministic seed
+    const today = new Date().toISOString().split('T')[0];
+    const dateSeed = hashString(today);
+    
+    // Simple rotation: index = (date hash) % (number of matches)
+    const index = dateSeed % liveMatches.length;
+    
+    console.log(`🎲 Daily featured rotation: match ${index + 1} of ${liveMatches.length}`);
+    
+    return liveMatches[index];
+}
+
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash);
 }
 
 function hideFeaturedSection() {
@@ -509,8 +534,8 @@ const ctaButton = document.createElement('div');
 ctaButton.className = 'featured-cta';
 
 if (userHasVoted) {
-    // User already voted - show "View Results" button
-    const votedSongName = userVotedSongId === song1.id 
+    // ✅ FIX: Compare userVotedSongId against "song1" or "song2", not song IDs
+    const votedSongName = userVotedSongId === 'song1'
         ? (song1.shortTitle || song1.title)
         : (song2.shortTitle || song2.title);
     

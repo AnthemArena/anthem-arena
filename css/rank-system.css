@@ -1,0 +1,89 @@
+/* ========================================
+   NAVIGATION RANK DISPLAY
+   ======================================== */
+
+.nav-rank-container {
+    margin-left: auto;
+    padding: 0 1rem;
+}
+
+.nav-rank-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1) 0%, rgba(200, 170, 110, 0.05) 100%);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.nav-rank-mini:hover {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.15) 0%, rgba(200, 170, 110, 0.08) 100%);
+    border-color: rgba(200, 170, 110, 0.5);
+    transform: translateY(-2px);
+}
+
+.rank-level-badge {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #C8AA6E 0%, #B89A5E 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(200, 170, 110, 0.4);
+}
+
+.rank-level-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    font-family: 'Lora', serif;
+}
+
+.rank-mini-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 120px;
+}
+
+.rank-mini-title {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rank-mini-progress {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.rank-mini-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E 0%, #E8D4A0 100%);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 8px rgba(200, 170, 110, 0.6);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .rank-mini-info {
+        display: none;
+    }
+    
+    .nav-rank-mini {
+        padding: 0.5rem;
+    }
+    
+    .rank-level-badge {
+        width: 36px;
+        height: 36px;
+    }
+}

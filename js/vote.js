@@ -12,6 +12,9 @@ import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/f
     import { getAllTournamentStats } from './music-gallery.js';
     import { getBookForSong } from './bookMappings.js';
     import { checkGlobalNotificationStatus } from './global-notifications.js';
+    // ✅ ADD THESE IMPORTS
+import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
+import { updateNavRank } from './nav.js';
 
 
     // ✅ ADD THIS LINE:
@@ -479,6 +482,107 @@ await updateCompetitorInfo(currentMatch);
         }
     }
 
+
+    // ========================================
+// LOAD OTHER LIVE MATCHES
+// ========================================
+
+/**
+ * Fetch and display other live matches (excluding current match)
+ */
+async function loadOtherLiveMatches() {
+    try {
+        console.log('📥 Loading other live matches...');
+        
+        // Import the match card renderer
+        const { createMatchCard } = await import('./match-card-renderer.js');
+        
+        // Fetch all matches from API (cached)
+        const response = await fetch('/.netlify/functions/get-matches');
+        const allMatches = await response.json();
+        
+        // Filter: only live matches, exclude current match
+        const otherLiveMatches = allMatches.filter(match => 
+            match.status === 'live' && 
+            match.id !== currentMatch.id
+        );
+        
+        console.log(`✅ Found ${otherLiveMatches.length} other live matches`);
+        
+        // If no other matches, hide the section
+        if (otherLiveMatches.length === 0) {
+            document.getElementById('other-matches-section').style.display = 'none';
+            return;
+        }
+        
+        // Check which matches user has voted on
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        
+        // Enhance match data with hasVoted status
+        const enhancedMatches = otherLiveMatches.map(match => {
+            const userVote = userVotes[match.id];
+            const hasVoted = !!userVote;
+            
+            return {
+                ...match,
+                hasVoted: hasVoted,
+                competitor1: {
+                    ...match.competitor1,
+                    userVoted: hasVoted && userVote.songId === 'song1'
+                },
+                competitor2: {
+                    ...match.competitor2,
+                    userVoted: hasVoted && userVote.songId === 'song2'
+                }
+            };
+        });
+        
+        // Render match cards
+        const grid = document.getElementById('other-matches-grid');
+        grid.innerHTML = enhancedMatches
+            .map(match => createMatchCard(match))
+            .join('');
+        
+        // Show the section
+        document.getElementById('other-matches-section').style.display = 'block';
+        
+        // Add click handlers to "Vote Now" buttons
+        attachVoteNowHandlers();
+        
+        console.log('✅ Other matches rendered');
+        
+    } catch (error) {
+        console.error('❌ Error loading other matches:', error);
+        // Hide section on error
+        document.getElementById('other-matches-section').style.display = 'none';
+    }
+}
+
+/**
+ * Attach click handlers to "Vote Now" buttons in other matches
+ */
+function attachVoteNowHandlers() {
+    const voteButtons = document.querySelectorAll('.other-matches-grid .vote-now-btn, .other-matches-grid .view-results-btn');
+    
+    voteButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const matchCard = btn.closest('.match-card');
+            const matchId = matchCard?.dataset.matchId;
+            
+            if (matchId) {
+                window.location.href = `/vote.html?id=${matchId}`;
+            }
+        });
+    });
+}
+
+/**
+ * Make voteNow function globally accessible for onclick handlers
+ */
+window.voteNow = function(matchId) {
+    window.location.href = `/vote.html?id=${matchId}`;
+};
     // ========================================
     // ⭐ UPDATED: CHECK VOTE STATUS (FIREBASE)
     // ========================================
@@ -953,136 +1057,149 @@ saveVoteForOtherPages(currentMatch.id, voteData.choice);
         // Videos will auto-initialize via iframe src
     }
 
-    // ========================================
-    // ⭐ UPDATED: SUBMIT VOTE TO FIREBASE
-    // ========================================
+// ========================================
+// ⭐ UPDATED: SUBMIT VOTE TO FIREBASE WITH XP
+// ========================================
 
-    async function submitVote(songId) {
-        // Prevent double voting
-        if (hasVoted) {
+async function submitVote(songId) {
+    // Prevent double voting
+    if (hasVoted) {
+        showNotification('You have already voted in this match!', 'error');
+        return;
+    }
+    
+    // Check if match is live
+    if (currentMatch.status !== 'live') {
+        showNotification('Voting is not open for this match', 'error');
+        return;
+    }
+    
+    // Disable voting buttons immediately
+    hasVoted = true;
+    const voteButtons = document.querySelectorAll('.vote-btn');
+    voteButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+    });
+    
+    try {
+        // Show loading state
+        showNotification('Submitting your vote...', 'info');
+        
+        // Determine which song was voted for (song1 or song2)
+        const votedForSong1 = songId === 'song1';
+        
+        console.log('🗳️ Voting for:', votedForSong1 ? 'Song 1' : 'Song 2');
+        console.log('👤 User ID:', userId);
+        
+        // ⭐ NEW: Create vote record in Firebase
+        const voteId = `${currentMatch.id}_${userId}`;
+        const voteRef = doc(db, 'votes', voteId);
+        
+        // Check if vote already exists (extra safety)
+        const existingVote = await getDoc(voteRef);
+        if (existingVote.exists()) {
+            console.warn('⚠️ Vote already exists!');
             showNotification('You have already voted in this match!', 'error');
+            disableVoting(existingVote.data().choice);
             return;
         }
         
-        // Check if match is live
-        if (currentMatch.status !== 'live') {
-            showNotification('Voting is not open for this match', 'error');
-            return;
-        }
-        
-        // Disable voting buttons immediately
-        hasVoted = true;
-        const voteButtons = document.querySelectorAll('.vote-btn');
-        voteButtons.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
+        await setDoc(voteRef, {
+            tournament: ACTIVE_TOURNAMENT,
+            matchId: currentMatch.id,
+            userId: userId,
+            choice: songId,
+            timestamp: new Date().toISOString(),
+            round: currentMatch.round,
+            // Store song details for analytics
+            votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
+            votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
         });
         
-        try {
-            // Show loading state
-            showNotification('Submitting your vote...', 'info');
-            
-            // Determine which song was voted for (song1 or song2)
-            const votedForSong1 = songId === 'song1';
-            
-            console.log('🗳️ Voting for:', votedForSong1 ? 'Song 1' : 'Song 2');
-            console.log('👤 User ID:', userId);
-            
-            // ⭐ NEW: Create vote record in Firebase
-            const voteId = `${currentMatch.id}_${userId}`;
-            const voteRef = doc(db, 'votes', voteId);
-            
-            // Check if vote already exists (extra safety)
-            const existingVote = await getDoc(voteRef);
-            if (existingVote.exists()) {
-                console.warn('⚠️ Vote already exists!');
-                showNotification('You have already voted in this match!', 'error');
-                disableVoting(existingVote.data().choice);
-                return;
-            }
-            
-        // ✅ CHANGE TO:
-    await setDoc(voteRef, {
-        tournament: ACTIVE_TOURNAMENT,  // ✅ ADD THIS
-        matchId: currentMatch.id,
-        userId: userId,
-        choice: songId,
-        timestamp: new Date().toISOString(),
-        round: currentMatch.round,
-        // Store song details for analytics
-        votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
-        votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
-    });
-            
-            console.log('✅ Vote record created in Firebase');
-            
-         // ✅ NEW: Use API client to submit vote (updates match counts)
-// ✅ NEW: Use API client to submit vote (updates match counts)
-await submitVoteToAPI(currentMatch.id, songId);
-//    ^^^^^^^^^^^^^^^ Use the renamed import            
-            console.log('✅ Vote submitted via API client');
-            
-            // Save vote locally as backup
-    localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
+        console.log('✅ Vote record created in Firebase');
+        
+        // ✅ NEW: Use API client to submit vote (updates match counts)
+        await submitVoteToAPI(currentMatch.id, songId);
+        console.log('✅ Vote submitted via API client');
+        
+        // Save vote locally as backup
+        localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
+        
+        // ✅ NEW: Also save in userVotes format for homepage/matches pages
+        saveVoteForOtherPages(currentMatch.id, songId);
+        
+        // ========================================
+        // ✅ NEW: CALCULATE AND AWARD XP
+        // ========================================
+        const xpData = calculateVoteXP({
+            isUnderdog: checkIfUnderdog(votedForSong1),
+            isCloseMatch: checkIfCloseMatch(),
+            isFirstVoteInMatch: checkIfFirstVoter()
+        });
+        
+        const newTotalXP = addXP(xpData.totalXP);
+        const rank = getUserRank(newTotalXP);
+        
+        console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
+        
+        // Update nav display immediately
+        updateNavRank();
+        
+        // ✅ Get full song data for modal BEFORE reload (we need the song info)
+        const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
+        const songName = votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name;
+        const songData = allSongsData.find(s => s.seed === songSeed);
+        
+        // First reload to update counts immediately
+        await reloadMatchData();
+        
+        // Show success notification
+        showNotification(`✅ Vote cast for "${songName}"!`, 'success');
+        
+        // Show voted indicator
+        disableVoting(songId);
 
-    // ✅ NEW: Also save in userVotes format for homepage/matches pages
-saveVoteForOtherPages(currentMatch.id, songId);
+        // ✨ Wait for cache to update, then show modal with accurate vote counts
+        setTimeout(async () => {
+            console.log('🔄 Reloading match data for modal (BYPASSING CACHE)...');
+            
+            // Force a second reload with cache bypass to get fresh data from Firebase
+            await reloadMatchData(true);
+            
+            // ✅ FIX: Update the UI elements again with fresh data
+            updateVoteCountsUI();
+            
+            console.log('📊 Modal will show:');
+            console.log('   Total votes:', currentMatch.totalVotes);
+            console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
+            console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
+            
+            // ✅ NEW: Pass XP data to modal
+            showPostVoteModal(songName, songData, xpData, rank);
 
-            
-     // ✅ Get full song data for modal BEFORE reload (we need the song info)
-            const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
-            const songName = votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name;
-            const songData = allSongsData.find(s => s.seed === songSeed);
-            
-            // First reload to update counts immediately
-            await reloadMatchData();
-            
-            // Show success notification
-            showNotification(`✅ Vote cast for "${songName}"!`, 'success');
-            
-            // Show voted indicator
-            disableVoting(songId);
+                // ✅ NEW: Load other live matches below
+    await loadOtherLiveMatches();
 
-// ✨ Wait for cache to update, then show modal with accurate vote counts
-setTimeout(async () => {
-    console.log('🔄 Reloading match data for modal (BYPASSING CACHE)...');
-    
-    // Force a second reload with cache bypass to get fresh data from Firebase
-    await reloadMatchData(true);  // ← Pass true to bypass cache
-    
-    // ✅ FIX: Update the UI elements again with fresh data
-    updateVoteCountsUI();
-    
-    console.log('📊 Modal will show:');
-    console.log('   Total votes:', currentMatch.totalVotes);
-    console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
-    console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
-    
-    // Now show modal with updated counts
-    showPostVoteModal(songName, songData);
-}, 2000);
+        }, 2000);
 
-            console.log('✅ Vote submitted successfully!');
-
-            // ========================================
-            // ✨ NEW: STOP UPDATES AFTER VOTING
-            // (Updates will stop automatically since hasVoted = true)
-            
-        } catch (error) {
-            console.error('❌ Error submitting vote:', error);
-            showNotification('Error submitting vote. Please try again.', 'error');
-            
-            // Re-enable voting on error
-            hasVoted = false;
-            const voteButtons = document.querySelectorAll('.vote-btn');
-            voteButtons.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-            });
-        }
+        console.log('✅ Vote submitted successfully!');
+        
+    } catch (error) {
+        console.error('❌ Error submitting vote:', error);
+        showNotification('Error submitting vote. Please try again.', 'error');
+        
+        // Re-enable voting on error
+        hasVoted = false;
+        const voteButtons = document.querySelectorAll('.vote-btn');
+        voteButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        });
     }
+}
 
 /**
  * ✅ NEW: Save vote to userVotes format for homepage/matches pages
@@ -1095,6 +1212,34 @@ function saveVoteForOtherPages(matchId, songId) {
     };
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
     console.log('✅ Vote saved to userVotes for other pages:', matchId, songId);
+}
+
+// ========================================
+// ✅ NEW: XP CALCULATION HELPERS
+// ========================================
+
+/**
+ * Check if user voted for the underdog (lower-seeded song)
+ */
+function checkIfUnderdog(votedForSong1) {
+    const votedSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
+    const opponentSeed = votedForSong1 ? currentMatch.competitor2.seed : currentMatch.competitor1.seed;
+    return votedSeed > opponentSeed; // Higher seed number = underdog
+}
+
+/**
+ * Check if the match is close (within 5 votes)
+ */
+function checkIfCloseMatch() {
+    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
+    return voteDiff <= 5;
+}
+
+/**
+ * Check if user is among first 10 voters
+ */
+function checkIfFirstVoter() {
+    return currentMatch.totalVotes <= 10;
 }
 
     // ========================================
@@ -1341,7 +1486,18 @@ function showNotification(message, type = 'success') {
  * @param {string} songName - Name of the song voted for
  * @param {object} songData - Full song data from JSON
  */
-function showPostVoteModal(songName, songData) {
+// ========================================
+// POST-VOTE MODAL WITH BOOK RECOMMENDATIONS & XP
+// ========================================
+
+/**
+ * Show post-vote modal with book recommendation and XP earned
+ * @param {string} songName - Name of the song voted for
+ * @param {object} songData - Full song data from JSON
+ * @param {object} xpData - XP earned data from calculateVoteXP
+ * @param {object} rank - User's rank data from getUserRank
+ */
+function showPostVoteModal(songName, songData, xpData, rank) {
     const book = songData ? getBookForSong(songData) : null;
     
     // ✨ Calculate voting situation
@@ -1612,6 +1768,42 @@ function showPostVoteModal(songName, songData) {
     }
     
     // ========================================
+    // ✅ NEW: XP EARNED SECTION
+    // ========================================
+    let xpSection = `
+        <div class="xp-earned-section">
+            <div class="xp-header">
+                <span class="xp-icon">✨</span>
+                <div class="xp-details">
+                    <div class="xp-amount">+${xpData.totalXP} XP</div>
+                    <div class="xp-breakdown">
+                        <span class="xp-base">+${xpData.baseXP} Base</span>
+                        ${xpData.bonuses.map(bonus => `
+                            <span class="xp-bonus">+${bonus.xp} ${bonus.type}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="xp-progress-container">
+                <div class="xp-level-info">
+                    <span class="xp-level-badge">${rank.currentLevel.title}</span>
+                    <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
+                </div>
+                ${rank.nextLevel ? `
+                    <div class="xp-bar-wrapper">
+                        <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
+                    </div>
+                    <div class="xp-next-level">
+                        ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} to Level ${rank.nextLevel.level}
+                    </div>
+                ` : `
+                    <div class="xp-max-level">🏆 Maximum Level Reached!</div>
+                `}
+            </div>
+        </div>
+    `;
+    
+    // ========================================
     // BUILD BOOK SECTION (existing code)
     // ========================================
     let bookSection = '';
@@ -1648,6 +1840,8 @@ function showPostVoteModal(songName, songData) {
             </h2>
             ${successMessage}
             
+            ${xpSection}
+            
             ${bookSection}
             
             ${shareMessage}
@@ -1667,7 +1861,7 @@ function showPostVoteModal(songName, songData) {
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     
-    console.log(`✅ Post-vote modal shown (${situationType})`);
+    console.log(`✅ Post-vote modal shown (${situationType}) with ${xpData.totalXP} XP`);
 }
 
 // ========================================

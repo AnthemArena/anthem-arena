@@ -1607,3 +1607,213 @@
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
     }
 }
+/* ========================================
+   XP EARNED SECTION IN MODAL
+   ======================================== */
+
+.xp-earned-section {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1) 0%, rgba(200, 170, 110, 0.05) 100%);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.xp-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.xp-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.xp-details {
+    flex: 1;
+}
+
+.xp-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Lora', serif;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.xp-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.xp-base {
+    padding: 0.25rem 0.75rem;
+    background: rgba(200, 170, 110, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+.xp-bonus {
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.2), rgba(0, 180, 130, 0.2));
+    border: 1px solid rgba(0, 200, 150, 0.3);
+    border-radius: 20px;
+    color: #00c896;
+    font-weight: 600;
+}
+
+.xp-progress-container {
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+    padding-top: 1rem;
+}
+
+.xp-level-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.xp-level-badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #C8AA6E;
+}
+
+.xp-level-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.xp-bar-wrapper {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E 0%, #E8D4A0 100%);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(200, 170, 110, 0.6);
+}
+
+.xp-next-level {
+    font-size: 0.8rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.xp-max-level {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #C8AA6E;
+    font-weight: 600;
+    padding: 0.5rem 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .xp-earned-section {
+        padding: 1rem;
+    }
+    
+    .xp-amount {
+        font-size: 1.5rem;
+    }
+    
+    .xp-icon {
+        font-size: 2rem;
+    }
+}
+/* ========================================
+   OTHER LIVE MATCHES SECTION
+   ======================================== */
+
+.other-matches-section {
+    padding: 4rem 0;
+    background: linear-gradient(180deg, 
+        rgba(10, 15, 25, 0.8) 0%, 
+        rgba(15, 20, 30, 0.9) 100%);
+    border-top: 2px solid rgba(200, 170, 110, 0.2);
+}
+
+.other-matches-section .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.other-matches-section .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Lora', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.other-matches-section .title-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.other-matches-section .section-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.other-matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Reuse match card styles from matches.css */
+.other-matches-grid .match-card {
+    background: linear-gradient(135deg, 
+        rgba(30, 35, 45, 0.95) 0%, 
+        rgba(20, 25, 35, 0.95) 100%);
+    border: 2px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.other-matches-grid .match-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200, 170, 110, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .other-matches-section {
+        padding: 3rem 0;
+    }
+    
+    .other-matches-section .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .other-matches-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
