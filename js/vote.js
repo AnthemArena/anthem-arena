@@ -504,7 +504,6 @@ async function loadOtherLiveMatches() {
             allMatches = await getAllMatches();
         } catch (apiError) {
             console.error('⚠️ API call failed:', apiError);
-            // Hide section if API fails
             document.getElementById('other-matches-section').style.display = 'none';
             return;
         }
@@ -524,7 +523,6 @@ async function loadOtherLiveMatches() {
         
         console.log(`✅ Found ${otherLiveMatches.length} other live matches`);
         
-        // Rest of function stays exactly the same...
         if (otherLiveMatches.length === 0) {
             document.getElementById('other-matches-section').style.display = 'none';
             return;
@@ -533,24 +531,37 @@ async function loadOtherLiveMatches() {
         // Check which matches user has voted on
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         
-        // Enhance match data with hasVoted status
-        const enhancedMatches = otherLiveMatches.map(match => {
-            const userVote = userVotes[match.id];
-            const hasVoted = !!userVote;
-            
-            return {
-                ...match,
-                hasVoted: hasVoted,
-                competitor1: {
-                    ...match.competitor1,
-                    userVoted: hasVoted && userVote.songId === 'song1'
-                },
-                competitor2: {
-                    ...match.competitor2,
-                    userVoted: hasVoted && userVote.songId === 'song2'
-                }
-            };
-        });
+        // ✅ NEW: Transform match data to include song details
+        const enhancedMatches = await Promise.all(
+            otherLiveMatches.map(async (match) => {
+                const userVote = userVotes[match.id];
+                const hasVoted = !!userVote;
+                
+                // Get song data for both competitors
+                const song1Data = await getSongData(match.song1?.songId);
+                const song2Data = await getSongData(match.song2?.songId);
+                
+                return {
+                    ...match,
+                    hasVoted: hasVoted,
+                    competitor1: {
+                        name: song1Data?.title || match.song1?.name || 'Unknown Song',
+                        hashtag: song1Data?.hashtag || match.song1?.hashtag || '#unknown',
+                        votes: match.song1?.votes || 0,
+                        percentage: match.song1?.percentage || 50,
+                        userVoted: hasVoted && userVote.songId === 'song1'
+                    },
+                    competitor2: {
+                        name: song2Data?.title || match.song2?.name || 'Unknown Song',
+                        hashtag: song2Data?.hashtag || match.song2?.hashtag || '#unknown',
+                        votes: match.song2?.votes || 0,
+                        percentage: match.song2?.percentage || 50,
+                        userVoted: hasVoted && userVote.songId === 'song2'
+                    },
+                    totalVotes: match.totalVotes || 0
+                };
+            })
+        );
         
         // Render match cards
         const grid = document.getElementById('other-matches-grid');
@@ -568,7 +579,6 @@ async function loadOtherLiveMatches() {
         
     } catch (error) {
         console.error('❌ Error loading other matches:', error);
-        // Hide section on error
         document.getElementById('other-matches-section').style.display = 'none';
     }
 }
