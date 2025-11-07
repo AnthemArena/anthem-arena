@@ -414,6 +414,10 @@ function hideFeaturedSection() {
 // DISPLAY FEATURED MATCH (VIEW-ONLY)
 // ========================================
 
+// ========================================
+// DISPLAY FEATURED MATCH (VIEW-ONLY)
+// ========================================
+
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
@@ -425,15 +429,23 @@ function displayFeaturedMatch() {
         return;
     }
     
-    // Update vote counts
+    // ✅ CHECK IF USER HAS VOTED
+    const userHasVoted = hasUserVoted(currentMatch.matchId || currentMatch.id);
+    const userVotedSongId = userHasVoted ? getUserVotedSongId(currentMatch.matchId || currentMatch.id) : null;
+    
+    // Update vote counts (only if user voted)
     voteState.leftVotes = song1.votes || 0;
     voteState.rightVotes = song2.votes || 0;
     voteState.totalVotes = currentMatch.totalVotes || 0;
     
-    // Update subtitle
+    // ✅ UPDATE SUBTITLE - Hide vote count until user votes
     const subtitle = document.querySelector('.featured-matchup .section-subtitle');
     if (subtitle) {
-        subtitle.textContent = `${voteState.totalVotes.toLocaleString()} votes • 🔴 Live Now`;
+        if (userHasVoted) {
+            subtitle.textContent = `${voteState.totalVotes.toLocaleString()} votes • 🔴 Live Now`;
+        } else {
+            subtitle.textContent = `🔴 Live Now • Vote to see results`;
+        }
     }
 
     // Add countdown timer if exists
@@ -458,13 +470,13 @@ function displayFeaturedMatch() {
         }
     }
 
-    // Render competitor layout (VIEW-ONLY - no voting buttons)
+    // ✅ RENDER COMPETITOR LAYOUT WITH CONDITIONAL VOTE DISPLAY
     const grid = document.querySelector('.competitors-grid');
     if (!grid) return;
     
     grid.innerHTML = `
         <!-- Left Competitor -->
-        <div class="competitor-column" data-side="left">
+        <div class="competitor-column" data-side="left" ${userHasVoted && userVotedSongId === 'song1' ? 'data-user-voted="true"' : ''}>
             <div class="competitor-header">
                 <span class="seed-badge">Seed #${song1.seed}</span>
                 <h3 class="competitor-name">${song1.shortTitle || song1.title}</h3>
@@ -482,11 +494,11 @@ function displayFeaturedMatch() {
                 </div>
             </div>
             
-            <div class="vote-section">
+            <div class="vote-section" ${!userHasVoted ? 'style="opacity: 0; pointer-events: none;"' : ''}>
                 <div class="vote-percentage">
-                    <span class="percentage-number">${calculatePercentage(voteState.leftVotes)}%</span>
+                    <span class="percentage-number">${userHasVoted ? calculatePercentage(voteState.leftVotes) : '—'}%</span>
                 </div>
-                <p class="vote-count">${voteState.leftVotes.toLocaleString()} votes</p>
+                <p class="vote-count">${userHasVoted ? voteState.leftVotes.toLocaleString() : '—'} votes</p>
             </div>
         </div>
         
@@ -498,7 +510,7 @@ function displayFeaturedMatch() {
         </div>
         
         <!-- Right Competitor -->
-        <div class="competitor-column" data-side="right">
+        <div class="competitor-column" data-side="right" ${userHasVoted && userVotedSongId === 'song2' ? 'data-user-voted="true"' : ''}>
             <div class="competitor-header">
                 <span class="seed-badge">Seed #${song2.seed}</span>
                 <h3 class="competitor-name">${song2.shortTitle || song2.title}</h3>
@@ -516,46 +528,43 @@ function displayFeaturedMatch() {
                 </div>
             </div>
             
-            <div class="vote-section">
+            <div class="vote-section" ${!userHasVoted ? 'style="opacity: 0; pointer-events: none;"' : ''}>
                 <div class="vote-percentage">
-                    <span class="percentage-number">${calculatePercentage(voteState.rightVotes)}%</span>
+                    <span class="percentage-number">${userHasVoted ? calculatePercentage(voteState.rightVotes) : '—'}%</span>
                 </div>
-                <p class="vote-count">${voteState.rightVotes.toLocaleString()} votes</p>
+                <p class="vote-count">${userHasVoted ? voteState.rightVotes.toLocaleString() : '—'} votes</p>
             </div>
         </div>
     `;
     
-// ✅ CHECK IF USER VOTED
-const userHasVoted = hasUserVoted(currentMatch.matchId || currentMatch.id);
-const userVotedSongId = userHasVoted ? getUserVotedSongId(currentMatch.matchId || currentMatch.id) : null;
+    // ✅ SHOW DIFFERENT CTA BASED ON VOTE STATUS
+    const ctaButton = document.createElement('div');
+    ctaButton.className = 'featured-cta';
 
-// ✅ SHOW DIFFERENT CTA BASED ON VOTE STATUS
-const ctaButton = document.createElement('div');
-ctaButton.className = 'featured-cta';
-
-if (userHasVoted) {
-    // ✅ FIX: Compare userVotedSongId against "song1" or "song2", not song IDs
-    const votedSongName = userVotedSongId === 'song1'
-        ? (song1.shortTitle || song1.title)
-        : (song2.shortTitle || song2.title);
+    if (userHasVoted) {
+        // ✅ User voted - show which song they voted for
+        const votedSongName = userVotedSongId === 'song1'
+            ? (song1.shortTitle || song1.title)
+            : (song2.shortTitle || song2.title);
+        
+        ctaButton.innerHTML = `
+            <div class="featured-voted-message">
+                <span class="voted-icon">✓</span>
+                <span class="voted-text">You voted for <strong>${votedSongName}</strong></span>
+            </div>
+            <a href="vote?match=${currentMatch.id}" class="view-results-btn">
+                📊 View Full Results
+            </a>
+        `;
+    } else {
+        // ✅ User hasn't voted - show "Cast Your Vote" button
+        ctaButton.innerHTML = `
+            <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
+                🎵 Cast Your Vote
+            </a>
+        `;
+    }
     
-    ctaButton.innerHTML = `
-        <div class="featured-voted-message">
-            <span class="voted-icon">✓</span>
-            <span class="voted-text">You voted for <strong>${votedSongName}</strong></span>
-        </div>
-        <a href="vote?match=${currentMatch.id}" class="view-results-btn">
-            📊 View Full Results
-        </a>
-    `;
-} else {
-    // User hasn't voted - show "Cast Your Vote" button
-    ctaButton.innerHTML = `
-        <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
-            🎵 Cast Your Vote
-        </a>
-    `;
-}
     ctaButton.style.cssText = `
         text-align: center;
         margin-top: 2rem;
@@ -564,8 +573,10 @@ if (userHasVoted) {
     
     grid.parentElement.appendChild(ctaButton);
     
-    // Highlight leading competitor
-    updateLeadingVisuals();
+    // ✅ ONLY update leading visuals if user has voted
+    if (userHasVoted) {
+        updateLeadingVisuals();
+    }
 }
 
 function calculatePercentage(votes) {
@@ -764,6 +775,10 @@ function showNoResultsMessage() {
 // CONVERT FIREBASE MATCH TO DISPLAY FORMAT
 // ========================================
 
+// ========================================
+// CONVERT FIREBASE MATCH TO DISPLAY FORMAT
+// ========================================
+
 function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, userVotedSongId = null) {
     const totalVotes = firebaseMatch.totalVotes || 0;
     const song1Votes = firebaseMatch.song1?.votes || 0;
@@ -777,6 +792,9 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
         userVotedSongId = getUserVotedSongId(firebaseMatch.matchId);
     }
     
+    // ✅ ONLY show leading status if user has voted
+    const showLeading = hasVoted;
+    
     return {
         id: firebaseMatch.matchId || firebaseMatch.id,
         tournament: 'Anthems Arena Championship',
@@ -785,7 +803,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
         date: firebaseMatch.date || '2025-11-01',
         totalVotes: totalVotes,
         timeLeft: firebaseMatch.status === 'live' ? 'Voting Open' : 'Not Started',
-        hasVoted: hasVoted, // ✅ Pass this to match card
+        hasVoted: hasVoted,
         competitor1: {
             seed: firebaseMatch.song1.seed,
             name: firebaseMatch.song1.shortTitle || firebaseMatch.song1.title,
@@ -794,8 +812,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song1Votes,
             percentage: song1Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
-            leading: song1Votes > song2Votes && totalVotes > 0,
-            userVoted: userVotedSongId === firebaseMatch.song1.id // ✅ Mark user's choice
+            leading: showLeading && song1Votes > song2Votes && totalVotes > 0, // ✅ Only show if voted
+            userVoted: userVotedSongId === firebaseMatch.song1.id
         },
         competitor2: {
             seed: firebaseMatch.song2.seed,
@@ -805,8 +823,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song2Votes,
             percentage: song2Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
-            leading: song2Votes > song1Votes && totalVotes > 0,
-            userVoted: userVotedSongId === firebaseMatch.song2.id // ✅ Mark user's choice
+            leading: showLeading && song2Votes > song1Votes && totalVotes > 0, // ✅ Only show if voted
+            userVoted: userVotedSongId === firebaseMatch.song2.id
         }
     };
 }

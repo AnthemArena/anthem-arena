@@ -11,22 +11,30 @@ export const RANK_SYSTEM = {
         { level: 1, xpNeeded: 0, title: '🎵 New Voter' },
         { level: 2, xpNeeded: 100, title: '🎶 Music Fan' },
         { level: 3, xpNeeded: 250, title: '🎧 Enthusiast' },
-        { level: 4, xpNeeded: 500, title: '🎸 Dedicated Supporter' },
+        { level: 4, xpNeeded: 500, title: '🎸 Dedicated Fan' },          // ✅ Shortened
         { level: 5, xpNeeded: 1000, title: '🎭 Tournament Regular' },
         { level: 6, xpNeeded: 1750, title: '🔥 Power Voter' },
         { level: 7, xpNeeded: 3000, title: '⭐ Super Fan' },
         { level: 8, xpNeeded: 5000, title: '👑 Elite Voter' },
         { level: 9, xpNeeded: 8000, title: '💎 Legend' },
-        { level: 10, xpNeeded: 12000, title: '🏆 Anthem Arena Champion' }
+        { level: 10, xpNeeded: 12000, title: '🏆 Arena Champion' }       // ✅ Shortened
     ],
     
     xpSources: {
-        vote: 10,                    // Base XP per vote
-        firstVoteOfDay: 25,          // Bonus for first vote each day
-        votingStreakDaily: 15,       // Bonus per day of active streak
-        underdogPick: 5,             // Bonus for voting underdog (lower seed)
-        closeMatch: 10,              // Bonus for voting in close match
-        firstVoteInMatch: 5          // Early voter bonus (first 10 votes)
+        vote: 10,
+        firstVoteOfDay: 25,
+        votingStreakDaily: 15,
+        underdogPick: 5,
+        closeMatch: 10,
+        firstVoteInMatch: 5
+    },
+    
+    // ✅ NEW: Tier groupings
+    tiers: {
+        BRONZE: { levels: [1, 2, 3], color: '#CD7F32', label: 'Bronze' },
+        SILVER: { levels: [4, 5, 6], color: '#C0C0C0', label: 'Silver' },
+        GOLD: { levels: [7, 8], color: '#FFD700', label: 'Gold' },
+        LEGEND: { levels: [9, 10], color: '#C8AA6E', label: 'Legendary' }
     }
 };
 
@@ -68,9 +76,11 @@ export function calculateUserXP(allVotes) {
         votedMatches.add(vote.matchId);
     });
     
-    // Voting streak bonus (from localStorage)
-    const streak = parseInt(localStorage.getItem('votingStreak') || '0');
-    totalXP += streak * RANK_SYSTEM.xpSources.votingStreakDaily;
+// Voting streak bonus (CAPPED at 10 days)
+const streak = parseInt(localStorage.getItem('votingStreak') || '0');
+const MAX_STREAK_BONUS = 10;
+const cappedStreak = Math.min(streak, MAX_STREAK_BONUS);
+totalXP += cappedStreak * RANK_SYSTEM.xpSources.votingStreakDaily;
     
     return {
         totalXP,

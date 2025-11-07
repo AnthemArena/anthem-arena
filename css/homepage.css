@@ -3324,22 +3324,7 @@ button {
     box-shadow: 0 6px 25px rgba(16, 185, 129, 0.25);
 }
 
-/* Optional: Add a small "Voted" indicator badge */
-.match-card.user-voted::after {
-    content: '✓ Voted';
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
+
 
 /* Make sure match card has position relative for the badge */
 .match-card {
@@ -3441,4 +3426,16 @@ button {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+/* Optional: Make header badge match the smaller style */
+.match-header .voted-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}
+/* Hidden vote section before user votes */
+.vote-section[style*="opacity: 0"] .percentage-number,
+.vote-section[style*="opacity: 0"] .vote-count {
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
 }
