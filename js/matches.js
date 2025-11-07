@@ -185,6 +185,8 @@ const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 
 // 🔧 NORMALIZE TOURNAMENT NAME
 const tournamentName = match.tournament || 'Anthem Arena Championship S1';
 
+// Inside the forEach loop where you push to allMatches:
+
 // ✅ CHECK IF USER VOTED
 const hasVoted = hasUserVoted(match.matchId);
 const userVotedSongId = hasVoted ? getUserVotedSongId(match.matchId) : null;
@@ -197,7 +199,7 @@ allMatches.push({
     date: match.date || '2025-11-01',
     totalVotes: totalVotes,
     timeLeft: match.status === 'live' ? 'Voting Open' : 'Not Started',
-    hasVoted: hasVoted, // ✅ Add this
+    hasVoted: hasVoted,
     competitor1: {
         seed: match.song1.seed,
         name: match.song1.shortTitle,
@@ -206,8 +208,8 @@ allMatches.push({
         votes: song1Votes,
         percentage: song1Percentage,
         winner: match.winnerId === match.song1.id,
-        leading: song1Votes > song2Votes && totalVotes > 0,
-        userVoted: userVotedSongId === match.song1.id // ✅ Add this
+        leading: userVotedSongId === 'song1', // ✅ Green glow = user's vote
+        userVoted: userVotedSongId === 'song1'
     },
     competitor2: {
         seed: match.song2.seed,
@@ -217,8 +219,8 @@ allMatches.push({
         votes: song2Votes,
         percentage: song2Percentage,
         winner: match.winnerId === match.song2.id,
-        leading: song2Votes > song1Votes && totalVotes > 0,
-        userVoted: userVotedSongId === match.song2.id // ✅ Add this
+        leading: userVotedSongId === 'song2', // ✅ Green glow = user's vote
+        userVoted: userVotedSongId === 'song2'
     }
 });
         });

@@ -418,6 +418,10 @@ function hideFeaturedSection() {
 // DISPLAY FEATURED MATCH (VIEW-ONLY)
 // ========================================
 
+// ========================================
+// DISPLAY FEATURED MATCH (VIEW-ONLY)
+// ========================================
+
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
@@ -537,9 +541,9 @@ function displayFeaturedMatch() {
         </div>
     `;
     
-    // ✅ SHOW DIFFERENT CTA BASED ON VOTE STATUS
+    // ✅ CREATE CTA BUTTON AND INSERT AFTER VIDEOS (BEFORE VOTE SECTIONS)
     const ctaButton = document.createElement('div');
-    ctaButton.className = 'featured-cta';
+    ctaButton.className = 'featured-cta-inline';
 
     if (userHasVoted) {
         // ✅ User voted - show which song they voted for
@@ -559,19 +563,14 @@ function displayFeaturedMatch() {
     } else {
         // ✅ User hasn't voted - show "Cast Your Vote" button
         ctaButton.innerHTML = `
-            <a href="vote?match=${currentMatch.id}" class="vote-now-btn">
+            <a href="vote?match=${currentMatch.id}" class="vote-now-btn-inline">
                 🎵 Cast Your Vote
             </a>
         `;
     }
     
-    ctaButton.style.cssText = `
-        text-align: center;
-        margin-top: 2rem;
-        padding: 2rem 0;
-    `;
-    
-    grid.parentElement.appendChild(ctaButton);
+    // ✅ Insert CTA button into the grid (spans all 3 columns)
+    grid.appendChild(ctaButton);
     
     // ✅ ONLY update leading visuals if user has voted
     if (userHasVoted) {
@@ -779,6 +778,10 @@ function showNoResultsMessage() {
 // CONVERT FIREBASE MATCH TO DISPLAY FORMAT
 // ========================================
 
+// ========================================
+// CONVERT FIREBASE MATCH TO DISPLAY FORMAT
+// ========================================
+
 function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, userVotedSongId = null) {
     const totalVotes = firebaseMatch.totalVotes || 0;
     const song1Votes = firebaseMatch.song1?.votes || 0;
@@ -791,9 +794,6 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
     if (!userVotedSongId && hasVoted) {
         userVotedSongId = getUserVotedSongId(firebaseMatch.matchId);
     }
-    
-    // ✅ ONLY show leading status if user has voted
-    const showLeading = hasVoted;
     
     return {
         id: firebaseMatch.matchId || firebaseMatch.id,
@@ -812,8 +812,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song1Votes,
             percentage: song1Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
-            leading: showLeading && song1Votes > song2Votes && totalVotes > 0, // ✅ Only show if voted
-            userVoted: userVotedSongId === firebaseMatch.song1.id
+            leading: userVotedSongId === 'song1', // ✅ Green glow = user's vote, not who's winning
+            userVoted: userVotedSongId === 'song1'
         },
         competitor2: {
             seed: firebaseMatch.song2.seed,
@@ -823,8 +823,8 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song2Votes,
             percentage: song2Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
-            leading: showLeading && song2Votes > song1Votes && totalVotes > 0, // ✅ Only show if voted
-            userVoted: userVotedSongId === firebaseMatch.song2.id
+            leading: userVotedSongId === 'song2', // ✅ Green glow = user's vote, not who's winning
+            userVoted: userVotedSongId === 'song2'
         }
     };
 }

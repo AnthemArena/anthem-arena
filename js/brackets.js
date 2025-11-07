@@ -401,6 +401,7 @@ function createMatchCardFromFirebase(match) {
 
     // ✅ Check if user voted
     const userHasVoted = checkUserVoted(match.matchId);
+    const userVotedSongId = userHasVoted ? getUserVotedSongId(match.matchId) : null;
 
     const totalVotes = match.totalVotes || 0;
     const song1Votes = match.song1?.votes || 0;
@@ -411,6 +412,10 @@ function createMatchCardFromFirebase(match) {
 
     const isWinner1 = isCompleted && match.winnerId === match.song1.id;
     const isWinner2 = isCompleted && match.winnerId === match.song2.id;
+
+    // ✅ Green glow shows user's voted song
+    const userVotedSong1 = userVotedSongId === 'song1';
+    const userVotedSong2 = userVotedSongId === 'song2';
 
     const song1Thumbnail = song1IsTBD ? '' : `https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg`;
     const song2Thumbnail = song2IsTBD ? '' : `https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg`;
@@ -425,7 +430,7 @@ function createMatchCardFromFirebase(match) {
             
             <div class="matchup-competitors">
                 <!-- Song 1 -->
-                <div class="competitor ${isWinner1 ? 'winner' : ''} ${song1Votes > song2Votes && totalVotes > 0 ? 'leading' : ''}">
+                <div class="competitor ${isWinner1 ? 'winner' : ''} ${userVotedSong1 ? 'leading' : ''}">
                     ${song1IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song1Thumbnail}" alt="${match.song1.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
@@ -441,7 +446,7 @@ function createMatchCardFromFirebase(match) {
                 </div>
 
                 <!-- Song 2 -->
-                <div class="competitor ${isWinner2 ? 'winner' : ''} ${song2Votes > song1Votes && totalVotes > 0 ? 'leading' : ''}">
+                <div class="competitor ${isWinner2 ? 'winner' : ''} ${userVotedSong2 ? 'leading' : ''}">
                     ${song2IsTBD ? `<div class="song-thumbnail tbd"></div>` : `
                         <img src="${song2Thumbnail}" alt="${match.song2.shortTitle}" class="song-thumbnail" loading="lazy">
                     `}
@@ -475,6 +480,15 @@ function createMatchCardFromFirebase(match) {
 </div>
         </div>
     `;
+}
+
+// ========================================
+// HELPER: GET WHICH SONG USER VOTED FOR
+// ========================================
+
+function getUserVotedSongId(matchId) {
+    const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${matchId}`);
+    return userVote; // Returns 'song1' or 'song2'
 }
 
 

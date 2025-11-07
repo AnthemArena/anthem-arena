@@ -535,6 +535,7 @@ async function loadOtherLiveMatches() {
         const enhancedMatches = otherLiveMatches.map(match => {
             const userVote = userVotes[match.id];
             const hasVoted = !!userVote;
+            const userVotedSongId = hasVoted ? userVote.songId : null; // ✅ Get which song
             
             // Calculate vote percentages
             const totalVotes = match.totalVotes || 0;
@@ -561,7 +562,7 @@ async function loadOtherLiveMatches() {
                     votes: song1Votes,
                     percentage: song1Percentage,
                     winner: false,
-                    leading: song1Votes > song2Votes && totalVotes > 0,
+                    leading: userVotedSongId === 'song1', // ✅ Green glow = user's vote
                     userVoted: hasVoted && userVote.songId === 'song1'
                 },
                 competitor2: {
@@ -572,7 +573,7 @@ async function loadOtherLiveMatches() {
                     votes: song2Votes,
                     percentage: song2Percentage,
                     winner: false,
-                    leading: song2Votes > song1Votes && totalVotes > 0,
+                    leading: userVotedSongId === 'song2', // ✅ Green glow = user's vote
                     userVoted: hasVoted && userVote.songId === 'song2'
                 }
             };

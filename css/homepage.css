@@ -3439,3 +3439,84 @@ button {
     color: rgba(255, 255, 255, 0.3);
     font-style: italic;
 }
+/* ========================================
+   FEATURED CTA - INLINE BELOW VIDEOS
+======================================== */
+
+.featured-cta-inline {
+    grid-column: 1 / -1; /* Span all 3 columns */
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vote-now-btn-inline {
+    width: 100%;
+    max-width: 600px;
+    padding: 1.25rem 2rem;
+    background: linear-gradient(135deg, #C8AA6E, #b49a5e);
+    color: #0a0a0a;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.3);
+    border: 2px solid rgba(200, 170, 110, 0.5);
+}
+
+.vote-now-btn-inline:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(200, 170, 110, 0.5);
+    background: linear-gradient(135deg, #d4b67a, #c0a66a);
+}
+
+.featured-voted-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.voted-icon {
+    font-size: 1.5rem;
+    color: #4ade80;
+}
+
+.view-results-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(180, 154, 94, 0.2));
+    color: #C8AA6E;
+    text-decoration: none;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid rgba(200, 170, 110, 0.4);
+    transition: all 0.3s ease;
+}
+
+.view-results-btn:hover {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(180, 154, 94, 0.3));
+    border-color: rgba(200, 170, 110, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .vote-now-btn-inline {
+        font-size: 1.1rem;
+        padding: 1rem 1.5rem;
+    }
+}
