@@ -6,7 +6,7 @@
 // ========================================
 
 // API Client (uses Netlify Edge cache for reads)
-import { getMatch, submitVote as submitVoteToAPI } from './api-client.js';
+import { getMatch, submitVote as submitVoteToAPI, getAllMatches } from './api-client.js';
 
 // Firebase
 import { db } from './firebase-config.js';
@@ -498,9 +498,7 @@ async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
         
-        // Fetch all matches from API (cached)
-        const response = await fetch('/.netlify/functions/get-matches');
-        const allMatches = await response.json();
+      
         
         // Filter: only live matches, exclude current match
         const otherLiveMatches = allMatches.filter(match => 
