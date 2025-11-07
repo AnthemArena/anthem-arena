@@ -9,6 +9,8 @@ import { db } from './firebase-config.js';
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🧭 Navigation DOMContentLoaded fired');
+    
     const navHTML = `
     <nav class="main-nav">
         <div class="nav-container">
@@ -48,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     
     document.getElementById('nav-placeholder').innerHTML = navHTML;
+    console.log('✅ Navigation HTML injected');
     
     // Auto-highlight current page
     const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
@@ -97,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ✅ LOAD RANK DISPLAY
+    console.log('🎯 Calling updateNavRank...');
     updateNavRank();
 });
 
@@ -108,24 +112,38 @@ async function updateNavRank() {
     const navRankContainer = document.getElementById('navRankContainer');
     const navRank = document.getElementById('navRankMini');
     
-    if (!navRank || !navRankContainer) return;
+    console.log('🔍 === RANK DEBUG START ===');
+    console.log('Container exists:', !!navRankContainer);
+    console.log('Rank element exists:', !!navRank);
+    
+    if (!navRank || !navRankContainer) {
+        console.error('❌ Rank elements not found in DOM');
+        return;
+    }
     
     try {
         // Get user ID
         const userId = localStorage.getItem('voterId');
+        console.log('User ID:', userId);
+        
         if (!userId) {
+            console.warn('⚠️ No voter ID found');
             navRankContainer.style.display = 'none';
             return;
         }
         
         // Try to get cached XP first (for instant display)
         const cachedXP = getUserXPFromStorage();
+        console.log('Cached XP:', cachedXP);
+        
         if (cachedXP > 0) {
+            console.log('✅ Displaying cached rank');
             displayRank(cachedXP);
-            navRankContainer.style.display = 'block';
+            navRankContainer.style.display = 'flex';  // ✅ Changed to 'flex'
         }
         
         // Then fetch real data from Firebase
+        console.log('📡 Fetching votes from Firebase...');
         const votesRef = collection(db, 'votes');
         const userVotesQuery = query(
             votesRef,
@@ -134,8 +152,10 @@ async function updateNavRank() {
         );
         
         const snapshot = await getDocs(userVotesQuery);
+        console.log('Votes found:', snapshot.size);
         
         if (snapshot.empty) {
+            console.warn('⚠️ No votes found for user');
             navRankContainer.style.display = 'none';
             return;
         }
@@ -145,18 +165,25 @@ async function updateNavRank() {
             ...doc.data()
         }));
         
+        console.log('All votes:', allVotes);
+        
         // Calculate XP and rank
         const xpData = calculateUserXP(allVotes);
+        console.log('XP Data:', xpData);
         
         // Update display
         displayRank(xpData.totalXP);
-        navRankContainer.style.display = 'block';
+        navRankContainer.style.display = 'flex';  // ✅ Changed to 'flex'
         
         // Save to localStorage for faster subsequent loads
         localStorage.setItem('userTotalXP', xpData.totalXP.toString());
         
+        console.log('✅ Rank display updated successfully');
+        console.log('🔍 === RANK DEBUG END ===');
+        
     } catch (error) {
-        console.error('Error updating nav rank:', error);
+        console.error('❌ Error updating nav rank:', error);
+        console.error('Error details:', error.message);
         navRankContainer.style.display = 'none';
     }
 }
