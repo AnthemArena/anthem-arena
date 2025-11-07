@@ -19,14 +19,15 @@ export function createMatchCard(match) {
         ? `https://img.youtube.com/vi/${match.competitor2.videoId}/mqdefault.jpg`
         : '';
 
-    return `
+    const cardHTML = `
         <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
              data-tournament="${match.tournament}" 
              data-round="${match.round}" 
              data-status="${match.status}"
              data-match-id="${match.id}"
              data-date="${match.date || ''}"
-             data-match-title="${match.competitor1.name} vs ${match.competitor2.name}">
+             data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
+             style="cursor: pointer;">
         <div class="match-header">
     <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
     <span class="match-round">${formatRoundName(match.round)}</span>
@@ -52,7 +53,6 @@ export function createMatchCard(match) {
                     <div class="competitor-result">
                         ${showPercentages ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
-                            ${match.competitor1.userVoted ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
                         ` : match.status === 'completed' ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
                             ${getResultBadge(match.competitor1, match.status)}
@@ -77,7 +77,6 @@ export function createMatchCard(match) {
                     <div class="competitor-result">
                         ${showPercentages ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
-                            ${match.competitor2.userVoted ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
                         ` : match.status === 'completed' ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
                             ${getResultBadge(match.competitor2, match.status)}
@@ -89,6 +88,22 @@ export function createMatchCard(match) {
             ${footerContent}
         </div>
     `;
+
+    // ✅ Create element and add click handler
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = cardHTML;
+    const card = wrapper.firstElementChild;
+    
+    // ✅ Make entire card clickable
+    card.addEventListener('click', (e) => {
+        // Don't navigate if clicking directly on a button (let button handlers fire)
+        if (e.target.closest('button')) return;
+        
+        // Navigate to vote page
+        window.location.href = `/vote.html?match=${match.id}`;
+    });
+    
+    return card;
 }
 
 // Helper functions
@@ -150,16 +165,15 @@ function getFooterContent(match) {
     
     statsHtml += '</div>';
 
-
     let buttonHtml = '';
     if (match.status === 'completed') {
-        buttonHtml = `<button class="view-details-btn" onclick="showMatchDetails('${match.id}')"><i class="fas fa-eye"></i> View Details</button>`;
+        buttonHtml = `<button class="view-details-btn"><i class="fas fa-eye"></i> View Details</button>`;
     } else if (match.status === 'live') {
         // ✅ Check if user voted
         if (match.hasVoted) {
-            buttonHtml = `<button class="view-results-btn voted" onclick="voteNow('${match.id}')"><i class="fas fa-check-circle"></i> View Results</button>`;
+            buttonHtml = `<button class="view-results-btn voted"><i class="fas fa-check-circle"></i> View Results</button>`;
         } else {
-            buttonHtml = `<button class="vote-now-btn" onclick="voteNow('${match.id}')"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
+            buttonHtml = `<button class="vote-now-btn"><i class="fas fa-vote-yea"></i> Vote Now</button>`;
         }
     } else if (match.status === 'upcoming') {
         const timeUntil = getTimeUntilMatch(match.date);
