@@ -1154,8 +1154,8 @@ async function submitVote(songId) {
         const songName = votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name;
         const songData = allSongsData.find(s => s.seed === songSeed);
         
-        // First reload to update counts immediately
-        await reloadMatchData();
+      // Reload with cache bypass to get fresh vote count
+        await reloadMatchData(true);
         
         // Show success notification
         showNotification(`✅ Vote cast for "${songName}"!`, 'success');
@@ -1163,28 +1163,16 @@ async function submitVote(songId) {
         // Show voted indicator
         disableVoting(songId);
 
-        // ✨ Wait for cache to update, then show modal with accurate vote counts
-        setTimeout(async () => {
-            console.log('🔄 Reloading match data for modal (BYPASSING CACHE)...');
-            
-            // Force a second reload with cache bypass to get fresh data from Firebase
-            await reloadMatchData(true);
-            
-            // ✅ FIX: Update the UI elements again with fresh data
-            updateVoteCountsUI();
-            
-            console.log('📊 Modal will show:');
-            console.log('   Total votes:', currentMatch.totalVotes);
-            console.log('   Song 1:', currentMatch.competitor1.percentage + '%', currentMatch.competitor1.votes, 'votes');
-            console.log('   Song 2:', currentMatch.competitor2.percentage + '%', currentMatch.competitor2.votes, 'votes');
-            
-            // ✅ NEW: Pass XP data to modal
-            showPostVoteModal(songName, songData, xpData, rank);
+                // Update UI with fresh vote count
+        updateVoteCountsUI();
 
-                // ✅ NEW: Load other live matches below
-    await loadOtherLiveMatches();
+        // Show modal with correct numbers
+        showPostVoteModal(songName, songData, xpData, rank);
 
-        }, 2000);
+        // Load other live matches
+        await loadOtherLiveMatches();
+
+       
 
         console.log('✅ Vote submitted successfully!');
         

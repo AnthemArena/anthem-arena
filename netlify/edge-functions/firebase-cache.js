@@ -3,7 +3,7 @@
 // Caches Firebase data at CDN edge for 5 minutes
 // ========================================
 
-const CACHE_DURATION = 300; // 5 minutes in seconds
+const CACHE_DURATION = 30; // 30 seconds
 const FIREBASE_PROJECT = "league-music-tournament";
 const TOURNAMENT = "2025-worlds-anthems";
 
