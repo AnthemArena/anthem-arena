@@ -14,7 +14,9 @@ import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/f
     import { checkGlobalNotificationStatus } from './global-notifications.js';
     // ✅ ADD THESE IMPORTS
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
-import { updateNavRank } from './nav.js';
+import { updateNavRank } from './navigation.js';  // ✅ Match actual filename
+// At the top of vote.js, add:
+import { createMatchCard } from './match-card-renderer.js';
 
 
     // ✅ ADD THIS LINE:
@@ -494,8 +496,7 @@ async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
         
-        // Import the match card renderer
-        const { createMatchCard } = await import('./match-card-renderer.js');
+        
         
         // Fetch all matches from API (cached)
         const response = await fetch('/.netlify/functions/get-matches');
