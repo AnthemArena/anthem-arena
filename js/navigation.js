@@ -123,7 +123,7 @@ async function updateNavRank() {
     
     try {
         // Get user ID
-        const userId = localStorage.getItem('voterId');
+const userId = localStorage.getItem('tournamentUserId');
         console.log('User ID:', userId);
         
         if (!userId) {
