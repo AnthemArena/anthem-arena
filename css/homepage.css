@@ -3590,3 +3590,52 @@ button {
         transform: scale(1.02) !important;
     }
 }
+/* ========================================
+   FEATURED MATCH WRAPPER STYLING
+   ======================================== */
+
+#featured-matchup {
+    margin-bottom: 4rem;
+}
+
+.featured-match-wrapper {
+    margin-top: 1.5rem;
+}
+
+.featured-match-wrapper .match-card {
+    transform: scale(1.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+    transition: all 0.3s ease;
+}
+
+.featured-match-wrapper .match-card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.featured-match-wrapper .match-header h3 {
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.featured-match-wrapper .status-badge {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .featured-match-wrapper .match-card {
+        transform: scale(1) !important;
+    }
+    
+    .featured-match-wrapper .match-card:hover {
+        transform: scale(1.02) !important;
+    }
+}

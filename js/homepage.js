@@ -396,7 +396,7 @@ function hashString(str) {
 }
 
 function hideFeaturedSection() {
-    const section = document.querySelector('.featured-matchup');
+    const section = document.getElementById('featured-matchup');
     if (section) section.style.display = 'none';
 }
 
@@ -405,10 +405,19 @@ function hideFeaturedSection() {
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
-    const featuredSection = document.getElementById('featured-match');
+    // ✅ Use the correct ID from HTML
+    const featuredSection = document.getElementById('featured-matchup');
     
     if (!featuredSection) {
         console.error('❌ Featured match section not found');
+        return;
+    }
+    
+    // ✅ Find the container inside the section
+    const container = featuredSection.querySelector('.container');
+    
+    if (!container) {
+        console.error('❌ Featured match container not found');
         return;
     }
     
@@ -420,10 +429,11 @@ function displayFeaturedMatch() {
     const matchData = convertFirebaseMatchToDisplayFormat(currentMatch, userHasVoted, userVotedSongId);
     
     // ✅ Render using existing match card component
-    featuredSection.innerHTML = `
+    container.innerHTML = `
         <div class="section-header">
-            <h2>🔥 Featured Match</h2>
-            <p>${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
+            <span class="section-label">🔥 Featured Match</span>
+            <h2 class="section-title">Match of the Day</h2>
+            <p class="section-subtitle">${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
         </div>
         <div class="featured-match-wrapper">
             ${createMatchCard(matchData)}
