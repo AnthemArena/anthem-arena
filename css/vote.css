@@ -1817,3 +1817,65 @@
         gap: 1rem;
     }
 }
+/* ========================================
+   OTHER LIVE MATCHES SECTION - FIXED GRID
+   ======================================== */
+
+.other-matches-section {
+    padding: 4rem 0;
+    background: linear-gradient(180deg, 
+        rgba(10, 15, 25, 0.8) 0%, 
+        rgba(15, 20, 30, 0.9) 100%);
+    border-top: 2px solid rgba(200, 170, 110, 0.2);
+}
+
+.other-matches-section .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.other-matches-section .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.other-matches-section .section-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Lora', serif;
+}
+
+/* ✅ FIX: Style the actual grid container used in votes.js */
+#other-matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 1200px) {
+    #other-matches-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .other-matches-section {
+        padding: 3rem 0;
+    }
+    
+    .other-matches-section .section-title {
+        font-size: 1.5rem;
+    }
+    
+    #other-matches-grid {
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+}
