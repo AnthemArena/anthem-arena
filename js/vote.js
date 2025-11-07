@@ -498,7 +498,23 @@ async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
         
-      
+        // ✅ Wrap in try-catch and provide fallback
+        let allMatches = [];
+        try {
+            allMatches = await getAllMatches();
+        } catch (apiError) {
+            console.error('⚠️ API call failed:', apiError);
+            // Hide section if API fails
+            document.getElementById('other-matches-section').style.display = 'none';
+            return;
+        }
+        
+        // ✅ Safety check
+        if (!allMatches || !Array.isArray(allMatches)) {
+            console.warn('⚠️ No matches returned from API');
+            document.getElementById('other-matches-section').style.display = 'none';
+            return;
+        }
         
         // Filter: only live matches, exclude current match
         const otherLiveMatches = allMatches.filter(match => 
@@ -508,7 +524,7 @@ async function loadOtherLiveMatches() {
         
         console.log(`✅ Found ${otherLiveMatches.length} other live matches`);
         
-        // If no other matches, hide the section
+        // Rest of function stays exactly the same...
         if (otherLiveMatches.length === 0) {
             document.getElementById('other-matches-section').style.display = 'none';
             return;
