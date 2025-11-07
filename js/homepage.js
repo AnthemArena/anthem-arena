@@ -400,204 +400,42 @@ function hideFeaturedSection() {
     if (section) section.style.display = 'none';
 }
 
-// ========================================
-// REAL-TIME VOTE POLLING
-// ========================================
 
-
-
-// ========================================
-// DISPLAY FEATURED MATCH
-// ========================================
-
-// ========================================
-// DISPLAY FEATURED MATCH (VIEW-ONLY)
-// ========================================
-
-// ========================================
-// DISPLAY FEATURED MATCH (VIEW-ONLY)
-// ========================================
-
-// ========================================
-// DISPLAY FEATURED MATCH (VIEW-ONLY)
-// ========================================
 
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
-    const song1 = currentMatch.song1;
-    const song2 = currentMatch.song2;
+    const featuredSection = document.getElementById('featured-match');
     
-    if (!song1 || !song2) {
-        console.error('❌ Songs not found in match data');
+    if (!featuredSection) {
+        console.error('❌ Featured match section not found');
         return;
     }
     
-    // ✅ CHECK IF USER HAS VOTED
+    // ✅ Check if user has voted
     const userHasVoted = hasUserVoted(currentMatch.matchId || currentMatch.id);
     const userVotedSongId = userHasVoted ? getUserVotedSongId(currentMatch.matchId || currentMatch.id) : null;
     
-    // Update vote counts (only if user voted)
-    voteState.leftVotes = song1.votes || 0;
-    voteState.rightVotes = song2.votes || 0;
-    voteState.totalVotes = currentMatch.totalVotes || 0;
+    // ✅ Convert to display format
+    const matchData = convertFirebaseMatchToDisplayFormat(currentMatch, userHasVoted, userVotedSongId);
     
-    // ✅ UPDATE SUBTITLE - Hide vote count until user votes
-    const subtitle = document.querySelector('.featured-matchup .section-subtitle');
-    if (subtitle) {
-        if (userHasVoted) {
-            subtitle.textContent = `${voteState.totalVotes.toLocaleString()} votes • 🔴 Live Now`;
-        } else {
-            subtitle.textContent = `🔴 Live Now • Vote to see results`;
-        }
-    }
-
-    // Add countdown timer if exists
-    if (currentMatch.endTime) {
-        const countdownContainer = document.createElement('p');
-        countdownContainer.className = 'featured-countdown';
-        countdownContainer.id = 'featured-countdown';
-        countdownContainer.style.cssText = `
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 1rem 0 2rem 0;
-            color: #ffaa00;
-        `;
-        
-        const titleSection = document.querySelector('.featured-matchup .section-header');
-        if (titleSection) {
-            titleSection.appendChild(countdownContainer);
-            setTimeout(() => {
-                startFeaturedCountdown(currentMatch.endTime);
-            }, 100);
-        }
-    }
-
-    // ✅ RENDER COMPETITOR LAYOUT WITH CONDITIONAL VOTE DISPLAY
-    const grid = document.querySelector('.competitors-grid');
-    if (!grid) return;
-    
-    grid.innerHTML = `
-        <!-- Left Competitor -->
-        <div class="competitor-column" data-side="left" ${userHasVoted && userVotedSongId === 'song1' ? 'data-user-voted="true"' : ''}>
-            <div class="competitor-header">
-                <span class="seed-badge">Seed #${song1.seed}</span>
-                <h3 class="competitor-name">${song1.shortTitle || song1.title}</h3>
-                <p class="competitor-source">${song1.artist}</p>
-            </div>
-            
-            <div class="video-container">
-                <div class="video-wrapper">
-                    <iframe 
-                        src="https://www.youtube.com/embed/${song1.videoId}?enablejsapi=1" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
-            
-            <div class="vote-section" ${!userHasVoted ? 'style="opacity: 0; pointer-events: none;"' : ''}>
-                <div class="vote-percentage">
-                    <span class="percentage-number">${userHasVoted ? calculatePercentage(voteState.leftVotes) : '—'}%</span>
-                </div>
-                <p class="vote-count">${userHasVoted ? voteState.leftVotes.toLocaleString() : '—'} votes</p>
-            </div>
+    // ✅ Render using existing match card component
+    featuredSection.innerHTML = `
+        <div class="section-header">
+            <h2>🔥 Featured Match</h2>
+            <p>${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
         </div>
-        
-        <!-- VS Divider -->
-        <div class="vs-divider">
-            <div class="vs-circle">
-                <span class="vs-text">VS</span>
-            </div>
-        </div>
-        
-        <!-- Right Competitor -->
-        <div class="competitor-column" data-side="right" ${userHasVoted && userVotedSongId === 'song2' ? 'data-user-voted="true"' : ''}>
-            <div class="competitor-header">
-                <span class="seed-badge">Seed #${song2.seed}</span>
-                <h3 class="competitor-name">${song2.shortTitle || song2.title}</h3>
-                <p class="competitor-source">${song2.artist}</p>
-            </div>
-            
-            <div class="video-container">
-                <div class="video-wrapper">
-                    <iframe 
-                        src="https://www.youtube.com/embed/${song2.videoId}?enablejsapi=1" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
-            
-            <div class="vote-section" ${!userHasVoted ? 'style="opacity: 0; pointer-events: none;"' : ''}>
-                <div class="vote-percentage">
-                    <span class="percentage-number">${userHasVoted ? calculatePercentage(voteState.rightVotes) : '—'}%</span>
-                </div>
-                <p class="vote-count">${userHasVoted ? voteState.rightVotes.toLocaleString() : '—'} votes</p>
-            </div>
+        <div class="featured-match-wrapper">
+            ${createMatchCard(matchData)}
         </div>
     `;
     
-    // ✅ CREATE CTA BUTTON AND INSERT AFTER VIDEOS (BEFORE VOTE SECTIONS)
-    const ctaButton = document.createElement('div');
-    ctaButton.className = 'featured-cta-inline';
-
-    if (userHasVoted) {
-        // ✅ User voted - show which song they voted for
-        const votedSongName = userVotedSongId === 'song1'
-            ? (song1.shortTitle || song1.title)
-            : (song2.shortTitle || song2.title);
-        
-        ctaButton.innerHTML = `
-            <div class="featured-voted-message">
-                <span class="voted-icon">✓</span>
-                <span class="voted-text">You voted for <strong>${votedSongName}</strong></span>
-            </div>
-            <a href="vote?match=${currentMatch.id}" class="view-results-btn">
-                📊 View Full Results
-            </a>
-        `;
-    } else {
-        // ✅ User hasn't voted - show "Cast Your Vote" button
-        ctaButton.innerHTML = `
-            <a href="vote?match=${currentMatch.id}" class="vote-now-btn-inline">
-                🎵 Cast Your Vote
-            </a>
-        `;
-    }
+    featuredSection.style.display = 'block';
     
-    // ✅ Insert CTA button into the grid (spans all 3 columns)
-    grid.appendChild(ctaButton);
-    
-    // ✅ ONLY update leading visuals if user has voted
-    if (userHasVoted) {
-        updateLeadingVisuals();
-    }
+    console.log('✅ Featured match rendered');
 }
 
-function calculatePercentage(votes) {
-    if (voteState.totalVotes === 0) return 50;
-    return Math.round((votes / voteState.totalVotes) * 100);
-}
 
-function updateLeadingVisuals() {
-    const leftCol = document.querySelector('.competitor-column[data-side="left"]');
-    const rightCol = document.querySelector('.competitor-column[data-side="right"]');
-    
-    if (!leftCol || !rightCol) return;
-    
-    leftCol.removeAttribute('data-leading');
-    rightCol.removeAttribute('data-leading');
-    
-    if (voteState.leftVotes > voteState.rightVotes) {
-        leftCol.setAttribute('data-leading', 'true');
-    } else if (voteState.rightVotes > voteState.leftVotes) {
-        rightCol.setAttribute('data-leading', 'true');
-    }
-}
 
 // ========================================
 // LOADING STATE HELPERS

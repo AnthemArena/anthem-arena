@@ -2958,7 +2958,7 @@ button {
 /* For very large screens, allow 3 columns max */
 @media (min-width: 1600px) {
     .matches-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -3518,5 +3518,75 @@ button {
     .vote-now-btn-inline {
         font-size: 1.1rem;
         padding: 1rem 1.5rem;
+    }
+}
+/* ========================================
+   FEATURED MATCH STYLING
+   ======================================== */
+
+#featured-match {
+    margin-bottom: 4rem;
+}
+
+.featured-match-wrapper {
+    margin-top: 1.5rem;
+}
+
+.featured-match-wrapper .match-card {
+    transform: scale(1.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+    transition: all 0.3s ease;
+}
+
+.featured-match-wrapper .match-card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.featured-match-wrapper .match-header h3 {
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.featured-match-wrapper .status-badge {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+}
+/* ========================================
+   MATCHES GRID - 2 COLUMN LAYOUT
+   ======================================== */
+
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+    .matches-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .matches-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .featured-match-wrapper .match-card {
+        transform: scale(1) !important;
+    }
+    
+    .featured-match-wrapper .match-card:hover {
+        transform: scale(1.02) !important;
     }
 }
