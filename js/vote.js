@@ -1,20 +1,24 @@
     // ========================================
     // VOTE PAGE FUNCTIONALITY - LEAGUE MUSIC TOURNAMENT
     // ========================================
+// ========================================
+// IMPORTS
+// ========================================
 
- // Import API Client (uses Netlify Edge cache for reads)
-// Import API Client (uses Netlify Edge cache for reads)
+// API Client (uses Netlify Edge cache for reads)
 import { getMatch, submitVote as submitVoteToAPI } from './api-client.js';
-//                   ^^^^^^^^^^^^^^^^^^^^^^^^^ Rename to avoid conflict
-// Keep Firebase for direct writes and checks
+
+// Firebase
 import { db } from './firebase-config.js';
 import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-    import { getAllTournamentStats } from './music-gallery.js';
-    import { getBookForSong } from './bookMappings.js';
-    import { checkGlobalNotificationStatus } from './global-notifications.js';
-    // ✅ ADD THESE IMPORTS
+
+// Features & Systems
+import { getAllTournamentStats } from './music-gallery.js';
+import { getBookForSong } from './bookMappings.js';
+import { checkGlobalNotificationStatus } from './global-notifications.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
-import { updateNavRank } from './navigation.js';  // ✅ Match actual filename
+import { updateNavRank } from './navigation.js';
+import { createMatchCard } from './match-card-renderer.js';
 
 
     // ✅ ADD THIS LINE:
@@ -493,10 +497,6 @@ await updateCompetitorInfo(currentMatch);
 async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
-        
-        
-        // ✅ Keep this (dynamic import):
-        const { createMatchCard } = await import('./match-card-renderer.js');
         
         // Fetch all matches from API (cached)
         const response = await fetch('/.netlify/functions/get-matches');
