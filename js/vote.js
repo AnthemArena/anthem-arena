@@ -486,8 +486,7 @@ await updateCompetitorInfo(currentMatch);
         }
     }
 
-
-    // ========================================
+/**
 // LOAD OTHER LIVE MATCHES
 // ========================================
 
@@ -535,7 +534,7 @@ async function loadOtherLiveMatches() {
         const enhancedMatches = otherLiveMatches.map(match => {
             const userVote = userVotes[match.id];
             const hasVoted = !!userVote;
-            const userVotedSongId = hasVoted ? userVote.songId : null; // ✅ Get which song
+            const userVotedSongId = hasVoted ? userVote.songId : null;
             
             // Calculate vote percentages
             const totalVotes = match.totalVotes || 0;
@@ -562,7 +561,7 @@ async function loadOtherLiveMatches() {
                     votes: song1Votes,
                     percentage: song1Percentage,
                     winner: false,
-                    leading: userVotedSongId === 'song1', // ✅ Green glow = user's vote
+                    leading: userVotedSongId === 'song1',
                     userVoted: hasVoted && userVote.songId === 'song1'
                 },
                 competitor2: {
@@ -573,23 +572,23 @@ async function loadOtherLiveMatches() {
                     votes: song2Votes,
                     percentage: song2Percentage,
                     winner: false,
-                    leading: userVotedSongId === 'song2', // ✅ Green glow = user's vote
+                    leading: userVotedSongId === 'song2',
                     userVoted: hasVoted && userVote.songId === 'song2'
                 }
             };
         });
         
-        // Render match cards
+        // ✅ Render match cards as DOM elements
         const grid = document.getElementById('other-matches-grid');
-        grid.innerHTML = enhancedMatches
-            .map(match => createMatchCard(match))
-            .join('');
-        
+        grid.innerHTML = ''; // Clear first
+
+        enhancedMatches.forEach(match => {
+            const card = createMatchCard(match);
+            grid.appendChild(card);
+        });
+
         // Show the section
         document.getElementById('other-matches-section').style.display = 'block';
-        
-        // Add click handlers to "Vote Now" buttons
-        attachVoteNowHandlers();
         
         console.log('✅ Other matches rendered');
         
@@ -598,32 +597,6 @@ async function loadOtherLiveMatches() {
         document.getElementById('other-matches-section').style.display = 'none';
     }
 }
-
-/**
- * Attach click handlers to "Vote Now" buttons in other matches
- */
-function attachVoteNowHandlers() {
-    const voteButtons = document.querySelectorAll('.other-matches-grid .vote-now-btn, .other-matches-grid .view-results-btn');
-    
-    voteButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const matchCard = btn.closest('.match-card');
-            const matchId = matchCard?.dataset.matchId;
-            
-            if (matchId) {
-                window.location.href = `/vote.html?id=${matchId}`;
-            }
-        });
-    });
-}
-
-/**
- * Make voteNow function globally accessible for onclick handlers
- */
-window.voteNow = function(matchId) {
-    window.location.href = `/vote.html?id=${matchId}`;
-};
     // ========================================
     // ⭐ UPDATED: CHECK VOTE STATUS (FIREBASE)
     // ========================================

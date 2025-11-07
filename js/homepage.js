@@ -428,18 +428,19 @@ function displayFeaturedMatch() {
     // ✅ Convert to display format
     const matchData = convertFirebaseMatchToDisplayFormat(currentMatch, userHasVoted, userVotedSongId);
     
-    // ✅ Render using existing match card component
-    container.innerHTML = `
-        <div class="section-header">
-            <span class="section-label">🔥 Featured Match</span>
-            <h2 class="section-title">Match of the Day</h2>
-            <p class="section-subtitle">${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
-        </div>
-        <div class="featured-match-wrapper">
-            ${createMatchCard(matchData)}
-        </div>
-    `;
-    
+container.innerHTML = `
+    <div class="section-header">
+        <span class="section-label">🔥 Featured Match</span>
+        <h2 class="section-title">Match of the Day</h2>
+        <p class="section-subtitle">${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
+    </div>
+    <div class="featured-match-wrapper" id="featured-card-container"></div>
+`;
+
+// ✅ Append card as DOM element
+const cardContainer = container.querySelector('#featured-card-container');
+const card = createMatchCard(matchData);
+cardContainer.appendChild(card);
     featuredSection.style.display = 'block';
     
     console.log('✅ Featured match rendered');
@@ -542,16 +543,16 @@ function displayLiveMatchesGrid(matches) {
     const grid = document.getElementById('liveMatchesGrid');
     if (!grid) return;
     
-    // ✅ Convert matches and check vote status for each
-    const convertedMatches = matches.map(m => {
-        const hasVoted = hasUserVoted(m.matchId); // ✅ Check for EACH match
-        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
-        return convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
-    });
+    grid.innerHTML = ''; // Clear first
     
-    grid.innerHTML = convertedMatches.map(match => createMatchCard(match)).join('');
+    matches.forEach(m => {
+        const hasVoted = hasUserVoted(m.matchId);
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+        const card = createMatchCard(matchData);
+        grid.appendChild(card);
+    });
 }
-
 function hideLiveMatchesSection() {
     const section = document.querySelector('.live-matches-section');
     if (section) section.style.display = 'none';
@@ -593,15 +594,17 @@ function displayRecentResultsGrid(matches) {
     const grid = document.getElementById('recentResultsGrid');
     if (!grid) return;
     
-    // ✅ Convert matches and check vote status for each
-    const convertedMatches = matches.map(m => {
-        const hasVoted = hasUserVoted(m.matchId); // ✅ Always true for completed, but for consistency
-        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
-        return convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
-    });
+    grid.innerHTML = ''; // Clear first
     
-    grid.innerHTML = convertedMatches.map(match => createMatchCard(match)).join('');
+    matches.forEach(m => {
+        const hasVoted = hasUserVoted(m.matchId);
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+        const card = createMatchCard(matchData);
+        grid.appendChild(card);
+    });
 }
+
 function showNoResultsMessage() {
     const grid = document.getElementById('recentResultsGrid');
     if (!grid) return;
@@ -814,8 +817,12 @@ function displayUpcomingMatches(matches) {
     const grid = document.getElementById('upcomingMatchesGrid');
     if (!grid) return;
     
-    // ✨ USE THE SAME createMatchCard FUNCTION!
-    grid.innerHTML = matches.map(match => createMatchCard(match)).join('');
+    grid.innerHTML = ''; // Clear first
+    
+    matches.forEach(match => {
+        const card = createMatchCard(match);
+        grid.appendChild(card);
+    });
 }
 
 function hideUpcomingSection() {

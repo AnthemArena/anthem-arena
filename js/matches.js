@@ -594,7 +594,6 @@ function clearFilters() {
     filterMatches(); // ← This applies sorting!
 }
 
-// Display matches in grid
 function displayMatches(matches) {
     const grid = document.getElementById('matches-grid');
     
@@ -608,9 +607,15 @@ function displayMatches(matches) {
         return;
     }
 
-    grid.innerHTML = matches.map(match => createMatchCard(match)).join('');
+    // ✅ Clear grid and append DOM elements
+    grid.innerHTML = '';
+    
+    matches.forEach(match => {
+        const card = createMatchCard(match);
+        grid.appendChild(card);
+    });
+    
     updateLoadMoreButton(matches);
-
 }
 
 
