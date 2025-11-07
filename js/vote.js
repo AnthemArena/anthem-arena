@@ -612,6 +612,9 @@ saveVoteForOtherPages(currentMatch.id, voteData.choice);
             
             // Then disable voting and show stats
             disableVoting(voteData.choice);
+
+            // ✅ ADD THIS: Load other matches since user already voted
+await loadOtherLiveMatches();
             
         } else {
             // Double-check localStorage as backup
