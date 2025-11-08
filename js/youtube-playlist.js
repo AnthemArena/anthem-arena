@@ -3,11 +3,11 @@
 // ========================================
 
 const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
-// At the top — NO hardcoded key!
-const API_KEY = window.YOUTUBE_API_KEY;
+// ✅ UPDATED: Use Vite environment variable
+const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 
-if (!API_KEY || API_KEY.includes('<%')) {
-    console.error('YouTube API key failed to load. Check Netlify.');
+if (!API_KEY) {
+    console.warn('⚠️ YouTube H2H Shorts disabled - API key not configured');
 }
 const MAX_RESULTS = 50; // Increased to get more videos
 const PLAYLIST_NAME = 'Anthem Arena Season 1'; // ✅ Playlist name
@@ -177,37 +177,6 @@ window.closePlayer = function() {
         // Reset current video
         currentVideoId = null;
     }
-};
-
-// ========================================
-// LOAD VIDEO IN PLAYER
-// ========================================
-window.loadVideo = function(videoId) {
-    currentVideoId = videoId;
-    
-    // ✅ Show player container with smooth reveal
-    const playerContainer = document.getElementById('youtube-player-container');
-    if (playerContainer && playerContainer.style.display === 'none') {
-        playerContainer.style.display = 'block';
-        // Smooth scroll to player
-        setTimeout(() => {
-            playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
-    
-    // Update player iframe
-    const player = document.getElementById('youtube-playlist-player');
-    if (player) {
-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-    }
-    
-    // Update active thumbnail
-    document.querySelectorAll('.video-thumbnail-card').forEach(card => {
-        card.classList.remove('active');
-        if (card.dataset.videoId === videoId) {
-            card.classList.add('active');
-        }
-    });
 };
 
 // ========================================
