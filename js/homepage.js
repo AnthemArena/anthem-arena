@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.timeEnd('⏱️ Hero Stats');
         
         hideChampionsSection();
-        initializeScrollAnimations();
         
         // ✅ Hide loading, show homepage with stagger animation
         hideHomepageLoading();
@@ -956,36 +955,11 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// ========================================
-// SCROLL ANIMATIONS
-// ========================================
-
-function initializeScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-    
-    // Observe all sections
-    document.querySelectorAll('.featured-matchup, .live-matches-section, .recent-results-section, .matches-cta').forEach(section => {
-        observer.observe(section);
-    });
-}
 
 // ========================================
 // ADD ANIMATION STYLES
 // ========================================
 
-// Add this CSS dynamically if not already in stylesheet
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -1010,27 +984,20 @@ style.textContent = `
         }
     }
     
+    /* ✅ SIMPLIFIED: All sections visible by default */
     .featured-matchup,
     .live-matches-section,
     .recent-results-section,
+    .upcoming-matches-section,
     .matches-cta {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-      /* ✅ ADD THIS: Cards are always visible */
-    .match-card {
         opacity: 1 !important;
         transform: none !important;
     }
     
-    .featured-matchup.animate-in,
-    .live-matches-section.animate-in,
-    .recent-results-section.animate-in,
-    .matches-cta.animate-in {
-        opacity: 1;
-        transform: translateY(0);
+    /* ✅ Cards always visible */
+    .match-card {
+        opacity: 1 !important;
+        transform: none !important;
     }
     
     /* No Results Message */
