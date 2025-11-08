@@ -1247,4 +1247,76 @@ document.addEventListener('visibilitychange', () => {
 window.enableGlobalNotifications = enableGlobalNotifications;
 window.checkGlobalNotificationStatus = checkGlobalNotificationStatus;
 
+// ========================================
+// DEBUG: Force show bulletin (for testing)
+// ========================================
+window.testBulletin = function(type = 'winning') {
+    console.log('🧪 Force showing bulletin:', type);
+    
+    const testNotifications = {
+        danger: {
+            priority: 1,
+            type: 'danger',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            userPct: 35,
+            opponentPct: 65,
+            voteDiff: 15,
+            message: '🚨 "GODS" is in danger!',
+            detail: 'Behind by 15 votes (35% vs 65%)',
+            cta: 'Rally Support Now!'
+        },
+        nailbiter: {
+            priority: 2,
+            type: 'nailbiter',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            voteDiff: 2,
+            userPct: 49,
+            opponentPct: 51,
+            message: '🔥 "GODS" is TOO CLOSE!',
+            detail: 'Separated by just 2 votes!',
+            cta: 'Share This Match!'
+        },
+        winning: {
+            priority: 4,
+            type: 'winning',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            userPct: 72,
+            opponentPct: 28,
+            message: '🎯 "GODS" is dominating!',
+            detail: 'Leading 72% to 28%',
+            cta: 'Share the Victory!'
+        },
+        comeback: {
+            priority: 3,
+            type: 'comeback',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            userPct: 55,
+            opponentPct: 45,
+            message: '🎉 "GODS" completed comeback!',
+            detail: 'Was losing, now leading 55% to 45%!',
+            cta: 'Celebrate & Share!'
+        },
+        welcome: {
+            priority: 5,
+            type: 'welcome',
+            message: '🎵 Welcome to the League Music Tournament!',
+            detail: '15 matches live - cast your first vote!',
+            cta: 'Start Voting',
+            action: 'navigate',
+            targetUrl: '/matches.html'
+        }
+    };
+    
+    const notification = testNotifications[type] || testNotifications.winning;
+    showBulletin(notification);
+};
+
 export { enableGlobalNotifications, checkGlobalNotificationStatus, checkAndShowBulletin };
