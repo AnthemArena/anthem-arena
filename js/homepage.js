@@ -1018,6 +1018,12 @@ style.textContent = `
         transform: translateY(30px);
         transition: opacity 0.6s ease, transform 0.6s ease;
     }
+
+      /* ✅ ADD THIS: Cards are always visible */
+    .match-card {
+        opacity: 1 !important;
+        transform: none !important;
+    }
     
     .featured-matchup.animate-in,
     .live-matches-section.animate-in,
