@@ -363,7 +363,7 @@ async function loadTournamentStats() {
         snapshot.forEach(doc => {
             const match = doc.data();
             
-            // Count all matches
+            // Count all matches (including TBD for total count)
             totalMatches++;
             
             // Count by status
@@ -394,16 +394,37 @@ async function loadTournamentStats() {
             }
         });
         
-        // Update the DOM
-        updateStatDisplay('total-matches', totalMatches);
-        updateStatDisplay('total-votes', totalVotes.toLocaleString());
-        updateStatDisplay('tournaments', uniqueTournaments.size || 1); // Default to 1 if none found
-        updateStatDisplay('unique-videos', uniqueSongs.size);
+        // ✅ UPDATE DOM - Using YOUR actual HTML IDs (with hyphens!)
+        const totalMatchesEl = document.getElementById('total-matches'); // ✅ With hyphen
+        if (totalMatchesEl) {
+            totalMatchesEl.textContent = totalMatches;
+            console.log(`✅ Updated total-matches: ${totalMatches}`);
+        } else {
+            console.warn('⚠️ #total-matches element not found');
+        }
         
-        // ✅ BONUS: Update the subtitle text with real stats
-        const statsSubtitle = document.querySelector('.archive-stats-header .section-subtitle');
-        if (statsSubtitle) {
-            statsSubtitle.textContent = `${completedMatches} completed • ${liveMatches} live • ${upcomingMatches} upcoming`;
+        const totalVotesEl = document.getElementById('total-votes'); // ✅ With hyphen
+        if (totalVotesEl) {
+            totalVotesEl.textContent = totalVotes.toLocaleString();
+            console.log(`✅ Updated total-votes: ${totalVotes}`);
+        } else {
+            console.warn('⚠️ #total-votes element not found');
+        }
+        
+        const tournamentsEl = document.getElementById('tournaments'); // ✅ No hyphen (already correct)
+        if (tournamentsEl) {
+            tournamentsEl.textContent = uniqueTournaments.size || 1;
+            console.log(`✅ Updated tournaments: ${uniqueTournaments.size || 1}`);
+        } else {
+            console.warn('⚠️ #tournaments element not found');
+        }
+        
+        const uniqueVideosEl = document.getElementById('unique-videos'); // ✅ With hyphen
+        if (uniqueVideosEl) {
+            uniqueVideosEl.textContent = uniqueSongs.size;
+            console.log(`✅ Updated unique-videos: ${uniqueSongs.size}`);
+        } else {
+            console.warn('⚠️ #unique-videos element not found');
         }
         
         console.log('✅ Tournament stats loaded:', {
@@ -419,19 +440,12 @@ async function loadTournamentStats() {
     } catch (error) {
         console.error('❌ Error loading tournament stats:', error);
         
-        // Show error state in stats
-        updateStatDisplay('total-matches', '—');
-        updateStatDisplay('total-votes', '—');
-        updateStatDisplay('tournaments', '—');
-        updateStatDisplay('unique-videos', '—');
-    }
-}
-
-// Helper function to update stat displays
-function updateStatDisplay(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = value;
+        // Show error state - use correct IDs with hyphens
+        const statElements = ['total-matches', 'total-votes', 'tournaments', 'unique-videos'];
+        statElements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '—';
+        });
     }
 }
 
