@@ -3,6 +3,69 @@
 // Used by: homepage.js, matches.js
 // ========================================
 
+// ========================================
+// COUNTDOWN TIMER HELPER
+// ========================================
+
+function getTimeRemaining(endDate) {
+    if (!endDate) return null;
+    
+    const now = new Date();
+    const end = new Date(endDate);
+    const diff = end - now;
+    
+    if (diff <= 0) {
+        return {
+            text: '⏱️ Voting Closed',
+            color: '#999',
+            urgent: false,
+            expired: true
+        };
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    // Critical (< 1 hour)
+    if (days === 0 && hours === 0) {
+        return {
+            text: `🚨 ${minutes}m left to vote!`,
+            color: '#ff4444',
+            urgent: true,
+            expired: false
+        };
+    }
+    
+    // Urgent (< 6 hours)
+    if (days === 0 && hours < 6) {
+        return {
+            text: `🔥 ${hours}h ${minutes}m left`,
+            color: '#ff4444',
+            urgent: true,
+            expired: false
+        };
+    }
+    
+    // Moderate (< 24 hours)
+    if (days === 0) {
+        return {
+            text: `⏰ ${hours}h ${minutes}m left`,
+            color: '#ffaa00',
+            urgent: false,
+            expired: false
+        };
+    }
+    
+    // Calm (1+ days)
+    return {
+        text: `⏰ ${days}d ${hours}h left`,
+        color: '#667eea',
+        urgent: false,
+        expired: false
+    };
+}
+
 export function createMatchCard(match) {
     const statusClass = match.status;
     const statusBadge = getStatusBadge(match);
@@ -147,14 +210,32 @@ function getFooterContent(match) {
             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
         `;
     } else if (match.status === 'live') {
-        // ✅ Only show vote count if user already voted
+        // ✅ Get countdown timer
+        const timer = match.endDate ? getTimeRemaining(match.endDate) : null;
+        
+        // Only show vote count if user already voted
         if (showVoteData) {
             statsHtml += `
                 <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
-                <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
+            `;
+        }
+        
+        // ✅ Show timer if available
+        if (timer && !timer.expired) {
+            statsHtml += `
+                <span class="stat timer ${timer.urgent ? 'urgent' : ''}" 
+                      style="color: ${timer.color}; font-weight: 600;">
+                    ${timer.text}
+                </span>
+            `;
+        } else if (timer && timer.expired) {
+            statsHtml += `
+                <span class="stat" style="color: #999;">
+                    ${timer.text}
+                </span>
             `;
         } else {
-            // ✅ Show generic "Voting open" message without counts
+            // Fallback if no endDate
             statsHtml += `
                 <span class="stat"><i class="fas fa-clock"></i> ${match.timeLeft || 'Voting open'}</span>
             `;

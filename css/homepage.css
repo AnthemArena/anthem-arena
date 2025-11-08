@@ -3606,3 +3606,30 @@ button {
         transform: scale(1.02) !important;
     }
 }
+/* ========================================
+   COUNTDOWN TIMER STYLES
+   ======================================== */
+
+.stat.timer {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.stat.timer.urgent {
+    animation: pulse-urgent 2s ease-in-out infinite;
+    font-weight: 700;
+}
+
+@keyframes pulse-urgent {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.85;
+        transform: scale(1.05);
+    }
+}

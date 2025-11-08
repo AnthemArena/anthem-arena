@@ -197,6 +197,8 @@ allMatches.push({
     round: roundName,
     status: match.status || 'upcoming',
     date: match.date || '2025-11-01',
+        endDate: match.endDate || null,  // ✅ ADD THIS LINE
+
     totalVotes: totalVotes,
     timeLeft: match.status === 'live' ? 'Voting Open' : 'Not Started',
     hasVoted: hasVoted,

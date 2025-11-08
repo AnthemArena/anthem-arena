@@ -456,27 +456,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 document.getElementById('scheduleDatesBtn').addEventListener('click', async () => {
-    if (!confirm('Schedule dates for all batches?\n\nThis will set batches 24 hours apart and clear TBD match dates.')) {
+    // ✅ Ask for start date
+    const startDateInput = prompt(
+        '📅 Enter tournament START date:\n\n' +
+        'Format: YYYY-MM-DD\n' +
+        'Example: 2025-11-05'
+    );
+    
+    if (!startDateInput) {
+        alert('❌ Cancelled');
+        return;
+    }
+    
+    // Validate date
+    const startDate = new Date(startDateInput + 'T00:00:00Z');
+    if (isNaN(startDate.getTime())) {
+        alert('❌ Invalid date format! Use YYYY-MM-DD');
+        return;
+    }
+    
+    if (!confirm(`Start tournament on ${startDate.toLocaleDateString()}?\n\nEach batch will be 24 hours.`)) {
         return;
     }
     
     try {
-        console.log('📅 Scheduling batch dates (24 hour spacing)...');
+        console.log('📅 Scheduling batches starting from:', startDate.toISOString());
         
         const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
         
-        // Group matches by round and batch
+        // Group matches by round & batch
         const batchGroups = {};
         
         snapshot.forEach(doc => {
             const match = doc.data();
-            const key = `R${match.round}B${match.batch || 0}`;
+            const key = `R${match.round}B${match.batch || 1}`;
             
             if (!batchGroups[key]) {
                 batchGroups[key] = {
                     round: match.round,
-                    batch: match.batch || 0,
+                    batch: match.batch || 1,
                     matches: []
                 };
             }
@@ -487,7 +506,7 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
             });
         });
         
-        // Sort batches by round, then batch number
+        // Sort batches
         const sortedBatchKeys = Object.keys(batchGroups).sort((a, b) => {
             const groupA = batchGroups[a];
             const groupB = batchGroups[b];
@@ -498,19 +517,21 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
             return groupA.batch - groupB.batch;
         });
         
-        let currentDate = new Date('2025-11-05T19:00:00Z'); // Starting date
+        // Assign dates (24-hour increments)
+        let currentDate = new Date(startDate);
         let updateCount = 0;
         let clearedCount = 0;
-        let batchSchedule = [];
+        const batchSummary = [];
         
         for (const batchKey of sortedBatchKeys) {
             const batchGroup = batchGroups[batchKey];
             const { round, batch, matches } = batchGroup;
             
-            let batchHasTBD = false;
+            // Calculate end date (24 hours later)
+            const endDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+            
             let scheduledInBatch = 0;
             
-            // Check if entire batch is TBD
             for (const matchObj of matches) {
                 const match = matchObj.data;
                 const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchObj.id);
@@ -518,56 +539,68 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
                 const isTBD = match.song1?.id === 'TBD' || match.song2?.id === 'TBD';
                 
                 if (isTBD) {
-                    batchHasTBD = true;
-                    await updateDoc(matchRef, { date: null });
+                    // Clear dates for TBD matches
+                    await updateDoc(matchRef, { 
+                        date: null,
+                        startDate: null,
+                        endDate: null
+                    });
                     clearedCount++;
                 } else {
-                    // Assign the same date to all non-TBD matches in this batch
-                   // When scheduling, add BOTH start and end times:
-await updateDoc(matchRef, {
-    date: currentDate.toISOString(),          // Start time
-    endTime: new Date(currentDate.getTime() + 24 * 60 * 60 * 1000).toISOString()  // +24 hours
-});
+                    // ✅ Assign start and end dates
+                    await updateDoc(matchRef, {
+                        date: currentDate.toISOString(),        // Legacy field
+                        startDate: currentDate.toISOString(),   // ✅ Start time
+                        endDate: endDate.toISOString()          // ✅ End time (+24h)
+                    });
                     scheduledInBatch++;
                     updateCount++;
                 }
             }
             
             if (scheduledInBatch > 0) {
-                batchSchedule.push({
+                batchSummary.push({
                     round,
                     batch,
-                    date: currentDate.toLocaleDateString('en-US', { 
-                        weekday: 'short',
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }),
-                    matchCount: scheduledInBatch
+                    start: new Date(currentDate),
+                    end: new Date(endDate),
+                    count: scheduledInBatch
                 });
                 
-                console.log(`📅 Round ${round} Batch ${batch}: ${currentDate.toLocaleDateString()} (${scheduledInBatch} matches)`);
+                console.log(`📅 R${round}B${batch}: ${currentDate.toLocaleDateString()} - ${endDate.toLocaleDateString()} (${scheduledInBatch} matches)`);
                 
-                // Move to next batch date (24 hours later)
-                currentDate.setHours(currentDate.getHours() + 24);
-            } else {
-                console.log(`⏭️ Round ${round} Batch ${batch}: Skipped (all TBD)`);
+                // Move to next batch (24 hours later)
+                currentDate = new Date(endDate);
             }
         }
         
-        // Create summary message
-        let summaryMessage = `✅ Successfully scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n📅 SCHEDULE:\n\n`;
+        // Show summary
+        let summaryMessage = `✅ Scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n📅 SCHEDULE:\n\n`;
         
-        batchSchedule.forEach(batch => {
-            summaryMessage += `Round ${batch.round} Batch ${batch.batch}: ${batch.date} (${batch.matchCount} matches)\n`;
+        batchSummary.forEach(batch => {
+            const startStr = batch.start.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+            });
+            const endStr = batch.end.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+            });
+            summaryMessage += `R${batch.round}B${batch.batch}: ${startStr} - ${endStr} (${batch.count} matches)\n`;
         });
         
-        console.log(`\n✅ Scheduled ${updateCount} matches across ${batchSchedule.length} batches`);
-        console.log(`✅ Cleared ${clearedCount} TBD matches`);
+        const finalDate = batchSummary[batchSummary.length - 1]?.end;
+        if (finalDate) {
+            summaryMessage += `\n🏆 Tournament ends: ${finalDate.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+            })}`;
+        }
         
+        console.log(`✅ Scheduled ${updateCount} matches across ${batchSummary.length} batches`);
         alert(summaryMessage);
-        
         loadMatches();
         
     } catch (error) {

@@ -550,6 +550,8 @@ async function loadOtherLiveMatches() {
                 round: match.round || 'round-1',
                 status: match.status || 'live',
                 date: match.date || new Date().toISOString(),
+                    endDate: match.endDate || null,  // ✅ ADD THIS LINE
+
                 totalVotes: totalVotes,
                 timeLeft: 'Voting Open',
                 hasVoted: hasVoted,
