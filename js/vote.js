@@ -141,8 +141,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     userId = await getUserId();
     console.log('👤 User ID:', userId);
     
-    // ✅ ADD THIS: Check notification status
-    await checkGlobalNotificationStatus();
     
     // Get match ID from URL
     const urlParams = new URLSearchParams(window.location.search);
