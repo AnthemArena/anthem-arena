@@ -109,6 +109,119 @@ async function getAllLiveMatches() {
     }
 }
 
+// Add after line 109 (after getAllLiveMatches function)
+
+// ========================================
+// LIVE ACTIVITY FROM EDGE FUNCTION
+// ========================================
+
+let activityPolling = null;
+let lastActivityCheck = 0;
+
+async function fetchLiveActivity() {
+    try {
+        const response = await fetch('/api/live-activity', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const activity = await response.json();
+        const cacheStatus = response.headers.get('X-Cache-Status');
+        const cacheAge = response.headers.get('X-Cache-Age');
+        
+        console.log(`📊 Activity fetched from edge (${cacheStatus}${cacheAge ? `, age: ${cacheAge}s` : ''})`);
+        
+        return activity;
+        
+    } catch (error) {
+        console.error('❌ Error fetching live activity:', error);
+        return null;
+    }
+}
+
+function startActivityPolling() {
+    // Poll every 30 seconds
+    activityPolling = setInterval(async () => {
+        const timeSinceLastCheck = Date.now() - lastActivityCheck;
+        
+        // Skip if checked recently
+        if (timeSinceLastCheck < 25000) {
+            return;
+        }
+        
+        const activity = await fetchLiveActivity();
+        
+        if (activity?.hotMatches?.length > 0) {
+            showLiveActivityToast(activity);
+        }
+        
+        lastActivityCheck = Date.now();
+        
+    }, 30000);
+    
+    // Initial fetch (wait 5s after page load)
+    setTimeout(async () => {
+        const activity = await fetchLiveActivity();
+        if (activity?.hotMatches?.length > 0) {
+            showLiveActivityToast(activity);
+        }
+        lastActivityCheck = Date.now();
+    }, 5000);
+}
+
+function showLiveActivityToast(activity) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    
+    // Find a hot match the user hasn't voted on yet
+    const unvotedMatch = activity.hotMatches.find(match => !userVotes[match.matchId]);
+    
+    if (!unvotedMatch) {
+        console.log('📭 No unvoted hot matches');
+        return;
+    }
+    
+    // Don't show if recently dismissed
+    const dismissKey = `activity-${unvotedMatch.matchId}`;
+    if (dismissedBulletins.has(dismissKey)) {
+        return;
+    }
+    
+    // Throttle - max 1 activity toast per 2 minutes
+    const lastActivityToast = parseInt(localStorage.getItem('lastActivityToast') || '0');
+    if (Date.now() - lastActivityToast < 120000) {
+        return;
+    }
+    
+    // Generate message variations
+    const messages = [
+        `🔥 ${unvotedMatch.recentVotes} people just voted in this match!`,
+        `⚡ This match is heating up - ${unvotedMatch.recentVotes} recent votes!`,
+        `👀 ${unvotedMatch.recentVotes} votes in the last 2 minutes!`,
+        `🎵 Hot match: "${unvotedMatch.song1}" vs "${unvotedMatch.song2}"!`
+    ];
+    
+    const message = messages[Math.floor(Math.random() * messages.length)];
+    
+    showBulletin({
+        type: 'live-activity',
+        matchId: unvotedMatch.matchId,
+        song: unvotedMatch.song1,
+        opponent: unvotedMatch.song2,
+        thumbnailUrl: unvotedMatch.thumbnailUrl,
+        message: message,
+        detail: `"${unvotedMatch.song1}" vs "${unvotedMatch.song2}"`,
+        cta: 'Vote Now!',
+        priority: 6
+    });
+    
+    localStorage.setItem('lastActivityToast', Date.now().toString());
+}
+
 // ========================================
 // BULLETIN DETECTION LOGIC
 // ========================================
@@ -603,8 +716,8 @@ window.dismissBulletin = function() {
 window.handleBulletinCTA = function() {
     if (!currentBulletin) return;
     
-    // Handle user's pick bulletins - go directly to match
-    if (['danger', 'nailbiter', 'comeback', 'winning'].includes(currentBulletin.type)) {
+    // Handle user's pick bulletins OR live activity - go directly to match
+    if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
             window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
         } else {
@@ -646,15 +759,14 @@ function initBulletinSystem() {
         console.error('Error loading dismissed bulletins:', e);
     }
     
-    // Clear old dismissed bulletins (older than 24 hours)
-    const now = Date.now();
-    const oneDayAgo = now - (24 * 60 * 60 * 1000);
-    
-    // Start polling
+    // Start user's own match checking
     checkAndShowBulletin();
     adjustPollingRate();
     
-    console.log('✅ Bulletin system initialized');
+    // 🆕 Start live activity monitoring
+    startActivityPolling();
+    
+    console.log('✅ Bulletin system initialized with live activity');
 }
 
 // Start when DOM is ready
