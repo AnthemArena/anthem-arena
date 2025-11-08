@@ -3,14 +3,8 @@
 // ========================================
 
 const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
-// ✅ UPDATED: Use Vite environment variable
-const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
-
-if (!API_KEY) {
-    console.warn('⚠️ YouTube H2H Shorts disabled - API key not configured');
-}
-const MAX_RESULTS = 50; // Increased to get more videos
-const PLAYLIST_NAME = 'Anthem Arena Season 1'; // ✅ Playlist name
+const MAX_RESULTS = 50;
+const PLAYLIST_NAME = 'Anthem Arena Season 1';
 
 let currentVideoId = null;
 let playlistVideos = [];
