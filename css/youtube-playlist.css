@@ -1,0 +1,208 @@
+/* ========================================
+   YOUTUBE PLAYLIST SECTION
+   ======================================== */
+
+.youtube-playlist-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.youtube-playlist-section .section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.youtube-playlist-section .section-label {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.youtube-playlist-section .section-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin: 12px 0;
+}
+
+.youtube-playlist-section .section-subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+/* Video Carousel */
+.video-carousel-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.video-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 20px 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.video-carousel::-webkit-scrollbar {
+    height: 8px;
+}
+
+.video-carousel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.video-carousel::-webkit-scrollbar-thumb {
+    background: rgba(243, 156, 18, 0.5);
+    border-radius: 4px;
+}
+
+.video-carousel::-webkit-scrollbar-thumb:hover {
+    background: rgba(243, 156, 18, 0.8);
+}
+
+/* Video Thumbnail Card */
+.video-thumbnail-card {
+    position: relative;
+    min-width: 200px;
+    width: 200px;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #0f1419;
+    border: 2px solid transparent;
+}
+
+.video-thumbnail-card:hover {
+    transform: translateY(-8px);
+    border-color: #f39c12;
+    box-shadow: 0 8px 24px rgba(243, 156, 18, 0.3);
+}
+
+.video-thumbnail-card.active {
+    border-color: #f39c12;
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+}
+
+.video-thumbnail-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.video-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-thumbnail-card:hover .video-card-overlay {
+    opacity: 1;
+}
+
+.video-card-overlay i {
+    font-size: 48px;
+    color: #f39c12;
+}
+
+.video-card-title {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.4;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+/* Video Player */
+.youtube-player-container {
+    max-width: 900px;
+    margin: 0 auto 30px;
+    padding: 0 20px;
+}
+
+.player-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.player-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Playlist CTA */
+.playlist-cta {
+    text-align: center;
+    padding: 0 20px;
+}
+
+.playlist-cta .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.playlist-cta .btn i {
+    font-size: 20px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .youtube-playlist-section .section-title {
+        font-size: 28px;
+    }
+    
+    .youtube-playlist-section .section-subtitle {
+        font-size: 16px;
+    }
+    
+    .video-thumbnail-card {
+        min-width: 160px;
+        width: 160px;
+        height: 240px;
+    }
+    
+    .video-thumbnail-card img {
+        height: 160px;
+    }
+    
+    .video-card-overlay {
+        height: 160px;
+    }
+    
+    .video-card-overlay i {
+        font-size: 36px;
+    }
+}

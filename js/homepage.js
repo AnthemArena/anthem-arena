@@ -3,6 +3,8 @@
 // ========================================
 import { getBookForSong } from './bookMappings.js';
 import { getAllMatches } from './api-client.js';
+import './youtube-playlist.js';  // ✅ ADD THIS LINE
+
 
 // Keep Firebase for direct operations if needed
 import { db } from './firebase-config.js';
