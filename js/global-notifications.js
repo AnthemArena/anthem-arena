@@ -203,9 +203,9 @@ async function checkAndShowBulletin() {
                             song: userSong.shortTitle || userSong.title,
                             opponent: opponent.shortTitle || opponent.title,
                             userPct, opponentPct, voteDiff,
-                            message: `🚨 "${userSong.shortTitle || userSong.title}" is in danger!`,
+                            message: `🚨 Your pick "${userSong.shortTitle || userSong.title}" is in danger!`,
                             detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
-                            cta: 'Rally Support Now!'
+                            cta: 'View Match Now!'
                         });
                     } else {
                         console.log(`🔍 ❌ Danger cooldown not passed yet`);
@@ -226,9 +226,9 @@ async function checkAndShowBulletin() {
                             song: userSong.shortTitle || userSong.title,
                             opponent: opponent.shortTitle || opponent.title,
                             voteDiff, userPct, opponentPct,
-                            message: `🔥 "${userSong.shortTitle || userSong.title}" is TOO CLOSE!`,
+                            message: `🔥 Your pick "${userSong.shortTitle || userSong.title}" is TOO CLOSE!`,
                             detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
-                            cta: 'Share This Match!'
+                            cta: 'View Match!'
                         });
                     } else {
                         console.log(`🔍 ❌ Nailbiter cooldown not passed yet`);
@@ -254,9 +254,9 @@ async function checkAndShowBulletin() {
                             song: userSong.shortTitle || userSong.title,
                             opponent: opponent.shortTitle || opponent.title,
                             userPct, opponentPct,
-                            message: `🎉 "${userSong.shortTitle || userSong.title}" completed comeback!`,
+                            message: `🎉 Your pick "${userSong.shortTitle || userSong.title}" completed comeback!`,
                             detail: `Was losing, now leading ${userPct}% to ${opponentPct}%!`,
-                            cta: 'Celebrate & Share!'
+                            cta: 'View Match!'
                         });
                     }
                 } else {
@@ -275,9 +275,9 @@ async function checkAndShowBulletin() {
                             song: userSong.shortTitle || userSong.title,
                             opponent: opponent.shortTitle || opponent.title,
                             userPct, opponentPct,
-                            message: `🎯 "${userSong.shortTitle || userSong.title}" is dominating!`,
+                            message: `🎯 Your pick "${userSong.shortTitle || userSong.title}" is dominating!`,
                             detail: `Leading ${userPct}% to ${opponentPct}%`,
-                            cta: 'Share the Victory!'
+                            cta: 'View Match!'
                         });
                     } else {
                         console.log(`🔍 ❌ Winning cooldown not passed yet`);
@@ -946,22 +946,13 @@ window.dismissBulletin = function() {
 window.handleBulletinCTA = function() {
     if (!currentBulletin) return;
     
-    // Handle user's pick bulletins (with rally message)
+    // Handle user's pick bulletins - go directly to match
     if (['danger', 'nailbiter', 'comeback', 'winning'].includes(currentBulletin.type)) {
-        const rallyMessage = generateRallyMessage(currentBulletin);
-        
-        navigator.clipboard.writeText(rallyMessage).then(() => {
-            showNotificationToast('Rally message copied! Share it to rally support! 🔥', 'success');
-            
-            setTimeout(() => {
-                window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
-            }, 1500);
-        }).catch(() => {
-            showNotificationToast('Opening match...', 'info');
-            setTimeout(() => {
-                window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
-            }, 1000);
-        });
+        if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
+            window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
+        } else {
+            showNotificationToast('Match not available', 'error');
+        }
     }
     // Handle general voting encouragement
     else if (currentBulletin.action === 'navigate' && currentBulletin.targetUrl) {
@@ -971,41 +962,7 @@ window.handleBulletinCTA = function() {
     console.log(`📤 Bulletin CTA clicked: ${currentBulletin.type}`);
 };
 
-// ========================================
-// GENERATE RALLY MESSAGE
-// ========================================
 
-function generateRallyMessage(notification) {
-    const matchUrl = `${window.location.origin}/vote.html?match=${notification.matchId}`;
-    
-    let message = '';
-    
-    if (notification.type === 'danger') {
-        message = `🚨 EMERGENCY: "${notification.song}" is being ELIMINATED!\n\n` +
-                  `It's losing ${notification.userPct}% to ${notification.opponentPct}% and needs YOUR vote!\n\n` +
-                  `Vote now: ${matchUrl}\n\n` +
-                  `#LeagueMusicTournament`;
-    }
-    else if (notification.type === 'nailbiter') {
-        message = `🔥 TOO CLOSE TO CALL!\n\n` +
-                  `"${notification.song}" vs "${notification.opponent}" - separated by ${notification.voteDiff} vote${notification.voteDiff === 1 ? '' : 's'}!\n\n` +
-                  `Your vote DECIDES: ${matchUrl}\n\n` +
-                  `#LeagueMusicTournament`;
-    }
-    else if (notification.type === 'comeback') {
-        message = `🎉 COMEBACK COMPLETE!\n\n` +
-                  `"${notification.song}" was losing but took the lead ${notification.userPct}%-${notification.opponentPct}%!\n\n` +
-                  `Help maintain momentum: ${matchUrl}\n\n` +
-                  `#LeagueMusicTournament`;
-    }
-    else if (notification.type === 'winning') {
-        message = `🎯 "${notification.song}" is DOMINATING at ${notification.userPct}%!\n\n` +
-                  `Join the winning side: ${matchUrl}\n\n` +
-                  `#LeagueMusicTournament`;
-    }
-    
-    return message;
-}
 
 // ========================================
 // ENABLE/DISABLE PUSH NOTIFICATIONS
@@ -1273,7 +1230,7 @@ window.testBulletin = function(type = 'winning') {
             userPct: 35,
             opponentPct: 65,
             voteDiff: 15,
-            message: '🚨 "GODS" is in danger!',
+    message: '🚨 Your pick "GODS" is in danger!',
             detail: 'Behind by 15 votes (35% vs 65%)',
             cta: 'Rally Support Now!'
         },
@@ -1286,7 +1243,7 @@ window.testBulletin = function(type = 'winning') {
             voteDiff: 2,
             userPct: 49,
             opponentPct: 51,
-            message: '🔥 "GODS" is TOO CLOSE!',
+    message: '🔥 Your pick "GODS" is TOO CLOSE!',
             detail: 'Separated by just 2 votes!',
             cta: 'Share This Match!'
         },
@@ -1298,7 +1255,7 @@ window.testBulletin = function(type = 'winning') {
             opponent: 'RISE',
             userPct: 72,
             opponentPct: 28,
-            message: '🎯 "GODS" is dominating!',
+    message: '🎯 Your pick "GODS" is dominating!',
             detail: 'Leading 72% to 28%',
             cta: 'Share the Victory!'
         },
@@ -1310,7 +1267,7 @@ window.testBulletin = function(type = 'winning') {
             opponent: 'RISE',
             userPct: 55,
             opponentPct: 45,
-            message: '🎉 "GODS" completed comeback!',
+    message: '🎉 Your pick "GODS" completed comeback!',
             detail: 'Was losing, now leading 55% to 45%!',
             cta: 'Celebrate & Share!'
         },
