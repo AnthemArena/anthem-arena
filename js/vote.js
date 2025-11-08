@@ -540,6 +540,9 @@ await updateCompetitorInfo(currentMatch);
 // Initialize YouTube players
             initializeYouTubePlayers();
 
+            // ✅ NEW: Load other live matches (always, not just after voting)
+await loadOtherLiveMatches();
+
             // ========================================
             // ✨ NEW: START REAL-TIME UPDATES
             // ========================================
