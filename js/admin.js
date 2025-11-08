@@ -456,9 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 document.getElementById('scheduleDatesBtn').addEventListener('click', async () => {
-    // ✅ Ask for start date
+    // ✅ Ask for Round 1 start and end dates
     const startDateInput = prompt(
-        '📅 Enter tournament START date:\n\n' +
+        '📅 Enter ROUND 1 START date:\n\n' +
         'Format: YYYY-MM-DD\n' +
         'Example: 2025-11-05'
     );
@@ -468,19 +468,42 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
         return;
     }
     
-    // Validate date
-    const startDate = new Date(startDateInput + 'T00:00:00Z');
-    if (isNaN(startDate.getTime())) {
+    const endDateInput = prompt(
+        '📅 Enter ROUND 1 END date:\n\n' +
+        'Format: YYYY-MM-DD\n' +
+        'Example: 2025-11-11\n\n' +
+        '(All Round 1 batches will close on this date)'
+    );
+    
+    if (!endDateInput) {
+        alert('❌ Cancelled');
+        return;
+    }
+    
+    // Validate dates
+    const round1Start = new Date(startDateInput + 'T00:00:00Z');
+    const round1End = new Date(endDateInput + 'T23:59:59Z'); // End of day
+    
+    if (isNaN(round1Start.getTime()) || isNaN(round1End.getTime())) {
         alert('❌ Invalid date format! Use YYYY-MM-DD');
         return;
     }
     
-    if (!confirm(`Start tournament on ${startDate.toLocaleDateString()}?\n\nEach batch will be 24 hours.`)) {
+    if (round1End <= round1Start) {
+        alert('❌ End date must be after start date!');
+        return;
+    }
+    
+    if (!confirm(
+        `Start Round 1 on ${round1Start.toLocaleDateString()}?\n` +
+        `End Round 1 on ${round1End.toLocaleDateString()}?\n\n` +
+        `Batches will open daily but all close on ${round1End.toLocaleDateString()}.`
+    )) {
         return;
     }
     
     try {
-        console.log('📅 Scheduling batches starting from:', startDate.toISOString());
+        console.log('📅 Scheduling Round 1:', round1Start.toISOString(), 'to', round1End.toISOString());
         
         const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         const snapshot = await getDocs(matchesRef);
@@ -517,18 +540,39 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
             return groupA.batch - groupB.batch;
         });
         
-        // Assign dates (24-hour increments)
-        let currentDate = new Date(startDate);
+        // ✅ Assign dates with STAGGERED STARTS but SAME END for Round 1
         let updateCount = 0;
         let clearedCount = 0;
         const batchSummary = [];
+        
+        // Track when next round should start (after R1 ends)
+        let currentRoundEndDate = round1End;
+        let currentRound = 1;
         
         for (const batchKey of sortedBatchKeys) {
             const batchGroup = batchGroups[batchKey];
             const { round, batch, matches } = batchGroup;
             
-            // Calculate end date (24 hours later)
-            const endDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+            let batchStartDate;
+            let batchEndDate;
+            
+            if (round === 1) {
+                // ✅ Round 1: Staggered starts, same end
+                const dayOffset = batch - 1; // Batch 1 = day 0, Batch 2 = day 1, etc.
+                batchStartDate = new Date(round1Start.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+                batchEndDate = round1End; // All R1 batches end on same date
+            } else {
+                // ✅ Future rounds: Start after previous round ends
+                if (round !== currentRound) {
+                    // New round starts 24h after previous round ended
+                    currentRoundEndDate = new Date(currentRoundEndDate.getTime() + 24 * 60 * 60 * 1000);
+                    currentRound = round;
+                }
+                
+                const dayOffset = batch - 1;
+                batchStartDate = new Date(currentRoundEndDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+                batchEndDate = new Date(batchStartDate.getTime() + 6 * 24 * 60 * 60 * 1000); // 6 days for future rounds
+            }
             
             let scheduledInBatch = 0;
             
@@ -547,11 +591,11 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
                     });
                     clearedCount++;
                 } else {
-                    // ✅ Assign start and end dates
+                    // ✅ Assign staggered start but same round end
                     await updateDoc(matchRef, {
-                        date: currentDate.toISOString(),        // Legacy field
-                        startDate: currentDate.toISOString(),   // ✅ Start time
-                        endDate: endDate.toISOString()          // ✅ End time (+24h)
+                        date: batchStartDate.toISOString(),      // When batch opens
+                        startDate: batchStartDate.toISOString(), // When voting starts
+                        endDate: batchEndDate.toISOString()      // When voting ends (same for all R1)
                     });
                     scheduledInBatch++;
                     updateCount++;
@@ -562,15 +606,12 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
                 batchSummary.push({
                     round,
                     batch,
-                    start: new Date(currentDate),
-                    end: new Date(endDate),
+                    start: new Date(batchStartDate),
+                    end: new Date(batchEndDate),
                     count: scheduledInBatch
                 });
                 
-                console.log(`📅 R${round}B${batch}: ${currentDate.toLocaleDateString()} - ${endDate.toLocaleDateString()} (${scheduledInBatch} matches)`);
-                
-                // Move to next batch (24 hours later)
-                currentDate = new Date(endDate);
+                console.log(`📅 R${round}B${batch}: Opens ${batchStartDate.toLocaleDateString()} → Closes ${batchEndDate.toLocaleDateString()} (${scheduledInBatch} matches)`);
             }
         }
         
@@ -586,7 +627,7 @@ document.getElementById('scheduleDatesBtn').addEventListener('click', async () =
                 month: 'short', 
                 day: 'numeric'
             });
-            summaryMessage += `R${batch.round}B${batch.batch}: ${startStr} - ${endStr} (${batch.count} matches)\n`;
+            summaryMessage += `R${batch.round}B${batch.batch}: Opens ${startStr} → Closes ${endStr} (${batch.count} matches)\n`;
         });
         
         const finalDate = batchSummary[batchSummary.length - 1]?.end;
