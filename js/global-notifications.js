@@ -1248,6 +1248,15 @@ window.enableGlobalNotifications = enableGlobalNotifications;
 window.checkGlobalNotificationStatus = checkGlobalNotificationStatus;
 
 // ========================================
+// EXPOSE FOR TESTING & BULLETIN SYSTEM
+// ========================================
+window.showBulletin = showBulletin;
+window.hideBulletin = hideBulletin;
+window.checkAndShowBulletin = checkAndShowBulletin;
+
+console.log('✅ Bulletin functions exposed to window');
+
+// ========================================
 // DEBUG: Force show bulletin (for testing)
 // ========================================
 window.testBulletin = function(type = 'winning') {
@@ -1320,3 +1329,4 @@ window.testBulletin = function(type = 'winning') {
 };
 
 export { enableGlobalNotifications, checkGlobalNotificationStatus, checkAndShowBulletin };
+
