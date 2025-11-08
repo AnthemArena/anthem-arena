@@ -83,31 +83,38 @@ function getThumbnailUrl(youtubeUrl) {
 // FIRESTORE DATA FETCHING
 // ========================================
 
+// ========================================
+// FIRESTORE DATA FETCHING (USE EDGE CACHE)
+// ========================================
+
 async function getMatchData(matchId) {
     try {
-        const matchRef = doc(db, 'matches', matchId);
-        const matchSnap = await getDoc(matchRef);
+        // ✅ Use edge cache instead of direct Firestore
+        const response = await fetch('/api/matches');
         
-        if (matchSnap.exists()) {
-            return { id: matchId, ...matchSnap.data() };
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+        
+        const allMatches = await response.json();
+        
+        // Find the specific match
+        const match = allMatches.find(m => m.matchId === matchId || m.id === matchId);
+        
+        if (match) {
+            return { id: matchId, ...match };
+        }
+        
+        console.warn(`⚠️ Match ${matchId} not found in cache`);
         return null;
+        
     } catch (error) {
         console.error(`Error fetching match ${matchId}:`, error);
         return null;
     }
 }
 
-async function getAllLiveMatches() {
-    try {
-        // This would need to be implemented based on your Firestore structure
-        // For now, returning empty array
-        return [];
-    } catch (error) {
-        console.error('Error fetching live matches:', error);
-        return [];
-    }
-}
+
 
 // Add after line 109 (after getAllLiveMatches function)
 
@@ -750,6 +757,8 @@ function showNotificationToast(message, type = 'info') {
 
 function initBulletinSystem() {
     console.log('🎯 Initializing bulletin system...');
+
+    
     
     // Load dismissed bulletins from storage
     try {
