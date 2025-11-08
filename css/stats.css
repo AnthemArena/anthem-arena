@@ -2080,3 +2080,63 @@ display: none;
         justify-content: center;
     }
 }
+/* Tournament Progress */
+.progress-stats {
+    background: rgba(200, 170, 110, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.progress-stat {
+    margin-bottom: 1.5rem;
+}
+
+.progress-label {
+    display: block;
+    color: #999;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar-wrapper {
+    position: relative;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E, #F0E6D2);
+    transition: width 0.5s ease;
+}
+
+.progress-percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 4px rgba(0,0,0,0.8);
+}
+
+.participation-highlight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(200, 170, 110, 0.1);
+    border-radius: 8px;
+}
+
+.highlight-icon {
+    font-size: 2rem;
+}
+
+.highlight-text {
+    color: #C8AA6E;
+}

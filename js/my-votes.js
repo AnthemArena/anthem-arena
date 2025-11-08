@@ -4,7 +4,6 @@
 
 import { getAllMatches, getMatch } from './api-client.js';
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
@@ -102,41 +101,46 @@ function filterByTournament() {
 // LOAD VOTE HISTORY
 // ========================================
 
+// ========================================
+// LOAD VOTE HISTORY (OPTIMIZED)
+// ========================================
+
 async function loadVoteHistory() {
     try {
         console.log('📥 Loading vote history for user:', userId);
         
-        // Query ALL votes for this user (no tournament filter)
-        const votesRef = collection(db, 'votes');
-        const userVotesQuery = query(
-            votesRef,
-            where('userId', '==', userId)
-            // ✅ No tournament filter - get everything!
-        );
+        // ✅ OPTIMIZED: Load votes from localStorage (instant, free)
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const voteIds = Object.keys(userVotes);
         
-        const votesSnapshot = await getDocs(userVotesQuery);
-        
-        if (votesSnapshot.empty) {
+        if (voteIds.length === 0) {
             showNoVotesState();
             return;
         }
         
-        console.log(`✅ Found ${votesSnapshot.size} votes across ALL tournaments`);
+        console.log(`✅ Found ${voteIds.length} votes in localStorage`);
         
-        // Get all vote data with match details
-        const votePromises = votesSnapshot.docs.map(async (voteDoc) => {
-            const voteData = voteDoc.data();
+        // ✅ Get ALL matches from edge cache (single call)
+        const allMatches = await getAllMatches();
+        
+        // Create a map for quick lookup
+        const matchMap = new Map();
+        allMatches.forEach(match => {
+            matchMap.set(match.matchId, match);
+        });
+        
+        // Build vote history from localStorage + cached matches
+        const votePromises = voteIds.map(async (matchId) => {
+            const voteData = userVotes[matchId];
+            const matchData = matchMap.get(matchId);
             
-      // ✅ NEW: Get match details from edge cache
-const matchData = await getMatch(voteData.matchId);
-
-if (!matchData) {
-    console.warn('⚠️ Match not found:', voteData.matchId);
-    return null;
-}
+            if (!matchData) {
+                console.warn('⚠️ Match not found in cache:', matchId);
+                return null;
+            }
             
             // Determine if this was an underdog pick or mainstream pick
-            const votedForSong = voteData.choice; // 'song1' or 'song2'
+            const votedForSong = voteData.songId; // 'song1' or 'song2'
             const song1Votes = matchData.song1.votes || 0;
             const song2Votes = matchData.song2.votes || 0;
             const totalMatchVotes = song1Votes + song2Votes;
@@ -171,16 +175,16 @@ if (!matchData) {
             }
             
             return {
-                id: voteDoc.id,
-                matchId: voteData.matchId,
+                id: matchId,
+                matchId: matchId,
                 choice: votedForSong,
-                timestamp: voteData.timestamp,
-                round: voteData.round || 1,
-                votedForSeed: voteData.votedForSeed,
-                votedForName: voteData.votedForName,
+                timestamp: voteData.timestamp || new Date().toISOString(),
+                round: matchData.round || 1,
+                votedForSeed: votedSong.seed,
+                votedForName: votedSong.shortTitle || votedSong.title,
                 votedForVideoId: votedSong.videoId,
                 votedForArtist: votedSong.artist,
-                opponentName: opponentSong.shortTitle,
+                opponentName: opponentSong.shortTitle || opponentSong.title,
                 opponentSeed: opponentSong.seed,
                 match: matchData,
                 voteType: voteType,
@@ -212,7 +216,7 @@ if (!matchData) {
         document.getElementById('loadingState').innerHTML = `
             <div class="no-votes-icon">⚠️</div>
             <h3>Error Loading History</h3>
-            <p>Could not load your vote history. Please try again later.</p>
+            <p>Could not load your vote history. Please try refreshing the page.</p>
         `;
     }
 }

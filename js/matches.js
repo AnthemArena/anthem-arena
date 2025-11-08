@@ -345,12 +345,15 @@ function exportToGlobalDatabase() {
 // ========================================
 // LOAD TOURNAMENT STATS
 // ========================================
+// ========================================
+// LOAD TOURNAMENT STATS
+// ========================================
 async function loadTournamentStats() {
     try {
         console.log('📊 Loading tournament stats from Firebase...');
         
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
+        // ✅ USE EDGE CACHE (same as homepage.js)
+        const allMatches = await getAllMatches();
         
         let totalMatches = 0;
         let completedMatches = 0;
@@ -360,9 +363,7 @@ async function loadTournamentStats() {
         let uniqueSongs = new Set();
         let uniqueTournaments = new Set();
         
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            
+        allMatches.forEach(match => {
             // Count all matches (including TBD for total count)
             totalMatches++;
             
@@ -375,10 +376,8 @@ async function loadTournamentStats() {
                 upcomingMatches++;
             }
             
-            // Add vote counts (from all matches)
-            const song1Votes = match.song1?.votes || 0;
-            const song2Votes = match.song2?.votes || 0;
-            totalVotes += song1Votes + song2Votes;
+            // ✅ USE PRE-CALCULATED totalVotes (same as homepage.js)
+            totalVotes += (match.totalVotes || 0);
             
             // Track unique songs (only if they're real, not TBD)
             if (match.song1?.id && match.song1.id !== 'TBD' && !String(match.song1.id).includes('TBD')) {
@@ -395,7 +394,7 @@ async function loadTournamentStats() {
         });
         
         // ✅ UPDATE DOM - Using YOUR actual HTML IDs (with hyphens!)
-        const totalMatchesEl = document.getElementById('total-matches'); // ✅ With hyphen
+        const totalMatchesEl = document.getElementById('total-matches');
         if (totalMatchesEl) {
             totalMatchesEl.textContent = totalMatches;
             console.log(`✅ Updated total-matches: ${totalMatches}`);
@@ -403,7 +402,7 @@ async function loadTournamentStats() {
             console.warn('⚠️ #total-matches element not found');
         }
         
-        const totalVotesEl = document.getElementById('total-votes'); // ✅ With hyphen
+        const totalVotesEl = document.getElementById('total-votes');
         if (totalVotesEl) {
             totalVotesEl.textContent = totalVotes.toLocaleString();
             console.log(`✅ Updated total-votes: ${totalVotes}`);
@@ -411,7 +410,7 @@ async function loadTournamentStats() {
             console.warn('⚠️ #total-votes element not found');
         }
         
-        const tournamentsEl = document.getElementById('tournaments'); // ✅ No hyphen (already correct)
+        const tournamentsEl = document.getElementById('tournaments');
         if (tournamentsEl) {
             tournamentsEl.textContent = uniqueTournaments.size || 1;
             console.log(`✅ Updated tournaments: ${uniqueTournaments.size || 1}`);
@@ -419,7 +418,7 @@ async function loadTournamentStats() {
             console.warn('⚠️ #tournaments element not found');
         }
         
-        const uniqueVideosEl = document.getElementById('unique-videos'); // ✅ With hyphen
+        const uniqueVideosEl = document.getElementById('unique-videos');
         if (uniqueVideosEl) {
             uniqueVideosEl.textContent = uniqueSongs.size;
             console.log(`✅ Updated unique-videos: ${uniqueSongs.size}`);

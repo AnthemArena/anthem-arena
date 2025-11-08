@@ -53,16 +53,13 @@ async function loadBracketData() {
     try {
         console.log('📥 Loading bracket data from edge cache...');
         
-        // ✅ SHOW LOADING STATE
         showBracketLoading();
         
-        // ✅ NEW: Load matches from API (edge cached)
-const firebaseMatches = await getAllMatches(true); // ← FORCE BYPASS
-
+        // ✅ Use normal edge cache (no force bypass)
+        const firebaseMatches = await getAllMatches();
         
         if (!firebaseMatches || firebaseMatches.length === 0) {
             console.error('❌ No matches found!');
-            console.log('💡 Run init-matches.html to create matches');
             hideBracketLoading();
             showEmptyState();
             return;
@@ -73,15 +70,12 @@ const firebaseMatches = await getAllMatches(true); // ← FORCE BYPASS
         // Sort by match number
         firebaseMatches.sort((a, b) => a.matchNumber - b.matchNumber);
         
-        // Generate bracket HTML with Firebase data
+        // Generate bracket HTML
         await generateBracketFromFirebase(firebaseMatches);
-
-           // ✅ NEW: Update tournament info section
-        await updateTournamentInfo();
-
- 
         
-        // ✅ HIDE LOADING, SHOW BRACKET
+        // Update tournament info
+        await updateTournamentInfo(firebaseMatches);
+        
         hideBracketLoading();
         showBracketSections();
         
@@ -262,20 +256,13 @@ percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVo
 // UPDATE TOURNAMENT INFO SECTION
 // ========================================
 
-async function updateTournamentInfo() {
+async function updateTournamentInfo(allMatches) {
     console.log('📊 Updating tournament info section...');
     
     try {
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const allMatches = [];
-        snapshot.forEach(doc => {
-            allMatches.push(doc.data());
-        });
-        
-        if (allMatches.length === 0) {
-            console.warn('⚠️ No matches found');
+        // ✅ Use provided matches (already from edge cache)
+        if (!allMatches || allMatches.length === 0) {
+            console.warn('⚠️ No matches provided');
             return;
         }
         
@@ -287,7 +274,7 @@ async function updateTournamentInfo() {
         
         // Count total songs (64 songs in the tournament)
         const totalSongs = 64;
-        const byeCount = 3; // Your tournament has 3 byes
+        const byeCount = 3;
         
         // Determine current status
         let statusText = '';
@@ -304,7 +291,6 @@ async function updateTournamentInfo() {
             statusClass = 'status-completed';
             
         } else if (liveMatches.length > 0) {
-            // Live matches happening
             const liveRound = Math.max(...liveMatches.map(m => m.round));
             const roundName = getRoundName(liveRound);
             
@@ -312,11 +298,9 @@ async function updateTournamentInfo() {
             statusClass = 'status-live';
             
         } else if (upcomingMatches > 0) {
-            // Upcoming matches
             const nextRound = Math.min(...allMatches.filter(m => m.status === 'upcoming').map(m => m.round));
             const roundName = getRoundName(nextRound);
             
-            // Try to get date from first upcoming match
             const nextMatch = allMatches.find(m => m.status === 'upcoming' && m.round === nextRound);
             const dateText = nextMatch?.date ? formatDate(nextMatch.date) : 'Coming Soon';
             
@@ -328,7 +312,6 @@ async function updateTournamentInfo() {
             statusClass = 'status-upcoming';
         }
         
-        // Format for display
         const formatText = 'Single Elimination';
         
         // Update the HTML
@@ -353,11 +336,7 @@ async function updateTournamentInfo() {
                 </div>
             `;
             
-            console.log('✅ Tournament info updated:', {
-                status: statusText,
-                completed: completedMatches,
-                total: totalMatches
-            });
+            console.log('✅ Tournament info updated');
         }
         
     } catch (error) {
@@ -493,85 +472,63 @@ function getUserVotedSongId(matchId) {
 
 
 // ========================================
-// GENERATE ROUND 2 (FROM FIREBASE)
+// GENERATE ROUND 2 (FROM EDGE CACHE)
 // ========================================
 
 async function generateRound2WithByes() {
-    console.log('🎯 Generating Round 2 from Firebase...');
+    console.log('🎯 Generating Round 2 from edge cache...');
     
     const round2Container = document.getElementById('round-2-matches');
     if (!round2Container) return;
     
     try {
-        // Load Round 2 matches from Firebase
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const round2Matches = [];
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            if (match.round === 2) {
-                round2Matches.push(match);
-            }
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
+        const round2Matches = allMatches.filter(m => m.round === 2);
         
         // Sort by match number
         round2Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         if (round2Matches.length === 0) {
-            console.warn('⚠️ No Round 2 matches found in Firebase');
+            console.warn('⚠️ No Round 2 matches found');
             round2Container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #888;">
-                    <p style="margin-bottom: 1rem;">Round 2 matches not yet created.</p>
-                    <a href="init-round2-matches.html" style="display: inline-block; padding: 1rem 2rem; background: #c89b3c; color: #0a0a0a; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                        Initialize Round 2 →
-                    </a>
+                    <p>Round 2 matches not yet created.</p>
                 </div>
             `;
             return;
         }
         
-        // Generate HTML from Firebase data
+        // Generate HTML
         round2Container.innerHTML = round2Matches.map(match => 
             createMatchCardFromFirebase(match)
         ).join('');
         
-        console.log(`✅ Round 2 generated (${round2Matches.length} matches from Firebase)`);
+        console.log(`✅ Round 2 generated (${round2Matches.length} matches)`);
         
     } catch (error) {
         console.error('❌ Error loading Round 2:', error);
-        round2Container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #dc3232;">
-                <p>Error loading Round 2: ${error.message}</p>
-            </div>
-        `;
     }
 }
 
+
 // ========================================
-// GENERATE ROUND 3 FROM FIREBASE
+// GENERATE ROUND 3 FROM EDGE CACHE
 // ========================================
 
 async function generateRound3FromFirebase() {
-    console.log('🎯 Generating Round 3 from Firebase...');
+    console.log('🎯 Generating Round 3 from edge cache...');
     
     const round3Container = document.getElementById('round-3-matches');
     if (!round3Container) return;
     
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const round3Matches = [];
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            if (match.round === 3) {
-                round3Matches.push(match);
-            }
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
+        const round3Matches = allMatches.filter(m => m.round === 3);
         
         if (round3Matches.length === 0) {
-            console.warn('⚠️ No Round 3 matches found - using hardcoded placeholders');
+            console.warn('⚠️ No Round 3 matches found');
             generateRound3(); // Fall back to hardcoded
             return;
         }
@@ -579,138 +536,114 @@ const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
         round3Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round3Container.innerHTML = round3Matches.map(match => 
-            createMatchCardFromFirebase(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match)
         ).join('');
         
-        console.log(`✅ Round 3 generated (${round3Matches.length} matches from Firebase)`);
+        console.log(`✅ Round 3 generated (${round3Matches.length} matches)`);
         
     } catch (error) {
         console.error('❌ Error loading Round 3:', error);
-        generateRound3(); // Fall back to hardcoded
+        generateRound3();
     }
 }
-
 // ========================================
-// GENERATE ROUND 4 FROM FIREBASE
+// GENERATE ROUND 4 FROM EDGE CACHE
 // ========================================
 
 async function generateRound4FromFirebase() {
-    console.log('🎯 Generating Round 4 from Firebase...');
+    console.log('🎯 Generating Round 4 from edge cache...');
     
     const round4Container = document.getElementById('quarterfinals-matches');
     if (!round4Container) return;
     
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const round4Matches = [];
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            if (match.round === 4) {
-                round4Matches.push(match);
-            }
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
+        const round4Matches = allMatches.filter(m => m.round === 4);
         
         if (round4Matches.length === 0) {
-            console.warn('⚠️ No Round 4 matches found - using hardcoded placeholders');
-            generateQuarterfinals(); // Fall back to hardcoded
+            console.warn('⚠️ No Round 4 matches found');
+            generateQuarterfinals();
             return;
         }
         
         round4Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round4Container.innerHTML = round4Matches.map(match => 
-            createMatchCardFromFirebase(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match)
         ).join('');
         
-        console.log(`✅ Round 4 generated (${round4Matches.length} matches from Firebase)`);
+        console.log(`✅ Round 4 generated (${round4Matches.length} matches)`);
         
     } catch (error) {
         console.error('❌ Error loading Round 4:', error);
-        generateQuarterfinals(); // Fall back to hardcoded
+        generateQuarterfinals();
     }
 }
 
 // ========================================
-// GENERATE ROUND 5 FROM FIREBASE
+// GENERATE ROUND 5 FROM EDGE CACHE
 // ========================================
 
 async function generateRound5FromFirebase() {
-    console.log('🎯 Generating Round 5 from Firebase...');
+    console.log('🎯 Generating Round 5 from edge cache...');
     
     const round5Container = document.getElementById('semifinals-matches');
     if (!round5Container) return;
     
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const round5Matches = [];
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            if (match.round === 5) {
-                round5Matches.push(match);
-            }
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
+        const round5Matches = allMatches.filter(m => m.round === 5);
         
         if (round5Matches.length === 0) {
-            console.warn('⚠️ No Round 5 matches found - using hardcoded placeholders');
-            generateSemifinals(); // Fall back to hardcoded
+            console.warn('⚠️ No Round 5 matches found');
+            generateSemifinals();
             return;
         }
         
         round5Matches.sort((a, b) => a.matchNumber - b.matchNumber);
         
         round5Container.innerHTML = round5Matches.map(match => 
-            createMatchCardFromFirebase(match) // Reuse R2 card function
+            createMatchCardFromFirebase(match)
         ).join('');
         
-        console.log(`✅ Round 5 generated (${round5Matches.length} matches from Firebase)`);
+        console.log(`✅ Round 5 generated (${round5Matches.length} matches)`);
         
     } catch (error) {
         console.error('❌ Error loading Round 5:', error);
-        generateSemifinals(); // Fall back to hardcoded
+        generateSemifinals();
     }
 }
 
 // ========================================
-// GENERATE FINALS FROM FIREBASE
+// GENERATE FINALS FROM EDGE CACHE
 // ========================================
 
 async function generateFinalsFromFirebase() {
-    console.log('🎯 Generating Finals from Firebase...');
+    console.log('🎯 Generating Finals from edge cache...');
     
     const finalsContainer = document.getElementById('finals-match');
     if (!finalsContainer) return;
     
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        let finalsMatch = null;
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            if (match.matchId === 'finals' || match.round === 6) {
-                finalsMatch = match;
-            }
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
+        const finalsMatch = allMatches.find(m => m.matchId === 'finals' || m.round === 6);
         
         if (!finalsMatch) {
-            console.warn('⚠️ No Finals match found - using hardcoded placeholder');
-            generateFinals(); // Fall back to hardcoded
+            console.warn('⚠️ No Finals match found');
+            generateFinals();
             return;
         }
         
-        // Use the same card function as other rounds!
-finalsContainer.innerHTML = createMatchCardFromFirebase(finalsMatch);
-
+        finalsContainer.innerHTML = createMatchCardFromFirebase(finalsMatch);
         
-        console.log('✅ Finals generated from Firebase');
+        console.log('✅ Finals generated from edge cache');
         
     } catch (error) {
         console.error('❌ Error loading Finals:', error);
-        generateFinals(); // Fall back to hardcoded
+        generateFinals();
     }
 }
 
@@ -722,14 +655,8 @@ async function generateTournamentStats() {
     console.log('🎯 Calculating tournament statistics...');
     
     try {
-const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        const allMatches = [];
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            allMatches.push(match);
-        });
+        // ✅ Use edge cache
+        const allMatches = await getAllMatches();
         
         const completedMatches = allMatches.filter(m => m.status === 'completed');
         

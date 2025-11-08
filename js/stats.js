@@ -10,7 +10,6 @@ import {
     getTournamentOverview, 
     getAllTimeSongRankings, 
     getUpsets,
-    getParticipationStats,
     getSeedPerformance
 } from './stats-queries.js';
 
@@ -155,24 +154,29 @@ async function loadSongData() {
 // LOAD ALL STATS
 // ========================================
 
+// ========================================
+// LOAD ALL STATS
+// ========================================
+
 async function loadAllStats() {
     try {
         console.log('📥 Loading all stats...');
         
-        // Load all stats in parallel
+        // ✅ OPTIMIZED: Load stats in parallel (removed getParticipationStats)
         [
             tournamentOverview,
             songRankings,
             upsets,
-            participationStats,
             seedPerformance
         ] = await Promise.all([
             getTournamentOverview(ACTIVE_TOURNAMENT),
             getAllTimeSongRankings(ACTIVE_TOURNAMENT),
             getUpsets(ACTIVE_TOURNAMENT),
-            getParticipationStats(),
             getSeedPerformance(ACTIVE_TOURNAMENT)
         ]);
+        
+        // ✅ Set participationStats to null (we'll derive from tournamentOverview)
+        participationStats = null;
         
         // Merge YouTube data into song rankings
         songRankings = songRankings.map(song => {
@@ -189,7 +193,7 @@ async function loadAllStats() {
         console.log('Tournament Overview:', tournamentOverview);
         console.log('Song Rankings:', songRankings.length);
         console.log('Upsets:', upsets.length);
-        console.log('Participation:', participationStats);
+        console.log('Participation: Derived from overview (no direct Firebase query)');
         console.log('Seed Performance:', seedPerformance);
         
     } catch (error) {
@@ -616,64 +620,85 @@ function renderUpsets() {
 // RENDER PARTICIPATION STATS
 // ========================================
 
+// ========================================
+// RENDER PARTICIPATION STATS
+// ========================================
+
 function renderParticipationStats() {
-    if (!participationStats) return;
+    if (!tournamentOverview) return;
     
     const container = document.getElementById('participation-stats');
     if (!container) return;
     
-    const { totalVotes, uniqueVoters, averageVotesPerUser, peakHour, votingHours } = participationStats;
+    const { totalVotes, completedMatches, liveMatches, upcomingMatches, totalMatches } = tournamentOverview;
+    
+    // ✅ Calculate average votes per match
+    const avgVotesPerMatch = completedMatches > 0 
+        ? Math.round(totalVotes / completedMatches) 
+        : 0;
     
     container.innerHTML = `
         <div class="stats-grid">
+            <div class="stat-card highlight">
+                <div class="stat-icon">🗳️</div>
+                <div class="stat-value">${totalVotes.toLocaleString()}</div>
+                <div class="stat-label">Total Votes Cast</div>
+                <div class="stat-sublabel">Across all matches</div>
+            </div>
+            
             <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-value">${uniqueVoters.toLocaleString()}</div>
-                <div class="stat-label">Unique Voters</div>
+                <div class="stat-icon">✅</div>
+                <div class="stat-value">${completedMatches}</div>
+                <div class="stat-label">Completed Matches</div>
+                <div class="stat-sublabel">of ${totalMatches} total</div>
             </div>
             
             <div class="stat-card">
                 <div class="stat-icon">📊</div>
-                <div class="stat-value">${averageVotesPerUser}</div>
-                <div class="stat-label">Avg Votes Per User</div>
+                <div class="stat-value">${avgVotesPerMatch}</div>
+                <div class="stat-label">Avg Votes Per Match</div>
+                <div class="stat-sublabel">From completed matches</div>
             </div>
             
             <div class="stat-card">
-                <div class="stat-icon">⏰</div>
-                <div class="stat-value">${formatHour(peakHour)}</div>
-                <div class="stat-label">Peak Voting Hour</div>
+                <div class="stat-icon">🔴</div>
+                <div class="stat-value">${liveMatches}</div>
+                <div class="stat-label">Live Matches</div>
+                <div class="stat-sublabel">Vote now!</div>
             </div>
         </div>
         
-        <div class="voting-chart">
-            <h3 class="chart-title">Votes by Hour</h3>
-            <div class="hour-chart">
-                ${renderHourChart(votingHours)}
+        <div class="participation-insights">
+            <h3 class="chart-title">📈 Tournament Progress</h3>
+            <div class="progress-stats">
+                <div class="progress-stat">
+                    <span class="progress-label">Tournament Completion</span>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-fill" style="width: ${Math.round((completedMatches / totalMatches) * 100)}%"></div>
+                        <span class="progress-percent">${Math.round((completedMatches / totalMatches) * 100)}%</span>
+                    </div>
+                </div>
+                
+                ${tournamentOverview.highestVoteMatch ? `
+                    <div class="participation-highlight">
+                        <span class="highlight-icon">🔥</span>
+                        <div class="highlight-text">
+                            <strong>Most Popular Match:</strong>
+                            ${tournamentOverview.highestVoteMatch.song1} vs ${tournamentOverview.highestVoteMatch.song2}
+                            (${tournamentOverview.highestVoteMatch.totalVotes.toLocaleString()} votes)
+                        </div>
+                    </div>
+                ` : ''}
             </div>
         </div>
+        
+        <p style="text-align: center; color: #999; margin-top: 2rem; font-size: 0.9rem;">
+            Real-time stats powered by edge cache • Updates every 30 seconds
+        </p>
     `;
 }
 
-function renderHourChart(votingHours) {
-    const maxVotes = Math.max(...Object.values(votingHours));
-    
-    let html = '<div class="hour-bars">';
-    
-    for (let hour = 0; hour < 24; hour++) {
-        const votes = votingHours[hour] || 0;
-        const heightPercent = maxVotes > 0 ? (votes / maxVotes) * 100 : 0;
-        
-        html += `
-            <div class="hour-bar-wrapper" title="${formatHour(hour)}: ${votes} votes">
-                <div class="hour-bar" style="height: ${heightPercent}%"></div>
-                <div class="hour-label">${hour}</div>
-            </div>
-        `;
-    }
-    
-    html += '</div>';
-    return html;
-}
+
 
 // ========================================
 // RENDER SEED PERFORMANCE
