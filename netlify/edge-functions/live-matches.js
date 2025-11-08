@@ -1,6 +1,6 @@
 // ========================================
 // LIVE MATCHES EDGE CACHE - NETLIFY EDGE FUNCTION
-// Caches all live matches for 2 minutes at edge
+// FIXED: Query nested matches collection
 // ========================================
 
 const CACHE_DURATION = 120; // 2 minutes
@@ -42,42 +42,14 @@ export default async (request, context) => {
   console.log(`❌ CACHE MISS - fetching from Firebase`);
   
   try {
-    const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
+    // FIXED: Query nested collection path
+    const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
     
     const response = await fetch(queryUrl, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        structuredQuery: {
-          from: [{
-            collectionId: 'matches',
-            allDescendants: false
-          }],
-          where: {
-            compositeFilter: {
-              op: 'AND',
-              filters: [
-                {
-                  fieldFilter: {
-                    field: { fieldPath: 'tournamentId' },
-                    op: 'EQUAL',
-                    value: { stringValue: TOURNAMENT }
-                  }
-                },
-                {
-                  fieldFilter: {
-                    field: { fieldPath: 'status' },
-                    op: 'EQUAL',
-                    value: { stringValue: 'live' }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      })
+      }
     });
     
     if (!response.ok) {
@@ -86,16 +58,22 @@ export default async (request, context) => {
     
     const data = await response.json();
     
-    const liveMatches = data
-      .filter(item => item.document)
-      .map(item => convertDocument(item.document));
+    // Filter for live matches
+    const allMatches = data.documents || [];
+    const liveMatches = allMatches
+      .filter(doc => {
+        const status = doc.fields?.status?.stringValue;
+        return status === 'live';
+      })
+      .map(doc => convertDocument(doc));
     
-    console.log(`🔥 Found ${liveMatches.length} live matches`);
+    console.log(`🔥 Found ${liveMatches.length} live matches out of ${allMatches.length} total`);
     
     // Fetch votes for all live matches in parallel
     const matchesWithVotes = await Promise.all(
       liveMatches.map(async (match) => {
-        const votes = await fetchVotesForMatch(match.matchId || match.id);
+        const matchId = match.id || match.matchId;
+        const votes = await fetchVotesForMatch(matchId);
         return addVoteCountsToMatch(match, votes);
       })
     );
@@ -143,32 +121,26 @@ export default async (request, context) => {
 async function fetchVotesForMatch(matchId) {
   if (!matchId) return [];
   
-  const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
+  // Query votes collection at tournament level
+  const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/votes`;
   
   try {
-    const response = await fetch(votesUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        structuredQuery: {
-          from: [{ collectionId: 'votes' }],
-          where: {
-            fieldFilter: {
-              field: { fieldPath: 'matchId' },
-              op: 'EQUAL',
-              value: { stringValue: matchId }
-            }
-          }
-        }
-      })
-    });
+    const response = await fetch(votesUrl);
     
     if (!response.ok) return [];
     
     const data = await response.json();
-    return data
-      .filter(item => item.document)
-      .map(item => convertDocument(item.document));
+    const allVotes = data.documents || [];
+    
+    // Filter votes for this match
+    const matchVotes = allVotes
+      .filter(doc => {
+        const voteMatchId = doc.fields?.matchId?.stringValue;
+        return voteMatchId === matchId;
+      })
+      .map(doc => convertDocument(doc));
+    
+    return matchVotes;
   } catch (error) {
     console.error(`❌ Error fetching votes for ${matchId}:`, error);
     return [];
@@ -212,6 +184,7 @@ function convertDocument(doc) {
     result[key] = extractValue(value);
   }
   
+  // Extract ID from document name
   if (doc.name && !result.id) {
     const nameParts = doc.name.split('/');
     result.id = nameParts[nameParts.length - 1];
