@@ -601,17 +601,18 @@ function showBulletin(notification) {
         banner = document.createElement('div');
         banner.id = 'bulletin-banner';
         banner.className = 'bulletin-banner';
-        banner.innerHTML = `
-            <div class="bulletin-content">
-                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
-                <div class="bulletin-icon" id="bulletin-icon"></div>
-                <div class="bulletin-text">
-                    <div class="bulletin-message" id="bulletin-message"></div>
-                    <div class="bulletin-detail" id="bulletin-detail"></div>
-                </div>
-                <button class="bulletin-cta" id="bulletin-cta" onclick="window.handleBulletinCTA()"></button>
-            </div>
-        `;
+  // In showBulletin() function, around line 630, change the HTML order:
+banner.innerHTML = `
+    <div class="bulletin-content">
+        <div class="bulletin-icon" id="bulletin-icon"></div>
+        <div class="bulletin-text">
+            <div class="bulletin-message" id="bulletin-message"></div>
+            <div class="bulletin-detail" id="bulletin-detail"></div>
+        </div>
+        <button class="bulletin-cta" id="bulletin-cta" onclick="window.handleBulletinCTA()"></button>
+        <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+    </div>
+`;
         document.body.appendChild(banner);
         
         if (!document.getElementById('bulletin-styles')) {
@@ -635,51 +636,50 @@ function showBulletin(notification) {
         transform: translateY(0); 
     }
     
-    /* Themed backgrounds matching your site */
-    .bulletin-banner.danger { 
-        background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(185, 28, 28, 0.95));
-        border-bottom: 3px solid rgba(239, 68, 68, 0.8);
-    }
-    
-    .bulletin-banner.nailbiter { 
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
-        border-bottom: 3px solid rgba(251, 191, 36, 0.8);
-    }
-    
-    .bulletin-banner.winning { 
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
-        border-bottom: 3px solid rgba(52, 211, 153, 0.8);
-    }
-    
-    .bulletin-banner.comeback { 
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(109, 40, 217, 0.95));
-        border-bottom: 3px solid rgba(167, 139, 250, 0.8);
-    }
-    
-    .bulletin-banner.close-match { 
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
-        border-bottom: 3px solid rgba(251, 191, 36, 0.8);
-    }
-    
-    .bulletin-banner.new-match { 
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
-        border-bottom: 3px solid rgba(96, 165, 250, 0.8);
-    }
-    
-    .bulletin-banner.low-turnout { 
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.95));
-        border-bottom: 3px solid rgba(129, 140, 248, 0.8);
-    }
-    
-    .bulletin-banner.welcome { 
-        background: linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(160, 136, 94, 0.95));
-        border-bottom: 3px solid rgba(212, 184, 118, 0.8);
-    }
-    
-    .bulletin-banner.return-voter { 
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.95), rgba(126, 34, 206, 0.95));
-        border-bottom: 3px solid rgba(192, 132, 252, 0.8);
-    }
+  /* Replace all the themed backgrounds (around line 683-730) with this unified theme: */
+
+/* Unified dark + gold theme for ALL bulletin types */
+.bulletin-banner.danger,
+.bulletin-banner.nailbiter,
+.bulletin-banner.winning,
+.bulletin-banner.comeback,
+.bulletin-banner.close-match,
+.bulletin-banner.new-match,
+.bulletin-banner.low-turnout,
+.bulletin-banner.welcome,
+.bulletin-banner.return-voter {
+    background: linear-gradient(135deg, rgba(20, 25, 35, 0.97), rgba(15, 20, 30, 0.97));
+    border-bottom: 3px solid #C8AA6E;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 40px rgba(200, 170, 110, 0.15);
+}
+
+/* Unified CTA button - gold theme */
+.bulletin-cta {
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    color: #0a0a0a;
+    border: none;
+    padding: 0.85rem 1.75rem;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+}
+
+.bulletin-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.5);
+    background: linear-gradient(135deg, #D4B876, #C8AA6E);
+}
+
+.bulletin-cta:active {
+    transform: translateY(0);
+}
     
     .bulletin-content {
         max-width: 1200px;
@@ -697,16 +697,17 @@ function showBulletin(notification) {
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
     
-    @keyframes pulse {
-        0%, 100% { 
-            transform: scale(1);
-            opacity: 1;
-        }
-        50% { 
-            transform: scale(1.15);
-            opacity: 0.85;
-        }
+   /* Update the @keyframes pulse around line 707 */
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
     }
+    50% { 
+        transform: scale(1.2) rotate(5deg);
+        opacity: 0.9;
+    }
+}
     
     .bulletin-text { 
         flex: 1;
