@@ -15,7 +15,6 @@ import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 // Features & Systems
 import { getAllTournamentStats } from './music-gallery.js';
 import { getBookForSong } from './bookMappings.js';
-import { checkGlobalNotificationStatus } from './global-notifications.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
 import { updateNavRank } from './navigation.js';
 import { createMatchCard } from './match-card-renderer.js';
