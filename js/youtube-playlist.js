@@ -20,25 +20,23 @@ let playlistVideos = [];
 // ========================================
 async function fetchPlaylistVideos() {
     try {
-        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${MAX_RESULTS}&key=${API_KEY}`;
-        
-        const response = await fetch(url);
+        // ✅ call your secure Netlify function instead of Google directly
+        const response = await fetch('/.netlify/functions/youtube');
         const data = await response.json();
-        
+
         if (data.error) {
             console.error('YouTube API Error:', data.error);
             return [];
         }
-        
+
         playlistVideos = data.items.map(item => ({
             videoId: item.snippet.resourceId.videoId,
             title: item.snippet.title,
             thumbnail: item.snippet.thumbnails.medium.url,
             publishedAt: item.snippet.publishedAt
         }));
-        
+
         return playlistVideos;
-        
     } catch (error) {
         console.error('Error fetching playlist:', error);
         return [];
