@@ -158,13 +158,36 @@ export function createMatchCard(match) {
     const card = wrapper.firstElementChild;
     
     // ✅ Make entire card clickable
-    card.addEventListener('click', (e) => {
-        // Don't navigate if clicking directly on a button (let button handlers fire)
-        if (e.target.closest('button')) return;
-        
-        // Navigate to vote page
+   // ✅ Make entire card clickable
+card.addEventListener('click', () => {
+    window.location.href = `/vote.html?match=${match.id}`;
+});
+
+// ✅ Add specific button handlers with stopPropagation
+const voteButton = card.querySelector('.vote-now-btn');
+const viewResultsButton = card.querySelector('.view-results-btn');
+const viewDetailsButton = card.querySelector('.view-details-btn');
+
+if (voteButton) {
+    voteButton.addEventListener('click', (e) => {
+        e.stopPropagation();  // Prevent card click
         window.location.href = `/vote.html?match=${match.id}`;
     });
+}
+
+if (viewResultsButton) {
+    viewResultsButton.addEventListener('click', (e) => {
+        e.stopPropagation();  // Prevent card click
+        window.location.href = `/vote.html?match=${match.id}`;
+    });
+}
+
+if (viewDetailsButton) {
+    viewDetailsButton.addEventListener('click', (e) => {
+        e.stopPropagation();  // Prevent card click
+        window.location.href = `/vote.html?match=${match.id}`;
+    });
+}
     
     return card;
 }

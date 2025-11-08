@@ -652,6 +652,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
         round: getRoundName(firebaseMatch.round),
         status: firebaseMatch.status || 'upcoming',
         date: firebaseMatch.date || '2025-11-01',
+        endDate: firebaseMatch.endDate || null,  // ✅ ADD THIS LINE!
         totalVotes: totalVotes,
         timeLeft: firebaseMatch.status === 'live' ? 'Voting Open' : 'Not Started',
         hasVoted: hasVoted,
@@ -663,7 +664,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song1Votes,
             percentage: song1Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
-            leading: userVotedSongId === 'song1', // ✅ Green glow = user's vote, not who's winning
+            leading: userVotedSongId === 'song1',
             userVoted: userVotedSongId === 'song1'
         },
         competitor2: {
@@ -674,7 +675,7 @@ function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, us
             votes: song2Votes,
             percentage: song2Percentage,
             winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
-            leading: userVotedSongId === 'song2', // ✅ Green glow = user's vote, not who's winning
+            leading: userVotedSongId === 'song2',
             userVoted: userVotedSongId === 'song2'
         }
     };
@@ -766,6 +767,8 @@ async function loadUpcomingMatches() {
                 round: getRoundName(match.round),
                 status: 'upcoming',
                 date: match.date || '2025-11-01',
+                    endDate: match.endDate || null,  // ✅ ADD THIS LINE!
+
                 totalVotes: 0,
                 timeLeft: 'Not Started',
                 competitor1: {
