@@ -3,74 +3,86 @@
    ======================================== */
 
 .youtube-playlist-section {
-    padding: 60px 0;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
 }
 
 .youtube-playlist-section .section-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 3rem;
 }
 
 .youtube-playlist-section .section-label {
     display: inline-block;
-    font-size: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: #f39c12;
-    background: rgba(243, 156, 18, 0.1);
-    padding: 8px 16px;
-    border-radius: 20px;
-    margin-bottom: 12px;
+    color: #C8AA6E;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
 }
 
 .youtube-playlist-section .section-title {
-    font-size: 36px;
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
     font-weight: 700;
     color: #fff;
-    margin: 12px 0;
+    margin: 1rem 0;
+    letter-spacing: 0.05em;
 }
 
 .youtube-playlist-section .section-subtitle {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    color: #999;
     margin: 0;
 }
 
-/* Video Carousel */
+/* ========================================
+   VIDEO CAROUSEL
+   ======================================== */
+
 .video-carousel-wrapper {
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 3rem;
     padding: 0 20px;
 }
 
 .video-carousel {
     display: flex;
-    gap: 20px;
+    gap: 1.5rem;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 20px 0;
+    padding: 1.5rem 0;
     -webkit-overflow-scrolling: touch;
 }
 
+/* Scrollbar styling to match theme */
 .video-carousel::-webkit-scrollbar {
     height: 8px;
 }
 
 .video-carousel::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.4);
     border-radius: 4px;
 }
 
 .video-carousel::-webkit-scrollbar-thumb {
-    background: rgba(243, 156, 18, 0.5);
+    background: rgba(200, 170, 110, 0.4);
     border-radius: 4px;
+    transition: background 0.3s;
 }
 
 .video-carousel::-webkit-scrollbar-thumb:hover {
-    background: rgba(243, 156, 18, 0.8);
+    background: rgba(200, 170, 110, 0.6);
 }
 
-/* Video Thumbnail Card */
+/* ========================================
+   VIDEO THUMBNAIL CARDS
+   ======================================== */
+
 .video-thumbnail-card {
     position: relative;
     min-width: 200px;
@@ -80,27 +92,34 @@
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #0f1419;
-    border: 2px solid transparent;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    flex-shrink: 0;
 }
 
 .video-thumbnail-card:hover {
     transform: translateY(-8px);
-    border-color: #f39c12;
-    box-shadow: 0 8px 24px rgba(243, 156, 18, 0.3);
+    border-color: rgba(200, 170, 110, 0.6);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .video-thumbnail-card.active {
-    border-color: #f39c12;
-    box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+    border-color: #C8AA6E;
+    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.4);
 }
 
 .video-thumbnail-card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    transition: transform 0.3s ease;
 }
 
+.video-thumbnail-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Play overlay */
 .video-card-overlay {
     position: absolute;
     top: 0;
@@ -110,7 +129,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -121,24 +140,31 @@
 
 .video-card-overlay i {
     font-size: 48px;
-    color: #f39c12;
+    color: #C8AA6E;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
+/* Video title */
 .video-card-title {
-    padding: 12px;
-    font-size: 14px;
+    padding: 1rem;
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #fff;
     line-height: 1.4;
     height: 80px;
     display: flex;
     align-items: center;
+    background: rgba(0, 0, 0, 0.3);
 }
 
-/* Video Player */
+/* ========================================
+   VIDEO PLAYER
+   ======================================== */
+
 .youtube-player-container {
-    max-width: 900px;
-    margin: 0 auto 30px;
+    max-width: 1000px;
+    margin: 0 auto 3rem;
     padding: 0 20px;
 }
 
@@ -148,7 +174,8 @@
     height: 0;
     overflow: hidden;
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(200, 170, 110, 0.3);
 }
 
 .player-wrapper iframe {
@@ -159,7 +186,10 @@
     height: 100%;
 }
 
-/* Playlist CTA */
+/* ========================================
+   PLAYLIST CTA
+   ======================================== */
+
 .playlist-cta {
     text-align: center;
     padding: 0 20px;
@@ -168,24 +198,111 @@
 .playlist-cta .btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 28px;
-    font-size: 16px;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: transparent;
+    border: 2px solid #C8AA6E;
+    border-radius: 8px;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.playlist-cta .btn:hover {
+    background: #C8AA6E;
+    color: #0a0a0a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(200, 170, 110, 0.3);
 }
 
 .playlist-cta .btn i {
-    font-size: 20px;
+    font-size: 1.25rem;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.youtube-playlist-section .loading-content {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.youtube-playlist-section .loader {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(200, 170, 110, 0.2);
+    border-top-color: #C8AA6E;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 2rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.youtube-playlist-section .loading-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 968px) {
     .youtube-playlist-section .section-title {
-        font-size: 28px;
+        font-size: 2.5rem;
     }
     
     .youtube-playlist-section .section-subtitle {
-        font-size: 16px;
+        font-size: 1.1rem;
+    }
+    
+    .video-thumbnail-card {
+        min-width: 180px;
+        width: 180px;
+        height: 260px;
+    }
+    
+    .video-thumbnail-card img {
+        height: 180px;
+    }
+    
+    .video-card-overlay {
+        height: 180px;
+    }
+    
+    .video-card-overlay i {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .youtube-playlist-section {
+        padding: 4rem 0;
+    }
+    
+    .youtube-playlist-section .section-title {
+        font-size: 2rem;
+    }
+    
+    .youtube-playlist-section .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .video-carousel {
+        gap: 1rem;
     }
     
     .video-thumbnail-card {
@@ -204,5 +321,64 @@
     
     .video-card-overlay i {
         font-size: 36px;
+    }
+    
+    .video-card-title {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+    
+    .playlist-cta .btn {
+        padding: 0.875rem 1.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .youtube-playlist-section .section-title {
+        font-size: 1.75rem;
+    }
+    
+    .video-thumbnail-card {
+        min-width: 140px;
+        width: 140px;
+        height: 220px;
+    }
+    
+    .video-thumbnail-card img {
+        height: 140px;
+    }
+    
+    .video-card-overlay {
+        height: 140px;
+    }
+    
+    .video-card-overlay i {
+        font-size: 32px;
+    }
+    
+    .playlist-cta .btn {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========================================
+   FADE IN ANIMATION
+   ======================================== */
+
+.youtube-playlist-section.fade-in {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
