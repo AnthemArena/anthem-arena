@@ -3,8 +3,9 @@
 // ========================================
 
 const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
-const API_KEY = 'AIzaSyBaCIWwOaINfdw5rkQ937jbqMBMDi1w2EI'; // Replace with your API key
-const MAX_RESULTS = 12; // Number of videos to show
+const API_KEY = 'AIzaSyBaCIWwOaINfdw5rkQ937jbqMBMDi1w2EI';
+const MAX_RESULTS = 50; // Increased to get more videos
+const PLAYLIST_NAME = 'Anthem Arena Season 1'; // ✅ Playlist name
 
 let currentVideoId = null;
 let playlistVideos = [];
@@ -49,61 +50,69 @@ async function renderPlaylistCarousel() {
     const videos = await fetchPlaylistVideos();
     
     if (videos.length === 0) {
-        container.innerHTML = '<p>Unable to load videos. Please check back later.</p>';
+        container.innerHTML = `
+            <div class="youtube-playlist-section">
+                <div class="section-header">
+                    <p style="color: #999; text-align: center;">Unable to load videos. Please check back later.</p>
+                </div>
+            </div>
+        `;
         return;
     }
     
     // Set first video as active
     currentVideoId = videos[0].videoId;
     
-    // Build carousel HTML
+    // ✅ Build carousel HTML with playlist name and video count
     const carouselHTML = `
         <div class="youtube-playlist-section">
-            <div class="section-header">
-                <span class="section-label">🎬 Match Highlights</span>
-                <h2 class="section-title">Watch the Action</h2>
-                <p class="section-subtitle">Head-to-head matchups on YouTube Shorts</p>
-            </div>
-            
-            <!-- Video Thumbnails Carousel -->
-            <div class="video-carousel-wrapper">
-                <div class="video-carousel">
-                    ${videos.map((video, index) => `
-                        <div class="video-thumbnail-card ${index === 0 ? 'active' : ''}" 
-                             data-video-id="${video.videoId}"
-                             onclick="loadVideo('${video.videoId}')">
-                            <img src="${video.thumbnail}" 
-                                 alt="${video.title}"
-                                 loading="lazy">
-                            <div class="video-card-overlay">
-                                <i class="fas fa-play-circle"></i>
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">🎬 Match Highlights</span>
+                    <h2 class="section-title">${PLAYLIST_NAME}</h2>
+                    <p class="section-subtitle">Head-to-head matchups on YouTube Shorts • ${videos.length} videos</p>
+                </div>
+                
+                <!-- Video Thumbnails Carousel -->
+                <div class="video-carousel-wrapper">
+                    <div class="video-carousel">
+                        ${videos.map((video, index) => `
+                            <div class="video-thumbnail-card ${index === 0 ? 'active' : ''}" 
+                                 data-video-id="${video.videoId}"
+                                 onclick="loadVideo('${video.videoId}')">
+                                <img src="${video.thumbnail}" 
+                                     alt="${video.title}"
+                                     loading="lazy">
+                                <div class="video-card-overlay">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="video-card-title">${truncateTitle(video.title)}</div>
                             </div>
-                            <div class="video-card-title">${truncateTitle(video.title)}</div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Active Video Player -->
-            <div class="youtube-player-container">
-                <div class="player-wrapper">
-                    <iframe id="youtube-playlist-player"
-                            src="https://www.youtube.com/embed/${currentVideoId}?rel=0"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                    </iframe>
+                
+                <!-- Active Video Player -->
+                <div class="youtube-player-container">
+                    <div class="player-wrapper">
+                        <iframe id="youtube-playlist-player"
+                                src="https://www.youtube.com/embed/${currentVideoId}?rel=0"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Playlist CTA -->
-            <div class="playlist-cta">
-                <a href="https://www.youtube.com/playlist?list=${PLAYLIST_ID}" 
-                   target="_blank" 
-                   class="btn btn-primary">
-                    <i class="fab fa-youtube"></i>
-                    Watch Full Playlist on YouTube
-                </a>
+                
+                <!-- Playlist CTA -->
+                <div class="playlist-cta">
+                    <a href="https://www.youtube.com/playlist?list=${PLAYLIST_ID}" 
+                       target="_blank" 
+                       class="btn btn-primary">
+                        <i class="fab fa-youtube"></i>
+                        Watch Full Playlist on YouTube
+                    </a>
+                </div>
             </div>
         </div>
     `;
