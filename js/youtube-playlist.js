@@ -59,25 +59,23 @@ async function renderPlaylistCarousel() {
         `;
         return;
     }
+        // ✅ NO default video - player starts hidden
+    currentVideoId = null;
     
-    // Set first video as active
-    currentVideoId = videos[0].videoId;
-    
-    // ✅ Build carousel HTML with playlist name and video count
     const carouselHTML = `
         <div class="youtube-playlist-section">
             <div class="container">
                 <div class="section-header">
                     <span class="section-label">🎬 Match Highlights</span>
                     <h2 class="section-title">${PLAYLIST_NAME}</h2>
-                    <p class="section-subtitle">Head-to-head matchups on YouTube Shorts • ${videos.length} videos</p>
+                    <p class="section-subtitle">Follow the action and watch the H2H matches on Youtube! • ${videos.length} videos</p>
                 </div>
                 
                 <!-- Video Thumbnails Carousel -->
                 <div class="video-carousel-wrapper">
                     <div class="video-carousel">
                         ${videos.map((video, index) => `
-                            <div class="video-thumbnail-card ${index === 0 ? 'active' : ''}" 
+                            <div class="video-thumbnail-card" 
                                  data-video-id="${video.videoId}"
                                  onclick="loadVideo('${video.videoId}')">
                                 <img src="${video.thumbnail}" 
@@ -92,11 +90,14 @@ async function renderPlaylistCarousel() {
                     </div>
                 </div>
                 
-                <!-- Active Video Player -->
-                <div class="youtube-player-container">
+                <!-- ✅ Active Video Player - HIDDEN BY DEFAULT with Close Button -->
+                <div class="youtube-player-container" id="youtube-player-container" style="display: none;">
+                    <button class="player-close-btn" onclick="closePlayer()" aria-label="Close video player">
+                        <i class="fas fa-times"></i>
+                    </button>
                     <div class="player-wrapper">
                         <iframe id="youtube-playlist-player"
-                                src="https://www.youtube.com/embed/${currentVideoId}?rel=0"
+                                src=""
                                 frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen>
@@ -126,6 +127,16 @@ async function renderPlaylistCarousel() {
 window.loadVideo = function(videoId) {
     currentVideoId = videoId;
     
+    // ✅ Show player container with smooth reveal
+    const playerContainer = document.getElementById('youtube-player-container');
+    if (playerContainer && playerContainer.style.display === 'none') {
+        playerContainer.style.display = 'block';
+        // Smooth scroll to player
+        setTimeout(() => {
+            playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+    
     // Update player iframe
     const player = document.getElementById('youtube-playlist-player');
     if (player) {
@@ -137,9 +148,61 @@ window.loadVideo = function(videoId) {
         card.classList.remove('active');
         if (card.dataset.videoId === videoId) {
             card.classList.add('active');
-            
-            // Scroll card into view
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    });
+};
+
+// ========================================
+// CLOSE VIDEO PLAYER
+// ========================================
+window.closePlayer = function() {
+    const playerContainer = document.getElementById('youtube-player-container');
+    if (playerContainer) {
+        playerContainer.style.display = 'none';
+        
+        // Stop video playback
+        const player = document.getElementById('youtube-playlist-player');
+        if (player) {
+            player.src = '';
+        }
+        
+        // Clear active states
+        document.querySelectorAll('.video-thumbnail-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Reset current video
+        currentVideoId = null;
+    }
+};
+
+// ========================================
+// LOAD VIDEO IN PLAYER
+// ========================================
+window.loadVideo = function(videoId) {
+    currentVideoId = videoId;
+    
+    // ✅ Show player container with smooth reveal
+    const playerContainer = document.getElementById('youtube-player-container');
+    if (playerContainer && playerContainer.style.display === 'none') {
+        playerContainer.style.display = 'block';
+        // Smooth scroll to player
+        setTimeout(() => {
+            playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+    
+    // Update player iframe
+    const player = document.getElementById('youtube-playlist-player');
+    if (player) {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    }
+    
+    // Update active thumbnail
+    document.querySelectorAll('.video-thumbnail-card').forEach(card => {
+        card.classList.remove('active');
+        if (card.dataset.videoId === videoId) {
+            card.classList.add('active');
         }
     });
 };
