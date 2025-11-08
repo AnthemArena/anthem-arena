@@ -20,6 +20,69 @@ import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
 import { updateNavRank } from './navigation.js';
 import { createMatchCard } from './match-card-renderer.js';
 
+// ========================================
+// COUNTDOWN TIMER HELPER
+// ========================================
+
+function getTimeRemaining(endDate) {
+    if (!endDate) return null;
+    
+    const now = new Date();
+    const end = new Date(endDate);
+    const diff = end - now;
+    
+    if (diff <= 0) {
+        return {
+            text: '⏱️ Voting Closed',
+            color: '#999',
+            urgent: false,
+            expired: true
+        };
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    // Critical (< 1 hour)
+    if (days === 0 && hours === 0) {
+        return {
+            text: `🚨 ${minutes}m left to vote!`,
+            color: '#ff4444',
+            urgent: true,
+            expired: false
+        };
+    }
+    
+    // Urgent (< 6 hours)
+    if (days === 0 && hours < 6) {
+        return {
+            text: `🔥 ${hours}h ${minutes}m left`,
+            color: '#ff4444',
+            urgent: true,
+            expired: false
+        };
+    }
+    
+    // Moderate (< 24 hours)
+    if (days === 0) {
+        return {
+            text: `⏰ ${hours}h ${minutes}m left`,
+            color: '#ffaa00',
+            urgent: false,
+            expired: false
+        };
+    }
+    
+    // Calm (1+ days)
+    return {
+        text: `⏰ ${days}d ${hours}h left`,
+        color: '#667eea',
+        urgent: false,
+        expired: false
+    };
+}
+
 
     // ✅ ADD THIS LINE:
     const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
@@ -430,6 +493,8 @@ currentMatch = {
     round: matchData.round || 1,
     status: matchData.status,
     totalVotes: matchData.totalVotes || 0,
+        endDate: matchData.endDate || null,  // ✅ Make sure this line exists!
+
 
     competitor1: {
         id: 'song1',
@@ -773,20 +838,46 @@ await loadOtherLiveMatches();
             tournamentBadge.innerHTML = `🏆 Anthem Arena Championship - ${roundName}`;
         }
         
-        // Update time remaining
-        const timeRemaining = document.getElementById('time-remaining');
-        if (timeRemaining) {
-            if (currentMatch.status === 'live') {
+       // Update time remaining with countdown support
+const timeRemaining = document.getElementById('time-remaining');
+if (timeRemaining) {
+    if (currentMatch.status === 'completed') {
+        timeRemaining.innerHTML = '✅ Voting Closed';
+        timeRemaining.style.color = '#999';
+    } else if (currentMatch.status === 'upcoming') {
+        timeRemaining.innerHTML = '⏰ Coming Soon';
+        timeRemaining.style.color = '#ffaa00';
+    } else if (currentMatch.status === 'live') {
+        // ✅ Check for endDate to show countdown
+        if (currentMatch.endDate) {
+            const timer = getTimeRemaining(currentMatch.endDate);
+            
+            if (timer && !timer.expired) {
+                timeRemaining.innerHTML = timer.text;
+                timeRemaining.style.color = timer.color;
+                timeRemaining.style.fontWeight = '600';
+                
+                if (timer.urgent) {
+                    timeRemaining.classList.add('urgent');
+                }
+            } else if (timer && timer.expired) {
+                timeRemaining.innerHTML = '⏱️ Voting Closed';
+                timeRemaining.style.color = '#999';
+            } else {
+                // Fallback
                 timeRemaining.innerHTML = '🔴 LIVE NOW';
                 timeRemaining.style.color = '#ff4444';
-            } else if (currentMatch.status === 'upcoming') {
-                timeRemaining.innerHTML = '⏰ Coming Soon';
-            } else if (currentMatch.status === 'completed') {
-                timeRemaining.innerHTML = '✅ Voting Closed';
-            } else {
-                timeRemaining.innerHTML = '⏰ Vote Now';
             }
+        } else {
+            // No endDate available, show generic live status
+            timeRemaining.innerHTML = '🔴 LIVE NOW';
+            timeRemaining.style.color = '#ff4444';
         }
+    } else {
+        timeRemaining.innerHTML = '⏰ Vote Now';
+        timeRemaining.style.color = '#ffaa00';
+    }
+}
         
         // Update total votes
         const totalVotesEl = document.getElementById('total-votes');
