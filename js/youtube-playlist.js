@@ -3,7 +3,12 @@
 // ========================================
 
 const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
-const API_KEY = 'AIzaSyBaCIWwOaINfdw5rkQ937jbqMBMDi1w2EI';
+// At the top — NO hardcoded key!
+const API_KEY = window.YOUTUBE_API_KEY;
+
+if (!API_KEY || API_KEY.includes('<%')) {
+    console.error('YouTube API key failed to load. Check Netlify.');
+}
 const MAX_RESULTS = 50; // Increased to get more videos
 const PLAYLIST_NAME = 'Anthem Arena Season 1'; // ✅ Playlist name
 
