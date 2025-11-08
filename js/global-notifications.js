@@ -184,16 +184,16 @@ async function checkAndShowBulletin() {
                 console.log(`   Opponent votes: ${opponentVotes} (${opponentPct}%)`);
                 console.log(`   Difference: ${voteDiff} votes`);
                 
-                if (totalVotes < 50) {
-                    console.log(`🔍 ❌ Not enough total votes yet (${totalVotes} < 50)`);
+            if (totalVotes < 3) { // CHANGED: Lower for new site
+                    console.log(`🔍 ❌ Not enough total votes yet (${totalVotes} < 3)`);
                     continue;
                 }
                 
                 console.log(`🔍 ✅ Enough votes (${totalVotes}), checking triggers...`);
                 
                 // TRIGGER 1: DANGER
-                if (userPct < 45 && voteDiff >= 10) {
-                    console.log(`🔍 🚨 DANGER TRIGGER: ${userPct}% < 45% AND ${voteDiff} >= 10`);
+                if (userPct < 40 && voteDiff >= 3) { // CHANGED: 40% and 3 votes
+                    console.log(`🔍 🚨 DANGER TRIGGER: ${userPct}% < 40% AND ${voteDiff} >= 3`);
                     if (shouldShowNotification(matchId, 'danger')) {
                         console.log(`🔍 ✅ Danger cooldown passed, adding notification`);
                         notifications.push({
@@ -211,12 +211,12 @@ async function checkAndShowBulletin() {
                         console.log(`🔍 ❌ Danger cooldown not passed yet`);
                     }
                 } else {
-                    console.log(`🔍 No danger: userPct=${userPct} (need <45), voteDiff=${voteDiff} (need >=10)`);
+                    console.log(`🔍 No danger: userPct=${userPct} (need <40), voteDiff=${voteDiff} (need >=3)`);
                 }
                 
                 // TRIGGER 2: NAIL-BITER
-                if (voteDiff <= 5) {
-                    console.log(`🔍 🔥 NAIL-BITER TRIGGER: ${voteDiff} <= 5`);
+                if (voteDiff <= 3) { // CHANGED: 3 votes
+                    console.log(`🔍 🔥 NAIL-BITER TRIGGER: ${voteDiff} <= 3`);
                     if (shouldShowNotification(matchId, 'nailbiter')) {
                         console.log(`🔍 ✅ Nailbiter cooldown passed, adding notification`);
                         notifications.push({
@@ -234,7 +234,7 @@ async function checkAndShowBulletin() {
                         console.log(`🔍 ❌ Nailbiter cooldown not passed yet`);
                     }
                 } else {
-                    console.log(`🔍 No nail-biter: voteDiff=${voteDiff} (need <=5)`);
+                    console.log(`🔍 No nail-biter: voteDiff=${voteDiff} (need <=3)`);
                 }
                 
                 // TRIGGER 3: COMEBACK
@@ -264,8 +264,8 @@ async function checkAndShowBulletin() {
                 }
                 
                 // TRIGGER 4: DOMINATING
-                if (userPct >= 60) {
-                    console.log(`🔍 🎯 DOMINATING TRIGGER: ${userPct}% >= 60%`);
+                if (userPct >= 65) { // CHANGED: 65%
+                    console.log(`🔍 🎯 DOMINATING TRIGGER: ${userPct}% >= 65%`);
                     if (shouldShowNotification(matchId, 'winning')) {
                         console.log(`🔍 ✅ Winning cooldown passed, adding notification`);
                         notifications.push({
@@ -283,7 +283,7 @@ async function checkAndShowBulletin() {
                         console.log(`🔍 ❌ Winning cooldown not passed yet`);
                     }
                 } else {
-                    console.log(`🔍 Not dominating: userPct=${userPct} (need >=60)`);
+                    console.log(`🔍 Not dominating: userPct=${userPct} (need >=65)`);
                 }
                 
                 saveMatchState(matchId, userPct, opponentPct);
@@ -360,7 +360,7 @@ async function checkAndShowBulletin() {
             }
             
             // CLOSE MATCH
-            if (totalVotes >= 50 && voteDiff <= 5) {
+if (totalVotes >= 3 && voteDiff <= 3) {
                 console.log(`🔍 🔥 Close match found: ${matchId}`);
                 notifications.push({
                     priority: 2,
@@ -573,7 +573,7 @@ function isLowTurnout(match) {
     const hoursSinceStart = (Date.now() - startTime) / 3600000;
     const totalVotes = match.totalVotes || 0;
     
-    return hoursSinceStart >= 2 && totalVotes < 30;
+return hoursSinceStart >= 2 && totalVotes < 10;
 }
 
 function isReturnVoter(userVotes) {
