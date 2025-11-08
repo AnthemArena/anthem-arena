@@ -56,7 +56,6 @@ function adjustPollingRate() {
     }
     
     pollInterval = setInterval(checkAndShowBulletin, interval);
-    console.log(`📊 Polling rate: ${interval / 1000}s (${isActive ? 'active' : 'inactive'})`);
 }
 
 // Track user activity

@@ -8,7 +8,6 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  YOUTUBE_API_KEY = "AIzaSyBcr0erM2k4eeMurg5L6M5AoJ8zolkX4YQ"
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # ========================================

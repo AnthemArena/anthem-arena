@@ -38,40 +38,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 League Music Tournament loaded');
     
     try {
-        // ✅ Show loading state
         showHomepageLoading();
         
         console.time('⏱️ Music Videos');
         await loadMusicVideos();
         console.timeEnd('⏱️ Music Videos');
         
+        // ✅ FETCH MATCHES ONCE
+        console.time('⏱️ Fetch All Matches');
+        const allMatches = await getAllMatches();
+        console.timeEnd('⏱️ Fetch All Matches');
+        
+        // ✅ PASS TO ALL FUNCTIONS
         console.time('⏱️ Tournament Info');
-        await loadTournamentInfo();
+        await loadTournamentInfo(allMatches);
         console.timeEnd('⏱️ Tournament Info');
         
         console.time('⏱️ Featured Match');
-        await loadFeaturedMatch();
+        await loadFeaturedMatch(allMatches);
         console.timeEnd('⏱️ Featured Match');
         
         console.time('⏱️ Live Matches');
-        await loadLiveMatches();
+        await loadLiveMatches(allMatches);
         console.timeEnd('⏱️ Live Matches');
         
         console.time('⏱️ Recent Results');
-        await loadRecentResults();
+        await loadRecentResults(allMatches);
         console.timeEnd('⏱️ Recent Results');
         
         console.time('⏱️ Upcoming Matches');
-        await loadUpcomingMatches();
+        await loadUpcomingMatches(allMatches);
         console.timeEnd('⏱️ Upcoming Matches');
         
         console.time('⏱️ Hero Stats');
-        await updateHeroStats();
+        await updateHeroStats(allMatches);
         console.timeEnd('⏱️ Hero Stats');
         
         hideChampionsSection();
-        
-        // ✅ Hide loading, show homepage with stagger animation
         hideHomepageLoading();
         showHomepageSections();
         
@@ -188,7 +191,7 @@ async function updateHeroStats() {
 // LOAD TOURNAMENT INFO (DYNAMIC BADGE)
 // ========================================
 
-async function loadTournamentInfo() {
+async function loadTournamentInfo(allMatches) {
     try {
         // ✅ NEW: Get all matches from edge cache
         const allMatches = await getAllMatches();
@@ -335,7 +338,7 @@ function getTimeUntilMatch(dateString) {
 // LOAD FEATURED MATCH (MOST VOTED)
 // ========================================
 
-async function loadFeaturedMatch() {
+async function loadFeaturedMatch(allMatches) {
     try {
         console.log('🔍 Searching for live matches...');
         
