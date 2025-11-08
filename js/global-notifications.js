@@ -618,120 +618,264 @@ function showBulletin(notification) {
             const style = document.createElement('style');
             style.id = 'bulletin-styles';
             style.textContent = `
-                .bulletin-banner {
-                    position: fixed;
-                    top: 80px;
-                    left: 0;
-                    right: 0;
-                    z-index: 999;
-                    padding: 1rem;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    transform: translateY(-100%);
-                    transition: transform 0.3s ease;
-                }
-                
-                .bulletin-banner.show { transform: translateY(0); }
-                
-                .bulletin-banner.danger { background: linear-gradient(135deg, #ff4444, #cc0000); }
-                .bulletin-banner.nailbiter { background: linear-gradient(135deg, #ff8800, #cc6600); }
-                .bulletin-banner.winning { background: linear-gradient(135deg, #00cc88, #009966); }
-.bulletin-banner.comeback { background: linear-gradient(135deg, #8844ff, #6622cc); }
-                .bulletin-banner.close-match { background: linear-gradient(135deg, #ff8800, #cc6600); }
-                .bulletin-banner.new-match { background: linear-gradient(135deg, #00aaff, #0088cc); }
-                .bulletin-banner.low-turnout { background: linear-gradient(135deg, #6666ff, #4444cc); }
-                .bulletin-banner.welcome { background: linear-gradient(135deg, #C8AA6E, #A0885E); }
-                .bulletin-banner.return-voter { background: linear-gradient(135deg, #9966ff, #7744cc); }
-                
-                .bulletin-content {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    color: white;
-                }
-                
-                .bulletin-icon {
-                    font-size: 2rem;
-                    animation: pulse 1.5s ease infinite;
-                }
-                
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
-                }
-                
-                .bulletin-text { flex: 1; }
-                
-                .bulletin-message {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    margin-bottom: 0.25rem;
-                }
-                
-                .bulletin-detail {
-                    font-size: 0.9rem;
-                    opacity: 0.9;
-                }
-                
-                .bulletin-cta {
-                    background: white;
-                    border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    white-space: nowrap;
-                }
-                
-                .bulletin-banner.danger .bulletin-cta { color: #ff4444; }
-                .bulletin-banner.nailbiter .bulletin-cta { color: #ff8800; }
-                .bulletin-banner.winning .bulletin-cta { color: #00cc88; }
-                .bulletin-banner.comeback .bulletin-cta { color: #8844ff; }
-                .bulletin-banner.close-match .bulletin-cta { color: #ff8800; }
-                .bulletin-banner.new-match .bulletin-cta { color: #00aaff; }
-                .bulletin-banner.low-turnout .bulletin-cta { color: #6666ff; }
-                .bulletin-banner.welcome .bulletin-cta { color: #C8AA6E; }
-                .bulletin-banner.return-voter .bulletin-cta { color: #9966ff; }
-                
-                .bulletin-cta:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                }
-                
-                .bulletin-close {
-                    background: none;
-                    border: none;
-                    color: white;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: opacity 0.2s;
-                }
-                
-                .bulletin-close:hover { opacity: 1; }
-                
-                @media (max-width: 768px) {
-                    .bulletin-banner { top: 60px; }
-                    
-                    .bulletin-content {
-                        flex-wrap: wrap;
-                        gap: 0.5rem;
-                    }
-                    
-                    .bulletin-icon { font-size: 1.5rem; }
-                    
-                    .bulletin-message { font-size: 1rem; }
-                    
-                    .bulletin-detail { font-size: 0.85rem; }
-                    
-                    .bulletin-cta {
-                        width: 100%;
-                        margin-top: 0.5rem;
-                    }
-                }
-            `;
+    .bulletin-banner {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 0;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        transform: translateY(-100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .bulletin-banner.show { 
+        transform: translateY(0); 
+    }
+    
+    /* Themed backgrounds matching your site */
+    .bulletin-banner.danger { 
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(185, 28, 28, 0.95));
+        border-bottom: 3px solid rgba(239, 68, 68, 0.8);
+    }
+    
+    .bulletin-banner.nailbiter { 
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
+        border-bottom: 3px solid rgba(251, 191, 36, 0.8);
+    }
+    
+    .bulletin-banner.winning { 
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+        border-bottom: 3px solid rgba(52, 211, 153, 0.8);
+    }
+    
+    .bulletin-banner.comeback { 
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(109, 40, 217, 0.95));
+        border-bottom: 3px solid rgba(167, 139, 250, 0.8);
+    }
+    
+    .bulletin-banner.close-match { 
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
+        border-bottom: 3px solid rgba(251, 191, 36, 0.8);
+    }
+    
+    .bulletin-banner.new-match { 
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
+        border-bottom: 3px solid rgba(96, 165, 250, 0.8);
+    }
+    
+    .bulletin-banner.low-turnout { 
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.95));
+        border-bottom: 3px solid rgba(129, 140, 248, 0.8);
+    }
+    
+    .bulletin-banner.welcome { 
+        background: linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(160, 136, 94, 0.95));
+        border-bottom: 3px solid rgba(212, 184, 118, 0.8);
+    }
+    
+    .bulletin-banner.return-voter { 
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.95), rgba(126, 34, 206, 0.95));
+        border-bottom: 3px solid rgba(192, 132, 252, 0.8);
+    }
+    
+    .bulletin-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.25rem 2rem;
+        color: white;
+    }
+    
+    .bulletin-icon {
+        font-size: 2.5rem;
+        animation: pulse 2s ease-in-out infinite;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    @keyframes pulse {
+        0%, 100% { 
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% { 
+            transform: scale(1.15);
+            opacity: 0.85;
+        }
+    }
+    
+    .bulletin-text { 
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .bulletin-message {
+        font-family: 'Cinzel', serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        letter-spacing: 0.02em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bulletin-detail {
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        opacity: 0.95;
+        font-weight: 400;
+    }
+    
+    .bulletin-cta {
+        background: white;
+        border: none;
+        padding: 0.85rem 1.75rem;
+        border-radius: 8px;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bulletin-banner.danger .bulletin-cta { 
+        color: #dc2626;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.nailbiter .bulletin-cta { 
+        color: #d97706;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.winning .bulletin-cta { 
+        color: #059669;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.comeback .bulletin-cta { 
+        color: #7c3aed;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.close-match .bulletin-cta { 
+        color: #d97706;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.new-match .bulletin-cta { 
+        color: #2563eb;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.low-turnout .bulletin-cta { 
+        color: #4f46e5;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.welcome .bulletin-cta { 
+        color: #C8AA6E;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    .bulletin-banner.return-voter .bulletin-cta { 
+        color: #7e22ce;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+    }
+    
+    .bulletin-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .bulletin-cta:active {
+        transform: translateY(0);
+    }
+    
+    .bulletin-close {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: white;
+        font-size: 1.5rem;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: all 0.2s;
+        line-height: 1;
+        padding: 0;
+        font-weight: 300;
+    }
+    
+    .bulletin-close:hover { 
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .bulletin-banner { 
+            top: 60px;
+        }
+        
+        .bulletin-content {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+        }
+        
+        .bulletin-icon { 
+            font-size: 1.75rem;
+        }
+        
+        .bulletin-message { 
+            font-size: 1rem;
+        }
+        
+        .bulletin-detail { 
+            font-size: 0.875rem;
+        }
+        
+        .bulletin-cta {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .bulletin-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 32px;
+            height: 32px;
+            font-size: 1.25rem;
+        }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 480px) {
+        .bulletin-content {
+            padding: 0.875rem 1rem;
+        }
+        
+        .bulletin-icon {
+            font-size: 1.5rem;
+        }
+        
+        .bulletin-message {
+            font-size: 0.95rem;
+        }
+        
+        .bulletin-detail {
+            font-size: 0.825rem;
+        }
+    }
+`;
             document.head.appendChild(style);
         }
     }
@@ -771,7 +915,15 @@ function showBulletin(notification) {
 function hideBulletin() {
     const banner = document.getElementById('bulletin-banner');
     if (banner) {
+        // Slide up animation
         banner.classList.remove('show');
+        
+        // Remove from DOM after animation completes
+        setTimeout(() => {
+            banner.remove();
+        }, 300);
+        
+        console.log('🔕 Bulletin hidden and removed');
     }
     currentBulletin = null;
 }
