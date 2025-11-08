@@ -20,7 +20,6 @@ let playlistVideos = [];
 // ========================================
 async function fetchPlaylistVideos() {
     try {
-        // ✅ call your secure Netlify function instead of Google directly
         const response = await fetch('/.netlify/functions/youtube');
         const data = await response.json();
 
@@ -42,6 +41,7 @@ async function fetchPlaylistVideos() {
         return [];
     }
 }
+
 
 // ========================================
 // RENDER PLAYLIST CAROUSEL

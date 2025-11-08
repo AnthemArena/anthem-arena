@@ -1,24 +1,30 @@
-export default async (req, context) => {
-  const key = process.env.YOUTUBE_API_KEY; // ← pulled securely from Netlify
-  const playlistId = "PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY";
-  const maxResults = 50;
+// edge-functions/youtube.js
+export async function handler(event, context) {
+  const API_KEY = process.env.YOUTUBE_API_KEY_SERVER; // server key
+  const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
+  const MAX_RESULTS = 50;
 
-  const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=${maxResults}&key=${key}`;
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${MAX_RESULTS}&key=${API_KEY}`;
 
   try {
-    const res = await fetch(apiUrl);
-    const data = await res.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-    return new Response(JSON.stringify(data), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*", // so your browser can fetch it
-      },
-    });
+    if (data.error) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: data.error })
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data)
+    };
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
+    };
   }
-};
+}
