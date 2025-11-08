@@ -125,7 +125,12 @@ function stopNotificationService() {
 // ========================================
 
 async function checkAndShowBulletin() {
+    console.log('🔍 ========== BULLETIN CHECK START ==========');
+    
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    console.log('🔍 User votes:', userVotes);
+    console.log('🔍 Number of votes:', Object.keys(userVotes).length);
+    
     const notifications = [];
     
     try {
@@ -133,65 +138,120 @@ async function checkAndShowBulletin() {
         // PRIORITY 1: Check user's picks FIRST
         // ========================================
         if (Object.keys(userVotes).length > 0) {
+            console.log('🔍 Checking user picks...');
+            
             for (const [matchId, vote] of Object.entries(userVotes)) {
-                const match = await getMatchData(matchId);
+                console.log(`🔍 --- Checking match ${matchId} ---`);
+                console.log(`🔍 Vote data:`, vote);
                 
-                if (!match || match.status !== 'live') continue;
-                if (isDismissedRecently(matchId)) continue;
+                const match = await getMatchData(matchId);
+                console.log(`🔍 Match data:`, match);
+                
+                if (!match) {
+                    console.log(`🔍 ❌ Match ${matchId} not found`);
+                    continue;
+                }
+                
+                if (match.status !== 'live') {
+                    console.log(`🔍 ❌ Match ${matchId} status is "${match.status}", not "live"`);
+                    continue;
+                }
+                
+                if (isDismissedRecently(matchId)) {
+                    console.log(`🔍 ❌ Match ${matchId} dismissed recently`);
+                    continue;
+                }
+                
+                console.log(`🔍 ✅ Match ${matchId} is live and not dismissed`);
                 
                 const userSong = vote.songId === 'song1' ? match.song1 : match.song2;
                 const opponent = vote.songId === 'song1' ? match.song2 : match.song1;
                 
-                const totalVotes = match.totalVotes || 0;
-                const userVotes = userSong.votes || 0;
-                const opponentVotes = opponent.votes || 0;
-                const voteDiff = Math.abs(userVotes - opponentVotes);
+                console.log(`🔍 User voted for:`, userSong);
+                console.log(`🔍 Opponent:`, opponent);
                 
-                const userPct = totalVotes > 0 ? Math.round((userVotes / totalVotes) * 100) : 50;
+                const totalVotes = match.totalVotes || 0;
+                const userSongVotes = userSong?.votes || 0;
+                const opponentVotes = opponent?.votes || 0;
+                const voteDiff = Math.abs(userSongVotes - opponentVotes);
+                
+                const userPct = totalVotes > 0 ? Math.round((userSongVotes / totalVotes) * 100) : 50;
                 const opponentPct = totalVotes > 0 ? 100 - userPct : 50;
                 
-                if (totalVotes < 50) continue;
+                console.log(`🔍 Vote stats:`);
+                console.log(`   Total votes: ${totalVotes}`);
+                console.log(`   User song votes: ${userSongVotes} (${userPct}%)`);
+                console.log(`   Opponent votes: ${opponentVotes} (${opponentPct}%)`);
+                console.log(`   Difference: ${voteDiff} votes`);
+                
+                if (totalVotes < 50) {
+                    console.log(`🔍 ❌ Not enough total votes yet (${totalVotes} < 50)`);
+                    continue;
+                }
+                
+                console.log(`🔍 ✅ Enough votes (${totalVotes}), checking triggers...`);
                 
                 // TRIGGER 1: DANGER
-                if (userPct < 45 && voteDiff >= 10 && shouldShowNotification(matchId, 'danger')) {
-                    notifications.push({
-                        priority: 1,
-                        type: 'danger',
-                        matchId: matchId,
-                        song: userSong.shortTitle || userSong.title,
-                        opponent: opponent.shortTitle || opponent.title,
-                        userPct, opponentPct, voteDiff,
-                        message: `🚨 "${userSong.shortTitle || userSong.title}" is in danger!`,
-                        detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
-                        cta: 'Rally Support Now!'
-                    });
+                if (userPct < 45 && voteDiff >= 10) {
+                    console.log(`🔍 🚨 DANGER TRIGGER: ${userPct}% < 45% AND ${voteDiff} >= 10`);
+                    if (shouldShowNotification(matchId, 'danger')) {
+                        console.log(`🔍 ✅ Danger cooldown passed, adding notification`);
+                        notifications.push({
+                            priority: 1,
+                            type: 'danger',
+                            matchId: matchId,
+                            song: userSong.shortTitle || userSong.title,
+                            opponent: opponent.shortTitle || opponent.title,
+                            userPct, opponentPct, voteDiff,
+                            message: `🚨 "${userSong.shortTitle || userSong.title}" is in danger!`,
+                            detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
+                            cta: 'Rally Support Now!'
+                        });
+                    } else {
+                        console.log(`🔍 ❌ Danger cooldown not passed yet`);
+                    }
+                } else {
+                    console.log(`🔍 No danger: userPct=${userPct} (need <45), voteDiff=${voteDiff} (need >=10)`);
                 }
                 
                 // TRIGGER 2: NAIL-BITER
-                else if (voteDiff <= 5 && shouldShowNotification(matchId, 'nailbiter')) {
-                    notifications.push({
-                        priority: 2,
-                        type: 'nailbiter',
-                        matchId, song: userSong.shortTitle || userSong.title,
-                        opponent: opponent.shortTitle || opponent.title,
-                        voteDiff, userPct, opponentPct,
-                        message: `🔥 "${userSong.shortTitle || userSong.title}" is TOO CLOSE!`,
-                        detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
-                        cta: 'Share This Match!'
-                    });
+                if (voteDiff <= 5) {
+                    console.log(`🔍 🔥 NAIL-BITER TRIGGER: ${voteDiff} <= 5`);
+                    if (shouldShowNotification(matchId, 'nailbiter')) {
+                        console.log(`🔍 ✅ Nailbiter cooldown passed, adding notification`);
+                        notifications.push({
+                            priority: 2,
+                            type: 'nailbiter',
+                            matchId, 
+                            song: userSong.shortTitle || userSong.title,
+                            opponent: opponent.shortTitle || opponent.title,
+                            voteDiff, userPct, opponentPct,
+                            message: `🔥 "${userSong.shortTitle || userSong.title}" is TOO CLOSE!`,
+                            detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
+                            cta: 'Share This Match!'
+                        });
+                    } else {
+                        console.log(`🔍 ❌ Nailbiter cooldown not passed yet`);
+                    }
+                } else {
+                    console.log(`🔍 No nail-biter: voteDiff=${voteDiff} (need <=5)`);
                 }
                 
                 // TRIGGER 3: COMEBACK
                 const previousState = getPreviousMatchState(matchId);
                 if (previousState) {
+                    console.log(`🔍 Previous state found:`, previousState);
                     const wasLosing = previousState.userPct < previousState.opponentPct;
                     const nowWinning = userPct > opponentPct;
+                    console.log(`🔍 Was losing: ${wasLosing}, Now winning: ${nowWinning}`);
                     
                     if (wasLosing && nowWinning && shouldShowNotification(matchId, 'comeback')) {
+                        console.log(`🔍 🎉 COMEBACK TRIGGER!`);
                         notifications.push({
                             priority: 3,
                             type: 'comeback',
-                            matchId, song: userSong.shortTitle || userSong.title,
+                            matchId, 
+                            song: userSong.shortTitle || userSong.title,
                             opponent: opponent.shortTitle || opponent.title,
                             userPct, opponentPct,
                             message: `🎉 "${userSong.shortTitle || userSong.title}" completed comeback!`,
@@ -199,69 +259,109 @@ async function checkAndShowBulletin() {
                             cta: 'Celebrate & Share!'
                         });
                     }
+                } else {
+                    console.log(`🔍 No previous state found for ${matchId}`);
                 }
                 
                 // TRIGGER 4: DOMINATING
-                else if (userPct >= 60 && shouldShowNotification(matchId, 'winning')) {
-                    notifications.push({
-                        priority: 4,
-                        type: 'winning',
-                        matchId, song: userSong.shortTitle || userSong.title,
-                        opponent: opponent.shortTitle || opponent.title,
-                        userPct, opponentPct,
-                        message: `🎯 "${userSong.shortTitle || userSong.title}" is dominating!`,
-                        detail: `Leading ${userPct}% to ${opponentPct}%`,
-                        cta: 'Share the Victory!'
-                    });
+                if (userPct >= 60) {
+                    console.log(`🔍 🎯 DOMINATING TRIGGER: ${userPct}% >= 60%`);
+                    if (shouldShowNotification(matchId, 'winning')) {
+                        console.log(`🔍 ✅ Winning cooldown passed, adding notification`);
+                        notifications.push({
+                            priority: 4,
+                            type: 'winning',
+                            matchId, 
+                            song: userSong.shortTitle || userSong.title,
+                            opponent: opponent.shortTitle || opponent.title,
+                            userPct, opponentPct,
+                            message: `🎯 "${userSong.shortTitle || userSong.title}" is dominating!`,
+                            detail: `Leading ${userPct}% to ${opponentPct}%`,
+                            cta: 'Share the Victory!'
+                        });
+                    } else {
+                        console.log(`🔍 ❌ Winning cooldown not passed yet`);
+                    }
+                } else {
+                    console.log(`🔍 Not dominating: userPct=${userPct} (need >=60)`);
                 }
                 
                 saveMatchState(matchId, userPct, opponentPct);
+                console.log(`🔍 Match state saved`);
             }
             
-            // If found user bulletin, show it and STOP (saves Firebase reads!)
+            // If found user bulletin, show it and STOP
             if (notifications.length > 0) {
+                console.log(`🔍 ✅ Found ${notifications.length} user bulletin(s):`, notifications);
                 notifications.sort((a, b) => a.priority - b.priority);
                 const topNotification = notifications[0];
+                console.log(`🔍 📢 Showing top priority bulletin:`, topNotification);
                 showBulletin(topNotification);
                 markNotificationShown(topNotification.matchId, topNotification.type);
+                console.log('🔍 ========== BULLETIN CHECK END (USER BULLETIN SHOWN) ==========');
                 return;
+            } else {
+                console.log(`🔍 ❌ No user bulletins triggered`);
             }
+        } else {
+            console.log('🔍 No user votes found, checking general bulletins...');
         }
         
         // ========================================
         // PRIORITY 2: General voting encouragement
-        // Only check every 30 minutes
         // ========================================
+        console.log('🔍 Checking general bulletins...');
+        
         const lastGeneralCheck = localStorage.getItem('lastGeneralBulletinCheck');
         const timeSinceGeneral = lastGeneralCheck 
             ? Date.now() - parseInt(lastGeneralCheck)
             : 1800001;
         
-        if (timeSinceGeneral < 1800000) { // 30 minutes
+        console.log(`🔍 Time since last general check: ${Math.round(timeSinceGeneral / 60000)} minutes`);
+        
+        if (timeSinceGeneral < 1800000) {
+            console.log(`🔍 ❌ General bulletin cooldown active (< 30 minutes)`);
             hideBulletin();
+            console.log('🔍 ========== BULLETIN CHECK END (COOLDOWN) ==========');
             return;
         }
+        
+        console.log(`🔍 ✅ General bulletin cooldown passed`);
         
         // Fetch all live matches from edge
         const liveMatches = await getAllLiveMatches();
+        console.log(`🔍 Found ${liveMatches.length} live matches`);
         
         if (liveMatches.length === 0) {
+            console.log(`🔍 ❌ No live matches`);
             hideBulletin();
+            console.log('🔍 ========== BULLETIN CHECK END (NO MATCHES) ==========');
             return;
         }
         
+        console.log(`🔍 Checking ${liveMatches.length} matches for general bulletins...`);
+        
         for (const match of liveMatches) {
-            const matchId = match.matchId;
+            const matchId = match.id || match.matchId;
             const totalVotes = match.totalVotes || 0;
-            const song1Votes = match.song1.votes || 0;
-            const song2Votes = match.song2.votes || 0;
+            const song1Votes = match.song1?.votes || 0;
+            const song2Votes = match.song2?.votes || 0;
             const voteDiff = Math.abs(song1Votes - song2Votes);
             
-            if (userVotes[matchId]) continue;
-            if (wasShownRecently(matchId, 'general')) continue;
+            console.log(`🔍 Match ${matchId}: ${totalVotes} votes, diff: ${voteDiff}`);
+            
+            if (userVotes[matchId]) {
+                console.log(`🔍 Skip ${matchId} - user already voted`);
+                continue;
+            }
+            if (wasShownRecently(matchId, 'general')) {
+                console.log(`🔍 Skip ${matchId} - shown recently`);
+                continue;
+            }
             
             // CLOSE MATCH
             if (totalVotes >= 50 && voteDiff <= 5) {
+                console.log(`🔍 🔥 Close match found: ${matchId}`);
                 notifications.push({
                     priority: 2,
                     type: 'close-match',
@@ -276,44 +376,11 @@ async function checkAndShowBulletin() {
                     targetUrl: `/vote.html?match=${matchId}`
                 });
             }
-            
-            // NEW MATCH
-            else if (isMatchNew(match)) {
-                notifications.push({
-                    priority: 3,
-                    type: 'new-match',
-                    matchId,
-                    song1: match.song1.shortTitle || match.song1.title,
-                    song2: match.song2.shortTitle || match.song2.title,
-                    totalVotes,
-                    message: `🆕 Fresh matchup: "${match.song1.shortTitle}" vs "${match.song2.shortTitle}"`,
-                    detail: `Just started - be among the first voters!`,
-                    cta: 'Vote First',
-                    action: 'navigate',
-                    targetUrl: `/vote.html?match=${matchId}`
-                });
-            }
-            
-            // LOW TURNOUT
-            else if (isLowTurnout(match)) {
-                notifications.push({
-                    priority: 4,
-                    type: 'low-turnout',
-                    matchId,
-                    song1: match.song1.shortTitle || match.song1.title,
-                    song2: match.song2.shortTitle || match.song2.title,
-                    totalVotes,
-                    message: `📊 "${match.song1.shortTitle}" vs "${match.song2.shortTitle}" needs votes`,
-                    detail: `Only ${totalVotes} votes so far!`,
-                    cta: 'Help Decide',
-                    action: 'navigate',
-                    targetUrl: `/vote.html?match=${matchId}`
-                });
-            }
         }
         
         // WELCOME (first-time visitor)
         if (Object.keys(userVotes).length === 0 && !wasShownRecently('welcome', 'general')) {
+            console.log(`🔍 🎵 Welcome bulletin triggered`);
             notifications.push({
                 priority: 5,
                 type: 'welcome',
@@ -325,38 +392,26 @@ async function checkAndShowBulletin() {
             });
         }
         
-        // RETURN VOTER (hasn't voted in 24h)
-        else if (isReturnVoter(userVotes) && !wasShownRecently('return', 'general')) {
-            const votedCount = Object.keys(userVotes).length;
-            const newMatchCount = liveMatches.filter(m => !userVotes[m.matchId]).length;
-            
-            if (newMatchCount > 0) {
-                notifications.push({
-                    priority: 4,
-                    type: 'return-voter',
-                    message: '👋 Welcome back!',
-                    detail: `You've voted in ${votedCount} matches - ${newMatchCount} new available!`,
-                    cta: 'Continue Voting',
-                    action: 'navigate',
-                    targetUrl: '/matches.html'
-                });
-            }
-        }
-        
         // Show highest priority
         if (notifications.length > 0) {
+            console.log(`🔍 ✅ Found ${notifications.length} general bulletin(s):`, notifications);
             notifications.sort((a, b) => a.priority - b.priority);
             const topNotification = notifications[0];
+            console.log(`🔍 📢 Showing general bulletin:`, topNotification);
             showBulletin(topNotification);
             markGeneralNotificationShown(topNotification.matchId || topNotification.type);
         } else {
+            console.log(`🔍 ❌ No general bulletins triggered`);
             hideBulletin();
         }
         
         localStorage.setItem('lastGeneralBulletinCheck', Date.now().toString());
+        console.log('🔍 ========== BULLETIN CHECK END ==========');
         
     } catch (error) {
         console.error('❌ Error checking bulletin:', error);
+        console.error('Stack:', error.stack);
+        console.log('🔍 ========== BULLETIN CHECK END (ERROR) ==========');
     }
 }
 
