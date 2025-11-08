@@ -251,8 +251,9 @@ async function checkAndShowBulletin() {
             if (!match || match.status !== 'live') continue;
             
             const userSongId = vote.songId;
-            const userSong = match.song1?.id === userSongId ? match.song1 : match.song2;
-            const opponent = match.song1?.id === userSongId ? match.song2 : match.song1;
+           // ✅ CORRECT:
+const userSong = userSongId === 'song1' ? match.song1 : match.song2;
+const opponent = userSongId === 'song1' ? match.song2 : match.song1;
             
             if (!userSong || !opponent) continue;
             
