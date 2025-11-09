@@ -300,6 +300,9 @@ document.getElementById('countLive').textContent = liveVotes.length;
     
     // Display tournament coverage
     displayTournamentCoverage(tournamentCoverage);
+
+     // ✅ ADD THIS LINE AT THE END
+    updateHeroCard();
     
     console.log('📊 Stats:', { 
         totalVotes, 
@@ -315,6 +318,43 @@ document.getElementById('countLive').textContent = liveVotes.length;
         supportImpact,
         tournamentCoverage
     });
+}
+
+// ========================================
+// UPDATE HERO CARD
+// ========================================
+
+function updateHeroCard() {
+    const heroCard = document.getElementById('statsHeroCard');
+    
+    if (allVotes.length === 0) {
+        heroCard.style.display = 'none';
+        return;
+    }
+    
+    const totalVotes = allVotes.length;
+    const underdogPicks = allVotes.filter(v => v.voteType === 'underdog').length;
+    const mainstreamPicks = allVotes.filter(v => v.voteType === 'mainstream').length;
+    const majorityAlignment = totalVotes > 0 
+        ? Math.round((mainstreamPicks / totalVotes) * 100) 
+        : 0;
+    
+    const tasteProfile = getTasteProfile(majorityAlignment, totalVotes, underdogPicks);
+    const journeyStats = calculateJourneyStats();
+    const votingStreak = calculateVotingStreak();
+    
+    // Update badge
+    document.getElementById('heroBadgeIcon').textContent = tasteProfile.icon;
+    document.getElementById('heroBadgeTitle').textContent = tasteProfile.title;
+    document.getElementById('heroBadgeDescription').textContent = tasteProfile.description;
+    
+    // Update quick stats
+    document.getElementById('heroTotalVotes').textContent = totalVotes;
+    document.getElementById('heroVotingStreak').textContent = votingStreak;
+    document.getElementById('heroSongsAlive').textContent = journeyStats.songsStillAlive;
+    
+    // Show the hero card
+    heroCard.style.display = 'block';
 }
 
 // ========================================

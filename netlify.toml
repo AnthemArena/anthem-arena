@@ -28,6 +28,25 @@
     Cache-Control = "public, max-age=300, stale-while-revalidate=60"
     Access-Control-Allow-Origin = "*"
 
+# ✅ ADD HEADERS FOR JS/CSS FILES
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/js/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*.css"
+  [headers.values]
+    Content-Type = "text/css; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
 # ========================================
 # CLEAN URL REDIRECTS
 # ========================================
@@ -52,11 +71,19 @@
   to = "/about.html"
   status = 200
 
+[[redirects]]
+  from = "/my-votes"
+  to = "/my-votes.html"
+  status = 200
+
 # ========================================
 # CATCH-ALL (SPA FALLBACK)
+# ✅ CRITICAL: This must NOT match static files
 # ========================================
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  # ✅ ADD THIS LINE - Don't redirect if file exists
+  force = false

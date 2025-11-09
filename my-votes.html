@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="/css/my-votes.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
-
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,7 +23,7 @@
 <body>
 
     <div id="nav-placeholder"></div>
-<script type="module" src="/js/navigation.js"></script>
+    <script type="module" src="/js/navigation.js"></script>
 
     <!-- ========================================
          HEADER SECTION
@@ -39,6 +38,58 @@
                 </div>
                 <h1 class="page-title">My Vote History</h1>
                 <p class="page-subtitle">Track your predictions and voting stats</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         ✨ NEW: STATS HERO CARD
+         ======================================== -->
+    <section class="stats-hero-card" id="statsHeroCard" style="display: none;">
+        <div class="container">
+            <div class="stats-hero-content">
+                <div class="stats-hero-left">
+                    <div class="stats-hero-badge" id="heroBadge">
+                        <span class="badge-icon" id="heroBadgeIcon">🎵</span>
+                        <div class="badge-text">
+                            <h3 class="badge-title" id="heroBadgeTitle">Music Enthusiast</h3>
+                            <p class="badge-description" id="heroBadgeDescription">Loading your profile...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-quick-view">
+                        <div class="quick-stat">
+                            <span class="quick-stat-number" id="heroTotalVotes">0</span>
+                            <span class="quick-stat-label">Votes</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-number" id="heroVotingStreak">0</span>
+                            <span class="quick-stat-label">Day Streak</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-number" id="heroSongsAlive">0</span>
+                            <span class="quick-stat-label">Songs Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-hero-right">
+                    <h2 class="stats-hero-title">Share Your Music Profile</h2>
+                    <p class="stats-hero-subtitle">
+                        Show off your taste in League music! Generate a beautiful stats card to share on social media.
+                    </p>
+                    <button onclick="shareStats()" class="stats-hero-share-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                        </svg>
+                        <span>Generate Stats Image</span>
+                    </button>
+                    <p class="stats-hero-hint">
+                        💡 Creates a shareable 1200x630px image perfect for Twitter, Facebook, and Discord
+                    </p>
+                </div>
             </div>
         </div>
     </section>
