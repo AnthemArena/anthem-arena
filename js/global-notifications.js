@@ -187,8 +187,11 @@ async function checkAndShowBulletin() {
         
         if (userId) {
             try {
+                // Import Firestore functions AND db together
                 const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-                const votesRef = collection(db, 'votes');
+                const { db: firestoreDb } = await import('./firebase-config.js');
+                
+                const votesRef = collection(firestoreDb, 'votes');
                 const q = query(votesRef, where('userId', '==', userId));
                 const snapshot = await getDocs(q);
                 
@@ -200,7 +203,7 @@ async function checkAndShowBulletin() {
                 hasVoted = Object.keys(userVotes).length > 0;
                 console.log(`📊 User has ${Object.keys(userVotes).length} votes`);
             } catch (error) {
-                console.error('Error fetching user votes:', error);
+                console.error('❌ Error fetching user votes:', error);
             }
         }
 
