@@ -189,6 +189,12 @@ async function checkAndShowBulletin() {
             const match = await getMatchData(matchId);
             
             if (!match || match.status !== 'live') continue;
+
+            // ✅ ADD THIS:
+if (!match.id && !match.matchId) {
+    console.warn('⚠️ Match missing ID:', match);
+    continue;  // Skip this match
+}
             
             const userSongId = vote.songId;
            // ✅ CORRECT:
@@ -553,6 +559,15 @@ async function checkForClosingMatches() {
 // ========================================
 
 function showBulletin(notification) {
+
+     // ✅ Final safety net
+    if (!notification.matchId) {
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency'];
+        if (!allowedWithoutMatch.includes(notification.type)) {
+            console.warn('⚠️ Bulletin missing matchId:', notification.type);
+            return;
+        }
+
     let banner = document.getElementById('bulletin-banner');
     
     if (!banner) {
@@ -1182,4 +1197,4 @@ window.testBulletin = function(type = 'winning') {
 };
 
 console.log('✅ global-notifications.js fully loaded with toast-style bulletins');
-
+}
