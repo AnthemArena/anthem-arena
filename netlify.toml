@@ -19,7 +19,7 @@
   function = "firebase-cache"
 
 # ========================================
-# CDN CACHING HEADERS
+# HEADERS - CRITICAL FIX
 # ========================================
 
 [[headers]]
@@ -28,27 +28,18 @@
     Cache-Control = "public, max-age=300, stale-while-revalidate=60"
     Access-Control-Allow-Origin = "*"
 
-# ✅ ADD HEADERS FOR JS/CSS FILES
 [[headers]]
   for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
-    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/js/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/css/*.css"
-  [headers.values]
-    Content-Type = "text/css; charset=utf-8"
-    Cache-Control = "public, max-age=31536000, immutable"
 
 # ========================================
-# CLEAN URL REDIRECTS
+# REDIRECTS
 # ========================================
 
 [[redirects]]
@@ -77,13 +68,11 @@
   status = 200
 
 # ========================================
-# CATCH-ALL (SPA FALLBACK)
-# ✅ CRITICAL: This must NOT match static files
+# CATCH-ALL - MUST BE LAST
 # ========================================
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  # ✅ ADD THIS LINE - Don't redirect if file exists
-  force = false
+  force = false  # ← THIS IS CRITICAL
