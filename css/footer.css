@@ -432,7 +432,7 @@
     text-decoration: underline;
 }
 /* ========================================
-   SHARE CTA BANNER (Above Footer)
+   SHARE CTA BANNER - CENTERED
 ======================================== */
 
 .footer-cta-banner {
@@ -470,8 +470,10 @@
 .cta-content {
     display: flex;
     align-items: center;
+    justify-content: center;  /* ✅ CENTER HORIZONTALLY */
     gap: 2rem;
     flex-wrap: wrap;
+    text-align: center;  /* ✅ CENTER TEXT */
 }
 
 .cta-icon {
@@ -488,6 +490,7 @@
 .cta-text {
     flex: 1;
     min-width: 280px;
+    max-width: 600px;  /* ✅ CONSTRAIN WIDTH FOR BETTER CENTERING */
 }
 
 .cta-text h3 {
@@ -511,6 +514,8 @@
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
+    justify-content: center;  /* ✅ CENTER BUTTONS */
+    width: 100%;  /* ✅ FULL WIDTH FOR CENTERING */
 }
 
 .cta-actions button {
