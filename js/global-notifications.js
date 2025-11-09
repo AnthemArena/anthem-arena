@@ -329,72 +329,74 @@ const opponent = userSongId === 'song1' ? match.song2 : match.song1;
                 lastCheck: Date.now()
             };
             
-            // DANGER: User's pick is losing badly
-            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-                notifications.push({
-                    priority: 1,
-                    type: 'danger',
-                    matchId: match.id,
-                    song: userSong.shortTitle || userSong.title,
-                    opponent: opponent.shortTitle || opponent.title,
-                    thumbnailUrl: getThumbnailUrl(userSong.youtubeUrl),
-                    userPct,
-                    opponentPct,
-                    voteDiff,
-                    message: `🚨 Your pick "${userSong.shortTitle || userSong.title}" is in danger!`,
-                    detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
-                    cta: 'View Match Now!'
-                });
-            }
+// DANGER: User's pick is losing badly
+if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+    notifications.push({
+        priority: 1,
+        type: 'danger',
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        userPct,
+        opponentPct,
+        voteDiff,
+        message: `🚨 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is in danger!`,
+        detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
+        cta: 'View Match Now!'
+    });
+}
             // COMEBACK: Was losing, now winning
-            else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
-                notifications.push({
-                    priority: 2,
-                    type: 'comeback',
-                    matchId: match.id,
-                    song: userSong.shortTitle || userSong.title,
-                    opponent: opponent.shortTitle || opponent.title,
-                    thumbnailUrl: getThumbnailUrl(userSong.youtubeUrl),
-                    userPct,
-                    opponentPct,
-                    message: `🎉 Your pick "${userSong.shortTitle || userSong.title}" completed comeback!`,
-                    detail: `Was losing, now leading ${userPct}% to ${opponentPct}%!`,
-                    cta: 'View Match!'
-                });
-            }
+         // COMEBACK: Was losing, now winning
+else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
+    notifications.push({
+        priority: 2,
+        type: 'comeback',
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        userPct,
+        opponentPct,
+        message: `🎉 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" completed comeback!`,
+        detail: `Was losing, now leading ${userPct}% to ${opponentPct}%!`,
+        cta: 'View Match!'
+    });
+}
             // NAILBITER: Very close match
-            else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
-                notifications.push({
-                    priority: 3,
-                    type: 'nailbiter',
-                    matchId: match.id,
-                    song: userSong.shortTitle || userSong.title,
-                    opponent: opponent.shortTitle || opponent.title,
-                    thumbnailUrl: getThumbnailUrl(userSong.youtubeUrl),
-                    voteDiff,
-                    userPct,
-                    opponentPct,
-                    message: `🔥 Your pick "${userSong.shortTitle || userSong.title}" is TOO CLOSE!`,
-                    detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
-                    cta: 'View Match!'
-                });
-            }
+else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
+    notifications.push({
+        priority: 3,
+        type: 'nailbiter',
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        voteDiff,
+        userPct,
+        opponentPct,
+        message: `🔥 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is TOO CLOSE!`,
+        detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
+        cta: 'View Match!'
+    });
+}
             // WINNING: User's pick is dominating
-            else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
-                notifications.push({
-                    priority: 4,
-                    type: 'winning',
-                    matchId: match.id,
-                    song: userSong.shortTitle || userSong.title,
-                    opponent: opponent.shortTitle || opponent.title,
-                    thumbnailUrl: getThumbnailUrl(userSong.youtubeUrl),
-                    userPct,
-                    opponentPct,
-                    message: `🎯 Your pick "${userSong.shortTitle || userSong.title}" is dominating!`,
-                    detail: `Leading ${userPct}% to ${opponentPct}%`,
-                    cta: 'View Match!'
-                });
-            }
+           // WINNING: User's pick is dominating
+else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
+    notifications.push({
+        priority: 4,
+        type: 'winning',
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        userPct,
+        opponentPct,
+        message: `🎯 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is dominating!`,
+        detail: `Leading ${userPct}% to ${opponentPct}%`,
+        cta: 'View Match!'
+    });
+}
         }
         
       // PRIORITY 2: CHECK ALL LIVE MATCHES FOR VOTE ISSUES
@@ -1246,7 +1248,48 @@ window.testBulletin = function(type = 'winning') {
             cta: 'Start Voting',
             action: 'navigate',
             targetUrl: '/matches.html'
-        }
+        },
+
+         // ✅ ADD THESE NEW TEST CASES:
+        novotes: {
+            priority: 1,
+            type: 'novotes',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+            hoursLeft: 4,
+            message: '🚨 URGENT: Match has ZERO votes!',
+            detail: 'GODS vs RISE • Closes in 4h',
+            cta: 'Cast First Vote!',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=test-match'
+        },
+        lowvotes: {
+            priority: 1,
+            type: 'lowvotes',
+            matchId: 'test-match',
+            song: 'GODS',
+            opponent: 'RISE',
+            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+            totalVotes: 3,
+            hoursLeft: 6,
+            message: '⚠️ Match needs more votes!',
+            detail: 'GODS vs RISE • Only 3 votes • 6h left',
+            cta: 'Help This Match!',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=test-match'
+        },
+        encouragement: {
+            priority: 5,
+            type: 'encouragement',
+            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+            message: '👀 Still deciding? Pick your favorites!',
+            detail: '12 matches closing soon - make your voice heard',
+            cta: 'Browse Matches',
+            action: 'navigate',
+            targetUrl: '/matches.html'
+        },
     };
     
     const notification = testNotifications[type] || testNotifications.winning;

@@ -1302,14 +1302,31 @@ async function submitVote(songId) {
 /**
  * ✅ NEW: Save vote to userVotes format for homepage/matches pages
  */
+/**
+ * ✅ FIXED: Save vote to userVotes format for homepage/matches pages
+ * Now includes songTitle and opponentTitle for alert messages
+ */
 function saveVoteForOtherPages(matchId, songId) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    
+    // Get the song names from currentMatch
+    const votedSong = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
+    const opponentSong = songId === 'song1' ? currentMatch.competitor2 : currentMatch.competitor1;
+    
     userVotes[matchId] = {
         songId: songId,
+        songTitle: votedSong.name,
+        opponentTitle: opponentSong.name,
         timestamp: Date.now()
     };
+    
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
-    console.log('✅ Vote saved to userVotes for other pages:', matchId, songId);
+    console.log('✅ Vote saved with full data:', {
+        matchId,
+        songId,
+        songTitle: votedSong.name,
+        opponentTitle: opponentSong.name
+    });
 }
 
 // ========================================
