@@ -1113,48 +1113,61 @@ console.log('✅ Bulletin functions exposed to window');
 // DEBUG FUNCTION - Check Match Vote Status
 // ========================================
 
+// ========================================
+// DEBUG FUNCTION - Check Match Vote Status
+// ========================================
+
 window.debugMatchVotes = async function() {
     console.log('🔍 Checking all live matches for vote counts...\n');
     
     try {
-        const matches = await db.collection('matches')
-            .where('status', '==', 'live')
-            .get();
+        // ✅ Use your edge cache API instead of direct Firestore
+        const response = await fetch('/api/matches');
         
-        console.log(`📊 Found ${matches.size} live matches:\n`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const allMatches = await response.json();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        
+        console.log(`📊 Found ${liveMatches.length} live matches:\n`);
         
         const now = new Date();
         let zeroVoteMatches = 0;
         let lowVoteMatches = 0;
         
-        matches.forEach(doc => {
-            const m = doc.data();
-            const votes = m.totalVotes ?? 0;
-            const hoursLeft = m.endTime ? 
-                ((m.endTime.toDate() - now) / (1000 * 60 * 60)).toFixed(1) : '???';
+        liveMatches.forEach(match => {
+            const matchId = match.matchId || match.id;
+            const song1Votes = match.song1?.votes || 0;
+            const song2Votes = match.song2?.votes || 0;
+            const totalVotes = song1Votes + song2Votes;
+            
+            const hoursLeft = match.endTime ? 
+                ((new Date(match.endTime) - now) / (1000 * 60 * 60)).toFixed(1) : '???';
             
             // Track counts
-            if (votes === 0) zeroVoteMatches++;
-            if (votes > 0 && votes < 10) lowVoteMatches++;
+            if (totalVotes === 0) zeroVoteMatches++;
+            if (totalVotes > 0 && totalVotes < 10) lowVoteMatches++;
             
             // Visual indicator
             let indicator = '✅';
-            if (votes === 0 && hoursLeft <= 12) indicator = '🆘';
-            else if (votes < 10 && hoursLeft <= 8) indicator = '⚠️';
-            else if (votes < 10) indicator = '📊';
+            if (totalVotes === 0 && hoursLeft <= 12) indicator = '🆘';
+            else if (totalVotes < 10 && hoursLeft <= 8) indicator = '⚠️';
+            else if (totalVotes < 10) indicator = '📊';
             
-            console.log(`${indicator} ${doc.id}:`, {
-                votes: votes,
+            console.log(`${indicator} ${matchId}:`, {
+                votes: totalVotes,
                 hoursLeft: hoursLeft + 'h',
-                song1: m.song1?.title || '???',
-                song2: m.song2?.title || '???',
-                shouldAlertNoVotes: (votes === 0 && hoursLeft <= 12),
-                shouldAlertLowVotes: (votes > 0 && votes < 10 && hoursLeft <= 8)
+                song1: match.song1?.shortTitle || match.song1?.title || '???',
+                song2: match.song2?.shortTitle || match.song2?.title || '???',
+                shouldAlertNoVotes: (totalVotes === 0 && hoursLeft <= 12),
+                shouldAlertLowVotes: (totalVotes > 0 && totalVotes < 10 && hoursLeft <= 8)
             });
         });
         
         console.log(`\n📊 Summary:`);
-        console.log(`   • ${matches.size} total live matches`);
+        console.log(`   • ${liveMatches.length} total live matches`);
         console.log(`   • ${zeroVoteMatches} matches with ZERO votes`);
         console.log(`   • ${lowVoteMatches} matches with LOW votes (1-9)`);
         console.log(`\n🎯 Alert Criteria:`);
