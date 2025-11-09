@@ -173,8 +173,36 @@ async function getMatchData(matchId) {
 
 async function checkAndShowBulletin() {
     try {
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const hasVoted = Object.keys(userVotes).length > 0;
+        // ✅ Get user ID properly
+        const userId = localStorage.getItem('deviceId');
+        
+        if (!userId) {
+            console.warn('⚠️ No user ID found - skipping vote checks');
+            // Still check for zero-vote/low-vote alerts below
+        }
+        
+        // ✅ Fetch user votes from Firebase
+        let userVotes = {};
+        let hasVoted = false;
+        
+        if (userId) {
+            try {
+                const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                const votesRef = collection(db, 'votes');
+                const q = query(votesRef, where('userId', '==', userId));
+                const snapshot = await getDocs(q);
+                
+                snapshot.forEach(doc => {
+                    const voteData = doc.data();
+                    userVotes[voteData.matchId] = voteData;
+                });
+                
+                hasVoted = Object.keys(userVotes).length > 0;
+                console.log(`📊 User has ${Object.keys(userVotes).length} votes`);
+            } catch (error) {
+                console.error('Error fetching user votes:', error);
+            }
+        }
 
         // ========================================
         // NON-VOTER ENGAGEMENT SYSTEM
