@@ -229,6 +229,10 @@ async function loadVoteHistory() {
 // UPDATE STATS (COMBINED HERO SECTION)
 // ========================================
 
+// ========================================
+// UPDATE STATS (COMBINED HERO SECTION)
+// ========================================
+
 function updateStats() {
     const totalVotes = allVotes.length;
     const completedVotes = allVotes.filter(v => v.isCompleted);
@@ -261,37 +265,65 @@ function updateStats() {
     // Favorite songs
     const favoriteSongs = getSongPreferences();
     
-    // ✅ UPDATE COMBINED HERO SECTION
+    // ✅ UPDATE COMBINED HERO SECTION (with null checks)
     if (totalVotes > 0) {
-        // Update profile badge
-        document.getElementById('heroProfileIcon').textContent = tasteProfile.icon;
-        document.getElementById('heroProfileTitle').textContent = tasteProfile.title;
-        document.getElementById('heroProfileDescription').textContent = tasteProfile.description;
+        // Check if hero section exists
+        const heroSection = document.getElementById('statsHeroSection');
+        if (!heroSection) {
+            console.error('❌ statsHeroSection element not found in DOM');
+            return;
+        }
         
-        // Update all stat values
-        document.getElementById('heroTotalVotes').textContent = totalVotes;
-        document.getElementById('heroUnderdogPicks').textContent = underdogPicks;
-        document.getElementById('heroMainstreamPicks').textContent = mainstreamPicks;
-        document.getElementById('heroVotingStreak').textContent = votingStreak;
-        document.getElementById('heroSongsAlive').textContent = journeyStats.songsStillAlive;
-        document.getElementById('heroSongsAdvanced').textContent = journeyStats.songsAdvanced;
-        document.getElementById('heroFurthestRound').textContent = getRoundName(journeyStats.furthestRound);
-        document.getElementById('heroCloseCalls').textContent = supportImpact.closeCalls;
-        document.getElementById('heroRoundsParticipated').textContent = supportImpact.roundsParticipated;
-        document.getElementById('heroVoteInfluence').textContent = voteInfluence;
+        // Update profile badge (with null checks)
+        const profileIcon = document.getElementById('heroProfileIcon');
+        const profileTitle = document.getElementById('heroProfileTitle');
+        const profileDescription = document.getElementById('heroProfileDescription');
+        
+        if (profileIcon) profileIcon.textContent = tasteProfile.icon;
+        if (profileTitle) profileTitle.textContent = tasteProfile.title;
+        if (profileDescription) profileDescription.textContent = tasteProfile.description;
+        
+        // Update all stat values (with null checks)
+        const totalVotesEl = document.getElementById('heroTotalVotes');
+        const underdogPicksEl = document.getElementById('heroUnderdogPicks');
+        const mainstreamPicksEl = document.getElementById('heroMainstreamPicks');
+        const votingStreakEl = document.getElementById('heroVotingStreak');
+        const songsAliveEl = document.getElementById('heroSongsAlive');
+        const songsAdvancedEl = document.getElementById('heroSongsAdvanced');
+        const furthestRoundEl = document.getElementById('heroFurthestRound');
+        const closeCallsEl = document.getElementById('heroCloseCalls');
+        const roundsParticipatedEl = document.getElementById('heroRoundsParticipated');
+        const voteInfluenceEl = document.getElementById('heroVoteInfluence');
+        
+        if (totalVotesEl) totalVotesEl.textContent = totalVotes;
+        if (underdogPicksEl) underdogPicksEl.textContent = underdogPicks;
+        if (mainstreamPicksEl) mainstreamPicksEl.textContent = mainstreamPicks;
+        if (votingStreakEl) votingStreakEl.textContent = votingStreak;
+        if (songsAliveEl) songsAliveEl.textContent = journeyStats.songsStillAlive;
+        if (songsAdvancedEl) songsAdvancedEl.textContent = journeyStats.songsAdvanced;
+        if (furthestRoundEl) furthestRoundEl.textContent = getRoundName(journeyStats.furthestRound);
+        if (closeCallsEl) closeCallsEl.textContent = supportImpact.closeCalls;
+        if (roundsParticipatedEl) roundsParticipatedEl.textContent = supportImpact.roundsParticipated;
+        if (voteInfluenceEl) voteInfluenceEl.textContent = voteInfluence;
         
         // Show hero section
-        document.getElementById('statsHeroSection').style.display = 'block';
+        heroSection.style.display = 'block';
         
         // Show filters section
-        document.getElementById('filtersSection').style.display = 'block';
+        const filtersSection = document.getElementById('filtersSection');
+        if (filtersSection) filtersSection.style.display = 'block';
     }
     
-    // Update filter counts
-    document.getElementById('countAll').textContent = totalVotes;
-    document.getElementById('countUnderdog').textContent = underdogPicks;
-    document.getElementById('countMainstream').textContent = mainstreamPicks;
-    document.getElementById('countLive').textContent = liveVotes.length;
+    // Update filter counts (with null checks)
+    const countAll = document.getElementById('countAll');
+    const countUnderdog = document.getElementById('countUnderdog');
+    const countMainstream = document.getElementById('countMainstream');
+    const countLive = document.getElementById('countLive');
+    
+    if (countAll) countAll.textContent = totalVotes;
+    if (countUnderdog) countUnderdog.textContent = underdogPicks;
+    if (countMainstream) countMainstream.textContent = mainstreamPicks;
+    if (countLive) countLive.textContent = liveVotes.length;
     
     // Display favorite songs
     displayFavoriteSongs(favoriteSongs);
@@ -302,7 +334,7 @@ function updateStats() {
     // Display tournament coverage
     displayTournamentCoverage(tournamentCoverage);
     
-    console.log('📊 Stats updated');
+    console.log('📊 Stats updated successfully');
 }
 
 
