@@ -1,26 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
     const footerHTML = `
 <!-- ========================================
-     BROWSER NOTIFICATIONS (Global - All Pages)
+     SHARE CTA BANNER (Global - All Pages)
      ======================================== -->
-<section class="newsletter">
+<section class="footer-cta-banner">
     <div class="container">
-        <div class="newsletter-content">
-            <div class="newsletter-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
+        <div class="cta-content">
+            <span class="cta-icon">🎤</span>
+            <div class="cta-text">
+                <h3>Think your friends will agree with your picks?</h3>
+                <p>Share your favorite matches and see if they vote the same way!</p>
             </div>
-            <div class="newsletter-text">
-                <h3 class="newsletter-title">Never Miss a Match</h3>
-                <p class="newsletter-description">Get notified when any match goes live</p>
-            </div>
-            <div class="notification-actions">
-                <button id="enable-notifications" class="newsletter-btn" onclick="enableGlobalNotifications()">
-                    <span class="notification-status">Enable Notifications</span>
+            <div class="cta-actions">
+                <button class="btn-primary share-twitter" onclick="shareToTwitter()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                    </svg>
+                    Share on X
                 </button>
-                <p class="notification-hint">Receive alerts for all upcoming matches</p>
+                <button class="btn-secondary share-reddit" onclick="shareToReddit()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                    </svg>
+                    Share on Reddit
+                </button>
+                <button class="btn-secondary share-discord" onclick="shareToDiscord()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                    Share on Discord
+                </button>
+                <button class="btn-secondary copy-link" onclick="copyShareLink()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    Copy Link
+                </button>
             </div>
         </div>
     </div>
@@ -71,16 +87,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     Join fellow League fans in celebrating the most memorable music videos. Follow us for tournament updates and share your favorite anthems.
                 </p>
 
-                 <!-- ✅ ADD THIS -->
-    <div class="footer-contact">
-        <a href="mailto:anthemarena@outlook.com" class="footer-email-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            <span>anthemarena@outlook.com</span>
-        </a>
-    </div>
+                <div class="footer-contact">
+                    <a href="mailto:anthemarena@outlook.com" class="footer-email-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span>anthemarena@outlook.com</span>
+                    </a>
+                </div>
 
                 <div class="footer-social">
                     <a href="https://x.com/AnthemArena" class="social-link" aria-label="X" target="_blank" rel="noopener noreferrer">
@@ -156,15 +171,84 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </footer>
+
+<script>
+// ========================================
+// SHARE FUNCTIONALITY
+// ========================================
+
+function shareToTwitter() {
+    const tweetText = \`🎵 Just voted in the League Music Tournament!
+
+Which anthem reigns supreme? Cast your vote:
+
+anthemarena.com
+
+#LeagueOfLegends #Worlds\`;
+    
+    const twitterUrl = \`https://twitter.com/intent/tweet?text=\${encodeURIComponent(tweetText)}\`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+    
+    console.log('🐦 Twitter share opened');
+}
+
+function shareToReddit() {
+    const redditUrl = \`https://www.reddit.com/submit?url=\${encodeURIComponent('https://anthemarena.com')}&title=\${encodeURIComponent('🎵 League Music Tournament - Vote for the Ultimate Anthem!')}\`;
+    window.open(redditUrl, '_blank', 'width=800,height=600');
+    
+    console.log('🔴 Reddit share opened');
+}
+
+function shareToDiscord() {
+    // Discord doesn't have a direct share URL, so we copy a formatted message
+    const discordMessage = \`🎵 **League Music Tournament**
+
+Vote for the most iconic League anthem!
+🎮 GODS vs RISE - Who wins?
+
+Cast your vote: https://anthemarena.com\`;
+    
+    navigator.clipboard.writeText(discordMessage).then(() => {
+        showCopySuccessToast('Discord message copied! Paste it in your server 💬');
+        console.log('💬 Discord message copied');
+    }).catch(err => {
+        alert(\`Copy this message:\n\n\${discordMessage}\`);
+    });
+}
+
+function copyShareLink() {
+    const shareUrl = 'https://anthemarena.com';
+    
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        showCopySuccessToast('✅ Link copied to clipboard!');
+        console.log('📋 Link copied');
+    }).catch(err => {
+        alert(\`Copy this link: \${shareUrl}\`);
+    });
+}
+
+function showCopySuccessToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'copy-success-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+// Expose functions globally
+window.shareToTwitter = shareToTwitter;
+window.shareToReddit = shareToReddit;
+window.shareToDiscord = shareToDiscord;
+window.copyShareLink = copyShareLink;
+</script>
     `;
     
     // Insert footer into the page
     document.getElementById('footer-placeholder').innerHTML = footerHTML;
-    
-    // Check notification status after footer loads
-    setTimeout(() => {
-        if (typeof window.checkGlobalNotificationStatus === 'function') {
-            window.checkGlobalNotificationStatus();
-        }
-    }, 100);
 });
