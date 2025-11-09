@@ -1944,3 +1944,33 @@
         align-items: center;
     }
 }
+.share-stats-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+}
+
+.share-stats-btn:hover {
+    background: linear-gradient(135deg, #D4B876, #C8AA6E);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.4);
+}
+
+.share-stats-btn:active {
+    transform: translateY(0);
+}
+
+.share-stats-btn svg {
+    stroke-width: 2.5;
+}

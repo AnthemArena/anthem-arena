@@ -1290,10 +1290,10 @@ function showNoVotesState() {
 }
 
 // ========================================
-// SHARE STATS
+// SHARE STATS (UPDATED WITH IMAGE GENERATION)
 // ========================================
 
-function shareStats() {
+async function shareStats() {
     const totalVotes = allVotes.length;
     const underdogPicks = allVotes.filter(v => v.voteType === 'underdog').length;
     const mainstreamPicks = allVotes.filter(v => v.voteType === 'mainstream').length;
@@ -1304,80 +1304,43 @@ function shareStats() {
     
     const tasteProfile = getTasteProfile(majorityAlignment, totalVotes, underdogPicks);
     const journeyStats = calculateJourneyStats();
-    const artistPreferences = getArtistPreferences();
-    const favoriteArtist = artistPreferences[0];
+    const votingStreak = calculateVotingStreak();
+    const supportImpact = calculateSupportImpact();
     const favoriteSongs = getSongPreferences();
     const favoriteSong = favoriteSongs[0];
     
-    // Generate share text (non-competitive framing)
-    let shareText = `🎵 My Anthem Arena Championship Profile:\n\n` +
-        `🗳️ ${totalVotes} votes cast\n` +
-        `${tasteProfile.icon} ${tasteProfile.title}\n`;
+    // Prepare stats data for image generation
+    const statsData = {
+        totalVotes: totalVotes,
+        underdogPicks: underdogPicks,
+        mainstreamPicks: mainstreamPicks,
+        songsStillAlive: journeyStats.songsStillAlive,
+        votingStreak: votingStreak,
+        roundsParticipated: supportImpact.roundsParticipated,
+        tasteProfile: {
+            icon: tasteProfile.icon,
+            title: tasteProfile.title,
+            description: tasteProfile.description
+        },
+        favoriteSong: favoriteSong ? {
+            name: favoriteSong.name,
+            thumbnailUrl: `https://img.youtube.com/vi/${favoriteSong.videoId}/mqdefault.jpg`,
+            voteCount: favoriteSong.count
+        } : null
+    };
     
-    if (journeyStats.songsStillAlive > 0) {
-        shareText += `✓ ${journeyStats.songsStillAlive} songs still competing\n`;
+    console.log('📊 Preparing stats for sharing:', statsData);
+    
+    // Call the image generator
+    if (window.generateAndShareStats) {
+        await window.generateAndShareStats(statsData);
+    } else {
+        console.error('❌ Stats image generator not loaded');
+        showNotification('Stats image generator not available. Please refresh the page.', 'error');
     }
-    
-    if (underdogPicks > 0) {
-        shareText += `🎭 ${underdogPicks} underdog picks\n`;
-    }
-    
-    if (favoriteSong) {
-        shareText += `🎵 Most supported: ${favoriteSong.name}\n`;
-    }
-    
-    if (favoriteArtist) {
-        shareText += `🎸 Favorite artist: ${favoriteArtist.artist}\n`;
-    }
-    
-    shareText += `\nVote for your favorite League music videos!`;
-    
-    // Update share preview
-    document.getElementById('sharePreview').innerHTML = shareText.replace(/\n/g, '<br>');
-    
-    // Store for sharing
-    window.currentShareText = shareText;
-    
-    // Show modal
-    document.getElementById('shareModal').style.display = 'flex';
 }
 
 window.shareStats = shareStats;
-
-function closeShareModal() {
-    document.getElementById('shareModal').style.display = 'none';
-}
-
-window.closeShareModal = closeShareModal;
-
-// ========================================
-// SHARE FUNCTIONS
-// ========================================
-
-function shareToTwitter() {
-    const text = encodeURIComponent(window.currentShareText);
-    const url = encodeURIComponent(window.location.origin);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-}
-
-window.shareToTwitter = shareToTwitter;
-
-function shareToFacebook() {
-    const url = encodeURIComponent(window.location.origin);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-}
-
-window.shareToFacebook = shareToFacebook;
-
-function copyShareText() {
-    navigator.clipboard.writeText(window.currentShareText).then(() => {
-        showNotification('Stats copied to clipboard!', 'success');
-    }).catch(() => {
-        showNotification('Failed to copy', 'error');
-    });
-}
-
-window.copyShareText = copyShareText;
 
 // ========================================
 // NOTIFICATION
