@@ -94,29 +94,23 @@ function getThumbnailUrl(youtubeUrl) {
 // ========================================
 // HELPER: CALCULATE HOURS UNTIL CLOSE
 // ========================================
+// ========================================
+// HELPER: CALCULATE HOURS UNTIL CLOSE
+// ========================================
 function getHoursUntilClose(match) {
-
-    // ✅ DEBUG: See what's happening
-console.log(`🔍 Match ${matchId}:`, {
-    hasEndTime: !!match.endTime,
-    hasEndDate: !!match.endDate,
-    endTimeValue: match.endTime || match.endDate,
-    hoursLeft: hoursLeft,
-    totalVotes: totalVotes
-});
-
     // ✅ Support both endTime (Firestore Timestamp) and endDate (ISO string)
     const endTimeValue = match.endTime || match.endDate;
     
-  if (!endTimeValue) {
-    console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
-    return null;
-}
+    if (!endTimeValue) {
+        // ✅ FIXED: Use match.matchId instead of undefined matchId variable
+        console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
+        return null;
+    }
     
     const now = Date.now();
     
-    // Handle Firestore Timestamp
-    if (endTimeValue.toMillis) {
+    // Handle Firestore Timestamp object
+    if (endTimeValue.toMillis && typeof endTimeValue.toMillis === 'function') {
         const msLeft = endTimeValue.toMillis() - now;
         if (msLeft <= 0) return 0;
         return Math.floor(msLeft / (1000 * 60 * 60));
@@ -126,7 +120,7 @@ console.log(`🔍 Match ${matchId}:`, {
     const endDate = new Date(endTimeValue);
     
     if (isNaN(endDate.getTime())) {
-        console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue);
+        console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue, 'for match:', match.matchId || match.id);
         return null;
     }
     
