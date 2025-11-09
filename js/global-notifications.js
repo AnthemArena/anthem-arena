@@ -1005,8 +1005,7 @@ function initBulletinSystem() {
     checkAndShowBulletin();
     adjustPollingRate();
     
-    // 🆕 Start live activity monitoring
-    startActivityPolling();
+
     
     console.log('✅ Bulletin system initialized with live activity');
 }
