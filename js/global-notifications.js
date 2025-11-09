@@ -36,6 +36,19 @@ let lastActivity = Date.now();
 let currentBulletin = null;
 let dismissedBulletins = new Set();
 let matchStates = {}; // Track previous states for comeback detection
+let recentlyShownBulletins = new Map(); // ✅ NEW: Track shown toasts with timestamps
+
+const COOLDOWN_MINUTES = {
+    danger: 5,          // Critical - show often
+    novotes: 5,         // Critical - needs votes urgently
+    nailbiter: 10,      // Important - check back soon
+    comeback: 15,       // Exciting but not urgent
+    winning: 30,        // Low priority - just FYI
+    lowvotes: 15,       // Moderate urgency
+    welcome: 720,       // 12 hours - only for new visitors
+    encouragement: 120  // 2 hours - gentle nudge
+};
+
 
 // ========================================
 // ACTIVITY TRACKING
@@ -398,15 +411,33 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             console.log(`⚠️ ${lowVoteCount} matches have low votes (${notifications.filter(n => n.type === 'lowvotes').length} will be shown)`);
         }
                 
-        // Show highest priority notification that hasn't been dismissed
+// Show highest priority notification that hasn't been dismissed
         notifications.sort((a, b) => a.priority - b.priority);
         
         for (const notification of notifications) {
             const bulletinKey = `${notification.type}-${notification.matchId}`;
-            if (!dismissedBulletins.has(bulletinKey)) {
-                showBulletin(notification);
-                break;
+            
+            // ✅ Check if dismissed (24h block)
+            if (dismissedBulletins.has(bulletinKey)) continue;
+            
+            // ✅ NEW: Check if recently shown (type-specific cooldown)
+            const lastShown = recentlyShownBulletins.get(bulletinKey);
+            if (lastShown) {
+                const cooldownMs = (COOLDOWN_MINUTES[notification.type] || 10) * 60000;
+                const timeSinceShown = Date.now() - lastShown;
+                
+                if (timeSinceShown < cooldownMs) {
+                    const minutesRemaining = Math.ceil((cooldownMs - timeSinceShown) / 60000);
+                    console.log(`⏳ Toast "${notification.type}" on cooldown (${minutesRemaining}m remaining)`);
+                    continue;
+                }
             }
+            
+            // ✅ Show the toast and track it
+            showBulletin(notification);
+            recentlyShownBulletins.set(bulletinKey, Date.now());
+            console.log(`📢 Toast shown and tracked: ${bulletinKey} (cooldown: ${COOLDOWN_MINUTES[notification.type] || 10}m)`);
+            break;
         }
         
     } catch (error) {
@@ -1077,6 +1108,63 @@ window.hideBulletin = hideBulletin;
 window.checkAndShowBulletin = checkAndShowBulletin;
 
 console.log('✅ Bulletin functions exposed to window');
+
+// ========================================
+// DEBUG FUNCTION - Check Match Vote Status
+// ========================================
+
+window.debugMatchVotes = async function() {
+    console.log('🔍 Checking all live matches for vote counts...\n');
+    
+    try {
+        const matches = await db.collection('matches')
+            .where('status', '==', 'live')
+            .get();
+        
+        console.log(`📊 Found ${matches.size} live matches:\n`);
+        
+        const now = new Date();
+        let zeroVoteMatches = 0;
+        let lowVoteMatches = 0;
+        
+        matches.forEach(doc => {
+            const m = doc.data();
+            const votes = m.totalVotes ?? 0;
+            const hoursLeft = m.endTime ? 
+                ((m.endTime.toDate() - now) / (1000 * 60 * 60)).toFixed(1) : '???';
+            
+            // Track counts
+            if (votes === 0) zeroVoteMatches++;
+            if (votes > 0 && votes < 10) lowVoteMatches++;
+            
+            // Visual indicator
+            let indicator = '✅';
+            if (votes === 0 && hoursLeft <= 12) indicator = '🆘';
+            else if (votes < 10 && hoursLeft <= 8) indicator = '⚠️';
+            else if (votes < 10) indicator = '📊';
+            
+            console.log(`${indicator} ${doc.id}:`, {
+                votes: votes,
+                hoursLeft: hoursLeft + 'h',
+                song1: m.song1?.title || '???',
+                song2: m.song2?.title || '???',
+                shouldAlertNoVotes: (votes === 0 && hoursLeft <= 12),
+                shouldAlertLowVotes: (votes > 0 && votes < 10 && hoursLeft <= 8)
+            });
+        });
+        
+        console.log(`\n📊 Summary:`);
+        console.log(`   • ${matches.size} total live matches`);
+        console.log(`   • ${zeroVoteMatches} matches with ZERO votes`);
+        console.log(`   • ${lowVoteMatches} matches with LOW votes (1-9)`);
+        console.log(`\n🎯 Alert Criteria:`);
+        console.log(`   🆘 No votes: 0 votes + ≤12h left`);
+        console.log(`   ⚠️ Low votes: 1-9 votes + ≤8h left`);
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+    }
+};
 
 // ========================================
 // DEBUG: Force show bulletin (for testing)
