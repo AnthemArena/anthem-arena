@@ -108,29 +108,29 @@ async function generateStatsImage(statsData) {
     ctx.fillText(statsData.tasteProfile.description, 600, 205);
     
     // ========================================
-    // STATS GRID
+    // STATS GRID (3 COLUMNS)
     // ========================================
     
     const statsY = 280;
-    const leftCol = 120;
-    const rightCol = 620;
+    const leftCol = 80;
+    const centerCol = 420;
+    const rightCol = 760;
     
     ctx.textAlign = 'left';
-    ctx.font = '32px Arial, sans-serif';
     
     // Left column stats
     const leftStats = [
         { emoji: '🗳️', label: `${statsData.totalVotes} Votes Cast`, color: '#ffffff' },
         { emoji: '🎭', label: `${statsData.underdogPicks} Underdog Picks`, color: '#ff6b9d' },
-        { emoji: '✓', label: `${statsData.songsStillAlive} Songs Still Competing`, color: '#4ade80' }
+        { emoji: '✓', label: `${statsData.songsStillAlive} Songs Still Alive`, color: '#4ade80' }
     ];
     
     leftStats.forEach((stat, index) => {
-        const y = statsY + (index * 60);
+        const y = statsY + (index * 65);
         
         // Stat background
         ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        roundRect(ctx, leftCol - 10, y - 35, 450, 50, 8);
+        roundRect(ctx, leftCol - 10, y - 35, 310, 50, 8);
         ctx.fill();
         
         // Emoji
@@ -140,95 +140,117 @@ async function generateStatsImage(statsData) {
         
         // Text
         ctx.fillStyle = stat.color;
-        ctx.font = '28px Arial, sans-serif';
+        ctx.font = 'bold 24px Arial, sans-serif';
         ctx.fillText(stat.label, leftCol + 50, y);
     });
     
-    // Right column stats
-    const rightStats = [
-        { emoji: '🎯', label: `${statsData.mainstreamPicks} Mainstream Picks`, color: '#60a5fa' },
+    // Center column stats
+    const centerStats = [
+        { emoji: '🎯', label: `${statsData.mainstreamPicks} Mainstream`, color: '#60a5fa' },
         { emoji: '🔥', label: `${statsData.votingStreak} Day Streak`, color: '#fb923c' },
-        { emoji: '📊', label: `${statsData.roundsParticipated} Rounds Participated`, color: '#a78bfa' }
+        { emoji: '📊', label: `${statsData.roundsParticipated} Rounds`, color: '#a78bfa' }
     ];
     
-    rightStats.forEach((stat, index) => {
-        const y = statsY + (index * 60);
+    centerStats.forEach((stat, index) => {
+        const y = statsY + (index * 65);
         
         // Stat background
         ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        roundRect(ctx, rightCol - 10, y - 35, 450, 50, 8);
+        roundRect(ctx, centerCol - 10, y - 35, 310, 50, 8);
         ctx.fill();
         
         // Emoji
         ctx.font = '32px Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(stat.emoji, rightCol, y);
+        ctx.fillText(stat.emoji, centerCol, y);
         
         // Text
         ctx.fillStyle = stat.color;
-        ctx.font = '28px Arial, sans-serif';
-        ctx.fillText(stat.label, rightCol + 50, y);
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.fillText(stat.label, centerCol + 50, y);
     });
     
-    // ========================================
-    // FAVORITE SONG SECTION
-    // ========================================
-    
+    // Right column - FAVORITE SONG (larger card)
     if (statsData.favoriteSong) {
-        const songY = 470;
+        const songCardY = statsY - 35;
+        
+        // Song card background
+        const songGradient = ctx.createLinearGradient(rightCol - 10, songCardY, rightCol + 400, songCardY + 240);
+        songGradient.addColorStop(0, 'rgba(200, 170, 110, 0.15)');
+        songGradient.addColorStop(1, 'rgba(200, 170, 110, 0.05)');
+        ctx.fillStyle = songGradient;
+        roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
+        ctx.fill();
+        
+        // Song card border
+        ctx.strokeStyle = 'rgba(200, 170, 110, 0.5)';
+        ctx.lineWidth = 3;
+        roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
+        ctx.stroke();
         
         // Section title
         ctx.fillStyle = '#C8AA6E';
-        ctx.font = 'bold 28px Arial, sans-serif';
+        ctx.font = 'bold 22px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('🎵 MOST SUPPORTED SONG', 600, songY);
+        ctx.fillText('🎵 MOST SUPPORTED', rightCol + 180, songCardY + 35);
         
         // Load and draw thumbnail
         try {
             const thumbnail = await loadImage(statsData.favoriteSong.thumbnailUrl);
             
-            // Thumbnail background/border
-            ctx.fillStyle = 'rgba(200, 170, 110, 0.2)';
-            roundRect(ctx, 435, songY + 15, 330, 90, 12);
-            ctx.fill();
-            
-            ctx.strokeStyle = '#C8AA6E';
-            ctx.lineWidth = 3;
-            roundRect(ctx, 435, songY + 15, 330, 90, 12);
-            ctx.stroke();
-            
             // Draw thumbnail (clipped to rounded rect)
+            const thumbX = rightCol + 90;
+            const thumbY = songCardY + 55;
+            const thumbWidth = 200;
+            const thumbHeight = 100;
+            
             ctx.save();
-            roundRect(ctx, 440, songY + 20, 160, 80, 8);
+            roundRect(ctx, thumbX, thumbY, thumbWidth, thumbHeight, 8);
             ctx.clip();
-            ctx.drawImage(thumbnail, 440, songY + 20, 160, 80);
+            ctx.drawImage(thumbnail, thumbX, thumbY, thumbWidth, thumbHeight);
             ctx.restore();
+            
+            // Thumbnail border
+            ctx.strokeStyle = 'rgba(200, 170, 110, 0.4)';
+            ctx.lineWidth = 2;
+            roundRect(ctx, thumbX, thumbY, thumbWidth, thumbHeight, 8);
+            ctx.stroke();
             
             // Song name
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 22px Arial, sans-serif';
-            ctx.textAlign = 'left';
+            ctx.font = 'bold 20px Arial, sans-serif';
+            ctx.textAlign = 'center';
             
             // Truncate if too long
             let songName = statsData.favoriteSong.name;
-            if (songName.length > 20) {
-                songName = songName.substring(0, 18) + '...';
+            if (songName.length > 24) {
+                songName = songName.substring(0, 22) + '...';
             }
-            ctx.fillText(songName, 615, songY + 55);
+            ctx.fillText(songName, rightCol + 180, songCardY + 180);
             
-            // Vote count
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.font = '18px Arial, sans-serif';
-            ctx.fillText(`${statsData.favoriteSong.voteCount} ${statsData.favoriteSong.voteCount === 1 ? 'vote' : 'votes'}`, 615, songY + 80);
+            // Vote count with icon
+            ctx.fillStyle = '#C8AA6E';
+            ctx.font = 'bold 18px Arial, sans-serif';
+            const voteText = `${statsData.favoriteSong.voteCount} ${statsData.favoriteSong.voteCount === 1 ? 'vote' : 'votes'}`;
+            ctx.fillText(`💗 ${voteText}`, rightCol + 180, songCardY + 210);
             
         } catch (error) {
             console.warn('⚠️ Could not load thumbnail:', error);
             
-            // Fallback: Just show song name without thumbnail
+            // Fallback: Just show song name
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 24px Arial, sans-serif';
+            ctx.font = 'bold 22px Arial, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(statsData.favoriteSong.name, 600, songY + 50);
+            
+            let songName = statsData.favoriteSong.name;
+            if (songName.length > 20) {
+                songName = songName.substring(0, 18) + '...';
+            }
+            ctx.fillText(songName, rightCol + 180, songCardY + 130);
+            
+            ctx.fillStyle = '#C8AA6E';
+            ctx.font = 'bold 18px Arial, sans-serif';
+            ctx.fillText(`${statsData.favoriteSong.voteCount} votes`, rightCol + 180, songCardY + 160);
         }
     }
     
@@ -240,15 +262,15 @@ async function generateStatsImage(statsData) {
     ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(100, 590);
-    ctx.lineTo(1100, 590);
+    ctx.moveTo(100, 575);
+    ctx.lineTo(1100, 575);
     ctx.stroke();
     
     // Footer text
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.font = '20px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 615);
+    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 605);
     
     console.log('✅ Stats image generated');
     
@@ -304,7 +326,7 @@ function downloadCanvas(canvas, filename = 'anthem-arena-stats.png') {
 }
 
 // ========================================
-// SHARE TO SOCIAL MEDIA
+// SHARE TO SOCIAL MEDIA (IMPROVED)
 // ========================================
 
 async function shareStatsImage(canvas, statsData) {
@@ -327,26 +349,97 @@ async function shareStatsImage(canvas, statsData) {
                     reject(error);
                 }
             } else {
-                // Desktop: Download image and open Twitter
+                // ✅ DESKTOP: Download + show helpful toast
                 downloadCanvas(canvas);
-                
-                // Open Twitter with pre-filled text
-                const tweetText = `🎵 My Anthem Arena Profile!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n✓ ${statsData.songsStillAlive} songs still competing\n\nVote for your favorite League anthems: anthemarena.com\n\n#LeagueOfLegends #AnthemArena`;
-                
-                setTimeout(() => {
-                    window.open(
-                        `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
-                        '_blank',
-                        'width=550,height=420'
-                    );
-                }, 500);
-                
-                console.log('✅ Image downloaded, Twitter opened');
+                showShareToast(statsData);
+                console.log('✅ Image downloaded');
                 resolve();
             }
         }, 'image/png');
     });
 }
+
+// ========================================
+// SHOW SHARE TOAST (NEW)
+// ========================================
+
+function showShareToast(statsData) {
+    const tweetText = `🎵 My Anthem Arena Profile!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n✓ ${statsData.songsStillAlive} songs still alive\n\nVote for your favorite League anthems: anthemarena.com\n\n#LeagueOfLegends #AnthemArena`;
+    
+    const toast = document.createElement('div');
+    toast.className = 'share-success-toast';
+    toast.innerHTML = `
+        <div class="toast-content">
+            <div class="toast-icon">✅</div>
+            <div class="toast-text">
+                <strong>Image Downloaded!</strong>
+                <p>Share it on your favorite platform</p>
+            </div>
+        </div>
+        <div class="toast-actions">
+            <button class="toast-btn copy-text-btn" onclick="copyToClipboard(\`${tweetText.replace(/`/g, '\\`')}\`)">
+                📋 Copy Caption
+            </button>
+            <button class="toast-btn twitter-btn" onclick="window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}', '_blank')">
+                🐦 Share on Twitter
+            </button>
+        </div>
+    `;
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(20, 20, 35, 0.98));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(200, 170, 110, 0.3);
+        z-index: 10001;
+        min-width: 350px;
+        animation: slideInUp 0.4s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideOutDown 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+    }, 10000);
+}
+
+// ========================================
+// COPY TO CLIPBOARD HELPER
+// ========================================
+
+window.copyToClipboard = function(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // Show confirmation
+        const confirmToast = document.createElement('div');
+        confirmToast.textContent = '✅ Caption copied to clipboard!';
+        confirmToast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4ade80;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Lora', serif;
+            font-weight: 600;
+            z-index: 10002;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+        `;
+        document.body.appendChild(confirmToast);
+        setTimeout(() => confirmToast.remove(), 3000);
+    }).catch(err => {
+        alert('Failed to copy caption. Please try manually.');
+        console.error('Copy failed:', err);
+    });
+};
 
 // ========================================
 // MAIN EXPORT FUNCTION
@@ -368,7 +461,7 @@ window.generateAndShareStats = async function(statsData) {
         // Share or download
         await shareStatsImage(canvas, statsData);
         
-        console.log('🎉 Stats image shared successfully!');
+        console.log('🎉 Stats image generated successfully!');
         
     } catch (error) {
         console.error('❌ Error generating stats image:', error);
@@ -406,33 +499,121 @@ function showLoadingToast(message) {
         animation: slideInRight 0.3s ease;
     `;
     
-    const style = document.createElement('style');
-    style.textContent = `
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(200, 170, 110, 0.3);
-            border-top-color: #C8AA6E;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
+    // Add styles to document if not already present
+    if (!document.getElementById('toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'toast-styles';
+        style.textContent = `
+            .loading-spinner {
+                width: 20px;
+                height: 20px;
+                border: 3px solid rgba(200, 170, 110, 0.3);
+                border-top-color: #C8AA6E;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
             }
-        }
-    `;
-    document.head.appendChild(style);
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideInUp {
+                from {
+                    transform: translateY(100px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutDown {
+                from {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(100px);
+                    opacity: 0;
+                }
+            }
+            
+            .toast-content {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .toast-icon {
+                font-size: 2rem;
+            }
+            
+            .toast-text strong {
+                display: block;
+                font-family: 'Cinzel', serif;
+                font-size: 1.1rem;
+                color: #C8AA6E;
+                margin-bottom: 0.25rem;
+            }
+            
+            .toast-text p {
+                margin: 0;
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.7);
+            }
+            
+            .toast-actions {
+                display: flex;
+                gap: 0.75rem;
+            }
+            
+            .toast-btn {
+                flex: 1;
+                padding: 0.75rem 1rem;
+                border: none;
+                border-radius: 8px;
+                font-family: 'Lora', serif;
+                font-size: 0.9rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .copy-text-btn {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid rgba(200, 170, 110, 0.3);
+            }
+            
+            .copy-text-btn:hover {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(200, 170, 110, 0.5);
+            }
+            
+            .twitter-btn {
+                background: #1DA1F2;
+                color: white;
+            }
+            
+            .twitter-btn:hover {
+                background: #1a8cd8;
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
     document.body.appendChild(toast);
     return toast;
