@@ -171,6 +171,21 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </footer>
+
+<!-- Global Notification Bulletin (Toast-Style) -->
+<div id="global-bulletin" class="global-bulletin" style="display: none;">
+    <div class="bulletin-content">
+        <div class="bulletin-icon"></div>
+        <div class="bulletin-text">
+            <div class="bulletin-title"></div>
+            <div class="bulletin-message"></div>
+        </div>
+        <div class="bulletin-actions">
+            <button class="bulletin-dismiss">Dismiss</button>
+            <button class="bulletin-cta"></button>
+        </div>
+    </div>
+</div>
     `;
     
     // Insert footer into the page
