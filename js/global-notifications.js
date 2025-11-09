@@ -95,11 +95,42 @@ function getThumbnailUrl(youtubeUrl) {
 // HELPER: CALCULATE HOURS UNTIL CLOSE
 // ========================================
 function getHoursUntilClose(match) {
-    if (!match.endTime) return null;
+
+    // ✅ DEBUG: See what's happening
+console.log(`🔍 Match ${matchId}:`, {
+    hasEndTime: !!match.endTime,
+    hasEndDate: !!match.endDate,
+    endTimeValue: match.endTime || match.endDate,
+    hoursLeft: hoursLeft,
+    totalVotes: totalVotes
+});
+
+    // ✅ Support both endTime (Firestore Timestamp) and endDate (ISO string)
+    const endTimeValue = match.endTime || match.endDate;
+    
+    if (!endTimeValue) {
+        console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id);
+        return null;
+    }
     
     const now = Date.now();
-    const endTime = match.endTime.toMillis ? match.endTime.toMillis() : match.endTime;
-    const msLeft = endTime - now;
+    
+    // Handle Firestore Timestamp
+    if (endTimeValue.toMillis) {
+        const msLeft = endTimeValue.toMillis() - now;
+        if (msLeft <= 0) return 0;
+        return Math.floor(msLeft / (1000 * 60 * 60));
+    }
+    
+    // Handle ISO string or Date object
+    const endDate = new Date(endTimeValue);
+    
+    if (isNaN(endDate.getTime())) {
+        console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue);
+        return null;
+    }
+    
+    const msLeft = endDate.getTime() - now;
     
     if (msLeft <= 0) return 0;
     
