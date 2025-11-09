@@ -560,13 +560,14 @@ async function checkForClosingMatches() {
 
 function showBulletin(notification) {
 
-     // ✅ Final safety net
+    // ✅ Final safety net
     if (!notification.matchId) {
         const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency'];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
         }
+    }
 
     let banner = document.getElementById('bulletin-banner');
     
@@ -861,19 +862,19 @@ function showBulletin(notification) {
     currentBulletin = notification;
     
     const icons = {
-    danger: '🚨',
-    novotes: '🆘',
-    nailbiter: '🔥',
-    winning: '🎯',
-    comeback: '🎉',
-    lowvotes: '⚠️',
-    'close-match': '🔥',
-    'new-match': '🆕',
-    'low-turnout': '📊',
-    welcome: '🎵',              // ← Already exists
-    encouragement: '👀',        // ← ADD THIS
-    'return-voter': '👋'
-};
+        danger: '🚨',
+        novotes: '🆘',
+        nailbiter: '🔥',
+        winning: '🎯',
+        comeback: '🎉',
+        lowvotes: '⚠️',
+        'close-match': '🔥',
+        'new-match': '🆕',
+        'low-turnout': '📊',
+        welcome: '🎵',
+        encouragement: '👀',
+        'return-voter': '👋'
+    };
     
     const icon = icons[notification.type] || '📢';
     
@@ -881,7 +882,7 @@ function showBulletin(notification) {
         <div class="bulletin-toast-content">
             <div class="bulletin-thumbnail">
                 ${notification.thumbnailUrl ? 
-                    `<img src="${notification.thumbnailUrl}" alt="${notification.song}" class="thumbnail-img">` :
+                    `<img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">` :
                     `<div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>`
                 }
                 <div class="thumbnail-overlay">${icon}</div>
@@ -901,7 +902,6 @@ function showBulletin(notification) {
     
     console.log(`📢 Bulletin shown: ${notification.type}`);
 }
-
 // ========================================
 // BULLETIN ACTIONS
 // ========================================
@@ -1197,4 +1197,3 @@ window.testBulletin = function(type = 'winning') {
 };
 
 console.log('✅ global-notifications.js fully loaded with toast-style bulletins');
-}
