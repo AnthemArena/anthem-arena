@@ -173,7 +173,7 @@ async function getMatchData(matchId) {
 async function checkAndShowBulletin() {
     try {
         // ✅ Get user ID properly
-        const userId = localStorage.getItem('deviceId');
+const userId = localStorage.getItem('tournamentUserId');  // ✅ Match navigation.js
         
         if (!userId) {
             console.warn('⚠️ No user ID found - skipping vote checks');
