@@ -108,10 +108,10 @@ console.log(`🔍 Match ${matchId}:`, {
     // ✅ Support both endTime (Firestore Timestamp) and endDate (ISO string)
     const endTimeValue = match.endTime || match.endDate;
     
-    if (!endTimeValue) {
-        console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id);
-        return null;
-    }
+  if (!endTimeValue) {
+    console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
+    return null;
+}
     
     const now = Date.now();
     
@@ -1148,11 +1148,14 @@ console.log('✅ Bulletin functions exposed to window');
 // DEBUG FUNCTION - Check Match Vote Status
 // ========================================
 
+// ========================================
+// DEBUG FUNCTION - Check Match Vote Status
+// ========================================
+
 window.debugMatchVotes = async function() {
     console.log('🔍 Checking all live matches for vote counts...\n');
     
     try {
-        // ✅ Use your edge cache API instead of direct Firestore
         const response = await fetch('/api/matches');
         
         if (!response.ok) {
@@ -1164,9 +1167,22 @@ window.debugMatchVotes = async function() {
         
         console.log(`📊 Found ${liveMatches.length} live matches:\n`);
         
+        // ✅ Sample first match to debug structure
+        if (liveMatches.length > 0) {
+            const sample = liveMatches[0];
+            console.log('🔍 Sample match structure:');
+            console.log('  Match ID:', sample.matchId || sample.id);
+            console.log('  endDate:', sample.endDate);
+            console.log('  endTime:', sample.endTime);
+            console.log('  Type:', typeof sample.endDate);
+            console.log('');
+        }
+        
         const now = new Date();
         let zeroVoteMatches = 0;
         let lowVoteMatches = 0;
+        let shouldAlertZero = 0;
+        let shouldAlertLow = 0;
         
         liveMatches.forEach(match => {
             const matchId = match.matchId || match.id;
@@ -1174,36 +1190,58 @@ window.debugMatchVotes = async function() {
             const song2Votes = match.song2?.votes || 0;
             const totalVotes = song1Votes + song2Votes;
             
-            const hoursLeft = match.endTime ? 
-                ((new Date(match.endTime) - now) / (1000 * 60 * 60)).toFixed(1) : '???';
+            // ✅ USE THE ACTUAL getHoursUntilClose FUNCTION
+            const hoursLeft = getHoursUntilClose(match);
             
             // Track counts
             if (totalVotes === 0) zeroVoteMatches++;
             if (totalVotes > 0 && totalVotes < 10) lowVoteMatches++;
             
+            // Check if should alert (using realistic thresholds)
+            const shouldAlertNoVotes = (totalVotes === 0 && hoursLeft !== null && hoursLeft <= 72);
+            const shouldAlertLowVotes = (totalVotes > 0 && totalVotes < 5 && hoursLeft !== null && hoursLeft <= 48);
+            
+            if (shouldAlertNoVotes) shouldAlertZero++;
+            if (shouldAlertLowVotes) shouldAlertLow++;
+            
             // Visual indicator
             let indicator = '✅';
-            if (totalVotes === 0 && hoursLeft <= 12) indicator = '🆘';
-            else if (totalVotes < 10 && hoursLeft <= 8) indicator = '⚠️';
+            if (shouldAlertNoVotes) indicator = '🆘';
+            else if (shouldAlertLowVotes) indicator = '⚠️';
             else if (totalVotes < 10) indicator = '📊';
             
             console.log(`${indicator} ${matchId}:`, {
                 votes: totalVotes,
-                hoursLeft: hoursLeft + 'h',
-                song1: match.song1?.shortTitle || match.song1?.title || '???',
-                song2: match.song2?.shortTitle || match.song2?.title || '???',
-                shouldAlertNoVotes: (totalVotes === 0 && hoursLeft <= 12),
-                shouldAlertLowVotes: (totalVotes > 0 && totalVotes < 10 && hoursLeft <= 8)
+                hoursLeft: hoursLeft !== null ? hoursLeft + 'h' : '❌ NO END DATE',
+                endDate: match.endDate ? new Date(match.endDate).toLocaleString() : '❌ MISSING',
+                song1: match.song1?.shortTitle || '???',
+                song2: match.song2?.shortTitle || '???',
+                shouldAlertNoVotes,
+                shouldAlertLowVotes
             });
         });
         
         console.log(`\n📊 Summary:`);
         console.log(`   • ${liveMatches.length} total live matches`);
         console.log(`   • ${zeroVoteMatches} matches with ZERO votes`);
+        console.log(`   • ${shouldAlertZero} zero-vote matches SHOULD ALERT (≤72h)`);
         console.log(`   • ${lowVoteMatches} matches with LOW votes (1-9)`);
+        console.log(`   • ${shouldAlertLow} low-vote matches SHOULD ALERT (≤48h)`);
         console.log(`\n🎯 Alert Criteria:`);
-        console.log(`   🆘 No votes: 0 votes + ≤12h left`);
-        console.log(`   ⚠️ Low votes: 1-9 votes + ≤8h left`);
+        console.log(`   🆘 No votes: 0 votes + ≤72h left`);
+        console.log(`   ⚠️ Low votes: 1-4 votes + ≤48h left`);
+        
+        // ✅ Show dismissal status
+        console.log(`\n🚫 Dismissed Alerts:`);
+        const dismissed = JSON.parse(localStorage.getItem('dismissedBulletins') || '[]');
+        if (dismissed.length === 0) {
+            console.log('   None');
+        } else {
+            dismissed.forEach(d => {
+                const key = typeof d === 'string' ? d : d.key;
+                console.log(`   • ${key}`);
+            });
+        }
         
     } catch (error) {
         console.error('❌ Error:', error);
