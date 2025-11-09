@@ -261,10 +261,9 @@ if (!match.id && !match.matchId) {
     continue;  // Skip this match
 }
             
-            const userSongId = vote.songId;
-           // ✅ CORRECT:
-const userSong = userSongId === 'song1' ? match.song1 : match.song2;
-const opponent = userSongId === 'song1' ? match.song2 : match.song1;
+        const userChoice = vote.choice;  // ✅ CORRECT - this exists in Firebase
+const userSong = userChoice === 'song1' ? match.song1 : match.song2;
+const opponent = userChoice === 'song1' ? match.song2 : match.song1;
             
             if (!userSong || !opponent) continue;
             
