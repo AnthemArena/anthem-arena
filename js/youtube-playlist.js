@@ -12,24 +12,48 @@ let playlistVideos = [];
 // ========================================
 // FETCH PLAYLIST VIDEOS
 // ========================================
+// ========================================
+// FETCH PLAYLIST VIDEOS
+// ========================================
 async function fetchPlaylistVideos() {
     try {
         const response = await fetch('/.netlify/functions/youtube');
         const data = await response.json();
+
+        // ✅ ADD: Log the response to see actual structure
+        console.log('YouTube API Response:', data);
 
         if (data.error) {
             console.error('YouTube API Error:', data.error);
             return [];
         }
 
-        playlistVideos = data.items.map(item => ({
-            videoId: item.snippet.resourceId.videoId,
-            title: item.snippet.title,
-            thumbnail: item.snippet.thumbnails.medium.url,
-            publishedAt: item.snippet.publishedAt
-        }));
+        // ✅ ADD: Check if items exist
+        if (!data.items || data.items.length === 0) {
+            console.error('No playlist items found');
+            return [];
+        }
 
+        playlistVideos = data.items.map(item => {
+            // ✅ ADD: Log individual item to debug
+            console.log('Processing item:', item);
+            
+            // ✅ FIX: Safe access with fallback
+            const snippet = item.snippet || {};
+            const thumbnails = snippet.thumbnails || {};
+            const medium = thumbnails.medium || thumbnails.default || thumbnails.high || {};
+            
+            return {
+                videoId: snippet.resourceId?.videoId || '',
+                title: snippet.title || 'Untitled',
+                thumbnail: medium.url || 'https://via.placeholder.com/320x180?text=No+Thumbnail',
+                publishedAt: snippet.publishedAt || ''
+            };
+        });
+
+        console.log('✅ Processed videos:', playlistVideos.length);
         return playlistVideos;
+        
     } catch (error) {
         console.error('Error fetching playlist:', error);
         return [];
