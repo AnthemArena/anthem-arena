@@ -5,9 +5,8 @@ console.log('🔔 global-notifications.js loaded');
 // With Smart Polling + Edge Caching
 // Toast-Style Bottom-Right Notifications
 // ========================================
-
 import { db } from './firebase-config.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { collection, query, where, getDocs, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
 // CONFIGURATION
@@ -187,11 +186,8 @@ async function checkAndShowBulletin() {
         
         if (userId) {
             try {
-                // Import Firestore functions AND db together
-                const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-                const { db: firestoreDb } = await import('./firebase-config.js');
-                
-                const votesRef = collection(firestoreDb, 'votes');
+                // ✅ Use the top-level imports (already available from line 4)
+                const votesRef = collection(db, 'votes');
                 const q = query(votesRef, where('userId', '==', userId));
                 const snapshot = await getDocs(q);
                 
