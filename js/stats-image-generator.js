@@ -258,19 +258,19 @@ async function generateStatsImage(statsData) {
     // FOOTER
     // ========================================
     
-    // Footer line (moved up)
-ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
-ctx.lineWidth = 1;
-ctx.beginPath();
-ctx.moveTo(100, 565);  // ← Changed from 575
-ctx.lineTo(1100, 565);  // ← Changed from 575
-ctx.stroke();
+    // Footer line
+    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(100, 565);
+    ctx.lineTo(1100, 565);
+    ctx.stroke();
     
- // Footer text (moved up)
-ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-ctx.font = '20px Arial, sans-serif';
-ctx.textAlign = 'center';
-ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 595);  // ← Changed from 605
+    // Footer text
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '20px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 595);
     
     console.log('✅ Stats image generated');
     
@@ -326,39 +326,13 @@ function downloadCanvas(canvas, filename = 'anthem-arena-stats.png') {
 }
 
 // ========================================
-// SHARE TO SOCIAL MEDIA (IMPROVED)
-// ========================================
-
-// ========================================
-// SHARE TO SOCIAL MEDIA (IMPROVED)
+// SHARE TO SOCIAL MEDIA (SIMPLIFIED)
 // ========================================
 
 async function shareStatsImage(canvas, statsData) {
-    return new Promise((resolve, reject) => {
-        // Check if Web Share API is available (mobile)
-        if (navigator.share && navigator.canShare) {
-            canvas.toBlob(async blob => {
-                const file = new File([blob], 'anthem-arena-stats.png', { type: 'image/png' });
-                
-                if (navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            title: 'My Anthem Arena Profile',
-                            text: `🎵 My League Music Voting Stats!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n\nVote at anthemarena.com`,
-                            files: [file]
-                        });
-                        console.log('✅ Shared via Web Share API');
-                        resolve();
-                        return;
-                    } catch (error) {
-                        console.log('❌ Web Share cancelled or failed');
-                        // Fall through to desktop toast
-                    }
-                }
-            }, 'image/png');
-        }
-        
-        // ✅ DESKTOP: Show toast with download/share options
+    // ✅ NO WEB SHARE API - Just show toast
+    // This prevents the native share dialog from appearing
+    return new Promise((resolve) => {
         showShareToast(statsData, canvas);
         console.log('✅ Share toast displayed');
         resolve();
@@ -366,16 +340,10 @@ async function shareStatsImage(canvas, statsData) {
 }
 
 // ========================================
-// SHOW SHARE TOAST (NEW)
-// ========================================
-
-// ========================================
-// SHOW SHARE TOAST (IMPROVED WITH DOWNLOAD)
+// SHOW SHARE TOAST (SIMPLIFIED)
 // ========================================
 
 function showShareToast(statsData, canvas) {
-    const tweetText = `🎵 My Anthem Arena Profile!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n✓ ${statsData.songsStillAlive} songs still alive\n\nVote for your favorite League anthems: anthemarena.com\n\n#LeagueOfLegends #AnthemArena`;
-    
     const toast = document.createElement('div');
     toast.className = 'share-success-toast';
     toast.innerHTML = `
@@ -383,20 +351,18 @@ function showShareToast(statsData, canvas) {
             <div class="toast-icon">✅</div>
             <div class="toast-text">
                 <strong>Stats Image Ready!</strong>
-                <p>Download or share your profile</p>
+                <p>Your profile image has been generated</p>
             </div>
         </div>
         <div class="toast-actions">
             <button class="toast-btn download-btn" onclick="downloadStatsImage()">
                 📥 Download Image
             </button>
-            <button class="toast-btn copy-text-btn" onclick="copyToClipboard(\`${tweetText.replace(/`/g, '\\`')}\`)">
-                📋 Copy Caption
-            </button>
-            <button class="toast-btn twitter-btn" onclick="window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}', '_blank')">
-                🐦 Share on Twitter
+            <button class="toast-btn copy-link-btn" onclick="copyShareLink()">
+                📋 Copy Site Link
             </button>
         </div>
+        <p class="toast-hint">💡 Share the image on your favorite social platform!</p>
     `;
     
     toast.style.cssText = `
@@ -410,7 +376,7 @@ function showShareToast(statsData, canvas) {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         border: 2px solid rgba(200, 170, 110, 0.3);
         z-index: 10001;
-        min-width: 400px;
+        min-width: 380px;
         animation: slideInUp 0.4s ease;
     `;
     
@@ -419,15 +385,15 @@ function showShareToast(statsData, canvas) {
     
     document.body.appendChild(toast);
     
-    // Auto-remove after 15 seconds
+    // Auto-remove after 12 seconds
     setTimeout(() => {
         toast.style.animation = 'slideOutDown 0.4s ease';
         setTimeout(() => toast.remove(), 400);
-    }, 15000);
+    }, 12000);
 }
 
 // ========================================
-// DOWNLOAD STATS IMAGE (NEW)
+// DOWNLOAD STATS IMAGE
 // ========================================
 
 window.downloadStatsImage = function() {
@@ -455,15 +421,18 @@ window.downloadStatsImage = function() {
         setTimeout(() => confirmToast.remove(), 3000);
     }
 };
+
 // ========================================
-// COPY TO CLIPBOARD HELPER
+// COPY SITE LINK
 // ========================================
 
-window.copyToClipboard = function(text) {
-    navigator.clipboard.writeText(text).then(() => {
+window.copyShareLink = function() {
+    const siteUrl = 'https://anthemarena.com';
+    
+    navigator.clipboard.writeText(siteUrl).then(() => {
         // Show confirmation
         const confirmToast = document.createElement('div');
-        confirmToast.textContent = '✅ Caption copied to clipboard!';
+        confirmToast.textContent = '✅ Site link copied to clipboard!';
         confirmToast.style.cssText = `
             position: fixed;
             top: 20px;
@@ -481,7 +450,7 @@ window.copyToClipboard = function(text) {
         document.body.appendChild(confirmToast);
         setTimeout(() => confirmToast.remove(), 3000);
     }).catch(err => {
-        alert('Failed to copy caption. Please try manually.');
+        alert('Failed to copy link. Please try manually: https://anthemarena.com');
         console.error('Copy failed:', err);
     });
 };
@@ -503,7 +472,7 @@ window.generateAndShareStats = async function(statsData) {
         // Hide loading
         loadingToast.remove();
         
-        // Share or download
+        // Show toast (no native share dialog)
         await shareStatsImage(canvas, statsData);
         
         console.log('🎉 Stats image generated successfully!');
@@ -637,35 +606,35 @@ function showLoadingToast(message) {
                 transition: all 0.3s ease;
             }
             
-            .copy-text-btn {
+            .download-btn {
+                background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                color: #0a0a0a;
+                font-weight: 700;
+            }
+            
+            .download-btn:hover {
+                background: linear-gradient(135deg, #D4B876, #C8AA6E);
+                transform: translateY(-1px);
+            }
+            
+            .copy-link-btn {
                 background: rgba(255, 255, 255, 0.1);
                 color: white;
                 border: 1px solid rgba(200, 170, 110, 0.3);
             }
             
-            .copy-text-btn:hover {
+            .copy-link-btn:hover {
                 background: rgba(255, 255, 255, 0.15);
                 border-color: rgba(200, 170, 110, 0.5);
             }
             
-            .twitter-btn {
-                background: #1DA1F2;
-                color: white;
+            .toast-hint {
+                margin-top: 1rem;
+                font-size: 0.85rem;
+                color: rgba(255, 255, 255, 0.5);
+                font-style: italic;
+                text-align: center;
             }
-            
-            .twitter-btn:hover {
-                background: #1a8cd8;
-            }
-                .download-btn {
-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
-    color: #0a0a0a;
-    font-weight: 700;
-}
-
-.download-btn:hover {
-    background: linear-gradient(135deg, #D4B876, #C8AA6E);
-    transform: translateY(-1px);
-}
         `;
         document.head.appendChild(style);
     }
