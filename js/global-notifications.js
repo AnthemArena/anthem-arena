@@ -249,21 +249,29 @@ const userId = localStorage.getItem('tournamentUserId');  // ✅ Match navigatio
         
         const notifications = [];
         
-        // PRIORITY 1: Check user's picks for danger/nailbiter/comeback/winning
-        for (const [matchId, vote] of Object.entries(userVotes)) {
-            const match = await getMatchData(matchId);
-            
-            if (!match || match.status !== 'live') continue;
+       // PRIORITY 1: Check user's picks for danger/nailbiter/comeback/winning
+for (const [matchId, vote] of Object.entries(userVotes)) {
+    const match = await getMatchData(matchId);
+    
+    if (!match || match.status !== 'live') continue;
 
-            // ✅ ADD THIS:
-if (!match.id && !match.matchId) {
-    console.warn('⚠️ Match missing ID:', match);
-    continue;  // Skip this match
-}
-            
-        const userChoice = vote.choice;  // ✅ CORRECT - this exists in Firebase
-const userSong = userChoice === 'song1' ? match.song1 : match.song2;
-const opponent = userChoice === 'song1' ? match.song2 : match.song1;
+    if (!match.id && !match.matchId) {
+        console.warn('⚠️ Match missing ID:', match);
+        continue;
+    }
+    
+    // ✅ ADD DEBUG LOGGING:
+    console.log(`\n🔍 Checking ${matchId}:`);
+    console.log('  Vote data:', vote);
+    console.log('  vote.choice:', vote.choice);
+    
+    const userChoice = vote.choice;
+    const userSong = userChoice === 'song1' ? match.song1 : match.song2;
+    const opponent = userChoice === 'song1' ? match.song2 : match.song1;
+    
+    console.log('  User picked:', userChoice);
+    console.log('  User song:', userSong?.shortTitle, '→', userSong?.votes || 0, 'votes');
+    console.log('  Opponent:', opponent?.shortTitle, '→', opponent?.votes || 0, 'votes');
             
             if (!userSong || !opponent) continue;
             
