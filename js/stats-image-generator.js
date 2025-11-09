@@ -258,19 +258,19 @@ async function generateStatsImage(statsData) {
     // FOOTER
     // ========================================
     
-    // Footer line
-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(100, 575);
-    ctx.lineTo(1100, 575);
-    ctx.stroke();
+    // Footer line (moved up)
+ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.moveTo(100, 565);  // ← Changed from 575
+ctx.lineTo(1100, 565);  // ← Changed from 575
+ctx.stroke();
     
-    // Footer text
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '20px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 605);
+ // Footer text (moved up)
+ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+ctx.font = '20px Arial, sans-serif';
+ctx.textAlign = 'center';
+ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 595);  // ← Changed from 605
     
     console.log('✅ Stats image generated');
     
@@ -329,33 +329,39 @@ function downloadCanvas(canvas, filename = 'anthem-arena-stats.png') {
 // SHARE TO SOCIAL MEDIA (IMPROVED)
 // ========================================
 
+// ========================================
+// SHARE TO SOCIAL MEDIA (IMPROVED)
+// ========================================
+
 async function shareStatsImage(canvas, statsData) {
     return new Promise((resolve, reject) => {
-        canvas.toBlob(async blob => {
-            const file = new File([blob], 'anthem-arena-stats.png', { type: 'image/png' });
-            
-            // Check if Web Share API is available (mobile)
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        title: 'My Anthem Arena Profile',
-                        text: `🎵 My League Music Voting Stats!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n\nVote at anthemarena.com`,
-                        files: [file]
-                    });
-                    console.log('✅ Shared via Web Share API');
-                    resolve();
-                } catch (error) {
-                    console.log('❌ Web Share cancelled or failed');
-                    reject(error);
+        // Check if Web Share API is available (mobile)
+        if (navigator.share && navigator.canShare) {
+            canvas.toBlob(async blob => {
+                const file = new File([blob], 'anthem-arena-stats.png', { type: 'image/png' });
+                
+                if (navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: 'My Anthem Arena Profile',
+                            text: `🎵 My League Music Voting Stats!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n\nVote at anthemarena.com`,
+                            files: [file]
+                        });
+                        console.log('✅ Shared via Web Share API');
+                        resolve();
+                        return;
+                    } catch (error) {
+                        console.log('❌ Web Share cancelled or failed');
+                        // Fall through to desktop toast
+                    }
                 }
-            } else {
-                // ✅ DESKTOP: Download + show helpful toast
-                downloadCanvas(canvas);
-                showShareToast(statsData);
-                console.log('✅ Image downloaded');
-                resolve();
-            }
-        }, 'image/png');
+            }, 'image/png');
+        }
+        
+        // ✅ DESKTOP: Show toast with download/share options
+        showShareToast(statsData, canvas);
+        console.log('✅ Share toast displayed');
+        resolve();
     });
 }
 
@@ -363,7 +369,11 @@ async function shareStatsImage(canvas, statsData) {
 // SHOW SHARE TOAST (NEW)
 // ========================================
 
-function showShareToast(statsData) {
+// ========================================
+// SHOW SHARE TOAST (IMPROVED WITH DOWNLOAD)
+// ========================================
+
+function showShareToast(statsData, canvas) {
     const tweetText = `🎵 My Anthem Arena Profile!\n\n🗳️ ${statsData.totalVotes} votes cast\n${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}\n✓ ${statsData.songsStillAlive} songs still alive\n\nVote for your favorite League anthems: anthemarena.com\n\n#LeagueOfLegends #AnthemArena`;
     
     const toast = document.createElement('div');
@@ -372,11 +382,14 @@ function showShareToast(statsData) {
         <div class="toast-content">
             <div class="toast-icon">✅</div>
             <div class="toast-text">
-                <strong>Image Downloaded!</strong>
-                <p>Share it on your favorite platform</p>
+                <strong>Stats Image Ready!</strong>
+                <p>Download or share your profile</p>
             </div>
         </div>
         <div class="toast-actions">
+            <button class="toast-btn download-btn" onclick="downloadStatsImage()">
+                📥 Download Image
+            </button>
             <button class="toast-btn copy-text-btn" onclick="copyToClipboard(\`${tweetText.replace(/`/g, '\\`')}\`)">
                 📋 Copy Caption
             </button>
@@ -397,19 +410,51 @@ function showShareToast(statsData) {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         border: 2px solid rgba(200, 170, 110, 0.3);
         z-index: 10001;
-        min-width: 350px;
+        min-width: 400px;
         animation: slideInUp 0.4s ease;
     `;
     
+    // Store canvas globally so download button can access it
+    window._statsCanvas = canvas;
+    
     document.body.appendChild(toast);
     
-    // Auto-remove after 10 seconds
+    // Auto-remove after 15 seconds
     setTimeout(() => {
         toast.style.animation = 'slideOutDown 0.4s ease';
         setTimeout(() => toast.remove(), 400);
-    }, 10000);
+    }, 15000);
 }
 
+// ========================================
+// DOWNLOAD STATS IMAGE (NEW)
+// ========================================
+
+window.downloadStatsImage = function() {
+    if (window._statsCanvas) {
+        downloadCanvas(window._statsCanvas);
+        
+        // Show quick confirmation
+        const confirmToast = document.createElement('div');
+        confirmToast.textContent = '✅ Image downloaded!';
+        confirmToast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4ade80;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Lora', serif;
+            font-weight: 600;
+            z-index: 10002;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+        `;
+        document.body.appendChild(confirmToast);
+        setTimeout(() => confirmToast.remove(), 3000);
+    }
+};
 // ========================================
 // COPY TO CLIPBOARD HELPER
 // ========================================
@@ -611,6 +656,16 @@ function showLoadingToast(message) {
             .twitter-btn:hover {
                 background: #1a8cd8;
             }
+                .download-btn {
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    color: #0a0a0a;
+    font-weight: 700;
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #D4B876, #C8AA6E);
+    transform: translateY(-1px);
+}
         `;
         document.head.appendChild(style);
     }
