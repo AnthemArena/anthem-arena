@@ -79,6 +79,21 @@ function getThumbnailUrl(youtubeUrl) {
 }
 
 // ========================================
+// HELPER: CALCULATE HOURS UNTIL CLOSE
+// ========================================
+function getHoursUntilClose(match) {
+    if (!match.endTime) return null;
+    
+    const now = Date.now();
+    const endTime = match.endTime.toMillis ? match.endTime.toMillis() : match.endTime;
+    const msLeft = endTime - now;
+    
+    if (msLeft <= 0) return 0;
+    
+    return Math.floor(msLeft / (1000 * 60 * 60));
+}
+
+// ========================================
 // FIRESTORE DATA FETCHING
 // ========================================
 
@@ -235,9 +250,49 @@ function showLiveActivityToast(activity) {
 async function checkAndShowBulletin() {
     try {
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const hasVoted = Object.keys(userVotes).length > 0;
+
+        // ========================================
+        // NON-VOTER ENGAGEMENT SYSTEM
+        // ========================================
         
-        if (Object.keys(userVotes).length === 0) {
-            console.log('📭 No user votes to check');
+        if (!hasVoted) {
+            console.log('👤 First-time visitor - checking engagement prompts');
+            
+            const lastEncouragement = parseInt(localStorage.getItem('lastEncouragementToast') || '0');
+            const timeSinceLastPrompt = Date.now() - lastEncouragement;
+            const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
+            const timeOnSite = Date.now() - pageLoadTime;
+            
+            // Store page load time if not set
+            if (!sessionStorage.getItem('pageLoadTime')) {
+                sessionStorage.setItem('pageLoadTime', Date.now().toString());
+            }
+            
+            // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
+            const shouldWelcome = await shouldShowWelcome(timeOnSite);
+            if (shouldWelcome) {
+                await showWelcomeToast();
+                return;
+            }
+            
+            // 👀 GENTLE REMINDER: After 2 minutes of browsing
+            const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
+            if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
+                await showEncouragementToast('gentle');
+                return;
+            }
+            
+            // ⏰ URGENCY: After 5 minutes + matches closing soon
+            if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
+                const hasUrgentMatches = await checkForClosingMatches();
+                if (hasUrgentMatches) {
+                    await showEncouragementToast('urgent');
+                    return;
+                }
+            }
+            
+            // Don't check voted-match alerts for non-voters
             return;
         }
         
@@ -342,6 +397,113 @@ const opponent = userSongId === 'song1' ? match.song2 : match.song1;
             }
         }
         
+      // PRIORITY 2: CHECK ALL LIVE MATCHES FOR VOTE ISSUES
+        // ========================================
+        
+        let zeroVoteCount = 0;
+        let lowVoteCount = 0;
+        
+        // Fetch all live matches once
+        const allLiveResponse = await fetch('/api/matches');
+        const allMatches = await allLiveResponse.json();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        
+        for (const match of liveMatches) {
+            const matchId = match.matchId || match.id;
+            const totalVotes = (match.song1?.votes || 0) + (match.song2?.votes || 0);
+            const hoursLeft = getHoursUntilClose(match);
+            
+            // Skip if no end time or already closed
+            if (!hoursLeft || hoursLeft <= 0) continue;
+            
+            // 🚨 CRITICAL: Zero votes
+            if (totalVotes === 0 && hoursLeft <= 6) {
+                zeroVoteCount++;
+                
+                // ✅ NEW: Check if user already dismissed this match
+                const dismissKey = `novotes-${matchId}`;
+                if (dismissedBulletins.has(dismissKey)) {
+                    continue; // Skip - user doesn't want to see this again
+                }
+                
+                // Check cooldown (only alert every 2 hours)
+                const alertKey = `lastAlert-novotes-${matchId}`;
+                const lastAlerted = localStorage.getItem(alertKey);
+                const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
+                
+                // Only show if:
+                // 1. Haven't shown this match alert in 2+ hours
+                // 2. No other zero-vote alert is pending
+                if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
+                    notifications.push({
+                        priority: 1,
+                        type: 'novotes',
+                        matchId: matchId,
+                        song: match.song1?.title,
+                        opponent: match.song2?.title,
+                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                        hoursLeft: hoursLeft,
+                        message: `🚨 URGENT: Match has ZERO votes!`,
+                        detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
+                        cta: 'Cast First Vote!',
+                        action: 'navigate',
+                        targetUrl: `/vote.html?match=${matchId}`
+                    });
+                    
+                    // Mark this match as alerted (timestamp)
+                    localStorage.setItem(alertKey, Date.now().toString());
+                    
+                    // ✅ BREAK after adding ONE notification
+                    break;
+                }
+            }
+            // ⚠️ WARNING: Low votes
+            else if (totalVotes > 0 && totalVotes < 5 && hoursLeft <= 3) {
+                lowVoteCount++;
+                
+                // ✅ NEW: Check if user dismissed this match
+                const dismissKey = `lowvotes-${matchId}`;
+                if (dismissedBulletins.has(dismissKey)) {
+                    continue; // Skip - user doesn't want to see this
+                }
+                
+                // Check cooldown
+                const alertKey = `lastAlert-lowvotes-${matchId}`;
+                const lastAlerted = localStorage.getItem(alertKey);
+                const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
+                
+                // Only show if no zero-vote alerts AND haven't shown recently
+                if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
+                    notifications.push({
+                        priority: 6,
+                        type: 'lowvotes',
+                        matchId: matchId,
+                        song: match.song1?.title,
+                        opponent: match.song2?.title,
+                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                        totalVotes: totalVotes,
+                        hoursLeft: hoursLeft,
+                        message: `⚠️ Match needs more votes!`,
+                        detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
+                        cta: 'Vote Now!',
+                        action: 'navigate',
+                        targetUrl: `/vote.html?match=${matchId}`
+                    });
+                    
+                    localStorage.setItem(alertKey, Date.now().toString());
+                    break;
+                }
+            }
+        }
+        
+        // Log summary
+        if (zeroVoteCount > 0) {
+            console.log(`⚠️ ${zeroVoteCount} matches have zero votes (${notifications.filter(n => n.type === 'novotes').length} will be shown)`);
+        }
+        if (lowVoteCount > 0) {
+            console.log(`⚠️ ${lowVoteCount} matches have low votes (${notifications.filter(n => n.type === 'lowvotes').length} will be shown)`);
+        }
+                
         // Show highest priority notification that hasn't been dismissed
         notifications.sort((a, b) => a.priority - b.priority);
         
@@ -355,6 +517,146 @@ const opponent = userSongId === 'song1' ? match.song2 : match.song1;
         
     } catch (error) {
         console.error('Error checking bulletin:', error);
+    }
+}
+
+// ========================================
+// SMART WELCOME TIMING
+// ========================================
+
+async function shouldShowWelcome(timeOnSite) {
+    // Must be on site at least 5 seconds
+    if (timeOnSite < 5000) return false;
+    
+    // Don't show twice in same session
+    const welcomeShownThisSession = sessionStorage.getItem('welcomeToastShown');
+    if (welcomeShownThisSession) return false;
+    
+    // Check last welcome (don't spam returning visitors)
+    const lastWelcome = parseInt(localStorage.getItem('lastWelcomeToast') || '0');
+    const hoursSinceWelcome = (Date.now() - lastWelcome) / (1000 * 60 * 60);
+    
+    // Show if first time OR been 12+ hours since last welcome
+    return !lastWelcome || hoursSinceWelcome >= 12;
+}
+// ========================================
+// WELCOME TOAST FOR FIRST-TIME VISITORS
+// ========================================
+
+async function showWelcomeToast() {
+    try {
+        // Count live matches
+        const response = await fetch('/api/matches');
+        const allMatches = await response.json();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        const liveCount = liveMatches.length;
+        
+        // Get a random live match for thumbnail
+        const randomMatch = liveMatches[Math.floor(Math.random() * liveMatches.length)];
+        const thumbnailUrl = randomMatch 
+            ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
+            : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
+        
+        showBulletin({
+            priority: 5,
+            type: 'welcome',
+            matchId: 'welcome',
+            thumbnailUrl: thumbnailUrl,
+            message: '🎵 Welcome to the League Music Tournament!',
+            detail: `${liveCount} live matches • Cast your first vote and join the action!`,
+            cta: 'Start Voting',
+            action: 'navigate',
+            targetUrl: '/matches.html'
+        });
+        
+   // Mark as shown
+sessionStorage.setItem('welcomeToastShown', 'true'); // This session
+localStorage.setItem('lastWelcomeToast', Date.now().toString()); // Timestamp for 12hr cooldown
+sessionStorage.setItem('pageLoadTime', Date.now().toString());
+        
+        console.log('👋 Welcome toast shown');
+        
+    } catch (error) {
+        console.error('Error showing welcome toast:', error);
+    }
+}
+
+// ========================================
+// ENCOURAGEMENT TOASTS FOR NON-VOTERS
+// ========================================
+
+async function showEncouragementToast(type = 'gentle') {
+    try {
+        const response = await fetch('/api/matches');
+        const allMatches = await response.json();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        
+        // Get random match for thumbnail
+        const randomMatch = liveMatches[Math.floor(Math.random() * liveMatches.length)];
+        const thumbnailUrl = randomMatch 
+            ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
+            : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
+        
+        const messages = {
+            gentle: {
+                icon: '👀',
+                message: 'Still deciding?',
+                detail: 'Pick your favorite songs and see the results in real-time!',
+                cta: 'Vote Now'
+            },
+            urgent: {
+                icon: '⏰',
+                message: 'Matches closing soon!',
+                detail: `Don't miss your chance to influence the winners!`,
+                cta: 'Cast Your Votes'
+            }
+        };
+        
+        const config = messages[type] || messages.gentle;
+        
+        showBulletin({
+            priority: 5,
+            type: 'encouragement',
+            matchId: 'encouragement',
+            thumbnailUrl: thumbnailUrl,
+            message: `${config.icon} ${config.message}`,
+            detail: config.detail,
+            cta: config.cta,
+            action: 'navigate',
+            targetUrl: '/matches.html'
+        });
+        
+        // Track last encouragement
+        localStorage.setItem('lastEncouragementToast', Date.now().toString());
+        
+        console.log(`📣 ${type} encouragement toast shown`);
+        
+    } catch (error) {
+        console.error('Error showing encouragement toast:', error);
+    }
+}
+
+// ========================================
+// CHECK FOR CLOSING MATCHES (URGENCY)
+// ========================================
+
+async function checkForClosingMatches() {
+    try {
+        const response = await fetch('/api/matches');
+        const allMatches = await response.json();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        
+        // Check if any match closes in next 6 hours
+        const closingSoon = liveMatches.some(match => {
+            const hoursLeft = getHoursUntilClose(match);
+            return hoursLeft !== null && hoursLeft <= 6;
+        });
+        
+        return closingSoon;
+        
+    } catch (error) {
+        console.error('Error checking closing matches:', error);
+        return false;
     }
 }
 
@@ -656,16 +958,19 @@ function showBulletin(notification) {
     currentBulletin = notification;
     
     const icons = {
-        danger: '🚨',
-        nailbiter: '🔥',
-        winning: '🎯',
-        comeback: '🎉',
-        'close-match': '🔥',
-        'new-match': '🆕',
-        'low-turnout': '📊',
-        welcome: '🎵',
-        'return-voter': '👋'
-    };
+    danger: '🚨',
+    novotes: '🆘',
+    nailbiter: '🔥',
+    winning: '🎯',
+    comeback: '🎉',
+    lowvotes: '⚠️',
+    'close-match': '🔥',
+    'new-match': '🆕',
+    'low-turnout': '📊',
+    welcome: '🎵',              // ← Already exists
+    encouragement: '👀',        // ← ADD THIS
+    'return-voter': '👋'
+};
     
     const icon = icons[notification.type] || '📢';
     
@@ -708,13 +1013,30 @@ function hideBulletin() {
 window.dismissBulletin = function() {
     if (currentBulletin) {
         const bulletinKey = `${currentBulletin.type}-${currentBulletin.matchId}`;
+        
+        // ✅ NEW: Store with timestamp for expiry tracking
+        const dismissalData = {
+            key: bulletinKey,
+            timestamp: Date.now()
+        };
+        
         dismissedBulletins.add(bulletinKey);
         
-        // Store dismissed bulletins in localStorage
-        const dismissed = Array.from(dismissedBulletins);
+        // Store in localStorage with timestamps
+        const dismissed = Array.from(dismissedBulletins).map(key => {
+            // Check if this is the newly dismissed one
+            if (key === bulletinKey) {
+                return dismissalData;
+            }
+            // Try to find existing data
+            const existing = JSON.parse(localStorage.getItem('dismissedBulletins') || '[]');
+            const found = existing.find(d => d.key === key);
+            return found || { key: key, timestamp: Date.now() };
+        });
+        
         localStorage.setItem('dismissedBulletins', JSON.stringify(dismissed));
         
-        console.log(`🚫 Bulletin dismissed: ${bulletinKey}`);
+        console.log(`🚫 Bulletin dismissed: ${bulletinKey} (expires in 24h)`);
     }
     hideBulletin();
     currentBulletin = null;
@@ -723,15 +1045,15 @@ window.dismissBulletin = function() {
 window.handleBulletinCTA = function() {
     if (!currentBulletin) return;
     
-    // Handle user's pick bulletins OR live activity - go directly to match
-    if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity'].includes(currentBulletin.type)) {
+    // Handle all match-specific alerts
+    if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
             window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
         } else {
             showNotificationToast('Match not available', 'error');
         }
     }
-    // Handle general voting encouragement
+    // Handle general navigation (welcome, encouragement, etc.)
     else if (currentBulletin.action === 'navigate' && currentBulletin.targetUrl) {
         window.location.href = currentBulletin.targetUrl;
     }
@@ -757,13 +1079,36 @@ function showNotificationToast(message, type = 'info') {
 
 function initBulletinSystem() {
     console.log('🎯 Initializing bulletin system...');
-
     
-    
-    // Load dismissed bulletins from storage
+    // ✅ NEW: Load dismissed bulletins and check for expired ones
     try {
         const dismissed = JSON.parse(localStorage.getItem('dismissedBulletins') || '[]');
-        dismissedBulletins = new Set(dismissed);
+        const now = Date.now();
+        const validDismissals = [];
+        
+        dismissed.forEach(item => {
+            // Handle old format (string) or new format (object)
+            const key = typeof item === 'string' ? item : item.key;
+            const timestamp = typeof item === 'string' ? now : item.timestamp;
+            
+            // Check if expired (24 hours = 86400000 ms)
+            const ageMs = now - timestamp;
+            const ageHours = ageMs / (1000 * 60 * 60);
+            
+            if (ageHours < 24) {
+                // Still valid
+                dismissedBulletins.add(key);
+                validDismissals.push({ key: key, timestamp: timestamp });
+            } else {
+                console.log(`🔄 Dismissal expired: ${key} (${Math.round(ageHours)}h old)`);
+            }
+        });
+        
+        // Save cleaned list back to localStorage
+        localStorage.setItem('dismissedBulletins', JSON.stringify(validDismissals));
+        
+        console.log(`✅ Loaded ${dismissedBulletins.size} active dismissals`);
+        
     } catch (e) {
         console.error('Error loading dismissed bulletins:', e);
     }
@@ -784,6 +1129,43 @@ if (document.readyState === 'loading') {
 } else {
     initBulletinSystem();
 }
+
+// ========================================
+// PERIODIC CLEANUP OF EXPIRED DISMISSALS
+// ========================================
+
+function cleanExpiredDismissals() {
+    try {
+        const dismissed = JSON.parse(localStorage.getItem('dismissedBulletins') || '[]');
+        const now = Date.now();
+        const validDismissals = [];
+        let expiredCount = 0;
+        
+        dismissed.forEach(item => {
+            const key = typeof item === 'string' ? item : item.key;
+            const timestamp = typeof item === 'string' ? now : item.timestamp;
+            const ageHours = (now - timestamp) / (1000 * 60 * 60);
+            
+            if (ageHours < 24) {
+                validDismissals.push({ key: key, timestamp: timestamp });
+            } else {
+                dismissedBulletins.delete(key);
+                expiredCount++;
+            }
+        });
+        
+        if (expiredCount > 0) {
+            localStorage.setItem('dismissedBulletins', JSON.stringify(validDismissals));
+            console.log(`🧹 Cleaned ${expiredCount} expired dismissals`);
+        }
+        
+    } catch (e) {
+        console.error('Error cleaning dismissals:', e);
+    }
+}
+
+// Run cleanup every 30 minutes
+setInterval(cleanExpiredDismissals, 1800000);
 
 // ========================================
 // EXPOSE FOR TESTING & BULLETIN SYSTEM
