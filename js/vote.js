@@ -1305,25 +1305,39 @@ if (window.updateNavRank) {
     console.warn('⚠️ updateNavRank not available yet');
 }
         
-        // ✅ Get full song data for modal BEFORE reload (we need the song info)
-        const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
-        const songName = votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name;
-        const songData = allSongsData.find(s => s.seed === songSeed);
-        
-      // Reload with cache bypass to get fresh vote count
-        await reloadMatchData(true);
-        
-        // Show success notification
-        showNotification(`✅ Vote cast for "${songName}"!`, 'success');
-        
-        // Show voted indicator
-        disableVoting(songId);
+       // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
+const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+const songSeed = votedSong.seed;
+const songName = votedSong.name || votedSong.shortTitle || votedSong.title || 'Your Song';
+const songData = allSongsData.find(s => s.seed === songSeed) || votedSong;
 
-                // Update UI with fresh vote count
-        updateVoteCountsUI();
+console.log('📊 Song data for modal:', { songName, songSeed, songData });
 
-        // Show modal with correct numbers
-        showPostVoteModal(songName, songData, xpData, rank);
+// Reload with cache bypass to get fresh vote count
+await reloadMatchData(true);
+
+// Show success notification
+showNotification(`✅ Vote cast for "${songName}"!`, 'success');
+
+// Show voted indicator
+disableVoting(songId);
+
+// Update UI with fresh vote count
+updateVoteCountsUI();
+
+// ✅ SAFETY CHECK: Ensure we have valid data before showing modal
+if (!songName || !songData || !xpData || !rank) {
+    console.error('❌ Missing data for post-vote modal:', {
+        songName,
+        songData: !!songData,
+        xpData: !!xpData,
+        rank: !!rank
+    });
+    showNotification('Vote recorded but modal failed to load', 'warning');
+} else {
+    // Show modal with correct numbers
+    showPostVoteModal(songName, songData, xpData, rank);
+}
 
         // Load other live matches
         await loadOtherLiveMatches();
