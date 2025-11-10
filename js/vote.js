@@ -20,7 +20,7 @@ import { updateNavRank } from './navigation.js';
 // ✅ Import global notification system for achievement/level-up toasts
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
-import { checkAchievements, showAchievementUnlock, ACHIEVEMENTS } from './achievement-tracker.js';
+import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 // ========================================
 // VOTING STREAK TRACKER
 // ========================================
