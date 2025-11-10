@@ -1,132 +1,136 @@
 // ========================================
 // ACHIEVEMENT SYSTEM - LEAGUE MUSIC TOURNAMENT
-// Inspired by League of Legends progression
+// Music-focused achievements with League inspiration
 // ========================================
-
-
 
 export const ACHIEVEMENTS = {
   
   // ========================================
   // MILESTONE ACHIEVEMENTS (Voting Volume)
   // ========================================
-  'first-blood': {
-    id: 'first-blood',
-    name: 'First Blood',
+  'opening-act': {
+    id: 'opening-act',
+    name: 'Opening Act',
     description: 'Cast your first vote',
-    icon: '⚔️',
+    icon: '🎤',
     xp: 25,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'common',
     condition: (stats) => stats.totalVotes >= 1,
     progress: (stats) => ({ current: stats.totalVotes, target: 1 })
   },
   
-  'double-kill': {
-    id: 'double-kill',
-    name: 'Double Kill',
+  'encore': {
+    id: 'encore',
+    name: 'Encore',
     description: 'Cast 5 votes',
-    icon: '⚔️⚔️',
+    icon: '🎶',
     xp: 50,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'common',
     condition: (stats) => stats.totalVotes >= 5,
     progress: (stats) => ({ current: stats.totalVotes, target: 5 })
   },
   
-  'triple-kill': {
-    id: 'triple-kill',
-    name: 'Triple Kill',
+  'world-tour': {
+    id: 'world-tour',
+    name: 'World Tour',
     description: 'Cast 10 votes',
-    icon: '🔥',
+    icon: '🌍',
     xp: 100,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'uncommon',
     condition: (stats) => stats.totalVotes >= 10,
     progress: (stats) => ({ current: stats.totalVotes, target: 10 })
   },
   
-  'quadra-kill': {
-    id: 'quadra-kill',
-    name: 'Quadra Kill',
+  'headliner': {
+    id: 'headliner',
+    name: 'Headliner',
     description: 'Cast 25 votes',
-    icon: '🔥🔥',
+    icon: '⭐',
     xp: 150,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'uncommon',
     condition: (stats) => stats.totalVotes >= 25,
     progress: (stats) => ({ current: stats.totalVotes, target: 25 })
   },
   
-  'penta-kill': {
-    id: 'penta-kill',
+  'pentakill': {
+    id: 'pentakill',
     name: 'Pentakill',
-    description: 'Cast 50 votes',
-    icon: '💀',
+    description: 'Cast 50 votes - Rock on like the legendary band!',
+    icon: '🎸',
     xp: 300,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'rare',
     condition: (stats) => stats.totalVotes >= 50,
     progress: (stats) => ({ current: stats.totalVotes, target: 50 })
   },
   
-  'legendary': {
-    id: 'legendary',
-    name: 'Legendary!',
+  'chart-topper': {
+    id: 'chart-topper',
+    name: 'Chart Topper',
     description: 'Cast 100 votes',
-    icon: '👑',
+    icon: '📈',
     xp: 500,
     category: 'milestones',
-            hidden: true,  // ✅ ADD THIS LINE
-
-    tier: 'legendary',
+    hidden: true,
+    tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.totalVotes >= 100,
     progress: (stats) => ({ current: stats.totalVotes, target: 100 })
   },
 
+  'hall-of-fame': {
+    id: 'hall-of-fame',
+    name: 'Hall of Fame',
+    description: 'Cast 250 votes - You are a legend!',
+    icon: '🏆',
+    xp: 1000,
+    category: 'milestones',
+    hidden: true,
+    tier: 'legendary',
+    rarity: 'legendary',
+    condition: (stats) => stats.totalVotes >= 250,
+    progress: (stats) => ({ current: stats.totalVotes, target: 250 })
+  },
+
   // ========================================
   // STREAK ACHIEVEMENTS
   // ========================================
-  'hot-streak': {
-    id: 'hot-streak',
+  'on-fire': {
+    id: 'on-fire',
     name: 'On Fire',
     description: 'Vote 3 days in a row',
     icon: '🔥',
     xp: 75,
     category: 'streaks',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.votingStreak >= 3,
     progress: (stats) => ({ current: stats.votingStreak, target: 3 })
   },
   
-  'rampage': {
-    id: 'rampage',
-    name: 'Rampage',
+  'hot-streak': {
+    id: 'hot-streak',
+    name: 'Hot Streak',
     description: 'Vote 7 days in a row',
-    icon: '🔥🔥',
+    icon: '🔥',
     xp: 200,
     category: 'streaks',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.votingStreak >= 7,
@@ -140,23 +144,21 @@ export const ACHIEVEMENTS = {
     icon: '⚡',
     xp: 400,
     category: 'streaks',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.votingStreak >= 14,
     progress: (stats) => ({ current: stats.votingStreak, target: 14 })
   },
   
-  'godlike': {
-    id: 'godlike',
-    name: 'Godlike',
-    description: 'Vote 30 days in a row',
+  'legendary-streak': {
+    id: 'legendary-streak',
+    name: 'Legendary',
+    description: 'Vote 30 days in a row - Unstoppable dedication!',
     icon: '👑',
     xp: 1000,
     category: 'streaks',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'legendary',
     rarity: 'legendary',
     condition: (stats) => stats.votingStreak >= 30,
@@ -166,30 +168,28 @@ export const ACHIEVEMENTS = {
   // ========================================
   // UNDERDOG ACHIEVEMENTS
   // ========================================
-  'giant-slayer': {
-    id: 'giant-slayer',
-    name: 'Giant Slayer',
+  'underdog-champion': {
+    id: 'underdog-champion',
+    name: 'Underdog Champion',
     description: 'Vote for 5 underdogs',
     icon: '🎯',
     xp: 100,
     category: 'underdog',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.underdogVotes >= 5,
     progress: (stats) => ({ current: stats.underdogVotes, target: 5 })
   },
   
-  'david-goliath': {
-    id: 'david-goliath',
-    name: 'David vs Goliath',
+  'dark-horse': {
+    id: 'dark-horse',
+    name: 'Dark Horse',
     description: 'Vote for 15 underdogs',
-    icon: '🎭',
+    icon: '🐎',
     xp: 250,
     category: 'underdog',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.underdogVotes >= 15,
@@ -199,12 +199,11 @@ export const ACHIEVEMENTS = {
   'rebel-heart': {
     id: 'rebel-heart',
     name: 'Rebel Heart',
-    description: 'Vote for 30 underdogs',
+    description: 'Vote for 30 underdogs - You love the unexpected!',
     icon: '💔',
     xp: 500,
     category: 'underdog',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.underdogVotes >= 30,
@@ -214,30 +213,28 @@ export const ACHIEVEMENTS = {
   // ========================================
   // EARLY VOTER ACHIEVEMENTS
   // ========================================
-  'vision-control': {
-    id: 'vision-control',
-    name: 'Vision Control',
+  'early-bird': {
+    id: 'early-bird',
+    name: 'Early Bird',
     description: 'Be among first 10 voters in 5 matches',
-    icon: '👁️',
+    icon: '🐦',
     xp: 150,
     category: 'early',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.earlyVotes >= 5,
     progress: (stats) => ({ current: stats.earlyVotes, target: 5 })
   },
   
-  'pioneer': {
-    id: 'pioneer',
-    name: 'Pioneer',
+  'trendsetter': {
+    id: 'trendsetter',
+    name: 'Trendsetter',
     description: 'Be among first 10 voters in 15 matches',
     icon: '🌟',
     xp: 300,
     category: 'early',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.earlyVotes >= 15,
@@ -247,30 +244,28 @@ export const ACHIEVEMENTS = {
   // ========================================
   // CLOSE MATCH ACHIEVEMENTS
   // ========================================
-  'clutch-factor': {
-    id: 'clutch-factor',
-    name: 'Clutch Factor',
+  'nail-biter': {
+    id: 'nail-biter',
+    name: 'Nail-Biter',
     description: 'Vote in 10 close matches (within 5%)',
-    icon: '⏰',
+    icon: '⚖️',
     xp: 150,
     category: 'clutch',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.closeMatchVotes >= 10,
     progress: (stats) => ({ current: stats.closeMatchVotes, target: 10 })
   },
   
-  'last-second': {
-    id: 'last-second',
-    name: 'Last Second Hero',
+  'deciding-vote': {
+    id: 'deciding-vote',
+    name: 'Deciding Vote',
     description: 'Vote in 25 close matches',
-    icon: '🚨',
+    icon: '🎯',
     xp: 350,
     category: 'clutch',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.closeMatchVotes >= 25,
@@ -287,8 +282,7 @@ export const ACHIEVEMENTS = {
     icon: '💙',
     xp: 100,
     category: 'loyalty',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.maxSongVotes >= 3,
@@ -302,8 +296,7 @@ export const ACHIEVEMENTS = {
     icon: '⭐',
     xp: 250,
     category: 'loyalty',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.maxSongVotes >= 5,
@@ -313,12 +306,11 @@ export const ACHIEVEMENTS = {
   'ultimate-stan': {
     id: 'ultimate-stan',
     name: 'Ultimate Stan',
-    description: 'Vote for the same song 10 times',
+    description: 'Vote for the same song 10 times - True devotion!',
     icon: '👑',
     xp: 500,
     category: 'loyalty',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.maxSongVotes >= 10,
@@ -328,45 +320,42 @@ export const ACHIEVEMENTS = {
   // ========================================
   // JOURNEY ACHIEVEMENTS
   // ========================================
-  'quarter-finalist': {
-    id: 'quarter-finalist',
-    name: 'Quarter-Finalist Supporter',
+  'quarter-final-supporter': {
+    id: 'quarter-final-supporter',
+    name: 'Quarter-Final Supporter',
     description: 'Support a song to the Quarterfinals',
-    icon: '🏆',
+    icon: '🏅',
     xp: 200,
     category: 'journey',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.furthestRound >= 4,
     progress: (stats) => ({ current: stats.furthestRound, target: 4 })
   },
   
-  'semi-finalist': {
-    id: 'semi-finalist',
-    name: 'Semi-Finalist Supporter',
+  'semi-final-believer': {
+    id: 'semi-final-believer',
+    name: 'Semi-Final Believer',
     description: 'Support a song to the Semifinals',
     icon: '🥇',
     xp: 400,
     category: 'journey',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.furthestRound >= 5,
     progress: (stats) => ({ current: stats.furthestRound, target: 5 })
   },
   
-  'finalist': {
-    id: 'finalist',
-    name: 'Finalist Supporter',
-    description: 'Support a song to the Finals',
+  'championship-supporter': {
+    id: 'championship-supporter',
+    name: 'Championship Supporter',
+    description: 'Support a song to the Finals - Almost there!',
     icon: '🌟',
     xp: 800,
     category: 'journey',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'legendary',
     rarity: 'legendary',
     condition: (stats) => stats.furthestRound >= 6,
@@ -376,30 +365,28 @@ export const ACHIEVEMENTS = {
   // ========================================
   // COMPLETIONIST ACHIEVEMENTS
   // ========================================
-  'round-warrior': {
-    id: 'round-warrior',
-    name: 'Round Warrior',
+  'tournament-veteran': {
+    id: 'tournament-veteran',
+    name: 'Tournament Veteran',
     description: 'Vote in all rounds (1-6)',
-    icon: '⚔️',
+    icon: '🎖️',
     xp: 300,
     category: 'completionist',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'rare',
     condition: (stats) => stats.roundsParticipated >= 6,
     progress: (stats) => ({ current: stats.roundsParticipated, target: 6 })
   },
   
-  'tournament-completionist': {
-    id: 'tournament-completionist',
-    name: 'Tournament Completionist',
+  'completionist': {
+    id: 'completionist',
+    name: 'Completionist',
     description: 'Vote in 50 unique matches',
     icon: '✅',
     xp: 500,
     category: 'completionist',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.uniqueMatches >= 50,
@@ -416,60 +403,109 @@ export const ACHIEVEMENTS = {
     icon: '🦉',
     xp: 50,
     category: 'special',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
-    hidden: true,
     condition: (stats) => stats.lateNightVotes >= 1
   },
   
-  'speed-demon': {
-    id: 'speed-demon',
-    name: 'Speed Demon',
+  'lightning-fast': {
+    id: 'lightning-fast',
+    name: 'Lightning Fast',
     description: 'Vote within 1 minute of match going live',
     icon: '⚡',
     xp: 100,
     category: 'special',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
-    hidden: true,
     condition: (stats) => stats.instantVotes >= 1
   },
   
   'prophet': {
     id: 'prophet',
-    name: 'Prophet of Runeterra',
+    name: 'Prophet',
     description: 'Vote for the tournament winner in Round 1',
     icon: '🔮',
     xp: 1000,
     category: 'special',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'legendary',
     rarity: 'legendary',
-    hidden: true,
     condition: (stats) => stats.prophesied === true
+  },
+
+  'taste-maker': {
+    id: 'taste-maker',
+    name: 'Taste Maker',
+    description: 'Vote for 10 different artists',
+    icon: '🎨',
+    xp: 200,
+    category: 'special',
+    hidden: true,
+    tier: 'silver',
+    rarity: 'rare',
+    condition: (stats) => stats.uniqueArtists >= 10,
+    progress: (stats) => ({ current: stats.uniqueArtists, target: 10 })
+  },
+
+  'music-historian': {
+    id: 'music-historian',
+    name: 'Music Historian',
+    description: 'Vote for songs from 5 different years',
+    icon: '📚',
+    xp: 150,
+    category: 'special',
+    hidden: true,
+    tier: 'bronze',
+    rarity: 'uncommon',
+    condition: (stats) => stats.uniqueYears >= 5,
+    progress: (stats) => ({ current: stats.uniqueYears, target: 5 })
+  },
+
+  'comeback-believer': {
+    id: 'comeback-believer',
+    name: 'Comeback Believer',
+    description: 'Vote for 5 songs that were losing when you voted',
+    icon: '🎭',
+    xp: 200,
+    category: 'special',
+    hidden: true,
+    tier: 'silver',
+    rarity: 'rare',
+    condition: (stats) => stats.comebackVotes >= 5,
+    progress: (stats) => ({ current: stats.comebackVotes, target: 5 })
   },
 
   // ========================================
   // SOCIAL ACHIEVEMENTS
   // ========================================
-  'influencer': {
-    id: 'influencer',
-    name: 'Content Creator',
+  'community-voice': {
+    id: 'community-voice',
+    name: 'Community Voice',
     description: 'Share 5 matches on social media',
     icon: '📱',
     xp: 200,
     category: 'social',
-            hidden: true,  // ✅ ADD THIS LINE
-
+    hidden: true,
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.sharesCount >= 5,
     progress: (stats) => ({ current: stats.sharesCount, target: 5 })
+  },
+
+  'hype-master': {
+    id: 'hype-master',
+    name: 'Hype Master',
+    description: 'Share 15 matches - Spread the word!',
+    icon: '📢',
+    xp: 500,
+    category: 'social',
+    hidden: true,
+    tier: 'gold',
+    rarity: 'epic',
+    condition: (stats) => stats.sharesCount >= 15,
+    progress: (stats) => ({ current: stats.sharesCount, target: 15 })
   }
 };
 
@@ -494,17 +530,17 @@ export const ACHIEVEMENT_CATEGORIES = {
     name: 'Underdog',
     icon: '🎭',
     color: '#c84aff',
-    description: 'Supporting the less favored'
+    description: 'Supporting the underdogs'
   },
   early: {
     name: 'Early Voter',
-    icon: '👁️',
+    icon: '🐦',
     color: '#00c896',
     description: 'Being first to vote'
   },
   clutch: {
-    name: 'Clutch',
-    icon: '⏰',
+    name: 'Close Calls',
+    icon: '⚖️',
     color: '#ffaa00',
     description: 'Close match participation'
   },

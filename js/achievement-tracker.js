@@ -15,16 +15,19 @@ export function calculateAchievementStats(allVotes) {
     totalVotes: allVotes.length,
     underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
     closeMatchVotes: allVotes.filter(v => v.voteType === 'closeCall').length,
-    earlyVotes: 0, // Count votes when match had <10 total votes
+    earlyVotes: 0,
     votingStreak: parseInt(localStorage.getItem('votingStreak') || '0'),
     furthestRound: Math.max(...allVotes.map(v => v.round), 0),
     roundsParticipated: new Set(allVotes.map(v => v.round)).size,
     uniqueMatches: new Set(allVotes.map(v => v.matchId)).size,
     lateNightVotes: 0,
-    instantVotes: 0, // Track separately
-    prophesied: false, // Check at tournament end
+    instantVotes: 0,
+    prophesied: false,
     maxSongVotes: 0,
-    sharesCount: parseInt(localStorage.getItem('sharesCount') || '0')
+    sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
+    uniqueArtists: 0, // ✅ NEW
+    uniqueYears: 0, // ✅ NEW
+    comebackVotes: 0 // ✅ NEW
   };
   
   // Calculate early votes (match had <10 votes when user voted)
@@ -41,6 +44,11 @@ export function calculateAchievementStats(allVotes) {
     return hour >= 0 && hour < 5;
   }).length;
   
+  // ✅ Calculate comeback votes (voted for song that was losing <40%)
+  stats.comebackVotes = allVotes.filter(v => {
+    return v.votedSongPercentage < 40;
+  }).length;
+  
   // Calculate max votes for a single song
   const songVoteCounts = {};
   allVotes.forEach(v => {
@@ -50,6 +58,28 @@ export function calculateAchievementStats(allVotes) {
     }
   });
   stats.maxSongVotes = Math.max(...Object.values(songVoteCounts), 0);
+  
+  // ✅ Calculate unique artists
+  const uniqueArtists = new Set();
+  allVotes.forEach(v => {
+    if (v.votedForArtist) {
+      uniqueArtists.add(v.votedForArtist);
+    }
+  });
+  stats.uniqueArtists = uniqueArtists.size;
+  
+  // ✅ Calculate unique years
+  const uniqueYears = new Set();
+  allVotes.forEach(v => {
+    const match = v.match;
+    if (match) {
+      const votedSong = v.choice === 'song1' ? match.song1 : match.song2;
+      if (votedSong && votedSong.year) {
+        uniqueYears.add(votedSong.year);
+      }
+    }
+  });
+  stats.uniqueYears = uniqueYears.size;
   
   return stats;
 }
@@ -72,13 +102,13 @@ export function checkAchievements(allVotes) {
     const isUnlocked = achievement.condition(stats);
     const wasUnlocked = previouslyUnlocked.includes(achievement.id);
     
-    // ✅ Always calculate progress
+    // Always calculate progress
     const progress = achievement.progress ? achievement.progress(stats) : null;
     
     if (isUnlocked) {
       unlocked.push({
         ...achievement,
-        progress  // ✅ Add progress even for unlocked achievements
+        progress
       });
       
       // Track newly unlocked
@@ -92,7 +122,7 @@ export function checkAchievements(allVotes) {
         progress
       });
     }
-});
+  });
   
   // Save newly unlocked achievements
   if (newlyUnlocked.length > 0) {
@@ -126,7 +156,7 @@ export function showAchievementUnlock(achievement) {
       priority: 2,
       type: 'achievement',
       matchId: `achievement-${achievement.id}`,
-      thumbnailUrl: null, // Will show emoji icon instead
+      thumbnailUrl: null,
       message: `🏆 Achievement Unlocked: ${achievement.name}`,
       detail: `${achievement.description} • +${achievement.xp} XP`,
       cta: 'View Achievements',
