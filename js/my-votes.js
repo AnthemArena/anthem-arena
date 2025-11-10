@@ -359,13 +359,22 @@ console.log('🔒 Locked achievements:', locked.map(a => a.id));
         
         console.log(`🏆 Achievements: ${unlocked.length} unlocked, ${locked.length} locked, ${completionPercentage}% complete`);
         
-        // Update completion percentage
+
+        // ✅ NEW: Hide section if no unlocked achievements yet
+        if (unlocked.length === 0) {
+            document.getElementById('achievementsSection').style.display = 'none';
+            console.log('📭 No achievements unlocked yet - section hidden');
+            return;
+        }
+
+         // Update completion percentage
         const completionEl = document.getElementById('achievementCompletion');
         if (completionEl) {
-            completionEl.textContent = `${completionPercentage}%`;
+            completionEl.textContent = `${unlocked.length} Unlocked`; // ✅ Show count instead of %
         }
         
        // Group achievements by category, keeping unlock status
+// ✅ Group achievements by category - ONLY show unlocked (since all are hidden)
 const byCategory = {};
 
 unlocked.forEach(ach => {
@@ -373,10 +382,11 @@ unlocked.forEach(ach => {
     byCategory[ach.category].push({ ...ach, isUnlocked: true });
 });
 
-locked.forEach(ach => {
-    if (!byCategory[ach.category]) byCategory[ach.category] = [];
-    byCategory[ach.category].push({ ...ach, isUnlocked: false });
-});
+// ❌ Don't show locked achievements - they're hidden!
+// locked.forEach(ach => {
+//     if (!byCategory[ach.category]) byCategory[ach.category] = [];
+//     byCategory[ach.category].push({ ...ach, isUnlocked: false });
+// });
         
         // Render categories
         const container = document.getElementById('achievementCategoriesContainer');
@@ -395,10 +405,17 @@ locked.forEach(ach => {
     }
 }
 
-/**
- * Create achievement category HTML
- */
+
+    
 function createAchievementCategory(categoryId, categoryInfo, achievements) {
+    // ✅ Only show unlocked count (not total, since locked are hidden)
+    const unlockedAchievements = achievements.filter(a => a.isUnlocked);
+    
+    // ✅ Don't render category if no unlocked achievements
+    if (unlockedAchievements.length === 0) {
+        return '';
+    }
+    
     return `
         <div class="achievement-category" data-category="${categoryId}">
             <div class="category-header">
@@ -407,12 +424,12 @@ function createAchievementCategory(categoryId, categoryInfo, achievements) {
                 </span>
                 <h3 class="category-name">${categoryInfo.name}</h3>
                 <span class="category-count">
-                    ${achievements.filter(a => !a.progress).length}/${achievements.length}
+                    ${unlockedAchievements.length} Unlocked
                 </span>
             </div>
             
             <div class="achievement-grid">
-                ${achievements.map(ach => createAchievementCard(ach)).join('')}
+                ${unlockedAchievements.map(ach => createAchievementCard(ach)).join('')}
             </div>
         </div>
     `;
@@ -422,39 +439,32 @@ function createAchievementCategory(categoryId, categoryInfo, achievements) {
  * Create individual achievement card
  */
 function createAchievementCard(achievement) {
-    // Check if achievement is actually unlocked (progress.current >= progress.target)
-    const isUnlocked = achievement.progress && 
-                       achievement.progress.current >= achievement.progress.target;
-    const isLocked = !isUnlocked;
+    // ✅ We only render unlocked achievements now, so this is always unlocked
     const tierClass = achievement.tier || 'bronze';
     const rarityClass = achievement.rarity || 'common';
     
     return `
-        <div class="achievement-card ${isLocked ? 'locked' : 'unlocked'} ${tierClass} ${rarityClass}">
+        <div class="achievement-card unlocked ${tierClass} ${rarityClass}">
             <div class="achievement-card-inner">
                 <div class="achievement-icon-container">
-                    <div class="achievement-icon ${isLocked ? 'grayscale' : ''}">
-                        ${isLocked ? '🔒' : achievement.icon}
+                    <div class="achievement-icon">
+                        ${achievement.icon}
                     </div>
-                    ${!isLocked ? `<div class="achievement-shine"></div>` : ''}
+                    <div class="achievement-shine"></div>
                 </div>
                 
                 <div class="achievement-info">
                     <div class="achievement-name">${achievement.name}</div>
                     <div class="achievement-description">${achievement.description}</div>
                     
-                 ${achievement.progress ? `
-    <div class="achievement-progress-container">
-        <div class="achievement-progress-bar">
-            <div class="achievement-progress-fill" 
-                 style="width: ${Math.min(100, (achievement.progress.current / achievement.progress.target) * 100)}%">
-            </div>
-        </div>
-        <div class="achievement-progress-text">
-            ${isLocked ? `${achievement.progress.current} / ${achievement.progress.target}` : 'COMPLETED'}
-        </div>
-    </div>
-` : ''}
+                    ${achievement.progress ? `
+                        <div class="achievement-progress-container">
+                            <div class="achievement-progress-bar">
+                                <div class="achievement-progress-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="achievement-progress-text">COMPLETED ✓</div>
+                        </div>
+                    ` : ''}
                     
                     <div class="achievement-footer">
                         <span class="achievement-xp">+${achievement.xp} XP</span>

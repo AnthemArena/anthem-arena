@@ -3,6 +3,8 @@
 // Inspired by League of Legends progression
 // ========================================
 
+
+
 export const ACHIEVEMENTS = {
   
   // ========================================
@@ -15,6 +17,8 @@ export const ACHIEVEMENTS = {
     icon: '⚔️',
     xp: 25,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'common',
     condition: (stats) => stats.totalVotes >= 1,
@@ -28,6 +32,8 @@ export const ACHIEVEMENTS = {
     icon: '⚔️⚔️',
     xp: 50,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'common',
     condition: (stats) => stats.totalVotes >= 5,
@@ -41,6 +47,8 @@ export const ACHIEVEMENTS = {
     icon: '🔥',
     xp: 100,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'uncommon',
     condition: (stats) => stats.totalVotes >= 10,
@@ -54,6 +62,8 @@ export const ACHIEVEMENTS = {
     icon: '🔥🔥',
     xp: 150,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'uncommon',
     condition: (stats) => stats.totalVotes >= 25,
@@ -67,6 +77,8 @@ export const ACHIEVEMENTS = {
     icon: '💀',
     xp: 300,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'rare',
     condition: (stats) => stats.totalVotes >= 50,
@@ -80,6 +92,8 @@ export const ACHIEVEMENTS = {
     icon: '👑',
     xp: 500,
     category: 'milestones',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'legendary',
     rarity: 'epic',
     condition: (stats) => stats.totalVotes >= 100,
@@ -96,6 +110,8 @@ export const ACHIEVEMENTS = {
     icon: '🔥',
     xp: 75,
     category: 'streaks',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.votingStreak >= 3,
@@ -109,6 +125,8 @@ export const ACHIEVEMENTS = {
     icon: '🔥🔥',
     xp: 200,
     category: 'streaks',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.votingStreak >= 7,
@@ -122,6 +140,8 @@ export const ACHIEVEMENTS = {
     icon: '⚡',
     xp: 400,
     category: 'streaks',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.votingStreak >= 14,
@@ -135,6 +155,8 @@ export const ACHIEVEMENTS = {
     icon: '👑',
     xp: 1000,
     category: 'streaks',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'legendary',
     rarity: 'legendary',
     condition: (stats) => stats.votingStreak >= 30,
@@ -151,6 +173,8 @@ export const ACHIEVEMENTS = {
     icon: '🎯',
     xp: 100,
     category: 'underdog',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.underdogVotes >= 5,
@@ -164,6 +188,8 @@ export const ACHIEVEMENTS = {
     icon: '🎭',
     xp: 250,
     category: 'underdog',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.underdogVotes >= 15,
@@ -177,6 +203,8 @@ export const ACHIEVEMENTS = {
     icon: '💔',
     xp: 500,
     category: 'underdog',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.underdogVotes >= 30,
@@ -193,6 +221,8 @@ export const ACHIEVEMENTS = {
     icon: '👁️',
     xp: 150,
     category: 'early',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.earlyVotes >= 5,
@@ -206,6 +236,8 @@ export const ACHIEVEMENTS = {
     icon: '🌟',
     xp: 300,
     category: 'early',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.earlyVotes >= 15,
@@ -222,6 +254,8 @@ export const ACHIEVEMENTS = {
     icon: '⏰',
     xp: 150,
     category: 'clutch',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.closeMatchVotes >= 10,
@@ -235,6 +269,8 @@ export const ACHIEVEMENTS = {
     icon: '🚨',
     xp: 350,
     category: 'clutch',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.closeMatchVotes >= 25,
@@ -251,6 +287,8 @@ export const ACHIEVEMENTS = {
     icon: '💙',
     xp: 100,
     category: 'loyalty',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.maxSongVotes >= 3,
@@ -264,6 +302,8 @@ export const ACHIEVEMENTS = {
     icon: '⭐',
     xp: 250,
     category: 'loyalty',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.maxSongVotes >= 5,
@@ -277,6 +317,8 @@ export const ACHIEVEMENTS = {
     icon: '👑',
     xp: 500,
     category: 'loyalty',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.maxSongVotes >= 10,
@@ -293,6 +335,8 @@ export const ACHIEVEMENTS = {
     icon: '🏆',
     xp: 200,
     category: 'journey',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.furthestRound >= 4,
@@ -306,6 +350,8 @@ export const ACHIEVEMENTS = {
     icon: '🥇',
     xp: 400,
     category: 'journey',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.furthestRound >= 5,
@@ -319,6 +365,8 @@ export const ACHIEVEMENTS = {
     icon: '🌟',
     xp: 800,
     category: 'journey',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'legendary',
     rarity: 'legendary',
     condition: (stats) => stats.furthestRound >= 6,
@@ -335,6 +383,8 @@ export const ACHIEVEMENTS = {
     icon: '⚔️',
     xp: 300,
     category: 'completionist',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'rare',
     condition: (stats) => stats.roundsParticipated >= 6,
@@ -348,6 +398,8 @@ export const ACHIEVEMENTS = {
     icon: '✅',
     xp: 500,
     category: 'completionist',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'gold',
     rarity: 'epic',
     condition: (stats) => stats.uniqueMatches >= 50,
@@ -364,6 +416,8 @@ export const ACHIEVEMENTS = {
     icon: '🦉',
     xp: 50,
     category: 'special',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'bronze',
     rarity: 'uncommon',
     hidden: true,
@@ -377,6 +431,8 @@ export const ACHIEVEMENTS = {
     icon: '⚡',
     xp: 100,
     category: 'special',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     hidden: true,
@@ -390,6 +446,8 @@ export const ACHIEVEMENTS = {
     icon: '🔮',
     xp: 1000,
     category: 'special',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'legendary',
     rarity: 'legendary',
     hidden: true,
@@ -406,6 +464,8 @@ export const ACHIEVEMENTS = {
     icon: '📱',
     xp: 200,
     category: 'social',
+            hidden: true,  // ✅ ADD THIS LINE
+
     tier: 'silver',
     rarity: 'rare',
     condition: (stats) => stats.sharesCount >= 5,
