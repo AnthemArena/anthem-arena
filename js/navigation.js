@@ -2,9 +2,8 @@
 // NAVIGATION WITH RANK SYSTEM
 // ========================================
 
-import { getUserXPFromStorage, getUserRank, calculateUserXP } from './rank-system.js';
-import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { db } from './firebase-config.js';
+import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+// ❌ Removed: calculateUserXP, Firebase imports (not needed here)
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
@@ -108,13 +107,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // UPDATE NAVIGATION RANK DISPLAY
 // ========================================
 
+// ========================================
+// UPDATE NAVIGATION RANK DISPLAY
+// ========================================
+
 async function updateNavRank() {
     const navRankContainer = document.getElementById('navRankContainer');
     const navRank = document.getElementById('navRankMini');
     
-    console.log('🔍 === RANK DEBUG START ===');
-    console.log('Container exists:', !!navRankContainer);
-    console.log('Rank element exists:', !!navRank);
+    console.log('🔍 Updating nav rank display...');
     
     if (!navRank || !navRankContainer) {
         console.error('❌ Rank elements not found in DOM');
@@ -123,8 +124,7 @@ async function updateNavRank() {
     
     try {
         // Get user ID
-const userId = localStorage.getItem('tournamentUserId');
-        console.log('User ID:', userId);
+        const userId = localStorage.getItem('tournamentUserId');
         
         if (!userId) {
             console.warn('⚠️ No voter ID found');
@@ -132,58 +132,25 @@ const userId = localStorage.getItem('tournamentUserId');
             return;
         }
         
-        // Try to get cached XP first (for instant display)
-        const cachedXP = getUserXPFromStorage();
-        console.log('Cached XP:', cachedXP);
+        // ✅ Get XP from localStorage (instant, no Firebase call needed)
+        const currentXP = getUserXPFromStorage();
+        console.log('Current XP:', currentXP);
         
-        if (cachedXP > 0) {
-            console.log('✅ Displaying cached rank');
-            displayRank(cachedXP);
-            navRankContainer.style.display = 'flex';  // ✅ Changed to 'flex'
-        }
-        
-        // Then fetch real data from Firebase
-        console.log('📡 Fetching votes from Firebase...');
-        const votesRef = collection(db, 'votes');
-        const userVotesQuery = query(
-            votesRef,
-            where('userId', '==', userId),
-            where('tournament', '==', ACTIVE_TOURNAMENT)
-        );
-        
-        const snapshot = await getDocs(userVotesQuery);
-        console.log('Votes found:', snapshot.size);
-        
-        if (snapshot.empty) {
-            console.warn('⚠️ No votes found for user');
+        if (currentXP === 0) {
+            // No XP yet - hide rank display
+            console.log('⚠️ No XP found - hiding rank display');
             navRankContainer.style.display = 'none';
             return;
         }
         
-        const allVotes = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-        
-        console.log('All votes:', allVotes);
-        
-        // Calculate XP and rank
-        const xpData = calculateUserXP(allVotes);
-        console.log('XP Data:', xpData);
-        
-        // Update display
-        displayRank(xpData.totalXP);
-        navRankContainer.style.display = 'flex';  // ✅ Changed to 'flex'
-        
-        // Save to localStorage for faster subsequent loads
-        localStorage.setItem('userTotalXP', xpData.totalXP.toString());
+        // Display rank
+        displayRank(currentXP);
+        navRankContainer.style.display = 'flex';
         
         console.log('✅ Rank display updated successfully');
-        console.log('🔍 === RANK DEBUG END ===');
         
     } catch (error) {
         console.error('❌ Error updating nav rank:', error);
-        console.error('Error details:', error.message);
         navRankContainer.style.display = 'none';
     }
 }
@@ -226,3 +193,6 @@ function displayRank(xp) {
 // ========================================
 
 export { updateNavRank };
+
+// ✅ Make updateNavRank globally available for rank-system.js to call
+window.updateNavRank = updateNavRank;

@@ -17,9 +17,10 @@ import { getAllTournamentStats } from './music-gallery.js';
 import { getBookForSong } from './bookMappings.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
 import { updateNavRank } from './navigation.js';
+// ✅ Import global notification system for achievement/level-up toasts
+import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
-import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
-
+import { checkAchievements, showAchievementUnlock, ACHIEVEMENTS } from './achievement-tracker.js';
 // ========================================
 // VOTING STREAK TRACKER
 // ========================================
@@ -1286,19 +1287,23 @@ async function submitVote(songId) {
             isFirstVoteInMatch: checkIfFirstVoter()
         });
         
-        const newTotalXP = addXP(xpData.totalXP);
-        const rank = getUserRank(newTotalXP);
+       const newTotalXP = addXP(xpData.totalXP);
+const rank = getUserRank(newTotalXP);
 
-        // ✅ Track voting streak
+// ✅ Track voting streak
 updateVotingStreak();
 
-            // ✅ NEW: Check for achievement unlocks
-        await checkForAchievementUnlocks();
-        
-        console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
-        
-        // Update nav display immediately
-        updateNavRank();
+// ✅ NEW: Check for achievement unlocks
+await checkForAchievementUnlocks();
+
+console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
+
+// ✅ Update nav display immediately (with safety check)
+if (window.updateNavRank) {
+    window.updateNavRank();
+} else {
+    console.warn('⚠️ updateNavRank not available yet');
+}
         
         // ✅ Get full song data for modal BEFORE reload (we need the song info)
         const songSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;

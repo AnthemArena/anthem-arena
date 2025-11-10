@@ -76,11 +76,14 @@ export function calculateUserXP(allVotes) {
         votedMatches.add(vote.matchId);
     });
     
-// Voting streak bonus (CAPPED at 10 days)
+// Voting streak bonus (CAPPED at 10 days to prevent abuse)
+// Users get 15 XP per day streak, but only up to 10 days = max 150 XP
 const streak = parseInt(localStorage.getItem('votingStreak') || '0');
 const MAX_STREAK_BONUS = 10;
 const cappedStreak = Math.min(streak, MAX_STREAK_BONUS);
 totalXP += cappedStreak * RANK_SYSTEM.xpSources.votingStreakDaily;
+
+console.log(`📊 Streak bonus: ${cappedStreak} days × ${RANK_SYSTEM.xpSources.votingStreakDaily} XP = ${cappedStreak * RANK_SYSTEM.xpSources.votingStreakDaily} XP`);
     
     return {
         totalXP,
@@ -196,12 +199,12 @@ export function addXP(xpToAdd, source = 'vote') {
     if (newLevel > oldLevel) {
         console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}`);
         
-        // ✅ Show level-up toast notification
+      // ✅ Show level-up toast notification
         if (window.showBulletin) {
             window.showBulletin({
                 type: 'level-up',
                 message: `⬆️ Level Up! Level ${newLevel}`,
-                detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP from ${source}`,
+                detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
                 cta: 'View Progress',
                 ctaAction: () => window.location.href = 'my-votes.html',
                 duration: 5000
