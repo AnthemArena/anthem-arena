@@ -181,9 +181,38 @@ export function getUserXPFromStorage() {
     return parseInt(localStorage.getItem('userTotalXP') || '0');
 }
 
-export function addXP(xpToAdd) {
+export function addXP(xpToAdd, source = 'vote') {
     const currentXP = getUserXPFromStorage();
+    const oldRank = getUserRank(currentXP);
+    const oldLevel = oldRank.currentLevel.level;
+    
     const newXP = currentXP + xpToAdd;
     saveUserXP(newXP);
+    
+    const newRank = getUserRank(newXP);
+    const newLevel = newRank.currentLevel.level;
+    
+    // ✅ Check for level-up
+    if (newLevel > oldLevel) {
+        console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}`);
+        
+        // ✅ Show level-up toast notification
+        if (window.showBulletin) {
+            window.showBulletin({
+                type: 'level-up',
+                message: `⬆️ Level Up! Level ${newLevel}`,
+                detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP from ${source}`,
+                cta: 'View Progress',
+                ctaAction: () => window.location.href = 'my-votes.html',
+                duration: 5000
+            });
+        }
+        
+        // Update nav if available
+        if (window.updateNavRank) {
+            window.updateNavRank();
+        }
+    }
+    
     return newXP;
 }

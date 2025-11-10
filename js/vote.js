@@ -1421,22 +1421,45 @@ async function checkForAchievementUnlocks() {
         // Check achievements with proper data
         const { newlyUnlocked } = checkAchievements(allVotes);
         
-        // Show notifications for newly unlocked achievements
-        if (newlyUnlocked.length > 0) {
-            console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
-            
-            // Stagger notifications by 2 seconds each
-            newlyUnlocked.forEach((achievement, index) => {
-                setTimeout(() => {
-                    showAchievementUnlock(achievement);
-                }, index * 2000);
-            });
-            
-            // Update navigation rank (achievements award XP)
-            if (window.updateNavRank) {
-                window.updateNavRank();
+     // Show notifications for newly unlocked achievements
+if (newlyUnlocked.length > 0) {
+    console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
+    
+    // ✅ Limit to 3 toasts max per vote session to prevent spam
+    const MAX_TOASTS_PER_SESSION = 3;
+    const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
+    
+    // Stagger notifications by 2.5 seconds each
+    toastsToShow.forEach((achievement, index) => {
+        setTimeout(() => {
+            showAchievementUnlock(achievement);
+        }, index * 2500); // ✅ Increased from 2000ms to 2500ms for better spacing
+    });
+    
+    // Log if any were skipped
+    if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
+        console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
+        
+        // Optional: Show a summary toast after the individual ones
+        setTimeout(() => {
+            if (window.showBulletin) {
+                window.showBulletin({
+                    type: 'achievement',
+                    message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
+                    detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
+                    cta: 'View All Achievements',
+                    ctaAction: () => window.location.href = 'my-votes.html',
+                    duration: 4000
+                });
             }
-        }
+        }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
+    }
+    
+    // Update navigation rank (achievements award XP)
+    if (window.updateNavRank) {
+        window.updateNavRank();
+    }
+}
         
     } catch (error) {
         console.error('⚠️ Error checking achievements:', error);

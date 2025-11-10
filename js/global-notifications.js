@@ -38,14 +38,16 @@ let matchStates = {}; // Track previous states for comeback detection
 let recentlyShownBulletins = new Map(); // ✅ NEW: Track shown toasts with timestamps
 
 const COOLDOWN_MINUTES = {
-    danger: 5,          // Critical - show often
-    novotes: 5,         // Critical - needs votes urgently
+ danger: 5,          // First danger alert - show quickly
+    'danger-repeat': 15, // ✅ Subsequent danger alerts - less frequent    novotes: 5,         // Critical - needs votes urgently
     nailbiter: 10,      // Important - check back soon
     comeback: 15,       // Exciting but not urgent
     winning: 30,        // Low priority - just FYI
     lowvotes: 15,       // Moderate urgency
     welcome: 720,       // 12 hours - only for new visitors
-    encouragement: 120  // 2 hours - gentle nudge
+    encouragement: 120, // 2 hours - gentle nudge
+    achievement: 0,     // ✅ No cooldown - one-time events (handled by staggering in vote.js)
+    'level-up': 0       // ✅ No cooldown - one-time events
 };
 
 
@@ -61,7 +63,26 @@ function updateActivity() {
 function adjustPollingRate() {
     const timeSinceActivity = Date.now() - lastActivity;
     const isActive = timeSinceActivity < POLL_CONFIG.INACTIVE_THRESHOLD;
-    const interval = isActive ? POLL_CONFIG.ACTIVE_INTERVAL : POLL_CONFIG.BASE_INTERVAL;
+    
+    // ✅ Check if user has any active votes in live matches
+    const userId = localStorage.getItem('tournamentUserId');
+    const hasActiveVotes = userId && localStorage.getItem('userVotes');
+    
+    let interval;
+    
+    if (!hasActiveVotes) {
+        // ✅ No votes yet - very slow polling (5 minutes)
+        interval = 300000;
+        console.log('🐌 Polling: 5min (no active votes)');
+    } else if (isActive) {
+        // Active user with votes - frequent polling
+        interval = POLL_CONFIG.ACTIVE_INTERVAL;
+        console.log('⚡ Polling: 30s (active user)');
+    } else {
+        // Inactive user with votes - moderate polling
+        interval = POLL_CONFIG.BASE_INTERVAL;
+        console.log('💤 Polling: 2min (inactive user)');
+    }
     
     if (pollInterval) {
         clearInterval(pollInterval);
@@ -306,9 +327,16 @@ for (const [matchId, vote] of Object.entries(userVotes)) {
             
 // DANGER: User's pick is losing badly
 if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+    // ✅ Check if we've alerted about this match before
+    const dangerAlertKey = `danger-alert-count-${match.id}`;
+    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+    
+    // ✅ Use escalating cooldown: first time = 5min, subsequent = 15min
+    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+    
     notifications.push({
         priority: 1,
-        type: 'danger',
+        type: notificationType,
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
@@ -316,10 +344,15 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
         userPct,
         opponentPct,
         voteDiff,
-        message: `🚨 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is in danger!`,
+        message: alertCount === 0 
+            ? `🚨 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is in danger!`
+            : `🚨 Still losing: "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}"`,
         detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
         cta: 'View Match Now!'
     });
+    
+    // ✅ Increment alert count for this match
+    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
 }
             // COMEBACK: Was losing, now winning
          // COMEBACK: Was losing, now winning
@@ -582,6 +615,15 @@ sessionStorage.setItem('pageLoadTime', Date.now().toString());
 
 async function showEncouragementToast(type = 'gentle') {
     try {
+        // ✅ Don't show if welcome was shown in last 5 minutes
+        const lastWelcome = parseInt(localStorage.getItem('lastWelcomeToast') || '0');
+        const minutesSinceWelcome = (Date.now() - lastWelcome) / (1000 * 60);
+        
+        if (minutesSinceWelcome < 5) {
+            console.log(`⏸️ Skipping ${type} encouragement - welcome was shown ${Math.round(minutesSinceWelcome)}min ago`);
+            return;
+        }
+        
         const response = await fetch('/api/matches');
         const allMatches = await response.json();
         const liveMatches = allMatches.filter(m => m.status === 'live');
@@ -655,15 +697,11 @@ async function checkForClosingMatches() {
     }
 }
 
-// ========================================
-// BULLETIN DISPLAY (TOAST STYLE)
-// ========================================
-
 function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency'];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up'];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -860,6 +898,143 @@ function showBulletin(notification) {
 }
 
 /* ========================================
+   ACHIEVEMENT-SPECIFIC TOAST STYLING
+======================================== */
+
+.achievement-toast {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(180, 150, 90, 0.2)) !important;
+}
+
+.achievement-badge-large {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.4),
+                0 0 40px rgba(200, 170, 110, 0.2);
+    border: 3px solid rgba(255, 215, 0, 0.3);
+    flex-shrink: 0;
+    animation: achievementPulse 2s ease-in-out infinite;
+}
+
+.achievement-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-title {
+    color: #FFD700 !important;
+    font-size: 1rem !important;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-cta {
+    background: linear-gradient(135deg, #FFD700, #C8AA6E) !important;
+    color: #1a1a1a !important;
+}
+
+.bulletin-banner.achievement {
+    border: 2px solid rgba(255, 215, 0, 0.5) !important;
+    box-shadow: 0 8px 32px rgba(200, 170, 110, 0.4),
+                0 0 40px rgba(255, 215, 0, 0.2) !important;
+}
+
+@keyframes achievementPop {
+    0% {
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(10deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes achievementPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(200, 170, 110, 0.4),
+                    0 0 40px rgba(200, 170, 110, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(200, 170, 110, 0.6),
+                    0 0 60px rgba(255, 215, 0, 0.4);
+    }
+}
+
+/* ========================================
+   LEVEL-UP TOAST STYLING
+======================================== */
+
+.level-up-toast {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2)) !important;
+}
+
+.level-badge-large {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4),
+                0 0 40px rgba(59, 130, 246, 0.2);
+    border: 3px solid rgba(147, 197, 253, 0.3);
+    flex-shrink: 0;
+}
+
+.level-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #60A5FA;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
+}
+
+.level-title {
+    color: #3B82F6 !important;
+    font-size: 1rem !important;
+    font-weight: 700;
+}
+
+.level-cta {
+    background: linear-gradient(135deg, #3B82F6, #2563EB) !important;
+    color: white !important;
+}
+
+.bulletin-banner.level-up {
+    border: 2px solid rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4),
+                0 0 40px rgba(59, 130, 246, 0.2) !important;
+}
+
+@keyframes levelPop {
+    0% {
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(360deg);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+/* ========================================
    RESPONSIVE DESIGN
 ======================================== */
 
@@ -974,32 +1149,102 @@ function showBulletin(notification) {
         'low-turnout': '📊',
         welcome: '🎵',
         encouragement: '👀',
-        'return-voter': '👋'
+        'return-voter': '👋',
+        achievement: '🏆',
+        'level-up': '⬆️'
     };
     
     const icon = icons[notification.type] || '📢';
     
-    banner.innerHTML = `
-        <div class="bulletin-toast-content">
-            <div class="bulletin-thumbnail">
-                ${notification.thumbnailUrl ? 
-                    `<img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">` :
-                    `<div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>`
-                }
-                <div class="thumbnail-overlay">${icon}</div>
+    // ✅ LEVEL-UP SPECIFIC STYLING
+    if (notification.type === 'level-up') {
+        const levelMatch = notification.message.match(/Level (\d+)/);
+        const level = levelMatch ? levelMatch[1] : '?';
+        
+        banner.innerHTML = `
+            <div class="bulletin-toast-content level-up-toast">
+                <div class="level-badge-large">
+                    ${level}
+                </div>
+                <div class="bulletin-toast-text">
+                    <div class="level-label">LEVEL UP!</div>
+                    <div class="bulletin-message level-title">${notification.message}</div>
+                    <div class="bulletin-detail">${notification.detail}</div>
+                </div>
+                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
             </div>
-            <div class="bulletin-toast-text">
-                <div class="bulletin-message">${notification.message}</div>
-                <div class="bulletin-detail">${notification.detail}</div>
+            <button class="bulletin-toast-cta level-cta" onclick="window.handleBulletinCTA()">
+                ${notification.cta || 'View Progress'}
+            </button>
+        `;
+        
+        banner.className = 'bulletin-banner level-up show';
+        
+        // Add special animation for level badge
+        setTimeout(() => {
+            const badge = banner.querySelector('.level-badge-large');
+            if (badge) {
+                badge.style.animation = 'levelPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            }
+        }, 100);
+        
+    } 
+    // ✅ ACHIEVEMENT SPECIFIC STYLING
+    else if (notification.type === 'achievement') {
+        const achievementIcon = notification.message.match(/[🏆✨⚔️🔥💀👑⭐💙🎯]/)?.[0] || '🏆';
+        
+        banner.innerHTML = `
+            <div class="bulletin-toast-content achievement-toast">
+                <div class="achievement-badge-large">
+                    ${achievementIcon}
+                </div>
+                <div class="bulletin-toast-text">
+                    <div class="achievement-label">ACHIEVEMENT UNLOCKED</div>
+                    <div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>
+                    <div class="bulletin-detail">${notification.detail}</div>
+                </div>
+                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
             </div>
-            <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
-        </div>
-        <button class="bulletin-toast-cta" onclick="window.handleBulletinCTA()">${notification.cta}</button>
-    `;
-    
-    banner.className = `bulletin-banner ${notification.type}`;
-    
-    setTimeout(() => banner.classList.add('show'), 10);
+            <button class="bulletin-toast-cta achievement-cta" onclick="window.handleBulletinCTA()">
+                ${notification.cta || 'View Achievements'}
+            </button>
+        `;
+        
+        banner.className = 'bulletin-banner achievement show';
+        
+        // Add special animation for achievement badge
+        setTimeout(() => {
+            const badge = banner.querySelector('.achievement-badge-large');
+            if (badge) {
+                badge.style.animation = 'achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            }
+        }, 100);
+        
+    }
+    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
+    else {
+        banner.innerHTML = `
+            <div class="bulletin-toast-content">
+                <div class="bulletin-thumbnail">
+                    ${notification.thumbnailUrl ? 
+                        `<img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">` :
+                        `<div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>`
+                    }
+                    <div class="thumbnail-overlay">${icon}</div>
+                </div>
+                <div class="bulletin-toast-text">
+                    <div class="bulletin-message">${notification.message}</div>
+                    <div class="bulletin-detail">${notification.detail}</div>
+                </div>
+                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+            </div>
+            <button class="bulletin-toast-cta" onclick="window.handleBulletinCTA()">${notification.cta}</button>
+        `;
+        
+        banner.className = `bulletin-banner ${notification.type}`;
+        
+        setTimeout(() => banner.classList.add('show'), 10);
+    }
     
     console.log(`📢 Bulletin shown: ${notification.type}`);
 }
