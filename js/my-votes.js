@@ -353,6 +353,9 @@ async function loadAchievements() {
     
     try {
         const { unlocked, locked, completionPercentage } = checkAchievements(allVotes);
+
+        console.log('🏆 Unlocked achievements:', unlocked.map(a => a.id));
+console.log('🔒 Locked achievements:', locked.map(a => a.id));
         
         console.log(`🏆 Achievements: ${unlocked.length} unlocked, ${locked.length} locked, ${completionPercentage}% complete`);
         
@@ -362,12 +365,18 @@ async function loadAchievements() {
             completionEl.textContent = `${completionPercentage}%`;
         }
         
-        // Group achievements by category
-        const byCategory = {};
-        [...unlocked, ...locked].forEach(ach => {
-            if (!byCategory[ach.category]) byCategory[ach.category] = [];
-            byCategory[ach.category].push(ach);
-        });
+       // Group achievements by category, keeping unlock status
+const byCategory = {};
+
+unlocked.forEach(ach => {
+    if (!byCategory[ach.category]) byCategory[ach.category] = [];
+    byCategory[ach.category].push({ ...ach, isUnlocked: true });
+});
+
+locked.forEach(ach => {
+    if (!byCategory[ach.category]) byCategory[ach.category] = [];
+    byCategory[ach.category].push({ ...ach, isUnlocked: false });
+});
         
         // Render categories
         const container = document.getElementById('achievementCategoriesContainer');
@@ -413,7 +422,10 @@ function createAchievementCategory(categoryId, categoryInfo, achievements) {
  * Create individual achievement card
  */
 function createAchievementCard(achievement) {
-    const isLocked = achievement.progress !== undefined && achievement.progress !== null;
+    // Check if achievement is actually unlocked (progress.current >= progress.target)
+    const isUnlocked = achievement.progress && 
+                       achievement.progress.current >= achievement.progress.target;
+    const isLocked = !isUnlocked;
     const tierClass = achievement.tier || 'bronze';
     const rarityClass = achievement.rarity || 'common';
     
@@ -431,18 +443,18 @@ function createAchievementCard(achievement) {
                     <div class="achievement-name">${achievement.name}</div>
                     <div class="achievement-description">${achievement.description}</div>
                     
-                    ${isLocked && achievement.progress ? `
-                        <div class="achievement-progress-container">
-                            <div class="achievement-progress-bar">
-                                <div class="achievement-progress-fill" 
-                                     style="width: ${Math.min(100, (achievement.progress.current / achievement.progress.target) * 100)}%">
-                                </div>
-                            </div>
-                            <div class="achievement-progress-text">
-                                ${achievement.progress.current} / ${achievement.progress.target}
-                            </div>
-                        </div>
-                    ` : ''}
+                 ${achievement.progress ? `
+    <div class="achievement-progress-container">
+        <div class="achievement-progress-bar">
+            <div class="achievement-progress-fill" 
+                 style="width: ${Math.min(100, (achievement.progress.current / achievement.progress.target) * 100)}%">
+            </div>
+        </div>
+        <div class="achievement-progress-text">
+            ${isLocked ? `${achievement.progress.current} / ${achievement.progress.target}` : 'COMPLETED'}
+        </div>
+    </div>
+` : ''}
                     
                     <div class="achievement-footer">
                         <span class="achievement-xp">+${achievement.xp} XP</span>
