@@ -20,6 +20,41 @@ import { updateNavRank } from './navigation.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 
+// ========================================
+// VOTING STREAK TRACKER
+// ========================================
+
+function updateVotingStreak() {
+    const today = new Date().toDateString();
+    const lastVoteDate = localStorage.getItem('lastVoteDate');
+    const currentStreak = parseInt(localStorage.getItem('votingStreak') || '0');
+    
+    if (lastVoteDate === today) {
+        // Already voted today, keep streak
+        return;
+    }
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toDateString();
+    
+    if (lastVoteDate === yesterdayStr) {
+        // Consecutive day - increment streak
+        localStorage.setItem('votingStreak', (currentStreak + 1).toString());
+        console.log(`🔥 Voting streak: ${currentStreak + 1} days`);
+    } else if (!lastVoteDate || currentStreak === 0) {
+        // First vote or starting new streak
+        localStorage.setItem('votingStreak', '1');
+        console.log('🔥 Voting streak started: 1 day');
+    } else {
+        // Streak broken - reset to 1
+        console.log(`❌ Streak broken after ${currentStreak} days. Starting fresh.`);
+        localStorage.setItem('votingStreak', '1');
+    }
+    
+    localStorage.setItem('lastVoteDate', today);
+}
+
 
 // ========================================
 // COUNTDOWN TIMER HELPER
@@ -1254,6 +1289,9 @@ async function submitVote(songId) {
         const newTotalXP = addXP(xpData.totalXP);
         const rank = getUserRank(newTotalXP);
 
+        // ✅ Track voting streak
+updateVotingStreak();
+
             // ✅ NEW: Check for achievement unlocks
         await checkForAchievementUnlocks();
         
@@ -1414,24 +1452,34 @@ async function checkForAchievementUnlocks() {
 function saveVoteForOtherPages(matchId, songId) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
     
-    // Get the song names from currentMatch
     const votedSong = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
     const opponentSong = songId === 'song1' ? currentMatch.competitor2 : currentMatch.competitor1;
+    
+    // ✅ Calculate voteType at time of voting
+    const votedSongPercentage = currentMatch.totalVotes > 0
+        ? Math.round((votedSong.votes / currentMatch.totalVotes) * 100)
+        : 50;
+    
+    let voteType = 'balanced';
+    if (votedSongPercentage < 40) {
+        voteType = 'underdog';
+    } else if (votedSongPercentage > 60) {
+        voteType = 'mainstream';
+    } else {
+        voteType = 'closeCall';
+    }
     
     userVotes[matchId] = {
         songId: songId,
         songTitle: votedSong.name,
         opponentTitle: opponentSong.name,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        voteType: voteType,  // ✅ NEW
+        round: currentMatch.round,  // ✅ NEW
+        totalVotesAtTime: currentMatch.totalVotes  // ✅ NEW (for early voter tracking)
     };
     
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
-    console.log('✅ Vote saved with full data:', {
-        matchId,
-        songId,
-        songTitle: votedSong.name,
-        opponentTitle: opponentSong.name
-    });
 }
 
 // ========================================

@@ -72,8 +72,14 @@ export function checkAchievements(allVotes) {
     const isUnlocked = achievement.condition(stats);
     const wasUnlocked = previouslyUnlocked.includes(achievement.id);
     
+    // ✅ Always calculate progress
+    const progress = achievement.progress ? achievement.progress(stats) : null;
+    
     if (isUnlocked) {
-      unlocked.push(achievement);
+      unlocked.push({
+        ...achievement,
+        progress  // ✅ Add progress even for unlocked achievements
+      });
       
       // Track newly unlocked
       if (!wasUnlocked) {
@@ -81,13 +87,12 @@ export function checkAchievements(allVotes) {
       }
     } else if (!achievement.hidden) {
       // Only show locked achievements that aren't hidden
-      const progress = achievement.progress ? achievement.progress(stats) : null;
       locked.push({
         ...achievement,
         progress
       });
     }
-  });
+});
   
   // Save newly unlocked achievements
   if (newlyUnlocked.length > 0) {
