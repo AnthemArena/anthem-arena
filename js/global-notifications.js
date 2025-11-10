@@ -1294,6 +1294,15 @@ window.dismissBulletin = function() {
 window.handleBulletinCTA = function() {
     if (!currentBulletin) return;
     
+    console.log(`📤 Bulletin CTA clicked: ${currentBulletin.type}`);
+    
+    // ✅ PRIORITY 1: Check for ctaAction function (level-up, achievement, etc.)
+    if (currentBulletin.ctaAction && typeof currentBulletin.ctaAction === 'function') {
+        currentBulletin.ctaAction();
+        hideBulletin();
+        return;
+    }
+    
     // Handle all match-specific alerts
     if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
@@ -1307,7 +1316,7 @@ window.handleBulletinCTA = function() {
         window.location.href = currentBulletin.targetUrl;
     }
     
-    console.log(`📤 Bulletin CTA clicked: ${currentBulletin.type}`);
+    hideBulletin();
 };
 
 // ========================================
