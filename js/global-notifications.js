@@ -274,6 +274,12 @@ for (const [matchId, vote] of Object.entries(userVotes)) {
     console.log('  Opponent:', opponent?.shortTitle, '→', opponent?.votes || 0, 'votes');
             
             if (!userSong || !opponent) continue;
+
+                // ✅ ADD THIS HERE (before the "if (!userSong || !opponent)" check):
+    if (!userSong || !opponent) {
+        console.log('  ❌ Missing song data, skipping...');
+        continue;
+    }
             
             const totalVotes = match.totalVotes || 0;
             const userSongVotes = userSong.votes || 0;
@@ -282,6 +288,11 @@ for (const [matchId, vote] of Object.entries(userVotes)) {
             
             const userPct = totalVotes > 0 ? Math.round((userSongVotes / totalVotes) * 100) : 50;
             const opponentPct = totalVotes > 0 ? 100 - userPct : 50;
+
+             // ✅ ADD DEBUG FOR DANGER CHECK:
+    console.log('  User %:', userPct + '%');
+    console.log('  Danger threshold: < 40% AND losing');
+    console.log('  Danger check:', userPct < 40 && userSongVotes < opponentVotes ? '🚨 YES' : '✅ NO');
             
             // Track state for comeback detection
             const previousState = matchStates[matchId];
