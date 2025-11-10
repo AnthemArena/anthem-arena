@@ -18,6 +18,8 @@ import { getBookForSong } from './bookMappings.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
 import { updateNavRank } from './navigation.js';
 import { createMatchCard } from './match-card-renderer.js';
+import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
+
 
 // ========================================
 // COUNTDOWN TIMER HELPER
@@ -1251,6 +1253,9 @@ async function submitVote(songId) {
         
         const newTotalXP = addXP(xpData.totalXP);
         const rank = getUserRank(newTotalXP);
+
+            // ✅ NEW: Check for achievement unlocks
+        await checkForAchievementUnlocks();
         
         console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
         
@@ -1299,6 +1304,106 @@ async function submitVote(songId) {
     }
 }
 
+
+// ========================================
+// ✅ NEW: ACHIEVEMENT CHECK AFTER VOTING
+// ========================================
+
+// ========================================
+// ✅ IMPROVED: ACHIEVEMENT CHECK AFTER VOTING
+// ========================================
+
+async function checkForAchievementUnlocks() {
+    try {
+        console.log('🏆 Checking for achievement unlocks...');
+        
+        // Get user's complete vote history from localStorage
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const voteIds = Object.keys(userVotes);
+        
+        if (voteIds.length === 0) return;
+        
+        // ✅ FIX: Get match data to properly categorize votes
+        const allMatches = await getAllMatches();
+        const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
+        
+        // Build proper vote history with match context
+        const allVotes = voteIds.map(matchId => {
+            const voteData = userVotes[matchId];
+            const matchData = matchMap.get(matchId);
+            
+            if (!matchData) {
+                return {
+                    matchId,
+                    timestamp: voteData.timestamp || new Date().toISOString(),
+                    voteType: 'balanced',
+                    round: 1,
+                    votedForSeed: null,
+                    votedForName: null,
+                    choice: voteData.songId,
+                    match: {}
+                };
+            }
+            
+            // Determine vote type based on match data
+            const votedForSong = voteData.songId === 'song1' ? matchData.song1 : matchData.song2;
+            const opponentSong = voteData.songId === 'song1' ? matchData.song2 : matchData.song1;
+            
+            const song1Votes = matchData.song1?.votes || 0;
+            const song2Votes = matchData.song2?.votes || 0;
+            const totalMatchVotes = song1Votes + song2Votes;
+            
+            const votedSongVotes = voteData.songId === 'song1' ? song1Votes : song2Votes;
+            const votedSongPercentage = totalMatchVotes > 0 
+                ? Math.round((votedSongVotes / totalMatchVotes) * 100) 
+                : 50;
+            
+            // Categorize vote type
+            let voteType = 'balanced';
+            if (votedSongPercentage < 40) {
+                voteType = 'underdog';
+            } else if (votedSongPercentage > 60) {
+                voteType = 'mainstream';
+            } else {
+                voteType = 'closeCall';
+            }
+            
+            return {
+                matchId,
+                timestamp: voteData.timestamp || new Date().toISOString(),
+                voteType,
+                round: matchData.round || 1,
+                votedForSeed: votedForSong?.seed,
+                votedForName: votedForSong?.shortTitle || votedForSong?.title,
+                choice: voteData.songId,
+                match: matchData
+            };
+        });
+        
+        // Check achievements with proper data
+        const { newlyUnlocked } = checkAchievements(allVotes);
+        
+        // Show notifications for newly unlocked achievements
+        if (newlyUnlocked.length > 0) {
+            console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
+            
+            // Stagger notifications by 2 seconds each
+            newlyUnlocked.forEach((achievement, index) => {
+                setTimeout(() => {
+                    showAchievementUnlock(achievement);
+                }, index * 2000);
+            });
+            
+            // Update navigation rank (achievements award XP)
+            if (window.updateNavRank) {
+                window.updateNavRank();
+            }
+        }
+        
+    } catch (error) {
+        console.error('⚠️ Error checking achievements:', error);
+    }
+}
 /**
  * ✅ NEW: Save vote to userVotes format for homepage/matches pages
  */

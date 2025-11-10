@@ -4,6 +4,9 @@
 
 import { getAllMatches, getMatch } from './api-client.js';
 import { db } from './firebase-config.js';
+// Add these imports at the top of my-votes.js
+import { checkAchievements, getCategoryInfo } from './achievement-tracker.js';
+import { getAchievementsByCategory } from './achievements.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
@@ -207,6 +210,9 @@ async function loadVoteHistory() {
         
         // Display votes
         displayVotes();
+
+            await loadAchievements();
+
         
         // Hide loading state
         document.getElementById('loadingState').style.display = 'none';
@@ -337,6 +343,116 @@ function updateStats() {
     console.log('📊 Stats updated successfully');
 }
 
+
+// Call this function after loadVoteHistory() completes
+async function loadAchievements() {
+    if (allVotes.length === 0) {
+        document.getElementById('achievementsSection').style.display = 'none';
+        return;
+    }
+    
+    try {
+        const { unlocked, locked, completionPercentage } = checkAchievements(allVotes);
+        
+        console.log(`🏆 Achievements: ${unlocked.length} unlocked, ${locked.length} locked, ${completionPercentage}% complete`);
+        
+        // Update completion percentage
+        const completionEl = document.getElementById('achievementCompletion');
+        if (completionEl) {
+            completionEl.textContent = `${completionPercentage}%`;
+        }
+        
+        // Group achievements by category
+        const byCategory = {};
+        [...unlocked, ...locked].forEach(ach => {
+            if (!byCategory[ach.category]) byCategory[ach.category] = [];
+            byCategory[ach.category].push(ach);
+        });
+        
+        // Render categories
+        const container = document.getElementById('achievementCategoriesContainer');
+        container.innerHTML = Object.entries(byCategory)
+            .map(([categoryId, achievements]) => {
+                const categoryInfo = getCategoryInfo(categoryId);
+                return createAchievementCategory(categoryId, categoryInfo, achievements);
+            })
+            .join('');
+        
+        // Show section
+        document.getElementById('achievementsSection').style.display = 'block';
+        
+    } catch (error) {
+        console.error('❌ Error loading achievements:', error);
+    }
+}
+
+/**
+ * Create achievement category HTML
+ */
+function createAchievementCategory(categoryId, categoryInfo, achievements) {
+    return `
+        <div class="achievement-category" data-category="${categoryId}">
+            <div class="category-header">
+                <span class="category-icon" style="color: ${categoryInfo.color};">
+                    ${categoryInfo.icon}
+                </span>
+                <h3 class="category-name">${categoryInfo.name}</h3>
+                <span class="category-count">
+                    ${achievements.filter(a => !a.progress).length}/${achievements.length}
+                </span>
+            </div>
+            
+            <div class="achievement-grid">
+                ${achievements.map(ach => createAchievementCard(ach)).join('')}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Create individual achievement card
+ */
+function createAchievementCard(achievement) {
+    const isLocked = achievement.progress !== undefined && achievement.progress !== null;
+    const tierClass = achievement.tier || 'bronze';
+    const rarityClass = achievement.rarity || 'common';
+    
+    return `
+        <div class="achievement-card ${isLocked ? 'locked' : 'unlocked'} ${tierClass} ${rarityClass}">
+            <div class="achievement-card-inner">
+                <div class="achievement-icon-container">
+                    <div class="achievement-icon ${isLocked ? 'grayscale' : ''}">
+                        ${isLocked ? '🔒' : achievement.icon}
+                    </div>
+                    ${!isLocked ? `<div class="achievement-shine"></div>` : ''}
+                </div>
+                
+                <div class="achievement-info">
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                    
+                    ${isLocked && achievement.progress ? `
+                        <div class="achievement-progress-container">
+                            <div class="achievement-progress-bar">
+                                <div class="achievement-progress-fill" 
+                                     style="width: ${Math.min(100, (achievement.progress.current / achievement.progress.target) * 100)}%">
+                                </div>
+                            </div>
+                            <div class="achievement-progress-text">
+                                ${achievement.progress.current} / ${achievement.progress.target}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="achievement-footer">
+                        <span class="achievement-xp">+${achievement.xp} XP</span>
+                        <span class="achievement-rarity ${rarityClass}">${achievement.rarity}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
 // ========================================
 // 🎯 JOURNEY STATS (NON-COMPETITIVE)
