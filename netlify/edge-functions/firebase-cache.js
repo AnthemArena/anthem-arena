@@ -19,9 +19,14 @@ export default async (request, context) => {
   const pathname = url.pathname;
   const matchId = url.searchParams.get('matchId');
 
-    // ✅ NEW: Handle view tracking endpoint
+// ✅ NEW: Handle view tracking endpoint
   if (pathname === "/api/track-view" && request.method === "POST") {
     return handleViewTracking(request);
+  }
+  
+  // ✅ NEW: Handle view stats endpoint
+  if (pathname === "/api/view-stats") {
+    return handleViewStats(matchId);
   }
   
   // ✅ Check for cache bypass (after voting)
