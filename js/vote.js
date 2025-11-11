@@ -922,6 +922,13 @@ if (timeRemaining) {
         if (totalVotesEl) {
             totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} votes cast`;
         }
+
+           // Update vote button text with song names
+    const voteSong1Name = document.getElementById('vote-song1-name');
+    const voteSong2Name = document.getElementById('vote-song2-name');
+    
+    if (voteSong1Name) voteSong1Name.textContent = currentMatch.competitor1.name;
+    if (voteSong2Name) voteSong2Name.textContent = currentMatch.competitor2.name;
         
         // ========================================
         // UPDATE COMPETITOR 1 - BASIC INFO
