@@ -520,6 +520,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         console.log('✅ Match data loaded from edge cache:', matchData);
+
+        // ✅ NEW: Track page view
+await trackMatchView(matchData.id || matchId);
             
             // Convert Firebase format to page format
           // ---- REPLACEMENT (paste over the old block) ----
@@ -2453,5 +2456,30 @@ window.trackBookClick = trackBookClick;
     window.closeModal = closeModal;
 
     console.log('✅ Vote.js loaded with IP + Fingerprint security');
+
+    // ========================================
+// ✅ NEW: TRACK MATCH VIEW
+// ========================================
+
+async function trackMatchView(matchId) {
+    try {
+        const response = await fetch('/api/track-view', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                matchId: matchId,
+                timestamp: Date.now()
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`👀 View tracked: ${data.totalViews} total, ${data.recentViews} recent`);
+        }
+    } catch (error) {
+        console.warn('⚠️ View tracking failed:', error);
+        // Don't block page load if tracking fails
+    }
+}
 
    

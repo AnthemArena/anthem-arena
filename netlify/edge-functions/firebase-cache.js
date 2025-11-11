@@ -18,6 +18,11 @@ export default async (request, context) => {
   const url = new URL(request.url);
   const pathname = url.pathname;
   const matchId = url.searchParams.get('matchId');
+
+    // ✅ NEW: Handle view tracking endpoint
+  if (pathname === "/api/track-view" && request.method === "POST") {
+    return handleViewTracking(request);
+  }
   
   // ✅ Check for cache bypass (after voting)
   const bypassCache = url.searchParams.get('_refresh') !== null;
@@ -131,6 +136,174 @@ export default async (request, context) => {
     });
   }
 };
+
+// ========================================
+// ✅ NEW: VIEW TRACKING HANDLER
+// ========================================
+
+async function handleViewTracking(request) {
+  try {
+    const { matchId, timestamp } = await request.json();
+    
+    if (!matchId) {
+      return new Response(JSON.stringify({ error: "Missing matchId" }), {
+        status: 400,
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+    
+    const viewUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/matchViews/${matchId}`;
+    
+    // Try to get current view data
+    const getResponse = await fetch(viewUrl);
+    let currentViews = 0;
+    let recentTimestamps = [];
+    
+    if (getResponse.ok) {
+      const data = await getResponse.json();
+      currentViews = extractValue(data.fields.totalViews) || 0;
+      
+      // Get recent timestamps and filter to last 5 minutes
+      recentTimestamps = (extractValue(data.fields.recentTimestamps) || [])
+        .filter(ts => timestamp - ts < 300000); // Keep only last 5 min
+      
+      // Add new timestamp
+      recentTimestamps.push(timestamp);
+      
+      // Keep only last 100 timestamps to prevent bloat
+      if (recentTimestamps.length > 100) {
+        recentTimestamps = recentTimestamps.slice(-100);
+      }
+      
+      // Update Firestore
+      await fetch(viewUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            matchId: { stringValue: matchId },
+            totalViews: { integerValue: currentViews + 1 },
+            lastViewed: { integerValue: timestamp },
+            recentTimestamps: { 
+              arrayValue: { 
+                values: recentTimestamps.map(ts => ({ integerValue: ts }))
+              }
+            }
+          }
+        })
+      });
+      
+    } else {
+      // Create new view record
+      recentTimestamps = [timestamp];
+      
+      await fetch(viewUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            matchId: { stringValue: matchId },
+            totalViews: { integerValue: 1 },
+            lastViewed: { integerValue: timestamp },
+            recentTimestamps: { 
+              arrayValue: { 
+                values: [{ integerValue: timestamp }]
+              }
+            }
+          }
+        })
+      });
+    }
+    
+    const recentViews = recentTimestamps.filter(ts => timestamp - ts < 300000).length;
+    
+    console.log(`👀 View tracked for ${matchId}: ${currentViews + 1} total, ${recentViews} recent`);
+    
+    return new Response(JSON.stringify({ 
+      success: true,
+      totalViews: currentViews + 1,
+      recentViews: recentViews
+    }), {
+      status: 200,
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ View tracking error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+  }
+}
+
+// ========================================
+// ✅ NEW: GET VIEW STATS FOR A MATCH
+// ========================================
+
+async function handleViewStats(matchId) {
+  try {
+    if (!matchId) {
+      return new Response(JSON.stringify({ error: "Missing matchId" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    
+    const viewUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/matchViews/${matchId}`;
+    
+    const response = await fetch(viewUrl);
+    
+    if (!response.ok) {
+      // No views yet
+      return new Response(JSON.stringify({ 
+        totalViews: 0,
+        recentViews: 0
+      }), {
+        status: 200,
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+    
+    const data = await response.json();
+    const totalViews = extractValue(data.fields.totalViews) || 0;
+    const recentTimestamps = extractValue(data.fields.recentTimestamps) || [];
+    const now = Date.now();
+    const recentViews = recentTimestamps.filter(ts => now - ts < 300000).length;
+    
+    return new Response(JSON.stringify({ 
+      totalViews,
+      recentViews
+    }), {
+      status: 200,
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ View stats error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+}
+
+
 
 // ========================================
 // ✅ NEW: ATTACH VOTE COUNTS
@@ -322,6 +495,7 @@ function extractValue(field) {
 // CONFIGURE ROUTES
 // ========================================
 
+// Update config to include new endpoint
 export const config = {
-  path: ["/api/matches", "/api/match/*"]
+  path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats"]
 };

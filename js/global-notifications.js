@@ -47,7 +47,11 @@ const COOLDOWN_MINUTES = {
     welcome: 720,       // 12 hours - only for new visitors
     encouragement: 120, // 2 hours - gentle nudge
     achievement: 0,     // ✅ No cooldown - one-time events (handled by staggering in vote.js)
-    'level-up': 0       // ✅ No cooldown - one-time events
+    'level-up': 0,
+      // ✅ NEW: Engagement toasts
+    trending: 20,
+    votesurge: 30,
+    mostviewed: 60       // ✅ No cooldown - one-time events
 };
 
 
@@ -512,6 +516,73 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
         }
         if (lowVoteCount > 0) {
             console.log(`⚠️ ${lowVoteCount} matches have low votes (${notifications.filter(n => n.type === 'lowvotes').length} will be shown)`);
+        }
+
+        // ========================================
+        // PRIORITY 3: CHECK FOR TRENDING/ENGAGING MATCHES
+        // ========================================
+        
+        if (hasVoted && Object.keys(userVotes).length >= 2) {
+            // Only show engagement toasts to users who have voted in 2+ matches
+            
+            for (const match of liveMatches) {
+                const matchId = match.matchId || match.id;
+                
+                // Skip if user already voted in this match
+                if (userVotes[matchId]) continue;
+                
+                try {
+                    // Fetch view stats for this match
+                    const viewResponse = await fetch(`/api/view-stats?matchId=${matchId}`);
+                    
+                    if (!viewResponse.ok) continue;
+                    
+                    const viewStats = await viewResponse.json();
+                    const totalViews = viewStats.totalViews || 0;
+                    const recentViews = viewStats.recentViews || 0;
+                    
+                    const totalVotes = match.totalVotes || 0;
+                    
+                    // 🔥 TRENDING: High recent views
+                    if (recentViews >= 10 && totalVotes >= 5) {
+                        notifications.push({
+                            priority: 3,
+                            type: 'trending',
+                            matchId: matchId,
+                            song: match.song1?.shortTitle || match.song1?.title || 'Unknown',
+                            opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
+                            thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
+                            viewCount: recentViews,
+                            message: `🔥 ${recentViews} people watching this match right now!`,
+                            detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} is heating up`,
+                            cta: 'Join the Action',
+                            action: 'navigate',
+                            targetUrl: `/vote.html?match=${matchId}`
+                        });
+                    }
+                    
+                    // 👀 MOST VIEWED: Popular but few votes
+                    else if (totalViews >= 30 && totalVotes < 15) {
+                        notifications.push({
+                            priority: 4,
+                            type: 'mostviewed',
+                            matchId: matchId,
+                            song: match.song1?.shortTitle || match.song1?.title || 'Unknown',
+                            opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
+                            thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
+                            viewCount: totalViews,
+                            message: `👀 Most-viewed match today!`,
+                            detail: `${totalViews} views but only ${totalVotes} votes - be one of the first!`,
+                            cta: 'Cast Your Vote',
+                            action: 'navigate',
+                            targetUrl: `/vote.html?match=${matchId}`
+                        });
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error checking engagement for ${matchId}:`, error);
+                }
+            }
         }
                 
 // Show highest priority notification that hasn't been dismissed
