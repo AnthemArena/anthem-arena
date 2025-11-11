@@ -1724,6 +1724,35 @@ window.testBulletin = function(type = 'winning') {
             action: 'navigate',
             targetUrl: '/matches.html'
         },
+        trending: {
+            priority: 3,
+            type: 'trending',
+            matchId: 'round-1-match-4',
+            song: 'Welcome to Noxus',
+            opponent: 'Unstoppable',
+            thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+            viewCount: 25,
+            message: '🔥 25 people watching this match right now!',
+            detail: 'Welcome to Noxus vs Unstoppable is heating up',
+            cta: 'Join the Action',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=round-1-match-4'
+        },
+        
+        mostviewed: {
+            priority: 4,
+            type: 'mostviewed',
+            matchId: 'round-1-match-2',
+            song: 'MORE',
+            opponent: 'Worlds Collide',
+            thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+            viewCount: 45,
+            message: '👀 Most-viewed match today!',
+            detail: '45 views but only 5 votes - be one of the first!',
+            cta: 'Cast Your Vote',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=round-1-match-2'
+        },
     };
     
     const notification = testNotifications[type] || testNotifications.winning;
