@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anthem Arena - League of Legends Music Tournament</title>
-    <meta name="description" content="Watch, vote, and decide which League of Legends music video reigns supreme. Monthly tournaments featuring Worlds anthems, K/DA, cinematic masterpieces, and more.">
+    <meta name="description" content="Watch, vote, and decide which League of Legends music video reigns supreme.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
@@ -17,24 +16,20 @@
     <link rel="manifest" href="/site.webmanifest">
     <meta name="theme-color" content="#c89b3c">
     
-  <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://anthemarena.com/">
-<meta property="og:title" content="Anthem Arena - League Music Tournament">
-<meta property="og:description" content="Vote for your favorite League of Legends music videos in the ultimate tournament!">
-<meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="800">
-<meta property="og:image:type" content="image/png">
-<meta property="og:site_name" content="Anthem Arena">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://anthemarena.com/">
+    <meta property="og:title" content="Anthem Arena - League Music Tournament">
+    <meta property="og:description" content="Vote for your favorite League of Legends music videos!">
+    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+    
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Anthem Arena - League Music Tournament">
     <meta name="twitter:description" content="Vote for your favorite League of Legends music videos!">
     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
@@ -46,22 +41,17 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ✅ Add YouTube playlist styles -->
-    <link rel="stylesheet" href="css/youtube-playlist.css">
-
+    <link rel="stylesheet" href="/css/youtube-playlist.css">
 </head>
+
 <body>
-
     <div id="nav-placeholder"></div>
-<!-- ✅ ADD THESE THREE SCRIPTS -->
-<script type="module" src="/js/firebase-config.js"></script>
-<script type="module" src="/js/rank-system.js"></script>
-<script type="module" src="/js/navigation.js"></script>
+    
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/rank-system.js"></script>
+    <script type="module" src="/js/navigation.js"></script>
 
-
-    <!-- ========================================
-         HERO SECTION
-         ======================================== -->
+    <!-- HERO SECTION -->
     <section class="hero">
         <div class="hero-background"></div>
         <div class="hero-overlay"></div>
@@ -73,10 +63,10 @@
                 <span class="badge-status" id="tournamentStatus">Live</span>
             </div>
             
-            <h1 class="hero-title">Anthem Arena Championship - League Music Tournament</h1>
+            <h1 class="hero-title">Anthem Arena Championship</h1>
             
             <p class="hero-subtitle">
-                Which League of Legends music video is the greatest? <br>
+                Which League of Legends music video is the greatest?<br>
                 Watch, vote for your favorites, and crown the champion.
             </p>
             
@@ -115,131 +105,132 @@
         </div>
     </section>
 
-
-        <!-- ✨ LOADING STATE -->
-<section class="homepage-loading-state" id="homepageLoadingState">
-    <div class="container">
-        <div class="loading-content">
-            <div class="loader"></div>
-            <p class="loading-text">Loading tournament...</p>
-            <p class="loading-subtext">Fetching latest matches and stats</p>
+    <!-- LOADING STATE -->
+    <section class="homepage-loading-state" id="homepageLoadingState">
+        <div class="container">
+            <div class="loading-content">
+                <div class="loader"></div>
+                <p class="loading-text">Loading tournament...</p>
+                <p class="loading-subtext">Fetching latest matches and stats</p>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-    <!-- ========================================
-         FEATURED MATCH SECTION (Full Layout)
-         ======================================== -->
+    <!-- FEATURED MATCH -->
     <section id="featured-matchup" class="featured-matchup">
         <div class="container">
-            
             <div class="section-header">
                 <span class="section-label">🔥 Featured Match</span>
                 <h2 class="section-title">Match of the Day</h2>
                 <p class="section-subtitle">Most voted match • 🔴 Live Now</p>
             </div>
-
-            <!-- Use full competitor layout from vote page -->
             <div class="competitors-grid">
-                <!-- Will be populated by JavaScript -->
+                <!-- Populated by JavaScript -->
             </div>
-
         </div>
     </section>
 
-    <!-- ========================================
-         CURRENT LIVE MATCHES (Match Cards Grid)
-         ======================================== -->
+    <!-- YOUR ACTIVE VOTES (NEW) -->
+    <section class="your-votes-section" id="yourVotesSection" style="display: none;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">🎯 Your Picks</span>
+                <h2 class="section-title">Your Active Votes</h2>
+                <p class="section-subtitle">
+                    Track your predictions in real-time
+                    <a href="my-votes.html" class="view-all-inline">View All →</a>
+                </p>
+            </div>
+            <div class="your-votes-grid" id="yourVotesGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE MATCHES (LIMITED TO 3) -->
     <section class="matches-section live-matches-section">
         <div class="container">
-            
             <div class="section-header">
                 <span class="section-label">🔴 Live Now</span>
                 <h2 class="section-title">Current Matches</h2>
                 <p class="section-subtitle">Cast your votes before they close</p>
             </div>
-
             <div class="matches-grid" id="liveMatchesGrid">
-                <!-- Populated by JavaScript using .match-card -->
+                <!-- Populated by JavaScript -->
             </div>
-
         </div>
     </section>
 
-        <!-- YouTube Playlist Section -->
-<div id="youtube-playlist-container"></div>
+    <!-- YOUTUBE PLAYLIST -->
+    <div id="youtube-playlist-container"></div>
 
-    <!-- ========================================
-         RECENT RESULTS (Match Cards Grid)
-         ======================================== -->
+    <!-- RECENT RESULTS (LIMITED TO 6) -->
     <section class="matches-section recent-results-section">
         <div class="container">
-            
             <div class="section-header">
                 <h2 class="section-title">Recent Results</h2>
-                <p class="section-subtitle">See how the tournament is unfolding</p>
+                <p class="section-subtitle">
+                    See how the tournament is unfolding
+                    <a href="matches.html?status=completed" class="view-all-inline">View All →</a>
+                </p>
             </div>
-
             <div class="matches-grid" id="recentResultsGrid">
-                <!-- Populated by JavaScript using .match-card -->
+                <!-- Populated by JavaScript -->
             </div>
-
         </div>
     </section>
 
-
-    <!-- ========================================
-         ✨ UPCOMING MATCHES (Match Cards Grid)
-         ======================================== -->
-    <section class="matches-section upcoming-matches-section">
+    <!-- NEXT MATCH COUNTDOWN (NEW) -->
+    <section class="next-match-countdown" id="nextMatchCountdown" style="display: none;">
         <div class="container">
-            
-            <div class="section-header">
-                <div class="section-title-group">
-                    <h2 class="section-title">📅 Upcoming Matches</h2>
-                    <p class="section-subtitle">Next battles on the horizon</p>
+            <div class="countdown-card">
+                <span class="countdown-label">⏰ Next Match</span>
+                <h3 class="countdown-title" id="nextMatchTitle">Loading...</h3>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="timer-segment">
+                        <span class="timer-number" id="countdownDays">00</span>
+                        <span class="timer-label">Days</span>
+                    </div>
+                    <div class="timer-segment">
+                        <span class="timer-number" id="countdownHours">00</span>
+                        <span class="timer-label">Hours</span>
+                    </div>
+                    <div class="timer-segment">
+                        <span class="timer-number" id="countdownMinutes">00</span>
+                        <span class="timer-label">Minutes</span>
+                    </div>
+                    <div class="timer-segment">
+                        <span class="timer-number" id="countdownSeconds">00</span>
+                        <span class="timer-label">Seconds</span>
+                    </div>
                 </div>
-                <a href="matches.html?status=upcoming" class="view-all-link">
-                    View All Upcoming
-                    <i class="fas fa-arrow-right"></i>
+                <a href="matches.html?status=upcoming" class="countdown-cta">
+                    View All Upcoming Matches →
                 </a>
             </div>
-
-            <div class="matches-grid" id="upcomingMatchesGrid">
-                <!-- Populated by JavaScript using .match-card -->
-            </div>
-
         </div>
     </section>
 
-    <!-- ========================================
-         VIEW ALL MATCHES CTA
-         ======================================== -->
+    <!-- VIEW ALL MATCHES CTA -->
     <section class="matches-cta">
         <div class="container">
             <div class="cta-card">
-                <h3>Want to see all matchups in Anthem Arena?</h3>
+                <h3>Want to see all matchups?</h3>
                 <p>View the complete bracket and tournament history</p>
                 <a href="/matches.html" class="view-details-btn">View All Matches</a>
             </div>
         </div>
     </section>
 
-    <!-- ========================================
-         FEATURED BOOK SECTION
-         ======================================== -->
+    <!-- FEATURED BOOK SECTION -->
     <section class="featured-book">
         <div class="container">
-            
             <div class="section-header">
                 <span class="section-label">📚 Explore the Lore</span>
                 <h2 class="section-title">From Music Video to Novel</h2>
                 <p class="section-subtitle">Dive deeper into the story behind the music</p>
             </div>
-
             <div class="featured-book-content">
-                
-                <!-- Video Side -->
                 <div class="featured-book-video">
                     <div class="video-container">
                         <div class="video-wrapper">
@@ -257,135 +248,45 @@
                         <p>Ambessa's Champion Theme • League of Legends</p>
                     </div>
                 </div>
-
-                <!-- Book Info Side -->
                 <div class="featured-book-info">
-                 
-                    
                     <div class="book-text">
                         <h3 class="book-title">Ambessa: Chosen of the Wolf</h3>
                         <p class="book-author">by Anthony Reynolds & Ian St. Martin</p>
-                        
                         <p class="book-description">
                             Discover the untold origin story of Ambessa Medarda, the ruthless Noxian warlord 
                             from Arcane. This gripping novel reveals how she became the warrior feared 
                             across Runeterra.
                         </p>
-                        
                         <ul class="book-highlights">
                             <li>✓ Official League of Legends novel</li>
                             <li>✓ Expands the Arcane universe</li>
                             <li>✓ Explores Noxian culture & warfare</li>
                             <li>✓ Perfect for Arcane fans</li>
                         </ul>
-                        
-<a href="https://amzn.to/4ozvEDP" 
+                        <a href="https://amzn.to/4ozvEDP" 
                            target="_blank" 
                            rel="noopener noreferrer nofollow"
                            class="featured-book-cta"
                            onclick="trackBookClick('ambessa', 'homepage-featured')">
                             Get the Book on Amazon →
                         </a>
-                        
                         <p class="book-disclaimer">
                             As an Amazon Associate, we earn from qualifying purchases
                         </p>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </section>
 
-    <!-- ========================================
-         CHAMPIONS SHOWCASE
-         ======================================== -->
-    <section class="champions">
-        <div class="container">
-            
-            <div class="section-header">
-                <h2 class="section-title">Hall of Champions</h2>
-                <p class="section-subtitle">Past tournament winners</p>
-            </div>
-
-            <div class="champions-grid">
-                
-                <!-- Champion 1 -->
-                <div class="champion-card">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-image">
-                        <img src="https://img.youtube.com/vi/UOxkGD8qRB4/maxresdefault.jpg" alt="K/DA POP/STARS">
-                        <div class="champion-overlay">
-                            <span class="champion-badge">2x Champion</span>
-                        </div>
-                    </div>
-                    <div class="champion-info">
-                        <h3 class="champion-title">K/DA - POP/STARS</h3>
-                        <p class="champion-tournaments">Summer 2025 • Winter 2024</p>
-                        <div class="champion-stats">
-                            <span>18-2 Record</span>
-                            <span>90% Win Rate</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Champion 2 -->
-                <div class="champion-card">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-image">
-                        <img src="https://img.youtube.com/vi/fmI_Ndrxy14/maxresdefault.jpg" alt="Warriors">
-                        <div class="champion-overlay">
-                            <span class="champion-badge">Champion</span>
-                        </div>
-                    </div>
-                    <div class="champion-info">
-                        <h3 class="champion-title">Warriors</h3>
-                        <p class="champion-tournaments">Spring 2025</p>
-                        <div class="champion-stats">
-                            <span>15-1 Record</span>
-                            <span>94% Win Rate</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Champion 3 -->
-                <div class="champion-card">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-image">
-                        <img src="https://img.youtube.com/vi/aR-KAldshAE/maxresdefault.jpg" alt="Awaken">
-                        <div class="champion-overlay">
-                            <span class="champion-badge">Champion</span>
-                        </div>
-                    </div>
-                    <div class="champion-info">
-                        <h3 class="champion-title">Awaken</h3>
-                        <p class="champion-tournaments">Fall 2024</p>
-                        <div class="champion-stats">
-                            <span>12-3 Record</span>
-                            <span>80% Win Rate</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ========================================
-         HOW IT WORKS
-         ======================================== -->
+    <!-- HOW IT WORKS -->
     <section class="how-it-works">
         <div class="container">
-            
             <div class="section-header">
                 <h2 class="section-title">How It Works</h2>
                 <p class="section-subtitle">Join the tournament in 3 simple steps</p>
             </div>
-
             <div class="steps-grid">
-                
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <div class="step-icon">
@@ -396,10 +297,9 @@
                     </div>
                     <h3 class="step-title">Watch the Music Videos</h3>
                     <p class="step-description">
-                        See two League music videos go head-to-head. From Worlds anthems to K/DA bangers, cinematic masterpieces to virtual band hits.
+                        See two League music videos go head-to-head. From Worlds anthems to K/DA bangers.
                     </p>
                 </div>
-
                 <div class="step-card">
                     <div class="step-number">2</div>
                     <div class="step-icon">
@@ -413,7 +313,6 @@
                         Click to vote for your favorite. No account needed. Voting is open for 48 hours per matchup.
                     </p>
                 </div>
-
                 <div class="step-card">
                     <div class="step-number">3</div>
                     <div class="step-icon">
@@ -424,33 +323,16 @@
                     </div>
                     <h3 class="step-title">Follow the Bracket</h3>
                     <p class="step-description">
-                        Watch as videos advance through the rounds. The last one standing becomes the champion until the next tournament begins.
+                        Watch as videos advance through the rounds. The last one standing becomes the champion.
                     </p>
                 </div>
-
             </div>
-
         </div>
     </section>
-
-
-
-
-
-    <!-- ========================================
-         BOOK RECOMMENDATION MODAL
-         ======================================== -->
-    <div id="bookModal" class="book-modal">
-        <div class="book-modal-content">
-            <button class="book-modal-close" onclick="closeBookModal()">&times;</button>
-            <div id="bookModalBody"></div>
-        </div>
-    </div>
 
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
     <script type="module" src="/js/global-notifications.js"></script>
-
     <script type="module" src="/js/homepage.js"></script>
 </body>
 </html>
