@@ -543,7 +543,7 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                     
                     const totalVotes = match.totalVotes || 0;
                     
-                    // 🔥 TRENDING: High recent views
+                 // 🔥 TRENDING: High recent views
                     if (recentViews >= 10 && totalVotes >= 5) {
                         notifications.push({
                             priority: 3,
@@ -553,9 +553,9 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                             opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
                             thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
                             viewCount: recentViews,
-                            message: `🔥 ${recentViews} people watching this match right now!`,
-                            detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} is heating up`,
-                            cta: 'Join the Action',
+                            message: `🔥 Hottest match right now!`,
+                            detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} is trending - join the action`,
+                            cta: 'Vote Now',
                             action: 'navigate',
                             targetUrl: `/vote.html?match=${matchId}`
                         });
@@ -571,8 +571,8 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                             opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
                             thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
                             viewCount: totalViews,
-                            message: `👀 Most-viewed match today!`,
-                            detail: `${totalViews} views but only ${totalVotes} votes - be one of the first!`,
+                            message: `👀 Most popular match today!`,
+                            detail: `Everyone's watching ${match.song1?.shortTitle} vs ${match.song2?.shortTitle} - add your vote!`,
                             cta: 'Cast Your Vote',
                             action: 'navigate',
                             targetUrl: `/vote.html?match=${matchId}`
@@ -1724,7 +1724,7 @@ window.testBulletin = function(type = 'winning') {
             action: 'navigate',
             targetUrl: '/matches.html'
         },
-        trending: {
+      trending: {
             priority: 3,
             type: 'trending',
             matchId: 'round-1-match-4',
@@ -1732,9 +1732,9 @@ window.testBulletin = function(type = 'winning') {
             opponent: 'Unstoppable',
             thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
             viewCount: 25,
-            message: '🔥 25 people watching this match right now!',
-            detail: 'Welcome to Noxus vs Unstoppable is heating up',
-            cta: 'Join the Action',
+            message: '🔥 Hottest match right now!',
+            detail: 'Welcome to Noxus vs Unstoppable is trending - join the action',
+            cta: 'Vote Now',
             action: 'navigate',
             targetUrl: '/vote.html?match=round-1-match-4'
         },
@@ -1747,8 +1747,8 @@ window.testBulletin = function(type = 'winning') {
             opponent: 'Worlds Collide',
             thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
             viewCount: 45,
-            message: '👀 Most-viewed match today!',
-            detail: '45 views but only 5 votes - be one of the first!',
+            message: '👀 Most popular match today!',
+            detail: 'Everyone\'s watching MORE vs Worlds Collide - add your vote!',
             cta: 'Cast Your Vote',
             action: 'navigate',
             targetUrl: '/vote.html?match=round-1-match-2'
