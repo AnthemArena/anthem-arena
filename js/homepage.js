@@ -409,7 +409,6 @@ function hideFeaturedSection() {
 function displayFeaturedMatch() {
     if (!currentMatch) return;
     
-    // ✅ Use the correct ID from HTML
     const featuredSection = document.getElementById('featured-matchup');
     
     if (!featuredSection) {
@@ -417,7 +416,6 @@ function displayFeaturedMatch() {
         return;
     }
     
-    // ✅ Find the container inside the section
     const container = featuredSection.querySelector('.container');
     
     if (!container) {
@@ -426,28 +424,147 @@ function displayFeaturedMatch() {
     }
     
     // ✅ Check if user has voted
-    const userHasVoted = hasUserVoted(currentMatch.matchId || currentMatch.id);
-    const userVotedSongId = userHasVoted ? getUserVotedSongId(currentMatch.matchId || currentMatch.id) : null;
+    const matchId = currentMatch.matchId || currentMatch.id;
+    const userHasVoted = hasUserVoted(matchId);
+    const userVotedSongId = userHasVoted ? getUserVotedSongId(matchId) : null;
     
-    // ✅ Convert to display format
-    const matchData = convertFirebaseMatchToDisplayFormat(currentMatch, userHasVoted, userVotedSongId);
+    // Calculate percentages
+    const totalVotes = currentMatch.totalVotes || 0;
+    const song1Votes = currentMatch.song1?.votes || 0;
+    const song2Votes = currentMatch.song2?.votes || 0;
     
-container.innerHTML = `
-    <div class="section-header">
-        <span class="section-label">🔥 Featured Match</span>
-        <h2 class="section-title">Match of the Day</h2>
-        <p class="section-subtitle">${userHasVoted ? `${matchData.totalVotes.toLocaleString()} votes • 🔴 Live Now` : '🔴 Live Now • Vote to see results'}</p>
-    </div>
-    <div class="featured-match-wrapper" id="featured-card-container"></div>
-`;
-
-// ✅ Append card as DOM element
-const cardContainer = container.querySelector('#featured-card-container');
-const card = createMatchCard(matchData);
-cardContainer.appendChild(card);
+    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+    
+    // Get countdown info
+    const timeLeftInfo = getTimeLeftForMatch(currentMatch.endDate);
+    
+    container.innerHTML = `
+        <div class="section-header">
+            <span class="section-label">🔥 Featured Match</span>
+            <h2 class="section-title">Match of the Day</h2>
+            <p class="section-subtitle">
+                ${userHasVoted 
+                    ? `${totalVotes.toLocaleString()} votes • ${timeLeftInfo}` 
+                    : `${timeLeftInfo} • Listen and vote →`
+                }
+            </p>
+        </div>
+        
+        <!-- Enhanced Featured Match Card -->
+        <div class="featured-match-card" onclick="voteNow('${matchId}')">
+            <div class="featured-match-inner">
+                <!-- Left: Thumbnails -->
+                <div class="featured-thumbnails">
+                    <div class="thumbnail-wrapper ${userVotedSongId === 'song1' ? 'user-voted' : ''}">
+                        <img src="https://img.youtube.com/vi/${currentMatch.song1.videoId}/mqdefault.jpg" 
+                             alt="${currentMatch.song1.shortTitle || currentMatch.song1.title}">
+                        <div class="thumbnail-overlay">
+                            <span class="seed-badge">#${currentMatch.song1.seed}</span>
+                            ${userVotedSongId === 'song1' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+                        </div>
+                        ${userHasVoted ? `
+                            <div class="thumbnail-result">
+                                <span class="result-pct">${song1Pct}%</span>
+                                <span class="result-votes">${song1Votes.toLocaleString()}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="featured-vs">
+                        <span class="vs-badge">VS</span>
+                        ${userHasVoted ? `
+                            <div class="vs-progress-bar">
+                                <div class="bar-fill left" style="height: ${song1Pct}%"></div>
+                                <div class="bar-fill right" style="height: ${song2Pct}%"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="thumbnail-wrapper ${userVotedSongId === 'song2' ? 'user-voted' : ''}">
+                        <img src="https://img.youtube.com/vi/${currentMatch.song2.videoId}/mqdefault.jpg" 
+                             alt="${currentMatch.song2.shortTitle || currentMatch.song2.title}">
+                        <div class="thumbnail-overlay">
+                            <span class="seed-badge">#${currentMatch.song2.seed}</span>
+                            ${userVotedSongId === 'song2' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+                        </div>
+                        ${userHasVoted ? `
+                            <div class="thumbnail-result">
+                                <span class="result-pct">${song2Pct}%</span>
+                                <span class="result-votes">${song2Votes.toLocaleString()}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- Right: Song Info & CTA -->
+                <div class="featured-info">
+                    <div class="song-pair">
+                        <div class="song-details">
+                            <h3 class="song-title">${currentMatch.song1.shortTitle || currentMatch.song1.title}</h3>
+                            <p class="song-meta">${currentMatch.song1.artist} • ${currentMatch.song1.year}</p>
+                        </div>
+                        
+                        <div class="song-details">
+                            <h3 class="song-title">${currentMatch.song2.shortTitle || currentMatch.song2.title}</h3>
+                            <p class="song-meta">${currentMatch.song2.artist} • ${currentMatch.song2.year}</p>
+                        </div>
+                    </div>
+                    
+                    ${userHasVoted ? `
+                        <button class="featured-cta voted" onclick="voteNow('${matchId}'); event.stopPropagation();">
+                            <span class="cta-icon">📊</span>
+                            <span class="cta-text">View Full Results</span>
+                            <span class="cta-arrow">→</span>
+                        </button>
+                    ` : `
+                        <button class="featured-cta" onclick="voteNow('${matchId}'); event.stopPropagation();">
+                            <span class="cta-icon">🎵</span>
+                            <span class="cta-text">Listen & Vote Now</span>
+                            <span class="cta-arrow">→</span>
+                        </button>
+                    `}
+                </div>
+            </div>
+            
+            <!-- Hover Hint -->
+            <div class="featured-hover-hint">
+                ${userHasVoted 
+                    ? 'Click to see detailed results and listen again' 
+                    : 'Click to hear both songs and cast your vote'
+                }
+            </div>
+        </div>
+    `;
+    
     featuredSection.style.display = 'block';
     
-    console.log('✅ Featured match rendered');
+    console.log('✅ Featured match rendered:', matchId);
+}
+
+// Helper: Get time left string
+function getTimeLeftForMatch(endDate) {
+    if (!endDate) return '🔴 Live Now';
+    
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end - now;
+    
+    if (diff <= 0) return '⏱️ Voting Closed';
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 24) {
+        const days = Math.floor(hours / 24);
+        return `⏰ ${days}d ${hours % 24}h left`;
+    } else if (hours > 0) {
+        return `⏰ ${hours}h ${minutes}m left`;
+    } else if (minutes > 5) {
+        return `⏰ ${minutes}m left`;
+    } else {
+        return `🚨 ${minutes}m left - Vote now!`;
+    }
 }
 
 
@@ -1031,6 +1148,426 @@ style.textContent = `
         color: rgba(255, 255, 255, 0.6);
         line-height: 1.7;
     }
+
+    /* ========================================
+   FEATURED MATCH CARD - ENHANCED
+======================================== */
+
+.featured-match-card {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(20, 20, 36, 0.9));
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 16px;
+    padding: 2.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.featured-match-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(200, 170, 110, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.featured-match-card:hover {
+    border-color: #C8AA6E;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(200, 170, 110, 0.3);
+}
+
+.featured-match-card:hover::before {
+    opacity: 1;
+}
+
+.featured-match-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+/* Thumbnails Section */
+.featured-thumbnails {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.thumbnail-wrapper {
+    position: relative;
+    width: 200px;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(200, 170, 110, 0.2);
+    transition: all 0.3s ease;
+}
+
+.thumbnail-wrapper.user-voted {
+    border-color: #C8AA6E;
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.3);
+}
+
+.thumbnail-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.featured-match-card:hover .thumbnail-wrapper img {
+    transform: scale(1.05);
+}
+
+.thumbnail-overlay {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.seed-badge {
+    background: rgba(200, 170, 110, 0.95);
+    color: #0a0a0a;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    backdrop-filter: blur(4px);
+}
+
+.voted-badge {
+    background: rgba(200, 170, 110, 0.95);
+    color: #0a0a0a;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.thumbnail-result {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-pct {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+}
+
+.result-votes {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* VS Section */
+.featured-vs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vs-badge {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.4);
+    transition: all 0.3s ease;
+}
+
+.featured-match-card:hover .vs-badge {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.6);
+}
+
+.vs-progress-bar {
+    width: 4px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.bar-fill {
+    transition: height 0.6s ease;
+    position: absolute;
+    width: 100%;
+}
+
+.bar-fill.left {
+    bottom: 50%;
+    background: linear-gradient(to top, #667eea, #764ba2);
+}
+
+.bar-fill.right {
+    top: 50%;
+    background: linear-gradient(to bottom, #f093fb, #f5576c);
+}
+
+/* Info Section */
+.featured-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.song-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.song-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.song-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    color: #C8AA6E;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.song-meta {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* CTA Button */
+.featured-cta {
+    width: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    border: none;
+    border-radius: 10px;
+    color: #0a0a0a;
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.featured-cta:hover::before {
+    left: 100%;
+}
+
+.featured-cta:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.5);
+}
+
+.featured-cta:active {
+    transform: scale(0.98);
+}
+
+.featured-cta.voted {
+    background: rgba(200, 170, 110, 0.15);
+    color: #C8AA6E;
+    border: 2px solid rgba(200, 170, 110, 0.4);
+}
+
+.featured-cta.voted:hover {
+    background: rgba(200, 170, 110, 0.25);
+    border-color: #C8AA6E;
+}
+
+.cta-icon {
+    font-size: 1.5rem;
+}
+
+.cta-text {
+    font-size: 1.15rem;
+}
+
+.cta-arrow {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.featured-cta:hover .cta-arrow {
+    transform: translateX(6px);
+}
+
+/* Hover Hint */
+.featured-hover-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(200, 170, 110, 0.15), transparent);
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.featured-match-card:hover .featured-hover-hint {
+    opacity: 1;
+}
+
+/* ========================================
+   RESPONSIVE - FEATURED MATCH
+======================================== */
+
+/* Tablet */
+@media (max-width: 968px) {
+    .featured-match-card {
+        padding: 2rem;
+    }
+    
+    .featured-match-inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .featured-thumbnails {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .thumbnail-wrapper {
+        width: 160px;
+        height: 120px;
+    }
+    
+    .vs-badge {
+        width: 50px;
+        height: 50px;
+        font-size: 0.95rem;
+    }
+    
+    .song-pair {
+        gap: 1.5rem;
+    }
+    
+    .song-title {
+        font-size: 1.2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .featured-match-card {
+        padding: 1.5rem;
+    }
+    
+    .featured-thumbnails {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .thumbnail-wrapper {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+    
+    .featured-vs {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .vs-progress-bar {
+        width: 120px;
+        height: 4px;
+        flex-direction: row;
+    }
+    
+    .bar-fill.left {
+        left: 0;
+        bottom: auto;
+        right: 50%;
+        background: linear-gradient(to left, #667eea, #764ba2);
+    }
+    
+    .bar-fill.right {
+        top: auto;
+        left: 50%;
+        right: 0;
+        background: linear-gradient(to right, #f093fb, #f5576c);
+    }
+    
+    .song-pair {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .featured-cta {
+        padding: 1.25rem;
+        font-size: 1rem;
+    }
+    
+    .cta-text {
+        font-size: 1rem;
+    }
+    
+    .featured-hover-hint {
+        position: static;
+        opacity: 1;
+        background: none;
+        padding: 1rem 0 0;
+        font-size: 0.85rem;
+    }
+}
 `;
 document.head.appendChild(style);
 
