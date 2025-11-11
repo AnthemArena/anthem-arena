@@ -49,9 +49,10 @@ const COOLDOWN_MINUTES = {
     achievement: 0,     // ✅ No cooldown - one-time events (handled by staggering in vote.js)
     'level-up': 0,
       // ✅ NEW: Engagement toasts
-    trending: 20,
+    // ✅ NEW: Engagement toasts
+    trending: 30,        // 30 min - if still trending after 30min, it's genuine
     votesurge: 30,
-    mostviewed: 60       // ✅ No cooldown - one-time events
+    mostviewed: 90       // 90 min - lower priority, less frequent
 };
 
 
@@ -610,6 +611,16 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             // ✅ Show the toast and track it
             showBulletin(notification);
             recentlyShownBulletins.set(bulletinKey, Date.now());
+
+            // ✅ NEW: Persist to sessionStorage (survives page refresh, expires on tab close)
+try {
+    const persistedData = Object.fromEntries(recentlyShownBulletins);
+    sessionStorage.setItem('recentBulletins', JSON.stringify(persistedData));
+} catch (e) {
+    console.warn('Could not persist bulletin cooldowns:', e);
+}
+
+
             console.log(`📢 Toast shown and tracked: ${bulletinKey} (cooldown: ${COOLDOWN_MINUTES[notification.type] || 10}m)`);
             break;
         }
@@ -1408,6 +1419,19 @@ function showNotificationToast(message, type = 'info') {
 
 function initBulletinSystem() {
     console.log('🎯 Initializing bulletin system...');
+
+        // ✅ NEW: Restore recent bulletins from sessionStorage
+    try {
+        const persisted = JSON.parse(sessionStorage.getItem('recentBulletins') || '{}');
+        Object.entries(persisted).forEach(([key, timestamp]) => {
+            recentlyShownBulletins.set(key, timestamp);
+        });
+        if (Object.keys(persisted).length > 0) {
+            console.log(`✅ Restored ${recentlyShownBulletins.size} recent bulletin timestamps`);
+        }
+    } catch (e) {
+        console.warn('Could not restore bulletin cooldowns:', e);
+    }
     
     // ✅ NEW: Load dismissed bulletins and check for expired ones
     try {
@@ -1494,6 +1518,42 @@ function cleanExpiredDismissals() {
 
 // Run cleanup every 30 minutes
 setInterval(cleanExpiredDismissals, 1800000);
+
+// ========================================
+// PERIODIC CLEANUP OF EXPIRED COOLDOWNS
+// ========================================
+
+function cleanExpiredCooldowns() {
+    const now = Date.now();
+    let cleanedCount = 0;
+    
+    for (const [key, timestamp] of recentlyShownBulletins.entries()) {
+        // Extract type from key (format: "type-matchId")
+        const type = key.split('-')[0];
+        const cooldownMs = (COOLDOWN_MINUTES[type] || 10) * 60000;
+        
+        // Remove if cooldown expired
+        if (now - timestamp > cooldownMs) {
+            recentlyShownBulletins.delete(key);
+            cleanedCount++;
+        }
+    }
+    
+    if (cleanedCount > 0) {
+        console.log(`🧹 Cleaned ${cleanedCount} expired cooldowns`);
+        
+        // Update sessionStorage
+        try {
+            const persistedData = Object.fromEntries(recentlyShownBulletins);
+            sessionStorage.setItem('recentBulletins', JSON.stringify(persistedData));
+        } catch (e) {
+            console.warn('Could not persist after cleanup:', e);
+        }
+    }
+}
+
+// Run cleanup every 5 minutes
+setInterval(cleanExpiredCooldowns, 300000);
 
 // ========================================
 // EXPOSE FOR TESTING & BULLETIN SYSTEM
