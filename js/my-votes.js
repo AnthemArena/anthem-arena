@@ -1371,15 +1371,54 @@ function getRoundName(roundNumber) {
 }
 
 function getTimeAgo(date) {
+    if (!date) {
+        return 'Unknown time';
+    }
+    
     const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
+    const voteDate = new Date(date);
     
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+    // Check for invalid dates
+    if (isNaN(voteDate.getTime())) {
+        return 'Unknown time';
+    }
     
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const seconds = Math.floor((now - voteDate) / 1000);
+    
+    // Handle future dates (shouldn't happen, but just in case)
+    if (seconds < 0) {
+        return 'Just now';
+    }
+    
+    // Less than 1 minute
+    if (seconds < 60) {
+        return 'Just now';
+    }
+    
+    // Less than 1 hour (show minutes)
+    if (seconds < 3600) {
+        const minutes = Math.floor(seconds / 60);
+        return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+    }
+    
+    // Less than 24 hours (show hours)
+    if (seconds < 86400) {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    }
+    
+    // Less than 7 days (show days)
+    if (seconds < 604800) {
+        const days = Math.floor(seconds / 86400);
+        return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+    }
+    
+    // More than 7 days (show actual date)
+    return voteDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
 }
 
 function getTimeRemaining(endTime) {
