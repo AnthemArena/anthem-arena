@@ -300,37 +300,30 @@ function sortMatchesByVotePriority(matches) {
 // CALCULATE POTENTIAL XP FOR MATCH
 // ========================================
 
+// ========================================
+// CALCULATE POTENTIAL XP FOR MATCH
+// ========================================
+
 function calculatePotentialMatchXP(match) {
-    // Base XP
-    let baseXP = 10; // From rank-system.js: vote XP
-    let bonuses = [];
-    let totalXP = baseXP;
+    // Base XP (always guaranteed)
+    let totalXP = 10;
+    const bonuses = [];
     
-    // Check if first vote today
+    // ✅ Only show GUARANTEED bonuses
+    
+    // First vote today (guaranteed if true now)
     const lastVoteDate = localStorage.getItem('lastVoteDate');
     const today = new Date().toISOString().split('T')[0];
     if (lastVoteDate !== today) {
         totalXP += 25;
-        bonuses.push({ label: '🌅 First vote today', xp: 25 });
+        bonuses.push({ icon: '🔥', label: 'First today' });
     }
     
-    // Check if close match (within 10% margin)
-    const diff = Math.abs(match.competitor1.percentage - match.competitor2.percentage);
-    if (diff <= 10) {
-        totalXP += 10;
-        bonuses.push({ label: '⚡ Close match', xp: 10 });
-    }
-    
-    // Check if early voter (less than 50 total votes)
-    if (match.totalVotes < 50) {
-        totalXP += 5;
-        bonuses.push({ label: '🎯 Early voter', xp: 5 });
-    }
+    // ❌ REMOVED: Close match (changes as people vote)
+    // ❌ REMOVED: Early voter (changes as people vote)
     
     return {
         totalXP,
-        baseXP,
-        bonuses,
         hasBonuses: bonuses.length > 0
     };
 }

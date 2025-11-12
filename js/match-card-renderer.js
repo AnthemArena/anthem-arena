@@ -122,20 +122,13 @@ export function createMatchCard(match) {
         : '';
 
    // ✅ CALCULATE XP REWARD (only for unvoted live matches)
+// ✅ CALCULATE XP REWARD (only for unvoted live matches)
 let xpBadgeHTML = '';
 if (!match.hasVoted && match.status === 'live') {
     const xpData = calculatePotentialMatchXP(match);
     
-    // Create tooltip text
-    let tooltipText = `Base vote: +${xpData.baseXP} XP`;
-    if (xpData.hasBonuses) {
-        xpData.bonuses.forEach(bonus => {
-            tooltipText += `\n${bonus.icon} ${bonus.label}: +${bonus.xp} XP`;
-        });
-    }
-    
     xpBadgeHTML = `
-        <div class="xp-reward-badge" title="${tooltipText}">
+        <div class="xp-reward-badge">
             <span class="xp-icon">⭐</span>
             <span class="xp-value">+${xpData.totalXP} XP</span>
             ${xpData.hasBonuses ? '<span class="xp-bonus-indicator">🔥</span>' : ''}
