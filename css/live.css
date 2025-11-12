@@ -378,6 +378,69 @@ body {
 }
 
 /* ========================================
+   VOTED SECTION (COLLAPSIBLE)
+   ======================================== */
+
+.voted-section {
+    max-width: 1400px;
+    margin: 2rem auto 0;
+    padding: 0 1.5rem;
+}
+
+.voted-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1), rgba(200, 170, 110, 0.05));
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.voted-header:hover {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.15), rgba(200, 170, 110, 0.08));
+}
+
+.voted-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #C8AA6E;
+    margin: 0;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: #C8AA6E;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.voted-grid {
+    margin-top: 1.5rem;
+    opacity: 0.9;
+}
+
+/* Voted cards have slightly different styling */
+.voted-grid .social-match-card {
+    border-color: rgba(200, 170, 110, 0.4);
+}
+
+.voted-grid .social-match-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(200, 170, 110, 0.25);
+}
+
+/* ========================================
    NO MATCHES STATE
    ======================================== */
 
@@ -484,6 +547,18 @@ body {
     .landing-footer {
         padding: 2rem 1rem;
     }
+    
+    .voted-section {
+        padding: 0 1rem;
+    }
+    
+    .voted-header {
+        padding: 1rem;
+    }
+    
+    .voted-header h2 {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -510,4 +585,58 @@ body {
 
 @media (prefers-color-scheme: dark) {
     /* Already optimized for dark mode */
+}
+/* ========================================
+   BUY ME A COFFEE
+   ======================================== */
+
+.bmc-container {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.bmc-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.bmc-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #FFDD00, #FDB813);
+    color: #1a1a2e;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 221, 0, 0.3);
+}
+
+.bmc-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(255, 221, 0, 0.5);
+    background: linear-gradient(135deg, #FFE44D, #FFCC00);
+}
+
+.bmc-icon {
+    font-size: 1.2rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .bmc-container {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+    
+    .bmc-button {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.25rem;
+    }
 }

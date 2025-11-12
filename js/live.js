@@ -52,10 +52,7 @@ async function loadLiveMatches() {
             return;
         }
         
-        // Sort by engagement (most votes first, then by close margins)
-        sortMatchesByEngagement();
-        
-        // Display matches
+        // Display matches (sorting handled in displayMatchGrid)
         displayMatchGrid();
         
         // Show main content
@@ -69,25 +66,8 @@ async function loadLiveMatches() {
 }
 
 // ========================================
-// SORT MATCHES BY ENGAGEMENT
+// GET VOTE MARGIN
 // ========================================
-function sortMatchesByEngagement() {
-    allLiveMatches.sort((a, b) => {
-        // Priority 1: Nail-biters (close margins) go first
-        const marginA = getVoteMargin(a);
-        const marginB = getVoteMargin(b);
-        
-        const isNailBiterA = marginA < 5;
-        const isNailBiterB = marginB < 5;
-        
-        if (isNailBiterA && !isNailBiterB) return -1;
-        if (!isNailBiterA && isNailBiterB) return 1;
-        
-        // Priority 2: Most votes
-        return (b.totalVotes || 0) - (a.totalVotes || 0);
-    });
-}
-
 function getVoteMargin(match) {
     const totalVotes = match.totalVotes || 0;
     if (totalVotes === 0) return 50;
@@ -99,28 +79,72 @@ function getVoteMargin(match) {
 }
 
 // ========================================
-// DISPLAY MATCH GRID
+// DISPLAY MATCH GRID (SORTED BY VOTED STATUS)
 // ========================================
 function displayMatchGrid() {
     const grid = document.getElementById('socialGrid');
+    const votedSection = document.getElementById('votedSection');
+    const votedGrid = document.getElementById('votedGrid');
+    const votedCount = document.getElementById('votedCount');
+    
     if (!grid) return;
     
     grid.innerHTML = '';
+    if (votedGrid) votedGrid.innerHTML = '';
     
-    allLiveMatches.forEach((match, index) => {
-        const card = createMatchCard(match, index);
+    // Separate matches by voting status
+    const unvotedMatches = [];
+    const votedMatches = [];
+    
+    allLiveMatches.forEach(match => {
+        if (hasUserVoted(match.matchId)) {
+            votedMatches.push(match);
+        } else {
+            unvotedMatches.push(match);
+        }
+    });
+    
+    // Sort unvoted by engagement (nail-biters first, then by votes)
+    unvotedMatches.sort((a, b) => {
+        const marginA = getVoteMargin(a);
+        const marginB = getVoteMargin(b);
+        
+        const isNailBiterA = marginA < 5;
+        const isNailBiterB = marginB < 5;
+        
+        if (isNailBiterA && !isNailBiterB) return -1;
+        if (!isNailBiterA && isNailBiterB) return 1;
+        
+        return (b.totalVotes || 0) - (a.totalVotes || 0);
+    });
+    
+    // Display unvoted matches (main grid)
+    unvotedMatches.forEach((match, index) => {
+        const card = createMatchCard(match, index, false);
         grid.appendChild(card);
     });
     
-    console.log('✅ Match grid rendered');
+    // Display voted matches in separate section (if any)
+    if (votedMatches.length > 0 && votedSection && votedGrid && votedCount) {
+        votedSection.style.display = 'block';
+        votedCount.textContent = votedMatches.length;
+        
+        votedMatches.forEach((match, index) => {
+            const card = createMatchCard(match, index, true);
+            votedGrid.appendChild(card);
+        });
+    } else if (votedSection) {
+        votedSection.style.display = 'none';
+    }
+    
+    console.log(`✅ Displayed ${unvotedMatches.length} unvoted, ${votedMatches.length} voted`);
 }
 
 // ========================================
 // CREATE MATCH CARD
 // ========================================
-function createMatchCard(match, index) {
-    const hasVoted = hasUserVoted(match.matchId);
-    const userVotedSongId = hasVoted ? getUserVotedSongId(match.matchId) : null;
+function createMatchCard(match, index, isVoted) {
+    const userVotedSongId = isVoted ? getUserVotedSongId(match.matchId) : null;
     
     const totalVotes = match.totalVotes || 0;
     const margin = getVoteMargin(match);
@@ -128,12 +152,12 @@ function createMatchCard(match, index) {
     const isTrending = totalVotes > 100;
     
     const card = document.createElement('div');
-    card.className = `social-match-card ${hasVoted ? 'voted' : ''}`;
+    card.className = `social-match-card ${isVoted ? 'voted' : ''}`;
     card.style.animationDelay = `${index * 0.1}s`;
     
     card.innerHTML = `
-        ${isNailBiter ? '<div class="nail-biter-badge">🚨 NAIL-BITER</div>' : ''}
-        ${!isNailBiter && isTrending && !hasVoted ? '<div class="trending-badge">🔥 TRENDING</div>' : ''}
+        ${!isVoted && isNailBiter ? '<div class="nail-biter-badge">🚨 NAIL-BITER</div>' : ''}
+        ${!isVoted && !isNailBiter && isTrending ? '<div class="trending-badge">🔥 TRENDING</div>' : ''}
         
         <div class="social-thumbnails">
             <img src="https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg" 
@@ -164,14 +188,19 @@ function createMatchCard(match, index) {
         </div>
         
         <div class="social-stats">
-            <span class="stat-icon">${hasVoted ? '✓' : '🔥'}</span>
-            <span>${hasVoted ? 'You voted' : `${totalVotes.toLocaleString()} votes`}</span>
+            <span class="stat-icon">${isVoted ? '✓' : '🔥'}</span>
+            <span>
+                ${isVoted 
+                    ? 'Tap to see results' 
+                    : `${totalVotes.toLocaleString()} votes • Tap to join`
+                }
+            </span>
         </div>
     `;
     
     // Add click handler
     card.addEventListener('click', () => {
-        handleCardClick(match.matchId, index, hasVoted);
+        handleCardClick(match.matchId, index, isVoted);
     });
     
     return card;
@@ -189,6 +218,27 @@ function handleCardClick(matchId, position, hasVoted) {
     // Navigate to vote page
     window.location.href = `vote?match=${matchId}`;
 }
+
+// ========================================
+// TOGGLE VOTED SECTION
+// ========================================
+function toggleVotedSection() {
+    const votedGrid = document.getElementById('votedGrid');
+    const toggleBtn = document.getElementById('votedToggle');
+    
+    if (!votedGrid || !toggleBtn) return;
+    
+    if (votedGrid.style.display === 'none') {
+        votedGrid.style.display = 'grid';
+        toggleBtn.textContent = '▼';
+    } else {
+        votedGrid.style.display = 'none';
+        toggleBtn.textContent = '▶';
+    }
+}
+
+// Make toggle available globally
+window.toggleVotedSection = toggleVotedSection;
 
 // ========================================
 // VOTE TRACKING HELPERS
@@ -227,11 +277,13 @@ function showNoMatches() {
     const noMatches = document.getElementById('noMatches');
     const socialGrid = document.getElementById('socialGrid');
     const landingFooter = document.querySelector('.landing-footer');
+    const votedSection = document.getElementById('votedSection');
     
     if (mainContent) mainContent.style.display = 'block';
     if (noMatches) noMatches.style.display = 'block';
     if (socialGrid) socialGrid.style.display = 'none';
     if (landingFooter) landingFooter.style.display = 'none';
+    if (votedSection) votedSection.style.display = 'none';
 }
 
 function showErrorState() {

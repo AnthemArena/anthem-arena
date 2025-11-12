@@ -55,9 +55,21 @@
             <p>Pick your winner • Earn XP for every vote</p>
         </div>
         
-        <!-- Match Grid -->
+        <!-- Unvoted Match Grid -->
         <div id="socialGrid" class="social-grid">
-            <!-- Cards will be inserted here by JavaScript -->
+            <!-- Unvoted cards inserted here by JavaScript -->
+        </div>
+        
+        <!-- Voted Matches Section (Collapsible) -->
+        <div id="votedSection" class="voted-section" style="display: none;">
+            <div class="voted-header" onclick="toggleVotedSection()">
+                <h2>✓ Your Votes (<span id="votedCount">0</span>)</h2>
+                <button id="votedToggle" class="toggle-btn">▼</button>
+            </div>
+            
+            <div id="votedGrid" class="social-grid voted-grid">
+                <!-- Voted cards inserted here by JavaScript -->
+            </div>
         </div>
         
         <!-- No Matches State -->
@@ -69,11 +81,22 @@
         </div>
         
         <!-- Footer CTA -->
-        <div class="landing-footer">
-            <p>Want to see results and past matches?</p>
-            <a href="index.html" class="footer-link">View Full Tournament →</a>
-        </div>
+<div class="landing-footer">
+    <p>Want to see results and past matches?</p>
+    <a href="index.html" class="footer-link">View Full Tournament →</a>
+    
+    <!-- Buy Me a Coffee -->
+    <div class="bmc-container">
+        <p class="bmc-text">Enjoying the tournament? ☕</p>
+        <a href="https://buymeacoffee.com/anthemarena" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="bmc-button">
+            <span class="bmc-icon">☕</span>
+            <span>Buy Me a Coffee</span>
+        </a>
     </div>
+</div>
     
     <!-- Scripts -->
     <script type="module" src="js/live.js"></script>
