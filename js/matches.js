@@ -304,27 +304,18 @@ function sortMatchesByVotePriority(matches) {
 // CALCULATE POTENTIAL XP FOR MATCH
 // ========================================
 
+// ========================================
+// CALCULATE POTENTIAL XP FOR MATCH
+// ========================================
+
 function calculatePotentialMatchXP(match) {
-    // Base XP (always guaranteed)
-    let totalXP = 10;
-    const bonuses = [];
-    
-    // ✅ Only show GUARANTEED bonuses
-    
-    // First vote today (guaranteed if true now)
-    const lastVoteDate = localStorage.getItem('lastVoteDate');
-    const today = new Date().toISOString().split('T')[0];
-    if (lastVoteDate !== today) {
-        totalXP += 25;
-        bonuses.push({ icon: '🔥', label: 'First today' });
-    }
-    
-    // ❌ REMOVED: Close match (changes as people vote)
-    // ❌ REMOVED: Early voter (changes as people vote)
+    // Always show base XP only
+    // Bonuses are revealed in post-vote modal
+    const totalXP = 10;
     
     return {
         totalXP,
-        hasBonuses: bonuses.length > 0
+        hasBonuses: false  // No bonus indicator on badge
     };
 }
 // ========================================
