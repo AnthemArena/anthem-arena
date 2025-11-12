@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         <div class="footer-bottom">
             <p class="footer-copyright">
-                © 2025 Anthem Arena. A fan-made community project.
+                    © 2025 Anthems Arena. All rights reserved.
             </p>
             <div class="footer-legal-links">
                 <a href="/about">About</a>
