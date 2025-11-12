@@ -598,8 +598,7 @@ await loadOtherLiveMatches();
 
 /**
  * Fetch and display other live matches (excluding current match)
- */
-async function loadOtherLiveMatches() {
+ */async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
         
@@ -620,28 +619,26 @@ async function loadOtherLiveMatches() {
             return;
         }
         
-      // ✅ Filter: only live matches user HASN'T voted on yet (excluding current match)
-const otherLiveMatches = allMatches.filter(match => {
-    const isLive = match.status === 'live';
-    const isNotCurrentMatch = match.id !== currentMatch.id;
-    const hasNotVoted = !userVotes[match.id]; // ✅ Check if user hasn't voted
-    
-    return isLive && isNotCurrentMatch && hasNotVoted;
-});
-
-console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
+        // ✅ STEP 1: Get user votes FIRST (before filtering)
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         
-        console.log(`✅ Found ${otherLiveMatches.length} other live matches`);
+        // ✅ STEP 2: Filter - only live matches user HASN'T voted on yet (excluding current match)
+        const otherLiveMatches = allMatches.filter(match => {
+            const isLive = match.status === 'live';
+            const isNotCurrentMatch = match.id !== currentMatch.id;
+            const hasNotVoted = !userVotes[match.id];
+            
+            return isLive && isNotCurrentMatch && hasNotVoted;
+        });
+        
+        console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
         
         if (otherLiveMatches.length === 0) {
             document.getElementById('other-matches-section').style.display = 'none';
             return;
         }
         
-        // Check which matches user has voted on
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        
-        // ✅ Transform match data (matches.js pattern)
+        // ✅ STEP 3: Transform match data (userVotes already declared above)
         const enhancedMatches = otherLiveMatches.map(match => {
             const userVote = userVotes[match.id];
             const hasVoted = !!userVote;
@@ -661,8 +658,7 @@ console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
                 round: match.round || 'round-1',
                 status: match.status || 'live',
                 date: match.date || new Date().toISOString(),
-                    endDate: match.endDate || null,  // ✅ ADD THIS LINE
-
+                endDate: match.endDate || null,
                 totalVotes: totalVotes,
                 timeLeft: 'Voting Open',
                 hasVoted: hasVoted,
@@ -691,26 +687,25 @@ console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
             };
         });
         
-        // ✅ Render match cards as DOM elements
+        // ✅ STEP 4: Render match cards as DOM elements
         const grid = document.getElementById('other-matches-grid');
-        grid.innerHTML = ''; // Clear first
+        grid.innerHTML = '';
 
         enhancedMatches.forEach(match => {
             const card = createMatchCard(match);
             grid.appendChild(card);
         });
 
-
-        // ✅ Update section header with count
-const sectionTitle = document.querySelector('#other-matches-section h2');
-if (sectionTitle && otherLiveMatches.length > 0) {
-    sectionTitle.textContent = `🗳️ ${otherLiveMatches.length} More ${otherLiveMatches.length === 1 ? 'Match' : 'Matches'} Need Your Vote`;
-}
+        // ✅ STEP 5: Update section header with count
+        const sectionTitle = document.querySelector('#other-matches-section h2');
+        if (sectionTitle) {
+            sectionTitle.textContent = `🗳️ ${otherLiveMatches.length} More ${otherLiveMatches.length === 1 ? 'Match' : 'Matches'} Need Your Vote`;
+        }
 
         // Show the section
         document.getElementById('other-matches-section').style.display = 'block';
         
-        console.log('✅ Other matches rendered');
+        console.log('✅ Unvoted matches rendered');
         
     } catch (error) {
         console.error('❌ Error loading other matches:', error);
