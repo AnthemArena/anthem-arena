@@ -488,7 +488,7 @@ async function loadYourActiveVotes(allMatches) {
         
         const activeVotedMatches = allMatches.filter(m => 
             m.status === 'live' && votedMatchIds.includes(m.matchId)
-        ).slice(0, 3);
+        ).slice(0, 4);
         
         if (activeVotedMatches.length === 0) {
             hideYourVotesSection();
@@ -600,7 +600,7 @@ async function loadLiveMatches(allMatches) {
         
         const topLiveMatches = liveMatches
             .sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0))
-            .slice(0, 3);
+            .slice(0, 4);
         
         console.log(`✅ Showing top ${topLiveMatches.length} live matches`);
         displayLiveMatchesGrid(topLiveMatches);
@@ -640,7 +640,7 @@ function addViewAllLiveLink(totalCount) {
         const subtitle = section.querySelector('.section-subtitle');
         if (subtitle) {
             subtitle.innerHTML = `
-                Showing 3 of ${totalCount} live matches
+                Showing 4 of ${totalCount} live matches
                 <a href="matches.html?status=live" class="view-all-inline">View All →</a>
             `;
         }
