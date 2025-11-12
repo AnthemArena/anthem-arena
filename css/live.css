@@ -640,3 +640,81 @@ body {
         padding: 0.7rem 1.25rem;
     }
 }
+/* ========================================
+   PROGRESS BAR
+   ======================================== */
+
+.progress-container {
+    max-width: 400px;
+    margin: 1.5rem auto 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(200, 170, 110, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #C8AA6E, #d4b97a);
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    position: relative;
+}
+
+/* Shimmer effect when progress increases */
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.progress-text span {
+    color: #C8AA6E;
+    font-weight: 700;
+}
+
+/* Celebration state when 100% complete */
+.progress-fill.complete {
+    background: linear-gradient(90deg, #4CAF50, #66BB6A);
+    animation: celebratePulse 0.8s ease;
+}
+
+@keyframes celebratePulse {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.2); }
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .progress-container {
+        max-width: 90%;
+    }
+    
+    .progress-text {
+        font-size: 0.85rem;
+    }
+}

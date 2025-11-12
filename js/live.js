@@ -79,6 +79,24 @@ function getVoteMargin(match) {
 }
 
 // ========================================
+// GET DYNAMIC VOTE CTA
+// ========================================
+function getVoteCTA(match, totalVotes) {
+    const margin = getVoteMargin(match);
+    const isNailBiter = margin < 5 && totalVotes > 10;
+    
+    if (isNailBiter) {
+        return `🔥 ${totalVotes.toLocaleString()} votes • Tap to break the tie`;
+    } else if (totalVotes > 200) {
+        return `${totalVotes.toLocaleString()} votes • Tap to vote`;
+    } else if (totalVotes < 20) {
+        return `${totalVotes} votes • Be an early voter`;
+    } else {
+        return `${totalVotes.toLocaleString()} votes • Tap to vote`;
+    }
+}
+
+// ========================================
 // DISPLAY MATCH GRID (SORTED BY VOTED STATUS)
 // ========================================
 function displayMatchGrid() {
@@ -137,7 +155,69 @@ function displayMatchGrid() {
         votedSection.style.display = 'none';
     }
     
+    // UPDATE PROGRESS BAR (NEW)
+    updateProgressBar(votedMatches.length, allLiveMatches.length);
+    
     console.log(`✅ Displayed ${unvotedMatches.length} unvoted, ${votedMatches.length} voted`);
+}
+
+// ========================================
+// UPDATE PROGRESS BAR (NEW)
+// ========================================
+function updateProgressBar(votedCount, totalCount) {
+    const progressFill = document.getElementById('progressFill');
+    const votedProgress = document.getElementById('votedProgress');
+    const totalProgress = document.getElementById('totalProgress');
+    const progressText = document.querySelector('.progress-text');
+    
+    if (!progressFill || !votedProgress || !totalProgress) return;
+    
+    const percentage = totalCount > 0 ? (votedCount / totalCount) * 100 : 0;
+    
+    // Update DOM
+    progressFill.style.width = `${percentage}%`;
+    votedProgress.textContent = votedCount;
+    totalProgress.textContent = totalCount;
+    
+    // Milestone messages
+    let milestone = '';
+    if (percentage === 100) {
+        progressFill.classList.add('complete');
+        milestone = ' 🎉 Complete!';
+    } else if (percentage >= 75) {
+        milestone = ' 🔥 Almost there!';
+    } else if (percentage >= 50) {
+        milestone = ' 💪 Halfway done!';
+    } else if (percentage >= 25) {
+        milestone = ' 👍 Keep going!';
+    }
+    
+    // Update text with milestone
+    if (progressText && milestone) {
+        progressText.innerHTML = `
+            <span id="votedProgress">${votedCount}</span> / 
+            <span id="totalProgress">${totalCount}</span> matches voted
+            <span style="color: #C8AA6E; font-weight: 700;">${milestone}</span>
+        `;
+    }
+}
+
+// ========================================
+// SHOW COMPLETION MESSAGE (OPTIONAL)
+// ========================================
+function showCompletionMessage() {
+    const progressText = document.querySelector('.progress-text');
+    if (!progressText) return;
+    
+    const originalText = progressText.innerHTML;
+    
+    // Show celebration message
+    progressText.innerHTML = `<span style="color: #4CAF50;">🎉 All matches voted! Nice work!</span>`;
+    
+    // Revert after 3 seconds
+    setTimeout(() => {
+        progressText.innerHTML = originalText;
+    }, 3000);
 }
 
 // ========================================
@@ -192,7 +272,7 @@ function createMatchCard(match, index, isVoted) {
             <span>
                 ${isVoted 
                     ? 'Tap to see results' 
-                    : `${totalVotes.toLocaleString()} votes • Tap to join`
+                    : getVoteCTA(match, totalVotes)
                 }
             </span>
         </div>
