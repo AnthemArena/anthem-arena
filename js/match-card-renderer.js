@@ -66,6 +66,45 @@ function getTimeRemaining(endDate) {
     };
 }
 
+// ========================================
+// CALCULATE POTENTIAL XP FOR MATCH
+// ========================================
+
+function calculatePotentialMatchXP(match) {
+    // Base XP (from rank-system.js)
+    const baseXP = 10;
+    let totalXP = baseXP;
+    const bonuses = [];
+    
+    // Check if first vote today
+    const lastVoteDate = localStorage.getItem('lastVoteDate');
+    const today = new Date().toISOString().split('T')[0];
+    if (lastVoteDate !== today) {
+        totalXP += 25;
+        bonuses.push({ icon: '🌅', label: 'First vote today', xp: 25 });
+    }
+    
+    // Check if close match (within 10% margin)
+    const diff = Math.abs(match.competitor1.percentage - match.competitor2.percentage);
+    if (diff <= 10 && match.totalVotes > 0) {
+        totalXP += 10;
+        bonuses.push({ icon: '⚡', label: 'Close match', xp: 10 });
+    }
+    
+    // Check if early voter (less than 50 total votes)
+    if (match.totalVotes < 50) {
+        totalXP += 5;
+        bonuses.push({ icon: '🎯', label: 'Early voter', xp: 5 });
+    }
+    
+    return {
+        totalXP,
+        baseXP,
+        bonuses,
+        hasBonuses: bonuses.length > 0
+    };
+}
+
 export function createMatchCard(match) {
     const statusClass = match.status;
     const statusBadge = getStatusBadge(match);
@@ -82,23 +121,48 @@ export function createMatchCard(match) {
         ? `https://img.youtube.com/vi/${match.competitor2.videoId}/mqdefault.jpg`
         : '';
 
-    const cardHTML = `
-        <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
-             data-tournament="${match.tournament}" 
-             data-round="${match.round}" 
-             data-status="${match.status}"
-             data-match-id="${match.id}"
-             data-date="${match.date || ''}"
-             data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
-             style="cursor: pointer;">
-        <div class="match-header">
-    <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
-    <span class="match-round">${formatRoundName(match.round)}</span>
-    ${match.hasVoted && match.status === 'live' 
-        ? '<span class="voted-badge">✓ Voted</span>' 
-        : statusBadge
+   // ✅ CALCULATE XP REWARD (only for unvoted live matches)
+let xpBadgeHTML = '';
+if (!match.hasVoted && match.status === 'live') {
+    const xpData = calculatePotentialMatchXP(match);
+    
+    // Create tooltip text
+    let tooltipText = `Base vote: +${xpData.baseXP} XP`;
+    if (xpData.hasBonuses) {
+        xpData.bonuses.forEach(bonus => {
+            tooltipText += `\n${bonus.icon} ${bonus.label}: +${bonus.xp} XP`;
+        });
     }
-</div>
+    
+    xpBadgeHTML = `
+        <div class="xp-reward-badge" title="${tooltipText}">
+            <span class="xp-icon">⭐</span>
+            <span class="xp-value">+${xpData.totalXP} XP</span>
+            ${xpData.hasBonuses ? '<span class="xp-bonus-indicator">🔥</span>' : ''}
+        </div>
+    `;
+}
+
+const cardHTML = `
+    <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
+         data-tournament="${match.tournament}" 
+         data-round="${match.round}" 
+         data-status="${match.status}"
+         data-match-id="${match.id}"
+         data-date="${match.date || ''}"
+         data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
+         style="cursor: pointer;">
+    
+    ${xpBadgeHTML}
+    
+    <div class="match-header">
+        <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
+        <span class="match-round">${formatRoundName(match.round)}</span>
+        ${match.hasVoted && match.status === 'live' 
+            ? '<span class="voted-badge">✓ Voted</span>' 
+            : statusBadge
+        }
+    </div>
             
             <div class="match-competitors">
                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">

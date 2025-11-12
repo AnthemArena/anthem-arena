@@ -256,6 +256,85 @@ function getRoundName(roundNumber) {
 }
 
 // ========================================
+// SMART SORTING: UNVOTED MATCHES FIRST
+// ========================================
+
+function sortMatchesByVotePriority(matches) {
+    // Get user's votes from localStorage
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    
+    // Separate matches into categories
+    const liveNotVoted = [];
+    const liveAlreadyVoted = [];
+    const upcoming = [];
+    const completed = [];
+    
+    matches.forEach(match => {
+        const hasVoted = userVotes.hasOwnProperty(match.id);
+        
+        if (match.status === 'live') {
+            if (hasVoted) {
+                liveAlreadyVoted.push(match);
+            } else {
+                liveNotVoted.push(match);
+            }
+        } else if (match.status === 'upcoming') {
+            upcoming.push(match);
+        } else if (match.status === 'completed') {
+            completed.push(match);
+        }
+    });
+    
+    console.log(`🎯 Vote Priority Sort: ${liveNotVoted.length} unvoted, ${liveAlreadyVoted.length} voted, ${upcoming.length} upcoming, ${completed.length} completed`);
+    
+    // ✅ PRIORITY ORDER:
+    return [
+        ...liveNotVoted,      // 🔥 TOP PRIORITY - Live matches user hasn't voted on
+        ...liveAlreadyVoted,  // Already engaged
+        ...upcoming,          // Coming soon
+        ...completed          // Historical
+    ];
+}
+
+// ========================================
+// CALCULATE POTENTIAL XP FOR MATCH
+// ========================================
+
+function calculatePotentialMatchXP(match) {
+    // Base XP
+    let baseXP = 10; // From rank-system.js: vote XP
+    let bonuses = [];
+    let totalXP = baseXP;
+    
+    // Check if first vote today
+    const lastVoteDate = localStorage.getItem('lastVoteDate');
+    const today = new Date().toISOString().split('T')[0];
+    if (lastVoteDate !== today) {
+        totalXP += 25;
+        bonuses.push({ label: '🌅 First vote today', xp: 25 });
+    }
+    
+    // Check if close match (within 10% margin)
+    const diff = Math.abs(match.competitor1.percentage - match.competitor2.percentage);
+    if (diff <= 10) {
+        totalXP += 10;
+        bonuses.push({ label: '⚡ Close match', xp: 10 });
+    }
+    
+    // Check if early voter (less than 50 total votes)
+    if (match.totalVotes < 50) {
+        totalXP += 5;
+        bonuses.push({ label: '🎯 Early voter', xp: 5 });
+    }
+    
+    return {
+        totalXP,
+        baseXP,
+        bonuses,
+        hasBonuses: bonuses.length > 0
+    };
+}
+// ========================================
 // POPULATE FILTER DROPDOWNS
 // ========================================
 
@@ -533,20 +612,25 @@ function sortMatchesArray(matches, sortType) {
     const sorted = [...matches];
 
     switch (sortType) {
- case 'recent':
-    // Most Recent — Context-aware based on status
-    const result = sorted.sort((a, b) => {
-        // Priority 1: Status order (Live → Completed → Upcoming)
-        const statusOrder = { 'live': 1, 'completed': 2, 'upcoming': 3 };
-        const statusDiff = (statusOrder[a.status] || 4) - (statusOrder[b.status] || 4);
-        if (statusDiff !== 0) return statusDiff;
+case 'recent':
+    // ✅ FIRST: Prioritize unvoted live matches
+    const votePrioritized = sortMatchesByVotePriority(sorted);
+    
+    // THEN: Sort within each category by date
+    return votePrioritized.sort((a, b) => {
+        // Don't change the vote priority order for live matches
+        const aIsLive = a.status === 'live';
+        const bIsLive = b.status === 'live';
         
-        // Priority 2: Within same status
+        // If both are live, maintain vote priority order (don't re-sort)
+        if (aIsLive && bIsLive) {
+            return 0; // Keep existing order from sortMatchesByVotePriority
+        }
+        
+        // For non-live matches, sort by date
         if (a.status === 'completed' || a.status === 'live') {
-            // For completed/live: Most recent = newest date first
             return new Date(b.date) - new Date(a.date);
         } else if (a.status === 'upcoming') {
-            // For upcoming: Most recent = soonest date first
             return new Date(a.date) - new Date(b.date);
         }
         

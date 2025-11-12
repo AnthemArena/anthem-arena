@@ -1371,7 +1371,6 @@ function createVoteCard(vote) {
             You voted for: <strong>${votedSong.shortTitle}</strong> 
             <span class="your-vote-badge-inline">✓ Your Pick</span>
         </p>
-        <div class="vote-timestamp">${timeAgo}</div>
     </div>
 </div>
             

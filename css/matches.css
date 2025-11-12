@@ -1240,3 +1240,107 @@
         transform: scale(1.05);
     }
 }
+/* ========================================
+   XP REWARD BADGE
+   ======================================== */
+
+.xp-reward-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #0a0a0a;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+    animation: xp-glow 2s ease-in-out infinite;
+    cursor: help;
+    transition: transform 0.2s ease;
+}
+
+.xp-reward-badge:hover {
+    transform: scale(1.05);
+}
+
+.xp-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.xp-value {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.xp-bonus-indicator {
+    font-size: 0.85rem;
+    margin-left: 2px;
+    animation: bonus-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes xp-glow {
+    0%, 100% { 
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    }
+    50% { 
+        box-shadow: 0 4px 16px rgba(255, 215, 0, 0.7);
+    }
+}
+
+@keyframes bonus-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* Tooltip on hover */
+.xp-reward-badge:hover::after {
+    content: attr(title);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 14px;
+    background: rgba(10, 10, 10, 0.95);
+    color: white;
+    border-radius: 8px;
+    white-space: pre-line;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.5;
+    z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    min-width: 160px;
+    text-align: left;
+    pointer-events: none;
+}
+
+/* Arrow for tooltip */
+.xp-reward-badge:hover::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(10, 10, 10, 0.95);
+    z-index: 1001;
+    pointer-events: none;
+}
+
+/* Ensure match card has position relative */
+.match-card {
+    position: relative;
+}
+
+/* Adjust match header to make room for XP badge */
+.match-card .match-header {
+    padding-top: 12px;
+    position: relative;
+}
