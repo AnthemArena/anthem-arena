@@ -8,6 +8,49 @@ import { db } from './firebase-config.js';
 import { checkAchievements, getCategoryInfo } from './achievement-tracker.js';
 import { getAchievementsByCategory } from './achievements.js';
 
+// ========================================
+// NORMALIZE TIMESTAMP HELPER
+// ========================================
+function normalizeTimestamp(timestamp) {
+    if (!timestamp) {
+        console.warn('⚠️ Vote has no timestamp');
+        return null; // Don't fake it!
+    }
+    
+    // If it's already an ISO string, return it
+    if (typeof timestamp === 'string' && timestamp.includes('T')) {
+        return timestamp;
+    }
+    
+    // If it's a Unix milliseconds number, convert to ISO
+    if (typeof timestamp === 'number' || !isNaN(Number(timestamp))) {
+        const ms = Number(timestamp);
+        
+        // Safety check: Reject obviously invalid timestamps
+        const year2020 = 1577836800000; // Jan 1, 2020
+        const year2030 = 1893456000000; // Jan 1, 2030
+        
+        if (ms < year2020 || ms > year2030) {
+            console.warn(`⚠️ Invalid timestamp: ${ms}`);
+            return null;
+        }
+        
+        return new Date(ms).toISOString();
+    }
+    
+    // Try parsing as date
+    try {
+        const date = new Date(timestamp);
+        if (!isNaN(date.getTime())) {
+            return date.toISOString();
+        }
+    } catch (e) {
+        console.warn('⚠️ Could not parse timestamp:', timestamp);
+    }
+    
+    return null;
+}
+
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 // State
@@ -181,7 +224,8 @@ async function loadVoteHistory() {
                 id: matchId,
                 matchId: matchId,
                 choice: votedForSong,
-                timestamp: voteData.timestamp || new Date().toISOString(),
+// ✅ NO Firebase reads - just validation
+timestamp: normalizeTimestamp(voteData.timestamp),
                 round: matchData.round || 1,
                 votedForSeed: votedSong.seed,
                 votedForName: votedSong.shortTitle || votedSong.title,
@@ -1371,6 +1415,7 @@ function getRoundName(roundNumber) {
 }
 
 function getTimeAgo(date) {
+    // ✅ Handle missing timestamps
     if (!date) {
         return 'Unknown time';
     }
@@ -1385,8 +1430,9 @@ function getTimeAgo(date) {
     
     const seconds = Math.floor((now - voteDate) / 1000);
     
-    // Handle future dates (shouldn't happen, but just in case)
+    // ✅ Handle future dates (bad data)
     if (seconds < 0) {
+        console.warn('⚠️ Vote timestamp is in the future:', date);
         return 'Just now';
     }
     
