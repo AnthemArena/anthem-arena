@@ -2237,3 +2237,165 @@
         transform: scale(1.05);
     }
 }
+
+.xp-reward-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #0a0a0a;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+    animation: xp-glow 2s ease-in-out infinite;
+    cursor: help;
+    transition: transform 0.2s ease;
+}
+
+.xp-reward-badge:hover {
+    transform: scale(1.05);
+}
+
+.xp-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.xp-value {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.xp-bonus-indicator {
+    font-size: 0.85rem;
+    margin-left: 2px;
+    animation: bonus-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes xp-glow {
+    0%, 100% { 
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    }
+    50% { 
+        box-shadow: 0 4px 16px rgba(255, 215, 0, 0.7);
+    }
+}
+
+@keyframes bonus-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+
+
+/* Ensure match card has position relative */
+.match-card {
+    position: relative;
+}
+
+/* Adjust match header to make room for XP badge */
+.match-card .match-header {
+    padding-top: 12px;
+    position: relative;
+}
+.xp-reward-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;  /* ✅ Changed from left to right */
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #0a0a0a;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+    animation: xp-glow 2s ease-in-out infinite;
+}
+.xp-reward-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #0a0a0a;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+    animation: xp-glow 2s ease-in-out infinite;
+}
+
+.xp-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.xp-value {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.xp-bonus-indicator {
+    font-size: 0.85rem;
+    margin-left: 2px;
+    animation: bonus-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes xp-glow {
+    0%, 100% { 
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    }
+    50% { 
+        box-shadow: 0 4px 16px rgba(255, 215, 0, 0.7);
+    }
+}
+
+@keyframes bonus-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+.xp-reward-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 215, 0, 0.15);  /* ✅ Subtle background */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #FFD700;  /* ✅ Gold text instead of black */
+    padding: 3px 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.xp-icon {
+    font-size: 0.75rem;
+}
+
+.xp-value {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+.xp-bonus-indicator {
+    font-size: 0.65rem;
+    margin-left: 1px;
+}

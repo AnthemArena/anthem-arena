@@ -620,11 +620,16 @@ async function loadOtherLiveMatches() {
             return;
         }
         
-        // Filter: only live matches, exclude current match
-        const otherLiveMatches = allMatches.filter(match => 
-            match.status === 'live' && 
-            match.id !== currentMatch.id
-        );
+      // ✅ Filter: only live matches user HASN'T voted on yet (excluding current match)
+const otherLiveMatches = allMatches.filter(match => {
+    const isLive = match.status === 'live';
+    const isNotCurrentMatch = match.id !== currentMatch.id;
+    const hasNotVoted = !userVotes[match.id]; // ✅ Check if user hasn't voted
+    
+    return isLive && isNotCurrentMatch && hasNotVoted;
+});
+
+console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
         
         console.log(`✅ Found ${otherLiveMatches.length} other live matches`);
         
@@ -694,6 +699,13 @@ async function loadOtherLiveMatches() {
             const card = createMatchCard(match);
             grid.appendChild(card);
         });
+
+
+        // ✅ Update section header with count
+const sectionTitle = document.querySelector('#other-matches-section h2');
+if (sectionTitle && otherLiveMatches.length > 0) {
+    sectionTitle.textContent = `🗳️ ${otherLiveMatches.length} More ${otherLiveMatches.length === 1 ? 'Match' : 'Matches'} Need Your Vote`;
+}
 
         // Show the section
         document.getElementById('other-matches-section').style.display = 'block';
