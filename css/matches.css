@@ -1374,3 +1374,34 @@
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.15); }
 }
+.xp-reward-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 215, 0, 0.15);  /* ✅ Subtle background */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #FFD700;  /* ✅ Gold text instead of black */
+    padding: 3px 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.xp-icon {
+    font-size: 0.75rem;
+}
+
+.xp-value {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+.xp-bonus-indicator {
+    font-size: 0.65rem;
+    margin-left: 1px;
+}
