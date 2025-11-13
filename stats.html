@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Stats | Anthem Arena</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>Tournament Stats & Rankings | LoL Music Tournament | Anthem Arena</title>
+    <meta name="description" content="View comprehensive League of Legends music tournament statistics, song rankings, voting records, upsets, and participation data. Track performance across all rounds.">
+    <link rel="canonical" href="https://anthemarena.com/stats">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://anthemarena.com/stats">
+    <meta property="og:title" content="Tournament Stats & Rankings | Anthem Arena">
+    <meta property="og:description" content="Comprehensive LoL music tournament statistics - song rankings, vote counts, upsets, and participation data updated in real-time.">
+    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+    <meta property="og:image:alt" content="Anthem Arena - Tournament Statistics Dashboard">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tournament Stats & Rankings | Anthem Arena">
+    <meta name="twitter:description" content="View comprehensive LoL music tournament statistics and rankings.">
+    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+    <meta name="twitter:image:alt" content="Anthem Arena Tournament Stats">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,20 +41,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/stats.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="/css/stats.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/images/favicon.png">
-    
-    <!-- Meta Tags -->
-    <meta name="description" content="View comprehensive statistics for the Anthem Arena tournament - vote counts, song rankings, upsets, and more!">
-    <meta property="og:title" content="Tournament Stats | Anthem Arena">
-    <meta property="og:description" content="Comprehensive tournament statistics and rankings">
-    <meta property="og:type" content="website">
+    <!-- Schema.org Structured Data - DataCatalog -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "DataCatalog",
+      "name": "Anthem Arena Tournament Statistics",
+      "description": "Real-time statistics dashboard for the League of Legends music tournament including rankings, votes, upsets, and participation metrics",
+      "url": "https://anthemarena.com/stats",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Anthem Arena",
+        "url": "https://anthemarena.com"
+      },
+      "dataset": [
+        {
+          "@type": "Dataset",
+          "name": "Song Rankings",
+          "description": "All-time song rankings by votes and performance"
+        },
+        {
+          "@type": "Dataset",
+          "name": "Tournament Upsets",
+          "description": "Lower seeds that defeated higher seeds"
+        },
+        {
+          "@type": "Dataset",
+          "name": "Voting Participation",
+          "description": "Real-time voting activity and engagement metrics"
+        }
+      ]
+    }
+    </script>
 </head>
-<body>
     
     <div id="nav-placeholder"></div>
 <script type="module" src="/js/navigation.js"></script>

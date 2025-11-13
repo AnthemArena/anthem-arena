@@ -3,14 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Gallery | League Music Tournament</title>
-    <meta name="description" content="Browse all League of Legends music videos competing in the tournament. Filter by type, year, artist, and mood.">
+    
+    <!-- SEO Meta Tags -->
+    <title>Music Gallery | All LoL Songs & Videos | Anthem Arena</title>
+    <meta name="description" content="Browse all 64 League of Legends music videos in the tournament. Filter by K/DA, Pentakill, Worlds anthems, year, and artist. Watch trailers and view stats.">
+    <link rel="canonical" href="https://anthemarena.com/music-gallery">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://anthemarena.com/music-gallery">
+    <meta property="og:title" content="Music Gallery | All LoL Songs | Anthem Arena">
+    <meta property="og:description" content="Explore all 64 League of Legends music videos competing in the tournament. Filter by K/DA, Pentakill, Worlds anthems, and more.">
+    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+    <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Gallery">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Music Gallery | All LoL Songs">
+    <meta name="twitter:description" content="Browse all 64 League of Legends music videos with filters for K/DA, Pentakill, Worlds anthems, and more.">
+    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+    <meta name="twitter:image:alt" content="Anthem Arena Music Gallery">
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/moments-gallery.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
-
+    
+    <!-- Schema.org Structured Data - CollectionPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "League of Legends Music Gallery",
+      "description": "Complete collection of League of Legends music videos including K/DA, Pentakill, Worlds anthems, and cinematics",
+      "url": "https://anthemarena.com/music-gallery",
+      "mainEntity": {
+        "@type": "ItemList",
+        "name": "LoL Music Videos",
+        "numberOfItems": 64,
+        "itemListElement": [
+          {
+            "@type": "MusicRecording",
+            "name": "Warriors",
+            "byArtist": {
+              "@type": "MusicGroup",
+              "name": "Imagine Dragons"
+            }
+          },
+          {
+            "@type": "MusicRecording",
+            "name": "POP/STARS",
+            "byArtist": {
+              "@type": "MusicGroup",
+              "name": "K/DA"
+            }
+          }
+        ]
+      }
+    }
+    </script>
 </head>
 <body>
 

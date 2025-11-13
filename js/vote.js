@@ -1010,8 +1010,79 @@ if (comp2Video) {
         document.title = `Vote: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name} | League Music Tournament`;
         
         console.log('✅ Page content updated (stats will be added by updateCompetitorInfo)');
+
+         // ✅ ADD THIS LINE:
+    updateDynamicMetaTags();
     }
 
+
+    // ========================================
+// UPDATE META TAGS DYNAMICALLY
+// ========================================
+
+function updateDynamicMetaTags() {
+    if (!currentMatch) return;
+    
+    const song1 = currentMatch.competitor1.name;
+    const song2 = currentMatch.competitor2.name;
+    const roundName = getRoundName(currentMatch.round || 1);
+    
+    // Dynamic title
+    const title = `Vote: ${song1} vs ${song2} | ${roundName} | Anthem Arena`;
+    
+    // Dynamic description
+    const description = `Cast your vote in the ${roundName}! Watch and vote: "${song1}" vs "${song2}" in the League of Legends music tournament. ${currentMatch.totalVotes} votes cast so far.`;
+    
+    // Update <title>
+    document.title = title;
+    
+    // Update meta description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+        metaDesc.setAttribute('content', description);
+    }
+    
+    // Update canonical URL (in case match ID is in URL)
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+        canonical.setAttribute('href', window.location.href);
+    }
+    
+    // ========================================
+    // UPDATE OPEN GRAPH TAGS
+    // ========================================
+    
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', title);
+    }
+    
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+        ogDesc.setAttribute('content', description);
+    }
+    
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+        ogUrl.setAttribute('content', window.location.href);
+    }
+    
+    // ========================================
+    // UPDATE TWITTER CARD TAGS
+    // ========================================
+    
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', title);
+    }
+    
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) {
+        twitterDesc.setAttribute('content', description);
+    }
+    
+    console.log('✅ Dynamic meta tags updated:', title);
+}
     // ========================================
     // HELPER FUNCTION: GET ROUND NAME
     // ========================================
