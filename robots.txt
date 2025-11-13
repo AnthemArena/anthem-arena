@@ -1,3 +1,4 @@
+# Anthem Arena - League of Legends Music Tournament
 User-agent: *
 Allow: /
 
@@ -7,11 +8,17 @@ Disallow: /admin.html
 Disallow: /init-tournament
 Disallow: /init-tournament.html
 
-# Block user-specific and empty pages
-Disallow: /vote
-Disallow: /vote.html
+# Block user-specific pages (personalized content)
 Disallow: /my-votes
 Disallow: /my-votes.html
 
+# Allow public voting pages
+Allow: /vote
+Allow: /vote.html
+Allow: /vote?*
+
 # Sitemap location
 Sitemap: https://anthemarena.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
