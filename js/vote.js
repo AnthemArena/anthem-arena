@@ -956,8 +956,14 @@ if (timeRemaining) {
         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
         if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
         if (comp1Votes) comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} votes`;
-        if (comp1Video) comp1Video.src = `https://www.youtube.com/embed/${currentMatch.competitor1.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
-        
+if (comp1Video) {
+    const song1Name = currentMatch.competitor1.name;
+    const artist1 = currentMatch.competitor1.source.split('•')[0]?.trim();
+    
+    comp1Video.src = `https://www.youtube.com/embed/${currentMatch.competitor1.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
+    comp1Video.title = `${song1Name} by ${artist1} - League of Legends Music Video`;
+    comp1Video.loading = 'lazy';
+}        
         // Check embedAllowed from JSON data
         if (!isEmbedAllowed(currentMatch.competitor1.videoId)) {
             console.log('🚫 Competitor 1 cannot be embedded, showing thumbnail');
@@ -980,8 +986,14 @@ if (timeRemaining) {
         if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
         if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
         if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
-        if (comp2Video) comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
-        
+if (comp2Video) {
+    const song2Name = currentMatch.competitor2.name;
+    const artist2 = currentMatch.competitor2.source.split('•')[0]?.trim();
+    
+    comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
+    comp2Video.title = `${song2Name} by ${artist2} - League of Legends Music Video`;
+    comp2Video.loading = 'lazy';
+}        
         // Check embedAllowed from JSON data
         if (!isEmbedAllowed(currentMatch.competitor2.videoId)) {
             console.log('🚫 Competitor 2 cannot be embedded, showing thumbnail');
@@ -1759,33 +1771,44 @@ function showNotification(message, type = 'success') {
      * @param {string} videoId - YouTube video ID
      */
     function showThumbnailForCompetitor(competitorNum, videoId) {
-        const wrapper = document.getElementById(`competitor${competitorNum}-wrapper`);
-        const fallback = document.getElementById(`competitor${competitorNum}-youtube-fallback`);
-        const thumbnail = document.getElementById(`competitor${competitorNum}-thumbnail`);
-        
-        if (!wrapper || !fallback || !thumbnail) {
-            console.warn(`Could not find thumbnail elements for competitor ${competitorNum}`);
-            return;
-        }
-        
-        // Set thumbnail image
-        thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-        
-        // Fallback to medium quality if max doesn't exist
-        thumbnail.onerror = () => {
-            thumbnail.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        };
-        
-        // Set YouTube link
-        fallback.href = `https://www.youtube.com/watch?v=${videoId}`;
-        
-        // Show thumbnail, hide iframe
-        wrapper.classList.add('show-thumbnail');
-        fallback.classList.add('active');
-        fallback.style.display = 'block';
-        
-        console.log(`📺 Showing thumbnail for competitor ${competitorNum} (video: ${videoId})`);
+    const wrapper = document.getElementById(`competitor${competitorNum}-wrapper`);
+    const fallback = document.getElementById(`competitor${competitorNum}-youtube-fallback`);
+    const thumbnail = document.getElementById(`competitor${competitorNum}-thumbnail`);
+    
+    if (!wrapper || !fallback || !thumbnail) {
+        console.warn(`Could not find thumbnail elements for competitor ${competitorNum}`);
+        return;
     }
+    
+    // ✅ NEW: Get song name for alt text
+    const songData = competitorNum === 1 ? currentMatch.competitor1 : currentMatch.competitor2;
+    const songName = songData.name || 'League of Legends Music Video';
+    const artist = songData.source.split('•')[0]?.trim() || 'Unknown Artist';
+    
+    // Set thumbnail image
+    thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    
+    // ✅ NEW: Add descriptive alt text
+    thumbnail.alt = `${songName} by ${artist} - League of Legends Music Video Thumbnail`;
+    
+    // ✅ NEW: Add loading="lazy" for performance
+    thumbnail.loading = 'lazy';
+    
+    // Fallback to medium quality if max doesn't exist
+    thumbnail.onerror = () => {
+        thumbnail.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    };
+    
+    // Set YouTube link
+    fallback.href = `https://www.youtube.com/watch?v=${videoId}`;
+    
+    // Show thumbnail, hide iframe
+    wrapper.classList.add('show-thumbnail');
+    fallback.classList.add('active');
+    fallback.style.display = 'block';
+    
+    console.log(`📺 Showing thumbnail for competitor ${competitorNum} (video: ${videoId}) with alt text`);
+}
 
     /**
      * Manual override for testing - call from console

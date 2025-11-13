@@ -120,10 +120,12 @@ export function createMatchCard(match) {
     const comp2Thumbnail = match.competitor2.videoId 
         ? `https://img.youtube.com/vi/${match.competitor2.videoId}/mqdefault.jpg`
         : '';
+    
+    // ✅ Extract artist names for better alt text
+    const artist1 = match.competitor1.source.split('•')[0]?.trim() || 'Artist';
+    const artist2 = match.competitor2.source.split('•')[0]?.trim() || 'Artist';
 
    // ✅ CALCULATE XP REWARD (only for unvoted live matches)
-// ✅ CALCULATE XP REWARD (only for unvoted live matches)
-// ✅ CALCULATE XP REWARD (only for unvoted live matches)
 let xpBadgeHTML = '';
 if (!match.hasVoted && match.status === 'live') {
     xpBadgeHTML = `
@@ -159,9 +161,11 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">
                     ${comp1Thumbnail ? `
                         <img src="${comp1Thumbnail}" 
-                             alt="${match.competitor1.name}" 
+                             alt="${match.competitor1.name} by ${artist1} - League of Legends Music Video Thumbnail" 
                              class="competitor-thumbnail"
-                             loading="lazy">
+                             loading="lazy"
+                             width="320"
+                             height="180">
                     ` : ''}
                     <div class="competitor-rank">#${match.competitor1.seed}</div>
                     <div class="competitor-details">
@@ -183,9 +187,11 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor2, match.status)}">
                     ${comp2Thumbnail ? `
                         <img src="${comp2Thumbnail}" 
-                             alt="${match.competitor2.name}" 
+                             alt="${match.competitor2.name} by ${artist2} - League of Legends Music Video Thumbnail" 
                              class="competitor-thumbnail"
-                             loading="lazy">
+                             loading="lazy"
+                             width="320"
+                             height="180">
                     ` : ''}
                     <div class="competitor-rank">#${match.competitor2.seed}</div>
                     <div class="competitor-details">
@@ -206,7 +212,6 @@ const cardHTML = `
             ${footerContent}
         </div>
     `;
-
     // ✅ Create element and add click handler
     const wrapper = document.createElement('div');
     wrapper.innerHTML = cardHTML;
