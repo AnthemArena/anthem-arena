@@ -11,17 +11,11 @@
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # ========================================
-# PLUGINS (POST-PROCESSING)
+# PLUGINS - REMOVED (CAUSING BUILD ISSUES)
 # ========================================
 
-[[plugins]]
-  package = "netlify-plugin-minify-html"
-
-[[plugins]]
-  package = "netlify-plugin-inline-critical-css"
-  
-[[plugins]]
-  package = "@netlify/plugin-minify"
+# All plugins commented out to fix deployment
+# You can enable Netlify's built-in optimization instead
 
 # ========================================
 # EDGE FUNCTIONS
@@ -88,4 +82,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false  # ← THIS IS CRITICAL
+  force = false
