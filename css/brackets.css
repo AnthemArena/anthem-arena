@@ -1404,3 +1404,175 @@
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
 }
+/* ========================================
+   PAGE INTRO SECTION
+======================================== */
+
+.page-intro {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.page-intro .container {
+    max-width: 900px;
+}
+
+.page-intro p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    margin: 0;
+}
+
+.page-intro a {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.page-intro a:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   INLINE LINKS IN STATS
+======================================== */
+
+.section-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.inline-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    transition: all 0.2s ease;
+}
+
+.inline-link:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+.stats-cta {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.view-details-btn {
+    display: inline-block;
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, #c8aa6e, #785a28);
+    color: #0a1428;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+}
+
+.view-details-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.5);
+    background: linear-gradient(135deg, #d4b97a, #8a6a32);
+}
+
+/* ========================================
+   EXPLORE MORE SECTION
+======================================== */
+
+.explore-more-bracket {
+    padding: 4rem 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 3rem;
+}
+
+.explore-more-bracket .section-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #c8aa6e;
+    margin-bottom: 2.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+}
+
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.explore-card-bracket {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.explore-card-bracket:hover {
+    background: rgba(200, 170, 110, 0.12);
+    border-color: #c8aa6e;
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.explore-card-bracket h3 {
+    font-size: 1.3rem;
+    color: #f0e6d2;
+    margin-bottom: 0.75rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 600;
+}
+
+.explore-card-bracket p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+    .page-intro p {
+        font-size: 0.95rem;
+        padding: 0 1rem;
+    }
+
+    .explore-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .explore-more-bracket {
+        padding: 3rem 0;
+    }
+
+    .explore-more-bracket .section-title {
+        font-size: 1.75rem;
+    }
+}
