@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anthem Arena - League of Legends Music Tournament</title>
-    <meta name="description" content="Watch, vote, and decide which League of Legends music video reigns supreme.">
-    
+<title>League of Legends Music Tournament | Vote for Best LoL Songs | Anthem Arena</title>
+<meta name="description" content="Vote for your favorite League of Legends music videos! K/DA, Worlds anthems, Pentakill & more compete in our interactive tournament. No account needed - vote now!">
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
@@ -42,7 +41,86 @@
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/youtube-playlist.css">
+
+    <!-- Schema.org Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Anthem Arena",
+  "alternateName": "League of Legends Music Tournament",
+  "url": "https://anthemarena.com",
+  "description": "Interactive League of Legends music video tournament where fans vote for their favorite LoL songs including K/DA, Pentakill, True Damage, Heartsteel, and Worlds anthems.",
+  "potentialAction": {
+    "@type": "VoteAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://anthemarena.com"
+    }
+  },
+  "keywords": "League of Legends music, LoL music tournament, K/DA, Pentakill, Worlds anthem, True Damage, Heartsteel, gaming music"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Anthem Arena?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Anthem Arena is an interactive tournament where League of Legends fans vote for their favorite music videos. The platform features all LoL music including virtual bands like K/DA, Pentakill, True Damage, Heartsteel, and Worlds Championship anthems. Fans can watch matchups and vote to determine which song becomes the champion."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I vote in the League of Legends music tournament?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Voting is simple and free. Watch the two competing music videos in each matchup, then click on your favorite to cast your vote. No account creation or sign-up is required. Each voting period lasts 48 hours, giving you plenty of time to participate."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to create an account to vote?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No! Voting on Anthem Arena is completely free and doesn't require any account creation, registration, or sign-up. Just visit the site, watch the videos, and vote for your favorites."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What League of Legends music is featured in the tournament?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The tournament features all official League of Legends music videos including virtual bands (K/DA, Pentakill, True Damage, Heartsteel), Worlds Championship anthems from artists like Imagine Dragons and Lil Nas X, champion theme songs, and cinematic music videos released by Riot Games since 2014."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does each voting round last?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each matchup voting period lasts 48 hours. This gives fans around the world time to watch both videos and cast their votes. New matches start regularly as videos advance through the tournament bracket."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I see the tournament bracket?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! You can view the complete tournament bracket showing all matchups, results, and upcoming battles. The bracket shows which videos have advanced and tracks the path to crowning the ultimate champion."
+      }
+    }
+  ]
+}
+</script>
 </head>
+
+
 
 <body>
     <div id="nav-placeholder"></div>
@@ -63,8 +141,8 @@
                 <span class="badge-status" id="tournamentStatus">Live</span>
             </div>
             
-            <h1 class="hero-title">Anthem Arena Championship</h1>
-            
+<h1 class="hero-title">League of Legends Music Video Tournament</h1>
+
             <p class="hero-subtitle">
                 Which League of Legends music video is the greatest?<br>
                 Watch, vote for your favorites, and crown the champion.
@@ -104,6 +182,26 @@
             </div>
         </div>
     </section>
+
+    <!-- SEO CONTENT SECTION -->
+<section class="seo-intro">
+    <div class="container">
+        <div class="seo-intro-content">
+            <p>
+                Welcome to <strong>Anthem Arena</strong>, the ultimate <strong>League of Legends music video tournament</strong>! 
+                Since 2014, Riot Games has created legendary music featuring virtual bands like 
+                <strong>K/DA</strong>, <strong>Pentakill</strong>, <strong>True Damage</strong>, and <strong>Heartsteel</strong>, 
+                plus iconic <strong>Worlds Championship anthems</strong> from artists like Imagine Dragons, Lil Nas X, and Newjeans.
+            </p>
+            <p>
+                Our community-driven tournament lets you <strong>vote for your favorite LoL songs</strong> and crown 
+                the ultimate champion. Watch head-to-head matchups, cast your votes (no account needed), 
+                and see which music video becomes the Arena champion. New matches every 48 hours—join thousands 
+                of League fans celebrating the best gaming music ever created!
+            </p>
+        </div>
+    </div>
+</section>
 
     <!-- LOADING STATE -->
     <section class="homepage-loading-state" id="homepageLoadingState">

@@ -1522,6 +1522,49 @@
     font-weight: 600;
 }
 
+/* ========================================
+   SEO INTRO SECTION
+   ======================================== */
+.seo-intro {
+    padding: 3rem 0 4rem;
+    background: linear-gradient(180deg, #0a0a0a, rgba(26, 26, 46, 0.5));
+}
+
+.seo-intro-content {
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+}
+
+.seo-intro-content p {
+    margin-bottom: 1.5rem;
+}
+
+.seo-intro-content p:last-child {
+    margin-bottom: 0;
+}
+
+.seo-intro-content strong {
+    color: #C8AA6E;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .seo-intro {
+        padding: 2rem 0 3rem;
+    }
+    
+    .seo-intro-content {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .your-votes-grid {

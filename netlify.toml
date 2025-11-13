@@ -11,24 +11,17 @@
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # ========================================
-# ASSET OPTIMIZATION (MINIFICATION)
-# ========================================
-
-[build.processing.css]
-  minify = true
-
-[build.processing.js]
-  minify = true
-
-[build.processing.html]
-  pretty_urls = true
-
-# ========================================
-# PLUGINS
+# PLUGINS (POST-PROCESSING)
 # ========================================
 
 [[plugins]]
   package = "netlify-plugin-minify-html"
+
+[[plugins]]
+  package = "netlify-plugin-inline-critical-css"
+  
+[[plugins]]
+  package = "@netlify/plugin-minify"
 
 # ========================================
 # EDGE FUNCTIONS
