@@ -728,3 +728,238 @@ body {
     background: linear-gradient(135deg, #d4b876, #C8AA6E);
     transform: translateY(-2px);
 }
+/* ========================================
+   PAGE INTRO SECTION
+======================================== */
+
+.page-intro {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.page-intro .container {
+    max-width: 950px;
+}
+
+.page-intro p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    margin: 0;
+}
+
+.page-intro a {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.page-intro a:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   ENHANCED ROSTER STATS
+======================================== */
+
+.roster-stats {
+    margin-bottom: 2rem;
+}
+
+.roster-stats p {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.stats-tip {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.inline-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    transition: all 0.2s ease;
+}
+
+.inline-link:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   TOURNAMENT ACTIONS SECTION
+======================================== */
+
+.tournament-actions {
+    padding: 4rem 0;
+    background: linear-gradient(180deg, 
+        rgba(10, 20, 40, 0.8) 0%, 
+        rgba(20, 30, 50, 0.9) 100%);
+    border-top: 2px solid rgba(200, 170, 110, 0.2);
+    margin-top: 4rem;
+}
+
+.tournament-actions .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tournament-actions .section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    color: #c8aa6e;
+    margin-bottom: 0.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+}
+
+.tournament-actions .section-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+}
+
+.action-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c8aa6e, #785a28);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.action-card:hover {
+    background: rgba(200, 170, 110, 0.12);
+    border-color: #c8aa6e;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.action-card:hover::before {
+    transform: scaleX(1);
+}
+
+.action-icon {
+    font-size: 3rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.action-card h3 {
+    font-size: 1.5rem;
+    color: #f0e6d2;
+    margin-bottom: 0.75rem;
+    font-family: 'Bebas Neue', sans-serif;
+    text-align: center;
+}
+
+.action-card p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.action-cta {
+    display: inline-block;
+    color: #c8aa6e;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.action-cta::after {
+    content: '→';
+    margin-left: 0.5rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.action-card:hover .action-cta {
+    color: #f0e6d2;
+}
+
+.action-card:hover .action-cta::after {
+    transform: translateX(6px);
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+    .page-intro p {
+        font-size: 0.95rem;
+        padding: 0 1rem;
+    }
+
+    .roster-stats p {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .stats-tip {
+        font-size: 0.85rem;
+    }
+
+    .tournament-actions {
+        padding: 3rem 0;
+    }
+
+    .tournament-actions .section-title {
+        font-size: 1.8rem;
+    }
+
+    .tournament-actions .section-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .action-card {
+        padding: 2rem;
+    }
+}

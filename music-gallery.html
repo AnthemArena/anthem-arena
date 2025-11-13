@@ -89,6 +89,27 @@
         </div>
     </section>
 
+    </section>
+
+    <!-- PAGE INTRO WITH INTERNAL LINKS -->
+    <section class="page-intro">
+        <div class="container">
+            <p>
+                Browse all 64 League of Legends music videos competing in the Anthem Arena tournament. 
+                Filter by virtual bands like <strong>K/DA</strong>, <strong>Pentakill</strong>, and 
+                <strong>Heartsteel</strong>, or explore <strong>Worlds Championship anthems</strong> 
+                from artists like Imagine Dragons and Lil Nas X. See which songs are winning in 
+                <a href="/matches.html">recent matches</a>, view the 
+                <a href="/brackets.html">tournament bracket</a> to track progression through each round, 
+                or check <a href="/stats.html">tournament statistics</a> to discover win rates and 
+                voting trends. Click any video to watch the preview or 
+                <a href="/matches.html">vote in active matches</a>.
+            </p>
+        </div>
+    </section>
+
+    <!-- Filters & Gallery -->
+
     <!-- Filters & Gallery -->
     <section class="roster-section container">
         
@@ -213,10 +234,14 @@
     <button class="reset-filters" id="resetFilters">Reset All Filters</button>
 </aside>
 
-        <!-- Music Videos Grid -->
-        <div class="roster-content">
-            <div class="roster-stats">
-                <p><span id="characterCount">6</span> music videos found</p>
+           <div class="roster-stats">
+                <p>
+                    <span id="characterCount">64</span> music videos found
+                    <span class="stats-tip">
+                        • View <a href="/stats.html" class="inline-link">detailed rankings</a> 
+                        or <a href="/brackets.html" class="inline-link">tournament bracket</a>
+                    </span>
+                </p>
             </div>
 
             <div class="character-grid" id="characterGrid">
@@ -623,6 +648,44 @@
         </div>
 
     </section>
+
+    <!-- TOURNAMENT ACTIONS SECTION -->
+    <section class="tournament-actions">
+        <div class="container">
+            <h2 class="section-title">Participate in the Tournament</h2>
+            <p class="section-subtitle">
+                Now that you've explored the music gallery, take the next step
+            </p>
+            <div class="actions-grid">
+                <a href="/matches.html" class="action-card">
+                    <div class="action-icon">🗳️</div>
+                    <h3>Vote Now</h3>
+                    <p>Cast your votes in active matches and influence which songs advance to the next round</p>
+                    <span class="action-cta">View Active Matches →</span>
+                </a>
+                <a href="/brackets.html" class="action-card">
+                    <div class="action-icon">🏆</div>
+                    <h3>View Bracket</h3>
+                    <p>See the complete tournament structure and track how your favorite songs are progressing</p>
+                    <span class="action-cta">View Full Bracket →</span>
+                </a>
+                <a href="/stats.html" class="action-card">
+                    <div class="action-icon">📊</div>
+                    <h3>Statistics</h3>
+                    <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
+                    <span class="action-cta">View Stats Dashboard →</span>
+                </a>
+                <a href="/my-votes.html" class="action-card">
+                    <div class="action-icon">✅</div>
+                    <h3>Track Your Votes</h3>
+                    <p>Review your voting history, track predictions, and earn achievements for participation</p>
+                    <span class="action-cta">View Your History →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Modal -->
 
     <!-- Video Modal -->
     <div class="video-modal" id="videoModal">
