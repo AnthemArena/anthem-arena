@@ -205,19 +205,35 @@ function updateProgressBar(votedCount, totalCount) {
 // ========================================
 // SHOW COMPLETION MESSAGE (OPTIONAL)
 // ========================================
+// ========================================
+// SHOW COMPLETION MESSAGE (ENHANCED)
+// ========================================
 function showCompletionMessage() {
     const progressText = document.querySelector('.progress-text');
+    const grid = document.getElementById('socialGrid');
+    
     if (!progressText) return;
     
-    const originalText = progressText.innerHTML;
-    
-    // Show celebration message
+    // Update progress text
     progressText.innerHTML = `<span style="color: #4CAF50;">🎉 All matches voted! Nice work!</span>`;
     
-    // Revert after 3 seconds
-    setTimeout(() => {
-        progressText.innerHTML = originalText;
-    }, 3000);
+    // Add completion banner to grid
+    if (grid && grid.children.length > 0) {
+        const banner = document.createElement('div');
+        banner.className = 'completion-banner';
+        banner.innerHTML = `
+            <div class="completion-content">
+                <h3>🎉 You've Voted on All Live Matches!</h3>
+                <p>Check out these pages while waiting for new matchups:</p>
+                <div class="completion-links">
+                    <a href="/my-votes.html">View Your Votes</a>
+                    <a href="/brackets.html">See Bracket</a>
+                    <a href="/stats.html">View Stats</a>
+                </div>
+            </div>
+        `;
+        grid.insertBefore(banner, grid.firstChild);
+    }
 }
 
 // ========================================

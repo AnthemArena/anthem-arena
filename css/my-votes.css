@@ -2421,3 +2421,308 @@
         grid-template-columns: 1fr;
     }
 }
+/* ========================================
+   PAGE INTRO SECTION
+======================================== */
+
+.page-intro {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.page-intro .container {
+    max-width: 950px;
+}
+
+.page-intro p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    margin: 0;
+}
+
+.page-intro a {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.page-intro a:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   ENHANCED NO VOTES STATE
+======================================== */
+
+.no-votes-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6d2;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #c8aa6e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.3);
+}
+
+.no-votes-tip {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.inline-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    transition: all 0.2s ease;
+}
+
+.inline-link:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   HERO NAVIGATION TIP
+======================================== */
+
+.hero-navigation-tip {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(200, 170, 110, 0.08);
+    border-radius: 8px;
+    margin-top: 2rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-navigation-tip i {
+    color: #c8aa6e;
+    margin-right: 0.5rem;
+}
+
+.hero-inline-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.3);
+    transition: all 0.2s ease;
+}
+
+.hero-inline-link:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* ========================================
+   CONTINUE EXPLORING SECTION
+======================================== */
+
+.continue-exploring {
+    padding: 4rem 0;
+    background: linear-gradient(180deg, 
+        rgba(10, 20, 40, 0.6) 0%, 
+        rgba(20, 30, 50, 0.8) 100%);
+    border-top: 2px solid rgba(200, 170, 110, 0.2);
+    margin-top: 4rem;
+}
+
+.continue-exploring .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.continue-exploring .section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    color: #c8aa6e;
+    margin-bottom: 0.5rem;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+}
+
+.continue-exploring .section-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+}
+
+.explore-votes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+}
+
+.explore-votes-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.explore-votes-card.primary {
+    border-color: rgba(200, 170, 110, 0.3);
+    background: rgba(200, 170, 110, 0.08);
+}
+
+.explore-votes-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c8aa6e, #785a28);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.explore-votes-card:hover {
+    background: rgba(200, 170, 110, 0.12);
+    border-color: #c8aa6e;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.explore-votes-card:hover::before {
+    transform: scaleX(1);
+}
+
+.votes-card-icon {
+    font-size: 3rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.explore-votes-card h3 {
+    font-size: 1.5rem;
+    color: #f0e6d2;
+    margin-bottom: 0.75rem;
+    font-family: 'Cinzel', serif;
+    text-align: center;
+    font-weight: 600;
+}
+
+.explore-votes-card p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.votes-card-cta {
+    display: inline-block;
+    color: #c8aa6e;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.votes-card-cta::after {
+    content: '→';
+    margin-left: 0.5rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.explore-votes-card:hover .votes-card-cta {
+    color: #f0e6d2;
+}
+
+.explore-votes-card:hover .votes-card-cta::after {
+    transform: translateX(6px);
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+    .page-intro p {
+        font-size: 0.95rem;
+        padding: 0 1rem;
+    }
+
+    .no-votes-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+
+    .no-votes-tip {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+
+    .hero-navigation-tip {
+        font-size: 0.9rem;
+        padding: 0.875rem;
+    }
+
+    .continue-exploring {
+        padding: 3rem 0;
+    }
+
+    .continue-exploring .section-title {
+        font-size: 1.8rem;
+    }
+
+    .continue-exploring .section-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .explore-votes-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .explore-votes-card {
+        padding: 2rem;
+    }
+}

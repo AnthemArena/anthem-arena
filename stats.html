@@ -95,6 +95,22 @@
             </p>
         </div>
     </header>
+
+     <!-- PAGE INTRO WITH INTERNAL LINKS -->
+    <section class="page-intro">
+        <div class="container">
+            <p>
+                Explore comprehensive tournament statistics for all League of Legends music videos 
+                competing in Anthem Arena. View song rankings by votes and win rates, discover 
+                <a href="/matches.html">recent match results</a>, analyze upset victories, and 
+                track participation trends. See the 
+                <a href="/brackets.html">tournament bracket</a> for visual progression through rounds, 
+                browse the <a href="/music-gallery.html">complete music gallery</a> to preview all 64 
+                competing songs, or check <a href="/my-votes.html">your voting history</a> to see 
+                your predictions and achievements.
+            </p>
+        </div>
+    </section>
     
     <!-- ========================================
      AUTO-REFRESH INDICATOR
@@ -156,10 +172,13 @@
         <section class="stats-section">
             <div class="section-header-with-controls">
                 <h2 class="section-title">Tournament Overview</h2>
-                
-                </div>
-
+            </div>
             
+            <div class="stats-tip">
+                💡 For visual bracket progression, visit the 
+                <a href="/brackets.html" class="inline-link">tournament bracket page</a>
+            </div>
+
             <div id="overview-stats">
                 <!-- Populated by JavaScript -->
             </div>
@@ -178,11 +197,12 @@
                 <div>
                     <h2 class="section-title">All-Time Song Rankings</h2>
                     <p class="section-description">
-                        Songs ranked by total votes, win rate, and YouTube performance
+                        Songs ranked by total votes, win rate, and YouTube performance. 
+                        <a href="/music-gallery.html" class="inline-link">Preview all videos</a> 
+                        or <a href="/matches.html" class="inline-link">vote in active matches</a>.
                     </p>
                 </div>
                 
-                <!-- ✅ ADD THIS BUTTON -->
                 <button class="compare-btn" onclick="showHeadToHead()">
                     <i class="fas fa-balance-scale"></i> Compare Songs
                 </button>
@@ -326,6 +346,44 @@
     </div>
 </div>
    
+
+<!-- EXPLORE TOURNAMENT SECTION -->
+    <section class="explore-tournament-stats">
+        <div class="container">
+            <h2 class="section-title">Continue Exploring</h2>
+            <p class="section-subtitle">Dive deeper into the tournament</p>
+            
+            <div class="explore-stats-grid">
+                <a href="/matches.html" class="explore-stats-card">
+                    <div class="stats-card-icon">📋</div>
+                    <h3>Match Results</h3>
+                    <p>View all completed and active matches with detailed voting breakdowns</p>
+                    <span class="stats-card-arrow">→</span>
+                </a>
+                
+                <a href="/brackets.html" class="explore-stats-card">
+                    <div class="stats-card-icon">🏆</div>
+                    <h3>Tournament Bracket</h3>
+                    <p>Visualize the complete bracket and track song progression through rounds</p>
+                    <span class="stats-card-arrow">→</span>
+                </a>
+                
+                <a href="/music-gallery.html" class="explore-stats-card">
+                    <div class="stats-card-icon">🎵</div>
+                    <h3>Music Gallery</h3>
+                    <p>Browse all 64 League music videos organized by virtual band and year</p>
+                    <span class="stats-card-arrow">→</span>
+                </a>
+                
+                <a href="/my-votes.html" class="explore-stats-card">
+                    <div class="stats-card-icon">✅</div>
+                    <h3>Your Votes</h3>
+                    <p>Track your voting history, predictions, and unlock achievements</p>
+                    <span class="stats-card-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
     <!-- ========================================
          SCRIPTS
     ======================================== -->
