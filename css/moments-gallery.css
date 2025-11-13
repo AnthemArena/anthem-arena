@@ -963,3 +963,55 @@ body {
         padding: 2rem;
     }
 }
+/* Wrap stats + grid in a single grid cell */
+.roster-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 20px; /* Optional spacing */
+}
+/* Ensure 2-column layout */
+.roster-section {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 50px;
+    padding: 80px 20px;
+    align-items: start;
+}
+
+/* Main content column */
+.roster-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive grid */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* Mobile: Stack filter above content */
+@media (max-width: 1024px) {
+    .roster-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-panel {
+        position: static;
+        margin-bottom: 30px;
+    }
+    
+    .roster-content {
+        margin-top: 0;
+    }
+}

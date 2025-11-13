@@ -105,131 +105,135 @@
             </p>
         </div>
     </section>
-
-    <!-- Filters & Gallery -->
-    <section class="roster-section container">
+<!-- Filters & Gallery -->
+<section class="roster-section container">
+    
+    <!-- Filter Panel (Left Column) -->
+    <aside class="filter-panel">
+        <h2 class="filter-title">Filters</h2>
         
-        <aside class="filter-panel">
-            <h2 class="filter-title">Filters</h2>
-            
-            <!-- Search Bar -->
-            <div class="filter-group">
-                <label class="filter-label">Search</label>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search music videos...">
+        <!-- Search Bar -->
+        <div class="filter-group">
+            <label class="filter-label">Search</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search music videos...">
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Category</label>
+            <div class="filter-options">
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="category" value="worlds-anthem" checked>
+                    <span>Worlds Anthem</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="category" value="virtual-group" checked>
+                    <span>Virtual Group</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="category" value="cinematic" checked>
+                    <span>Cinematic</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="category" value="champion-theme" checked>
+                    <span>Champion Theme</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="category" value="esports" checked>
+                    <span>Esports Event</span>
+                </label>
             </div>
+        </div>
 
-            <!-- Category Filter -->
-            <div class="filter-group">
-                <label class="filter-label">Category</label>
-                <div class="filter-options">
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="category" value="worlds-anthem" checked>
-                        <span>Worlds Anthem</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="category" value="virtual-group" checked>
-                        <span>Virtual Group</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="category" value="cinematic" checked>
-                        <span>Cinematic</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="category" value="champion-theme" checked>
-                        <span>Champion Theme</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="category" value="esports" checked>
-                        <span>Esports Event</span>
-                    </label>
-                </div>
+        <!-- Year Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Year</label>
+            <div class="filter-options">
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
+                    <span>2024-2025</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
+                    <span>2022-2023</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
+                    <span>2020-2021</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
+                    <span>2018-2019</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
+                    <span>2014-2017</span>
+                </label>
             </div>
+        </div>
 
-            <!-- Year Filter -->
-            <div class="filter-group">
-                <label class="filter-label">Year</label>
-                <div class="filter-options">
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
-                        <span>2024-2025</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
-                        <span>2022-2023</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
-                        <span>2020-2021</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
-                        <span>2018-2019</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
-                        <span>2014-2017</span>
-                    </label>
-                </div>
+        <!-- Artist/Group Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Artist/Group</label>
+            <div class="filter-options">
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="kda" checked>
+                    <span>K/DA</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="pentakill" checked>
+                    <span>Pentakill</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="true-damage" checked>
+                    <span>True Damage</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="heartsteel" checked>
+                    <span>Heartsteel</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="imagine-dragons" checked>
+                    <span>Imagine Dragons</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="artist" value="other" checked>
+                    <span>Other Artists</span>
+                </label>
             </div>
+        </div>
 
-            <!-- Artist/Group Filter -->
-            <div class="filter-group">
-                <label class="filter-label">Artist/Group</label>
-                <div class="filter-options">
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="kda" checked>
-                        <span>K/DA</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="pentakill" checked>
-                        <span>Pentakill</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="true-damage" checked>
-                        <span>True Damage</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="heartsteel" checked>
-                        <span>Heartsteel</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="imagine-dragons" checked>
-                        <span>Imagine Dragons</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="artist" value="other" checked>
-                        <span>Other Artists</span>
-                    </label>
-                </div>
+        <!-- Accolades Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Accolades</label>
+            <div class="filter-options">
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="accolade" value="legend" checked>
+                    <span>Legends (2+ titles)</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="accolade" value="champion" checked>
+                    <span>Champions (1 title)</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="accolade" value="contender" checked>
+                    <span>Contenders (finalists)</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" class="filter-input" data-filter="accolade" value="competitor" checked>
+                    <span>Competitors (0 titles)</span>
+                </label>
             </div>
+        </div>
 
-            <!-- Accolades Filter (NEW) -->
-            <div class="filter-group">
-                <label class="filter-label">Accolades</label>
-                <div class="filter-options">
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="accolade" value="legend" checked>
-                        <span>Legends (2+ titles)</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="accolade" value="champion" checked>
-                        <span>Champions (1 title)</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="accolade" value="contender" checked>
-                        <span>Contenders (finalists)</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" class="filter-input" data-filter="accolade" value="competitor" checked>
-                        <span>Competitors (0 titles)</span>
-                    </label>
-                </div>
-            </div>
+        <!-- Reset Button -->
+        <button class="reset-filters" id="resetFilters">Reset All Filters</button>
+    </aside>
 
-            <!-- Reset Button -->
-            <button class="reset-filters" id="resetFilters">Reset All Filters</button>
-        </aside>
+    <!-- Main Content (Right Column) -->
+    <div class="roster-content">
 
+        <!-- Stats Bar -->
         <div class="roster-stats">
             <p>
                 <span id="characterCount">64</span> music videos found
@@ -240,6 +244,7 @@
             </p>
         </div>
 
+        <!-- Music Video Grid -->
         <div class="character-grid" id="characterGrid">
             
             <!-- Music Video Card: Warriors -->
@@ -268,7 +273,7 @@
                     
                     <!-- View Details Overlay -->
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -333,7 +338,7 @@
                     </div>
                     
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -397,7 +402,7 @@
                     </div>
                     
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -461,7 +466,7 @@
                     </div>
                     
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -525,7 +530,7 @@
                     </div>
                     
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -589,7 +594,7 @@
                     </div>
                     
                     <div class="character-overlay">
-                        <span class="view-profile">View Full Details →</span>
+                        <span class="view-profile">View Full Details</span>
                     </div>
                 </div>
                 
@@ -637,7 +642,9 @@
             <p>Try adjusting your filters or search terms.</p>
         </div>
 
-    </section> <!-- End of .roster-section.container -->
+    </div> <!-- End of .roster-content -->
+
+</section> <!-- End of .roster-section.container -->
 
     <!-- TOURNAMENT ACTIONS SECTION -->
     <section class="tournament-actions">
