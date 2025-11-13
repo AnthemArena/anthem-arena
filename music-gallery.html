@@ -78,7 +78,7 @@
 <body>
 
     <div id="nav-placeholder"></div>
-<script type="module" src="/js/navigation.js"></script>
+    <script type="module" src="/js/navigation.js"></script>
 
     <!-- Page Hero -->
     <section class="roster-hero">
@@ -107,545 +107,537 @@
     </section>
 
     <!-- Filters & Gallery -->
-
-    <!-- Filters & Gallery -->
     <section class="roster-section container">
         
-     <aside class="filter-panel">
-    <h2 class="filter-title">Filters</h2>
-    
-    <!-- Search Bar -->
-    <div class="filter-group">
-        <label class="filter-label">Search</label>
-        <input type="text" id="searchInput" class="search-input" placeholder="Search music videos...">
-    </div>
-
-    <!-- Category Filter -->
-    <div class="filter-group">
-        <label class="filter-label">Category</label>
-        <div class="filter-options">
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="category" value="worlds-anthem" checked>
-                <span>Worlds Anthem</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="category" value="virtual-group" checked>
-                <span>Virtual Group</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="category" value="cinematic" checked>
-                <span>Cinematic</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="category" value="champion-theme" checked>
-                <span>Champion Theme</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="category" value="esports" checked>
-                <span>Esports Event</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Year Filter -->
-    <div class="filter-group">
-        <label class="filter-label">Year</label>
-        <div class="filter-options">
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
-                <span>2024-2025</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
-                <span>2022-2023</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
-                <span>2020-2021</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
-                <span>2018-2019</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
-                <span>2014-2017</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Artist/Group Filter -->
-    <div class="filter-group">
-        <label class="filter-label">Artist/Group</label>
-        <div class="filter-options">
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="kda" checked>
-                <span>K/DA</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="pentakill" checked>
-                <span>Pentakill</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="true-damage" checked>
-                <span>True Damage</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="heartsteel" checked>
-                <span>Heartsteel</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="imagine-dragons" checked>
-                <span>Imagine Dragons</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="artist" value="other" checked>
-                <span>Other Artists</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Accolades Filter (NEW) -->
-    <div class="filter-group">
-        <label class="filter-label">Accolades</label>
-        <div class="filter-options">
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="accolade" value="legend" checked>
-                <span>🏆🏆 Legends (2+ titles)</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="accolade" value="champion" checked>
-                <span>🏆 Champions (1 title)</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="accolade" value="contender" checked>
-                <span>🥈 Contenders (finalists)</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="accolade" value="competitor" checked>
-                <span>⚔️ Competitors (0 titles)</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Reset Button -->
-    <button class="reset-filters" id="resetFilters">Reset All Filters</button>
-</aside>
-
-           <div class="roster-stats">
-                <p>
-                    <span id="characterCount">64</span> music videos found
-                    <span class="stats-tip">
-                        • View <a href="/stats.html" class="inline-link">detailed rankings</a> 
-                        or <a href="/brackets.html" class="inline-link">tournament bracket</a>
-                    </span>
-                </p>
+        <aside class="filter-panel">
+            <h2 class="filter-title">Filters</h2>
+            
+            <!-- Search Bar -->
+            <div class="filter-group">
+                <label class="filter-label">Search</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search music videos...">
             </div>
 
-            <div class="character-grid" id="characterGrid">
+            <!-- Category Filter -->
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <div class="filter-options">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="category" value="worlds-anthem" checked>
+                        <span>Worlds Anthem</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="category" value="virtual-group" checked>
+                        <span>Virtual Group</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="category" value="cinematic" checked>
+                        <span>Cinematic</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="category" value="champion-theme" checked>
+                        <span>Champion Theme</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="category" value="esports" checked>
+                        <span>Esports Event</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Year Filter -->
+            <div class="filter-group">
+                <label class="filter-label">Year</label>
+                <div class="filter-options">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
+                        <span>2024-2025</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
+                        <span>2022-2023</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
+                        <span>2020-2021</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
+                        <span>2018-2019</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
+                        <span>2014-2017</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Artist/Group Filter -->
+            <div class="filter-group">
+                <label class="filter-label">Artist/Group</label>
+                <div class="filter-options">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="kda" checked>
+                        <span>K/DA</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="pentakill" checked>
+                        <span>Pentakill</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="true-damage" checked>
+                        <span>True Damage</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="heartsteel" checked>
+                        <span>Heartsteel</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="imagine-dragons" checked>
+                        <span>Imagine Dragons</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="artist" value="other" checked>
+                        <span>Other Artists</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Accolades Filter (NEW) -->
+            <div class="filter-group">
+                <label class="filter-label">Accolades</label>
+                <div class="filter-options">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="accolade" value="legend" checked>
+                        <span>Legends (2+ titles)</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="accolade" value="champion" checked>
+                        <span>Champions (1 title)</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="accolade" value="contender" checked>
+                        <span>Contenders (finalists)</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="filter-input" data-filter="accolade" value="competitor" checked>
+                        <span>Competitors (0 titles)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <button class="reset-filters" id="resetFilters">Reset All Filters</button>
+        </aside>
+
+        <div class="roster-stats">
+            <p>
+                <span id="characterCount">64</span> music videos found
+                <span class="stats-tip">
+                    • View <a href="/stats.html" class="inline-link">detailed rankings</a> 
+                    or <a href="/brackets.html" class="inline-link">tournament bracket</a>
+                </span>
+            </p>
+        </div>
+
+        <div class="character-grid" id="characterGrid">
+            
+            <!-- Music Video Card: Warriors -->
+            <div class="character-card" 
+                 data-category="worlds-anthem" 
+                 data-year="2014-2017" 
+                 data-mood="epic hype" 
+                 data-artist="imagine-dragons"
+                 data-tournament="competing"
+                 data-name="Warriors"
+                 data-moment-url="/music/warriors.html"
+                 data-video-id="fmI_Ndrxy14">
                 
-                <!-- Music Video Card: Warriors -->
-                <div class="character-card" 
-                     data-category="worlds-anthem" 
-                     data-year="2014-2017" 
-                     data-mood="epic hype" 
-                     data-artist="imagine-dragons"
-                     data-tournament="competing"
-                     data-name="Warriors"
-                     data-moment-url="/music/warriors.html"
-                     data-video-id="fmI_Ndrxy14">
+                <div class="character-image-wrapper video-thumbnail" data-video-id="fmI_Ndrxy14">
+                    <img src="https://img.youtube.com/vi/fmI_Ndrxy14/maxresdefault.jpg" alt="Warriors" class="character-image">
                     
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="fmI_Ndrxy14">
-                        <img src="https://img.youtube.com/vi/fmI_Ndrxy14/maxresdefault.jpg" alt="Warriors" class="character-image">
-                        
-                        <!-- Play Button Overlay -->
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <!-- View Details Overlay -->
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
+                    <!-- Play Button Overlay -->
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
                         </div>
                     </div>
                     
-                    <div class="character-info">
-                        <h3 class="character-name">Warriors</h3>
-                        <p class="character-title">Worlds 2014 • Imagine Dragons</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">🏆</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">1</span>
-                                    <span class="stat-desc">Championships</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">15-1</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">🔥</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">94%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                     <div class="character-tags">
-    <span class="tag tag-seed">Seed #14</span>
-    <span class="tag tag-category">Worlds Anthem</span>
-    <span class="tag tag-accolade">🏆 Champion</span>
-</div>
+                    <!-- View Details Overlay -->
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
                     </div>
                 </div>
-
-                <!-- Music Video Card: K/DA POP/STARS -->
-                <div class="character-card" 
-                     data-category="virtual-group" 
-                     data-year="2018-2019" 
-                     data-mood="energetic hype" 
-                     data-artist="kda"
-                     data-tournament="champion"
-                     data-name="K/DA - POP/STARS"
-                     data-moment-url="/music/kda-popstars.html"
-                     data-video-id="UOxkGD8qRB4">
+                
+                <div class="character-info">
+                    <h3 class="character-name">Warriors</h3>
+                    <p class="character-title">Worlds 2014 • Imagine Dragons</p>
                     
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="UOxkGD8qRB4">
-                        <img src="https://img.youtube.com/vi/UOxkGD8qRB4/maxresdefault.jpg" alt="K/DA POP/STARS" class="character-image">
-                        
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
+                    <!-- Tournament Stats Detail Section -->
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championships</span>
+                            <div class="stat-content">
+                                <span class="stat-number">1</span>
+                                <span class="stat-desc">Championships</span>
                             </div>
                         </div>
-                        
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">15-1</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">94%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="character-info">
-                        <h3 class="character-name">K/DA - POP/STARS</h3>
-                        <p class="character-title">Worlds 2018 • Virtual K-Pop Group</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">🏆</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">2</span>
-                                    <span class="stat-desc">Championships</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">18-2</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">🔥</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">90%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="character-tags">
-                            <span class="tag tag-expansion">K/DA</span>
-                            <span class="tag tag-emotion">Viral</span>
-                            <span class="tag tag-status">Champion</span>
-                        </div>
+                    <div class="character-tags">
+                        <span class="tag tag-seed">Seed #14</span>
+                        <span class="tag tag-category">Worlds Anthem</span>
+                        <span class="tag tag-accolade">Champion</span>
                     </div>
                 </div>
-
-                <!-- Music Video Card: RISE -->
-                <div class="character-card" 
-                     data-category="worlds-anthem" 
-                     data-year="2018-2019" 
-                     data-mood="epic emotional" 
-                     data-artist="other"
-                     data-tournament="competing"
-                     data-name="RISE"
-                     data-moment-url="/music/rise.html"
-                     data-video-id="C3GouGa0noM">
-                    
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="C3GouGa0noM">
-                        <img src="https://img.youtube.com/vi/C3GouGa0noM/maxresdefault.jpg" alt="RISE" class="character-image">
-                        
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
-                        </div>
-                    </div>
-                    
-                    <div class="character-info">
-                        <h3 class="character-name">RISE</h3>
-                        <p class="character-title">Worlds 2018 • The Glitch Mob, Mako, The Word Alive</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">⭐</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">0</span>
-                                    <span class="stat-desc">Championships</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">12-3</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">🔥</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">80%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="character-tags">
-                            <span class="tag tag-expansion">Worlds Anthem</span>
-                            <span class="tag tag-emotion">Epic</span>
-                            <span class="tag tag-type">2018</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Music Video Card: Awaken -->
-                <div class="character-card" 
-                     data-category="cinematic" 
-                     data-year="2018-2019" 
-                     data-mood="epic cinematic" 
-                     data-artist="other"
-                     data-tournament="champion"
-                     data-name="Awaken"
-                     data-moment-url="/music/awaken.html"
-                     data-video-id="aR-KAldshAE">
-                    
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="aR-KAldshAE">
-                        <img src="https://img.youtube.com/vi/aR-KAldshAE/maxresdefault.jpg" alt="Awaken" class="character-image">
-                        
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
-                        </div>
-                    </div>
-                    
-                    <div class="character-info">
-                        <h3 class="character-name">Awaken</h3>
-                        <p class="character-title">Season 2019 Cinematic</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">🏆</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">1</span>
-                                    <span class="stat-desc">Championship</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">12-3</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">📊</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">80%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="character-tags">
-                            <span class="tag tag-expansion">Cinematic</span>
-                            <span class="tag tag-emotion">Epic</span>
-                            <span class="tag tag-status">Champion</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Music Video Card: Phoenix -->
-                <div class="character-card" 
-                     data-category="worlds-anthem" 
-                     data-year="2020-2021" 
-                     data-mood="epic hype" 
-                     data-artist="other"
-                     data-tournament="competing"
-                     data-name="Phoenix"
-                     data-moment-url="/music/phoenix.html"
-                     data-video-id="i1IKnWDecwA">
-                    
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="i1IKnWDecwA">
-                        <img src="https://img.youtube.com/vi/i1IKnWDecwA/maxresdefault.jpg" alt="Phoenix" class="character-image">
-                        
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
-                        </div>
-                    </div>
-                    
-                    <div class="character-info">
-                        <h3 class="character-name">Phoenix</h3>
-                        <p class="character-title">Worlds 2019 • Cailin Russo & Chrissy Costanza</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">🏅</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">0</span>
-                                    <span class="stat-desc">Championships</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">9-4</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">📊</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">69%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="character-tags">
-                            <span class="tag tag-expansion">Worlds Anthem</span>
-                            <span class="tag tag-emotion">Epic</span>
-                            <span class="tag tag-type">2019</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Eliminated Music Video Example -->
-                <div class="character-card eliminated-moment" 
-                     data-category="worlds-anthem" 
-                     data-year="2020-2021" 
-                     data-mood="energetic" 
-                     data-artist="other"
-                     data-tournament="eliminated"
-                     data-name="Burn It All Down"
-                     data-moment-url="/music/burn-it-all-down.html"
-                     data-video-id="1Z6CHioIn3s">
-                    
-                    <div class="character-image-wrapper video-thumbnail" data-video-id="1Z6CHioIn3s">
-                        <img src="https://img.youtube.com/vi/1Z6CHioIn3s/maxresdefault.jpg" alt="Burn It All Down" class="character-image">
-                        
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <svg width="60" height="60" viewBox="0 0 60 60">
-                                    <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                                    <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <div class="character-overlay">
-                            <span class="view-profile">View Full Details →</span>
-                        </div>
-                    </div>
-                    
-                    <div class="character-info">
-                        <h3 class="character-name">Burn It All Down</h3>
-                        <p class="character-title">Worlds 2021 • PVRIS</p>
-                        
-                        <!-- Tournament Stats Detail Section -->
-                        <div class="tournament-stats-detail">
-                            <div class="stat-item">
-                                <span class="stat-icon">🏆</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">0</span>
-                                    <span class="stat-desc">Championships</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">⚔️</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">3-5</span>
-                                    <span class="stat-desc">Win Record</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">📊</span>
-                                <div class="stat-content">
-                                    <span class="stat-number">38%</span>
-                                    <span class="stat-desc">Win Rate</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="character-tags">
-                            <span class="tag tag-expansion">Worlds Anthem</span>
-                            <span class="tag tag-emotion">Energetic</span>
-                            <span class="tag tag-status">Eliminated</span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- No Results Message -->
-            <div class="no-results" id="noResults" style="display: none;">
-                <h3>No music videos found</h3>
-                <p>Try adjusting your filters or search terms.</p>
+            <!-- Music Video Card: K/DA POP/STARS -->
+            <div class="character-card" 
+                 data-category="virtual-group" 
+                 data-year="2018-2019" 
+                 data-mood="energetic hype" 
+                 data-artist="kda"
+                 data-tournament="champion"
+                 data-name="K/DA - POP/STARS"
+                 data-moment-url="/music/kda-popstars.html"
+                 data-video-id="UOxkGD8qRB4">
+                
+                <div class="character-image-wrapper video-thumbnail" data-video-id="UOxkGD8qRB4">
+                    <img src="https://img.youtube.com/vi/UOxkGD8qRB4/maxresdefault.jpg" alt="K/DA POP/STARS" class="character-image">
+                    
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h3 class="character-name">K/DA - POP/STARS</h3>
+                    <p class="character-title">Worlds 2018 • Virtual K-Pop Group</p>
+                    
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championships</span>
+                            <div class="stat-content">
+                                <span class="stat-number">2</span>
+                                <span class="stat-desc">Championships</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">18-2</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">90%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-tags">
+                        <span class="tag tag-expansion">K/DA</span>
+                        <span class="tag tag-emotion">Viral</span>
+                        <span class="tag tag-status">Champion</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- Music Video Card: RISE -->
+            <div class="character-card" 
+                 data-category="worlds-anthem" 
+                 data-year="2018-2019" 
+                 data-mood="epic emotional" 
+                 data-artist="other"
+                 data-tournament="competing"
+                 data-name="RISE"
+                 data-moment-url="/music/rise.html"
+                 data-video-id="C3GouGa0noM">
+                
+                <div class="character-image-wrapper video-thumbnail" data-video-id="C3GouGa0noM">
+                    <img src="https://img.youtube.com/vi/C3GouGa0noM/maxresdefault.jpg" alt="RISE" class="character-image">
+                    
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h3 class="character-name">RISE</h3>
+                    <p class="character-title">Worlds 2018 • The Glitch Mob, Mako, The Word Alive</p>
+                    
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championships</span>
+                            <div class="stat-content">
+                                <span class="stat-number">0</span>
+                                <span class="stat-desc">Championships</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">12-3</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">80%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-tags">
+                        <span class="tag tag-expansion">Worlds Anthem</span>
+                        <span class="tag tag-emotion">Epic</span>
+                        <span class="tag tag-type">2018</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Video Card: Awaken -->
+            <div class="character-card" 
+                 data-category="cinematic" 
+                 data-year="2018-2019" 
+                 data-mood="epic cinematic" 
+                 data-artist="other"
+                 data-tournament="champion"
+                 data-name="Awaken"
+                 data-moment-url="/music/awaken.html"
+                 data-video-id="aR-KAldshAE">
+                
+                <div class="character-image-wrapper video-thumbnail" data-video-id="aR-KAldshAE">
+                    <img src="https://img.youtube.com/vi/aR-KAldshAE/maxresdefault.jpg" alt="Awaken" class="character-image">
+                    
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h3 class="character-name">Awaken</h3>
+                    <p class="character-title">Season 2019 Cinematic</p>
+                    
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championship</span>
+                            <div class="stat-content">
+                                <span class="stat-number">1</span>
+                                <span class="stat-desc">Championship</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">12-3</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">80%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-tags">
+                        <span class="tag tag-expansion">Cinematic</span>
+                        <span class="tag tag-emotion">Epic</span>
+                        <span class="tag tag-status">Champion</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Video Card: Phoenix -->
+            <div class="character-card" 
+                 data-category="worlds-anthem" 
+                 data-year="2020-2021" 
+                 data-mood="epic hype" 
+                 data-artist="other"
+                 data-tournament="competing"
+                 data-name="Phoenix"
+                 data-moment-url="/music/phoenix.html"
+                 data-video-id="i1IKnWDecwA">
+                
+                <div class="character-image-wrapper video-thumbnail" data-video-id="i1IKnWDecwA">
+                    <img src="https://img.youtube.com/vi/i1IKnWDecwA/maxresdefault.jpg" alt="Phoenix" class="character-image">
+                    
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h3 class="character-name">Phoenix</h3>
+                    <p class="character-title">Worlds 2019 • Cailin Russo & Chrissy Costanza</p>
+                    
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championships</span>
+                            <div class="stat-content">
+                                <span class="stat-number">0</span>
+                                <span class="stat-desc">Championships</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">9-4</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">69%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-tags">
+                        <span class="tag tag-expansion">Worlds Anthem</span>
+                        <span class="tag tag-emotion">Epic</span>
+                        <span class="tag tag-type">2019</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eliminated Music Video Example -->
+            <div class="character-card eliminated-moment" 
+                 data-category="worlds-anthem" 
+                 data-year="2020-2021" 
+                 data-mood="energetic" 
+                 data-artist="other"
+                 data-tournament="eliminated"
+                 data-name="Burn It All Down"
+                 data-moment-url="/music/burn-it-all-down.html"
+                 data-video-id="1Z6CHioIn3s">
+                
+                <div class="character-image-wrapper video-thumbnail" data-video-id="1Z6CHioIn3s">
+                    <img src="https://img.youtube.com/vi/1Z6CHioIn3s/maxresdefault.jpg" alt="Burn It All Down" class="character-image">
+                    
+                    <div class="play-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+                                <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="character-overlay">
+                        <span class="view-profile">View Full Details →</span>
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h3 class="character-name">Burn It All Down</h3>
+                    <p class="character-title">Worlds 2021 • PVRIS</p>
+                    
+                    <div class="tournament-stats-detail">
+                        <div class="stat-item">
+                            <span class="stat-icon">Championships</span>
+                            <div class="stat-content">
+                                <span class="stat-number">0</span>
+                                <span class="stat-desc">Championships</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Record</span>
+                            <div class="stat-content">
+                                <span class="stat-number">3-5</span>
+                                <span class="stat-desc">Win Record</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">Win Rate</span>
+                            <div class="stat-content">
+                                <span class="stat-number">38%</span>
+                                <span class="stat-desc">Win Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-tags">
+                        <span class="tag tag-expansion">Worlds Anthem</span>
+                        <span class="tag tag-emotion">Energetic</span>
+                        <span class="tag tag-status">Eliminated</span>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End of .character-grid -->
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>No music videos found</h3>
+            <p>Try adjusting your filters or search terms.</p>
         </div>
 
-    </section>
+    </section> <!-- End of .roster-section.container -->
 
     <!-- TOURNAMENT ACTIONS SECTION -->
     <section class="tournament-actions">
@@ -656,25 +648,25 @@
             </p>
             <div class="actions-grid">
                 <a href="/matches.html" class="action-card">
-                    <div class="action-icon">🗳️</div>
+                    <div class="action-icon">Vote Now</div>
                     <h3>Vote Now</h3>
                     <p>Cast your votes in active matches and influence which songs advance to the next round</p>
                     <span class="action-cta">View Active Matches →</span>
                 </a>
                 <a href="/brackets.html" class="action-card">
-                    <div class="action-icon">🏆</div>
+                    <div class="action-icon">View Bracket</div>
                     <h3>View Bracket</h3>
                     <p>See the complete tournament structure and track how your favorite songs are progressing</p>
                     <span class="action-cta">View Full Bracket →</span>
                 </a>
                 <a href="/stats.html" class="action-card">
-                    <div class="action-icon">📊</div>
+                    <div class="action-icon">Statistics</div>
                     <h3>Statistics</h3>
                     <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
                     <span class="action-cta">View Stats Dashboard →</span>
                 </a>
                 <a href="/my-votes.html" class="action-card">
-                    <div class="action-icon">✅</div>
+                    <div class="action-icon">Track Your Votes</div>
                     <h3>Track Your Votes</h3>
                     <p>Review your voting history, track predictions, and earn achievements for participation</p>
                     <span class="action-cta">View Your History →</span>
@@ -684,11 +676,9 @@
     </section>
 
     <!-- Video Modal -->
-
-    <!-- Video Modal -->
     <div class="video-modal" id="videoModal">
         <div class="video-modal-content">
-            <span class="video-modal-close">&times;</span>
+            <span class="video-modal-close">×</span>
             <iframe id="modalVideoFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </div>
@@ -697,6 +687,6 @@
     <script src="/js/footer.js"></script>
     <script type="module" src="/js/global-notifications.js"></script>
 
-<script type="module" src="js/music-gallery.js"></script>
+    <script type="module" src="/js/music-gallery.js"></script>
 </body>
 </html>
