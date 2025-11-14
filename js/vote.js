@@ -21,6 +21,7 @@ import { updateNavRank } from './navigation.js';
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
+import { awardFoundingMemberBadge, initFoundingMemberTracking } from './founding-member-tracker.js';
 // ========================================
 // VOTING STREAK TRACKER
 // ========================================
@@ -178,6 +179,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ⭐ NEW: Get user ID first
     userId = await getUserId();
     console.log('👤 User ID:', userId);
+
+    // ✅ ADD THIS: Initialize founding member tracking
+    await initFoundingMemberTracking();
     
     
     // Get match ID from URL
@@ -1403,6 +1407,13 @@ if (window.updateNavRank) {
     window.updateNavRank();
 } else {
     console.warn('⚠️ updateNavRank not available yet');
+}
+
+// ✅ ADD THIS: Check for founding member badge
+const earnedFoundingBadge = awardFoundingMemberBadge();
+if (earnedFoundingBadge) {
+    console.log('👑 User earned Founding Member badge!');
+    // Toast will show automatically from founding-member-tracker.js
 }
         
        // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)

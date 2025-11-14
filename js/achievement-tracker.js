@@ -27,7 +27,10 @@ export function calculateAchievementStats(allVotes) {
     sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
     uniqueArtists: 0, // ✅ NEW
     uniqueYears: 0, // ✅ NEW
-    comebackVotes: 0 // ✅ NEW
+    comebackVotes: 0, // ✅ NEW
+    // ✅ ADD THIS:
+    isFoundingMember: localStorage.getItem('foundingMember') === 'true'
+
   };
   
   // Calculate early votes (match had <10 votes when user voted)

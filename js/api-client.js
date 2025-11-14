@@ -103,3 +103,34 @@ export async function submitVote(matchId, songId) {
 }
 
 console.log('✅ API Client loaded - using Netlify Edge cache');
+
+/**
+ * Get total site-wide vote count (cached at edge)
+ */
+export async function getTotalVotes() {
+    try {
+        console.log('📊 Fetching total site votes...');
+        
+        const response = await fetch('/api/total-votes', {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const cacheStatus = response.headers.get('X-Cache');
+        
+        console.log(`✅ Total votes: ${data.totalVotes} (Cache: ${cacheStatus || 'UNKNOWN'})`);
+        
+        return data;
+        
+    } catch (error) {
+        console.error('❌ Error fetching total votes:', error);
+        // Return fallback on error
+        return { totalVotes: 0, milestoneReached: false, timestamp: Date.now() };
+    }
+}

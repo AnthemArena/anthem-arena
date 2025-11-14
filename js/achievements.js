@@ -106,6 +106,27 @@ export const ACHIEVEMENTS = {
     progress: (stats) => ({ current: stats.totalVotes, target: 250 })
   },
 
+
+  // ========================================
+// FOUNDING MEMBER ACHIEVEMENT (SPECIAL)
+// ========================================
+'founding-member': {
+  id: 'founding-member',
+  name: 'Founding Member',
+  description: 'Voted before the site reached 1,000 total votes',
+  icon: '👑',
+  xp: 500,
+  category: 'special',
+  hidden: false, // ✅ Visible to encourage voting
+  tier: 'legendary',
+  rarity: 'legendary',
+  condition: (stats) => {
+    // Check if user voted before 1000-vote milestone
+    const foundingMember = localStorage.getItem('foundingMember');
+    return foundingMember === 'true';
+  }
+},
+
   // ========================================
   // STREAK ACHIEVEMENTS
   // ========================================

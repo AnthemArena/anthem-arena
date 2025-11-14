@@ -19,6 +19,12 @@ export default async (request, context) => {
   const pathname = url.pathname;
   const matchId = url.searchParams.get('matchId');
 
+   // ✅ NEW: Handle total votes endpoint
+  if (pathname === "/api/total-votes") {
+    return handleTotalVotes(request);
+  }
+
+
 // ✅ NEW: Handle view tracking endpoint
   if (pathname === "/api/track-view" && request.method === "POST") {
     return handleViewTracking(request);
@@ -308,7 +314,98 @@ async function handleViewStats(matchId) {
   }
 }
 
+// ========================================
+// ✅ NEW: GET TOTAL SITE-WIDE VOTES
+// ========================================
 
+async function handleTotalVotes(request) {
+  try {
+    // Check cache first (cache for 30 seconds)
+    const cacheKey = 'total-votes';
+    const cached = edgeCache.get(cacheKey);
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp) < 30000) { // 30 second cache
+      console.log(`✅ CACHE HIT: total votes = ${cached.data.totalVotes}`);
+      
+      return new Response(JSON.stringify(cached.data), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=30",
+          "X-Cache": "HIT",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+    
+    console.log('🔥 Fetching total votes from Firebase...');
+    
+    // Query all votes using structured query
+    const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
+    
+    const response = await fetch(votesUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        structuredQuery: {
+          from: [{
+            collectionId: 'votes'
+          }],
+          select: {
+            fields: [{ fieldPath: 'matchId' }] // Only select matchId to reduce payload
+          }
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Firebase error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Count total votes (each document = 1 vote)
+    const totalVotes = data.filter(item => item.document).length;
+    
+    console.log(`✅ Total site votes: ${totalVotes}`);
+    
+    const result = {
+      totalVotes,
+      timestamp: now,
+      milestoneReached: totalVotes >= 1000
+    };
+    
+    // Cache the result
+    edgeCache.set(cacheKey, { data: result, timestamp: now });
+    
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=30",
+        "X-Cache": "MISS",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Total votes error:", error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      totalVotes: 0,
+      milestoneReached: false
+    }), {
+      status: 500,
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+  }
+}
 
 // ========================================
 // ✅ NEW: ATTACH VOTE COUNTS
@@ -502,5 +599,5 @@ function extractValue(field) {
 
 // Update config to include new endpoint
 export const config = {
-  path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats"]
+  path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats", "/api/total-votes"]
 };
