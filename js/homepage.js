@@ -134,10 +134,10 @@ async function updateHeroStats(allMatches) {
             console.log('🎯 Milestone NOT reached - attempting to display banner...');
             
             const heroSection = document.getElementById('heroSection');
-            console.log('🔍 heroSection found:', !!heroSection, heroSection);
+            console.log('🔍 heroSection found:', !!heroSection);
             
             const heroStats = heroSection?.querySelector('.hero-stats');
-            console.log('🔍 heroStats found:', !!heroStats, heroStats);
+            console.log('🔍 heroStats found:', !!heroStats);
             
             const existingBanner = document.querySelector('.founding-member-milestone');
             console.log('🔍 existing banner:', !!existingBanner);
@@ -178,6 +178,38 @@ async function updateHeroStats(allMatches) {
         } else {
             console.log('ℹ️ Milestone already reached - not displaying banner');
         }
+        
+        // ✅ CONTINUE WITH EXISTING CODE
+        const totalVideosEl = document.getElementById('totalVideos');
+        if (totalVideosEl) {
+            totalVideosEl.textContent = musicVideos.length;
+        }
+        
+        let totalVotes = 0;
+        let activeMatches = 0;
+        
+        allMatches.forEach(match => {
+            totalVotes += (match.totalVotes || 0);
+            if (match.status === 'live') activeMatches++;
+        });
+        
+        const totalVotesEl = document.getElementById('totalVotes');
+        const matchesLeftEl = document.getElementById('matchesLeft');
+        
+        if (totalVotesEl) {
+            totalVotesEl.textContent = totalVotes.toLocaleString();
+        }
+        
+        if (matchesLeftEl) {
+            matchesLeftEl.textContent = activeMatches;
+        }
+        
+        console.log('✅ Hero stats updated:', { totalVotes, activeMatches });
+        
+    } catch (error) {
+        console.error('❌ Error updating hero stats:', error);
+    }
+}
 
 // ========================================
 // LOAD TOURNAMENT INFO (BADGE)
