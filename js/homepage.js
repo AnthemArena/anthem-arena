@@ -66,12 +66,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNextMatchCountdown(allMatches);
         console.timeEnd('⏱️ Next Match Countdown');
         
-        // ✅ MOVED: Hide champions and show sections FIRST
+        // Hide champions and show sections
         hideChampionsSection();
         hideHomepageLoading();
         showHomepageSections();
         
-        // ✅ NOW update hero stats (after sections are visible)
+        // ✅ NEW: Wait for next frame to ensure DOM is rendered
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        
+        // NOW update hero stats (after next frame)
         console.time('⏱️ Hero Stats');
         await updateHeroStats(allMatches);
         console.timeEnd('⏱️ Hero Stats');
