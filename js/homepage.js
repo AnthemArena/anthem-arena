@@ -115,21 +115,38 @@ async function loadMusicVideos() {
 // ========================================
 async function updateHeroStats(allMatches) {
     try {
-
-          // ✅ NEW: Fetch founding member milestone data FIRST
+        console.log('🔍 updateHeroStats STARTED');
+        
+        // ✅ Fetch founding member milestone data FIRST
         const { getTotalVotes } = await import('./api-client.js');
+        console.log('✅ getTotalVotes imported');
+        
         const totalVotesData = await getTotalVotes();
+        console.log('📊 totalVotesData received:', totalVotesData);
+        
         const foundingMemberProgress = totalVotesData.totalVotes || 0;
         const milestoneReached = totalVotesData.milestoneReached || false;
         
-        // ✅ NEW: Add milestone banner if not reached
+        console.log(`👑 Milestone check: ${foundingMemberProgress}/1,000 (reached: ${milestoneReached})`);
+        
+        // ✅ Add milestone banner if not reached
         if (!milestoneReached) {
-            const heroSection = document.getElementById('heroSection');
-            const heroStats = heroSection?.querySelector('.hero-stats');
+            console.log('🎯 Milestone NOT reached - attempting to display banner...');
             
-            if (heroStats && !document.querySelector('.founding-member-milestone')) {
+            const heroSection = document.getElementById('heroSection');
+            console.log('🔍 heroSection found:', !!heroSection, heroSection);
+            
+            const heroStats = heroSection?.querySelector('.hero-stats');
+            console.log('🔍 heroStats found:', !!heroStats, heroStats);
+            
+            const existingBanner = document.querySelector('.founding-member-milestone');
+            console.log('🔍 existing banner:', !!existingBanner);
+            
+            if (heroStats && !existingBanner) {
+                console.log('✅ DOM ready - injecting milestone HTML...');
+                
                 const milestoneHTML = `
-                    <div class="founding-member-milestone">
+                    <div class="founding-member-milestone" style="background: red; padding: 20px; color: white; font-size: 24px;">
                         <div class="milestone-content">
                             <span class="milestone-icon">👑</span>
                             <div class="milestone-info">
@@ -140,47 +157,27 @@ async function updateHeroStats(allMatches) {
                                 </span>
                             </div>
                             <div class="milestone-bar">
-                                <div class="milestone-fill" style="width: ${(foundingMemberProgress/1000)*100}%"></div>
+                                <div class="milestone-fill" style="width: ${(foundingMemberProgress/1000)*100}%; background: yellow; height: 20px;"></div>
                             </div>
                         </div>
                     </div>
                 `;
                 
                 heroStats.insertAdjacentHTML('beforebegin', milestoneHTML);
-                console.log(`✅ Founding Member milestone displayed: ${foundingMemberProgress}/1,000`);
+                console.log(`✅ Founding Member milestone HTML INJECTED`);
+                
+                // Verify it was added
+                const addedBanner = document.querySelector('.founding-member-milestone');
+                console.log('🔍 Banner now in DOM:', !!addedBanner);
+            } else {
+                console.error('❌ Cannot display milestone:', {
+                    heroStatsExists: !!heroStats,
+                    bannerAlreadyExists: !!existingBanner
+                });
             }
+        } else {
+            console.log('ℹ️ Milestone already reached - not displaying banner');
         }
-        
-        const totalVideosEl = document.getElementById('totalVideos');
-        if (totalVideosEl) {
-            totalVideosEl.textContent = musicVideos.length;
-        }
-        
-        let totalVotes = 0;
-        let activeMatches = 0;
-        
-        allMatches.forEach(match => {
-            totalVotes += (match.totalVotes || 0);
-            if (match.status === 'live') activeMatches++;
-        });
-        
-        const totalVotesEl = document.getElementById('totalVotes');
-        const matchesLeftEl = document.getElementById('matchesLeft');
-        
-        if (totalVotesEl) {
-            totalVotesEl.textContent = totalVotes.toLocaleString();
-        }
-        
-        if (matchesLeftEl) {
-            matchesLeftEl.textContent = activeMatches;
-        }
-        
-        console.log('✅ Hero stats updated:', { totalVotes, activeMatches });
-        
-    } catch (error) {
-        console.error('❌ Error updating hero stats:', error);
-    }
-}
 
 // ========================================
 // LOAD TOURNAMENT INFO (BADGE)
