@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadFeaturedMatch(allMatches);
         console.timeEnd('⏱️ Featured Match');
         
+        // ✅ ADD THIS:
         console.time('⏱️ Your Active Votes');
         await loadYourActiveVotes(allMatches);
         console.timeEnd('⏱️ Your Active Votes');
@@ -66,18 +67,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNextMatchCountdown(allMatches);
         console.timeEnd('⏱️ Next Match Countdown');
         
-        // Hide champions and show sections
-        hideChampionsSection();
-        hideHomepageLoading();
-        showHomepageSections();
-        
-        // ✅ NEW: Wait for next frame to ensure DOM is rendered
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        
-        // NOW update hero stats (after next frame)
         console.time('⏱️ Hero Stats');
         await updateHeroStats(allMatches);
         console.timeEnd('⏱️ Hero Stats');
+        
+        hideChampionsSection();
+        hideHomepageLoading();
+        showHomepageSections();
         
         console.timeEnd('⏱️ Total Homepage Load');
         
@@ -119,71 +115,6 @@ async function loadMusicVideos() {
 // ========================================
 async function updateHeroStats(allMatches) {
     try {
-        console.log('🔍 updateHeroStats STARTED');
-        
-        // ✅ Fetch founding member milestone data FIRST
-        const { getTotalVotes } = await import('./api-client.js');
-        console.log('✅ getTotalVotes imported');
-        
-        const totalVotesData = await getTotalVotes();
-        console.log('📊 totalVotesData received:', totalVotesData);
-        
-        const foundingMemberProgress = totalVotesData.totalVotes || 0;
-        const milestoneReached = totalVotesData.milestoneReached || false;
-        
-        console.log(`👑 Milestone check: ${foundingMemberProgress}/1,000 (reached: ${milestoneReached})`);
-        
-        // ✅ Add milestone banner if not reached
-        if (!milestoneReached) {
-            console.log('🎯 Milestone NOT reached - attempting to display banner...');
-            
-            const heroSection = document.getElementById('heroSection');
-            console.log('🔍 heroSection found:', !!heroSection);
-            
-            const heroStats = heroSection?.querySelector('.hero-stats');
-            console.log('🔍 heroStats found:', !!heroStats);
-            
-            const existingBanner = document.querySelector('.founding-member-milestone');
-            console.log('🔍 existing banner:', !!existingBanner);
-            
-            if (heroStats && !existingBanner) {
-                console.log('✅ DOM ready - injecting milestone HTML...');
-                
-                const milestoneHTML = `
-                    <div class="founding-member-milestone" style="background: red; padding: 20px; color: white; font-size: 24px;">
-                        <div class="milestone-content">
-                            <span class="milestone-icon">👑</span>
-                            <div class="milestone-info">
-                                <span class="milestone-label">Founding Member Challenge</span>
-                                <span class="milestone-progress-text">
-                                    <strong>${foundingMemberProgress.toLocaleString()}/1,000</strong> votes • 
-                                    Vote now to earn your badge!
-                                </span>
-                            </div>
-                            <div class="milestone-bar">
-                                <div class="milestone-fill" style="width: ${(foundingMemberProgress/1000)*100}%; background: yellow; height: 20px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                heroStats.insertAdjacentHTML('beforebegin', milestoneHTML);
-                console.log(`✅ Founding Member milestone HTML INJECTED`);
-                
-                // Verify it was added
-                const addedBanner = document.querySelector('.founding-member-milestone');
-                console.log('🔍 Banner now in DOM:', !!addedBanner);
-            } else {
-                console.error('❌ Cannot display milestone:', {
-                    heroStatsExists: !!heroStats,
-                    bannerAlreadyExists: !!existingBanner
-                });
-            }
-        } else {
-            console.log('ℹ️ Milestone already reached - not displaying banner');
-        }
-        
-        // ✅ CONTINUE WITH EXISTING CODE
         const totalVideosEl = document.getElementById('totalVideos');
         if (totalVideosEl) {
             totalVideosEl.textContent = musicVideos.length;
