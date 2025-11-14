@@ -192,9 +192,8 @@ async function updateProgressBar(votedCount, totalCount) {
         milestone = ' 🎉 Complete!';
     } else if (!milestoneReached) {
         // Show founding member progress if milestone not reached
-        const remainingVotes = 1000 - foundingMemberProgress;
         const foundingPct = Math.round((foundingMemberProgress/1000)*100);
-        milestone = ` <span style="color: #C8AA6E;">👑 Help us reach 1,000 votes! Only ${remainingVotes} more needed - Vote now to become a Founding Member!</span>`;
+        milestone = ` <span style="color: #C8AA6E;">👑 ${foundingMemberProgress}/1,000 votes - Help us hit our goal! Vote now to become a Founding Member! 🎯</span>`;
     } else if (percentage >= 75) {
         milestone = ' 🔥 Almost there!';
     } else if (percentage >= 50) {
