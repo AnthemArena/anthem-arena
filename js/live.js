@@ -164,7 +164,7 @@ function displayMatchGrid() {
 // ========================================
 // UPDATE PROGRESS BAR (NEW)
 // ========================================
-function updateProgressBar(votedCount, totalCount) {
+async function updateProgressBar(votedCount, totalCount) {
     const progressFill = document.getElementById('progressFill');
     const votedProgress = document.getElementById('votedProgress');
     const totalProgress = document.getElementById('totalProgress');
@@ -174,22 +174,30 @@ function updateProgressBar(votedCount, totalCount) {
     
     const percentage = totalCount > 0 ? (votedCount / totalCount) * 100 : 0;
     
+    // ✅ NEW: Get founding member milestone data
+    const { getTotalVotes } = await import('./api-client.js');
+    const totalVotesData = await getTotalVotes();
+    const foundingMemberProgress = totalVotesData.totalVotes || 0;
+    const milestoneReached = totalVotesData.milestoneReached || false;
+    
     // Update DOM
     progressFill.style.width = `${percentage}%`;
     votedProgress.textContent = votedCount;
     totalProgress.textContent = totalCount;
     
-    // Milestone messages
+    // ✅ NEW: Add founding member milestone message
     let milestone = '';
     if (percentage === 100) {
         progressFill.classList.add('complete');
         milestone = ' 🎉 Complete!';
+    } else if (!milestoneReached) {
+        // Show founding member progress if milestone not reached
+        const foundingPct = Math.round((foundingMemberProgress/1000)*100);
+        milestone = ` <span style="color: #C8AA6E;">👑 ${foundingMemberProgress}/1,000 votes site-wide - Vote to become Founding Member!</span>`;
     } else if (percentage >= 75) {
         milestone = ' 🔥 Almost there!';
     } else if (percentage >= 50) {
         milestone = ' 💪 Halfway done!';
-    } else if (percentage >= 25) {
-        milestone = ' 👍 Keep going!';
     }
     
     // Update text with milestone
@@ -197,11 +205,10 @@ function updateProgressBar(votedCount, totalCount) {
         progressText.innerHTML = `
             <span id="votedProgress">${votedCount}</span> / 
             <span id="totalProgress">${totalCount}</span> matches voted
-            <span style="color: #C8AA6E; font-weight: 700;">${milestone}</span>
+            ${milestone}
         `;
     }
 }
-
 // ========================================
 // SHOW COMPLETION MESSAGE (OPTIONAL)
 // ========================================

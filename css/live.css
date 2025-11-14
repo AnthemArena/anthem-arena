@@ -988,3 +988,51 @@ body {
         transform: translateY(0);
     }
 }
+/* ========================================
+   FOUNDING MEMBER MILESTONE (IN PROGRESS BAR)
+   ======================================== */
+
+.progress-text .milestone-highlight {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.15), rgba(200, 170, 110, 0.08));
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #C8AA6E;
+    font-weight: 700;
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    animation: milestoneGlow 2s ease-in-out infinite;
+}
+
+@keyframes milestoneGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(200, 170, 110, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(200, 170, 110, 0.4);
+    }
+}
+
+.progress-text .milestone-highlight .crown-icon {
+    font-size: 1.1rem;
+    animation: crownFloat 2s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Mobile optimization for milestone */
+@media (max-width: 768px) {
+    .progress-text .milestone-highlight {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        margin-top: 0.4rem;
+    }
+}

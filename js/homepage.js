@@ -115,6 +115,42 @@ async function loadMusicVideos() {
 // ========================================
 async function updateHeroStats(allMatches) {
     try {
+
+          // ✅ NEW: Fetch founding member milestone data FIRST
+        const { getTotalVotes } = await import('./api-client.js');
+        const totalVotesData = await getTotalVotes();
+        const foundingMemberProgress = totalVotesData.totalVotes || 0;
+        const milestoneReached = totalVotesData.milestoneReached || false;
+        
+        // ✅ NEW: Add milestone banner if not reached
+        if (!milestoneReached) {
+            const heroSection = document.getElementById('heroSection');
+            const heroStats = heroSection?.querySelector('.hero-stats');
+            
+            if (heroStats && !document.querySelector('.founding-member-milestone')) {
+                const milestoneHTML = `
+                    <div class="founding-member-milestone">
+                        <div class="milestone-content">
+                            <span class="milestone-icon">👑</span>
+                            <div class="milestone-info">
+                                <span class="milestone-label">Founding Member Challenge</span>
+                                <span class="milestone-progress-text">
+                                    <strong>${foundingMemberProgress.toLocaleString()}/1,000</strong> votes • 
+                                    Vote now to earn your badge!
+                                </span>
+                            </div>
+                            <div class="milestone-bar">
+                                <div class="milestone-fill" style="width: ${(foundingMemberProgress/1000)*100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                heroStats.insertAdjacentHTML('beforebegin', milestoneHTML);
+                console.log(`✅ Founding Member milestone displayed: ${foundingMemberProgress}/1,000`);
+            }
+        }
+        
         const totalVideosEl = document.getElementById('totalVideos');
         if (totalVideosEl) {
             totalVideosEl.textContent = musicVideos.length;
