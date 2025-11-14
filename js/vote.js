@@ -21,7 +21,8 @@ import { updateNavRank } from './navigation.js';
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
-import { awardFoundingMemberBadge, initFoundingMemberTracking } from './founding-member-tracker.js';
+import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
+
 // ========================================
 // VOTING STREAK TRACKER
 // ========================================
@@ -182,7 +183,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ✅ ADD THIS: Initialize founding member tracking
     await initFoundingMemberTracking();
-    
+      // ✅ One-time XP backfill for existing badge holders
+  await backfillFoundingMemberXP();
     
     // Get match ID from URL
     const urlParams = new URLSearchParams(window.location.search);

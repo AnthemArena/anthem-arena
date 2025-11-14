@@ -45,7 +45,11 @@ export async function initFoundingMemberTracking() {
  * Award founding member badge when user votes
  * Call this AFTER a vote is successfully cast
  */
-export function awardFoundingMemberBadge() {
+/**
+ * Award founding member badge when user votes
+ * Call this AFTER a vote is successfully cast
+ */
+export async function awardFoundingMemberBadge() {
   // Check if milestone already reached
   const milestoneReached = localStorage.getItem(MILESTONE_REACHED_KEY);
   
@@ -65,6 +69,11 @@ export function awardFoundingMemberBadge() {
   // Award the badge!
   localStorage.setItem(FOUNDING_MEMBER_KEY, 'true');
   console.log('👑 Founding Member badge awarded!');
+  
+  // ✅ NEW: Award 500 XP
+  const { addXP } = await import('./rank-system.js');
+  const newXP = addXP(500, 'founding-member-achievement');
+  console.log(`✨ Awarded 500 XP for Founding Member! New total: ${newXP} XP`);
   
   // Show celebration toast (if on client-side)
   if (typeof window !== 'undefined' && window.showBulletin) {
@@ -105,6 +114,10 @@ async function getTotalSiteVotes() {
  * Backfill founding member status for existing users
  * Call this ONCE when deploying the feature
  */
+/**
+ * Backfill founding member status for existing users
+ * Call this ONCE when deploying the feature
+ */
 export async function backfillFoundingMemberForExistingUsers() {
   try {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
@@ -118,6 +131,12 @@ export async function backfillFoundingMemberForExistingUsers() {
       if (totalVotes < FOUNDING_MEMBER_THRESHOLD) {
         localStorage.setItem(FOUNDING_MEMBER_KEY, 'true');
         console.log('👑 Backfilled Founding Member badge for existing user');
+        
+        // ✅ NEW: Award 500 XP for backfilled users too
+        const { addXP } = await import('./rank-system.js');
+        const newXP = addXP(500, 'founding-member-achievement');
+        console.log(`✨ Awarded 500 XP for Founding Member! New total: ${newXP} XP`);
+        
         return true;
       }
     }
@@ -137,4 +156,41 @@ export function isFoundingMember() {
 
 export function getTotalVotesCount() {
   return parseInt(localStorage.getItem(TOTAL_VOTES_KEY) || '0');
+}
+
+/**
+ * One-time XP backfill for users who got badge before XP was implemented
+ * Call this on page load
+ */
+export async function backfillFoundingMemberXP() {
+  const hasFoundingBadge = localStorage.getItem(FOUNDING_MEMBER_KEY) === 'true';
+  const xpBackfilled = localStorage.getItem('foundingMemberXPBackfilled') === 'true';
+  
+  // If user has badge but hasn't received XP yet
+  if (hasFoundingBadge && !xpBackfilled) {
+    console.log('🔄 Backfilling 500 XP for existing Founding Member...');
+    
+    const { addXP } = await import('./rank-system.js');
+    const newXP = addXP(500, 'founding-member-achievement');
+    
+    // Mark as backfilled so it doesn't happen again
+    localStorage.setItem('foundingMemberXPBackfilled', 'true');
+    
+    console.log(`✨ Backfilled 500 XP! New total: ${newXP} XP`);
+    
+    // Show notification
+    if (window.showBulletin) {
+      window.showBulletin({
+        priority: 1,
+        type: 'achievement',
+        message: '✨ Founding Member Bonus!',
+        detail: 'You received 500 XP for being a Founding Member!',
+        duration: 4000
+      });
+    }
+    
+    return true;
+  }
+  
+  return false;
 }
