@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadFeaturedMatch(allMatches);
         console.timeEnd('⏱️ Featured Match');
         
-        // ✅ ADD THIS:
         console.time('⏱️ Your Active Votes');
         await loadYourActiveVotes(allMatches);
         console.timeEnd('⏱️ Your Active Votes');
@@ -67,13 +66,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNextMatchCountdown(allMatches);
         console.timeEnd('⏱️ Next Match Countdown');
         
-        console.time('⏱️ Hero Stats');
-        await updateHeroStats(allMatches);
-        console.timeEnd('⏱️ Hero Stats');
-        
+        // ✅ MOVED: Hide champions and show sections FIRST
         hideChampionsSection();
         hideHomepageLoading();
         showHomepageSections();
+        
+        // ✅ NOW update hero stats (after sections are visible)
+        console.time('⏱️ Hero Stats');
+        await updateHeroStats(allMatches);
+        console.timeEnd('⏱️ Hero Stats');
         
         console.timeEnd('⏱️ Total Homepage Load');
         
