@@ -2021,3 +2021,59 @@ text-align: center;
         font-size: 1.5rem;
     }
 }
+/* ========================================
+   HERO HEADER
+   ======================================== */
+.hero-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1) 0%, rgba(200, 170, 110, 0.05) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.hero-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.3;
+}
+
+.hero-header p {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    color: #aaa;
+    margin: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .hero-header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-header p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .hero-header p {
+        font-size: 0.95rem;
+    }
+}
