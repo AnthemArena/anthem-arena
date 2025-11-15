@@ -119,14 +119,20 @@ function displayPosts() {
     const gridContainer = document.getElementById('blogGrid');
     const loadMoreContainer = document.getElementById('loadMoreContainer');
     
-    if (!gridContainer) return;
+    if (!gridContainer) {
+        console.error('❌ blogGrid container not found!');
+        return;
+    }
     
     // Filter out featured post from grid
     const postsToDisplay = filteredPosts
         .filter(post => !post.featured)
         .slice(0, displayedCount);
     
-    if (postsToDisplay.length === 0 && filteredPosts.length === 0) {
+    console.log(`📊 Displaying ${postsToDisplay.length} posts`);
+    
+    // Show "No posts found" if filter returns nothing
+    if (postsToDisplay.length === 0) {
         gridContainer.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🔍</div>
@@ -134,19 +140,18 @@ function displayPosts() {
                 <p>Try selecting a different filter</p>
             </div>
         `;
-        loadMoreContainer.style.display = 'none';
+        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
         return;
     }
     
     gridContainer.innerHTML = postsToDisplay.map(post => createPostCard(post)).join('');
 
-
-    // Render icons
+    // Render category icons
     renderCategoryIcons();
     
     // Show/hide load more button
     const hasMore = filteredPosts.filter(p => !p.featured).length > displayedCount;
-    loadMoreContainer.style.display = hasMore ? 'block' : 'none';
+    if (loadMoreContainer) loadMoreContainer.style.display = hasMore ? 'block' : 'none';
 }
 
 // ========================================
