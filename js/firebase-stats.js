@@ -277,3 +277,103 @@ export async function getCurrentTournamentForm(seedNumber) {
         return null;
     }
 }
+
+// ========================================
+// ANALYZE MATCH CONTEXT
+// ========================================
+
+/**
+ * Analyze a completed match and return context for blog generation
+ * @param {Object} match - Match object with song1, song2, votes, etc.
+ */
+export function analyzeMatchContext(match) {
+    const song1Votes = match.song1?.votes || 0;
+    const song2Votes = match.song2?.votes || 0;
+    const totalVotes = match.totalVotes || (song1Votes + song2Votes);
+    
+    // Determine winner and loser
+    const isWinner1 = song1Votes > song2Votes;
+    const winner = isWinner1 ? match.song1 : match.song2;
+    const loser = isWinner1 ? match.song2 : match.song1;
+    
+    const winnerVotes = Math.max(song1Votes, song2Votes);
+    const loserVotes = Math.min(song1Votes, song2Votes);
+    const voteDiff = winnerVotes - loserVotes;
+    
+    // Calculate percentages
+    const winnerPct = totalVotes > 0 ? Math.round((winnerVotes / totalVotes) * 100) : 50;
+    const loserPct = 100 - winnerPct;
+    
+    // Determine match type based on margin
+    let matchType = 'standard';
+    let intensity = 'competitive';
+    
+    if (voteDiff <= 5 || winnerPct <= 52) {
+        matchType = 'nailbiter';
+        intensity = 'nail-biting';
+    } else if (winnerPct >= 70) {
+        matchType = 'dominant';
+        intensity = 'dominant';
+    } else if (winnerPct >= 65) {
+        matchType = 'blowout';
+        intensity = 'commanding';
+    } else if (winnerPct >= 60) {
+        matchType = 'comfortable';
+        intensity = 'comfortable';
+    }
+    
+    const isBlowout = winnerPct >= 70;
+    
+    // Check for upset (lower seed beats higher seed)
+    // Note: Lower seed number = higher seeding (e.g., #1 seed is better than #16)
+    const isUpset = winner.seed > loser.seed;
+    const seedDiff = Math.abs(winner.seed - loser.seed);
+    const isMajorUpset = isUpset && seedDiff >= 8;
+    
+    // Check undefeated status (if wins/losses data exists)
+    const winnerWins = winner.wins || 0;
+    const winnerLosses = winner.losses || 0;
+    const loserWins = loser.wins || 0;
+    const loserLosses = loser.losses || 0;
+    
+    const isUndefeated = winnerWins > 0 && winnerLosses === 0;
+    
+    return {
+        // Core data
+        winner: {
+            ...winner,
+            votes: winnerVotes,
+            wins: winnerWins,
+            losses: winnerLosses
+        },
+        loser: {
+            ...loser,
+            votes: loserVotes,
+            wins: loserWins,
+            losses: loserLosses
+        },
+        
+        // Vote metrics
+        winnerVotes,
+        loserVotes,
+        voteDiff,
+        totalVotes,
+        winnerPct,
+        loserPct,
+        
+        // Match classification
+        matchType,
+        intensity,
+        isBlowout,
+        
+        // Upset detection
+        isUpset,
+        isMajorUpset,
+        seedDiff,
+        
+        // Tournament context
+        isUndefeated,
+        round: match.round,
+        matchId: match.matchId
+    };
+}
