@@ -124,14 +124,24 @@ function displayPosts() {
         return;
     }
     
-    // Filter out featured post from grid
-    const postsToDisplay = filteredPosts
-        .filter(post => !post.featured)
-        .slice(0, displayedCount);
+    const featuredSection = document.getElementById('featuredSection');
+    const isShowingFeaturedSection = featuredSection && featuredSection.style.display !== 'none';
     
-    console.log(`📊 Displaying ${postsToDisplay.length} posts`);
+    // Only exclude featured post from grid if it's being shown in featured section
+    let postsToDisplay;
+    if (isShowingFeaturedSection && currentFilter === 'all') {
+        // "All Posts" - exclude featured post from grid (it's in featured section)
+        postsToDisplay = filteredPosts
+            .filter(post => !post.featured)
+            .slice(0, displayedCount);
+    } else {
+        // Filtered view - show all matching posts (including featured)
+        postsToDisplay = filteredPosts.slice(0, displayedCount);
+    }
     
-    // Show "No posts found" if filter returns nothing
+    console.log(`📊 Displaying ${postsToDisplay.length} posts (total filtered: ${filteredPosts.length}, filter: ${currentFilter})`);
+    
+    // Show "No posts found" if no posts match
     if (postsToDisplay.length === 0) {
         gridContainer.innerHTML = `
             <div class="empty-state">
@@ -150,7 +160,10 @@ function displayPosts() {
     renderCategoryIcons();
     
     // Show/hide load more button
-    const hasMore = filteredPosts.filter(p => !p.featured).length > displayedCount;
+    const totalAvailable = isShowingFeaturedSection && currentFilter === 'all'
+        ? filteredPosts.filter(p => !p.featured).length
+        : filteredPosts.length;
+    const hasMore = totalAvailable > displayedCount;
     if (loadMoreContainer) loadMoreContainer.style.display = hasMore ? 'block' : 'none';
 }
 
@@ -198,43 +211,51 @@ function initializeFilters() {
         return;
     }
     
-filterButtons.forEach((btn, index) => {
-    console.log(`Button ${index}:`, btn.textContent.trim(), 'filter:', btn.dataset.filter);
-    
-    btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter;
+    filterButtons.forEach((btn, index) => {
+        console.log(`Button ${index}:`, btn.textContent.trim(), 'filter:', btn.dataset.filter);
         
-        console.log('🎯 Filter clicked:', filter);
-        console.log('📊 All posts:', allPosts.length, allPosts.map(p => `${p.headline} (${p.type})`));
-        
-        // Update active state
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Apply filter
-        currentFilter = filter;
-        displayedCount = POSTS_PER_PAGE;
-        
-        if (filter === 'all') {
-            filteredPosts = allPosts;
-            // Show featured section only on "All Posts"
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            
+            console.log('🎯 Filter clicked:', filter);
+            console.log('📊 All posts:', allPosts.length, allPosts.map(p => `${p.headline} (${p.type})`));
+            
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Apply filter
+            currentFilter = filter;
+            displayedCount = POSTS_PER_PAGE;
+            
             const featuredSection = document.getElementById('featuredSection');
-            const featuredPost = allPosts.find(post => post.featured);
-            if (featuredPost && featuredSection) {
-                displayFeaturedPost(featuredPost);
+            
+            if (filter === 'all') {
+                // Show all posts
+                filteredPosts = allPosts;
+                
+                // Show featured section with featured post
+                const featuredPost = allPosts.find(post => post.featured);
+                if (featuredPost && featuredSection) {
+                    displayFeaturedPost(featuredPost);
+                } else if (featuredSection) {
+                    featuredSection.style.display = 'none';
+                }
+            } else {
+                // Filter by type
+                filteredPosts = allPosts.filter(post => post.type === filter);
+                
+                // Hide featured section when filtering by type
+                if (featuredSection) {
+                    featuredSection.style.display = 'none';
+                }
             }
-        } else {
-            filteredPosts = allPosts.filter(post => post.type === filter);
-            // Hide featured section when filtering
-            const featuredSection = document.getElementById('featuredSection');
-            if (featuredSection) featuredSection.style.display = 'none';
-        }
-        
-        console.log('✅ Filtered posts:', filteredPosts.length, filteredPosts.map(p => `${p.headline} (${p.type})`));
-        
-        displayPosts();
+            
+            console.log('✅ Filtered posts:', filteredPosts.length, filteredPosts.map(p => `${p.headline} (${p.type})`));
+            
+            displayPosts();
+        });
     });
-});
     
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', () => {
