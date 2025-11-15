@@ -1657,3 +1657,307 @@ text-align: center;
 .founding-member-banner.urgent {
     animation: urgentPulse 1.5s ease-in-out infinite;
 }
+/* ========================================
+   BENEFITS GRID
+   ======================================== */
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    max-width: 1000px;
+    margin: 2rem auto 1.5rem;
+    padding: 0 1.5rem;
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.benefit:hover {
+    background: rgba(200, 170, 110, 0.12);
+    border-color: rgba(200, 170, 110, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.2);
+}
+
+.benefit-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.benefit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.benefit-title {
+    font-size: 1rem;
+    color: #C8AA6E;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+}
+
+.benefit-desc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+    .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0 1rem;
+        margin: 1.5rem auto 1rem;
+    }
+    
+    .benefit {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .benefit-icon {
+        font-size: 1.75rem;
+    }
+    
+    .benefit-title {
+        font-size: 0.9rem;
+    }
+    
+    .benefit-desc {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   PROGRESSION TEASER
+   ======================================== */
+
+.progression-teaser {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto 2rem;
+    padding: 1.75rem 2rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.15) 0%, rgba(200, 170, 110, 0.05) 100%);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 16px;
+    gap: 2rem;
+    animation: fadeInUp 0.6s ease 0.3s backwards;
+}
+
+.teaser-left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 1;
+}
+
+.teaser-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.teaser-text strong {
+    display: block;
+    font-size: 1.3rem;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.teaser-text p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+}
+
+.teaser-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.teaser-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.teaser-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.teaser-cta {
+    padding: 0.875rem 1.75rem;
+    background: linear-gradient(135deg, #C8AA6E, #b49a5e);
+    color: #1a1a2e;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
+}
+
+.teaser-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.5);
+    background: linear-gradient(135deg, #d4b97a, #C8AA6E);
+}
+
+@media (max-width: 968px) {
+    .progression-teaser {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1.25rem;
+        gap: 1.5rem;
+    }
+    
+    .teaser-left {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .teaser-icon {
+        font-size: 2.5rem;
+    }
+    
+    .teaser-text strong {
+        font-size: 1.1rem;
+    }
+    
+    .teaser-text p {
+        font-size: 0.9rem;
+    }
+    
+    .teaser-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .teaser-stats {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .teaser-cta {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .progression-teaser {
+        padding: 1.25rem 1rem;
+        margin: 0 0.5rem 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   XP BONUSES CALLOUT
+   ======================================== */
+
+.xp-bonuses-callout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: rgba(200, 170, 110, 0.08);
+    border: 1px solid rgba(200, 170, 110, 0.25);
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.bonus-label {
+    color: #C8AA6E;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+}
+
+.bonus-item {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.bonus-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .xp-bonuses-callout {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.875rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .bonus-label {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ========================================
+   SOCIAL CONTAINER - FIX TOP SPACING
+   ======================================== */
+
+.social-container {
+    padding: 1.5rem;
+    margin-top: 70px; /* Space for fixed nav */
+}
+
+@media (max-width: 768px) {
+    .social-container {
+        padding: 1rem;
+        margin-top: 60px;
+    }
+}
