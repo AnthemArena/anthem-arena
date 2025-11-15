@@ -391,6 +391,9 @@ function showCompletionMessage() {
 // ========================================
 // CREATE MATCH CARD (NO VOTE COUNTS)
 // ========================================
+// ========================================
+// CREATE MATCH CARD (NO VOTE COUNTS)
+// ========================================
 function createMatchCard(match, index, isVoted) {
     const userVotedSongId = isVoted ? getUserVotedSongId(match.matchId) : null;
     
@@ -398,8 +401,11 @@ function createMatchCard(match, index, isVoted) {
     card.className = `social-match-card ${isVoted ? 'voted' : ''}`;
     card.style.animationDelay = `${index * 0.1}s`;
     
-    // ✅ Show Founding Member prompt on unvoted cards
-    const foundingPrompt = !isVoted ? `
+    // ✅ FIXED: Only show Founding Member prompt if user hasn't voted in ANY match
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    const hasVotedAnywhere = Object.keys(userVotes).length > 0;
+    
+    const foundingPrompt = !isVoted && !hasVotedAnywhere ? `
         <div class="founding-prompt">
             👑 Vote to become Founding Member
         </div>
