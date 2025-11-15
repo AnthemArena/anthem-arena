@@ -2640,3 +2640,224 @@
         padding: 2rem;
     }
 }
+/* ========================================
+   XP EARNED SECTION
+   ======================================== */
+
+.xp-earned-section {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1), rgba(200, 170, 110, 0.05));
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.xp-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.xp-icon {
+    font-size: 2.5rem;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-10deg); }
+    75% { transform: scale(1.1) rotate(10deg); }
+}
+
+.xp-details {
+    flex: 1;
+}
+
+.xp-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.xp-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.xp-base {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.xp-bonus {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(180, 150, 90, 0.3));
+    border: 1px solid rgba(200, 170, 110, 0.5);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #C8AA6E;
+    font-weight: 600;
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   BONUS REVEAL MESSAGE
+   ======================================== */
+
+.bonus-reveal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(200, 170, 110, 0.2));
+    border: 1px dashed rgba(200, 170, 110, 0.5);
+    border-radius: 8px;
+    margin: 1rem 0;
+    animation: fadeInUp 0.6s ease 0.3s backwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reveal-icon {
+    font-size: 1.5rem;
+}
+
+.reveal-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+/* ========================================
+   XP PROGRESS BAR
+   ======================================== */
+
+.xp-progress-container {
+    margin-top: 1rem;
+}
+
+.xp-level-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.xp-level-badge {
+    font-size: 1rem;
+    color: #C8AA6E;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+}
+
+.xp-level-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.xp-bar-wrapper {
+    width: 100%;
+    height: 10px;
+    background: rgba(200, 170, 110, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E, #d4b97a, #C8AA6E);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+    animation: shimmerGold 3s linear infinite;
+}
+
+@keyframes shimmerGold {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.xp-next-level {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.xp-max-level {
+    text-align: center;
+    font-size: 1rem;
+    color: #FFD700;
+    font-weight: 700;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(200, 170, 110, 0.2));
+    border-radius: 8px;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .xp-earned-section {
+        padding: 1rem;
+    }
+    
+    .xp-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .xp-icon {
+        font-size: 2rem;
+    }
+    
+    .xp-amount {
+        font-size: 1.2rem;
+    }
+    
+    .xp-breakdown {
+        justify-content: center;
+    }
+    
+    .bonus-reveal {
+        flex-direction: column;
+        text-align: center;
+        padding: 0.75rem;
+    }
+    
+    .reveal-text {
+        font-size: 0.85rem;
+    }
+}

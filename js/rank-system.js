@@ -26,7 +26,9 @@ export const RANK_SYSTEM = {
         votingStreakDaily: 15,
         underdogPick: 5,
         closeMatch: 10,
-        firstVoteInMatch: 5
+        firstVoteInMatch: 5,
+            share: 5  // ✅ ADD THIS
+
     },
     
     // ✅ NEW: Tier groupings

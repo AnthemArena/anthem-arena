@@ -1166,6 +1166,58 @@ function updateDynamicMetaTags() {
         }
     }
 
+    // Add this helper function to vote.js (after your other helper functions)
+
+/**
+ * Track share and award XP
+ */
+function trackShare(platform, context) {
+    // Increment share count in localStorage
+    const currentShares = parseInt(localStorage.getItem('sharesCount') || '0');
+    localStorage.setItem('sharesCount', (currentShares + 1).toString());
+    
+    // Award XP using rank system
+    const SHARE_XP = 5; // Matches rank-system.js xpSources.share
+    const newTotalXP = addXP(SHARE_XP, 'share');
+    
+    console.log(`📤 Share tracked: ${platform} (${context}) - Share #${currentShares + 1} - +${SHARE_XP} XP`);
+    
+    // Show notification
+    showNotification(`+${SHARE_XP} XP for sharing! 📤 (${currentShares + 1} total shares)`, 'success');
+    
+    // Check for achievement unlocks (social achievements)
+    setTimeout(async () => {
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const voteIds = Object.keys(userVotes);
+        
+        if (voteIds.length > 0) {
+            const allMatches = await getAllMatches();
+            const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
+            
+            const allVotes = voteIds.map(matchId => {
+                const voteData = userVotes[matchId];
+                const matchData = matchMap.get(matchId);
+                return {
+                    matchId,
+                    timestamp: voteData.timestamp || new Date().toISOString(),
+                    match: matchData || {}
+                };
+            });
+            
+            const { newlyUnlocked } = checkAchievements(allVotes);
+            
+            // Show social achievement notifications
+            newlyUnlocked
+                .filter(a => a.category === 'social')
+                .forEach((achievement, index) => {
+                    setTimeout(() => {
+                        showAchievementUnlock(achievement);
+                    }, (index + 1) * 2000);
+                });
+        }
+    }, 500);
+}
+
     // ========================================
     // ✨ NEW: SHOW VOTE URGENCY INDICATORS
     // ========================================
@@ -2200,42 +2252,55 @@ function showPostVoteModal(songName, songData, xpData, rank) {
             </div>
         `;
     }
-    
-    // ========================================
-    // ✅ NEW: XP EARNED SECTION
-    // ========================================
-    let xpSection = `
-        <div class="xp-earned-section">
-            <div class="xp-header">
-                <span class="xp-icon">✨</span>
-                <div class="xp-details">
-                    <div class="xp-amount">+${xpData.totalXP} XP</div>
-                    <div class="xp-breakdown">
-                        <span class="xp-base">+${xpData.baseXP} Base</span>
+// ========================================
+// ✅ IMPROVED: XP EARNED SECTION
+// ========================================
+let xpSection = `
+    <div class="xp-earned-section">
+        <div class="xp-header">
+            <span class="xp-icon">✨</span>
+            <div class="xp-details">
+                <div class="xp-amount">+${xpData.totalXP} XP Earned!</div>
+                <div class="xp-breakdown">
+                    <span class="xp-base">+${xpData.baseXP} Base vote</span>
+                    ${xpData.bonuses.length > 0 ? `
                         ${xpData.bonuses.map(bonus => `
-                            <span class="xp-bonus">+${bonus.xp} ${bonus.type}</span>
+                            <span class="xp-bonus surprise">
+                                🎁 +${bonus.xp} ${bonus.type}
+                            </span>
                         `).join('')}
-                    </div>
+                    ` : ''}
                 </div>
-            </div>
-            <div class="xp-progress-container">
-                <div class="xp-level-info">
-                    <span class="xp-level-badge">${rank.currentLevel.title}</span>
-                    <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
-                </div>
-                ${rank.nextLevel ? `
-                    <div class="xp-bar-wrapper">
-                        <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
-                    </div>
-                    <div class="xp-next-level">
-                        ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} to Level ${rank.nextLevel.level}
-                    </div>
-                ` : `
-                    <div class="xp-max-level">🏆 Maximum Level Reached!</div>
-                `}
             </div>
         </div>
-    `;
+        
+        ${xpData.bonuses.length > 0 ? `
+            <div class="bonus-reveal">
+                <span class="reveal-icon">🎉</span>
+                <span class="reveal-text">
+                    Bonus! You earned ${xpData.bonuses.length} extra reward${xpData.bonuses.length === 1 ? '' : 's'}!
+                </span>
+            </div>
+        ` : ''}
+        
+        <div class="xp-progress-container">
+            <div class="xp-level-info">
+                <span class="xp-level-badge">${rank.currentLevel.title}</span>
+                <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
+            </div>
+            ${rank.nextLevel ? `
+                <div class="xp-bar-wrapper">
+                    <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
+                </div>
+                <div class="xp-next-level">
+                    ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} XP to Level ${rank.nextLevel.level}
+                </div>
+            ` : `
+                <div class="xp-max-level">🏆 Maximum Level Reached!</div>
+            `}
+        </div>
+    </div>
+`;
     
     // ========================================
     // BUILD BOOK SECTION (existing code)
@@ -2302,16 +2367,18 @@ function showPostVoteModal(songName, songData, xpData, rank) {
 // SHARE FUNCTIONS
 // ========================================
 
+// ========================================
+// UPDATED: Share functions with tracking
+// ========================================
+
 window.shareToTwitter = function(songName, context) {
     const matchUrl = window.location.href;
     let tweetText = '';
     
-    // Get opponent name
     const opponentName = songName === currentMatch.competitor1.name 
         ? currentMatch.competitor2.name 
         : currentMatch.competitor1.name;
     
-    // Get vote difference for context
     const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
     
     switch(context) {
@@ -2336,21 +2403,15 @@ window.shareToTwitter = function(songName, context) {
         case 'dominating':
             tweetText = `🎯 "${songName}" is DOMINATING in the League Music Tournament! Join the winning side!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
             break;
-        case 'losing': // Legacy fallback
-            tweetText = `🚨 "${songName}" is being eliminated! Help save it!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'close': // Legacy fallback
-            tweetText = `🔥 "${songName}" vs "${opponentName}" is TOO CLOSE!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'competitive': // Legacy fallback
-            tweetText = `⚔️ I just voted for "${songName}" in the League Music Tournament!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
         default:
             tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\n${matchUrl}\n\n#LeagueMusicTournament`;
     }
     
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
+    
+    // ✅ ADD THIS:
+    trackShare('twitter', context);
     
     console.log(`📤 Shared to Twitter (${context})`);
 };
@@ -2394,14 +2455,6 @@ window.shareToReddit = function(songName, context) {
             title = `"${songName}" is dominating in the League Music Tournament!`;
             text = `Come vote in the League Music Tournament and see the results!\n\nVote here: ${matchUrl}`;
             break;
-        case 'losing': // Legacy fallback
-            title = `"${songName}" is being eliminated! Rally to save it!`;
-            text = `"${songName}" is currently losing. If you love this song, vote now!\n\nVote here: ${matchUrl}`;
-            break;
-        case 'close': // Legacy fallback
-            title = `NAIL-BITER: "${songName}" matchup is too close to call!`;
-            text = `This matchup is separated by just a few votes! Every vote matters.\n\nVote here: ${matchUrl}`;
-            break;
         default:
             title = `League Music Tournament - Vote for your favorite songs!`;
             text = `I just voted in the League Music Tournament! Come vote for your favorites.\n\n${matchUrl}`;
@@ -2409,6 +2462,9 @@ window.shareToReddit = function(songName, context) {
     
     const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
     window.open(redditUrl, '_blank', 'width=800,height=600');
+    
+    // ✅ ADD THIS:
+    trackShare('reddit', context);
     
     console.log(`📤 Shared to Reddit (${context})`);
 };
@@ -2418,6 +2474,9 @@ window.copyMatchLink = function() {
     
     navigator.clipboard.writeText(matchUrl).then(() => {
         showNotification('Link copied to clipboard! 🔗', 'success');
+        
+        // ✅ ADD THIS:
+        trackShare('copy-link', 'manual');
     }).catch(() => {
         // Fallback for older browsers
         const tempInput = document.createElement('input');
@@ -2427,6 +2486,9 @@ window.copyMatchLink = function() {
         document.execCommand('copy');
         document.body.removeChild(tempInput);
         showNotification('Link copied! 🔗', 'success');
+        
+        // ✅ ADD THIS:
+        trackShare('copy-link', 'manual');
     });
     
     console.log('📋 Match link copied to clipboard');
