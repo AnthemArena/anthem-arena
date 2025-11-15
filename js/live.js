@@ -248,27 +248,6 @@ async function loadLiveMatches() {
 }
 
 // ========================================
-// GET VOTE MARGIN
-// ========================================
-function getVoteMargin(match) {
-    const totalVotes = match.totalVotes || 0;
-    if (totalVotes === 0) return 50;
-    
-    const song1Votes = match.song1?.votes || 0;
-    const song1Pct = (song1Votes / totalVotes) * 100;
-    
-    return Math.abs(50 - song1Pct);
-}
-
-// ========================================
-// GET DYNAMIC VOTE CTA (NO VOTE COUNTS)
-// ========================================
-function getVoteCTA(match, totalVotes) {
-    // ✅ REMOVED: Vote counts from CTA
-    return 'Watch & Vote →';
-}
-
-// ========================================
 // DISPLAY MATCH GRID (SORTED BY VOTED STATUS)
 // ========================================
 function displayMatchGrid() {
@@ -305,6 +284,9 @@ function displayMatchGrid() {
         grid.appendChild(card);
     });
     
+    // ✅ UPDATE UNVOTED HEADER
+    updateUnvotedHeader(unvotedMatches.length);
+    
     // Display voted matches in separate section (if any)
     if (votedMatches.length > 0 && votedSection && votedGrid && votedCount) {
         votedSection.style.display = 'block';
@@ -322,6 +304,33 @@ function displayMatchGrid() {
     updateProgressBar(votedMatches.length, allLiveMatches.length);
     
     console.log(`✅ Displayed ${unvotedMatches.length} unvoted, ${votedMatches.length} voted`);
+}
+
+// ========================================
+// ✅ NEW: UPDATE UNVOTED HEADER (DYNAMIC)
+// ========================================
+function updateUnvotedHeader(unvotedCount) {
+    const headerText = document.querySelector('.unvoted-header .header-text');
+    const headerIcon = document.querySelector('.unvoted-header .header-icon');
+    
+    if (!headerText || !headerIcon) return;
+    
+    if (unvotedCount === 0) {
+        headerIcon.textContent = '🎉';
+        headerText.innerHTML = `All Caught Up! Check back for new matches.`;
+    } else if (unvotedCount === 1) {
+        headerIcon.textContent = '⚡';
+        headerText.innerHTML = `<span id="unvotedCount">1</span> Match Needs Your Vote!`;
+    } else if (unvotedCount <= 3) {
+        headerIcon.textContent = '🔥';
+        headerText.innerHTML = `Almost Done! <span id="unvotedCount">${unvotedCount}</span> Matches Left`;
+    } else if (unvotedCount <= 6) {
+        headerIcon.textContent = '🗳️';
+        headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Matches Need Your Vote!`;
+    } else {
+        headerIcon.textContent = '🎵';
+        headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Live Matches — Start Voting!`;
+    }
 }
 
 // ========================================
@@ -391,9 +400,6 @@ function showCompletionMessage() {
 // ========================================
 // CREATE MATCH CARD (NO VOTE COUNTS)
 // ========================================
-// ========================================
-// CREATE MATCH CARD (NO VOTE COUNTS)
-// ========================================
 function createMatchCard(match, index, isVoted) {
     const userVotedSongId = isVoted ? getUserVotedSongId(match.matchId) : null;
     
@@ -401,7 +407,7 @@ function createMatchCard(match, index, isVoted) {
     card.className = `social-match-card ${isVoted ? 'voted' : ''}`;
     card.style.animationDelay = `${index * 0.1}s`;
     
-    // ✅ FIXED: Only show Founding Member prompt if user hasn't voted in ANY match
+    // ✅ Show Founding Member prompt on unvoted cards (only if user hasn't voted anywhere)
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
     const hasVotedAnywhere = Object.keys(userVotes).length > 0;
     
