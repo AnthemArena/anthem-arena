@@ -11,25 +11,18 @@
     <meta property="og:description" content="Match recaps, upsets, and tournament coverage">
     <meta property="og:type" content="website">
     
+        <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/blog.css">
+        <link rel="stylesheet" href="/css/navigation.css">
+         <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+
     <link rel="icon" type="image/png" href="/assets/favicon.png">
 </head>
 <body>
     <!-- Header -->
-    <header class="site-header">
-        <div class="container">
-            <a href="/" class="logo">
-                <span class="logo-icon">🏆</span>
-                <span class="logo-text">Anthem Arena</span>
-            </a>
-            <nav class="main-nav">
-                <a href="/vote.html">Vote</a>
-                <a href="/leaderboard.html">Leaderboard</a>
-                <a href="/bracket.html">Bracket</a>
-                <a href="/blog.html" class="active">Blog</a>
-            </nav>
-        </div>
-    </header>
+   <div id="nav-placeholder"></div>
+<script type="module" src="/js/navigation.js"></script>
 
     <!-- Blog Hero -->
     <section class="blog-hero">
@@ -84,31 +77,9 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Anthem Arena</h3>
-                    <p>The ultimate League of Legends Worlds anthem championship</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Tournament</h4>
-                    <a href="/vote.html">Vote Now</a>
-                    <a href="/bracket.html">View Bracket</a>
-                    <a href="/leaderboard.html">Leaderboard</a>
-                </div>
-                <div class="footer-section">
-                    <h4>More</h4>
-                    <a href="/blog.html">Blog</a>
-                    <a href="/about.html">About</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Anthem Arena. Not affiliated with Riot Games.</p>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 
     <script type="module" src="/js/blog.js"></script>
 </body>
