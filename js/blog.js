@@ -139,6 +139,10 @@ function displayPosts() {
     }
     
     gridContainer.innerHTML = postsToDisplay.map(post => createPostCard(post)).join('');
+
+
+    // Render icons
+    renderCategoryIcons();
     
     // Show/hide load more button
     const hasMore = filteredPosts.filter(p => !p.featured).length > displayedCount;
@@ -159,8 +163,7 @@ function createPostCard(post) {
                 <img src="${thumbnailUrl}" 
                      alt="${post.headline}"
                      onerror="this.src='https://via.placeholder.com/400x250/0a0a0a/C8AA6E?text=Anthem+Arena'">
-                <span class="blog-card-category">${formatCategory(post.type)}</span>
-            </div>
+<span class="blog-card-category" data-category="${post.type}"></span>            </div>
             <div class="blog-card-content">
                 <h3>${post.headline}</h3>
                 <p class="blog-card-excerpt">${excerpt}</p>
@@ -283,4 +286,10 @@ function showError() {
             <button onclick="location.reload()" class="btn-primary">Retry</button>
         </div>
     `;
+}
+// Render category icons after DOM is ready
+function renderCategoryIcons() {
+    document.querySelectorAll('[data-category]').forEach(el => {
+        el.innerHTML = formatCategory(el.dataset.category);
+    });
 }

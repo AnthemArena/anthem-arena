@@ -91,7 +91,7 @@ function displayPost(post) {
     document.getElementById('ogImage').content = thumbnailUrl;
     
     // Category
-    document.getElementById('postCategory').textContent = formatCategory(post.type);
+document.getElementById('postCategory').innerHTML = formatCategory(post.type);
     
     // Headline
     document.getElementById('postHeadline').textContent = post.headline;
