@@ -198,34 +198,43 @@ function initializeFilters() {
         return;
     }
     
-    filterButtons.forEach((btn, index) => {
-        console.log(`Button ${index}:`, btn.textContent.trim(), 'filter:', btn.dataset.filter);
+filterButtons.forEach((btn, index) => {
+    console.log(`Button ${index}:`, btn.textContent.trim(), 'filter:', btn.dataset.filter);
+    
+    btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
         
-        btn.addEventListener('click', () => {
-            const filter = btn.dataset.filter;
-            
-            console.log('🎯 Filter clicked:', filter);
-            console.log('📊 All posts:', allPosts.length, allPosts.map(p => `${p.headline} (${p.type})`));
-            
-            // Update active state
-            filterButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Apply filter
-            currentFilter = filter;
-            displayedCount = POSTS_PER_PAGE;
-            
-            if (filter === 'all') {
-                filteredPosts = allPosts;
-            } else {
-                filteredPosts = allPosts.filter(post => post.type === filter);
+        console.log('🎯 Filter clicked:', filter);
+        console.log('📊 All posts:', allPosts.length, allPosts.map(p => `${p.headline} (${p.type})`));
+        
+        // Update active state
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Apply filter
+        currentFilter = filter;
+        displayedCount = POSTS_PER_PAGE;
+        
+        if (filter === 'all') {
+            filteredPosts = allPosts;
+            // Show featured section only on "All Posts"
+            const featuredSection = document.getElementById('featuredSection');
+            const featuredPost = allPosts.find(post => post.featured);
+            if (featuredPost && featuredSection) {
+                displayFeaturedPost(featuredPost);
             }
-            
-            console.log('✅ Filtered posts:', filteredPosts.length, filteredPosts.map(p => `${p.headline} (${p.type})`));
-            
-            displayPosts();
-        });
+        } else {
+            filteredPosts = allPosts.filter(post => post.type === filter);
+            // Hide featured section when filtering
+            const featuredSection = document.getElementById('featuredSection');
+            if (featuredSection) featuredSection.style.display = 'none';
+        }
+        
+        console.log('✅ Filtered posts:', filteredPosts.length, filteredPosts.map(p => `${p.headline} (${p.type})`));
+        
+        displayPosts();
     });
+});
     
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', () => {
