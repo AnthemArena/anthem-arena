@@ -1464,11 +1464,15 @@ text-align: center;
 /* Adjust social container to have consistent padding */
 .social-container {
     padding: 1.5rem;
+    margin-top: 70px; /* ✅ Use margin-top instead - cleaner separation */
+
 }
 
 @media (max-width: 768px) {
     .social-container {
         padding: 1rem;
+        margin-top: 60px;
+
     }
     
     .landing-hero {
