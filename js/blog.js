@@ -232,14 +232,14 @@ function getPostThumbnail(post) {
 
 function formatCategory(type) {
     const categories = {
-        'match-recap': '📊 Match Recap',
-        'round-recap': '🏆 Round Recap',
-        'upset-alert': '🚨 Upset Alert',
-        'preview': '🔮 Preview',
-        'round-preview': '🔮 Round Preview',
-        'analysis': '📈 Analysis'
+        'match-recap': '<i class="fas fa-chart-bar"></i> Match Recap',
+        'round-recap': '<i class="fas fa-trophy"></i> Round Recap',
+        'upset-alert': '<i class="fas fa-bolt"></i> Upset Alert',
+        'preview': '<i class="fas fa-crystal-ball"></i> Preview',
+        'round-preview': '<i class="fas fa-crystal-ball"></i> Round Preview',
+        'analysis': '<i class="fas fa-chart-line"></i> Analysis'
     };
-    return categories[type] || '📰 News';
+    return categories[type] || '<i class="fas fa-newspaper"></i> News';
 }
 
 function formatDate(dateString) {
