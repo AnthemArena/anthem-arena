@@ -1036,3 +1036,620 @@ body {
         margin-top: 0.4rem;
     }
 }
+/* ========================================
+   COUNTDOWN BANNER
+   ======================================== */
+.countdown-banner {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #C8AA6E;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.2);
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+.countdown-content {
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Lora', serif;
+    letter-spacing: 0.5px;
+}
+
+.countdown-content strong {
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+}
+
+#countdownTimer {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: #C8AA6E;
+        box-shadow: 0 4px 12px rgba(200, 170, 110, 0.2);
+    }
+    50% {
+        border-color: #E8C88E;
+        box-shadow: 0 4px 20px rgba(200, 170, 110, 0.4);
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .countdown-banner {
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+    
+    .countdown-content {
+        font-size: 14px;
+    }
+    
+    .countdown-content strong {
+        font-size: 15px;
+        display: block;
+        margin-bottom: 4px;
+    }
+    
+    #countdownTimer {
+        font-size: 18px;
+    }
+}
+/* ========================================
+   FOUNDING MEMBER BANNER
+   ======================================== */
+
+.founding-member-banner {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.15) 0%, rgba(200, 170, 110, 0.08) 100%);
+    border: 2px solid rgba(200, 170, 110, 0.4);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 0 auto 2rem;
+    max-width: 800px;
+    animation: fadeInUp 0.6s ease;
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
+}
+
+.founding-content {
+text-align: center;
+}
+
+.founding-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.founding-header .crown-icon {
+    font-size: 2rem;
+    animation: crownFloat 2s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-5px) rotate(5deg);
+    }
+}
+
+.founding-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: #C8AA6E;
+    margin: 0;
+    font-weight: 700;
+}
+
+.founding-description {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.founding-description strong {
+    color: #C8AA6E;
+    font-weight: 700;
+}
+
+.founding-progress {
+    margin-top: 1.5rem;
+}
+
+.progress-bar-founding {
+    width: 100%;
+    height: 12px;
+    background: rgba(200, 170, 110, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progress-fill-founding {
+    height: 100%;
+    background: linear-gradient(90deg, #C8AA6E, #d4b97a, #C8AA6E);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease;
+    animation: shimmerGold 3s linear infinite;
+    position: relative;
+}
+
+@keyframes shimmerGold {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.progress-fill-founding::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-text-founding {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.progress-text-founding strong {
+    color: #C8AA6E;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.progress-text-founding .remaining {
+    display: inline-block;
+    margin-left: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.progress-text-founding .remaining strong {
+    color: #ff6b6b;
+    font-size: 1rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .founding-member-banner {
+        padding: 1.5rem 1rem;
+        margin: 0 1rem 1.5rem;
+    }
+    
+    .founding-header h2 {
+        font-size: 1.4rem;
+    }
+    
+    .founding-header .crown-icon {
+        font-size: 1.5rem;
+    }
+    
+    .founding-description {
+        font-size: 0.95rem;
+    }
+    
+    .progress-bar-founding {
+        height: 10px;
+    }
+    
+    .progress-text-founding {
+        font-size: 0.9rem;
+    }
+    
+    .progress-text-founding strong {
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   FOUNDING MEMBER PROMPT ON CARDS
+   ======================================== */
+
+.founding-prompt {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95));
+    color: #1a1a2e;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(200, 170, 110, 0.4);
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   HOW IT WORKS SECTION
+   ======================================== */
+
+.how-it-works {
+    max-width: 900px;
+    margin: 0 auto 2.5rem;
+    padding: 0 1.5rem;
+    text-align: center;
+}
+
+.how-it-works h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    color: #C8AA6E;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.step {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    background: rgba(200, 170, 110, 0.1);
+    border-color: rgba(200, 170, 110, 0.3);
+    transform: translateY(-5px);
+}
+
+.step-number {
+    display: inline-block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.75rem;
+    font-family: 'Cinzel', serif;
+}
+
+.step p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .how-it-works {
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .how-it-works h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .step {
+        padding: 1rem 0.75rem;
+    }
+    
+    .step-number {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .step p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   STICKY FOUNDING PROGRESS BANNER (MOBILE)
+   ======================================== */
+
+.sticky-founding-progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.98), rgba(180, 150, 90, 0.98));
+    backdrop-filter: blur(10px);
+    padding: 0.875rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.sticky-founding-progress .crown-icon {
+    font-size: 1.5rem;
+    animation: crownBounce 2s ease-in-out infinite;
+}
+
+@keyframes crownBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.sticky-founding-progress .progress-text {
+    font-size: 0.9rem;
+    color: #1a1a2e;
+    font-weight: 700;
+    margin: 0;
+}
+
+.sticky-founding-progress .progress-text strong {
+    color: #0a0a0a;
+    font-size: 1rem;
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+    .sticky-founding-progress {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   ADJUSTMENTS TO EXISTING STYLES
+   ======================================== */
+
+/* Update hero section padding to account for new banners */
+.landing-hero {
+    padding: 3rem 1.5rem 1.5rem;
+}
+
+/* Remove old hero content if it conflicts */
+.landing-hero .hero-badge {
+    display: none; /* Remove "LIVE NOW" badge - replaced by countdown */
+}
+
+/* Adjust social container to have consistent padding */
+.social-container {
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .social-container {
+        padding: 1rem;
+    }
+    
+    .landing-hero {
+        padding: 2rem 1rem 1rem;
+    }
+}
+
+/* Update progress container margin */
+.progress-container {
+    max-width: 600px;
+    margin: 1.5rem auto 2rem;
+}
+
+/* ========================================
+   VOTED BADGE UPDATE (MORE PROMINENT)
+   ======================================== */
+
+.social-match-card.voted::before {
+    content: '✅ FOUNDING MEMBER ELIGIBLE';
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    color: white;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(76, 175, 80, 0.4);
+}
+
+/* ========================================
+   COMPLETION BANNER ENHANCEMENTS
+   ======================================== */
+
+.completion-banner {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, 
+        rgba(76, 175, 80, 0.2) 0%, 
+        rgba(200, 170, 110, 0.2) 100%);
+    border: 2px solid rgba(76, 175, 80, 0.5);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    animation: celebrateEntry 0.8s ease;
+}
+
+@keyframes celebrateEntry {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.completion-content h3 {
+    font-size: 1.8rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+    font-family: 'Cinzel', serif;
+}
+
+.completion-content p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.completion-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.completion-links a {
+    padding: 0.875rem 1.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.4);
+    border-radius: 10px;
+    color: #C8AA6E;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.completion-links a:hover {
+    background: rgba(200, 170, 110, 0.25);
+    border-color: #C8AA6E;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(200, 170, 110, 0.3);
+}
+
+@media (max-width: 768px) {
+    .completion-banner {
+        padding: 2rem 1.5rem;
+    }
+    
+    .completion-content h3 {
+        font-size: 1.4rem;
+    }
+    
+    .completion-content p {
+        font-size: 1rem;
+    }
+    
+    .completion-links {
+        gap: 0.75rem;
+    }
+    
+    .completion-links a {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 480px) {
+    .founding-member-banner {
+        margin: 0 0.5rem 1rem;
+        padding: 1.25rem 0.75rem;
+    }
+    
+    .countdown-banner {
+        margin: 0 0.5rem 1rem;
+        padding: 0.75rem 0.875rem;
+    }
+    
+    .how-it-works {
+        padding: 0 0.5rem;
+    }
+}
+
+/* ========================================
+   ANIMATION ENHANCEMENTS
+   ======================================== */
+
+/* Celebrate milestone achievements */
+@keyframes milestoneReached {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    75% {
+        transform: scale(1.1) rotate(5deg);
+    }
+}
+
+.founding-member-banner.milestone-reached {
+    animation: milestoneReached 0.6s ease;
+    border-color: #4CAF50;
+    background: linear-gradient(135deg, 
+        rgba(76, 175, 80, 0.2) 0%, 
+        rgba(200, 170, 110, 0.15) 100%);
+}
+
+/* Pulse effect for urgent milestones */
+@keyframes urgentPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(200, 170, 110, 0.5);
+    }
+}
+
+.founding-member-banner.urgent {
+    animation: urgentPulse 1.5s ease-in-out infinite;
+}
