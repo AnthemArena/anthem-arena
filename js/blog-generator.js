@@ -423,13 +423,9 @@ export async function generateRoundPreview(roundNumber) {
     }
 }
 
-// ========================================
-// SAVE TO FIREBASE
-// ========================================
-
 export async function saveBlogPost(blogPost) {
     try {
-        const blogRef = doc(db, 'blog-posts', blogPost.id);
+        const blogRef = doc(db, 'blog', blogPost.id);  // ← Changed from 'blog-posts'
         await setDoc(blogRef, blogPost);
         console.log(`✅ Saved blog post to Firebase: ${blogPost.id}`);
         return true;
@@ -439,22 +435,15 @@ export async function saveBlogPost(blogPost) {
     }
 }
 
-// ========================================
-// GET ALL BLOG POSTS
-// ========================================
-
-export async function getAllBlogPosts(limit = 50) {
+export async function getAllBlogPosts(limitCount = 50) {
     try {
-        const blogRef = collection(db, 'blog-posts');
+        const blogRef = collection(db, 'blog');  // ← Changed from 'blog-posts'
         const q = query(
             blogRef,
-            where('status', '==', 'published'),
-            orderBy('publishedDate', 'desc')
+            where('published', '==', true),
+            orderBy('publishedDate', 'desc'),
+            limit(limitCount)
         );
-        
-        if (limit) {
-            q = query(q, limit(limit));
-        }
         
         const snapshot = await getDocs(q);
         const posts = [];
@@ -472,13 +461,9 @@ export async function getAllBlogPosts(limit = 50) {
     }
 }
 
-// ========================================
-// GET SINGLE BLOG POST
-// ========================================
-
 export async function getBlogPost(postId) {
     try {
-        const blogRef = doc(db, 'blog-posts', postId);
+        const blogRef = doc(db, 'blog', postId);  // ← Changed from 'blog-posts'
         const snapshot = await getDoc(blogRef);
         
         if (snapshot.exists()) {
@@ -492,19 +477,15 @@ export async function getBlogPost(postId) {
     }
 }
 
-// ========================================
-// GET POSTS BY TYPE
-// ========================================
-
-export async function getBlogPostsByType(type, limit = 20) {
+export async function getBlogPostsByType(type, limitCount = 20) {
     try {
-        const blogRef = collection(db, 'blog-posts');
+        const blogRef = collection(db, 'blog');  // ← Changed from 'blog-posts'
         const q = query(
             blogRef,
-            where('status', '==', 'published'),
+            where('published', '==', true),
             where('type', '==', type),
             orderBy('publishedDate', 'desc'),
-            limit(limit)
+            limit(limitCount)
         );
         
         const snapshot = await getDocs(q);

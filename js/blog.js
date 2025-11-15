@@ -305,8 +305,16 @@ function formatDate(dateString) {
     });
 }
 
-function showError(message) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'block';
-    console.error('❌', message);
+function showError() {
+    const gridContainer = document.getElementById('blogGrid');
+    if (!gridContainer) return;  // ← Add safety check
+    
+    gridContainer.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon">❌</div>
+            <h3>Error Loading Posts</h3>
+            <p>Something went wrong. Please try again later.</p>
+            <button onclick="location.reload()" class="btn-primary">Retry</button>
+        </div>
+    `;
 }
