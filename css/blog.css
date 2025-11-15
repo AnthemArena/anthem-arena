@@ -790,14 +790,20 @@
     color: white;
     border-color: #10b981;
 }
+/* ========================================
+   SIDEBAR - COMPLETE
+   ======================================== */
 
-/* Sidebar */
+/* Sidebar Container */
 .post-sidebar {
     position: sticky;
     top: 100px;
     height: fit-content;
 }
 
+/* ========================================
+   CTA BOX
+   ======================================== */
 .sidebar-cta {
     background: linear-gradient(135deg, rgba(200, 170, 110, 0.15), rgba(200, 170, 110, 0.05));
     border: 2px solid rgba(200, 170, 110, 0.3);
@@ -815,16 +821,24 @@
     color: #C8AA6E;
 }
 
+.sidebar-cta h3 i {
+    margin-right: 0.5rem;
+}
+
 .sidebar-cta p {
     font-family: 'Lora', serif;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 1.5rem;
+    line-height: 1.5;
 }
 
 .btn-block {
     width: 100%;
 }
 
+/* ========================================
+   SIDEBAR SECTIONS (General)
+   ======================================== */
 .sidebar-section {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.6), rgba(20, 20, 36, 0.8));
     border: 2px solid rgba(200, 170, 110, 0.2);
@@ -840,6 +854,156 @@
     color: #C8AA6E;
 }
 
+.sidebar-section h4 i {
+    margin-right: 0.5rem;
+}
+
+/* ========================================
+   QUICK LINKS SECTION
+   ======================================== */
+.sidebar-links {
+    padding: 1.5rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: rgba(200, 170, 110, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.sidebar-link:hover {
+    background: rgba(200, 170, 110, 0.15);
+    border-color: #C8AA6E;
+    transform: translateX(4px);
+}
+
+.sidebar-link:last-child {
+    margin-bottom: 0;
+}
+
+.link-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.link-icon i {
+    font-size: 1.5rem;
+    color: #C8AA6E;
+}
+
+.link-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.link-content strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.link-content span {
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ========================================
+   SOCIAL SECTION
+   ======================================== */
+.sidebar-social {
+    text-align: center;
+}
+
+.social-intro {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.social-link i {
+    font-size: 1.25rem;
+}
+
+/* YouTube */
+.social-link.youtube {
+    color: #FF0000;
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.social-link.youtube:hover {
+    background: #FF0000;
+    color: white;
+    border-color: #FF0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+/* Twitter/X */
+.social-link.twitter {
+    color: #1DA1F2;
+    border-color: rgba(29, 161, 242, 0.3);
+}
+
+.social-link.twitter:hover {
+    background: #1DA1F2;
+    color: white;
+    border-color: #1DA1F2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3);
+}
+
+/* Instagram */
+.social-link.instagram {
+    color: #E4405F;
+    border-color: rgba(228, 64, 95, 0.3);
+}
+
+.social-link.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    border-color: #E4405F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(228, 64, 95, 0.3);
+}
+
+/* ========================================
+   RELATED POSTS SECTION
+   ======================================== */
 .related-post-item {
     display: flex;
     gap: 1rem;
@@ -903,169 +1067,14 @@
     color: #C8AA6E;
 }
 
-/* Post Error State */
-.post-loading,
-.post-error {
-    text-align: center;
-    padding: 5rem 2rem;
-}
-
-.error-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-}
-
-.post-error h2 {
-    font-family: 'Cinzel', serif;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #C8AA6E;
-}
-
-.post-error p {
-    font-family: 'Lora', serif;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 2rem;
-    font-size: 1.125rem;
-}
 /* ========================================
-   ENHANCED SIDEBAR
+   RESPONSIVE SIDEBAR
    ======================================== */
-
-/* Sidebar Links Section */
-.sidebar-links {
-    padding: 1.5rem;
-}
-
-.sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    background: rgba(200, 170, 110, 0.05);
-    border: 1px solid rgba(200, 170, 110, 0.2);
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.sidebar-link:hover {
-    background: rgba(200, 170, 110, 0.15);
-    border-color: #C8AA6E;
-    transform: translateX(4px);
-}
-
-.sidebar-link:last-child {
-    margin-bottom: 0;
-}
-
-.link-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.link-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.link-content strong {
-    font-family: 'Cinzel', serif;
-    font-size: 0.95rem;
-    color: #fff;
-    font-weight: 600;
-}
-
-.link-content span {
-    font-family: 'Lora', serif;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* Social Section */
-.sidebar-social {
-    text-align: center;
-}
-
-.social-intro {
-    font-family: 'Lora', serif;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-}
-
-.social-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1.25rem;
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: 'Lora', serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-.social-link svg {
-    width: 20px;
-    height: 20px;
-}
-
-.social-link.youtube {
-    color: #FF0000;
-    border-color: rgba(255, 0, 0, 0.3);
-}
-
-.social-link.youtube:hover {
-    background: #FF0000;
-    color: white;
-    border-color: #FF0000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
-}
-
-.social-link.twitter {
-    color: #1DA1F2;
-    border-color: rgba(29, 161, 242, 0.3);
-}
-
-.social-link.twitter:hover {
-    background: #1DA1F2;
-    color: white;
-    border-color: #1DA1F2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3);
-}
-
-.social-link.instagram {
-    color: #E4405F;
-    border-color: rgba(228, 64, 95, 0.3);
-}
-
-.social-link.instagram:hover {
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    color: white;
-    border-color: #E4405F;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(228, 64, 95, 0.3);
-}
-
-/* Responsive Adjustments */
 @media (max-width: 1024px) {
+    .post-sidebar {
+        position: static;
+    }
+    
     .sidebar-links,
     .sidebar-social {
         display: grid;
@@ -1083,99 +1092,30 @@
     .sidebar-social {
         grid-template-columns: 1fr;
     }
-}
-/* Icon spacing in headings */
-.blog-hero h1 i,
-.sidebar-section h4 i,
-.sidebar-cta h3 i,
-.filter-btn i {
-    margin-right: 0.5rem;
-    color: #C8AA6E;
-}
-
-/* Icon sizing */
-.link-icon i {
-    font-size: 1.5rem;
-    color: #C8AA6E;
+    
+    .sidebar-cta {
+        padding: 1.5rem;
+    }
+    
+    .sidebar-cta h3 {
+        font-size: 1.25rem;
+    }
 }
 
-/* Social icon sizing */
-.social-link i {
-    font-size: 1.25rem;
-}
-/* Social Section */
-.sidebar-social {
-    text-align: center;
-}
-
-.social-intro {
-    font-family: 'Lora', serif;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-}
-
-.social-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1.25rem;
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: 'Lora', serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-.social-link i {
-    font-size: 1.25rem;
-}
-
-.social-link.youtube {
-    color: #FF0000;
-    border-color: rgba(255, 0, 0, 0.3);
-}
-
-.social-link.youtube:hover {
-    background: #FF0000;
-    color: white;
-    border-color: #FF0000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
-}
-
-.social-link.twitter {
-    color: #1DA1F2;
-    border-color: rgba(29, 161, 242, 0.3);
-}
-
-.social-link.twitter:hover {
-    background: #1DA1F2;
-    color: white;
-    border-color: #1DA1F2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3);
-}
-
-.social-link.instagram {
-    color: #E4405F;
-    border-color: rgba(228, 64, 95, 0.3);
-}
-
-.social-link.instagram:hover {
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    color: white;
-    border-color: #E4405F;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(228, 64, 95, 0.3);
+@media (max-width: 480px) {
+    .sidebar-section {
+        padding: 1rem;
+    }
+    
+    .sidebar-link {
+        padding: 0.75rem;
+    }
+    
+    .link-icon i {
+        font-size: 1.25rem;
+    }
+    
+    .social-link {
+        padding: 0.75rem 1rem;
+    }
 }
