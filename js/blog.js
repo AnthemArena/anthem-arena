@@ -1,288 +1,233 @@
 // ========================================
-// BLOG POST PAGE - JavaScript
+// BLOG INDEX PAGE - JavaScript
 // ========================================
 
 import { db } from './firebase-config.js';
-import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-let currentPost = null;
+const POSTS_PER_PAGE = 12;
+let allPosts = [];
+let filteredPosts = [];
+let currentFilter = 'all';
+let displayedCount = POSTS_PER_PAGE;
 
 // ========================================
 // INITIALIZE
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    const slug = getSlugFromURL();
-    
-    if (!slug) {
-        showError('No blog post specified');
-        return;
-    }
-    
-    loadBlogPost(slug);
-    initializeShareButtons();
+    console.log('🎯 Blog index page loading...');
+    loadBlogPosts();
+    initializeFilters();
 });
 
 // ========================================
-// LOAD BLOG POST
+// LOAD BLOG POSTS
 // ========================================
 
-async function loadBlogPost(slug) {
+async function loadBlogPosts() {
     try {
-        console.log(`📥 Loading blog post: ${slug}`);
+        console.log('📥 Loading all blog posts...');
         
         const blogRef = collection(db, 'blog');
+        
+        // Simple query without orderBy (to avoid index requirement)
         const q = query(
             blogRef,
-            where('slug', '==', slug),
-            where('published', '==', true),
-            limit(1)
+            where('published', '==', true)
         );
         
         const snapshot = await getDocs(q);
         
-        if (snapshot.empty) {
-            showError('Post not found');
+        allPosts = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        
+        // Sort manually by publishedDate
+        allPosts.sort((a, b) => {
+            const dateA = new Date(a.publishedDate || 0);
+            const dateB = new Date(b.publishedDate || 0);
+            return dateB - dateA; // Descending (newest first)
+        });
+        
+        console.log(`✅ Loaded ${allPosts.length} blog posts`, allPosts);
+        
+        if (allPosts.length === 0) {
+            showEmptyState();
             return;
         }
         
-        currentPost = {
-            id: snapshot.docs[0].id,
-            ...snapshot.docs[0].data()
-        };
+        // Show featured post
+        const featuredPost = allPosts.find(post => post.featured);
+        if (featuredPost) {
+            displayFeaturedPost(featuredPost);
+        }
         
-        console.log('✅ Post loaded:', currentPost);
-        
-        displayPost(currentPost);
-        loadRelatedPosts(currentPost);
+        // Display all posts
+        filteredPosts = allPosts;
+        displayPosts();
         
     } catch (error) {
-        console.error('❌ Error loading blog post:', error);
-        showError('Failed to load post');
+        console.error('❌ Error loading blog posts:', error);
+        showError();
     }
 }
 
 // ========================================
-// DISPLAY POST
+// DISPLAY FEATURED POST
 // ========================================
 
-function displayPost(post) {
-    // Hide loading, show content
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('postContent').style.display = 'block';
+function displayFeaturedPost(post) {
+    const featuredSection = document.getElementById('featuredSection');
+    const featuredContainer = document.getElementById('featuredPost');
     
-    // Update page title and meta
-    document.title = `${post.headline} - Anthem Arena`;
-    document.getElementById('pageTitle').textContent = `${post.headline} - Anthem Arena`;
-    document.getElementById('pageDescription').content = post.lede || post.headline;
-    document.getElementById('ogTitle').content = post.headline;
-    document.getElementById('ogDescription').content = post.lede || post.headline;
+    if (!featuredContainer) return;
     
-    // Hero image
     const thumbnailUrl = getPostThumbnail(post);
-    document.getElementById('postHeroImage').innerHTML = `
-        <img src="${thumbnailUrl}" 
-             alt="${post.headline}"
-             onerror="this.src='https://via.placeholder.com/1200x600/1a1a2e/0ea5e9?text=Anthem+Arena'">
-    `;
-    document.getElementById('ogImage').content = thumbnailUrl;
+    const excerpt = post.excerpt || (post.content ? post.content.substring(0, 200) + '...' : 'Read more...');
     
-    // Category
-    document.getElementById('postCategory').textContent = formatCategory(post.type);
-    
-    // Headline
-    document.getElementById('postHeadline').textContent = post.headline;
-    
-    // Meta
-    document.getElementById('postDate').textContent = formatDate(post.publishedDate);
-    document.getElementById('postReadTime').textContent = post.readTime || '3 min read';
-    
-    // Lede
-    document.getElementById('postLede').textContent = post.lede || '';
-    
-    // Match stats widget (if match recap)
-    if (post.type === 'match-recap' && post.matchData) {
-        displayMatchStats(post.matchData);
-    }
-    
-    // Post sections
-    displaySections(post.sections || []);
-    
-    // Tags
-    displayTags(post.tags || []);
-}
-
-// ========================================
-// DISPLAY MATCH STATS
-// ========================================
-
-function displayMatchStats(matchData) {
-    const widget = document.getElementById('matchStatsWidget');
-    if (!widget) return;
-    
-    const { song1, song2, winnerId } = matchData;
-    
-    widget.innerHTML = `
-        <h3>⚔️ Match Result</h3>
-        <div class="match-stats-grid">
-            <div class="match-stats-song ${song1.id === winnerId ? 'winner' : ''}">
-                <div class="match-stats-song-title">${song1.shortTitle || song1.title}</div>
-                <div class="match-stats-song-artist">${song1.artist}</div>
-                <div class="match-stats-votes">${song1.votes.toLocaleString()}</div>
-                ${song1.id === winnerId ? '<div class="match-stats-winner">🏆 Winner</div>' : ''}
+    featuredContainer.innerHTML = `
+        <div class="featured-post-card" onclick="location.href='/blog/${post.slug}'">
+            <div class="featured-post-image">
+                <img src="${thumbnailUrl}" 
+                     alt="${post.headline}"
+                     onerror="this.src='https://via.placeholder.com/800x500/0a0a0a/C8AA6E?text=Anthem+Arena'">
             </div>
-            
-            <div class="match-stats-vs">VS</div>
-            
-            <div class="match-stats-song ${song2.id === winnerId ? 'winner' : ''}">
-                <div class="match-stats-song-title">${song2.shortTitle || song2.title}</div>
-                <div class="match-stats-song-artist">${song2.artist}</div>
-                <div class="match-stats-votes">${song2.votes.toLocaleString()}</div>
-                ${song2.id === winnerId ? '<div class="match-stats-winner">🏆 Winner</div>' : ''}
+            <div class="featured-post-content">
+                <span class="featured-post-category">${formatCategory(post.type)}</span>
+                <h2>${post.headline}</h2>
+                <p class="featured-post-excerpt">${excerpt}</p>
+                <div class="featured-post-meta">
+                    <span>${formatDate(post.publishedDate)}</span>
+                    <span class="meta-divider">•</span>
+                    <span>3 min read</span>
+                </div>
+                <a href="/blog/${post.slug}" class="btn-primary">Read Full Story</a>
             </div>
         </div>
     `;
     
-    widget.style.display = 'block';
+    featuredSection.style.display = 'block';
 }
 
 // ========================================
-// DISPLAY SECTIONS
+// DISPLAY POSTS
 // ========================================
 
-function displaySections(sections) {
-    const container = document.getElementById('postSections');
-    if (!container) return;
+function displayPosts() {
+    const gridContainer = document.getElementById('blogGrid');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
     
-    container.innerHTML = sections.map(section => `
-        <div class="post-section">
-            ${section.heading ? `<h2>${section.heading}</h2>` : ''}
-            ${section.content.split('\n\n').map(para => `<p>${para}</p>`).join('')}
-        </div>
-    `).join('');
-}
-
-// ========================================
-// DISPLAY TAGS
-// ========================================
-
-function displayTags(tags) {
-    const container = document.getElementById('postTags');
-    if (!container) return;
+    if (!gridContainer) return;
     
-    if (tags.length === 0) {
-        container.style.display = 'none';
+    // Filter out featured post from grid
+    const postsToDisplay = filteredPosts
+        .filter(post => !post.featured)
+        .slice(0, displayedCount);
+    
+    if (postsToDisplay.length === 0 && filteredPosts.length === 0) {
+        gridContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3>No posts found</h3>
+                <p>Try selecting a different filter</p>
+            </div>
+        `;
+        loadMoreContainer.style.display = 'none';
         return;
     }
     
-    container.innerHTML = tags.map(tag => 
-        `<span class="tag">#${tag}</span>`
-    ).join('');
+    gridContainer.innerHTML = postsToDisplay.map(post => createPostCard(post)).join('');
+    
+    // Show/hide load more button
+    const hasMore = filteredPosts.filter(p => !p.featured).length > displayedCount;
+    loadMoreContainer.style.display = hasMore ? 'block' : 'none';
 }
 
 // ========================================
-// LOAD RELATED POSTS
+// CREATE POST CARD
 // ========================================
 
-async function loadRelatedPosts(currentPost) {
-    try {
-        const blogRef = collection(db, 'blog');
-        const q = query(
-            blogRef,
-            where('published', '==', true),
-            where('type', '==', currentPost.type),
-            orderBy('publishedDate', 'desc'),
-            limit(4)
-        );
-        
-        const snapshot = await getDocs(q);
-        const relatedPosts = snapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .filter(post => post.id !== currentPost.id)
-            .slice(0, 3);
-        
-        if (relatedPosts.length === 0) return;
-        
-        const container = document.getElementById('relatedPosts');
-        const section = document.getElementById('relatedPostsSection');
-        
-        container.innerHTML = relatedPosts.map(post => `
-            <a href="/blog/${post.slug}" class="related-post-item">
-                <div class="related-post-image">
-                    <img src="${getPostThumbnail(post)}" 
-                         alt="${post.headline}"
-                         onerror="this.src='https://via.placeholder.com/80x80/1a1a2e/0ea5e9?text=AA'">
+function createPostCard(post) {
+    const thumbnailUrl = getPostThumbnail(post);
+    const excerpt = post.excerpt || (post.content ? post.content.substring(0, 120) + '...' : 'Read more...');
+    
+    return `
+        <div class="blog-card" onclick="location.href='/blog/${post.slug}'">
+            <div class="blog-card-image">
+                <img src="${thumbnailUrl}" 
+                     alt="${post.headline}"
+                     onerror="this.src='https://via.placeholder.com/400x250/0a0a0a/C8AA6E?text=Anthem+Arena'">
+                <span class="blog-card-category">${formatCategory(post.type)}</span>
+            </div>
+            <div class="blog-card-content">
+                <h3>${post.headline}</h3>
+                <p class="blog-card-excerpt">${excerpt}</p>
+                <div class="blog-card-footer">
+                    <span class="blog-card-date">${formatDate(post.publishedDate)}</span>
+                    <span class="blog-card-read-more">Read More</span>
                 </div>
-                <div class="related-post-content">
-                    <h5>${post.headline}</h5>
-                    <p>${formatDate(post.publishedDate)}</p>
-                </div>
-            </a>
-        `).join('');
-        
-        section.style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error loading related posts:', error);
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
+// FILTERS
+// ========================================
+
+function initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Apply filter
+            currentFilter = filter;
+            displayedCount = POSTS_PER_PAGE;
+            
+            if (filter === 'all') {
+                filteredPosts = allPosts;
+            } else {
+                filteredPosts = allPosts.filter(post => post.type === filter);
+            }
+            
+            displayPosts();
+        });
+    });
+    
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            displayedCount += POSTS_PER_PAGE;
+            displayPosts();
+        });
     }
-}
-
-// ========================================
-// SHARE FUNCTIONALITY
-// ========================================
-
-function initializeShareButtons() {
-    document.getElementById('shareTwitter')?.addEventListener('click', () => {
-        const url = window.location.href;
-        const text = currentPost ? currentPost.headline : 'Check out this post';
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-    });
-    
-    document.getElementById('shareReddit')?.addEventListener('click', () => {
-        const url = window.location.href;
-        const title = currentPost ? currentPost.headline : 'Anthem Arena Blog Post';
-        window.open(`https://reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`, '_blank');
-    });
-    
-    document.getElementById('shareCopy')?.addEventListener('click', async () => {
-        const btn = document.getElementById('shareCopy');
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            btn.textContent = '✓ Copied!';
-            btn.classList.add('copied');
-            setTimeout(() => {
-                btn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    Copy Link
-                `;
-                btn.classList.remove('copied');
-            }, 2000);
-        } catch (error) {
-            alert('Failed to copy link');
-        }
-    });
 }
 
 // ========================================
 // UTILITY FUNCTIONS
 // ========================================
 
-function getSlugFromURL() {
-    const pathParts = window.location.pathname.split('/');
-    return pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
-}
-
 function getPostThumbnail(post) {
-    if (post.matchData?.song1?.videoId) {
-        return `https://img.youtube.com/vi/${post.matchData.song1.videoId}/maxresdefault.jpg`;
+    // Priority 1: Use images.hero if available
+    if (post.images?.hero) {
+        return post.images.hero;
     }
-    if (post.winningSongVideoId) {
-        return `https://img.youtube.com/vi/${post.winningSongVideoId}/maxresdefault.jpg`;
+    
+    // Priority 2: Use metadata video ID
+    if (post.metadata?.winnerVideoId) {
+        return `https://img.youtube.com/vi/${post.metadata.winnerVideoId}/maxresdefault.jpg`;
     }
-    return 'https://via.placeholder.com/1200x600/1a1a2e/0ea5e9?text=Anthem+Arena';
+    
+    // Fallback: Placeholder
+    return 'https://via.placeholder.com/800x450/0a0a0a/C8AA6E?text=Anthem+Arena';
 }
 
 function formatCategory(type) {
@@ -291,23 +236,44 @@ function formatCategory(type) {
         'round-recap': '🏆 Round Recap',
         'upset-alert': '🚨 Upset Alert',
         'preview': '🔮 Preview',
+        'round-preview': '🔮 Round Preview',
         'analysis': '📈 Analysis'
     };
     return categories[type] || '📰 News';
 }
 
 function formatDate(dateString) {
+    if (!dateString) return 'Recent';
+    
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-        month: 'long', 
-        day: 'numeric',
-        year: 'numeric'
-    });
+    const now = new Date();
+    const diffMs = now - date;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffHours < 24) {
+        if (diffHours < 1) return 'Just now';
+        return `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+        return `${diffDays}d ago`;
+    } else {
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        });
+    }
+}
+
+function showEmptyState() {
+    document.getElementById('featuredSection').style.display = 'none';
+    document.getElementById('blogGrid').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
 }
 
 function showError() {
     const gridContainer = document.getElementById('blogGrid');
-    if (!gridContainer) return;  // ← Add safety check
+    if (!gridContainer) return;
     
     gridContainer.innerHTML = `
         <div class="empty-state">

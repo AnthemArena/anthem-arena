@@ -3,7 +3,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
-import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs, query, where, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 let currentPost = null;
 
@@ -72,11 +72,14 @@ function displayPost(post) {
     document.getElementById('postContent').style.display = 'block';
     
     // Update page title and meta
-    document.title = `${post.headline} - Anthem Arena`;
-    document.getElementById('pageTitle').textContent = `${post.headline} - Anthem Arena`;
-    document.getElementById('pageDescription').content = post.excerpt || post.headline;
+    const pageTitle = `${post.headline} - Anthem Arena`;
+    const description = post.excerpt || post.lede || post.headline;
+    
+    document.title = pageTitle;
+    document.getElementById('pageTitle').textContent = pageTitle;
+    document.getElementById('pageDescription').content = description;
     document.getElementById('ogTitle').content = post.headline;
-    document.getElementById('ogDescription').content = post.excerpt || post.headline;
+    document.getElementById('ogDescription').content = description;
     
     // Hero image
     const thumbnailUrl = getPostThumbnail(post);
@@ -97,15 +100,16 @@ function displayPost(post) {
     document.getElementById('postDate').textContent = formatDate(post.publishedDate);
     document.getElementById('postReadTime').textContent = post.readTime || '3 min read';
     
-    // Lede
-    document.getElementById('postLede').textContent = post.excerpt || '';
+    // Lede/Excerpt
+    const ledeText = post.excerpt || post.lede || '';
+    document.getElementById('postLede').textContent = ledeText;
     
     // Match stats widget (if match recap)
     if (post.type === 'match-recap' && post.metadata) {
         displayMatchStats(post.metadata);
     }
     
-    // Post content (convert markdown-style to HTML)
+    // Post content
     displayContent(post.content || '');
     
     // Tags
@@ -156,6 +160,11 @@ function displayContent(content) {
     const container = document.getElementById('postSections');
     if (!container) return;
     
+    if (!content || content.trim() === '') {
+        container.innerHTML = '<div class="post-section"><p>Content coming soon...</p></div>';
+        return;
+    }
+    
     // Convert markdown-style headings and paragraphs to HTML
     const lines = content.split('\n');
     let html = '';
@@ -181,7 +190,12 @@ function displayContent(content) {
     
     if (inSection) html += '</div>';
     
-    container.innerHTML = html || '<p>Content coming soon...</p>';
+    // If no content was generated, add wrapper
+    if (!html) {
+        html = '<div class="post-section"><p>Content coming soon...</p></div>';
+    }
+    
+    container.innerHTML = html;
 }
 
 // ========================================
@@ -192,7 +206,7 @@ function displayTags(tags) {
     const container = document.getElementById('postTags');
     if (!container) return;
     
-    if (tags.length === 0) {
+    if (!tags || tags.length === 0) {
         container.style.display = 'none';
         return;
     }
@@ -200,6 +214,7 @@ function displayTags(tags) {
     container.innerHTML = tags.map(tag => 
         `<span class="tag">#${tag}</span>`
     ).join('');
+    container.style.display = 'flex';
 }
 
 // ========================================
@@ -209,12 +224,13 @@ function displayTags(tags) {
 async function loadRelatedPosts(currentPost) {
     try {
         const blogRef = collection(db, 'blog');
+        
+        // Simple query without orderBy
         const q = query(
             blogRef,
             where('published', '==', true),
             where('type', '==', currentPost.type),
-            orderBy('publishedDate', 'desc'),
-            limit(4)
+            limit(10)
         );
         
         const snapshot = await getDocs(q);
@@ -293,17 +309,27 @@ function initializeShareButtons() {
 // ========================================
 
 function getSlugFromURL() {
-    const pathParts = window.location.pathname.split('/');
-    return pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    return pathParts[pathParts.length - 1] || '';
 }
 
 function getPostThumbnail(post) {
+    // Priority 1: Use images.hero if available
     if (post.images?.hero) {
         return post.images.hero;
     }
+    
+    // Priority 2: Use metadata video ID
     if (post.metadata?.winnerVideoId) {
         return `https://img.youtube.com/vi/${post.metadata.winnerVideoId}/maxresdefault.jpg`;
     }
+    
+    // Priority 3: Try matchData (from blog-generator)
+    if (post.matchData?.song1?.videoId) {
+        return `https://img.youtube.com/vi/${post.matchData.song1.videoId}/maxresdefault.jpg`;
+    }
+    
+    // Fallback: Placeholder
     return 'https://via.placeholder.com/1200x600/0a0a0a/C8AA6E?text=Anthem+Arena';
 }
 
@@ -320,6 +346,8 @@ function formatCategory(type) {
 }
 
 function formatDate(dateString) {
+    if (!dateString) return 'Recent';
+    
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
         month: 'long', 
