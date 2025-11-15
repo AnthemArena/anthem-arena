@@ -2359,3 +2359,133 @@ display: none;
         padding: 2rem;
     }
 }
+/* H2H Winner Styling */
+.h2h-song.h2h-winner {
+    border: 2px solid #C8AA6E;
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.3);
+}
+
+/* H2H History Section */
+.h2h-matchup-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1), rgba(200, 170, 110, 0.05));
+    border-radius: 12px;
+}
+
+.h2h-history-header {
+    text-align: center;
+}
+
+.h2h-history-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.h2h-history-header h4 {
+    color: #C8AA6E;
+    font-family: 'Cinzel', serif;
+    margin: 0;
+}
+
+/* Overall Record */
+.h2h-overall-record {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.h2h-record-badge {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.h2h-record-badge.leading {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(200, 170, 110, 0.1));
+    border: 2px solid #C8AA6E;
+}
+
+.h2h-leader-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Match List */
+.h2h-match-list {
+    margin-top: 1rem;
+}
+
+.h2h-match-list h5 {
+    color: #C8AA6E;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.h2h-match-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.h2h-match-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.h2h-match-tournament {
+    font-weight: 600;
+}
+
+.h2h-match-score {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.h2h-match-score .winner {
+    color: #C8AA6E;
+    font-weight: 700;
+}
+
+.h2h-match-winner {
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Loading State */
+.h2h-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+}
+
+.loading-spinner {
+    border: 3px solid rgba(200, 170, 110, 0.2);
+    border-top: 3px solid #C8AA6E;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

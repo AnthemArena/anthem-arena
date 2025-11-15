@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Blog Post - Anthem Arena</title>
+    <meta name="description" id="pageDescription" content="Read the latest from Anthem Arena">
+    
+    <!-- Open Graph (populated dynamically) -->
+    <meta property="og:title" id="ogTitle" content="">
+    <meta property="og:description" id="ogDescription" content="">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:type" content="article">
+    
+    <link rel="stylesheet" href="/css/blog.css">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🏆</span>
+                <span class="logo-text">Anthem Arena</span>
+            </a>
+            <nav class="main-nav">
+                <a href="/vote.html">Vote</a>
+                <a href="/leaderboard.html">Leaderboard</a>
+                <a href="/bracket.html">Bracket</a>
+                <a href="/blog.html" class="active">Blog</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="post-loading">
+        <div class="container">
+            <div class="spinner"></div>
+            <p>Loading post...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="post-error" style="display: none;">
+        <div class="container">
+            <div class="error-icon">❌</div>
+            <h2>Post Not Found</h2>
+            <p>This blog post doesn't exist or may have been removed.</p>
+            <a href="/blog.html" class="btn-primary">Back to Blog</a>
+        </div>
+    </div>
+
+    <!-- Post Content -->
+    <article id="postContent" class="blog-post-article" style="display: none;">
+        <!-- Post Hero -->
+        <div class="post-hero">
+            <div class="post-hero-image" id="postHeroImage"></div>
+            <div class="post-hero-overlay">
+                <div class="container">
+                    <div class="post-category" id="postCategory"></div>
+                    <h1 id="postHeadline"></h1>
+                    <div class="post-meta">
+                        <span id="postDate"></span>
+                        <span class="meta-divider">•</span>
+                        <span id="postReadTime"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Body -->
+        <div class="post-body">
+            <div class="container">
+                <div class="post-main">
+                    <!-- Lede -->
+                    <div class="post-lede" id="postLede"></div>
+
+                    <!-- Match Stats Widget (if match recap) -->
+                    <div id="matchStatsWidget" class="match-stats-widget" style="display: none;"></div>
+
+                    <!-- Post Sections -->
+                    <div id="postSections" class="post-sections"></div>
+
+                    <!-- Tags -->
+                    <div class="post-tags" id="postTags"></div>
+
+                    <!-- Share Buttons -->
+                    <div class="post-share">
+                        <h4>Share this post</h4>
+                        <div class="share-buttons">
+                            <button class="share-btn twitter" id="shareTwitter">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                                </svg>
+                                Twitter
+                            </button>
+                            <button class="share-btn reddit" id="shareReddit">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                                </svg>
+                                Reddit
+                            </button>
+                            <button class="share-btn copy" id="shareCopy">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="post-sidebar">
+                    <!-- CTA Box -->
+                    <div class="sidebar-cta">
+                        <h3>🗳️ Join the Battle</h3>
+                        <p>Vote for your favorite Worlds anthems and climb the leaderboard!</p>
+                        <a href="/vote.html" class="btn-primary btn-block">Vote Now</a>
+                    </div>
+
+                    <!-- Related Posts -->
+                    <div class="sidebar-section" id="relatedPostsSection" style="display: none;">
+                        <h4>Related Posts</h4>
+                        <div id="relatedPosts"></div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Anthem Arena</h3>
+                    <p>The ultimate League of Legends Worlds anthem championship</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tournament</h4>
+                    <a href="/vote.html">Vote Now</a>
+                    <a href="/bracket.html">View Bracket</a>
+                    <a href="/leaderboard.html">Leaderboard</a>
+                </div>
+                <div class="footer-section">
+                    <h4>More</h4>
+                    <a href="/blog.html">Blog</a>
+                    <a href="/about.html">About</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Anthem Arena. Not affiliated with Riot Games.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/js/blog-post.js"></script>
+</body>
+</html>

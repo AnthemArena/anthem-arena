@@ -74,6 +74,69 @@
                 </div>
             </section>
 
+
+            <!-- Add after your existing sections -->
+
+<!-- ========================================
+     BLOG POST GENERATION
+     ======================================== -->
+<div class="admin-section">
+    <h2>📝 Blog Post Generator</h2>
+    
+    <!-- Match Recap -->
+    <div class="control-group">
+        <h3>Generate Match Recap</h3>
+        <div class="form-row">
+            <input type="text" 
+                   id="blogMatchId" 
+                   placeholder="round-1-match-1"
+                   style="flex: 1;">
+            <button onclick="generateMatchRecapFromAdmin()" class="btn-primary">
+                Generate Recap
+            </button>
+        </div>
+    </div>
+    
+    <!-- Round Recap -->
+    <div class="control-group">
+        <h3>Generate Round Recap</h3>
+        <div class="form-row">
+            <input type="number" 
+                   id="blogRoundNumber" 
+                   placeholder="1" 
+                   min="1" 
+                   max="6"
+                   style="width: 100px;">
+            <button onclick="generateRoundRecapFromAdmin()" class="btn-primary">
+                Generate Round Recap
+            </button>
+        </div>
+    </div>
+    
+    <!-- Auto-Generate After Closing -->
+    <div class="control-group">
+        <label class="checkbox-label">
+            <input type="checkbox" 
+                   id="autoGenerateBlog" 
+                   checked>
+            Auto-generate blog posts when closing matches
+        </label>
+    </div>
+    
+    <!-- Recent Blog Posts -->
+    <div class="control-group">
+        <h3>Recent Blog Posts</h3>
+        <div id="recentBlogPosts" class="blog-posts-list">
+            <p style="color: #888;">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Blog Generation Log -->
+<div class="admin-section">
+    <h2>📋 Blog Generation Log</h2>
+    <div id="blogGenerationLog" class="log-output"></div>
+</div>
            
 
             <!-- Match Management -->

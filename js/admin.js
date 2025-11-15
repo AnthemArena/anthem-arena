@@ -1,9 +1,20 @@
 // ========================================
-// ADMIN PANEL - TOURNAMENT MANAGEMENT
+// ADMIN PANEL - TOURNAMENT MANAGEMENT + BLOG GENERATION
 // ========================================
 
 import { db, auth } from './firebase-config.js';
 import { initializeCompleteTournament } from './init-firebase.js';
+
+// ✅ NEW: Import blog generation functions
+import {
+    generateMatchRecap,
+    generateRoundRecap,
+    generateRoundPreview,
+    saveBlogPost,
+    getAllBlogPosts,
+    autoGenerateMatchRecap,
+    autoGenerateRoundRecap
+} from './blog-generator.js';
 
 import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -18,23 +29,20 @@ const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 // AUTHENTICATION
 // ========================================
 
-// Check authentication state on page load
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // User is logged in
         console.log('✅ Authenticated as:', user.email);
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
         loadMatches();
+        loadRecentBlogPosts();
     } else {
-        // User is not logged in
         console.log('❌ Not authenticated');
         document.getElementById('login-container').style.display = 'flex';
         document.getElementById('admin-content').style.display = 'none';
     }
 });
 
-// Login function
 window.loginAdmin = async function(event) {
     event.preventDefault();
     
@@ -53,7 +61,6 @@ window.loginAdmin = async function(event) {
     }
 };
 
-// Logout function
 window.logoutAdmin = async function() {
     if (!confirm('Logout from admin panel?')) return;
     
@@ -66,10 +73,179 @@ window.logoutAdmin = async function() {
     }
 };
 
+// ========================================
+// BLOG GENERATION FUNCTIONS
+// ========================================
 
+window.generateMatchRecapFromAdmin = async function() {
+    const matchId = document.getElementById('blogMatchId').value.trim();
+    
+    if (!matchId) {
+        alert('Please enter a match ID');
+        return;
+    }
+    
+    logBlog(`🤖 Generating match recap for ${matchId}...`);
+    
+    try {
+        const blogPost = await generateMatchRecap(matchId);
+        await saveBlogPost(blogPost);
+        
+        logBlog(`✅ SUCCESS: "${blogPost.headline}"`, 'success');
+        logBlog(`📝 Post ID: ${blogPost.id}`);
+        logBlog(`🔗 Slug: /blog/${blogPost.slug}`);
+        
+        document.getElementById('blogMatchId').value = '';
+        loadRecentBlogPosts();
+        
+        alert(`✅ Blog post created!\n\n${blogPost.headline}\n\nView at: /blog/${blogPost.slug}`);
+        
+    } catch (error) {
+        logBlog(`❌ ERROR: ${error.message}`, 'error');
+        alert(`❌ Error: ${error.message}`);
+        console.error(error);
+    }
+};
+
+window.generateRoundRecapFromAdmin = async function() {
+    const roundNumber = parseInt(document.getElementById('blogRoundNumber').value);
+    
+    if (!roundNumber || roundNumber < 1 || roundNumber > 6) {
+        alert('Please enter a valid round number (1-6)');
+        return;
+    }
+    
+    logBlog(`🤖 Generating round ${roundNumber} recap...`);
+    
+    try {
+        const blogPost = await generateRoundRecap(roundNumber);
+        await saveBlogPost(blogPost);
+        
+        logBlog(`✅ SUCCESS: "${blogPost.headline}"`, 'success');
+        logBlog(`📝 Post ID: ${blogPost.id}`);
+        
+        document.getElementById('blogRoundNumber').value = '';
+        loadRecentBlogPosts();
+        
+        alert(`✅ Round recap created!\n\n${blogPost.headline}`);
+        
+    } catch (error) {
+        logBlog(`❌ ERROR: ${error.message}`, 'error');
+        alert(`❌ Error: ${error.message}`);
+        console.error(error);
+    }
+};
+
+async function loadRecentBlogPosts() {
+    try {
+        const posts = await getAllBlogPosts(5);
+        const container = document.getElementById('recentBlogPosts');
+        
+        if (!container) return;
+        
+        if (posts.length === 0) {
+            container.innerHTML = '<p style="color: #888;">No blog posts yet. Generate one above!</p>';
+            return;
+        }
+        
+        container.innerHTML = posts.map(post => `
+            <div class="blog-post-item">
+                <div class="blog-post-header">
+                    <span class="blog-post-type">${post.type}</span>
+                    ${post.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
+                </div>
+                <h4>${post.headline}</h4>
+                <p class="blog-post-meta">
+                    ${new Date(post.publishedDate).toLocaleDateString()} • 
+                    ${post.category} • 
+                    ${post.tags.slice(0, 2).join(', ')}
+                </p>
+                <div class="blog-post-actions">
+                    <a href="/blog/${post.slug}" target="_blank" class="btn-view">View Post</a>
+                </div>
+            </div>
+        `).join('');
+        
+        logBlog(`✅ Loaded ${posts.length} recent blog posts`);
+        
+    } catch (error) {
+        console.error('Error loading recent blog posts:', error);
+        logBlog(`⚠️ Failed to load recent posts: ${error.message}`, 'error');
+    }
+}
+
+function logBlog(message, type = 'info') {
+    const logOutput = document.getElementById('blogGenerationLog');
+    if (!logOutput) return;
+    
+    const timestamp = new Date().toLocaleTimeString();
+    const className = type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : 'log-info';
+    
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry ${className}`;
+    logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
+    
+    logOutput.insertBefore(logEntry, logOutput.firstChild);
+    
+    while (logOutput.children.length > 50) {
+        logOutput.removeChild(logOutput.lastChild);
+    }
+}
 
 // ========================================
-// OPEN INDIVIDUAL MATCH
+// STAGGERED BLOG GENERATION QUEUE
+// ========================================
+
+let blogGenerationQueue = [];
+let isProcessingQueue = false;
+
+async function addToGenerationQueue(matchId, delayMinutes = 0) {
+    blogGenerationQueue.push({
+        matchId,
+        scheduledTime: Date.now() + (delayMinutes * 60 * 1000)
+    });
+    
+    logBlog(`📋 Queued blog for ${matchId} (publish in ${delayMinutes}m)`);
+    
+    if (!isProcessingQueue) {
+        processGenerationQueue();
+    }
+}
+
+async function processGenerationQueue() {
+    isProcessingQueue = true;
+    
+    while (blogGenerationQueue.length > 0) {
+        const now = Date.now();
+        const nextItem = blogGenerationQueue[0];
+        
+        if (now >= nextItem.scheduledTime) {
+            blogGenerationQueue.shift();
+            
+            try {
+                logBlog(`🤖 Generating scheduled blog for ${nextItem.matchId}...`);
+                const blogPost = await autoGenerateMatchRecap(nextItem.matchId);
+                
+                if (blogPost) {
+                    logBlog(`✅ Published: "${blogPost.headline}"`, 'success');
+                    loadRecentBlogPosts();
+                }
+            } catch (error) {
+                logBlog(`❌ Failed to generate ${nextItem.matchId}: ${error.message}`, 'error');
+            }
+        } else {
+            const waitTime = nextItem.scheduledTime - now;
+            logBlog(`⏳ Next blog in ${Math.round(waitTime / 60000)}m...`);
+            await new Promise(resolve => setTimeout(resolve, Math.min(waitTime, 60000)));
+        }
+    }
+    
+    isProcessingQueue = false;
+    logBlog(`✅ Blog generation queue complete`);
+}
+
+// ========================================
+// MATCH OPERATIONS
 // ========================================
 
 window.openMatch = async function(matchId) {
@@ -91,14 +267,6 @@ window.openMatch = async function(matchId) {
     }
 };
 
-// ========================================
-// CLOSE INDIVIDUAL MATCH
-// ========================================
-
-// ========================================
-// CLOSE INDIVIDUAL MATCH (with auto-advance)
-// ========================================
-
 window.closeMatch = async function(matchId) {
     if (!confirm(`Close match ${matchId}?\n\nThis will determine the winner and advance them to the next round.`)) return;
     
@@ -115,7 +283,6 @@ window.closeMatch = async function(matchId) {
         const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
         const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
         
-        // Close the match
         await updateDoc(matchRef, {
             status: 'completed',
             winnerId: winnerId
@@ -123,8 +290,22 @@ window.closeMatch = async function(matchId) {
         
         console.log(`✅ Closed match: ${matchId}, Winner: ${winnerId}`);
         
-        // ✅ Auto-advance winner to next round
         await advanceWinnerToNextRound(match, winnerData);
+        
+        // Single match = immediate blog (no staggering)
+        const autoGenerate = document.getElementById('autoGenerateBlog');
+        if (autoGenerate && autoGenerate.checked) {
+            logBlog(`🤖 Generating blog for ${matchId}...`);
+            try {
+                const blogPost = await autoGenerateMatchRecap(matchId);
+                if (blogPost) {
+                    logBlog(`✅ Published: "${blogPost.headline}"`, 'success');
+                    loadRecentBlogPosts();
+                }
+            } catch (error) {
+                logBlog(`⚠️ Blog generation failed: ${error.message}`, 'error');
+            }
+        }
         
         alert(`✅ Match ${matchId} closed!\n\nWinner: ${winnerData.shortTitle}\n✨ Advanced to next round!`);
         
@@ -136,16 +317,11 @@ window.closeMatch = async function(matchId) {
     }
 };
 
-// ========================================
-// AUTO-ADVANCE WINNER USING sourceMatch
-// ========================================
-
 async function advanceWinnerToNextRound(completedMatch, winner) {
     const nextRound = completedMatch.round + 1;
     
     console.log(`📈 Checking if ${completedMatch.matchId} winner advances to Round ${nextRound}...`);
     
-    // Find next-round matches that reference this match
     const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
     const q = query(matchesRef, where('round', '==', nextRound));
     const snapshot = await getDocs(q);
@@ -155,26 +331,24 @@ async function advanceWinnerToNextRound(completedMatch, winner) {
     for (const nextMatchDoc of snapshot.docs) {
         const nextMatch = nextMatchDoc.data();
         
-        // Check if song1 should come from this match
         if (nextMatch.song1?.sourceMatch === completedMatch.matchId) {
             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
                 'song1': {
                     ...winner,
                     votes: 0,
-                    sourceMatch: completedMatch.matchId  // Keep the sourceMatch reference
+                    sourceMatch: completedMatch.matchId
                 }
             });
             console.log(`  ✅ Advanced to ${nextMatch.matchId} (song1 slot)`);
             advanced = true;
         }
         
-        // Check if song2 should come from this match
         if (nextMatch.song2?.sourceMatch === completedMatch.matchId) {
             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
                 'song2': {
                     ...winner,
                     votes: 0,
-                    sourceMatch: completedMatch.matchId  // Keep the sourceMatch reference
+                    sourceMatch: completedMatch.matchId
                 }
             });
             console.log(`  ✅ Advanced to ${nextMatch.matchId} (song2 slot)`);
@@ -187,10 +361,193 @@ async function advanceWinnerToNextRound(completedMatch, winner) {
     }
 }
 
+// ========================================
+// BATCH OPERATIONS
+// ========================================
 
+window.openBatch = async function(roundNumber, batchNumber) {
+    if (!confirm(`Open Round ${roundNumber}, Batch ${batchNumber} for voting?`)) return;
+    
+    try {
+        console.log(`🚀 Opening Round ${roundNumber}, Batch ${batchNumber}...`);
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const q = query(
+            matchesRef, 
+            where('round', '==', roundNumber),
+            where('batch', '==', batchNumber)
+        );
+        const snapshot = await getDocs(q);
+        
+        let updateCount = 0;
+        const matchList = [];
+        
+        for (const matchDoc of snapshot.docs) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
+                status: 'live'
+            });
+            matchList.push(matchDoc.data().matchId);
+            updateCount++;
+        }
+        
+        console.log(`✅ Opened ${updateCount} matches:`, matchList);
+        
+        // ✅ Generate round preview if this is batch 1
+        const autoGenerate = document.getElementById('autoGenerateBlog');
+        if (autoGenerate && autoGenerate.checked && batchNumber === 1) {
+            logBlog(`🔮 Generating Round ${roundNumber} preview...`);
+            try {
+                const previewPost = await generateRoundPreview(roundNumber);
+                await saveBlogPost(previewPost);
+                logBlog(`✅ Round preview published: "${previewPost.headline}"`, 'success');
+                loadRecentBlogPosts();
+            } catch (error) {
+                logBlog(`⚠️ Preview generation failed: ${error.message}`, 'error');
+            }
+        }
+        
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} is now LIVE!\n\n${updateCount} matches opened:\n${matchList.join('\n')}`);
+        
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error opening batch:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
+
+window.closeBatch = async function(roundNumber, batchNumber) {
+    if (!confirm(`Close Round ${roundNumber}, Batch ${batchNumber}?\n\nThis will:\n- Determine winners\n- Advance them to next round\n- Stagger blog post generation`)) return;
+    
+    try {
+        console.log(`🔒 Closing Round ${roundNumber}, Batch ${batchNumber}...`);
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const q = query(
+            matchesRef,
+            where('round', '==', roundNumber),
+            where('batch', '==', batchNumber)
+        );
+        const snapshot = await getDocs(q);
+        
+        let closedCount = 0;
+        const results = [];
+        const autoGenerate = document.getElementById('autoGenerateBlog');
+        const shouldAutoGenerate = autoGenerate && autoGenerate.checked;
+        
+        // ✅ Categorize matches for staggered posting
+        const upsets = [];
+        const nailbiters = [];
+        const regularMatches = [];
+        
+        for (const matchDoc of snapshot.docs) {
+            const match = matchDoc.data();
+            
+            const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
+            const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
+            const loserData = match.song1.votes > match.song2.votes ? match.song2 : match.song1;
+            
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
+                status: 'completed',
+                winnerId: winnerId
+            });
+            
+            await advanceWinnerToNextRound(match, winnerData);
+            
+            results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})`);
+            closedCount++;
+            
+            // ✅ Categorize for staggered posting
+            if (shouldAutoGenerate) {
+                const voteDiff = Math.abs(winnerData.votes - loserData.votes);
+                const totalVotes = match.totalVotes || (winnerData.votes + loserData.votes);
+                const percentDiff = totalVotes > 0 ? (voteDiff / totalVotes) * 100 : 0;
+                const isUpset = loserData.seed < winnerData.seed;
+                const isNailbiter = voteDiff <= 5 || percentDiff <= 5;
+                
+                if (isUpset && Math.abs(loserData.seed - winnerData.seed) >= 8) {
+                    upsets.push(match.matchId);
+                } else if (isNailbiter) {
+                    nailbiters.push(match.matchId);
+                } else {
+                    regularMatches.push(match.matchId);
+                }
+            }
+        }
+        
+        console.log(`✅ Closed ${closedCount} matches`);
+        
+        // ✅ Stagger blog post generation
+        if (shouldAutoGenerate && closedCount > 0) {
+            logBlog(`📰 Scheduling ${closedCount} blog posts with smart timing...`);
+            
+            let delayMinutes = 0;
+            
+            // Priority 1: Upsets (immediate)
+            for (const matchId of upsets) {
+                await addToGenerationQueue(matchId, delayMinutes);
+                delayMinutes += 15;
+            }
+            
+            // Priority 2: Nail-biters
+            for (const matchId of nailbiters) {
+                await addToGenerationQueue(matchId, delayMinutes);
+                delayMinutes += 20;
+            }
+            
+            // Priority 3: Regular matches
+            for (const matchId of regularMatches) {
+                await addToGenerationQueue(matchId, delayMinutes);
+                delayMinutes += 30;
+            }
+            
+            logBlog(`📅 Blog schedule:`, 'success');
+            logBlog(`  • ${upsets.length} upsets (0-${upsets.length * 15}m)`);
+            logBlog(`  • ${nailbiters.length} thrillers (${upsets.length * 15}-${upsets.length * 15 + nailbiters.length * 20}m)`);
+            logBlog(`  • ${regularMatches.length} regular (${upsets.length * 15 + nailbiters.length * 20}+m)`);
+            
+            // ✅ Schedule round recap after all match recaps (only if round complete)
+            const roundRecapDelay = delayMinutes + 120;
+            
+            setTimeout(async () => {
+                const stillLiveQuery = query(
+                    matchesRef,
+                    where('round', '==', roundNumber),
+                    where('status', '==', 'live')
+                );
+                const stillLiveSnap = await getDocs(stillLiveQuery);
+                
+                if (stillLiveSnap.empty) {
+                    logBlog(`🎉 Round ${roundNumber} complete! Generating round recap...`);
+                    try {
+                        const roundBlogPost = await autoGenerateRoundRecap(roundNumber);
+                        if (roundBlogPost) {
+                            logBlog(`✅ Round recap published: "${roundBlogPost.headline}"`, 'success');
+                            loadRecentBlogPosts();
+                        }
+                    } catch (error) {
+                        logBlog(`⚠️ Round recap failed: ${error.message}`, 'error');
+                    }
+                } else {
+                    logBlog(`ℹ️ Round ${roundNumber} still has ${stillLiveSnap.size} live matches - skipping round recap`);
+                }
+            }, roundRecapDelay * 60 * 1000);
+            
+            logBlog(`📖 Round recap scheduled in ${Math.round(roundRecapDelay / 60)}h ${roundRecapDelay % 60}m (if round complete)`);
+        }
+        
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${closedCount} matches completed\n\n${shouldAutoGenerate ? `Blog posts scheduled:\n• ${upsets.length} upsets\n• ${nailbiters.length} thrillers\n• ${regularMatches.length} regular\n\nPublishing over next ${Math.round(delayMinutes / 60)}h ${delayMinutes % 60}m` : 'Auto-blog disabled'}\n\n${results.slice(0, 3).join('\n')}${results.length > 3 ? `\n...and ${results.length - 3} more` : ''}`);
+        
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error closing batch:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
 
 // ========================================
-// LOAD MATCHES INTO TABLE
+// LOAD MATCHES
 // ========================================
 
 async function loadMatches() {
@@ -216,12 +573,10 @@ async function loadMatches() {
         
         tbody.innerHTML = '';
         
-        // Track batch groups for batch controls
         let currentRound = null;
         let currentBatch = null;
         
         for (const match of matches) {
-            // Add batch header row when batch changes
             if (match.round !== currentRound || match.batch !== currentBatch) {
                 currentRound = match.round;
                 currentBatch = match.batch;
@@ -240,7 +595,6 @@ async function loadMatches() {
                 tbody.appendChild(batchHeaderRow);
             }
             
-            // Format date
             const dateStr = match.date 
                 ? new Date(match.date).toLocaleDateString('en-US', { 
                     month: 'short', 
@@ -282,16 +636,12 @@ async function loadMatches() {
     }
 }
 
-// ========================================
-// VIEW MATCH DETAILS
-// ========================================
-
 window.viewMatch = function(matchId) {
     window.location.href = `/vote.html?match=${matchId}`;
 };
 
 // ========================================
-// CLEAR ALL VOTES (TESTING ONLY)
+// TESTING FUNCTIONS
 // ========================================
 
 window.clearAllVotesForTesting = async function() {
@@ -320,7 +670,6 @@ window.clearAllVotesForTesting = async function() {
             return;
         }
         
-        // Delete all vote documents
         const deletePromises = votesSnapshot.docs.map(voteDoc => 
             deleteDoc(doc(db, 'votes', voteDoc.id))
         );
@@ -330,7 +679,6 @@ window.clearAllVotesForTesting = async function() {
         console.log('✅ All votes cleared');
         alert(`✅ Successfully deleted ${voteCount} votes!`);
         
-        // Refresh the matches table to show updated vote counts
         loadMatches();
         
     } catch (error) {
@@ -340,107 +688,13 @@ window.clearAllVotesForTesting = async function() {
 };
 
 // ========================================
-// OPEN A BATCH
-// ========================================
-
-window.openBatch = async function(roundNumber, batchNumber) {
-    if (!confirm(`Open Round ${roundNumber}, Batch ${batchNumber} for voting?`)) return;
-    
-    try {
-        console.log(`🚀 Opening Round ${roundNumber}, Batch ${batchNumber}...`);
-        
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const q = query(
-            matchesRef, 
-            where('round', '==', roundNumber),
-            where('batch', '==', batchNumber)
-        );
-        const snapshot = await getDocs(q);
-        
-        let updateCount = 0;
-        const matchList = [];
-        
-        for (const matchDoc of snapshot.docs) {
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
-                status: 'live'
-            });
-            matchList.push(matchDoc.data().matchId);
-            updateCount++;
-        }
-        
-        console.log(`✅ Opened ${updateCount} matches:`, matchList);
-        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} is now LIVE!\n\n${updateCount} matches opened:\n${matchList.join('\n')}`);
-        
-        loadMatches();
-        
-    } catch (error) {
-        console.error('❌ Error opening batch:', error);
-        alert(`Error: ${error.message}`);
-    }
-};
-
-// ========================================
-// CLOSE A BATCH
-// ========================================
-
-window.closeBatch = async function(roundNumber, batchNumber) {
-    if (!confirm(`Close Round ${roundNumber}, Batch ${batchNumber}?\n\nThis will:\n- Determine winners\n- Advance them to next round\n- Close voting`)) return;
-    
-    try {
-        console.log(`🔒 Closing Round ${roundNumber}, Batch ${batchNumber}...`);
-        
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const q = query(
-            matchesRef,
-            where('round', '==', roundNumber),
-            where('batch', '==', batchNumber)
-        );
-        const snapshot = await getDocs(q);
-        
-        let closedCount = 0;
-        const results = [];
-        
-        for (const matchDoc of snapshot.docs) {
-            const match = matchDoc.data();
-            
-            const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
-            const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
-            const loserData = match.song1.votes > match.song2.votes ? match.song2 : match.song1;
-            
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
-                status: 'completed',
-                winnerId: winnerId
-            });
-            
-            // Auto-advance winner
-            await advanceWinnerToNextRound(match, winnerData);
-            
-            results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})`);
-            closedCount++;
-        }
-        
-        console.log(`✅ Closed ${closedCount} matches`);
-        console.log('Results:', results);
-        
-        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${closedCount} matches completed:\n\n${results.join('\n')}`);
-        
-        loadMatches();
-        
-    } catch (error) {
-        console.error('❌ Error closing batch:', error);
-        alert(`Error: ${error.message}`);
-    }
-};
-
-// ========================================
-// SCHEDULE MATCH DATES
+// INITIALIZATION
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
     
-    // Initialize Tournament Button
-    document.getElementById('initTournamentBtn').addEventListener('click', async () => {
+    document.getElementById('initTournamentBtn')?.addEventListener('click', async () => {
         if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
             return;
         }
@@ -455,315 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-document.getElementById('scheduleDatesBtn').addEventListener('click', async () => {
-    // ========================================
-    // STEP 1: GET ROUND 1 DATES
-    // ========================================
-    
-    const startDateInput = prompt(
-        '📅 Enter ROUND 1 START date:\n\n' +
-        'Format: YYYY-MM-DD\n' +
-        'Example: 2025-11-05'
-    );
-    
-    if (!startDateInput) {
-        alert('❌ Cancelled');
-        return;
-    }
-    
-    const endDateInput = prompt(
-        '📅 Enter ROUND 1 END date:\n\n' +
-        'Format: YYYY-MM-DD\n' +
-        'Example: 2025-11-17\n\n' +
-        '(All Round 1 batches will close on this date)'
-    );
-    
-    if (!endDateInput) {
-        alert('❌ Cancelled');
-        return;
-    }
-    
-    // ========================================
-    // STEP 2: GET ROUND 1 BATCH INTERVAL
-    // ========================================
-    
-    const batchIntervalInput = prompt(
-        '⏰ BATCH RELEASE INTERVAL\n\n' +
-        'How many HOURS between each batch release?\n\n' +
-        'Options:\n' +
-        '• 24 = Daily batches\n' +
-        '• 48 = Every 2 days\n' +
-        '• 72 = Every 3 days\n\n' +
-        'Enter hours:',
-        '48'
-    );
-    
-    if (!batchIntervalInput) {
-        alert('❌ Cancelled');
-        return;
-    }
-    
-    const batchIntervalHours = parseInt(batchIntervalInput);
-    
-    if (isNaN(batchIntervalHours) || batchIntervalHours < 1) {
-        alert('❌ Must enter a valid number of hours!');
-        return;
-    }
-    
-    // ========================================
-    // STEP 3: GET FUTURE ROUNDS DURATION
-    // ========================================
-    
-    const futureRoundDaysInput = prompt(
-        '📅 FUTURE ROUNDS DURATION\n\n' +
-        'How many DAYS should each future round (R2, R3, etc.) last?\n\n' +
-        'Recommended: 5-7 days\n' +
-        'Example: If you enter 6, Round 2 will have 6 days of voting',
-        '6'
-    );
-    
-    if (!futureRoundDaysInput) {
-        alert('❌ Cancelled');
-        return;
-    }
-    
-    const futureRoundDays = parseInt(futureRoundDaysInput);
-    
-    if (isNaN(futureRoundDays) || futureRoundDays < 1) {
-        alert('❌ Must enter a valid number of days!');
-        return;
-    }
-    
-    // ========================================
-    // VALIDATE DATES
-    // ========================================
-    
-    const round1Start = new Date(startDateInput + 'T00:00:00Z');
-    const round1End = new Date(endDateInput + 'T23:59:59Z');
-    
-    if (isNaN(round1Start.getTime()) || isNaN(round1End.getTime())) {
-        alert('❌ Invalid date format! Use YYYY-MM-DD');
-        return;
-    }
-    
-    if (round1End <= round1Start) {
-        alert('❌ End date must be after start date!');
-        return;
-    }
-    
-    // Calculate Round 2 start (day after R1 ends)
-    const round2Start = new Date(round1End.getTime() + 24 * 60 * 60 * 1000);
-    
-    // ========================================
-    // PREVIEW SCHEDULE
-    // ========================================
-    
-    const preview = `
-📅 TOURNAMENT SCHEDULE PREVIEW:
-
-🎯 ROUND 1:
-- Starts: ${round1Start.toLocaleDateString()}
-- Batches release every ${batchIntervalHours} hours
-- All batches close: ${round1End.toLocaleDateString()}
-
-🎯 ROUND 2+:
-- Round 2 starts: ${round2Start.toLocaleDateString()}
-- Each round lasts: ${futureRoundDays} days
-- Batches auto-calculated
-
-Example voting periods:
-- Batch 1 (R1): ${Math.round((round1End - round1Start) / (24 * 60 * 60 * 1000))} days
-- Batch 2 (R1): ${Math.round((round1End - (round1Start.getTime() + batchIntervalHours * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000))} days
-- Round 2: ${futureRoundDays} days
-
-Apply this schedule?
-    `;
-    
-    if (!confirm(preview)) {
-        alert('❌ Cancelled');
-        return;
-    }
-    
-    // ========================================
-    // APPLY SCHEDULE
-    // ========================================
-    
-    try {
-        console.log('📅 Scheduling tournament with new dates...');
-        
-        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-        const snapshot = await getDocs(matchesRef);
-        
-        // Group matches by round & batch
-        const batchGroups = {};
-        
-        snapshot.forEach(doc => {
-            const match = doc.data();
-            const key = `R${match.round}B${match.batch || 1}`;
-            
-            if (!batchGroups[key]) {
-                batchGroups[key] = {
-                    round: match.round,
-                    batch: match.batch || 1,
-                    matches: []
-                };
-            }
-            
-            batchGroups[key].matches.push({
-                id: doc.id,
-                data: match
-            });
-        });
-        
-        // Sort batches
-        const sortedBatchKeys = Object.keys(batchGroups).sort((a, b) => {
-            const groupA = batchGroups[a];
-            const groupB = batchGroups[b];
-            
-            if (groupA.round !== groupB.round) {
-                return groupA.round - groupB.round;
-            }
-            return groupA.batch - groupB.batch;
-        });
-        
-        // ========================================
-        // ASSIGN DATES
-        // ========================================
-        
-        let updateCount = 0;
-        let clearedCount = 0;
-        const batchSummary = [];
-        
-        // Track round timing
-        let currentRoundEndDate = round1End;
-        let currentRound = 1;
-        
-        for (const batchKey of sortedBatchKeys) {
-            const batchGroup = batchGroups[batchKey];
-            const { round, batch, matches } = batchGroup;
-            
-            let batchStartDate;
-            let batchEndDate;
-            
-            if (round === 1) {
-                // ✅ ROUND 1: Staggered starts, same end
-                const batchOffset = (batch - 1) * batchIntervalHours * 60 * 60 * 1000;
-                batchStartDate = new Date(round1Start.getTime() + batchOffset);
-                batchEndDate = round1End; // All R1 batches end on same date
-                
-            } else {
-                // ✅ ROUND 2+: Start after previous round ends
-                if (round !== currentRound) {
-                    // New round starts 24h after previous round ended
-                    currentRoundEndDate = new Date(currentRoundEndDate.getTime() + 24 * 60 * 60 * 1000);
-                    currentRound = round;
-                }
-                
-                // For R2+, batches might still be staggered within the round
-                const batchOffset = (batch - 1) * batchIntervalHours * 60 * 60 * 1000;
-                batchStartDate = new Date(currentRoundEndDate.getTime() + batchOffset);
-                batchEndDate = new Date(batchStartDate.getTime() + futureRoundDays * 24 * 60 * 60 * 1000);
-                
-                // Update round end to be the latest batch end in this round
-                if (batchEndDate > currentRoundEndDate) {
-                    currentRoundEndDate = batchEndDate;
-                }
-            }
-            
-            let scheduledInBatch = 0;
-            
-            // Update all matches in this batch
-            for (const matchObj of matches) {
-                const match = matchObj.data;
-                const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchObj.id);
-                
-                const isTBD = match.song1?.id === 'TBD' || match.song2?.id === 'TBD';
-                
-                if (isTBD && round > 1) {
-                    // Clear dates for TBD matches in future rounds
-                    await updateDoc(matchRef, { 
-                        date: null,
-                        startDate: null,
-                        endDate: null
-                    });
-                    clearedCount++;
-                } else {
-                    // Assign dates
-                    await updateDoc(matchRef, {
-                        date: batchStartDate.toISOString(),
-                        startDate: batchStartDate.toISOString(),
-                        endDate: batchEndDate.toISOString()
-                    });
-                    scheduledInBatch++;
-                    updateCount++;
-                }
-            }
-            
-            if (scheduledInBatch > 0) {
-                const votingDays = Math.round((batchEndDate - batchStartDate) / (24 * 60 * 60 * 1000));
-                
-                batchSummary.push({
-                    round,
-                    batch,
-                    start: new Date(batchStartDate),
-                    end: new Date(batchEndDate),
-                    votingDays: votingDays,
-                    count: scheduledInBatch
-                });
-                
-                console.log(`📅 R${round}B${batch}: Opens ${batchStartDate.toLocaleDateString()} → Closes ${batchEndDate.toLocaleDateString()} (${votingDays} days, ${scheduledInBatch} matches)`);
-            }
-        }
-        
-        // ========================================
-        // SHOW SUMMARY
-        // ========================================
-        
-        let summaryMessage = `✅ Scheduled ${updateCount} matches!\n🧹 Cleared ${clearedCount} TBD matches\n\n📅 COMPLETE SCHEDULE:\n\n`;
-        
-        let lastRound = 1;
-        batchSummary.forEach(batch => {
-            // Add round separator
-            if (batch.round !== lastRound) {
-                summaryMessage += `\n`;
-                lastRound = batch.round;
-            }
-            
-            const startStr = batch.start.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-            });
-            const endStr = batch.end.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-            });
-            summaryMessage += `R${batch.round}B${batch.batch}: ${startStr} → ${endStr} (${batch.votingDays}d, ${batch.count} matches)\n`;
-        });
-        
-        const finalDate = batchSummary[batchSummary.length - 1]?.end;
-        if (finalDate) {
-            summaryMessage += `\n🏆 Tournament ends: ${finalDate.toLocaleDateString('en-US', { 
-                weekday: 'long',
-                month: 'long', 
-                day: 'numeric',
-                year: 'numeric'
-            })}`;
-        }
-        
-        console.log(`✅ Scheduled ${updateCount} matches across ${batchSummary.length} batches`);
-        alert(summaryMessage);
-        loadMatches();
-        
-    } catch (error) {
-        console.error('❌ Error scheduling dates:', error);
-        alert(`❌ Error: ${error.message}`);
-    }
-});
-
-
-
-    // Reset Tournament Button
-    document.getElementById('resetTournamentBtn').addEventListener('click', async () => {
+    document.getElementById('resetTournamentBtn')?.addEventListener('click', async () => {
         if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
             return;
         }
@@ -779,7 +725,6 @@ Apply this schedule?
         }
         
         try {
-            // Delete all matches
             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const snapshot = await getDocs(matchesRef);
             
@@ -794,7 +739,6 @@ Apply this schedule?
             
             alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
             
-            // Regenerate
             await initializeCompleteTournament();
             
             alert('✅ Tournament reset complete! Refresh page.');
@@ -805,4 +749,7 @@ Apply this schedule?
             console.error(error);
         }
     });
+    
+    loadRecentBlogPosts();
+    logBlog('🎨 Admin Panel loaded - Blog generation ready');
 });

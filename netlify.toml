@@ -46,9 +46,21 @@
     Content-Type = "application/javascript; charset=utf-8"
 
 # ========================================
-# REDIRECTS
+# REDIRECTS - ORDER MATTERS!
 # ========================================
 
+# Blog routes (MUST come before catch-all)
+[[redirects]]
+  from = "/blog/:slug"
+  to = "/blog-post.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog"
+  to = "/blog.html"
+  status = 200
+
+# Existing routes
 [[redirects]]
   from = "/vote"
   to = "/vote.html"

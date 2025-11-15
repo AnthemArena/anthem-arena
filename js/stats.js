@@ -445,11 +445,15 @@ function renderRankingsList(rankings, sortBy) {
 // RENDER SONG DETAIL MODAL
 // ========================================
 
-function renderSongDetailModal(song, matches) {
+async function renderSongDetailModal(song, matches) {
     const header = document.getElementById('songDetailHeader');
     const body = document.getElementById('songDetailBody');
     
-    // Header
+    // ✅ NEW: Load historical data
+    const allTimeStats = await getSongAllTimeStats(song.seed);
+    const currentForm = await getCurrentTournamentForm(song.seed);
+    
+    // Header (same as before but add all-time stats)
     header.innerHTML = `
         <div class="song-detail-info">
             <img 
@@ -461,26 +465,77 @@ function renderSongDetailModal(song, matches) {
                 <p class="song-detail-artist">${song.artist}</p>
                 <div class="song-detail-stats">
                     <span class="stat-badge">Seed #${song.seed}</span>
-                    <span class="stat-badge">${song.winRecord} Record</span>
-                    <span class="stat-badge ${song.winRate >= 70 ? 'excellent' : song.winRate >= 50 ? 'good' : 'poor'}">
-                        ${song.winRate}% Win Rate
-                    </span>
-                    <span class="stat-badge">${song.totalVotes.toLocaleString()} Total Votes</span>
+                    <span class="stat-badge">${song.winRecord} Current</span>
+                    ${allTimeStats ? `
+                        <span class="stat-badge highlight">
+                            ${allTimeStats.record} All-Time
+                        </span>
+                        ${allTimeStats.championships > 0 ? `
+                            <span class="stat-badge champion">
+                                ${allTimeStats.championships}x Champion 🏆
+                            </span>
+                        ` : ''}
+                    ` : ''}
                 </div>
             </div>
         </div>
     `;
     
-    // Body - Match History
+    // Body - Add tournament history section
+    let bodyHTML = '';
+    
+    // ✅ NEW: All-Time Stats Section
+    if (allTimeStats && allTimeStats.tournamentHistory.length > 0) {
+        bodyHTML += `
+            <div class="song-history-section">
+                <h3 class="section-title">📚 Tournament History</h3>
+                <div class="tournament-history">
+                    ${allTimeStats.tournamentHistory.map(t => `
+                        <div class="history-item">
+                            <span class="history-year">${t.year}</span>
+                            <span class="history-tournament">${t.tournament}</span>
+                            <span class="history-record">${t.record}</span>
+                            <span class="history-finish ${t.finish.includes('Champion') ? 'champion' : ''}">
+                                ${t.finish}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // ✅ NEW: Current Form Section
+    if (currentForm) {
+        bodyHTML += `
+            <div class="current-form-section">
+                <h3 class="section-title">📈 Current Tournament Form</h3>
+                <div class="form-stats">
+                    <div class="form-stat">
+                        <span class="form-label">Record</span>
+                        <span class="form-value">${currentForm.currentRecord}</span>
+                    </div>
+                    <div class="form-stat">
+                        <span class="form-label">Avg Vote Share</span>
+                        <span class="form-value">${currentForm.avgVoteShare}%</span>
+                    </div>
+                    <div class="form-stat">
+                        <span class="form-label">Momentum</span>
+                        <span class="form-value">${currentForm.momentum}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Existing match history (keep your current code)
+    bodyHTML += '<div class="song-matches">';
+    
     const completedMatches = matches.filter(m => m.status === 'completed');
     const liveMatches = matches.filter(m => m.status === 'live');
-    const upcomingMatches = matches.filter(m => m.status === 'upcoming');
     
-    let matchesHTML = '<div class="song-matches">';
-    
-    // Live Matches
     if (liveMatches.length > 0) {
-        matchesHTML += `
+        bodyHTML += `
             <div class="matches-section">
                 <h3 class="section-title">🔴 Live Now</h3>
                 ${liveMatches.map(match => renderMatchRow(song, match)).join('')}
@@ -488,37 +543,18 @@ function renderSongDetailModal(song, matches) {
         `;
     }
     
-    // Upcoming Matches
-    if (upcomingMatches.length > 0) {
-        matchesHTML += `
-            <div class="matches-section">
-                <h3 class="section-title">📅 Upcoming</h3>
-                ${upcomingMatches.map(match => renderMatchRow(song, match)).join('')}
-            </div>
-        `;
-    }
-    
-    // Completed Matches
     if (completedMatches.length > 0) {
-        matchesHTML += `
+        bodyHTML += `
             <div class="matches-section">
-                <h3 class="section-title">✅ Match History</h3>
+                <h3 class="section-title">✅ Current Tournament Matches</h3>
                 ${completedMatches.map(match => renderMatchRow(song, match)).join('')}
             </div>
         `;
     }
     
-    if (matches.length === 0) {
-        matchesHTML += `
-            <div class="no-matches">
-                <p>No matches yet for this song</p>
-            </div>
-        `;
-    }
+    bodyHTML += '</div>';
     
-    matchesHTML += '</div>';
-    
-    body.innerHTML = matchesHTML;
+    body.innerHTML = bodyHTML;
 }
 
 // ========================================
@@ -890,7 +926,7 @@ function formatHour(hour) {
 console.log('✅ Stats.js loaded');
 
 // ========================================
-// HEAD-TO-HEAD COMPARISON
+// HEAD-TO-HEAD COMPARISON (ENHANCED)
 // ========================================
 
 window.showHeadToHead = function() {
@@ -936,12 +972,24 @@ window.compareHeadToHead = async function() {
     const song1 = songRankings.find(s => s.seed === seed1);
     const song2 = songRankings.find(s => s.seed === seed2);
     
-  // ✅ NEW: Get matches from edge cache
-const allMatches = await getAllMatches();
+    // Show loading state
+    const container = document.getElementById('h2hResults');
+    container.innerHTML = `
+        <div class="h2h-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading cross-tournament history...</p>
+        </div>
+    `;
+    container.style.display = 'block';
     
-    let directMatchup = null;
+    // ✅ NEW: Get cross-tournament H2H history
+    const h2hHistory = await getCrossTournamentH2H(seed1, seed2);
     
-  allMatches.forEach(match => {
+    // Get current tournament matchup (if exists)
+    const allMatches = await getAllMatches();
+    let currentMatchup = null;
+    
+    allMatches.forEach(match => {
         const hasBoth = (match.song1?.seed === seed1 && match.song2?.seed === seed2) ||
                        (match.song1?.seed === seed2 && match.song2?.seed === seed1);
         
@@ -949,26 +997,36 @@ const allMatches = await getAllMatches();
             const song1Data = match.song1.seed === seed1 ? match.song1 : match.song2;
             const song2Data = match.song1.seed === seed2 ? match.song1 : match.song2;
             
-            directMatchup = {
+            currentMatchup = {
                 round: match.round,
                 song1Votes: song1Data.votes,
                 song2Votes: song2Data.votes,
                 totalVotes: match.totalVotes,
-                winner: match.winnerId === song1Data.id ? song1.name : song2.name
+                winner: match.winnerId === 'song1' ? song1Data.shortTitle : song2Data.shortTitle
             };
         }
     });
     
-    renderHeadToHeadComparison(song1, song2, directMatchup);
+    renderHeadToHeadComparison(song1, song2, currentMatchup, h2hHistory);
 };
 
-function renderHeadToHeadComparison(song1, song2, directMatchup) {
+function renderHeadToHeadComparison(song1, song2, currentMatchup, h2hHistory) {
     const container = document.getElementById('h2hResults');
+    
+    // Determine overall H2H leader
+    let h2hLeader = null;
+    if (h2hHistory.hasHistory) {
+        if (h2hHistory.song1Wins > h2hHistory.song2Wins) {
+            h2hLeader = song1.name;
+        } else if (h2hHistory.song2Wins > h2hHistory.song1Wins) {
+            h2hLeader = song2.name;
+        }
+    }
     
     container.innerHTML = `
         <div class="h2h-comparison">
             <!-- Song 1 -->
-            <div class="h2h-song">
+            <div class="h2h-song ${h2hLeader === song1.name ? 'h2h-winner' : ''}">
                 <img src="https://img.youtube.com/vi/${song1.videoId}/mqdefault.jpg" 
                      alt="${song1.name}"
                      class="h2h-thumbnail">
@@ -998,32 +1056,103 @@ function renderHeadToHeadComparison(song1, song2, directMatchup) {
                         <span class="h2h-label">YouTube Views</span>
                         <span class="h2h-value">${formatNumber(song1.views)}</span>
                     </div>
+                    ${h2hHistory.hasHistory ? `
+                        <div class="h2h-stat h2h-record">
+                            <span class="h2h-label">vs ${song2.name}</span>
+                            <span class="h2h-value highlight">${h2hHistory.song1Wins}-${h2hHistory.song2Wins}</span>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
             
             <!-- VS Divider -->
             <div class="h2h-divider">
-                ${directMatchup ? `
-                    <div class="h2h-matchup-result">
-                        <div class="h2h-direct-label">🔥 They Faced Off!</div>
-                        <div class="h2h-direct-round">${getRoundName(directMatchup.round)}</div>
-                        <div class="h2h-direct-score">
-                            ${directMatchup.song1Votes} - ${directMatchup.song2Votes}
+                ${h2hHistory.hasHistory ? `
+                    <div class="h2h-matchup-history">
+                        <div class="h2h-history-header">
+                            <span class="h2h-history-icon">📚</span>
+                            <h4>All-Time Matchup History</h4>
                         </div>
-                        <div class="h2h-direct-winner">
-                            Winner: <strong>${directMatchup.winner}</strong>
+                        
+                        <div class="h2h-overall-record">
+                            <div class="h2h-record-badge ${h2hLeader === song1.name ? 'leading' : ''}">
+                                ${song1.name}: ${h2hHistory.song1Wins}
+                            </div>
+                            <span class="h2h-record-divider">-</span>
+                            <div class="h2h-record-badge ${h2hLeader === song2.name ? 'leading' : ''}">
+                                ${song2.name}: ${h2hHistory.song2Wins}
+                            </div>
                         </div>
+                        
+                        ${h2hLeader ? `
+                            <p class="h2h-leader-text">
+                                <strong>${h2hLeader}</strong> leads the all-time series
+                            </p>
+                        ` : `
+                            <p class="h2h-leader-text">
+                                Series tied at ${h2hHistory.song1Wins}-${h2hHistory.song2Wins}
+                            </p>
+                        `}
+                        
+                        <!-- Match History List -->
+                        <div class="h2h-match-list">
+                            <h5>Previous Meetings</h5>
+                            ${h2hHistory.matches.map(match => `
+                                <div class="h2h-match-item">
+                                    <div class="h2h-match-header">
+                                        <span class="h2h-match-tournament">${match.tournament}</span>
+                                        <span class="h2h-match-round">${getRoundName(match.round)}</span>
+                                    </div>
+                                    <div class="h2h-match-score">
+                                        <span class="${match.winnerName === song1.name ? 'winner' : ''}">
+                                            ${match.song1Name}: ${match.song1Votes}
+                                        </span>
+                                        <span class="score-divider">-</span>
+                                        <span class="${match.winnerName === song2.name ? 'winner' : ''}">
+                                            ${match.song2Name}: ${match.song2Votes}
+                                        </span>
+                                    </div>
+                                    <div class="h2h-match-winner">
+                                        Winner: <strong>${match.winnerName}</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${currentMatchup ? `
+                            <div class="h2h-current-badge">
+                                <span class="badge-icon">🔥</span>
+                                Current Tournament: ${getRoundName(currentMatchup.round)}
+                            </div>
+                        ` : ''}
                     </div>
                 ` : `
-                    <div class="h2h-no-matchup">
+                    <div class="h2h-no-history">
                         <span class="h2h-vs">VS</span>
-                        <p class="h2h-never-met">Haven't faced each other yet</p>
+                        <div class="h2h-no-history-text">
+                            <p class="h2h-never-met">🆕 First-Ever Matchup!</p>
+                            <p class="h2h-never-met-sub">
+                                These songs have never faced each other in tournament history
+                            </p>
+                        </div>
+                        ${currentMatchup ? `
+                            <div class="h2h-current-result">
+                                <div class="h2h-current-label">Current Tournament Result</div>
+                                <div class="h2h-current-round">${getRoundName(currentMatchup.round)}</div>
+                                <div class="h2h-current-score">
+                                    ${currentMatchup.song1Votes} - ${currentMatchup.song2Votes}
+                                </div>
+                                <div class="h2h-current-winner">
+                                    Winner: <strong>${currentMatchup.winner}</strong>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `}
             </div>
             
             <!-- Song 2 -->
-            <div class="h2h-song">
+            <div class="h2h-song ${h2hLeader === song2.name ? 'h2h-winner' : ''}">
                 <img src="https://img.youtube.com/vi/${song2.videoId}/mqdefault.jpg" 
                      alt="${song2.name}"
                      class="h2h-thumbnail">
@@ -1053,6 +1182,12 @@ function renderHeadToHeadComparison(song1, song2, directMatchup) {
                         <span class="h2h-label">YouTube Views</span>
                         <span class="h2h-value">${formatNumber(song2.views)}</span>
                     </div>
+                    ${h2hHistory.hasHistory ? `
+                        <div class="h2h-stat h2h-record">
+                            <span class="h2h-label">vs ${song1.name}</span>
+                            <span class="h2h-value highlight">${h2hHistory.song2Wins}-${h2hHistory.song1Wins}</span>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         </div>

@@ -1,0 +1,70 @@
+[
+  {
+    "id": "match-round-1-match-5",
+    "slug": "popstars-storms-past-warriors-round-1",
+    "type": "match-recap",
+    "status": "published",
+    "featured": true,
+    "": "2025-11-10T18:30:00Z",
+    "headline": "💥 POP/STARS Storms Past Warriors in Round 1",
+    "subheadline": "Round 1 | POP/STARS 58%-42% Warriors",
+    "excerpt": "The #1 seed K/DA anthem dominates in a statement performance, winning by 89 votes against the 2014 Worlds classic.",
+    "author": "Anthem Arena",
+    "category": "Match Recap",
+    "tags": ["Round 1", "POP/STARS", "Warriors", "Upset", "K/DA"],
+    "metadata": {
+      "matchId": "round-1-match-5",
+      "round": 1,
+      "winnerSeed": 1,
+      "loserSeed": 2,
+      "finalScore": "58-42",
+      "totalVotes": 535,
+      "margin": 89,
+      "matchType": "decisive"
+    },
+    "content": "**POP/STARS** has advanced to Round 2 after a convincing 58%-42% victory over **Warriors**. The virtual group phenomenon never let the Imagine Dragons classic into the match, winning by 89 votes in a statement performance...",
+    "relatedMatches": ["round-1-match-3", "round-1-match-7"],
+    "relatedSongs": [2, 14],
+    "images": {
+      "hero": "https://img.youtube.com/vi/UOxkGD8qRB4/maxresdefault.jpg",
+      "thumbnail": "https://img.youtube.com/vi/UOxkGD8qRB4/mqdefault.jpg"
+    }
+  },
+  {
+    "id": "round-1-recap",
+    "slug": "round-1-recap-5-upsets-7-thrillers",
+    "type": "round-recap",
+    "status": "published",
+    "featured": true,
+    "publishedDate": "2025-11-12T12:00:00Z",
+    "headline": "Round 1 Recap: 5 Upsets, 7 Thrillers, and 12,547 Votes Cast",
+    "subheadline": "The tournament's opening round delivered non-stop drama",
+    "excerpt": "Round 1 is in the books with 32 matches decided. From nail-biting finishes to shocking upsets, here are the biggest storylines.",
+    "author": "Anthem Arena",
+    "category": "Round Recap",
+    "tags": ["Round 1", "Recap", "Tournament"],
+    "content": "...",
+    "metadata": {
+      "round": 1,
+      "totalMatches": 32,
+      "totalVotes": 12547,
+      "upsets": 5,
+      "nailbiters": 7
+    }
+  },
+  {
+    "id": "preview-semifinals",
+    "slug": "semifinals-preview-final-four-set",
+    "type": "round-preview",
+    "status": "published",
+    "featured": false,
+    "publishedDate": "2025-11-18T09:00:00Z",
+    "headline": "Semifinals Preview: The Final Four is Set",
+    "subheadline": "Four songs remain. Who will advance to the championship?",
+    "excerpt": "After three brutal rounds, only four songs remain standing. Here's what you need to know before voting opens.",
+    "author": "Anthem Arena",
+    "category": "Round Preview",
+    "tags": ["Semifinals", "Preview", "Predictions"],
+    "content": "..."
+  }
+]
