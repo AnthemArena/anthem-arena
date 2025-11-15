@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vote Now - League Music Tournament</title>
+    <title>Vote Now - League Music Tournament | Become a Founding Member</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,8 +17,8 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
     <!-- Meta Tags for Social Sharing -->
-    <meta property="og:title" content="Vote Now - League Music Tournament">
-    <meta property="og:description" content="Cast your vote on live League of Legends music matchups!">
+    <meta property="og:title" content="Vote Now - League Music Tournament | Become a Founding Member">
+    <meta property="og:description" content="Vote in any match before we hit 1,000 total votes to earn permanent Founding Member status!">
     <meta property="og:image" content="https://anthemarena.com/og-image.jpg">
     <meta name="twitter:card" content="summary_large_image">
     
@@ -33,7 +33,7 @@
 </head>
 <body>
 
-       <!-- Subtle Navigation -->
+    <!-- Subtle Navigation -->
     <nav class="top-nav">
         <a href="/" class="nav-home">← Home</a>
         <div class="nav-links">
@@ -57,23 +57,43 @@
     </div>
     
     <!-- Main Content -->
-    <div id="mainContent" style="display: none;">
-        <!-- Hero Section -->
-        <div class="landing-hero">
-            <div class="hero-badge">🔴 LIVE NOW</div>
-            <h1>Vote on Live Matchups</h1>
-            <p>Pick your winner • Earn XP for every vote</p>
-
-                <!-- PROGRESS BAR (NEW) -->
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
+    <div id="mainContent" class="social-container" style="display: none;">
+        
+        <!-- ✅ COUNTDOWN TIMER (dynamically inserted by JS) -->
+        
+        <!-- ✅ FOUNDING MEMBER HERO BANNER (dynamically inserted by JS) -->
+        
+        <!-- How It Works (Quick Explainer) -->
+        <div class="how-it-works">
+            <h2>🎵 How It Works</h2>
+            <div class="steps-grid">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <p>Pick a matchup below</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <p>Watch both music videos</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <p>Vote for your favorite</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">👑</span>
+                    <p>Become a Founding Member!</p>
+                </div>
+            </div>
         </div>
-        <p class="progress-text">
-            <span id="votedProgress">0</span> / <span id="totalProgress">0</span> matches voted
-        </p>
-    </div>
-    
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p class="progress-text">
+                <span id="votedProgress">0</span> / <span id="totalProgress">0</span> matches voted
+            </p>
         </div>
         
         <!-- Unvoted Match Grid -->
@@ -93,73 +113,79 @@
             </div>
         </div>
         
-       <!-- No Matches State -->
-<div id="noMatches" class="no-matches" style="display: none;">
-    <div class="no-matches-icon">🎵</div>
-    <h2>No Live Matches Right Now</h2>
-    <p>Check back soon for new matchups!</p>
-    
-    <div class="no-matches-actions">
-        <a href="/" class="action-btn primary">
-            <i class="fas fa-home"></i> Go to Homepage
-        </a>
-        <a href="/brackets.html" class="action-btn secondary">
-            <i class="fas fa-sitemap"></i> View Bracket
-        </a>
-        <a href="/stats.html" class="action-btn secondary">
-            <i class="fas fa-chart-bar"></i> View Stats
-        </a>
-    </div>
-    
-    <p class="no-matches-tip">
-        💡 Explore the <a href="/music-gallery.html" class="inline-link">music gallery</a> 
-        or check your <a href="/my-votes.html" class="inline-link">voting history</a>
-    </p>
-</div>
+        <!-- No Matches State -->
+        <div id="noMatches" class="no-matches" style="display: none;">
+            <div class="no-matches-icon">🎵</div>
+            <h2>No Live Matches Right Now</h2>
+            <p>Check back soon for new matchups!</p>
+            
+            <div class="no-matches-actions">
+                <a href="/" class="action-btn primary">
+                    <i class="fas fa-home"></i> Go to Homepage
+                </a>
+                <a href="/brackets.html" class="action-btn secondary">
+                    <i class="fas fa-sitemap"></i> View Bracket
+                </a>
+                <a href="/stats.html" class="action-btn secondary">
+                    <i class="fas fa-chart-bar"></i> View Stats
+                </a>
+            </div>
+            
+            <p class="no-matches-tip">
+                💡 Explore the <a href="/music-gallery.html" class="inline-link">music gallery</a> 
+                or check your <a href="/my-votes.html" class="inline-link">voting history</a>
+            </p>
+        </div>
         
-   <!-- Footer CTA -->
-<div class="landing-footer">
-    <div class="footer-content">
-        <div class="footer-main">
-            <h3>Explore the Full Tournament</h3>
-            <p>View bracket progression, detailed stats, and your voting history</p>
-            <div class="footer-links">
-                <a href="/brackets.html" class="footer-link-card">
-                    <span class="link-icon">🏆</span>
-                    <span>View Bracket</span>
-                </a>
-                <a href="/stats.html" class="footer-link-card">
-                    <span class="link-icon">📊</span>
-                    <span>Statistics</span>
-                </a>
-                <a href="/my-votes.html" class="footer-link-card">
-                    <span class="link-icon">✅</span>
-                    <span>Your Votes</span>
-                </a>
-                <a href="/music-gallery.html" class="footer-link-card">
-                    <span class="link-icon">🎵</span>
-                    <span>Music Gallery</span>
-                </a>
+        <!-- Footer CTA -->
+        <div class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <h3>Explore the Full Tournament</h3>
+                    <p>View bracket progression, detailed stats, and your voting history</p>
+                    <div class="footer-links">
+                        <a href="/brackets.html" class="footer-link-card">
+                            <span class="link-icon">🏆</span>
+                            <span>View Bracket</span>
+                        </a>
+                        <a href="/stats.html" class="footer-link-card">
+                            <span class="link-icon">📊</span>
+                            <span>Statistics</span>
+                        </a>
+                        <a href="/my-votes.html" class="footer-link-card">
+                            <span class="link-icon">✅</span>
+                            <span>Your Votes</span>
+                        </a>
+                        <a href="/music-gallery.html" class="footer-link-card">
+                            <span class="link-icon">🎵</span>
+                            <span>Music Gallery</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Buy Me a Coffee -->
+                <div class="bmc-container">
+                    <p class="bmc-text">Enjoying the tournament? ☕</p>
+                    <a href="https://buymeacoffee.com/anthemarena" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="bmc-button">
+                        <span class="bmc-icon">☕</span>
+                        <span>Buy Me a Coffee</span>
+                    </a>
+                </div>
             </div>
         </div>
         
-        <!-- Buy Me a Coffee -->
-        <div class="bmc-container">
-            <p class="bmc-text">Enjoying the tournament? ☕</p>
-            <a href="https://buymeacoffee.com/anthemarena" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               class="bmc-button">
-                <span class="bmc-icon">☕</span>
-                <span>Buy Me a Coffee</span>
-            </a>
-        </div>
     </div>
-</div>
+    
+    <!-- Sticky Progress Banner (Mobile) -->
+    <div id="stickyBanner" class="sticky-founding-progress" style="display: none;">
+        <span class="crown-icon">👑</span>
+        <span id="stickyText" class="progress-text"></span>
+    </div>
     
     <!-- Scripts -->
     <script type="module" src="js/live.js"></script>
 </body>
-
-
 </html>
