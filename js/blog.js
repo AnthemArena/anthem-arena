@@ -181,12 +181,26 @@ function createPostCard(post) {
 // ========================================
 
 function initializeFilters() {
+    console.log('🔧 Initializing filters...');
+    
     const filterButtons = document.querySelectorAll('.filter-btn');
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     
-    filterButtons.forEach(btn => {
+    console.log(`📋 Found ${filterButtons.length} filter buttons`);
+    
+    if (filterButtons.length === 0) {
+        console.error('❌ No filter buttons found!');
+        return;
+    }
+    
+    filterButtons.forEach((btn, index) => {
+        console.log(`Button ${index}:`, btn.textContent.trim(), 'filter:', btn.dataset.filter);
+        
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
+            
+            console.log('🎯 Filter clicked:', filter);
+            console.log('📊 All posts:', allPosts.length, allPosts.map(p => `${p.headline} (${p.type})`));
             
             // Update active state
             filterButtons.forEach(b => b.classList.remove('active'));
@@ -202,6 +216,8 @@ function initializeFilters() {
                 filteredPosts = allPosts.filter(post => post.type === filter);
             }
             
+            console.log('✅ Filtered posts:', filteredPosts.length, filteredPosts.map(p => `${p.headline} (${p.type})`));
+            
             displayPosts();
         });
     });
@@ -212,6 +228,8 @@ function initializeFilters() {
             displayPosts();
         });
     }
+    
+    console.log('✅ Filters initialized successfully');
 }
 
 // ========================================
