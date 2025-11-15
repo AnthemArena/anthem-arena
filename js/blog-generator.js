@@ -773,18 +773,4 @@ function getNextRoundName(currentRound) {
     return getRoundName(currentRound + 1);
 }
 
-// ========================================
-// EXPORT ALL FUNCTIONS
-// ========================================
 
-export {
-    generateMatchRecap,
-    generateRoundRecap,
-    generateRoundPreview,
-    saveBlogPost,
-    getAllBlogPosts,
-    getBlogPost,
-    getBlogPostsByType,
-    autoGenerateMatchRecap,
-    autoGenerateRoundRecap
-};
