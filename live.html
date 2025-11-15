@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vote Now - League Music Tournament | Earn XP & Unlock Achievements</title>
+    <title>Vote Now - League Music Tournament</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,8 +17,8 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
     <!-- Meta Tags for Social Sharing -->
-    <meta property="og:title" content="Vote Now - Earn XP & Unlock Achievements | League Music Tournament">
-    <meta property="og:description" content="Vote in League music matchups, earn XP, unlock 50+ achievements, and become a Founding Member!">
+    <meta property="og:title" content="Vote Now - League Music Tournament">
+    <meta property="og:description" content="Vote in League music matchups and help decide the ultimate anthem!">
     <meta property="og:image" content="https://anthemarena.com/og-image.jpg">
     <meta name="twitter:card" content="summary_large_image">
     
@@ -60,99 +60,9 @@
     <!-- Main Content -->
     <div id="mainContent" class="social-container" style="display: none;">
         
-        <!-- ✅ COUNTDOWN TIMER (dynamically inserted by JS) -->
+        <!-- Countdown Timer (dynamically inserted by JS) -->
         
-        <!-- ✅ FOUNDING MEMBER HERO BANNER (dynamically inserted by JS) -->
-        
-        <!-- ✅ NEW: Benefits Grid -->
-        <div class="benefits-grid">
-            <div class="benefit">
-                <span class="benefit-icon">✨</span>
-                <div class="benefit-content">
-                    <span class="benefit-title">Earn XP</span>
-                    <span class="benefit-desc">10 XP per vote + bonuses</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <span class="benefit-icon">📈</span>
-                <div class="benefit-content">
-                    <span class="benefit-title">Level Up</span>
-                    <span class="benefit-desc">10 ranks to unlock</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <span class="benefit-icon">🏆</span>
-                <div class="benefit-content">
-                    <span class="benefit-title">Achievements</span>
-                    <span class="benefit-desc">50+ to collect</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <span class="benefit-icon">👑</span>
-                <div class="benefit-content">
-                    <span class="benefit-title">Founding Member</span>
-                    <span class="benefit-desc">Limited badge</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ✅ NEW: Progression Teaser -->
-        <div class="progression-teaser">
-            <div class="teaser-left">
-                <span class="teaser-icon">🎮</span>
-                <div class="teaser-text">
-                    <strong>Level Up Your Music Taste</strong>
-                    <p>Track your journey from 🎵 New Voter → 🏆 Arena Champion</p>
-                </div>
-            </div>
-            <div class="teaser-right">
-                <div class="teaser-stats">
-                    <div class="teaser-stat">
-                        <span class="stat-number">50+</span>
-                        <span class="stat-label">Achievements</span>
-                    </div>
-                    <div class="teaser-stat">
-                        <span class="stat-number">10</span>
-                        <span class="stat-label">Ranks</span>
-                    </div>
-                </div>
-                <a href="/my-votes.html" class="teaser-cta">View Progression →</a>
-            </div>
-        </div>
-        
-<!-- ✅ UPDATED: How It Works -->
-<div class="how-it-works">
-    <h2>🎮 How It Works</h2>
-    <div class="steps-grid">
-        <div class="step">
-            <span class="step-number">1</span>
-            <p>Pick a matchup</p>
-        </div>
-        <div class="step">
-            <span class="step-number">2</span>
-            <p>Watch & Vote</p>
-        </div>
-        <div class="step">
-            <span class="step-number">+10</span>
-            <p>Earn 10 XP</p>
-        </div>
-        <div class="step">
-            <span class="step-number">🏆</span>
-            <p>Unlock achievements</p>
-        </div>
-    </div>
-    
-    <!-- ✅ NEW: XP Bonuses callout (non-manipulative only) -->
-    <div class="xp-bonuses-callout">
-        <span class="bonus-label">💰 Bonus XP:</span>
-        <span class="bonus-item">+25 First vote of day</span>
-        <span class="bonus-item">+15 Daily streak</span>
-        <span class="bonus-item">+5 Share match</span>
-        <span class="bonus-item">+ Mystery bonuses!</span>
-    </div>
-</div>
-        
-         <!-- Progress Bar -->
+        <!-- Progress Bar -->
         <div class="progress-container">
             <div class="progress-bar">
                 <div id="progressFill" class="progress-fill"></div>
@@ -162,7 +72,7 @@
             </p>
         </div>
         
-        <!-- ✅ ADD THIS SECTION HERE -->
+        <!-- Unvoted Matches Section -->
         <div id="unvotedSection" class="unvoted-section">
             <h2 class="unvoted-header">
                 <span class="header-icon">🗳️</span>
@@ -176,7 +86,6 @@
                 <!-- Unvoted cards inserted here by JavaScript -->
             </div>
         </div>
-        <!-- ✅ END NEW SECTION -->
         
         <!-- Voted Matches Section (Collapsible) -->
         <div id="votedSection" class="voted-section" style="display: none;">
@@ -209,7 +118,7 @@
             </div>
             
             <p class="no-matches-tip">
-                💡 Check your <a href="/my-votes.html" class="inline-link">progression & achievements</a> 
+                💡 Check your <a href="/my-votes.html" class="inline-link">progress</a> 
                 or explore the <a href="/music-gallery.html" class="inline-link">music gallery</a>
             </p>
         </div>
@@ -231,7 +140,7 @@
                         </a>
                         <a href="/my-votes.html" class="footer-link-card">
                             <span class="link-icon">🎮</span>
-                            <span>My Progression</span>
+                            <span>My Progress</span>
                         </a>
                         <a href="/music-gallery.html" class="footer-link-card">
                             <span class="link-icon">🎵</span>
@@ -254,12 +163,6 @@
             </div>
         </div>
         
-    </div>
-    
-    <!-- Sticky Progress Banner (Mobile) -->
-    <div id="stickyBanner" class="sticky-founding-progress" style="display: none;">
-        <span class="crown-icon">👑</span>
-        <span id="stickyText" class="progress-text"></span>
     </div>
     
     <!-- Scripts -->

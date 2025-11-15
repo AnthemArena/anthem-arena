@@ -7,7 +7,6 @@ import { getAllMatches } from './api-client.js';
 // STATE
 // ========================================
 let allLiveMatches = [];
-const FOUNDING_MEMBER_GOAL = 1000;
 
 // ========================================
 // ROUND COUNTDOWN CONFIGURATION
@@ -27,14 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Track page view
     trackPageView();
     
-    // ✅ Load founding member data and display banner
-    await displayFoundingMemberBanner();
-    
-    // ✅ Display countdown timer
+    // Display countdown timer
     displayRoundCountdown();
-    
-    // ✅ Initialize sticky banner (mobile)
-    initializeStickyBanner();
     
     try {
         await loadLiveMatches();
@@ -43,124 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         showErrorState();
     }
 });
-
-// ========================================
-// ✅ NEW: FOUNDING MEMBER BANNER
-// ========================================
-async function displayFoundingMemberBanner() {
-    try {
-        const { getTotalVotes } = await import('./api-client.js');
-        const totalVotesData = await getTotalVotes();
-        const currentVotes = totalVotesData.totalVotes || 0;
-        const milestoneReached = totalVotesData.milestoneReached || false;
-        
-        // Don't show banner if milestone already reached
-        if (milestoneReached) {
-            console.log('✅ Founding Member milestone already reached');
-            return;
-        }
-        
-        const spotsRemaining = FOUNDING_MEMBER_GOAL - currentVotes;
-        const progressPercent = Math.round((currentVotes / FOUNDING_MEMBER_GOAL) * 100);
-        
-        // Check if user has already voted (and thus is eligible)
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const hasVoted = Object.keys(userVotes).length > 0;
-        
-        const container = document.querySelector('.social-container');
-        if (!container) return;
-        
-        const banner = document.createElement('div');
-        banner.className = 'founding-member-banner';
-        banner.innerHTML = `
-            <div class="founding-content">
-                <div class="founding-header">
-                    <span class="crown-icon">👑</span>
-                    <h2>Become a Founding Member</h2>
-                </div>
-                <p class="founding-description">
-                    ${hasVoted 
-                        ? '<strong style="color: #4CAF50;">✅ Founding Member Secured!</strong> You voted before we hit 1,000 total votes.' 
-                        : `Vote in <strong>any match</strong> before we hit <strong>1,000 total votes</strong> to earn permanent Founding Member status!`
-                    }
-                </p>
-                <div class="founding-progress">
-                    <div class="progress-bar-founding">
-                        <div class="progress-fill-founding" style="width: ${progressPercent}%"></div>
-                    </div>
-                    <div class="progress-text-founding">
-                        <strong>${currentVotes.toLocaleString()}</strong> / 1,000 votes cast
-                        <span class="remaining">• <strong>${spotsRemaining.toLocaleString()}</strong> spots remaining!</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Insert after countdown banner (if it exists)
-        const countdown = container.querySelector('.countdown-banner');
-        if (countdown && countdown.nextSibling) {
-            container.insertBefore(banner, countdown.nextSibling);
-        } else {
-            container.insertBefore(banner, container.firstChild);
-        }
-        
-        console.log(`✅ Founding Member banner displayed: ${currentVotes}/${FOUNDING_MEMBER_GOAL} votes`);
-        
-    } catch (error) {
-        console.error('⚠️ Error loading founding member data:', error);
-        // Don't block page if this fails
-    }
-}
-
-// ========================================
-// ✅ NEW: STICKY MOBILE BANNER
-// ========================================
-function initializeStickyBanner() {
-    const stickyBanner = document.getElementById('stickyBanner');
-    if (!stickyBanner) return;
-    
-    // Show sticky banner on scroll (mobile only)
-    let lastScrollTop = 0;
-    
-    window.addEventListener('scroll', async () => {
-        if (window.innerWidth > 768) return; // Desktop - don't show
-        
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Show after scrolling past hero section
-        if (scrollTop > 300) {
-            stickyBanner.style.display = 'flex';
-            
-            // Update text dynamically
-            try {
-                const { getTotalVotes } = await import('./api-client.js');
-                const totalVotesData = await getTotalVotes();
-                const currentVotes = totalVotesData.totalVotes || 0;
-                const milestoneReached = totalVotesData.milestoneReached || false;
-                
-                const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-                const hasVoted = Object.keys(userVotes).length > 0;
-                
-                const stickyText = document.getElementById('stickyText');
-                if (stickyText) {
-                    if (milestoneReached) {
-                        stickyText.innerHTML = `🎉 Founding Members closed at 1,000 votes!`;
-                    } else if (hasVoted) {
-                        stickyText.innerHTML = `<strong>${currentVotes}/1,000</strong> • Founding Member secured! ✅`;
-                    } else {
-                        stickyText.innerHTML = `<strong>${currentVotes}/1,000</strong> votes • Vote to become Founding Member!`;
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ Sticky banner update failed:', error);
-            }
-        } else {
-            stickyBanner.style.display = 'none';
-        }
-        
-        lastScrollTop = scrollTop;
-    });
-}
 
 // ========================================
 // DISPLAY COUNTDOWN BANNER
@@ -234,7 +109,7 @@ async function loadLiveMatches() {
             return;
         }
         
-        // Display matches (sorting handled in displayMatchGrid)
+        // Display matches
         displayMatchGrid();
         
         // Show main content
@@ -284,7 +159,7 @@ function displayMatchGrid() {
         grid.appendChild(card);
     });
     
-    // ✅ UPDATE UNVOTED HEADER
+    // Update unvoted header
     updateUnvotedHeader(unvotedMatches.length);
     
     // Display voted matches in separate section (if any)
@@ -300,14 +175,14 @@ function displayMatchGrid() {
         votedSection.style.display = 'none';
     }
     
-    // UPDATE PROGRESS BAR
+    // Update progress bar
     updateProgressBar(votedMatches.length, allLiveMatches.length);
     
     console.log(`✅ Displayed ${unvotedMatches.length} unvoted, ${votedMatches.length} voted`);
 }
 
 // ========================================
-// ✅ NEW: UPDATE UNVOTED HEADER (DYNAMIC)
+// UPDATE UNVOTED HEADER (DYNAMIC)
 // ========================================
 function updateUnvotedHeader(unvotedCount) {
     const headerText = document.querySelector('.unvoted-header .header-text');
@@ -351,7 +226,7 @@ async function updateProgressBar(votedCount, totalCount) {
     votedProgress.textContent = votedCount;
     totalProgress.textContent = totalCount;
     
-    // ✅ Add milestone message
+    // Add milestone message
     let milestone = '';
     if (percentage === 100) {
         progressFill.classList.add('complete');
@@ -387,7 +262,7 @@ function showCompletionMessage() {
                 <h3>🎉 You've Voted on All Live Matches!</h3>
                 <p>Check out these pages while waiting for new matchups:</p>
                 <div class="completion-links">
-                    <a href="/my-votes.html">View Your Votes</a>
+                    <a href="/my-votes.html">View Your Progress</a>
                     <a href="/brackets.html">See Bracket</a>
                     <a href="/stats.html">View Stats</a>
                 </div>
@@ -398,7 +273,7 @@ function showCompletionMessage() {
 }
 
 // ========================================
-// CREATE MATCH CARD (NO VOTE COUNTS)
+// CREATE MATCH CARD
 // ========================================
 function createMatchCard(match, index, isVoted) {
     const userVotedSongId = isVoted ? getUserVotedSongId(match.matchId) : null;
@@ -407,19 +282,7 @@ function createMatchCard(match, index, isVoted) {
     card.className = `social-match-card ${isVoted ? 'voted' : ''}`;
     card.style.animationDelay = `${index * 0.1}s`;
     
-    // ✅ Show Founding Member prompt on unvoted cards (only if user hasn't voted anywhere)
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    const hasVotedAnywhere = Object.keys(userVotes).length > 0;
-    
-    const foundingPrompt = !isVoted && !hasVotedAnywhere ? `
-        <div class="founding-prompt">
-            👑 Vote to become Founding Member
-        </div>
-    ` : '';
-    
     card.innerHTML = `
-        ${foundingPrompt}
-        
         <div class="social-thumbnails">
             <img src="https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg" 
                  alt="${match.song1.shortTitle || match.song1.title}"
