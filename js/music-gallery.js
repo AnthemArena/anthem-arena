@@ -13,12 +13,12 @@ const musicCount = document.getElementById('characterCount');
 const noResults = document.getElementById('noResults');
 const resetButton = document.getElementById('resetFilters');
 const musicGrid = document.getElementById('characterGrid');
+const sortSelect = document.getElementById('sortSelect');
 
 // Video modal elements
 const videoModal = document.getElementById('videoModal');
 const modalVideoFrame = document.getElementById('modalVideoFrame');
 const videoModalClose = document.querySelector('.video-modal-close');
-
 
 // ========================================
 // GET ALL TOURNAMENT STATS (OPTIMIZED - ONE QUERY)
@@ -27,7 +27,6 @@ async function getAllTournamentStats() {
     try {
         console.log('📊 Loading tournament stats from edge cache...');
         
-        // ✅ NEW: Get matches from edge cache
         const allMatches = await getAllMatches();
         
         // Create stats object for all songs
@@ -99,7 +98,7 @@ async function loadMusicVideos() {
         allVideos.forEach(video => {
             const liveStats = tournamentStats[video.id];
             
-            if (liveStats) {
+            if (liveStats && liveStats.totalMatches > 0) {
                 // Override JSON stats with live Firebase data
                 video.stats.winRecord = liveStats.winRecord;
                 video.stats.winRate = liveStats.winRate;
@@ -131,6 +130,7 @@ function renderVideos(videos) {
         musicGrid.appendChild(card);
     });
 }
+
 // ========================================
 // CREATE INDIVIDUAL VIDEO CARD
 // ========================================
@@ -142,10 +142,11 @@ function createVideoCard(video) {
     card.dataset.category = video.category;
     card.dataset.year = getYearRange(video.year);
     card.dataset.artist = video.artistGroup;
-    card.dataset.accolade = video.accolade;
+    card.dataset.series = video.seriesCollection; // ✅ NEW: Filter by series
     card.dataset.name = video.title;
     card.dataset.videoId = video.videoId;
     card.dataset.embedAllowed = video.embedAllowed !== false;
+    card.dataset.views = video.views; // ✅ For sorting
     
     // ✨ Get book recommendation for this video
     const book = getBookForSong(video);
@@ -195,32 +196,26 @@ function createVideoCard(video) {
             
             <div class="tournament-stats-detail">
                 <div class="stat-item">
-                    <span class="stat-icon">${getChampionIcon(video.stats.championships)}</span>
+                    <span class="stat-icon">${getAccomplishmentIcon(video)}</span>
                     <div class="stat-content">
-                        <span class="stat-number">${video.stats.championships}</span>
-                        <span class="stat-desc">Championships</span>
+                        <span class="stat-number">${getAccomplishmentText(video)}</span>
+                        <span class="stat-desc">Status</span>
                     </div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-icon">⚔️</span>
+                    <span class="stat-icon">👁️</span>
                     <div class="stat-content">
-                        <span class="stat-number">${video.stats.winRecord}</span>
-                        <span class="stat-desc">Win Record</span>
+                        <span class="stat-number">${formatViews(video.views)}</span>
+                        <span class="stat-desc">Views</span>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔥</span>
-                    <div class="stat-content">
-                        <span class="stat-number">${video.stats.winRate}</span>
-                        <span class="stat-desc">Win Rate</span>
-                    </div>
-                </div>
+                ${getPerformanceStatHTML(video)}
             </div>
             
             <div class="character-tags">
                 <span class="tag tag-seed">Seed #${video.seed}</span>
-                <span class="tag tag-category">${getCategoryLabel(video.category)}</span>
-                <span class="tag tag-accolade">${getAccoladeLabel(video.accolade)}</span>
+                <span class="tag tag-category">${video.seriesCollection}</span>
+                ${getStatusBadge(video)}
             </div>
             
             ${bookSection}
@@ -233,34 +228,13 @@ function createVideoCard(video) {
 // ========================================
 // HELPER FUNCTIONS
 // ========================================
+
 function getYearRange(year) {
     if (year >= 2024) return '2024-2025';
     if (year >= 2022) return '2022-2023';
     if (year >= 2020) return '2020-2021';
     if (year >= 2018) return '2018-2019';
     return '2014-2017';
-}
-
-// Helper function for accolade labels
-function getAccoladeLabel(accolade) {
-    const labels = {
-        'legend': '🏆🏆 Legend',
-        'champion': '🏆 Champion',
-        'contender': '🥈 Finalist',
-        'competitor': '⚔️ Competitor'
-    };
-    return labels[accolade] || '⚔️ Competitor';
-}
-
-function getCategoryLabel(category) {
-    const labels = {
-        'worlds-anthem': 'Worlds Anthem',
-        'virtual-group': 'Virtual Group',
-        'cinematic': 'Cinematic',
-        'champion-theme': 'Champion Theme',
-        'esports': 'Esports Event'
-    };
-    return labels[category] || category;
 }
 
 function getSubtitle(video) {
@@ -281,14 +255,104 @@ function getSubtitle(video) {
     return subtitle;
 }
 
-function getChampionIcon(count) {
-    if (count >= 2) return '🏆';
-    if (count === 1) return '🏆';
-    return '⭐';
+// ✅ NEW: Accomplishment display logic
+function getAccomplishmentIcon(video) {
+    if (video.stats.championships >= 2) return '🏆🏆';
+    if (video.stats.championships === 1) return '🏆';
+    if (video.tournamentStatus === 'eliminated') return '❌';
+    return '⚔️';
+}
+
+function getAccomplishmentText(video) {
+    if (video.stats.championships >= 2) return `${video.stats.championships}x Champion`;
+    if (video.stats.championships === 1) return 'Champion';
+    if (video.tournamentStatus === 'eliminated') return 'Eliminated';
+    return 'Competing';
+}
+
+function getStatusBadge(video) {
+    if (video.stats.championships >= 2) {
+        return '<span class="tag tag-champion">Legend</span>';
+    }
+    if (video.stats.championships === 1) {
+        return '<span class="tag tag-champion">Champion</span>';
+    }
+    if (video.tournamentStatus === 'eliminated') {
+        return '<span class="tag tag-eliminated">Eliminated</span>';
+    }
+    return '<span class="tag tag-competing">Competing</span>';
+}
+
+// ✅ NEW: Only show performance if they have real data
+function getPerformanceStatHTML(video) {
+    // Only show if they have actual matches (not 0-0)
+    if (video.stats.winRecord && video.stats.winRecord !== '0-0') {
+        return `
+            <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <div class="stat-content">
+                    <span class="stat-number">${video.stats.winRecord}</span>
+                    <span class="stat-desc">${video.stats.winRate} Win Rate</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Show year as fallback
+    return `
+        <div class="stat-item">
+            <span class="stat-icon">📅</span>
+            <div class="stat-content">
+                <span class="stat-number">${video.year}</span>
+                <span class="stat-desc">Released</span>
+            </div>
+        </div>
+    `;
+}
+
+// ✅ NEW: Format view count
+function formatViews(views) {
+    if (views >= 1000000000) return (views / 1000000000).toFixed(1) + 'B';
+    if (views >= 1000000) return (views / 1000000).toFixed(0) + 'M';
+    if (views >= 1000) return (views / 1000).toFixed(0) + 'K';
+    return views.toString();
 }
 
 function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ========================================
+// ✅ NEW: SORTING FUNCTIONALITY
+// ========================================
+function sortVideos(videos, sortBy) {
+    const sorted = [...videos];
+    
+    switch(sortBy) {
+        case 'popular':
+            sorted.sort((a, b) => b.views - a.views);
+            break;
+        case 'newest':
+            sorted.sort((a, b) => b.year - a.year || b.uploadDate.localeCompare(a.uploadDate));
+            break;
+        case 'oldest':
+            sorted.sort((a, b) => a.year - b.year || a.uploadDate.localeCompare(b.uploadDate));
+            break;
+        case 'alphabetical':
+            sorted.sort((a, b) => a.shortTitle.localeCompare(b.shortTitle));
+            break;
+        case 'seed':
+            sorted.sort((a, b) => a.seed - b.seed);
+            break;
+        case 'championships':
+            sorted.sort((a, b) => (b.stats.championships || 0) - (a.stats.championships || 0));
+            break;
+        default:
+            // Default: seed order
+            sorted.sort((a, b) => a.seed - b.seed);
+    }
+    
+    return sorted;
 }
 
 // ========================================
@@ -300,58 +364,69 @@ function filterMusicVideos() {
     
     // Get all checked filters
     const activeFilters = {
-        category: [],
-        year: [],
-        artist: [],
-        accolade: []
+        series: [], // ✅ NEW: Filter by series/collection
+        year: []
     };
 
     filterInputs.forEach(input => {
         if (input.checked) {
             const filterType = input.dataset.filter;
-            activeFilters[filterType].push(input.value);
+            const value = input.value;
+            
+            if (filterType === 'series') {
+                activeFilters.series.push(value);
+            } else if (filterType === 'year') {
+                activeFilters.year.push(value);
+            }
         }
     });
 
     // Get search term
     const searchTerm = searchInput.value.toLowerCase();
+    
+    // Get sort option
+    const sortBy = sortSelect ? sortSelect.value : 'seed';
 
     // Filter cards
-    let visibleCount = 0;
+    let visibleVideos = [];
 
-    musicCards.forEach(card => {
-        const cardCategory = card.dataset.category;
-        const cardYear = card.dataset.year;
-        const cardArtist = card.dataset.artist;
-        const cardAccolade = card.dataset.accolade;
-        const cardName = card.dataset.name.toLowerCase();
+    allVideos.forEach(video => {
+        const cardSeries = video.seriesCollection;
+        const cardYear = getYearRange(video.year);
+        const cardName = video.title.toLowerCase();
+        const cardArtist = video.artist.toLowerCase();
 
         // Check if card matches all filter criteria
-        const matchesCategory = activeFilters.category.length === 0 || activeFilters.category.includes(cardCategory);
+        const matchesSeries = activeFilters.series.length === 0 || activeFilters.series.includes(cardSeries);
         const matchesYear = activeFilters.year.length === 0 || activeFilters.year.includes(cardYear);
-        const matchesArtist = activeFilters.artist.length === 0 || activeFilters.artist.includes(cardArtist);
-        const matchesAccolade = activeFilters.accolade.length === 0 || activeFilters.accolade.includes(cardAccolade);
-        const matchesSearch = searchTerm === '' || cardName.includes(searchTerm);
+        const matchesSearch = searchTerm === '' || cardName.includes(searchTerm) || cardArtist.includes(searchTerm);
 
         // Show or hide card
-        if (matchesCategory && matchesYear && matchesArtist && matchesAccolade && matchesSearch) {
-            card.style.display = 'block';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
+        if (matchesSeries && matchesYear && matchesSearch) {
+            visibleVideos.push(video);
         }
     });
+    
+    // Sort visible videos
+    visibleVideos = sortVideos(visibleVideos, sortBy);
+    
+    // Render sorted videos
+    renderVideos(visibleVideos);
+    
+    // Re-attach event listeners
+    attachCardEventListeners();
 
     // Update count
-    musicCount.textContent = visibleCount;
+    musicCount.textContent = visibleVideos.length;
 
     // Show/hide no results message
-    if (visibleCount === 0) {
+    if (visibleVideos.length === 0) {
         noResults.style.display = 'block';
     } else {
         noResults.style.display = 'none';
     }
 }
+
 // ========================================
 // EVENT LISTENERS SETUP
 // ========================================
@@ -363,29 +438,62 @@ function setupEventListeners() {
     });
 
     // Search input
-    searchInput.addEventListener('input', filterMusicVideos);
+    if (searchInput) {
+        searchInput.addEventListener('input', filterMusicVideos);
+    }
+    
+    // Sort select
+    if (sortSelect) {
+        sortSelect.addEventListener('change', filterMusicVideos);
+    }
 
     // Reset filters
-    resetButton.addEventListener('click', () => {
-        filterInputs.forEach(input => {
-            input.checked = true;
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            filterInputs.forEach(input => {
+                input.checked = true;
+            });
+            if (searchInput) searchInput.value = '';
+            if (sortSelect) sortSelect.value = 'seed';
+            filterMusicVideos();
         });
-        searchInput.value = '';
-        filterMusicVideos();
-    });
+    }
+    
+    // Attach card listeners
+    attachCardEventListeners();
 
-    // ✨ NEW: Entire card is clickable for video
+    // Close video modal
+    if (videoModalClose) {
+        videoModalClose.addEventListener('click', closeVideoModal);
+    }
+    
+    if (videoModal) {
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && videoModal && videoModal.style.display === 'block') {
+            closeVideoModal();
+        }
+    });
+}
+
+function attachCardEventListeners() {
     document.querySelectorAll('.character-card').forEach(card => {
         // Make entire card show pointer cursor
         card.style.cursor = 'pointer';
         
-        // ✅ UPDATED: Prevent book recommendation area from triggering video
+        // Prevent book recommendation area from triggering video
         const bookRec = card.querySelector('.card-book-recommendation');
         if (bookRec) {
             bookRec.addEventListener('click', function(e) {
-                e.stopPropagation(); // Stop the card click event
+                e.stopPropagation();
             });
-            bookRec.style.cursor = 'default'; // Show normal cursor
+            bookRec.style.cursor = 'default';
         }
         
         // Click anywhere on card opens video
@@ -394,15 +502,13 @@ function setupEventListeners() {
             const embedAllowed = this.dataset.embedAllowed === 'true';
             
             if (!embedAllowed) {
-                // Open directly on YouTube (new tab)
                 window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
             } else {
-                // Open in modal
                 openVideoModal(videoId);
             }
         });
         
-        // Show play overlay on hover anywhere on card
+        // Show play overlay on hover
         card.addEventListener('mouseenter', function() {
             const overlay = this.querySelector('.play-overlay');
             if (overlay) {
@@ -417,36 +523,24 @@ function setupEventListeners() {
             }
         });
     });
-
-    // Close video modal
-    if (videoModalClose) {
-        videoModalClose.addEventListener('click', closeVideoModal);
-    }
-    
-    videoModal.addEventListener('click', function(e) {
-        if (e.target === videoModal) {
-            closeVideoModal();
-        }
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && videoModal.style.display === 'block') {
-            closeVideoModal();
-        }
-    });
 }
 
 function openVideoModal(videoId) {
-    modalVideoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-    videoModal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
+    if (modalVideoFrame && videoModal) {
+        modalVideoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        videoModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function closeVideoModal() {
-    videoModal.style.display = 'none';
-    modalVideoFrame.src = '';
-    document.body.style.overflow = ''; // Restore scroll
+    if (videoModal && modalVideoFrame) {
+        videoModal.style.display = 'none';
+        modalVideoFrame.src = '';
+        document.body.style.overflow = '';
+    }
 }
+
 // ========================================
 // INITIALIZE ON PAGE LOAD (CONDITIONAL)
 // ========================================
@@ -459,15 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 /**
  * Track book clicks for analytics
- * @param {string} songSlug - Song identifier
- * @param {string} location - Where the click occurred
  */
 function trackBookClick(songSlug, location) {
     console.log(`📊 Book clicked: ${songSlug} from ${location}`);
-    // Add analytics tracking here if needed
 }
 
 // Make available globally
