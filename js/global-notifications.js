@@ -233,45 +233,49 @@ const userId = localStorage.getItem('tournamentUserId');  // ✅ Match navigatio
         // NON-VOTER ENGAGEMENT SYSTEM
         // ========================================
         
-        if (!hasVoted) {
-            console.log('👤 First-time visitor - checking engagement prompts');
-            
-            const lastEncouragement = parseInt(localStorage.getItem('lastEncouragementToast') || '0');
-            const timeSinceLastPrompt = Date.now() - lastEncouragement;
-            const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
-            const timeOnSite = Date.now() - pageLoadTime;
-            
-            // Store page load time if not set
-            if (!sessionStorage.getItem('pageLoadTime')) {
-                sessionStorage.setItem('pageLoadTime', Date.now().toString());
-            }
-            
-            // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
-            const shouldWelcome = await shouldShowWelcome(timeOnSite);
-            if (shouldWelcome) {
-                await showWelcomeToast();
-                return;
-            }
-            
-            // 👀 GENTLE REMINDER: After 2 minutes of browsing
-            const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
-            if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
-                await showEncouragementToast('gentle');
-                return;
-            }
-            
-            // ⏰ URGENCY: After 5 minutes + matches closing soon
-            if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
-                const hasUrgentMatches = await checkForClosingMatches();
-                if (hasUrgentMatches) {
-                    await showEncouragementToast('urgent');
-                    return;
-                }
-            }
-            
-            // Don't check voted-match alerts for non-voters
+       // ========================================
+// NON-VOTER ENGAGEMENT SYSTEM
+// ========================================
+
+if (!hasVoted) {
+    console.log('👤 First-time visitor - checking engagement prompts');
+    
+    const lastEncouragement = parseInt(localStorage.getItem('lastEncouragementToast') || '0');
+    const timeSinceLastPrompt = Date.now() - lastEncouragement;
+    const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
+    const timeOnSite = Date.now() - pageLoadTime;
+    
+    // Store page load time if not set
+    if (!sessionStorage.getItem('pageLoadTime')) {
+        sessionStorage.setItem('pageLoadTime', Date.now().toString());
+    }
+    
+    // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
+    const shouldWelcome = await shouldShowWelcome(timeOnSite);
+    if (shouldWelcome) {
+        await showWelcomeToast();
+        return;
+    }
+    
+    // 👀 GENTLE REMINDER: After 2 minutes of browsing
+    const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
+    if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
+        await showEncouragementToast('gentle');
+        return;
+    }
+    
+    // ⏰ URGENCY: After 5 minutes + matches closing soon
+    if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
+        const hasUrgentMatches = await checkForClosingMatches();
+        if (hasUrgentMatches) {
+            await showEncouragementToast('urgent');
             return;
         }
+    }
+    
+    // Don't check voted-match alerts for non-voters
+    return;
+}
         
         const notifications = [];
         
@@ -637,6 +641,23 @@ try {
 async function shouldShowWelcome(timeOnSite) {
     // Must be on site at least 5 seconds
     if (timeOnSite < 5000) return false;
+    
+    // ✅ NEW: Check if user has ANY votes in Firebase first
+    const userId = localStorage.getItem('tournamentUserId');
+    if (userId) {
+        try {
+            const votesRef = collection(db, 'votes');
+            const q = query(votesRef, where('userId', '==', userId));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                console.log('⏸️ User has votes - skipping welcome toast');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking votes for welcome:', error);
+        }
+    }
     
     // Don't show twice in same session
     const welcomeShownThisSession = sessionStorage.getItem('welcomeToastShown');
