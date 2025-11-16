@@ -724,7 +724,31 @@ await loadOtherLiveMatches();
 
 async function checkVoteStatus() {
     try {
-        // Check Firebase votes collection
+        // ✅ NEW: Check localStorage FIRST (free, instant)
+        const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
+        
+        if (localVote) {
+            hasVoted = true;
+            console.log('✅ Found vote in localStorage:', localVote);
+            
+            // Make sure it's saved in the new format too
+            saveVoteForOtherPages(currentMatch.id, localVote);
+            
+            // Update UI with current vote counts
+            updateVoteCountsUI();
+            
+            // Disable voting and show stats
+            disableVoting(localVote);
+            
+            // Load other matches since user already voted
+            await loadOtherLiveMatches();
+            
+            return; // ← EXIT EARLY - no Firebase call needed!
+        }
+        
+        // ✅ Only check Firebase if localStorage is empty (new device/cleared cache)
+        console.log('🔍 No local vote found, checking Firebase...');
+        
         const voteId = `${currentMatch.id}_${userId}`;
         const voteRef = doc(db, 'votes', voteId);
         const voteDoc = await getDoc(voteRef);
@@ -732,47 +756,26 @@ async function checkVoteStatus() {
         if (voteDoc.exists()) {
             hasVoted = true;
             const voteData = voteDoc.data();
-            console.log('✅ User already voted:', voteData.choice);
+            console.log('✅ User already voted (found in Firebase):', voteData.choice);
             
-            // Store in localStorage
+            // Store in localStorage for next time
             localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
-
-            // ✅ NEW: Also save in userVotes format
-saveVoteForOtherPages(currentMatch.id, voteData.choice);
-
+            saveVoteForOtherPages(currentMatch.id, voteData.choice);
             
-            // ✅ NEW: Update UI with current vote counts FIRST
             updateVoteCountsUI();
-            
-            // Then disable voting and show stats
             disableVoting(voteData.choice);
-
-            // ✅ ADD THIS: Load other matches since user already voted
-await loadOtherLiveMatches();
-            
+            await loadOtherLiveMatches();
         } else {
-            // Double-check localStorage as backup
-            const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
-            if (localVote) {
-                hasVoted = true;
-                console.log('✅ Found vote in localStorage:', localVote);
-                
-                // ✅ NEW: Update UI here too
-                updateVoteCountsUI();
-                
-                disableVoting(localVote);
-            }
+            hasVoted = false;
+            console.log('📝 No vote found - user can vote');
         }
     } catch (error) {
         console.error('⚠️ Error checking vote status:', error);
         // Fallback to localStorage only
-        const localVote = localStorage.getItem(`vote_${currentMatch.id}`);
+        const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
         if (localVote) {
             hasVoted = true;
-            
-            // ✅ NEW: Update UI here too
             updateVoteCountsUI();
-            
             disableVoting(localVote);
         }
     }
