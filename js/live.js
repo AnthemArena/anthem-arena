@@ -11,10 +11,12 @@ let allLiveMatches = [];
 // ========================================
 // ROUND COUNTDOWN CONFIGURATION
 // ========================================
+// ========================================
+// ROUND COUNTDOWN CONFIGURATION
+// ========================================
 const ROUND_CONFIG = {
     roundName: "ROUND 1",
-    endDate: new Date(Date.now() + (2 * 24 * 60 * 60 * 1000) + (10 * 60 * 60 * 1000)) // 2 days 10 hours from now
-    // TO UPDATE FOR R2: Change to new Date('2024-11-20T23:59:59Z') with your actual end date
+    endDate: new Date('2024-11-17T19:00:00Z') // Monday 17th Nov, 7pm GMT
 };
 
 // ========================================
