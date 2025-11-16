@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="css/live.css">
     
@@ -51,7 +54,7 @@
     
     <!-- Error State -->
     <div id="errorState" class="error-state" style="display: none;">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h2>Unable to Load Matches</h2>
         <p>Please check your connection and try again.</p>
         <button onclick="location.reload()" class="retry-button">Retry</button>
@@ -64,7 +67,7 @@
         
         <!-- Hero Header -->
         <div class="hero-header">
-            <h1>🎵 Vote for Your Favorite League of Legends Songs</h1>
+            <h1><i class="fa-solid fa-music"></i> Vote for Your Favorite League of Legends Songs</h1>
             <p>Help decide the ultimate League anthem in this head-to-head tournament</p>
         </div>
         
@@ -81,7 +84,7 @@
         <!-- Unvoted Matches Section -->
         <div id="unvotedSection" class="unvoted-section">
             <h2 class="unvoted-header">
-                <span class="header-icon">🗳️</span>
+                <span class="header-icon"><i class="fa-solid fa-check-to-slot"></i></span>
                 <span class="header-text">
                     <span id="unvotedCount">0</span> Matches Need Your Vote!
                 </span>
@@ -96,7 +99,7 @@
         <!-- Voted Matches Section (Collapsible) -->
         <div id="votedSection" class="voted-section" style="display: none;">
             <div class="voted-header" onclick="toggleVotedSection()">
-                <h2>✓ Your Votes (<span id="votedCount">0</span>)</h2>
+                <h2><i class="fa-solid fa-check"></i> Your Votes (<span id="votedCount">0</span>)</h2>
                 <button id="votedToggle" class="toggle-btn">▼</button>
             </div>
             
@@ -107,7 +110,7 @@
         
         <!-- No Matches State -->
         <div id="noMatches" class="no-matches" style="display: none;">
-            <div class="no-matches-icon">🎵</div>
+            <div class="no-matches-icon"><i class="fa-solid fa-music"></i></div>
             <h2>No Live Matches Right Now</h2>
             <p>Check back soon for new matchups!</p>
             
@@ -124,7 +127,7 @@
             </div>
             
             <p class="no-matches-tip">
-                💡 Check your <a href="/my-votes.html" class="inline-link">progress</a> 
+                <i class="fa-solid fa-lightbulb"></i> Check your <a href="/my-votes.html" class="inline-link">progress</a> 
                 or explore the <a href="/music-gallery.html" class="inline-link">music gallery</a>
             </p>
         </div>
@@ -137,19 +140,19 @@
                     <p>View bracket progression, detailed stats, and your voting history</p>
                     <div class="footer-links">
                         <a href="/brackets.html" class="footer-link-card">
-                            <span class="link-icon">🏆</span>
+                            <span class="link-icon"><i class="fa-solid fa-trophy"></i></span>
                             <span>View Bracket</span>
                         </a>
                         <a href="/stats.html" class="footer-link-card">
-                            <span class="link-icon">📊</span>
+                            <span class="link-icon"><i class="fa-solid fa-chart-column"></i></span>
                             <span>Statistics</span>
                         </a>
                         <a href="/my-votes.html" class="footer-link-card">
-                            <span class="link-icon">🎮</span>
+                            <span class="link-icon"><i class="fa-solid fa-gamepad"></i></span>
                             <span>My Progress</span>
                         </a>
                         <a href="/music-gallery.html" class="footer-link-card">
-                            <span class="link-icon">🎵</span>
+                            <span class="link-icon"><i class="fa-solid fa-music"></i></span>
                             <span>Music Gallery</span>
                         </a>
                     </div>
@@ -157,12 +160,12 @@
                 
                 <!-- Buy Me a Coffee -->
                 <div class="bmc-container">
-                    <p class="bmc-text">Enjoying the tournament? ☕</p>
+                    <p class="bmc-text">Enjoying the tournament? <i class="fa-solid fa-mug-hot"></i></p>
                     <a href="https://buymeacoffee.com/anthemarena" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        class="bmc-button">
-                        <span class="bmc-icon">☕</span>
+                        <span class="bmc-icon"><i class="fa-solid fa-mug-hot"></i></span>
                         <span>Buy Me a Coffee</span>
                     </a>
                 </div>

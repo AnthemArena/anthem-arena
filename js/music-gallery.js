@@ -400,12 +400,43 @@ function filterMusicVideos() {
         const cardName = video.title.toLowerCase();
         const cardArtist = video.artist.toLowerCase();
 
-        // Check primary OR additional categories
-        const matchesSeries = activeFilters.series.length === 0 || 
-                             activeFilters.series.includes(cardSeries) ||
-                             activeFilters.series.some(filter => additionalCats.includes(filter));
+        // ✅ FIXED LOGIC:
+        // If NO filters are checked in a category, show NOTHING
+        // If ALL filters are checked in a category, show EVERYTHING
+        // If SOME filters are checked, show only matching items
         
-        const matchesYear = activeFilters.year.length === 0 || activeFilters.year.includes(cardYear);
+        const seriesInputs = document.querySelectorAll('input[data-filter="series"]');
+        const yearInputs = document.querySelectorAll('input[data-filter="year"]');
+        
+        const allSeriesChecked = Array.from(seriesInputs).every(input => input.checked);
+        const allYearsChecked = Array.from(yearInputs).every(input => input.checked);
+        
+        const noSeriesChecked = activeFilters.series.length === 0;
+        const noYearsChecked = activeFilters.year.length === 0;
+
+        // Series filter logic
+        let matchesSeries;
+        if (noSeriesChecked) {
+            matchesSeries = false; // No filters selected = show nothing
+        } else if (allSeriesChecked) {
+            matchesSeries = true; // All filters selected = show everything
+        } else {
+            // Some filters selected = check if video matches
+            matchesSeries = activeFilters.series.includes(cardSeries) ||
+                           activeFilters.series.some(filter => additionalCats.includes(filter));
+        }
+        
+        // Year filter logic
+        let matchesYear;
+        if (noYearsChecked) {
+            matchesYear = false; // No filters selected = show nothing
+        } else if (allYearsChecked) {
+            matchesYear = true; // All filters selected = show everything
+        } else {
+            // Some filters selected = check if video matches
+            matchesYear = activeFilters.year.includes(cardYear);
+        }
+        
         const matchesSearch = searchTerm === '' || cardName.includes(searchTerm) || cardArtist.includes(searchTerm);
 
         // Show or hide card

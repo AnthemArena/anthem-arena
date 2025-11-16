@@ -2077,3 +2077,108 @@ text-align: center;
         font-size: 0.95rem;
     }
 }
+/* Gold icon styling for live page */
+.error-icon i {
+    color: #ff4444;
+    font-size: 4rem;
+    animation: shake-error 0.5s ease-in-out infinite;
+}
+
+@keyframes shake-error {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.hero-header h1 i {
+    color: #C8AA6E;
+    margin-right: 12px;
+    animation: pulse-music 2s ease-in-out infinite;
+}
+
+@keyframes pulse-music {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.header-icon i {
+    color: #C8AA6E;
+    font-size: 1.5rem;
+    animation: bounce-icon 1s ease-in-out infinite;
+}
+
+@keyframes bounce-icon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.voted-header h2 i {
+    color: #4aff4a;
+    margin-right: 8px;
+}
+
+.no-matches-icon i {
+    color: #C8AA6E;
+    font-size: 5rem;
+    opacity: 0.6;
+}
+
+.no-matches-tip i {
+    color: #C8AA6E;
+    margin-right: 6px;
+}
+
+.link-icon i {
+    color: #C8AA6E;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.footer-link-card:hover .link-icon i {
+    transform: scale(1.2) rotate(5deg);
+    color: #F0E6D2;
+    filter: drop-shadow(0 0 10px rgba(200, 170, 110, 0.5));
+}
+
+/* Individual footer link colors */
+.footer-link-card:nth-child(1) .link-icon i {
+    color: #C8AA6E; /* Gold for bracket */
+}
+
+.footer-link-card:nth-child(2) .link-icon i {
+    color: #4a9eff; /* Blue for stats */
+}
+
+.footer-link-card:nth-child(3) .link-icon i {
+    color: #ff4444; /* Red for progress */
+}
+
+.footer-link-card:nth-child(4) .link-icon i {
+    color: #4aff4a; /* Green for gallery */
+}
+
+.bmc-text i {
+    color: #C8AA6E;
+    animation: steam-rise 2s ease-in-out infinite;
+}
+
+@keyframes steam-rise {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-3px); opacity: 0.7; }
+}
+
+.bmc-icon i {
+    color: #C8AA6E;
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.bmc-button:hover .bmc-icon i {
+    animation: coffee-wobble 0.5s ease-in-out;
+}
+
+@keyframes coffee-wobble {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
