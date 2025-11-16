@@ -15,7 +15,6 @@ const ROUND_CONFIG = {
     roundName: "ROUND 1",
     endDate: new Date('2025-11-17T19:00:00Z') // YEAR IS 2025, not 2024!
 };
-
 // ========================================
 // INITIALIZE ON PAGE LOAD
 // ========================================
@@ -28,6 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display countdown timer
     displayRoundCountdown();
     
+    // ✅ Initialize dismissible social banner
+    initializeSocialBanner();
+    
     try {
         await loadLiveMatches();
     } catch (error) {
@@ -35,6 +37,95 @@ document.addEventListener('DOMContentLoaded', async () => {
         showErrorState();
     }
 });
+
+// ========================================
+// SOCIAL BANNER MANAGEMENT
+// ========================================
+
+/**
+ * Initialize the social promo banner with dismiss functionality
+ */
+function initializeSocialBanner() {
+    const banner = document.querySelector('.social-promo-banner');
+    
+    if (!banner) {
+        console.log('ℹ️ Social banner not found in DOM');
+        return;
+    }
+    
+    // Check if user dismissed it before
+    const isDismissed = localStorage.getItem('socialBannerDismissed');
+    const dismissedTime = localStorage.getItem('socialBannerDismissedTime');
+    
+    // Show banner again after 7 days
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    if (isDismissed === 'true' && dismissedTime) {
+        const timeSinceDismissed = Date.now() - parseInt(dismissedTime);
+        
+        if (timeSinceDismissed < SEVEN_DAYS) {
+            banner.style.display = 'none';
+            console.log('📴 Social banner hidden (dismissed by user)');
+            return;
+        } else {
+            // Reset after 7 days
+            localStorage.removeItem('socialBannerDismissed');
+            localStorage.removeItem('socialBannerDismissedTime');
+            console.log('🔄 Social banner reset (7 days passed)');
+        }
+    }
+    
+    // Create dismiss button
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'banner-dismiss';
+    dismissBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    dismissBtn.setAttribute('aria-label', 'Dismiss banner');
+    dismissBtn.title = 'Dismiss';
+    
+    // Add dismiss handler
+    dismissBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        dismissSocialBanner(banner);
+    });
+    
+    // Insert dismiss button into banner
+    banner.appendChild(dismissBtn);
+    
+    console.log('✅ Social banner initialized with dismiss button');
+}
+
+/**
+ * Dismiss the social banner with animation
+ * @param {HTMLElement} banner - The banner element
+ */
+function dismissSocialBanner(banner) {
+    // Animate out
+    banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(-20px)';
+    
+    setTimeout(() => {
+        banner.style.display = 'none';
+        
+        // Save dismissal to localStorage
+        localStorage.setItem('socialBannerDismissed', 'true');
+        localStorage.setItem('socialBannerDismissedTime', Date.now().toString());
+        
+        console.log('📴 Social banner dismissed by user');
+    }, 300);
+}
+
+/**
+ * Reset social banner visibility (for testing or admin)
+ */
+function resetSocialBanner() {
+    localStorage.removeItem('socialBannerDismissed');
+    localStorage.removeItem('socialBannerDismissedTime');
+    console.log('🔄 Social banner reset - will show on next page load');
+    location.reload();
+}
+
+// Make reset function available globally (for console debugging)
+window.resetSocialBanner = resetSocialBanner;
 
 // ========================================
 // DISPLAY COUNTDOWN BANNER

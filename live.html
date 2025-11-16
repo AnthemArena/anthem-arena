@@ -69,8 +69,31 @@
         <div class="hero-header">
             <h1><i class="fa-solid fa-music"></i> Vote for Your Favorite League of Legends Songs</h1>
             <p>Help decide the ultimate League anthem in this head-to-head tournament</p>
+ <!-- ✅ ADD THIS: Social follow bar -->
+    <div class="social-follow-bar">
+        <span class="follow-label">Follow for updates:</span>
+        <div class="social-icons">
+            <a href="https://x.com/anthemarena" target="_blank" rel="noopener" class="social-icon x-twitter" aria-label="Follow on X" title="Follow on X">
+                <i class="fa-brands fa-x-twitter"></i>
+            </a>
+            <a href="https://youtube.com/@anthemarena" target="_blank" rel="noopener" class="social-icon youtube" aria-label="Subscribe on YouTube" title="Subscribe on YouTube">
+                <i class="fa-brands fa-youtube"></i>
+            </a>
+            <a href="https://tiktok.com/@anthemarena" target="_blank" rel="noopener" class="social-icon tiktok" aria-label="Follow on TikTok" title="Follow on TikTok">
+                <i class="fa-brands fa-tiktok"></i>
+            </a>
+              <a href="https://instagram.com/anthemarena" target="_blank" rel="noopener" class="social-icon instagram" aria-label="Follow on Instagram" title="Follow on Instagram">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a href="https://bsky.app/profile/anthemarena.bsky.social" target="_blank" rel="noopener" class="social-icon bluesky" aria-label="Follow on Bluesky" title="Follow on Bluesky">
+                <i class="fa-brands fa-bluesky"></i>
+            </a>
+            <a href="https://anthemarena.tumblr.com" target="_blank" rel="noopener" class="social-icon tumblr" aria-label="Follow on Tumblr" title="Follow on Tumblr">
+                <i class="fa-brands fa-tumblr"></i>
+            </a>
         </div>
-        
+    </div>
+</div>        
         <!-- Progress Bar -->
         <div class="progress-container">
             <div class="progress-bar">
@@ -80,6 +103,35 @@
                 <span id="votedProgress">0</span> / <span id="totalProgress">0</span> matches voted
             </p>
         </div>
+
+        <!-- ✅ ADD THIS: Social Promo Banner -->
+<!-- ✅ UPDATED: Social Promo Banner with Instagram & Bluesky -->
+<div class="social-promo-banner">
+    <div class="banner-content">
+        <div class="banner-text">
+            <h3><i class="fa-solid fa-bell"></i> Don't Miss Round 2!</h3>
+            <p>Follow us for results, upsets, and tournament updates</p>
+        </div>
+        <div class="banner-socials">
+            <a href="https://x.com/anthemarena" target="_blank" rel="noopener" class="banner-btn x-twitter" onclick="trackSocialClick('x-twitter')">
+                <i class="fa-brands fa-x-twitter"></i>
+                <span>X/Twitter</span>
+            </a>
+            <a href="https://youtube.com/@anthemarena" target="_blank" rel="noopener" class="banner-btn youtube" onclick="trackSocialClick('youtube')">
+                <i class="fa-brands fa-youtube"></i>
+                <span>YouTube</span>
+            </a>
+            <a href="https://instagram.com/anthemarena" target="_blank" rel="noopener" class="banner-btn instagram" onclick="trackSocialClick('instagram')">
+                <i class="fa-brands fa-instagram"></i>
+                <span>Instagram</span>
+            </a>
+            <a href="https://bsky.app/profile/anthemarena.bsky.social" target="_blank" rel="noopener" class="banner-btn bluesky" onclick="trackSocialClick('bluesky')">
+                <i class="fa-brands fa-bluesky"></i>
+                <span>Bluesky</span>
+            </a>
+        </div>
+    </div>
+</div>
         
         <!-- Unvoted Matches Section -->
         <div id="unvotedSection" class="unvoted-section">
