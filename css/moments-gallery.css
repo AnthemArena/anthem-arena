@@ -1188,3 +1188,45 @@ body {
     color: #C8AA6E;
     margin-right: 8px;
 }
+/* Filter panel scrolling */
+.filter-panel {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 12px;
+    scrollbar-gutter: stable; /* Prevent layout shift */
+}
+
+/* Gold-themed scrollbar */
+.filter-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.filter-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.filter-panel::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+        rgba(200, 155, 60, 0.6), 
+        rgba(200, 155, 60, 0.4)
+    );
+    border-radius: 4px;
+    border: 2px solid rgba(10, 10, 10, 0.5);
+}
+
+.filter-panel::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, 
+        rgba(200, 155, 60, 0.8), 
+        rgba(200, 155, 60, 0.6)
+    );
+}
+
+/* Firefox scrollbar */
+.filter-panel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200, 155, 60, 0.5) rgba(255, 255, 255, 0.05);
+}

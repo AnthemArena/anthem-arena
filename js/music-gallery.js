@@ -259,7 +259,7 @@ function getAccomplishmentIcon(video) {
     if (video.stats.championships >= 2) return '<i class="fa-solid fa-trophy"></i><i class="fa-solid fa-trophy"></i>';
     if (video.stats.championships === 1) return '<i class="fa-solid fa-trophy"></i>';
     if (video.tournamentStatus === 'eliminated') return '<i class="fa-solid fa-xmark"></i>';
-    return '<i class="fa-solid fa-swords"></i>';
+    return '<i class="fa-solid fa-bolt"></i>';
 }
 
 function getAccomplishmentText(video) {
@@ -456,7 +456,7 @@ function updateToggleButtonText(filterType) {
 }
 
 // ========================================
-// EVENT LISTENERS SETUP (ENHANCED WITH TOGGLE + SHIFT-CLICK)
+// EVENT LISTENERS SETUP (ENHANCED WITH TOGGLE + SHIFT-CLICK + SCROLL FIX)
 // ========================================
 function setupEventListeners() {
     const filterInputs = document.querySelectorAll('.filter-input');
@@ -515,6 +515,21 @@ function setupEventListeners() {
             filterMusicVideos();
         });
     });
+
+    // ✅ NEW: Smooth filter panel scrolling (prevent scroll hijacking)
+    const filterPanel = document.querySelector('.filter-panel');
+    if (filterPanel) {
+        filterPanel.addEventListener('wheel', (e) => {
+            const { scrollTop, scrollHeight, clientHeight } = filterPanel;
+            const atTop = scrollTop === 0;
+            const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            // Allow scroll within panel, prevent propagation to page
+            if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+                e.stopPropagation();
+            }
+        }, { passive: false });
+    }
 
     // Search input
     if (searchInput) {
