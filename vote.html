@@ -81,11 +81,17 @@
         <h1 class="match-title" id="match-title"></h1>
         
      <div class="match-info">
-    <div class="info-badge tournament" id="tournament-badge">🏆 Loading...</div>
-    <div class="info-badge time" id="time-remaining">⏰ Loading...</div>
+    <div class="info-badge tournament" id="tournament-badge">
+        <i class="fa-solid fa-trophy"></i> Loading...
+    </div>
+    <div class="info-badge time" id="time-remaining">
+        <i class="fa-solid fa-clock"></i> Loading...
+    </div>
     <!-- ✅ HIDE TOTAL VOTES UNTIL USER VOTES -->
     <div class="vote-stats hidden">
-        <div class="info-badge votes" id="total-votes">📊 Loading...</div>
+        <div class="info-badge votes" id="total-votes">
+            <i class="fa-solid fa-chart-column"></i> Loading...
+        </div>
     </div>
 </div>
 </section>
@@ -134,10 +140,10 @@
     <div class="video-controls">
         <!-- Competitor 1 Controls -->
         <button class="control-btn replay-btn" data-video="competitor1">
-            🔄 Replay
+            <i class="fa-solid fa-rotate-right"></i> Replay
         </button>
         <button class="control-btn fullscreen-btn" data-video="competitor1">
-            ⛶ Fullscreen
+            <i class="fa-solid fa-expand"></i> Fullscreen
         </button>
     </div>
 </div>
@@ -156,7 +162,7 @@
     class="vote-btn" 
     id="vote-btn-competitor1"
     data-competitor="song1">
-    <span class="vote-icon">🎵</span>
+    <span class="vote-icon"><i class="fa-solid fa-music"></i></span>
     <span class="vote-text">Vote for <span id="vote-song1-name">This Music Video</span></span>
 </button>
 </div>
@@ -168,9 +174,9 @@
                         Loading match details...
                     </p>
                     <div class="details-meta" id="competitor1-meta">
-                        <span class="meta-item">📅 Loading...</span>
-                        <span class="meta-item">🎮 Loading...</span>
-                        <span class="meta-item">⏱️ Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-calendar"></i> Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-gamepad"></i> Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-stopwatch"></i> Loading...</span>
                     </div>
                 </div>
             </div>
@@ -219,10 +225,10 @@
     <div class="video-controls">
         <!-- Competitor 2 Controls -->
         <button class="control-btn replay-btn" data-video="competitor2">
-            🔄 Replay
+            <i class="fa-solid fa-rotate-right"></i> Replay
         </button>
         <button class="control-btn fullscreen-btn" data-video="competitor2">
-            ⛶ Fullscreen
+            <i class="fa-solid fa-expand"></i> Fullscreen
         </button>
     </div>
 </div>
@@ -241,7 +247,7 @@
     class="vote-btn" 
     id="vote-btn-competitor2"
     data-competitor="song2">
-    <span class="vote-icon">🔥</span>
+    <span class="vote-icon"><i class="fa-solid fa-fire"></i></span>
     <span class="vote-text">Vote for <span id="vote-song2-name">This Music Video</span></span>
 </button>
 </div>
@@ -253,9 +259,9 @@
                         Loading match details...
                     </p>
                     <div class="details-meta" id="competitor2-meta">
-                        <span class="meta-item">📅 Loading...</span>
-                        <span class="meta-item">🎮 Loading...</span>
-                        <span class="meta-item">⏱️ Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-calendar"></i> Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-gamepad"></i> Loading...</span>
+                        <span class="meta-item"><i class="fa-solid fa-stopwatch"></i> Loading...</span>
                     </div>
                 </div>
             </div>
@@ -305,7 +311,7 @@
     <div class="container-wide">
         <div class="section-header">
             <h2 class="section-title">
-                <span class="title-icon">🎵</span>
+                <span class="title-icon"><i class="fa-solid fa-music"></i></span>
                 Keep Voting
             </h2>
             <p class="section-subtitle">
@@ -323,7 +329,7 @@
  <!-- VOTE CONFIRMATION MODAL -->
     <div id="vote-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-icon">✓</div>
+            <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
             <h2 class="modal-title">Vote Cast Successfully!</h2>
             <p class="modal-message">Your vote for <strong id="voted-moment"></strong> has been recorded.</p>
             <div class="modal-actions">
@@ -355,28 +361,28 @@
             
             <div class="after-voting-grid">
                 <a href="/my-votes.html" class="after-voting-card">
-                    <div class="card-icon">✅</div>
+                    <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
                     <h3>View Your Votes</h3>
                     <p>Track all your predictions and unlock achievements</p>
                     <span class="card-arrow">→</span>
                 </a>
                 
                 <a href="/brackets.html" class="after-voting-card">
-                    <div class="card-icon">🏆</div>
+                    <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
                     <h3>Tournament Bracket</h3>
                     <p>See the full bracket and track song progression</p>
                     <span class="card-arrow">→</span>
                 </a>
                 
                 <a href="/stats.html" class="after-voting-card">
-                    <div class="card-icon">📊</div>
+                    <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
                     <h3>Statistics</h3>
                     <p>Explore voting trends and tournament analytics</p>
                     <span class="card-arrow">→</span>
                 </a>
                 
                 <a href="/music-gallery.html" class="after-voting-card">
-                    <div class="card-icon">🎵</div>
+                    <div class="card-icon"><i class="fa-solid fa-music"></i></div>
                     <h3>Music Gallery</h3>
                     <p>Browse all 64 competing League music videos</p>
                     <span class="card-arrow">→</span>
@@ -387,8 +393,8 @@
 
 <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
-        <script type="module" src="/js/global-notifications.js"></script> <!-- ✅ ADD THIS -->
-            <script type="module" src="/js/match-card-renderer.js"></script> <!-- ✅ ADD THIS -->
+        <script type="module" src="/js/global-notifications.js"></script>
+            <script type="module" src="/js/match-card-renderer.js"></script>
 
 
     <script type="module" src="/js/vote.js"></script>

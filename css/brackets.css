@@ -1576,3 +1576,67 @@
         font-size: 1.75rem;
     }
 }
+/* Gold icon styling for brackets page */
+.stat-icon i {
+    color: #C8AA6E;
+    font-size: 2rem;
+    filter: drop-shadow(0 0 8px rgba(200, 170, 110, 0.3));
+}
+
+.badge-icon i {
+    color: #FFD700;
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+    animation: pulse-crown 2s ease-in-out infinite;
+}
+
+@keyframes pulse-crown {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7));
+    }
+}
+
+.card-icon i {
+    color: #C8AA6E;
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
+}
+
+.explore-card-bracket:hover .card-icon i {
+    transform: scale(1.15);
+    color: #F0E6D2;
+    filter: drop-shadow(0 0 15px rgba(200, 170, 110, 0.6));
+}
+
+.info-value i {
+    color: #C8AA6E;
+    margin-right: 6px;
+}
+
+/* Stat cards hover effects */
+.stat-card:hover .stat-icon i {
+    transform: scale(1.2) rotate(5deg);
+    transition: all 0.3s ease;
+}
+
+/* Different colors for different stat types */
+.stat-card:nth-child(1) .stat-icon i {
+    color: #4a9eff; /* Blue for current round */
+}
+
+.stat-card:nth-child(2) .stat-icon i {
+    color: #ff4444; /* Red/fire for closest match */
+}
+
+.stat-card:nth-child(3) .stat-icon i {
+    color: #ffaa00; /* Orange for dominant win */
+}
+
+.stat-card:nth-child(4) .stat-icon i {
+    color: #C8AA6E; /* Gold for most voted */
+}

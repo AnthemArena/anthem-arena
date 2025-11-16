@@ -1584,3 +1584,62 @@
         font-size: 0.75rem;
     }
 }
+/* Gold icon styling for homepage */
+.badge-icon i {
+    color: #C8AA6E;
+    font-size: 1.5rem;
+    animation: pulse-music 2s ease-in-out infinite;
+}
+
+@keyframes pulse-music {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.section-label i {
+    color: #C8AA6E;
+    margin-right: 8px;
+    filter: drop-shadow(0 0 8px rgba(200, 170, 110, 0.4));
+}
+
+.section-subtitle i {
+    color: #ff4444;
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.countdown-label i {
+    color: #C8AA6E;
+    margin-right: 8px;
+}
+
+.book-highlights li i {
+    color: #4aff4a;
+    margin-right: 8px;
+}
+
+/* Hero badge animation */
+.hero .badge-icon i {
+    animation: float-icon 3s ease-in-out infinite;
+}
+
+@keyframes float-icon {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}

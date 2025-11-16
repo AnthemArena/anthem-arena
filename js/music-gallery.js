@@ -461,7 +461,7 @@ function updateToggleButtonText(filterType) {
 function setupEventListeners() {
     const filterInputs = document.querySelectorAll('.filter-input');
     
-    // ✅ NEW: Toggle buttons for Select/Deselect All
+    // ✅ FIXED: Toggle buttons for Select/Deselect All
     const filterToggles = document.querySelectorAll('.filter-toggle');
     filterToggles.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -479,12 +479,12 @@ function setupEventListeners() {
             // Update button text
             e.target.textContent = allChecked ? 'Select All' : 'Deselect All';
             
-            // Re-filter
+            // ✅ FIX: Force re-filter after toggling
             filterMusicVideos();
         });
     });
 
-    // ✅ NEW: Shift+Click to isolate single filter
+    // ✅ Shift+Click to isolate single filter
     filterInputs.forEach(input => {
         input.addEventListener('click', (e) => {
             // If shift-clicking, deselect all others in that category
@@ -505,18 +505,25 @@ function setupEventListeners() {
                 
                 // Trigger filter
                 filterMusicVideos();
+                
+                // ✅ FIX: Prevent normal change event from firing
+                e.preventDefault();
+                return;
             }
         });
         
         // Regular change event (no shift key)
         input.addEventListener('change', (e) => {
-            const filterType = input.dataset.filter;
-            updateToggleButtonText(filterType);
-            filterMusicVideos();
+            // ✅ FIX: Only update if not a shift-click (already handled above)
+            if (!e.shiftKey) {
+                const filterType = input.dataset.filter;
+                updateToggleButtonText(filterType);
+                filterMusicVideos();
+            }
         });
     });
 
-    // ✅ NEW: Smooth filter panel scrolling (prevent scroll hijacking)
+    // ✅ Smooth filter panel scrolling (prevent scroll hijacking)
     const filterPanel = document.querySelector('.filter-panel');
     if (filterPanel) {
         filterPanel.addEventListener('wheel', (e) => {
@@ -555,6 +562,8 @@ function setupEventListeners() {
             
             if (searchInput) searchInput.value = '';
             if (sortSelect) sortSelect.value = 'seed';
+            
+            // ✅ FIX: Ensure filter runs after reset
             filterMusicVideos();
         });
     }

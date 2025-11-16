@@ -747,3 +747,71 @@
     background: linear-gradient(135deg, #d4b876, #C8AA6E);
     transform: translateY(-2px);
 }
+/* Gold icon styling for about page */
+.icon-circle i {
+    color: #C8AA6E;
+    font-size: 2rem;
+}
+
+.mission-icon i,
+.category-icon i {
+    color: #C8AA6E;
+    font-size: 1.5rem;
+}
+
+.fp-icon i {
+    color: #4aff4a;
+    font-size: 1.25rem;
+}
+
+.involvement-card h4 i {
+    color: #C8AA6E;
+    margin-right: 8px;
+}
+
+.contact-method h4 i {
+    color: #C8AA6E;
+    margin-right: 8px;
+}
+
+/* Hover effects for icon circles */
+.icon-circle {
+    transition: all 0.3s ease;
+}
+
+.content-box:hover .icon-circle i {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(200, 170, 110, 0.5));
+}
+
+/* Highlight boxes get animated icons */
+.highlight .icon-circle i {
+    animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(200, 170, 110, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(200, 170, 110, 0.6));
+    }
+}
+
+/* Category cards hover effect */
+.category-card:hover .category-icon i {
+    transform: scale(1.15) rotate(5deg);
+    transition: all 0.3s ease;
+}
+
+/* Mission items hover */
+.mission-item:hover .mission-icon i {
+    transform: scale(1.2);
+    color: #F0E6D2;
+    transition: all 0.3s ease;
+}
+
+/* Fair play checkmarks get a success glow */
+.fair-play-item:hover .fp-icon i {
+    filter: drop-shadow(0 0 8px rgba(74, 255, 74, 0.6));
+}

@@ -16,7 +16,7 @@ function getTimeRemaining(endDate) {
     
     if (diff <= 0) {
         return {
-            text: '⏱️ Voting Closed',
+            text: '<i class="fa-solid fa-stopwatch"></i> Voting Closed',
             color: '#999',
             urgent: false,
             expired: true
@@ -30,7 +30,7 @@ function getTimeRemaining(endDate) {
     // Critical (< 1 hour)
     if (days === 0 && hours === 0) {
         return {
-            text: `🚨 ${minutes}m left to vote!`,
+            text: `<i class="fa-solid fa-triangle-exclamation"></i> ${minutes}m left to vote!`,
             color: '#ff4444',
             urgent: true,
             expired: false
@@ -40,7 +40,7 @@ function getTimeRemaining(endDate) {
     // Urgent (< 6 hours)
     if (days === 0 && hours < 6) {
         return {
-            text: `🔥 ${hours}h ${minutes}m left`,
+            text: `<i class="fa-solid fa-fire"></i> ${hours}h ${minutes}m left`,
             color: '#ff4444',
             urgent: true,
             expired: false
@@ -50,7 +50,7 @@ function getTimeRemaining(endDate) {
     // Moderate (< 24 hours)
     if (days === 0) {
         return {
-            text: `⏰ ${hours}h ${minutes}m left`,
+            text: `<i class="fa-solid fa-clock"></i> ${hours}h ${minutes}m left`,
             color: '#ffaa00',
             urgent: false,
             expired: false
@@ -59,7 +59,7 @@ function getTimeRemaining(endDate) {
     
     // Calm (1+ days)
     return {
-        text: `⏰ ${days}d ${hours}h left`,
+        text: `<i class="fa-solid fa-clock"></i> ${days}d ${hours}h left`,
         color: '#667eea',
         urgent: false,
         expired: false
@@ -81,20 +81,20 @@ function calculatePotentialMatchXP(match) {
     const today = new Date().toISOString().split('T')[0];
     if (lastVoteDate !== today) {
         totalXP += 25;
-        bonuses.push({ icon: '🌅', label: 'First vote today', xp: 25 });
+        bonuses.push({ icon: '<i class="fa-solid fa-sunrise"></i>', label: 'First vote today', xp: 25 });
     }
     
     // Check if close match (within 10% margin)
     const diff = Math.abs(match.competitor1.percentage - match.competitor2.percentage);
     if (diff <= 10 && match.totalVotes > 0) {
         totalXP += 10;
-        bonuses.push({ icon: '⚡', label: 'Close match', xp: 10 });
+        bonuses.push({ icon: '<i class="fa-solid fa-bolt"></i>', label: 'Close match', xp: 10 });
     }
     
     // Check if early voter (less than 50 total votes)
     if (match.totalVotes < 50) {
         totalXP += 5;
-        bonuses.push({ icon: '🎯', label: 'Early voter', xp: 5 });
+        bonuses.push({ icon: '<i class="fa-solid fa-bullseye"></i>', label: 'Early voter', xp: 5 });
     }
     
     return {
@@ -130,7 +130,7 @@ let xpBadgeHTML = '';
 if (!match.hasVoted && match.status === 'live') {
     xpBadgeHTML = `
         <div class="xp-reward-badge">
-            <span class="xp-icon">⭐</span>
+            <span class="xp-icon"><i class="fa-solid fa-star"></i></span>
             <span class="xp-value">+10 XP</span>
         </div>
     `;
@@ -152,7 +152,7 @@ const cardHTML = `
         <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
         <span class="match-round">${formatRoundName(match.round)}</span>
         ${match.hasVoted && match.status === 'live' 
-            ? '<span class="voted-badge">✓ Voted</span>' 
+            ? '<span class="voted-badge"><i class="fa-solid fa-check"></i> Voted</span>' 
             : statusBadge
         }
     </div>
@@ -255,7 +255,7 @@ if (viewDetailsButton) {
 // Helper functions
 function getStatusBadge(match) {
     if (match.status === 'live') {
-        return '<span class="live-badge">🔴 Live</span>';
+        return '<span class="live-badge"><i class="fa-solid fa-circle"></i> Live</span>';
     } else if (match.status === 'upcoming') {
         return '<span class="upcoming-badge">Upcoming</span>';
     } else if (match.status === 'completed') {
@@ -303,7 +303,7 @@ function getFooterContent(match) {
             `;
         }
         
-        // ✅ Show timer if available
+        // ✅ Show timer if available (HTML is already in timer.text)
         if (timer && !timer.expired) {
             statsHtml += `
                 <span class="stat timer ${timer.urgent ? 'urgent' : ''}" 

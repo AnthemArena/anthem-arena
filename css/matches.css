@@ -1600,3 +1600,61 @@
         font-size: 1.75rem;
     }
 }
+/* Gold icon styling for matches page */
+.filter-tip i {
+    color: #C8AA6E;
+    margin-right: 6px;
+    animation: pulse-lightbulb 2s ease-in-out infinite;
+}
+
+@keyframes pulse-lightbulb {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.link-icon i {
+    color: #C8AA6E;
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
+}
+
+.quick-link-card:hover .link-icon i {
+    transform: scale(1.15) rotate(5deg);
+    color: #F0E6D2;
+    filter: drop-shadow(0 0 15px rgba(200, 170, 110, 0.6));
+}
+
+/* Different colors for different quick links */
+.quick-link-card:nth-child(1) .link-icon i {
+    color: #4a9eff; /* Blue for bracket */
+}
+
+.quick-link-card:nth-child(2) .link-icon i {
+    color: #ff4444; /* Red for statistics */
+}
+
+.quick-link-card:nth-child(3) .link-icon i {
+    color: #C8AA6E; /* Gold for music */
+}
+
+.quick-link-card:nth-child(4) .link-icon i {
+    color: #4aff4a; /* Green for voting history */
+}
+
+/* Hover effects for quick links */
+.quick-link-card:hover .link-icon i {
+    animation: bounce-icon 0.6s ease-in-out;
+}
+
+@keyframes bounce-icon {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.1);
+    }
+}

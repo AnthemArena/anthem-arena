@@ -1230,3 +1230,55 @@ body {
     scrollbar-width: thin;
     scrollbar-color: rgba(200, 155, 60, 0.5) rgba(255, 255, 255, 0.05);
 }
+/* ========================================
+   FILTER SUBGROUPS - NEUTRAL CONTENT GROUPING
+   ======================================== */
+
+.filter-subgroup {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.filter-subgroup:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.filter-subgroup-title {
+    font-size: 0.75rem;
+    color: rgba(200, 155, 60, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+    padding-left: 4px;
+}
+
+/* Adjust checkbox spacing within subgroups */
+.filter-subgroup .filter-checkbox {
+    margin-bottom: 8px;
+}
+
+.filter-subgroup .filter-checkbox:last-child {
+    margin-bottom: 0;
+}
+
+/* Add subtle spacing for visual hierarchy */
+.filter-options {
+    padding-top: 4px;
+}
+
+/* Optional: Add icons to subgroup titles */
+.filter-subgroup-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 12px;
+    background: linear-gradient(180deg, rgba(200, 155, 60, 0.8), rgba(200, 155, 60, 0.3));
+    margin-right: 8px;
+    border-radius: 2px;
+    vertical-align: middle;
+}

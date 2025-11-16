@@ -2861,3 +2861,22 @@
         font-size: 0.85rem;
     }
 }
+/* Gold icon styling for vote page */
+.info-badge i,
+.vote-icon i,
+.control-btn i,
+.meta-item i,
+.title-icon i,
+.card-icon i,
+.modal-icon i {
+    color: #C8AA6E;
+}
+
+.vote-btn:hover .vote-icon i {
+    color: #F0E6D2;
+}
+
+.modal-icon i {
+    font-size: 3rem;
+    color: #4CAF50; /* Green for success checkmark */
+}
