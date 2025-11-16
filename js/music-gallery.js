@@ -707,9 +707,6 @@ function trackBookClick(songSlug, location) {
 // Make available globally
 window.trackBookClick = trackBookClick;
 
-// ========================================
-// EXPORT FOR USE IN OTHER PAGES
-// ========================================
-export { getAllTournamentStats };
+// (getAllTournamentStats already exported at line 28)
 
 console.log('League Music Gallery script loaded');
