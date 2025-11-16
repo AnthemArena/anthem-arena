@@ -271,16 +271,26 @@ function getAccomplishmentText(video) {
 }
 
 function getStatusBadge(video) {
+    let badges = '';
+    
+    // Championship status
     if (video.stats.championships >= 2) {
-        return '<span class="tag tag-champion">Legend</span>';
+        badges += '<span class="tag tag-champion">Legend</span>';
+    } else if (video.stats.championships === 1) {
+        badges += '<span class="tag tag-champion">Champion</span>';
+    } else if (video.tournamentStatus === 'eliminated') {
+        badges += '<span class="tag tag-eliminated">Eliminated</span>';
+    } else {
+        badges += '<span class="tag tag-competing">Competing</span>';
     }
-    if (video.stats.championships === 1) {
-        return '<span class="tag tag-champion">Champion</span>';
+    
+    // ✅ NEW: Multi-category indicator
+    if (video.additionalCategories && video.additionalCategories.length > 0) {
+        const extraCount = video.additionalCategories.length;
+        badges += ` <span class="tag tag-multi" title="Also in: ${video.additionalCategories.join(', ')}">+${extraCount} Series</span>`;
     }
-    if (video.tournamentStatus === 'eliminated') {
-        return '<span class="tag tag-eliminated">Eliminated</span>';
-    }
-    return '<span class="tag tag-competing">Competing</span>';
+    
+    return badges;
 }
 
 // ✅ NEW: Only show performance if they have real data
@@ -358,13 +368,15 @@ function sortVideos(videos, sortBy) {
 // ========================================
 // FILTER FUNCTIONALITY
 // ========================================
+// ========================================
+// FILTER FUNCTIONALITY (ENHANCED FOR MULTI-CATEGORY)
+// ========================================
 function filterMusicVideos() {
     const filterInputs = document.querySelectorAll('.filter-input');
-    const musicCards = document.querySelectorAll('.character-card');
     
     // Get all checked filters
     const activeFilters = {
-        series: [], // ✅ NEW: Filter by series/collection
+        series: [], 
         year: []
     };
 
@@ -392,12 +404,16 @@ function filterMusicVideos() {
 
     allVideos.forEach(video => {
         const cardSeries = video.seriesCollection;
+        const additionalCats = video.additionalCategories || []; // ✅ NEW
         const cardYear = getYearRange(video.year);
         const cardName = video.title.toLowerCase();
         const cardArtist = video.artist.toLowerCase();
 
-        // Check if card matches all filter criteria
-        const matchesSeries = activeFilters.series.length === 0 || activeFilters.series.includes(cardSeries);
+        // ✅ UPDATED: Check primary OR additional categories
+        const matchesSeries = activeFilters.series.length === 0 || 
+                             activeFilters.series.includes(cardSeries) ||
+                             activeFilters.series.some(filter => additionalCats.includes(filter));
+        
         const matchesYear = activeFilters.year.length === 0 || activeFilters.year.includes(cardYear);
         const matchesSearch = searchTerm === '' || cardName.includes(searchTerm) || cardArtist.includes(searchTerm);
 
@@ -412,6 +428,14 @@ function filterMusicVideos() {
     
     // Render sorted videos
     renderVideos(visibleVideos);
+
+    // Prevent jarring scroll on filter change
+    if (window.scrollY > 300) {
+        window.scrollTo({
+            top: Math.min(window.scrollY, 300),
+            behavior: 'smooth'
+        });
+    }
     
     // Re-attach event listeners
     attachCardEventListeners();

@@ -1103,3 +1103,16 @@ body {
         flex: 1;
     }
 }
+/* Multi-category badge */
+.tag-multi {
+    background: linear-gradient(135deg, rgba(200, 155, 60, 0.2), rgba(200, 155, 60, 0.1));
+    border: 1px solid rgba(200, 155, 60, 0.4);
+    color: #C8AA6E;
+    font-size: 0.75rem;
+    cursor: help;
+}
+
+.tag-multi:hover {
+    background: rgba(200, 155, 60, 0.3);
+    border-color: #C8AA6E;
+}

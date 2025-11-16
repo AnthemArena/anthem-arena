@@ -254,6 +254,8 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Season Cinematic",
+    "additionalCategories": ["Worlds Anthem"],
+  "notes": "Remix of the original Warriors anthem",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -312,6 +314,8 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Champion Theme",
+     "additionalCategories": ["Arcane"],
+  "tags": ["jinx", "arcane", "champion-launch"],
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -604,7 +608,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "League of Legends, Twenty One Pilots",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -807,7 +811,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "League of Legends",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1069,7 +1073,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "Riot Games Music",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1082,6 +1086,7 @@
     "id": 31,
     "title": "Blood Sweat & Tears ft. Sheryl Lee Ralph | Official Music Video - League of Legends",
     "shortTitle": "Blood Sweat & Tears",
+      "additionalCategories": ["Arcane"],
     "slug": "blood-sweat-tears",
     "artist": "Sheryl Lee Ralph",
     "year": 2024,
@@ -1275,7 +1280,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "Riot Games Music",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1305,7 +1310,9 @@
     "artistGroup": "imagine-dragons",
     "franchise": "Arcane",
     "channel": "League of Legends",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
+     "additionalCategories": ["Worlds Anthem", "Arcane"],
+  "tags": ["arcane", "worlds-2021", "show-open"],
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1334,7 +1341,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "Riot Games Music",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1508,7 +1515,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "Riot Games Music",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1609,6 +1616,7 @@
     "id": 58,
     "title": "Welcome to the Playground (Bea Miller) - Worlds 2021 Show Open Presented by Mastercard",
     "shortTitle": "Welcome to the Playground",
+    
     "slug": "welcome-to-playground",
     "artist": "Bea Miller",
     "year": 2021,
@@ -1626,6 +1634,8 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Worlds Anthem",
+    "additionalCategories": ["Arcane"],
+  "tags": ["arcane", "worlds-2021", "show-open"],
     "accolade": "competitor",
     "stats": {
       "championships": 0,
@@ -1743,7 +1753,7 @@
     "artistGroup": "other",
     "franchise": "Arcane",
     "channel": "JVKE",
-    "seriesCollection": "Arcane Soundtrack",
+    "seriesCollection": "Arcane",
     "accolade": "competitor",
     "stats": {
       "championships": 0,
