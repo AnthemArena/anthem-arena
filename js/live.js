@@ -11,12 +11,9 @@ let allLiveMatches = [];
 // ========================================
 // ROUND COUNTDOWN CONFIGURATION
 // ========================================
-// ========================================
-// ROUND COUNTDOWN CONFIGURATION
-// ========================================
 const ROUND_CONFIG = {
     roundName: "ROUND 1",
-    endDate: new Date('2024-11-17T19:00:00Z') // Monday 17th Nov, 7pm GMT
+    endDate: new Date('2025-11-17T19:00:00Z') // YEAR IS 2025, not 2024!
 };
 
 // ========================================
