@@ -9,9 +9,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup smooth scrolling for anchor links
     setupSmoothScrolling();
     
+    // Load and display current season stats
+    loadSeasonStats();
+    
     // Track page view
     trackPageView();
 });
+
+// ========================================
+// LOAD CURRENT SEASON STATS
+// ========================================
+
+async function loadSeasonStats() {
+    try {
+        // Fetch total votes from API
+        const response = await fetch('/api/total-votes');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch stats');
+        }
+        
+        const data = await response.json();
+        const totalVotes = data.totalVotes || 0;
+        
+        // Update the stats display
+        const statsElement = document.querySelector('.stat-number.votes-count');
+        if (statsElement) {
+            statsElement.textContent = totalVotes.toLocaleString();
+        }
+        
+        console.log(`✅ Season stats loaded: ${totalVotes} votes`);
+        
+    } catch (error) {
+        console.error('Error loading season stats:', error);
+        // Fallback to showing placeholder
+        const statsElement = document.querySelector('.stat-number.votes-count');
+        if (statsElement) {
+            statsElement.textContent = '---';
+        }
+    }
+}
 
 // ========================================
 // NEWSLETTER SUBSCRIPTION
@@ -187,7 +224,6 @@ function trackPageView() {
     console.log('About page view tracked');
     
     // Example Google Analytics tracking:
-    /*
     if (typeof gtag !== 'undefined') {
         gtag('event', 'page_view', {
             page_title: 'About',
@@ -195,18 +231,15 @@ function trackPageView() {
             page_path: '/about.html'
         });
     }
-    */
 }
 
 function trackEvent(eventName, params = {}) {
     console.log('Event tracked:', eventName, params);
     
     // Example Google Analytics event tracking:
-    /*
     if (typeof gtag !== 'undefined') {
         gtag('event', eventName, params);
     }
-    */
 }
 
 // Export functions for HTML onclick handlers

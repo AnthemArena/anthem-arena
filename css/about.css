@@ -129,6 +129,92 @@
     border-bottom-color: var(--gold);
 }
 
+/* ========================================
+   NEW: SEASON 1 STATS
+   ======================================== */
+
+.season-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, var(--gold), rgba(180, 135, 40, 1));
+    color: #0a0a0a;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+    text-transform: uppercase;
+}
+
+.cta-button:hover {
+    background: linear-gradient(135deg, var(--gold-hover), var(--gold));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(200, 155, 60, 0.4);
+}
+
+/* ========================================
+   NEW: FEATURE LIST
+   ======================================== */
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.feature-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+.feature-list li strong {
+    color: var(--gold);
+    font-weight: 600;
+}
+
 /* MISSION POINTS */
 .mission-points {
     display: flex;
@@ -545,6 +631,15 @@
     .categories-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
+    
+    .season-stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -594,6 +689,15 @@
     .newsletter-btn {
         width: 100%;
     }
+    
+    .season-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -616,7 +720,13 @@
     .newsletter-box {
         padding: 2rem 1.5rem;
     }
+    
+    .cta-button {
+        font-size: 1rem;
+        padding: 0.875rem 2rem;
+    }
 }
+
 /* Notification Button States */
 .newsletter-btn.notifications-enabled {
     background: linear-gradient(135deg, #4CAF50, #45a049);
