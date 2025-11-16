@@ -23,6 +23,24 @@ import { createMatchCard } from './match-card-renderer.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
+
+// ========================================
+// 🆕 PAGE-LEVEL MATCHES CACHE
+// Prevents fetching all matches multiple times per page load
+// ========================================
+
+let pageLoadMatchesCache = null;
+
+async function getMatchesForThisPageLoad() {
+    if (!pageLoadMatchesCache) {
+        console.log('📥 Fetching all matches (first time this page load)');
+        pageLoadMatchesCache = await getAllMatches();
+    } else {
+        console.log('📦 Reusing matches from earlier in page load (saved ~64 reads)');
+    }
+    return pageLoadMatchesCache;
+}
+
 // ========================================
 // VOTING STREAK TRACKER
 // ========================================
@@ -608,11 +626,10 @@ await loadOtherLiveMatches();
     try {
         console.log('📥 Loading other live matches...');
         
-        // ✅ Wrap in try-catch and provide fallback
-        let allMatches = [];
-        try {
-            allMatches = await getAllMatches();
-        } catch (apiError) {
+       let allMatches = [];
+try {
+    allMatches = await getMatchesForThisPageLoad();  // ✅ NEW
+} catch (apiError) {
             console.error('⚠️ API call failed:', apiError);
             document.getElementById('other-matches-section').style.display = 'none';
             return;
@@ -740,8 +757,7 @@ async function checkVoteStatus() {
             // Disable voting and show stats
             disableVoting(localVote);
             
-            // Load other matches since user already voted
-            await loadOtherLiveMatches();
+    
             
             return; // ← EXIT EARLY - no Firebase call needed!
         }
@@ -1548,9 +1564,9 @@ async function checkForAchievementUnlocks() {
         
         if (voteIds.length === 0) return;
         
-        // ✅ FIX: Get match data to properly categorize votes
-        const allMatches = await getAllMatches();
-        const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
+// ✅ FIX: Get match data to properly categorize votes
+const allMatches = await getMatchesForThisPageLoad();  // ✅ NEW
+const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
         
         // Build proper vote history with match context
         const allVotes = voteIds.map(matchId => {

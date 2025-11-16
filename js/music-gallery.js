@@ -5,6 +5,9 @@ import { getBookForSong } from './bookMappings.js';
 // Keep Firebase imports for backward compatibility if needed elsewhere
 import { db } from './firebase-config.js';
 
+// Use shared cache if available (set by vote.js)
+window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
+
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 let allVideos = []; // Store all video data
@@ -23,11 +26,12 @@ const videoModalClose = document.querySelector('.video-modal-close');
 // ========================================
 // GET ALL TOURNAMENT STATS (OPTIMIZED - ONE QUERY)
 // ========================================
-async function getAllTournamentStats() {
+export async function getAllTournamentStats() {
     try {
         console.log('📊 Loading tournament stats from edge cache...');
         
-        const allMatches = await getAllMatches();
+        // Check if matches cache exists from vote.js
+        const allMatches = window.pageLoadMatchesCache || await getAllMatches();  // ✅ NEW
         
         // Create stats object for all songs
         const statsMap = {};

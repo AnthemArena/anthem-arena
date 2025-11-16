@@ -1,12 +1,6 @@
 console.log('🔔 global-notifications.js loaded');
 
-// ========================================
-// GLOBAL NOTIFICATION + BULLETIN SYSTEM
-// With Smart Polling + Edge Caching
-// Toast-Style Bottom-Right Notifications
-// ========================================
-import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
 
 // ========================================
 // CONFIGURATION
@@ -14,7 +8,7 @@ import { collection, query, where, getDocs, Timestamp } from 'https://www.gstati
 
 const POLL_CONFIG = {
     BASE_INTERVAL: 120000,      // 2 minutes base
-    ACTIVE_INTERVAL: 30000,     // 30 seconds when active
+ACTIVE_INTERVAL: 120000,    // 2 minutes when active (still responsive)
     INACTIVE_THRESHOLD: 300000, // 5 minutes = inactive
     MAX_INTERVAL: 300000        // 5 minutes max
 };
@@ -210,24 +204,30 @@ const userId = localStorage.getItem('tournamentUserId');  // ✅ Match navigatio
         let userVotes = {};
         let hasVoted = false;
         
-        if (userId) {
-            try {
-                // ✅ Use the top-level imports (already available from line 4)
-                const votesRef = collection(db, 'votes');
-                const q = query(votesRef, where('userId', '==', userId));
-                const snapshot = await getDocs(q);
-                
-                snapshot.forEach(doc => {
-                    const voteData = doc.data();
-                    userVotes[voteData.matchId] = voteData;
-                });
-                
-                hasVoted = Object.keys(userVotes).length > 0;
-                console.log(`📊 User has ${Object.keys(userVotes).length} votes`);
-            } catch (error) {
-                console.error('❌ Error fetching user votes:', error);
-            }
-        }
+       // ✅ NEW: Read from localStorage (FREE, instant)
+if (userId) {
+    try {
+        // Get votes from localStorage (already set by vote.js)
+        const storedVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        
+        // Convert to the format this function expects
+        Object.entries(storedVotes).forEach(([matchId, voteData]) => {
+            userVotes[matchId] = {
+                matchId: matchId,
+                choice: voteData.songId,
+                songTitle: voteData.songTitle,
+                opponentTitle: voteData.opponentTitle,
+                timestamp: voteData.timestamp
+            };
+        });
+        
+        hasVoted = Object.keys(userVotes).length > 0;
+        console.log(`📊 User has ${Object.keys(userVotes).length} votes (from localStorage)`);
+        
+    } catch (error) {
+        console.error('❌ Error reading votes from localStorage:', error);
+    }
+}
 
         // ========================================
         // NON-VOTER ENGAGEMENT SYSTEM
