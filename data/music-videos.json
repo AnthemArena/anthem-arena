@@ -402,11 +402,10 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Season Cinematic",
-    "tournamentStatus": "",
     "stats": {
-      "championships": 1,
-      "winRecord": "12-3",
-      "winRate": "80%"
+      "championships": 0,
+      "winRecord": "0-0",
+      "winRate": "0%"
     },
     "seedScore": 92313515.6
   },
@@ -637,7 +636,6 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Worlds Anthem",
-    "tournamentStatus": "",
     "stats": {
       "championships": 0,
       "winRecord": "3-5",
