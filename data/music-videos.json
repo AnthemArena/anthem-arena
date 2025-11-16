@@ -254,7 +254,6 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Season Cinematic",
-    "additionalCategories": ["Worlds Anthem"],
   "notes": "Remix of the original Warriors anthem",
     "accolade": "competitor",
     "stats": {
@@ -1311,7 +1310,6 @@
     "franchise": "Arcane",
     "channel": "League of Legends",
     "seriesCollection": "Arcane",
-     "additionalCategories": ["Worlds Anthem", "Arcane"],
   "tags": ["arcane", "worlds-2021", "show-open"],
     "accolade": "competitor",
     "stats": {
@@ -1633,8 +1631,7 @@
     "artistGroup": "other",
     "franchise": "LoL",
     "channel": "League of Legends",
-    "seriesCollection": "Worlds Anthem",
-    "additionalCategories": ["Arcane"],
+    "seriesCollection": "Arcane",
   "tags": ["arcane", "worlds-2021", "show-open"],
     "accolade": "competitor",
     "stats": {
