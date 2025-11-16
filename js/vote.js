@@ -72,7 +72,7 @@ function getTimeRemaining(endDate) {
     
     if (diff <= 0) {
         return {
-            text: '⏱️ Voting Closed',
+            text: '<i class="fa-solid fa-stopwatch"></i> Voting Closed', // ✅ Changed
             color: '#999',
             urgent: false,
             expired: true
@@ -86,7 +86,7 @@ function getTimeRemaining(endDate) {
     // Critical (< 1 hour)
     if (days === 0 && hours === 0) {
         return {
-            text: `🚨 ${minutes}m left to vote!`,
+            text: `<i class="fa-solid fa-triangle-exclamation"></i> ${minutes}m left to vote!`, // ✅ Changed
             color: '#ff4444',
             urgent: true,
             expired: false
@@ -96,7 +96,7 @@ function getTimeRemaining(endDate) {
     // Urgent (< 6 hours)
     if (days === 0 && hours < 6) {
         return {
-            text: `🔥 ${hours}h ${minutes}m left`,
+            text: `<i class="fa-solid fa-fire"></i> ${hours}h ${minutes}m left`, // ✅ Changed
             color: '#ff4444',
             urgent: true,
             expired: false
@@ -106,7 +106,7 @@ function getTimeRemaining(endDate) {
     // Moderate (< 24 hours)
     if (days === 0) {
         return {
-            text: `⏰ ${hours}h ${minutes}m left`,
+            text: `<i class="fa-solid fa-clock"></i> ${hours}h ${minutes}m left`, // ✅ Changed
             color: '#ffaa00',
             urgent: false,
             expired: false
@@ -115,7 +115,7 @@ function getTimeRemaining(endDate) {
     
     // Calm (1+ days)
     return {
-        text: `⏰ ${days}d ${hours}h left`,
+        text: `<i class="fa-solid fa-clock"></i> ${days}d ${hours}h left`, // ✅ Changed
         color: '#667eea',
         urgent: false,
         expired: false
@@ -829,7 +829,7 @@ await loadOtherLiveMatches();
         indicator.className = 'voted-indicator';
         indicator.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
-                <div style="font-size: 1.5rem;">✅</div>
+            <div style="font-size: 1.5rem;"><i class="fa-solid fa-check"></i></div>
                 <div>
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Vote Recorded</div>
                     <div style="opacity: 0.9;">You voted for <strong>${songName}</strong></div>
@@ -896,10 +896,10 @@ await loadOtherLiveMatches();
 const timeRemaining = document.getElementById('time-remaining');
 if (timeRemaining) {
     if (currentMatch.status === 'completed') {
-        timeRemaining.innerHTML = '✅ Voting Closed';
+        timeRemaining.innerHTML = '<i class="fa-solid fa-check"></i> Voting Closed'; // ✅ Changed
         timeRemaining.style.color = '#999';
     } else if (currentMatch.status === 'upcoming') {
-        timeRemaining.innerHTML = '⏰ Coming Soon';
+        timeRemaining.innerHTML = '<i class="fa-solid fa-clock"></i> Coming Soon'; // ✅ Changed
         timeRemaining.style.color = '#ffaa00';
     } else if (currentMatch.status === 'live') {
         // ✅ Check for endDate to show countdown
@@ -915,20 +915,20 @@ if (timeRemaining) {
                     timeRemaining.classList.add('urgent');
                 }
             } else if (timer && timer.expired) {
-                timeRemaining.innerHTML = '⏱️ Voting Closed';
+                timeRemaining.innerHTML = '<i class="fa-solid fa-stopwatch"></i> Voting Closed'; // ✅ Changed
                 timeRemaining.style.color = '#999';
             } else {
                 // Fallback
-                timeRemaining.innerHTML = '🔴 LIVE NOW';
+                timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
                 timeRemaining.style.color = '#ff4444';
             }
         } else {
             // No endDate available, show generic live status
-            timeRemaining.innerHTML = '🔴 LIVE NOW';
+            timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
             timeRemaining.style.color = '#ff4444';
         }
     } else {
-        timeRemaining.innerHTML = '⏰ Vote Now';
+        timeRemaining.innerHTML = '<i class="fa-solid fa-clock"></i> Vote Now'; // ✅ Changed
         timeRemaining.style.color = '#ffaa00';
     }
 }
@@ -936,7 +936,7 @@ if (timeRemaining) {
         // Update total votes
         const totalVotesEl = document.getElementById('total-votes');
         if (totalVotesEl) {
-            totalVotesEl.innerHTML = `📊 ${currentMatch.totalVotes.toLocaleString()} votes cast`;
+    totalVotesEl.innerHTML = `<i class="fa-solid fa-chart-column"></i> ${currentMatch.totalVotes.toLocaleString()} votes cast`; // ✅ Changed
         }
 
            // Update vote button text with song names
@@ -1262,7 +1262,7 @@ function trackShare(platform, context) {
         banner.className = 'urgency-banner';
         banner.innerHTML = `
             <div class="urgency-content">
-                <span class="urgency-icon">⚠️</span>
+            <span class="urgency-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 <div class="urgency-text">
                     <strong>${losingSong.name}</strong> is being eliminated!
                     <span class="vote-diff">Trailing by ${voteDiff.toLocaleString()} votes</span>
@@ -1328,7 +1328,7 @@ function trackShare(platform, context) {
         const prompt = document.createElement('div');
         prompt.className = 'save-prompt';
         prompt.innerHTML = `
-            <span class="save-icon">🚨</span>
+        <span class="save-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
             <span class="save-text">Being Eliminated!</span>
             <span class="save-diff">${voteDiff.toLocaleString()} votes behind</span>
         `;
@@ -2030,13 +2030,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2065,13 +2065,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2100,13 +2100,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2135,13 +2135,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-close')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-close')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2170,13 +2170,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-bad')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-bad')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2205,13 +2205,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'winning-close')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'winning-close')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2240,13 +2240,13 @@ function showPostVoteModal(songName, songData, xpData, rank) {
                 </p>
                 <div class="share-buttons">
                     <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')">
-                        <span class="btn-icon">🐦</span> Tweet
+            <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                     </button>
                     <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')">
-                        <span class="btn-icon">🔶</span> Reddit
+            <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                     </button>
                     <button class="share-btn copy" onclick="copyMatchLink()">
-                        <span class="btn-icon">🔗</span> Copy Link
+            <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
                     </button>
                 </div>
             </div>
@@ -2258,7 +2258,7 @@ function showPostVoteModal(songName, songData, xpData, rank) {
 let xpSection = `
     <div class="xp-earned-section">
         <div class="xp-header">
-            <span class="xp-icon">✨</span>
+        <span class="xp-icon"><i class="fa-solid fa-sparkles"></i></span>
             <div class="xp-details">
                 <div class="xp-amount">+${xpData.totalXP} XP Earned!</div>
                 <div class="xp-breakdown">

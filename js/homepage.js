@@ -174,7 +174,7 @@ async function loadTournamentInfo(allMatches) {
                 const song1 = liveMatch.song1.shortTitle || liveMatch.song1.title;
                 const song2 = liveMatch.song2.shortTitle || liveMatch.song2.title;
                 
-                badgeIcon.textContent = '🔴';
+                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
                 tournamentNameEl.textContent = 'Live Now';
                 tournamentStatusEl.textContent = `${song1} vs ${song2}`;
                 tournamentStatusEl.style.maxWidth = '400px';
@@ -187,7 +187,7 @@ async function loadTournamentInfo(allMatches) {
             } else if (actualLiveMatches.length > 1) {
                 const currentRound = actualLiveMatches[0].round || 1;
                 
-                badgeIcon.textContent = '🔴';
+                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
                 tournamentNameEl.textContent = 'Live Now';
                 tournamentStatusEl.textContent = `${actualLiveMatches.length} matches • ${getRoundDisplayName(currentRound)}`;
                 
@@ -214,7 +214,7 @@ async function loadTournamentInfo(allMatches) {
                 const roundName = getRoundDisplayName(nextMatch.round);
                 const timeUntil = getTimeUntilMatch(nextMatch.date);
                 
-                badgeIcon.textContent = '⏰';
+                badgeIcon.innerHTML = '<i class="fa-solid fa-clock"></i>'; // ✅ Changed
                 tournamentNameEl.textContent = `${song1} vs ${song2}`;
                 tournamentStatusEl.textContent = `${roundName} • Starts ${timeUntil}`;
                 tournamentStatusEl.style.maxWidth = '500px';
@@ -228,7 +228,7 @@ async function loadTournamentInfo(allMatches) {
         }
         
         // SCENARIO 3: Fallback
-        badgeIcon.textContent = '🎵';
+        badgeIcon.innerHTML = '<i class="fa-solid fa-music"></i>'; // ✅ Changed
         tournamentNameEl.textContent = 'Music Tournament';
         tournamentStatusEl.textContent = 'Season 1';
         
@@ -450,7 +450,7 @@ function displayFeaturedMatch() {
 }
 
 function getTimeLeftForMatch(endDate) {
-    if (!endDate) return '🔴 Live Now';
+    if (!endDate) return '<i class="fa-solid fa-circle"></i> Live Now'; // ✅ Changed
     
     const end = new Date(endDate);
     const now = new Date();
@@ -463,13 +463,13 @@ function getTimeLeftForMatch(endDate) {
     
     if (hours > 24) {
         const days = Math.floor(hours / 24);
-        return `⏰ ${days}d ${hours % 24}h left`;
+        return `<i class="fa-solid fa-clock"></i> ${days}d ${hours % 24}h left`; // ✅ Changed
     } else if (hours > 0) {
-        return `⏰ ${hours}h ${minutes}m left`;
+        return `<i class="fa-solid fa-clock"></i> ${hours}h ${minutes}m left`; // ✅ Changed
     } else if (minutes > 5) {
-        return `⏰ ${minutes}m left`;
+        return `<i class="fa-solid fa-clock"></i> ${minutes}m left`; // ✅ Changed
     } else {
-        return `🚨 ${minutes}m left - Vote now!`;
+        return `<i class="fa-solid fa-triangle-exclamation"></i> ${minutes}m left - Vote now!`; // ✅ Changed
     }
 }
 
@@ -543,7 +543,7 @@ function displayYourActiveVotes(matches) {
         card.onclick = () => voteNow(match.matchId);
         
         card.innerHTML = `
-            <div class="your-pick-badge">✓ Your Pick</div>
+            <div class="your-pick-badge"><i class="fa-solid fa-check"></i> Your Pick</div>
             <div class="vote-matchup">
                 <div class="vote-song">
                     <img src="https://img.youtube.com/vi/${userSong.videoId}/mqdefault.jpg" 
@@ -564,7 +564,7 @@ function displayYourActiveVotes(matches) {
                 </div>
             </div>
             <div class="vote-status ${isWinning ? 'winning' : 'losing'}">
-                <span class="status-icon">${isWinning ? '🔥' : '⚔️'}</span>
+<span class="status-icon">${isWinning ? '<i class="fa-solid fa-fire"></i>' : '<i class="fa-solid fa-arrow-down"></i>'}</span>
                 <span class="status-text">
                     ${isWinning ? 'Leading' : 'Trailing'} at ${userPct}%
                 </span>

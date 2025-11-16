@@ -47,7 +47,7 @@ function displayRoundCountdown() {
     banner.className = 'countdown-banner';
     banner.innerHTML = `
         <div class="countdown-content">
-            🚨 <strong>${ROUND_CONFIG.roundName} ENDS IN <span id="countdownTimer">...</span></strong>
+            <i class="fa-solid fa-triangle-exclamation"></i> <strong>${ROUND_CONFIG.roundName} ENDS IN <span id="countdownTimer">...</span></strong>
         </div>
     `;
     
@@ -70,7 +70,7 @@ function updateCountdown() {
     
     if (diff <= 0) {
         countdownEl.textContent = '0d 0h 0m';
-        countdownEl.parentElement.innerHTML = '🎉 <strong>ROUND ENDED!</strong> • Check back soon for Round 2!';
+        countdownEl.parentElement.innerHTML = '<i class="fa-solid fa-champagne-glasses"></i> <strong>ROUND ENDED!</strong> • Check back soon for Round 2!';
         return;
     }
     
@@ -190,19 +190,19 @@ function updateUnvotedHeader(unvotedCount) {
     if (!headerText || !headerIcon) return;
     
     if (unvotedCount === 0) {
-        headerIcon.textContent = '🎉';
+        headerIcon.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
         headerText.innerHTML = `All Caught Up! Check back for new matches.`;
     } else if (unvotedCount === 1) {
-        headerIcon.textContent = '⚡';
+        headerIcon.innerHTML = '<i class="fa-solid fa-bolt"></i>';
         headerText.innerHTML = `<span id="unvotedCount">1</span> Match Needs Your Vote!`;
     } else if (unvotedCount <= 3) {
-        headerIcon.textContent = '🔥';
+        headerIcon.innerHTML = '<i class="fa-solid fa-fire"></i>';
         headerText.innerHTML = `Almost Done! <span id="unvotedCount">${unvotedCount}</span> Matches Left`;
     } else if (unvotedCount <= 6) {
-        headerIcon.textContent = '🗳️';
+        headerIcon.innerHTML = '<i class="fa-solid fa-check-to-slot"></i>';
         headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Matches Need Your Vote!`;
     } else {
-        headerIcon.textContent = '🎵';
+        headerIcon.innerHTML = '<i class="fa-solid fa-music"></i>';
         headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Live Matches — Start Voting!`;
     }
 }
@@ -229,12 +229,12 @@ async function updateProgressBar(votedCount, totalCount) {
     let milestone = '';
     if (percentage === 100) {
         progressFill.classList.add('complete');
-        milestone = ' 🎉 All matches voted!';
+        milestone = ' <i class="fa-solid fa-trophy"></i> All matches voted!';
         showCompletionMessage();
     } else if (percentage >= 75) {
-        milestone = ' 🔥 Almost there!';
+        milestone = ' <i class="fa-solid fa-fire"></i> Almost there!';
     } else if (percentage >= 50) {
-        milestone = ' 💪 Halfway done!';
+        milestone = ' <i class="fa-solid fa-dumbbell"></i> Halfway done!';
     }
     
     // Update text with milestone
@@ -258,7 +258,7 @@ function showCompletionMessage() {
         banner.className = 'completion-banner';
         banner.innerHTML = `
             <div class="completion-content">
-                <h3>🎉 You've Voted on All Live Matches!</h3>
+                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
                 <p>Check out these pages while waiting for new matchups:</p>
                 <div class="completion-links">
                     <a href="/my-votes.html">View Your Progress</a>
@@ -311,7 +311,7 @@ function createMatchCard(match, index, isVoted) {
         </div>
         
         <div class="social-stats">
-            <span>${isVoted ? '✅ You Voted • Tap to see results' : '🗳️ Watch & Vote'}</span>
+            <span>${isVoted ? '<i class="fa-solid fa-check"></i> You Voted • Tap to see results' : '<i class="fa-solid fa-square-poll-vertical"></i> Watch & Vote'}</span>
         </div>
     `;
     

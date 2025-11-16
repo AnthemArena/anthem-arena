@@ -628,7 +628,7 @@ function displayUpcomingReminders(matches) {
     
     container.innerHTML = `
         <div class="reminders-header">
-            <h3 class="reminders-title">🔔 Your Songs Coming Up</h3>
+            <h3 class="reminders-title"><i class="fa-solid fa-bell"></i> Your Songs Coming Up</h3>
             <p class="reminders-subtitle">Songs you've supported have upcoming matches</p>
         </div>
         <div class="reminders-list">
@@ -643,7 +643,7 @@ function displayUpcomingReminders(matches) {
                         <div class="reminder-info">
                             <div class="reminder-song">${match.userSong.shortTitle}</div>
                             <div class="reminder-opponent">vs ${match.song1.id === match.userSong.id ? match.song2.shortTitle : match.song1.shortTitle}</div>
-                            <div class="reminder-time">⏰ ${timeUntil}</div>
+                            <div class="reminder-time"><i class="fa-solid fa-clock"></i> ${timeUntil}</div>
                         </div>
                         <a href="/vote.html?match=${match.id}" class="reminder-action">
                             Set Reminder →
@@ -860,11 +860,15 @@ function displayFavoriteSongs(songs) {
     }
     
     // Medal emojis for top 3
-    const medals = ['🥇', '🥈', '🥉'];
+    const medals = [
+        '<i class="fa-solid fa-medal" style="color: #FFD700;"></i>', // Gold
+        '<i class="fa-solid fa-medal" style="color: #C0C0C0;"></i>', // Silver
+        '<i class="fa-solid fa-medal" style="color: #CD7F32;"></i>'  // Bronze
+    ];
     
     container.innerHTML = `
         <div class="favorite-songs-header">
-            <h3 class="favorite-songs-title">🎵 Your Most Supported Songs</h3>
+            <h3 class="favorite-songs-title"><i class="fa-solid fa-music"></i> Your Most Supported Songs</h3>
             <p class="favorite-songs-subtitle">Songs you've voted for the most across all matches</p>
         </div>
         <div class="favorite-songs-list">
@@ -889,7 +893,7 @@ function displayFavoriteSongs(songs) {
                         </div>
                     </div>
                     <div class="song-badge ${song.count >= 3 ? 'superfan' : song.count >= 2 ? 'fan' : 'supporter'}">
-                        ${song.count >= 3 ? '⭐ Superfan' : song.count >= 2 ? '💙 Fan' : '✓ Supporter'}
+                        ${song.count >= 3 ? '<i class="fa-solid fa-star"></i> Superfan' : song.count >= 2 ? '<i class="fa-solid fa-heart"></i> Fan' : '✓ Supporter'}
                     </div>
                 </div>
             `).join('')}
@@ -932,7 +936,7 @@ function displaySongJourneys() {
     
     container.innerHTML = `
         <div class="song-journeys-header">
-            <h3 class="journeys-title">🏆 Song Journeys</h3>
+            <h3 class="journeys-title"><i class="fa-solid fa-trophy"></i> Song Journeys</h3>
             <p class="journeys-subtitle">Track how far your favorite songs have gone</p>
         </div>
         <div class="journeys-list">
@@ -949,7 +953,7 @@ function createSongJourneyCard(song) {
     
     // Status display
     const statusConfig = {
-        'active': { icon: '🎵', label: 'Still Active', class: 'active' },
+        'active': { icon: '<i class="fa-solid fa-music"></i>', label: 'Still Active', class: 'active' },
         'advanced': { icon: '✓', label: 'Advanced', class: 'advanced' },
         'eliminated': { icon: '○', label: 'Eliminated', class: 'eliminated' }
     };
@@ -1099,7 +1103,7 @@ function displayTournamentCoverage(coverage) {
     
     container.innerHTML = `
         <div class="coverage-header">
-            <h3 class="coverage-title">📊 Tournament Participation</h3>
+            <h3 class="coverage-title"><i class="fa-solid fa-chart-column"></i> Tournament Participation</h3>
             <p class="coverage-subtitle">Your engagement across all rounds</p>
         </div>
         
@@ -1136,7 +1140,7 @@ function displayTournamentCoverage(coverage) {
 function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
     if (totalVotes < 5) {
         return {
-            icon: '🎵',
+            icon: '<i class="fa-solid fa-music"></i>',
             title: 'New Voter',
             description: 'Just getting started - vote more to unlock your taste profile!'
         };
@@ -1147,31 +1151,31 @@ function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
     
     if (underdogPercentage >= 40) {
         return {
-            icon: '🎭',
+            icon: '<i class="fa-solid fa-mask"></i>',
             title: 'Rebel Voter',
             description: `You champion the underdog ${underdogPercentage}% of the time!`
         };
     } else if (majorityAlignment >= 70) {
         return {
-            icon: '🎯',
+            icon: '<i class="fa-solid fa-bullseye"></i>',
             title: 'Mainstream Maven',
             description: `Your taste aligns with the crowd ${majorityAlignment}% of the time`
         };
     } else if (majorityAlignment >= 55) {
         return {
-            icon: '⚖️',
+            icon: '<i class="fa-solid fa-scale-balanced"></i>',
             title: 'Balanced Critic',
             description: 'You have your own taste but appreciate popular picks too'
         };
     } else if (underdogPercentage >= 25) {
         return {
-            icon: '🎸',
+            icon: '<i class="fa-solid fa-guitar"></i>',
             title: 'Independent Voter',
             description: 'You march to the beat of your own drum'
         };
     } else {
         return {
-            icon: '🎵',
+            icon: '<i class="fa-solid fa-music"></i>',
             title: 'Music Enthusiast',
             description: 'You appreciate all kinds of League music'
         };
@@ -1193,52 +1197,52 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
     // Priority: Journey achievements > Participation > Taste profile
     if (journeyStats.songsStillAlive >= 10) {
         badgeData = {
-            title: '🌟 Champion Supporter',
+            title: '<i class="fa-solid fa-star"></i> Champion Supporter',
             description: `${journeyStats.songsStillAlive} songs you voted for are still competing!`
         };
     } else if (votingStreak >= 7) {
         badgeData = {
-            title: '🔥 Week Warrior',
+            title: '<i class="fa-solid fa-fire"></i> Week Warrior',
             description: `${votingStreak} days voting streak! You're incredibly dedicated!`
         };
     } else if (journeyStats.furthestRound >= 5) {
         badgeData = {
-            title: '🏆 Deep Run Supporter',
+            title: '<i class="fa-solid fa-trophy"></i> Deep Run Supporter',
             description: `You've voted in matches all the way to ${getRoundName(journeyStats.furthestRound)}!`
         };
     } else if (underdogPicks >= 10) {
         badgeData = {
-            title: '🎭 Underdog Champion',
+            title: '<i class="fa-solid fa-mask"></i> Underdog Champion',
             description: `You've voted for the underdog ${underdogPicks} times! True rebel!`
         };
     } else if (journeyStats.songsStillAlive >= 5) {
         badgeData = {
-            title: '🎵 Song Champion',
+            title: '<i class="fa-solid fa-music"></i> Song Champion',
             description: `${journeyStats.songsStillAlive} of your picks are still in the tournament!`
         };
     } else if (votingStreak >= 5) {
         badgeData = {
-            title: '🔥 Hot Streak',
+            title: '<i class="fa-solid fa-fire"></i> Hot Streak',
             description: `${votingStreak} days of voting in a row!`
         };
     } else if (totalVotes >= 30) {
         badgeData = {
-            title: '🗳️ Super Voter',
+            title: '<i class="fa-solid fa-square-poll-vertical"></i> Super Voter',
             description: `${totalVotes} votes cast! You're incredibly active!`
         };
     } else if (favoriteArtist && favoriteArtist.count >= 5) {
         badgeData = {
-            title: `🎸 ${favoriteArtist.artist} Superfan`,
+            title: `<i class="fa-solid fa-guitar"></i> ${favoriteArtist.artist} Superfan`,
             description: `You've voted for ${favoriteArtist.artist} ${favoriteArtist.count} times!`
         };
     } else if (underdogPicks >= 5) {
         badgeData = {
-            title: '🎭 Underdog Supporter',
+            title: '<i class="fa-solid fa-mask"></i> Underdog Supporter',
             description: `${underdogPicks} underdog picks! You support the underdogs!`
         };
     } else if (totalVotes >= 20) {
         badgeData = {
-            title: '🎵 Dedicated Fan',
+            title: '<i class="fa-solid fa-music"></i> Dedicated Fan',
             description: `${totalVotes} votes and counting!`
         };
     } else if (totalVotes >= 10) {
@@ -1254,7 +1258,7 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
     }
     
     if (badgeData) {
-        title.textContent = badgeData.title;
+        title.innerHTML = badgeData.title; // ✅ Changed to innerHTML
         description.textContent = badgeData.description;
         badge.style.display = 'flex';
     } else {
@@ -1308,10 +1312,10 @@ function createVoteCard(vote) {
     
     // Status icon based on vote type
     const statusIcon = {
-        'underdog': '🎭',
-        'mainstream': '🎯',
-        'closeCall': '⚖️'
-    }[vote.voteType] || '🗳️';
+        'underdog': '<i class="fa-solid fa-mask"></i>',
+        'mainstream': '<i class="fa-solid fa-bullseye"></i>',
+        'closeCall': '<i class="fa-solid fa-scale-balanced"></i>'
+    }[vote.voteType] || '<i class="fa-solid fa-square-poll-vertical"></i>';
     
     // Vote type label
     const voteTypeLabel = {
