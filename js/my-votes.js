@@ -329,7 +329,7 @@ function updateStats() {
         const profileTitle = document.getElementById('heroProfileTitle');
         const profileDescription = document.getElementById('heroProfileDescription');
         
-        if (profileIcon) profileIcon.textContent = tasteProfile.icon;
+if (profileIcon) profileIcon.innerHTML = tasteProfile.icon;
         if (profileTitle) profileTitle.textContent = tasteProfile.title;
         if (profileDescription) profileDescription.textContent = tasteProfile.description;
         

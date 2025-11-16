@@ -252,7 +252,7 @@ export const ACHIEVEMENTS = {
     id: 'trendsetter',
     name: 'Trendsetter',
     description: 'Be among first 10 voters in 15 matches',
-    icon: '<i class="fa-solid fa-sparkles"></i>',
+icon: '<i class="fa-solid fa-fire"></i>',
     xp: 300,
     category: 'early',
     hidden: true,
