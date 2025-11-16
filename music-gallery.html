@@ -33,6 +33,7 @@
     <meta name="twitter:image:alt" content="Anthem Arena Music Gallery">
     
     <!-- Fonts -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
@@ -87,15 +88,24 @@
         <aside class="filter-panel">
             <h2 class="filter-title">Filters</h2>
             
+            <!-- ✅ NEW: Pro Tip -->
+          <div class="filter-tip">
+    <i class="fa-solid fa-lightbulb"></i>
+    <strong>Pro tip:</strong> Shift+Click a filter to select only that one
+</div>
+            
             <!-- Search Bar -->
             <div class="filter-group">
                 <label class="filter-label">Search</label>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search by song or artist...">
             </div>
 
-            <!-- ✅ NEW: Series/Collection Filter -->
+            <!-- ✅ UPDATED: Series/Collection Filter with Toggle Button -->
             <div class="filter-group">
-                <label class="filter-label">Series / Collection</label>
+                <div class="filter-header">
+                    <label class="filter-label">Series / Collection</label>
+                    <button class="filter-toggle" data-target="series">Deselect All</button>
+                </div>
                 <div class="filter-options">
                     <label class="filter-checkbox">
                         <input type="checkbox" class="filter-input" data-filter="series" value="Worlds Anthem" checked>
@@ -168,9 +178,12 @@
                 </div>
             </div>
 
-            <!-- Year Filter -->
+            <!-- ✅ UPDATED: Year Filter with Toggle Button -->
             <div class="filter-group">
-                <label class="filter-label">Release Year</label>
+                <div class="filter-header">
+                    <label class="filter-label">Release Year</label>
+                    <button class="filter-toggle" data-target="year">Deselect All</button>
+                </div>
                 <div class="filter-options">
                     <label class="filter-checkbox">
                         <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
@@ -246,25 +259,25 @@
             </p>
             <div class="actions-grid">
                 <a href="/live" class="action-card">
-                    <div class="action-icon">🗳️</div>
+<div class="action-icon"><i class="fa-solid fa-vote-yea"></i></div>
                     <h3>Vote Now</h3>
                     <p>Cast your votes in active matches and influence which songs advance to the next round</p>
                     <span class="action-cta">View Active Matches →</span>
                 </a>
                 <a href="/brackets.html" class="action-card">
-                    <div class="action-icon">🏆</div>
+<div class="action-icon"><i class="fa-solid fa-trophy"></i></div>
                     <h3>View Bracket</h3>
                     <p>See the complete tournament structure and track how your favorite songs are progressing</p>
                     <span class="action-cta">View Full Bracket →</span>
                 </a>
                 <a href="/stats.html" class="action-card">
-                    <div class="action-icon">📊</div>
+<div class="action-icon"><i class="fa-solid fa-chart-bar"></i></div>
                     <h3>Statistics</h3>
                     <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
                     <span class="action-cta">View Stats Dashboard →</span>
                 </a>
                 <a href="/my-votes.html" class="action-card">
-                    <div class="action-icon">📈</div>
+<div class="action-icon"><i class="fa-solid fa-chart-line"></i></div>
                     <h3>Track Your Votes</h3>
                     <p>Review your voting history, track predictions, and earn achievements for participation</p>
                     <span class="action-cta">View Your History →</span>

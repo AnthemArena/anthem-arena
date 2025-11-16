@@ -403,7 +403,7 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Season Cinematic",
-    "tournamentStatus": "champion",
+    "tournamentStatus": "",
     "stats": {
       "championships": 1,
       "winRecord": "12-3",
@@ -638,7 +638,7 @@
     "franchise": "LoL",
     "channel": "League of Legends",
     "seriesCollection": "Worlds Anthem",
-    "tournamentStatus": "eliminated",
+    "tournamentStatus": "",
     "stats": {
       "championships": 0,
       "winRecord": "3-5",

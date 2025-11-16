@@ -142,11 +142,11 @@ function createVideoCard(video) {
     card.dataset.category = video.category;
     card.dataset.year = getYearRange(video.year);
     card.dataset.artist = video.artistGroup;
-    card.dataset.series = video.seriesCollection; // ✅ NEW: Filter by series
+    card.dataset.series = video.seriesCollection;
     card.dataset.name = video.title;
     card.dataset.videoId = video.videoId;
     card.dataset.embedAllowed = video.embedAllowed !== false;
-    card.dataset.views = video.views; // ✅ For sorting
+    card.dataset.views = video.views;
     
     // ✨ Get book recommendation for this video
     const book = getBookForSong(video);
@@ -202,13 +202,13 @@ function createVideoCard(video) {
                         <span class="stat-desc">Status</span>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-icon">👁️</span>
-                    <div class="stat-content">
-                        <span class="stat-number">${formatViews(video.views)}</span>
-                        <span class="stat-desc">Views</span>
-                    </div>
-                </div>
+               <div class="stat-item">
+    <span class="stat-icon"><i class="fa-solid fa-eye"></i></span>
+    <div class="stat-content">
+        <span class="stat-number">${formatViews(video.views)}</span>
+        <span class="stat-desc">Views</span>
+    </div>
+</div>
                 ${getPerformanceStatHTML(video)}
             </div>
             
@@ -255,12 +255,11 @@ function getSubtitle(video) {
     return subtitle;
 }
 
-// ✅ NEW: Accomplishment display logic
 function getAccomplishmentIcon(video) {
-    if (video.stats.championships >= 2) return '🏆🏆';
-    if (video.stats.championships === 1) return '🏆';
-    if (video.tournamentStatus === 'eliminated') return '❌';
-    return '⚔️';
+    if (video.stats.championships >= 2) return '<i class="fa-solid fa-trophy"></i><i class="fa-solid fa-trophy"></i>';
+    if (video.stats.championships === 1) return '<i class="fa-solid fa-trophy"></i>';
+    if (video.tournamentStatus === 'eliminated') return '<i class="fa-solid fa-xmark"></i>';
+    return '<i class="fa-solid fa-swords"></i>';
 }
 
 function getAccomplishmentText(video) {
@@ -284,7 +283,7 @@ function getStatusBadge(video) {
         badges += '<span class="tag tag-competing">Competing</span>';
     }
     
-    // ✅ NEW: Multi-category indicator
+    // Multi-category indicator
     if (video.additionalCategories && video.additionalCategories.length > 0) {
         const extraCount = video.additionalCategories.length;
         badges += ` <span class="tag tag-multi" title="Also in: ${video.additionalCategories.join(', ')}">+${extraCount} Series</span>`;
@@ -293,13 +292,11 @@ function getStatusBadge(video) {
     return badges;
 }
 
-// ✅ NEW: Only show performance if they have real data
 function getPerformanceStatHTML(video) {
-    // Only show if they have actual matches (not 0-0)
     if (video.stats.winRecord && video.stats.winRecord !== '0-0') {
         return `
             <div class="stat-item">
-                <span class="stat-icon">📊</span>
+                <span class="stat-icon"><i class="fa-solid fa-chart-line"></i></span>
                 <div class="stat-content">
                     <span class="stat-number">${video.stats.winRecord}</span>
                     <span class="stat-desc">${video.stats.winRate} Win Rate</span>
@@ -308,10 +305,9 @@ function getPerformanceStatHTML(video) {
         `;
     }
     
-    // Show year as fallback
     return `
         <div class="stat-item">
-            <span class="stat-icon">📅</span>
+            <span class="stat-icon"><i class="fa-regular fa-calendar"></i></span>
             <div class="stat-content">
                 <span class="stat-number">${video.year}</span>
                 <span class="stat-desc">Released</span>
@@ -320,7 +316,6 @@ function getPerformanceStatHTML(video) {
     `;
 }
 
-// ✅ NEW: Format view count
 function formatViews(views) {
     if (views >= 1000000000) return (views / 1000000000).toFixed(1) + 'B';
     if (views >= 1000000) return (views / 1000000).toFixed(0) + 'M';
@@ -333,7 +328,7 @@ function capitalizeFirst(str) {
 }
 
 // ========================================
-// ✅ NEW: SORTING FUNCTIONALITY
+// SORTING FUNCTIONALITY
 // ========================================
 function sortVideos(videos, sortBy) {
     const sorted = [...videos];
@@ -358,16 +353,12 @@ function sortVideos(videos, sortBy) {
             sorted.sort((a, b) => (b.stats.championships || 0) - (a.stats.championships || 0));
             break;
         default:
-            // Default: seed order
             sorted.sort((a, b) => a.seed - b.seed);
     }
     
     return sorted;
 }
 
-// ========================================
-// FILTER FUNCTIONALITY
-// ========================================
 // ========================================
 // FILTER FUNCTIONALITY (ENHANCED FOR MULTI-CATEGORY)
 // ========================================
@@ -404,12 +395,12 @@ function filterMusicVideos() {
 
     allVideos.forEach(video => {
         const cardSeries = video.seriesCollection;
-        const additionalCats = video.additionalCategories || []; // ✅ NEW
+        const additionalCats = video.additionalCategories || [];
         const cardYear = getYearRange(video.year);
         const cardName = video.title.toLowerCase();
         const cardArtist = video.artist.toLowerCase();
 
-        // ✅ UPDATED: Check primary OR additional categories
+        // Check primary OR additional categories
         const matchesSeries = activeFilters.series.length === 0 || 
                              activeFilters.series.includes(cardSeries) ||
                              activeFilters.series.some(filter => additionalCats.includes(filter));
@@ -452,13 +443,77 @@ function filterMusicVideos() {
 }
 
 // ========================================
-// EVENT LISTENERS SETUP
+// HELPER: UPDATE TOGGLE BUTTON TEXT
+// ========================================
+function updateToggleButtonText(filterType) {
+    const button = document.querySelector(`.filter-toggle[data-target="${filterType}"]`);
+    const inputs = document.querySelectorAll(`input[data-filter="${filterType}"]`);
+    const allChecked = Array.from(inputs).every(input => input.checked);
+    
+    if (button) {
+        button.textContent = allChecked ? 'Deselect All' : 'Select All';
+    }
+}
+
+// ========================================
+// EVENT LISTENERS SETUP (ENHANCED WITH TOGGLE + SHIFT-CLICK)
 // ========================================
 function setupEventListeners() {
-    // Filter inputs
     const filterInputs = document.querySelectorAll('.filter-input');
+    
+    // ✅ NEW: Toggle buttons for Select/Deselect All
+    const filterToggles = document.querySelectorAll('.filter-toggle');
+    filterToggles.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const target = e.target.dataset.target; // 'series' or 'year'
+            const inputs = document.querySelectorAll(`input[data-filter="${target}"]`);
+            
+            // Check if all are currently checked
+            const allChecked = Array.from(inputs).every(input => input.checked);
+            
+            // Toggle all
+            inputs.forEach(input => {
+                input.checked = !allChecked;
+            });
+            
+            // Update button text
+            e.target.textContent = allChecked ? 'Select All' : 'Deselect All';
+            
+            // Re-filter
+            filterMusicVideos();
+        });
+    });
+
+    // ✅ NEW: Shift+Click to isolate single filter
     filterInputs.forEach(input => {
-        input.addEventListener('change', filterMusicVideos);
+        input.addEventListener('click', (e) => {
+            // If shift-clicking, deselect all others in that category
+            if (e.shiftKey) {
+                const filterType = input.dataset.filter;
+                
+                filterInputs.forEach(otherInput => {
+                    if (otherInput.dataset.filter === filterType && otherInput !== input) {
+                        otherInput.checked = false;
+                    }
+                });
+                
+                // Ensure the clicked item stays checked
+                input.checked = true;
+                
+                // Update toggle button text
+                updateToggleButtonText(filterType);
+                
+                // Trigger filter
+                filterMusicVideos();
+            }
+        });
+        
+        // Regular change event (no shift key)
+        input.addEventListener('change', (e) => {
+            const filterType = input.dataset.filter;
+            updateToggleButtonText(filterType);
+            filterMusicVideos();
+        });
     });
 
     // Search input
@@ -477,6 +532,12 @@ function setupEventListeners() {
             filterInputs.forEach(input => {
                 input.checked = true;
             });
+            
+            // Reset toggle button texts
+            filterToggles.forEach(button => {
+                button.textContent = 'Deselect All';
+            });
+            
             if (searchInput) searchInput.value = '';
             if (sortSelect) sortSelect.value = 'seed';
             filterMusicVideos();

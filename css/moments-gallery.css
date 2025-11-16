@@ -1116,3 +1116,75 @@ body {
     background: rgba(200, 155, 60, 0.3);
     border-color: #C8AA6E;
 }
+/* Filter header with toggle button */
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.filter-header h3 {
+    margin: 0;
+}
+
+/* Toggle button styling */
+.filter-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-toggle:hover {
+    background: rgba(200, 155, 60, 0.15);
+    color: #C8AA6E;
+    border-color: rgba(200, 155, 60, 0.4);
+}
+
+.filter-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Filter count indicator (optional) */
+.filter-count {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 8px;
+}
+/* Gold icon theme */
+.stat-icon i,
+.action-icon i {
+    color: #C8AA6E;
+    text-shadow: 0 0 10px rgba(200, 155, 60, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stat-icon i:hover {
+    color: #F0E6D2;
+    text-shadow: 0 0 15px rgba(200, 155, 60, 0.5);
+}
+
+/* Status-specific colors */
+.tag-champion i {
+    color: #C8AA6E;
+}
+
+.tag-eliminated i {
+    color: #ff4444;
+}
+
+.tag-competing i {
+    color: #888;
+}
+
+/* Pro tip icon */
+.filter-tip i {
+    color: #C8AA6E;
+    margin-right: 8px;
+}
