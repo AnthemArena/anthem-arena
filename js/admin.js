@@ -280,15 +280,59 @@ window.closeMatch = async function(matchId) {
         }
         
         const match = matchSnap.data();
-        const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
-        const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
+        
+        // ========================================
+        // ✅ DETERMINE WINNER WITH TIEBREAKER
+        // ========================================
+        
+        const song1Votes = match.song1.votes;
+        const song2Votes = match.song2.votes;
+        const song1Seed = match.song1.seed;
+        const song2Seed = match.song2.seed;
+        
+        let winnerId;
+        let winnerData;
+        let winMethod;
+        
+        if (song1Votes > song2Votes) {
+            // Song 1 wins by votes
+            winnerId = match.song1.id;
+            winnerData = match.song1;
+            winMethod = 'votes';
+        } else if (song2Votes > song1Votes) {
+            // Song 2 wins by votes
+            winnerId = match.song2.id;
+            winnerData = match.song2;
+            winMethod = 'votes';
+        } else {
+            // ✅ TIE - Higher seed (lower number) wins
+            if (song1Seed < song2Seed) {
+                winnerId = match.song1.id;
+                winnerData = match.song1;
+                winMethod = 'tiebreaker-seed';
+                console.log(`⚖️ TIEBREAKER: Seed ${song1Seed} beats Seed ${song2Seed}`);
+            } else {
+                winnerId = match.song2.id;
+                winnerData = match.song2;
+                winMethod = 'tiebreaker-seed';
+                console.log(`⚖️ TIEBREAKER: Seed ${song2Seed} beats Seed ${song1Seed}`);
+            }
+        }
+        
+        // ========================================
+        // UPDATE MATCH WITH WINNER INFO
+        // ========================================
         
         await updateDoc(matchRef, {
             status: 'completed',
-            winnerId: winnerId
+            winnerId: winnerId,
+            winMethod: winMethod,  // ← NEW: Track how they won
+            finalScore: `${song1Votes}-${song2Votes}`  // ← NEW: Store final score
         });
         
-        console.log(`✅ Closed match: ${matchId}, Winner: ${winnerId}`);
+        console.log(`✅ Closed match: ${matchId}`);
+        console.log(`Winner: ${winnerData.shortTitle} (${winMethod})`);
+        console.log(`Final Score: ${song1Votes}-${song2Votes}`);
         
         await advanceWinnerToNextRound(match, winnerData);
         
@@ -307,7 +351,12 @@ window.closeMatch = async function(matchId) {
             }
         }
         
-        alert(`✅ Match ${matchId} closed!\n\nWinner: ${winnerData.shortTitle}\n✨ Advanced to next round!`);
+        // ✅ UPDATED ALERT - Show if tiebreaker was used
+        const tiebreakerMsg = winMethod === 'tiebreaker-seed' 
+            ? `\n\n⚖️ TIEBREAKER: Won by higher seed (${winnerData.seed} > ${winnerData === match.song1 ? match.song2.seed : match.song1.seed})`
+            : '';
+        
+        alert(`✅ Match ${matchId} closed!\n\nWinner: ${winnerData.shortTitle}\nScore: ${song1Votes}-${song2Votes}${tiebreakerMsg}\n✨ Advanced to next round!`);
         
         loadMatches();
         
@@ -443,18 +492,63 @@ window.closeBatch = async function(roundNumber, batchNumber) {
         for (const matchDoc of snapshot.docs) {
             const match = matchDoc.data();
             
-            const winnerId = match.song1.votes > match.song2.votes ? match.song1.id : match.song2.id;
-            const winnerData = match.song1.votes > match.song2.votes ? match.song1 : match.song2;
-            const loserData = match.song1.votes > match.song2.votes ? match.song2 : match.song1;
+            // ========================================
+            // ✅ DETERMINE WINNER WITH TIEBREAKER
+            // ========================================
+            
+            const song1Votes = match.song1.votes;
+            const song2Votes = match.song2.votes;
+            const song1Seed = match.song1.seed;
+            const song2Seed = match.song2.seed;
+            
+            let winnerId;
+            let winnerData;
+            let loserData;
+            let winMethod;
+            
+            if (song1Votes > song2Votes) {
+                winnerId = match.song1.id;
+                winnerData = match.song1;
+                loserData = match.song2;
+                winMethod = 'votes';
+            } else if (song2Votes > song1Votes) {
+                winnerId = match.song2.id;
+                winnerData = match.song2;
+                loserData = match.song1;
+                winMethod = 'votes';
+            } else {
+                // ✅ TIE - Higher seed (lower number) wins
+                if (song1Seed < song2Seed) {
+                    winnerId = match.song1.id;
+                    winnerData = match.song1;
+                    loserData = match.song2;
+                    winMethod = 'tiebreaker-seed';
+                    console.log(`⚖️ TIEBREAKER: Seed ${song1Seed} beats Seed ${song2Seed}`);
+                } else {
+                    winnerId = match.song2.id;
+                    winnerData = match.song2;
+                    loserData = match.song1;
+                    winMethod = 'tiebreaker-seed';
+                    console.log(`⚖️ TIEBREAKER: Seed ${song2Seed} beats Seed ${song1Seed}`);
+                }
+            }
+            
+            // ========================================
+            // UPDATE MATCH WITH WINNER INFO
+            // ========================================
             
             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
                 status: 'completed',
-                winnerId: winnerId
+                winnerId: winnerId,
+                winMethod: winMethod,  // ← Store how they won
+                finalScore: `${song1Votes}-${song2Votes}`  // ← Store final score
             });
             
             await advanceWinnerToNextRound(match, winnerData);
             
-            results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})`);
+            // ✅ Add tiebreaker indicator to results
+            const tiebreakerIndicator = winMethod === 'tiebreaker-seed' ? ' ⚖️' : '';
+            results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})${tiebreakerIndicator}`);
             closedCount++;
             
             // ✅ Categorize for staggered posting
