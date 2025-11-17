@@ -369,53 +369,44 @@ window.closeMatch = async function(matchId) {
 async function advanceWinnerToNextRound(completedMatch, winner) {
     const nextRound = completedMatch.round + 1;
     
-    console.log(`Advancing winner from ${completedMatch.matchId} to Round ${nextRound}...`);
-
+    console.log(`📈 Checking if ${completedMatch.matchId} winner advances to Round ${nextRound}...`);
+    
     const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+    const q = query(matchesRef, where('round', '==', nextRound));
+    const snapshot = await getDocs(q);
     
-    // Find all next-round matches that are waiting for this specific completed match
-    const q1 = query(matchesRef, where('song1.sourceMatch', '==', completedMatch.matchId));
-    const q2 = query(matchesRef, where('song2.sourceMatch', '==', completedMatch.matchId));
+    let advanced = false;
     
-    const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-    const targetDocs = [...snap1.docs, ...snap2.docs];
-
-    if (targetDocs.length === 0) {
-        console.log(`No next-round match waiting for ${completedMatch.matchId} (likely finals)`);
-        return;
+    for (const nextMatchDoc of snapshot.docs) {
+        const nextMatch = nextMatchDoc.data();
+        
+        if (nextMatch.song1?.sourceMatch === completedMatch.matchId) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
+                'song1': {
+                    ...winner,
+                    votes: 0,
+                    sourceMatch: completedMatch.matchId
+                }
+            });
+            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song1 slot)`);
+            advanced = true;
+        }
+        
+        if (nextMatch.song2?.sourceMatch === completedMatch.matchId) {
+            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
+                'song2': {
+                    ...winner,
+                    votes: 0,
+                    sourceMatch: completedMatch.matchId
+                }
+            });
+            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song2 slot)`);
+            advanced = true;
+        }
     }
-
-    for (const targetDoc of targetDocs) {
-        const targetData = targetDoc.data();
-        const updateData = {};
-
-        if (targetData.song1?.sourceMatch === completedMatch.matchId) {
-            updateData.song1 = {
-                ...winner,
-                votes: 0
-                // DO NOT overwrite sourceMatch — it should stay as the R2/R3 match ID for next round!
-            };
-        }
-
-        if (targetData.song2?.sourceMatch === completedMatch.matchId) {
-            updateData.song2 = {
-                ...winner,
-                votes: 0
-                // DO NOT overwrite sourceMatch
-            };
-        }
-
-        // Activate match if both songs are now real (not TBD)
-        const bothReady = 
-            (updateData.song1 || targetData.song1.id !== 'TBD') &&
-            (updateData.song2 || targetData.song2.id !== 'TBD');
-
-        if (bothReady) {
-            updateData.status = 'active';
-        }
-
-        await updateDoc(targetDoc.ref, updateData);
-        console.log(`Advanced ${winner.shortTitle} → ${targetDoc.id}`);
+    
+    if (!advanced) {
+        console.log(`ℹ️ No next round found for ${completedMatch.matchId} (might be tournament winner!)`);
     }
 }
 
@@ -856,3 +847,99 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRecentBlogPosts();
     logBlog('🎨 Admin Panel loaded - Blog generation ready');
 });
+// ========================================
+// RECOUNT ALL ROUND 1 VOTES
+// ========================================
+
+window.recountRound1 = async function() {
+    if (!confirm('Recount all Round 1 votes and fix winners?\n\nThis will:\n- Recount votes from vote records\n- Update match scores\n- Fix Round 2 bracket')) {
+        return;
+    }
+    
+    try {
+        console.log('🔧 Starting Round 1 recount...\n');
+        
+        const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+        const matchesQuery = query(matchesRef, where('round', '==', 1));
+        const matchesSnap = await getDocs(matchesQuery);
+        
+        console.log(`📊 Found ${matchesSnap.size} Round 1 matches\n`);
+        
+        let fixedCount = 0;
+        
+        for (const matchDoc of matchesSnap.docs) {
+            const matchId = matchDoc.id;
+            const match = matchDoc.data();
+            
+            console.log(`🔄 ${matchId}: ${match.song1.shortTitle} vs ${match.song2.shortTitle}`);
+            
+            // Count votes
+            const votesRef = collection(db, 'votes');
+            const votesQuery = query(votesRef, where('matchId', '==', matchId));
+            const votesSnap = await getDocs(votesQuery);
+            
+            let song1Votes = 0;
+            let song2Votes = 0;
+            
+            votesSnap.forEach(voteDoc => {
+                const vote = voteDoc.data();
+                if (vote.choice === 'song1') song1Votes++;
+                if (vote.choice === 'song2') song2Votes++;
+            });
+            
+            console.log(`   Old: ${match.song1?.votes || 0}-${match.song2?.votes || 0} → New: ${song1Votes}-${song2Votes}`);
+            
+            // Determine winner
+            let winnerId, winnerData, winMethod;
+            
+            if (song1Votes > song2Votes) {
+                winnerId = match.song1.id;
+                winnerData = match.song1;
+                winMethod = 'votes';
+            } else if (song2Votes > song1Votes) {
+                winnerId = match.song2.id;
+                winnerData = match.song2;
+                winMethod = 'votes';
+            } else {
+                if (match.song1.seed < match.song2.seed) {
+                    winnerId = match.song1.id;
+                    winnerData = match.song1;
+                    winMethod = 'tiebreaker-seed';
+                } else {
+                    winnerId = match.song2.id;
+                    winnerData = match.song2;
+                    winMethod = 'tiebreaker-seed';
+                }
+                console.log(`   ⚖️ TIE: ${winnerData.shortTitle} wins by seed`);
+            }
+            
+            console.log(`   ✅ Winner: ${winnerData.shortTitle}`);
+            
+            // Update match
+            await updateDoc(matchDoc.ref, {
+                'song1.votes': song1Votes,
+                'song2.votes': song2Votes,
+                totalVotes: song1Votes + song2Votes,
+                winnerId: winnerId,
+                winMethod: winMethod,
+                finalScore: `${song1Votes}-${song2Votes}`,
+                status: 'completed'
+            });
+            
+            // Update Round 2
+            await advanceWinnerToNextRound(match, winnerData);
+            
+            fixedCount++;
+            console.log('');
+        }
+        
+        console.log(`\n🎉 Fixed ${fixedCount} matches!`);
+        alert(`✅ Success!\n\nRecounted ${fixedCount} matches.\nRefresh brackets.html to see correct winners.`);
+        
+        loadMatches();
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
