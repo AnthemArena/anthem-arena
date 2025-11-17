@@ -378,50 +378,117 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ========================================
-    // GENERATE DYNAMIC DESCRIPTIONS
-    // ========================================
-    function updateCompetitorDescription(songData, competitor, currentRound, descriptionElement, h2hRecord) {
-    if (!descriptionElement) return;
+// ========================================
+// UPDATE COMPETITOR DESCRIPTION (NOW ACCOMPLISHMENTS ONLY)
+// ========================================
+function updateCompetitorDescription(songData, competitor, currentRound, accomplishmentsSection) {
+    if (!accomplishmentsSection) return;
     
-    const artist = competitor.source.split('•')[0]?.trim() || 'Unknown Artist';
-    const name = competitor.name;
+    const accomplishmentsText = accomplishmentsSection.querySelector('.accomplishments-text');
+    if (!accomplishmentsText) return;
+    
     const championships = songData.stats?.championships || 0;
-        const liveStats = songData.liveStats; // ✅ ADD THIS LINE
+    const semifinals = songData.stats?.semifinals || 0;
+    const quarterfinals = songData.stats?.quarterfinals || 0;
+    const finals = songData.stats?.finals || 0;
+    
+    let accomplishments = [];
+    
+    // Championships
+    if (championships > 1) {
+        accomplishments.push(`${championships}x Champion`);
+    } else if (championships === 1) {
+        accomplishments.push('Champion');
+    }
+    
+    // Finals (but not champion)
+    if (finals > championships && finals > 1) {
+        accomplishments.push(`${finals}x Finalist`);
+    } else if (finals > championships && finals === 1) {
+        accomplishments.push('Finalist');
+    }
+    
+    // Semifinals
+    if (semifinals > 1) {
+        accomplishments.push(`${semifinals}x Semifinalist`);
+    } else if (semifinals === 1) {
+        accomplishments.push('Semifinalist');
+    }
+    
+    // Quarterfinals
+    if (quarterfinals > 1) {
+        accomplishments.push(`${quarterfinals}x Quarterfinalist`);
+    } else if (quarterfinals === 1) {
+        accomplishments.push('Quarterfinalist');
+    }
+    
+    // Show/hide section based on accomplishments
+    if (accomplishments.length > 0) {
+        accomplishmentsText.textContent = accomplishments.join(' • ');
+        accomplishmentsSection.style.display = 'block';
+    } else {
+        accomplishmentsSection.style.display = 'none';
+    }
+}
 
+// ========================================
+// ✅ NEW: UPDATE "ABOUT THIS SONG" TEXT
+// ========================================
+function updateSongAbout(songData, competitorNum) {
+    const aboutSection = document.getElementById(`competitor${competitorNum}-about`);
+    const aboutText = document.getElementById(`competitor${competitorNum}-about-text`);
     
-    let description = '';
+    if (!aboutSection || !aboutText) return;
     
-    // Check for head-to-head history first
-    if (h2hRecord && h2hRecord.hasHistory) {
-        const isComp1 = competitor.id === 'song1';
-        const wins = isComp1 ? h2hRecord.song1Wins : h2hRecord.song2Wins;
-        const losses = isComp1 ? h2hRecord.song2Wins : h2hRecord.song1Wins;
+    if (songData.about) {
+        aboutText.textContent = songData.about;
+    } else {
+        // Fallback if no "about" text exists in JSON
+        aboutText.textContent = 'A League of Legends music video competing in the tournament.';
+    }
+}
+
+// ========================================
+// UPDATE COMPETITOR INFO (CALL BOTH FUNCTIONS)
+// ========================================
+async function updateCompetitorInfo(match) {
+    try {
+        console.log('🎯 Starting updateCompetitorInfo...');
         
-        description = `"${name}" by ${artist} has faced this opponent before with a ${wins}-${losses} record in their matchups.`;
+        const [comp1Data, comp2Data, h2hRecord] = await Promise.all([
+            getCompetitorData(match.competitor1.seed),
+            getCompetitorData(match.competitor2.seed),
+        ]);
+        
+        console.log('H2H Record:', h2hRecord);
+        
+        if (!comp1Data || !comp2Data) {
+            console.error('❌ Could not load competitor data');
+            return;
+        }
+        
+        // Get elements
+        const comp1Accomplishments = document.getElementById('competitor1-accomplishments');
+        const comp1Meta = document.getElementById('competitor1-meta');
+        const comp2Accomplishments = document.getElementById('competitor2-accomplishments');
+        const comp2Meta = document.getElementById('competitor2-meta');
+        
+        // Update accomplishments
+        updateCompetitorDescription(comp1Data, match.competitor1, match.round, comp1Accomplishments);
+        updateCompetitorDescription(comp2Data, match.competitor2, match.round, comp2Accomplishments);
+        
+        // Update "about this song" text
+        updateSongAbout(comp1Data, 1);
+        updateSongAbout(comp2Data, 2);
+        
+        // Update meta info
+        updateCompetitorMeta(comp1Data, match.competitor1, comp1Meta);
+        updateCompetitorMeta(comp2Data, match.competitor2, comp2Meta);
+        
+        console.log('✅ Competitor info updated with accomplishments and about text');
+    } catch (error) {
+        console.error('❌ Error updating competitor info:', error);
     }
-    // Tournament debut (no matches played)
-    else if (liveStats.totalMatches === 0) {
-        description = `"${name}" by ${artist} makes their tournament debut.`;
-    }
-    // Multi-time champion
-    else if (championships >= 2) {
-        description = `${championships}x Champion "${name}" by ${artist} returns to the arena.`;
-    }
-    // Single champion
-    else if (championships === 1) {
-        description = `Defending champion "${name}" by ${artist} continues their title defense.`;
-    }
-    // Former finalist
-    else if (songData.accolade === 'contender') {
-        description = `Former finalist "${name}" by ${artist} looks to go all the way this time.`;
-    }
-    // Everyone else
-    else {
-        description = `"${name}" by ${artist} brings their best to this matchup.`;
-    }
-    
-    descriptionElement.textContent = description;
 }
 
     // ========================================

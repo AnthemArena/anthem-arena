@@ -2950,3 +2950,39 @@
 .bmc-button:active {
     transform: translateY(0);
 }
+/* Accomplishments Section */
+.accomplishments-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.accomplishments-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: #c8aa6e;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* About Song Section */
+.about-song-section {
+    margin-bottom: 1.5rem;
+}
+
+.about-text {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+}
+
+.details-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: #c8aa6e;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
