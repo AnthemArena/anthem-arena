@@ -12,8 +12,9 @@ let allLiveMatches = [];
 // ROUND COUNTDOWN CONFIGURATION
 // ========================================
 const ROUND_CONFIG = {
-    roundName: "ROUND 1",
-    endDate: new Date('2025-11-17T19:00:00Z') // YEAR IS 2025, not 2024!
+    roundName: "ROUND 2",
+    roundDescription: "Single Elimination • 16 Matches",
+    endDate: new Date('2025-11-24T19:00:00Z') // Updated for Round 2 - adjust this date as needed
 };
 // ========================================
 // INITIALIZE ON PAGE LOAD
@@ -138,7 +139,7 @@ function displayRoundCountdown() {
     banner.className = 'countdown-banner';
     banner.innerHTML = `
         <div class="countdown-content">
-            <i class="fa-solid fa-triangle-exclamation"></i> <strong>${ROUND_CONFIG.roundName} ENDS IN <span id="countdownTimer">...</span></strong>
+            <i class="fa-solid fa-trophy"></i> <strong>${ROUND_CONFIG.roundName} NOW LIVE!</strong> • ${ROUND_CONFIG.roundDescription} • Ends in <span id="countdownTimer">...</span>
         </div>
     `;
     
@@ -161,7 +162,7 @@ function updateCountdown() {
     
     if (diff <= 0) {
         countdownEl.textContent = '0d 0h 0m';
-        countdownEl.parentElement.innerHTML = '<i class="fa-solid fa-champagne-glasses"></i> <strong>ROUND ENDED!</strong> • Check back soon for Round 2!';
+        countdownEl.parentElement.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> <strong>${ROUND_CONFIG.roundName} ENDED!</strong> • Check back soon for Round 3!`;
         return;
     }
     
@@ -289,7 +290,7 @@ function updateUnvotedHeader(unvotedCount) {
     } else if (unvotedCount <= 3) {
         headerIcon.innerHTML = '<i class="fa-solid fa-fire"></i>';
         headerText.innerHTML = `Almost Done! <span id="unvotedCount">${unvotedCount}</span> Matches Left`;
-    } else if (unvotedCount <= 6) {
+    } else if (unvotedCount <= 8) {
         headerIcon.innerHTML = '<i class="fa-solid fa-check-to-slot"></i>';
         headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Matches Need Your Vote!`;
     } else {
@@ -349,7 +350,7 @@ function showCompletionMessage() {
         banner.className = 'completion-banner';
         banner.innerHTML = `
             <div class="completion-content">
-                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
+                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Round 2 Matches!</h3>
                 <p>Check out these pages while waiting for new matchups:</p>
                 <div class="completion-links">
                     <a href="/my-votes.html">View Your Progress</a>
