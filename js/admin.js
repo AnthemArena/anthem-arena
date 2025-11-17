@@ -369,44 +369,53 @@ window.closeMatch = async function(matchId) {
 async function advanceWinnerToNextRound(completedMatch, winner) {
     const nextRound = completedMatch.round + 1;
     
-    console.log(`📈 Checking if ${completedMatch.matchId} winner advances to Round ${nextRound}...`);
-    
+    console.log(`Advancing winner from ${completedMatch.matchId} to Round ${nextRound}...`);
+
     const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
-    const q = query(matchesRef, where('round', '==', nextRound));
-    const snapshot = await getDocs(q);
     
-    let advanced = false;
+    // Find all next-round matches that are waiting for this specific completed match
+    const q1 = query(matchesRef, where('song1.sourceMatch', '==', completedMatch.matchId));
+    const q2 = query(matchesRef, where('song2.sourceMatch', '==', completedMatch.matchId));
     
-    for (const nextMatchDoc of snapshot.docs) {
-        const nextMatch = nextMatchDoc.data();
-        
-        if (nextMatch.song1?.sourceMatch === completedMatch.matchId) {
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
-                'song1': {
-                    ...winner,
-                    votes: 0,
-                    sourceMatch: completedMatch.matchId
-                }
-            });
-            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song1 slot)`);
-            advanced = true;
-        }
-        
-        if (nextMatch.song2?.sourceMatch === completedMatch.matchId) {
-            await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, nextMatchDoc.id), {
-                'song2': {
-                    ...winner,
-                    votes: 0,
-                    sourceMatch: completedMatch.matchId
-                }
-            });
-            console.log(`  ✅ Advanced to ${nextMatch.matchId} (song2 slot)`);
-            advanced = true;
-        }
+    const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+    const targetDocs = [...snap1.docs, ...snap2.docs];
+
+    if (targetDocs.length === 0) {
+        console.log(`No next-round match waiting for ${completedMatch.matchId} (likely finals)`);
+        return;
     }
-    
-    if (!advanced) {
-        console.log(`ℹ️ No next round found for ${completedMatch.matchId} (might be tournament winner!)`);
+
+    for (const targetDoc of targetDocs) {
+        const targetData = targetDoc.data();
+        const updateData = {};
+
+        if (targetData.song1?.sourceMatch === completedMatch.matchId) {
+            updateData.song1 = {
+                ...winner,
+                votes: 0
+                // DO NOT overwrite sourceMatch — it should stay as the R2/R3 match ID for next round!
+            };
+        }
+
+        if (targetData.song2?.sourceMatch === completedMatch.matchId) {
+            updateData.song2 = {
+                ...winner,
+                votes: 0
+                // DO NOT overwrite sourceMatch
+            };
+        }
+
+        // Activate match if both songs are now real (not TBD)
+        const bothReady = 
+            (updateData.song1 || targetData.song1.id !== 'TBD') &&
+            (updateData.song2 || targetData.song2.id !== 'TBD');
+
+        if (bothReady) {
+            updateData.status = 'active';
+        }
+
+        await updateDoc(targetDoc.ref, updateData);
+        console.log(`Advanced ${winner.shortTitle} → ${targetDoc.id}`);
     }
 }
 
