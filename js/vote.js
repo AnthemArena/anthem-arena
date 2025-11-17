@@ -382,46 +382,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     // GENERATE DYNAMIC DESCRIPTIONS
     // ========================================
     function updateCompetitorDescription(songData, competitor, currentRound, descriptionElement, h2hRecord) {
-        if (!descriptionElement) return;
+    if (!descriptionElement) return;
+    
+    const artist = competitor.source.split('•')[0]?.trim() || 'Unknown Artist';
+    const name = competitor.name;
+    const championships = songData.stats?.championships || 0;
+    
+    let description = '';
+    
+    // Check for head-to-head history first
+    if (h2hRecord && h2hRecord.hasHistory) {
+        const isComp1 = competitor.id === 'song1';
+        const wins = isComp1 ? h2hRecord.song1Wins : h2hRecord.song2Wins;
+        const losses = isComp1 ? h2hRecord.song2Wins : h2hRecord.song1Wins;
         
-        const artist = competitor.source.split('•')[0]?.trim() || 'Unknown Artist';
-        const name = competitor.name;
-        const championships = songData.stats?.championships || 0;
-        const liveStats = songData.liveStats;
-        
-        let description = '';
-        
-        // Check for head-to-head history first
-        if (h2hRecord && h2hRecord.hasHistory) {
-            const isComp1 = competitor.id === 'song1';
-            const wins = isComp1 ? h2hRecord.song1Wins : h2hRecord.song2Wins;
-            const losses = isComp1 ? h2hRecord.song2Wins : h2hRecord.song1Wins;
-            
-            description = `"${name}" by ${artist} has a ${wins}-${losses} record in previous matchups. Overall tournament record: ${liveStats.winRecord} (${liveStats.winRate} win rate).`;
-        }
-        // Tournament debut (no matches played)
-        else if (liveStats.totalMatches === 0) {
-            description = `"${name}" by ${artist} makes their tournament debut.`;
-        }
-        // Multi-time champion
-        else if (championships >= 2) {
-            description = `${championships}x Champion "${name}" by ${artist} has a ${liveStats.winRecord} all-time record.`;
-        }
-        // Single champion
-        else if (championships === 1) {
-            description = `Defending champion "${name}" by ${artist} has a ${liveStats.winRecord} all-time record.`;
-        }
-        // Former finalist
-        else if (songData.accolade === 'contender') {
-            description = `Former finalist "${name}" by ${artist} has a ${liveStats.winRecord} tournament record.`;
-        }
-        // Everyone else
-        else {
-            description = `"${name}" by ${artist} has a ${liveStats.winRecord} tournament record with a ${liveStats.winRate} win rate.`;
-        }
-        
-        descriptionElement.textContent = description;
+        description = `"${name}" by ${artist} has faced this opponent before with a ${wins}-${losses} record in their matchups.`;
     }
+    // Tournament debut (no matches played)
+    else if (liveStats.totalMatches === 0) {
+        description = `"${name}" by ${artist} makes their tournament debut.`;
+    }
+    // Multi-time champion
+    else if (championships >= 2) {
+        description = `${championships}x Champion "${name}" by ${artist} returns to the arena.`;
+    }
+    // Single champion
+    else if (championships === 1) {
+        description = `Defending champion "${name}" by ${artist} continues their title defense.`;
+    }
+    // Former finalist
+    else if (songData.accolade === 'contender') {
+        description = `Former finalist "${name}" by ${artist} looks to go all the way this time.`;
+    }
+    // Everyone else
+    else {
+        description = `"${name}" by ${artist} brings their best to this matchup.`;
+    }
+    
+    descriptionElement.textContent = description;
+}
 
     // ========================================
     // UPDATE META STATS DISPLAY
@@ -430,95 +429,88 @@ document.addEventListener('DOMContentLoaded', async () => {
     // UPDATE META STATS DISPLAY
     // ========================================
     function updateCompetitorMeta(songData, competitor, metaElement) {
-        if (!metaElement) return;
+    if (!metaElement) return;
+    
+    const artist = competitor.source.split('•')[0]?.trim();
+    const year = competitor.source.split('•')[1]?.trim();
+    const liveStats = songData.liveStats;
+    
+    let metaHTML = '';
+    
+    // Always show basic info
+    metaHTML += `
+        <div class="meta-row basic-info">
+            <span class="meta-item seed">
+                <i class="fas fa-trophy"></i>
+                <span class="meta-label">Seed</span>
+                <span class="meta-value">#${competitor.seed}</span>
+            </span>
+            <span class="meta-item year">
+                <i class="far fa-calendar"></i>
+                <span class="meta-label">Released</span>
+                <span class="meta-value">${year}</span>
+            </span>
+            <span class="meta-item artist">
+                <i class="fas fa-microphone"></i>
+                <span class="meta-label">Artist</span>
+                <span class="meta-value">${artist}</span>
+            </span>
+        </div>
+    `;
+    
+    // Show tournament accomplishments if they exist
+    if (liveStats.totalMatches > 0) {
+        const accolades = [];
         
-        const artist = competitor.source.split('•')[0]?.trim();
-        const year = competitor.source.split('•')[1]?.trim();
-        const liveStats = songData.liveStats;
-        
-        let metaHTML = '';
-        
-        // Always show basic info
-        metaHTML += `
-            <div class="meta-row basic-info">
-                <span class="meta-item seed">
-                    <i class="fas fa-trophy"></i>
-                    <span class="meta-label">Seed</span>
-                    <span class="meta-value">#${competitor.seed}</span>
+        // Add championship badges
+        if (songData.stats?.championships >= 2) {
+            accolades.push(`
+                <span class="meta-item accolade champion">
+                    <i class="fas fa-crown"></i>
+                    <span class="meta-value">${songData.stats.championships}x Champion</span>
                 </span>
-                <span class="meta-item year">
-                    <i class="far fa-calendar"></i>
-                    <span class="meta-label">Released</span>
-                    <span class="meta-value">${year}</span>
+            `);
+        } else if (songData.stats?.championships === 1) {
+            accolades.push(`
+                <span class="meta-item accolade champion">
+                    <i class="fas fa-crown"></i>
+                    <span class="meta-value">Champion</span>
                 </span>
-                <span class="meta-item artist">
-                    <i class="fas fa-microphone"></i>
-                    <span class="meta-label">Artist</span>
-                    <span class="meta-value">${artist}</span>
-                </span>
-            </div>
-        `;
+            `);
+        }
         
-        // Show tournament stats if they have matches played
-        if (liveStats.totalMatches > 0) {
-            const accolades = [];
-            
-            // Add championship badges
-            if (songData.stats?.championships >= 2) {
-                accolades.push(`
-                    <span class="meta-item accolade champion">
-                        <i class="fas fa-crown"></i>
-                        <span class="meta-value">${songData.stats.championships}x Champion</span>
-                    </span>
-                `);
-            } else if (songData.stats?.championships === 1) {
-                accolades.push(`
-                    <span class="meta-item accolade champion">
-                        <i class="fas fa-crown"></i>
-                        <span class="meta-value">Champion</span>
-                    </span>
-                `);
-            }
-            
-            // Add finalist badge
-            if (songData.accolade === 'contender' && songData.stats?.championships === 0) {
-                accolades.push(`
-                    <span class="meta-item accolade finalist">
-                        <i class="fas fa-medal"></i>
-                        <span class="meta-value">Finalist</span>
-                    </span>
-                `);
-            }
-            
+        // Add finalist badge
+        if (songData.accolade === 'contender' && songData.stats?.championships === 0) {
+            accolades.push(`
+                <span class="meta-item accolade finalist">
+                    <i class="fas fa-medal"></i>
+                    <span class="meta-value">Finalist</span>
+                </span>
+            `);
+        }
+        
+        // Only show tournament stats row if there are accolades to display
+        if (accolades.length > 0) {
             metaHTML += `
                 <div class="meta-row tournament-stats">
-                    <span class="meta-item record">
-                        <i class="fas fa-swords"></i>
-                        <span class="meta-label">Record</span>
-                        <span class="meta-value">${liveStats.winRecord}</span>
-                    </span>
-                    <span class="meta-item winrate ${liveStats.wins > liveStats.losses ? 'winning' : ''}">
-                        <i class="fas fa-fire"></i>
-                        <span class="meta-label">Win Rate</span>
-                        <span class="meta-value">${liveStats.winRate}</span>
-                    </span>
                     ${accolades.join('')}
                 </div>
             `;
-        } else {
-            // Tournament debut
-            metaHTML += `
-                <div class="meta-row tournament-stats">
-                    <span class="meta-item debut">
-                        <i class="fas fa-star"></i>
-                        <span class="meta-value">Tournament Debut</span>
-                    </span>
-                </div>
-            `;
         }
-        
-        metaElement.innerHTML = metaHTML;
+    } else {
+        // Tournament debut
+        metaHTML += `
+            <div class="meta-row tournament-stats">
+                <span class="meta-item debut">
+                    <i class="fas fa-star"></i>
+                    <span class="meta-value">Tournament Debut</span>
+                </span>
+            </div>
+        `;
     }
+    
+    metaElement.innerHTML = metaHTML;
+}
 
 
     // ========================================
