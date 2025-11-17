@@ -387,6 +387,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const artist = competitor.source.split('•')[0]?.trim() || 'Unknown Artist';
     const name = competitor.name;
     const championships = songData.stats?.championships || 0;
+        const liveStats = songData.liveStats; // ✅ ADD THIS LINE
+
     
     let description = '';
     
