@@ -87,6 +87,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     Join fellow League fans in celebrating the most memorable music videos. Follow us for tournament updates and share your favorite anthems.
                 </p>
 
+         <!-- Support Section -->
+<div class="footer-support" style="margin: 1.5rem 0;">
+    <div class="footer-bmc">
+        <p class="footer-text" style="margin-bottom: 0.75rem;">
+            ☕ <strong>Support the Tournament</strong>
+        </p>
+        <a href="https://buymeacoffee.com/anthemarena" target="_blank" rel="noopener noreferrer" class="footer-bmc-link">
+            Buy Me a Coffee
+        </a>
+    </div>
+</div>
+
                 <div class="footer-contact">
                     <a href="mailto:anthemarena@outlook.com" class="footer-email-link">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<!-- BMC Floating Widget -->
+<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="anthemarena" data-description="Support me on Buy me a coffee!" data-message="Enjoying our events? Keep the tournament running!" data-color="#d4af37" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
     `;
     
     // Insert footer into the page

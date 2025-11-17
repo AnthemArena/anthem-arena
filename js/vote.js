@@ -2340,6 +2340,24 @@ let xpSection = `
             </div>
         `;
     }
+
+    // ========================================
+// BMC SUPPORT SECTION
+// ========================================
+let bmcSection = `
+    <div class="bmc-support-section">
+        <div class="bmc-callout">
+            <span class="bmc-icon">☕</span>
+            <div class="bmc-text">
+                <strong>Enjoying the tournament?</strong>
+                <p>Help keep it running with a coffee!</p>
+            </div>
+        </div>
+        <a href="https://buymeacoffee.com/anthemarena" target="_blank" class="bmc-button">
+            Buy Me a Coffee
+        </a>
+    </div>
+`;
     
     // ========================================
     // MODAL HTML
@@ -2359,6 +2377,9 @@ let xpSection = `
             ${successMessage}
             
             ${xpSection}
+
+                    ${bmcSection}
+
             
             ${bookSection}
             
