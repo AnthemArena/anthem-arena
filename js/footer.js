@@ -87,16 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     Join fellow League fans in celebrating the most memorable music videos. Follow us for tournament updates and share your favorite anthems.
                 </p>
 
-         <!-- Support Section -->
+<!-- Support Section -->
 <div class="footer-support" style="margin: 1.5rem 0;">
-    <div class="footer-bmc">
-        <p class="footer-text" style="margin-bottom: 0.75rem;">
-            ☕ <strong>Support the Tournament</strong>
-        </p>
-        <a href="https://buymeacoffee.com/anthemarena" target="_blank" rel="noopener noreferrer" class="footer-bmc-link">
-            Buy Me a Coffee
-        </a>
-    </div>
+    <p style="color: #d4af37; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+        ☕ <span>Support the Tournament</span>
+    </p>
+    <a href="https://buymeacoffee.com/anthemarena" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%); color: #000; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: transform 0.2s ease; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);"
+       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(212, 175, 55, 0.5)'"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(212, 175, 55, 0.3)'">
+        Buy Me a Coffee ☕
+    </a>
+</div>
 </div>
 
                 <div class="footer-contact">
