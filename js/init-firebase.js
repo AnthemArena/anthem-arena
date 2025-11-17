@@ -124,12 +124,23 @@ const byeSeeds = [allSongs[0], allSongs[1], allSongs[2]]; // Seeds 1, 2, 3
 console.log('✅ Bye seeds defined:', byeSeeds.map(s => `${s.seed}. ${s.shortTitle}`));
     
 // ========================================
-// ROUND 2: 16 MATCHES (4 matches per batch = 4 batches)
+// ROUND 2: 16 MATCHES – FIXED & CORRECT (2025-worlds-anthems)
 // ========================================
 
-console.log('🎯 Generating Round 2 (16 matches, 4 batches)...');
+console.log('Generating Round 2 (16 matches, 4 batches)...');
 
-// Helper function to add Round 2 match with batch
+const TBD = {
+    id: 'TBD',
+    seed: '?',
+    shortTitle: 'TBD',
+    title: 'To Be Determined',
+    artist: 'Pending',
+    videoId: 'dQw4w9WgXcQ',
+    year: '2024',
+    slug: 'tbd'
+};
+
+// Re-define the helper just for Round 2 (safe & clean)
 const addRound2Match = (matchNum, song1Data, song2Data) => {
     allMatches.push({
         matchId: `round-2-match-${matchNum}`,
@@ -137,7 +148,7 @@ const addRound2Match = (matchNum, song1Data, song2Data) => {
         tournamentName: TOURNAMENT_CONFIG.name,
         round: 2,
         matchNumber: matchNum,
-        batch: Math.floor((matchNum - 1) / 4) + 1,  // Batches 1-4 (4 per batch)
+        batch: Math.floor((matchNum - 1) / 4) + 1,
         status: 'upcoming',
         totalVotes: 0,
         winnerId: null,
@@ -146,91 +157,31 @@ const addRound2Match = (matchNum, song1Data, song2Data) => {
     });
 };
 
-// TOP QUARTER (Matches 1-4): Seed #1's Region - BATCH 1
-addRound2Match(1, 
-    { ...byeSeeds[0], hasBye: true },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-1' }
-);
+// TOP QUARTER – Seed #1 Region
+addRound2Match(1,  { ...byeSeeds[0], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-1' });
+addRound2Match(2,  { ...TBD, sourceMatch: 'round-1-match-2' },                   { ...TBD, sourceMatch: 'round-1-match-3' });
+addRound2Match(3,  { ...TBD, sourceMatch: 'round-1-match-4' },                   { ...TBD, sourceMatch: 'round-1-match-5' });
+addRound2Match(4,  { ...TBD, sourceMatch: 'round-1-match-6' },                   { ...TBD, sourceMatch: 'round-1-match-7' });
 
-addRound2Match(2,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-5' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-6' }
-);
+// UPPER-MIDDLE – Seed #3 Region
+addRound2Match(5,  { ...byeSeeds[2], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-8' });
+addRound2Match(6,  { ...TBD, sourceMatch: 'round-1-match-9' },                    { ...TBD, sourceMatch: 'round-1-match-10' });
+addRound2Match(7,  { ...TBD, sourceMatch: 'round-1-match-11' },                   { ...TBD, sourceMatch: 'round-1-match-12' });
+addRound2Match(8,  { ...TBD, sourceMatch: 'round-1-match-13' },                   { ...TBD, sourceMatch: 'round-1-match-14' });
 
-addRound2Match(3,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-2' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-9' }
-);
+// LOWER-MIDDLE – No bye
+addRound2Match(9,  { ...TBD, sourceMatch: 'round-1-match-15' },                   { ...TBD, sourceMatch: 'round-1-match-16' });
+addRound2Match(10, { ...TBD, sourceMatch: 'round-1-match-17' },                   { ...TBD, sourceMatch: 'round-1-match-18' });
+addRound2Match(11, { ...TBD, sourceMatch: 'round-1-match-19' },                   { ...TBD, sourceMatch: 'round-1-match-20' });
+addRound2Match(12, { ...TBD, sourceMatch: 'round-1-match-21' },                   { ...TBD, sourceMatch: 'round-1-match-22' });
 
-addRound2Match(4,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-10' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-13' }
-);
+// BOTTOM – Seed #2 Region
+addRound2Match(13, { ...byeSeeds[1], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-23' });
+addRound2Match(14, { ...TBD, sourceMatch: 'round-1-match-24' },                   { ...TBD, sourceMatch: 'round-1-match-25' });
+addRound2Match(15, { ...TBD, sourceMatch: 'round-1-match-26' },                   { ...TBD, sourceMatch: 'round-1-match-27' });
+addRound2Match(16, { ...TBD, sourceMatch: 'round-1-match-28' },                   { ...TBD, sourceMatch: 'round-1-match-29' });
 
-// UPPER-MIDDLE QUARTER (Matches 5-8): Seed #3's Region - BATCH 2
-addRound2Match(5,
-    { ...byeSeeds[2], hasBye: true },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-3' }
-);
-
-addRound2Match(6,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-8' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-11' }
-);
-
-addRound2Match(7,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-4' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-7' }
-);
-
-addRound2Match(8,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-12' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-15' }
-);
-
-// LOWER-MIDDLE QUARTER (Matches 9-12) - BATCH 3
-addRound2Match(9,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-16' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-19' }
-);
-
-addRound2Match(10,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-24' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-27' }
-);
-
-addRound2Match(11,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-20' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-23' }
-);
-
-addRound2Match(12,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-28' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-29' }
-);
-
-// BOTTOM QUARTER (Matches 13-16): Seed #2's Region - BATCH 4
-addRound2Match(13,
-    { ...byeSeeds[1], hasBye: true },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-14' }
-);
-
-addRound2Match(14,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-21' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-22' }
-);
-
-addRound2Match(15,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-17' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-26' }
-);
-
-addRound2Match(16,
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-18' },
-    { id: 'TBD', seed: '?', shortTitle: 'TBD', title: 'To Be Determined', artist: 'Pending', videoId: 'dQw4w9WgXcQ', year: '2024', slug: 'tbd', sourceMatch: 'round-1-match-25' }
-);
-
-console.log(`✅ Round 2: 16 matches in 4 batches (${allMatches.length} total)`);
+console.log('Round 2: 16 matches correctly mapped – all 29 R1 winners now feed perfectly');
  // ========================================
     // ROUND 3: 8 MATCHES (4 per batch = 2 batches)
     // ========================================
@@ -428,7 +379,7 @@ console.log(`✅ Round 2: 16 matches in 4 batches (${allMatches.length} total)`)
         }
     });
     
-    console.log(`✅ Finals: 1 match (${allMatches.length} total)`);
+    console.log(`✅ The Finals: 1 match (${allMatches.length} total)`);
     
     return allMatches;
 }
