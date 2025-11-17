@@ -32,21 +32,20 @@ let matchStates = {}; // Track previous states for comeback detection
 let recentlyShownBulletins = new Map(); // ✅ NEW: Track shown toasts with timestamps
 
 const COOLDOWN_MINUTES = {
- danger: 5,          // First danger alert - show quickly
-    'danger-repeat': 15, // ✅ Subsequent danger alerts - less frequent    novotes: 5,         // Critical - needs votes urgently
-    nailbiter: 10,      // Important - check back soon
-    comeback: 15,       // Exciting but not urgent
-    winning: 30,        // Low priority - just FYI
-    lowvotes: 15,       // Moderate urgency
-    welcome: 720,       // 12 hours - only for new visitors
-    encouragement: 120, // 2 hours - gentle nudge
-    achievement: 0,     // ✅ No cooldown - one-time events (handled by staggering in vote.js)
-    'level-up': 0,
-      // ✅ NEW: Engagement toasts
-    // ✅ NEW: Engagement toasts
-    trending: 30,        // 30 min - if still trending after 30min, it's genuine
-    votesurge: 30,
-    mostviewed: 90       // 90 min - lower priority, less frequent
+    danger: 5,           // ✅ Keep - urgent
+    'danger-repeat': 10, // 🔽 Reduce from 15 - still losing is urgent
+    novotes: 5,          // ✅ Keep - critical
+    nailbiter: 10,       // ✅ Keep - perfect urgency
+    comeback: 10,        // 🔽 Reduce from 15 - exciting news!
+    winning: 20,         // 🔽 Reduce from 30 - users like wins
+    lowvotes: 15,        // ✅ Keep - moderate urgency
+    welcome: 720,        // ✅ Keep - 12 hours is right
+    encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
+    achievement: 0,      // ✅ Keep - one-time
+    'level-up': 0,       // ✅ Keep - one-time
+    trending: 30,        // ✅ Keep - good for engagement
+    votesurge: 30,       // ✅ Keep
+    mostviewed: 60       // 🔽 Reduce from 90 - still low priority but more active
 };
 
 
@@ -1410,15 +1409,20 @@ window.handleBulletinCTA = function() {
     if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
             window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
+            return; // ✅ Don't hide - page is navigating away
         } else {
             showNotificationToast('Match not available', 'error');
+            hideBulletin(); // ✅ Hide only on error
+            return;
         }
     }
     // Handle general navigation (welcome, encouragement, etc.)
     else if (currentBulletin.action === 'navigate' && currentBulletin.targetUrl) {
         window.location.href = currentBulletin.targetUrl;
+        return; // ✅ Don't hide - page is navigating away
     }
     
+    // ✅ Only hide if no navigation happened
     hideBulletin();
 };
 
