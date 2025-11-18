@@ -1,5 +1,5 @@
 // ========================================
-// SETTINGS PAGE - PROFILE MANAGEMENT
+// SETTINGS MODAL - PROFILE MANAGEMENT
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
@@ -31,13 +31,19 @@ const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champi
 
 let selectedChampion = null;
 let hasChanges = false;
+let modalElement = null;
 
 // ========================================
-// INITIALIZE PAGE
+// OPEN SETTINGS MODAL
 // ========================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('⚙️ Settings page loaded');
+export function openSettingsModal() {
+    console.log('⚙️ Opening settings modal...');
+    
+    // Create modal if it doesn't exist
+    if (!modalElement) {
+        createModalHTML();
+    }
     
     // Load current profile
     loadCurrentProfile();
@@ -48,9 +54,148 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup event listeners
     setupEventListeners();
     
-    // Hide loading overlay
-    hideLoadingOverlay();
-});
+    // Show modal with animation
+    setTimeout(() => {
+        modalElement.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+    }, 10);
+}
+
+// ========================================
+// CLOSE SETTINGS MODAL
+// ========================================
+
+function closeSettingsModal() {
+    if (!modalElement) return;
+    
+    // Check for unsaved changes
+    if (hasChanges) {
+        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+            return;
+        }
+    }
+    
+    modalElement.classList.remove('active');
+    document.body.style.overflow = ''; // Re-enable scroll
+    
+    // Reset state
+    hasChanges = false;
+    selectedChampion = null;
+    
+    console.log('✅ Settings modal closed');
+}
+
+// ========================================
+// CREATE MODAL HTML
+// ========================================
+
+function createModalHTML() {
+    const modalHTML = `
+        <div class="settings-modal-overlay" id="settingsModalOverlay">
+            <div class="settings-modal-container">
+                <div class="settings-modal-header">
+                    <h2><i class="fas fa-cog"></i> Profile Settings</h2>
+                    <button class="modal-close-btn" id="settingsModalClose">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="settings-modal-body">
+                    <!-- Profile Preview -->
+                    <div class="profile-preview-card" id="profilePreview">
+                        <div class="preview-avatar" id="previewAvatar">🎵</div>
+                        <div class="preview-info">
+                            <div class="preview-username" id="previewUsername">Guest</div>
+                            <div class="preview-rank" id="previewRank">Level 1 - New Voter</div>
+                            <div class="preview-stats" id="previewStats">
+                                <span><i class="fas fa-trophy"></i> 0 votes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Form -->
+                    <form id="settingsForm" class="settings-form">
+                        
+                        <!-- Username Section -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-user"></i> Username</h3>
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="usernameInput" 
+                                    placeholder="Enter username..." 
+                                    maxlength="20"
+                                    autocomplete="off"
+                                />
+                                <div class="form-hint">3-20 characters, letters, numbers, and underscores</div>
+                                <div class="form-error" id="usernameError"></div>
+                            </div>
+                        </div>
+
+                        <!-- Avatar Section -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-image"></i> Avatar</h3>
+                            <p class="section-description">Choose a League champion</p>
+                            
+                            <div class="avatar-search-wrapper">
+                                <input 
+                                    type="text" 
+                                    id="avatarSearch" 
+                                    placeholder="Search champions..." 
+                                    autocomplete="off"
+                                />
+                                <span class="search-icon">🔍</span>
+                            </div>
+                            
+                            <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
+                                <img id="selectedAvatarImg" src="" alt="Selected avatar" />
+                                <span id="selectedAvatarName">No champion selected</span>
+                                <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="avatar-grid" id="avatarGrid">
+                                <!-- Champion grid will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Privacy Section -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-shield-alt"></i> Privacy</h3>
+                            
+                            <label class="toggle-label">
+                                <input type="checkbox" id="publicToggle" class="toggle-input" />
+                                <span class="toggle-slider"></span>
+                                <div class="toggle-info">
+                                    <strong>Make my votes public</strong>
+                                    <p>Appear in Community Activity feed</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Inject modal into body
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer.firstElementChild);
+    
+    modalElement = document.getElementById('settingsModalOverlay');
+    
+    console.log('✅ Settings modal created');
+}
 
 // ========================================
 // LOAD CURRENT PROFILE
@@ -88,10 +233,7 @@ function loadCurrentProfile() {
         showSelectedAvatar();
     }
     
-    // Update stats
-    updateStatsPreview();
-    
-    console.log('✅ Profile loaded');
+    console.log('✅ Profile loaded in modal');
 }
 
 // ========================================
@@ -103,6 +245,8 @@ function updatePreviewCard(username, avatar, rank, xp) {
     const previewUsername = document.getElementById('previewUsername');
     const previewRank = document.getElementById('previewRank');
     const previewStats = document.getElementById('previewStats');
+    
+    if (!previewAvatar || !previewUsername || !previewRank || !previewStats) return;
     
     // Update avatar
     if (avatar && avatar.type === 'url') {
@@ -122,24 +266,9 @@ function updatePreviewCard(username, avatar, rank, xp) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
     const totalVotes = Object.keys(userVotes).length;
     previewStats.innerHTML = `
-        <span><i class="fas fa-trophy"></i> ${totalVotes} votes cast</span>
+        <span><i class="fas fa-trophy"></i> ${totalVotes} votes</span>
         <span><i class="fas fa-star"></i> ${xp.toLocaleString()} XP</span>
     `;
-}
-
-// ========================================
-// UPDATE STATS PREVIEW
-// ========================================
-
-function updateStatsPreview() {
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    const totalVotes = Object.keys(userVotes).length;
-    const streak = parseInt(localStorage.getItem('votingStreak') || '0');
-    const xp = getUserXPFromStorage();
-    
-    document.getElementById('totalVotesStat').textContent = totalVotes;
-    document.getElementById('streakStat').textContent = streak;
-    document.getElementById('xpStat').textContent = xp.toLocaleString();
 }
 
 // ========================================
@@ -148,6 +277,7 @@ function updateStatsPreview() {
 
 function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
+    if (!grid) return;
     
     const html = CHAMPIONS.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
@@ -167,31 +297,87 @@ function renderChampionGrid() {
 
 function setupEventListeners() {
     // Form submission
-    document.getElementById('settingsForm').addEventListener('submit', handleSaveSettings);
+    const form = document.getElementById('settingsForm');
+    if (form) {
+        form.removeEventListener('submit', handleSaveSettings); // Remove old listener
+        form.addEventListener('submit', handleSaveSettings);
+    }
+    
+    // Close buttons
+    const closeBtn = document.getElementById('settingsModalClose');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const overlay = document.getElementById('settingsModalOverlay');
+    
+    if (closeBtn) {
+        closeBtn.removeEventListener('click', closeSettingsModal);
+        closeBtn.addEventListener('click', closeSettingsModal);
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.removeEventListener('click', closeSettingsModal);
+        cancelBtn.addEventListener('click', closeSettingsModal);
+    }
+    
+    // Click outside to close
+    if (overlay) {
+        overlay.removeEventListener('click', handleOverlayClick);
+        overlay.addEventListener('click', handleOverlayClick);
+    }
     
     // Avatar search
-    document.getElementById('avatarSearch').addEventListener('input', handleAvatarSearch);
+    const searchInput = document.getElementById('avatarSearch');
+    if (searchInput) {
+        searchInput.removeEventListener('input', handleAvatarSearch);
+        searchInput.addEventListener('input', handleAvatarSearch);
+    }
     
     // Champion selection
-    document.getElementById('avatarGrid').addEventListener('click', handleChampionClick);
+    const avatarGrid = document.getElementById('avatarGrid');
+    if (avatarGrid) {
+        avatarGrid.removeEventListener('click', handleChampionClick);
+        avatarGrid.addEventListener('click', handleChampionClick);
+    }
     
     // Clear avatar button
-    document.getElementById('clearAvatarBtn').addEventListener('click', clearSelectedAvatar);
-    
-    // Clear profile button
-    document.getElementById('clearProfileBtn').addEventListener('click', handleClearProfile);
+    const clearBtn = document.getElementById('clearAvatarBtn');
+    if (clearBtn) {
+        clearBtn.removeEventListener('click', clearSelectedAvatar);
+        clearBtn.addEventListener('click', clearSelectedAvatar);
+    }
     
     // Track changes
-    document.getElementById('usernameInput').addEventListener('input', () => hasChanges = true);
-    document.getElementById('publicToggle').addEventListener('change', () => hasChanges = true);
+    const usernameInput = document.getElementById('usernameInput');
+    const publicToggle = document.getElementById('publicToggle');
     
-    // Warn before leaving if unsaved changes
-    window.addEventListener('beforeunload', (e) => {
-        if (hasChanges) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
+    if (usernameInput) {
+        usernameInput.removeEventListener('input', trackChanges);
+        usernameInput.addEventListener('input', trackChanges);
+    }
+    
+    if (publicToggle) {
+        publicToggle.removeEventListener('change', trackChanges);
+        publicToggle.addEventListener('change', trackChanges);
+    }
+    
+    // ESC key to close
+    document.removeEventListener('keydown', handleEscapeKey);
+    document.addEventListener('keydown', handleEscapeKey);
+}
+
+function trackChanges() {
+    hasChanges = true;
+}
+
+function handleEscapeKey(e) {
+    if (e.key === 'Escape' && modalElement && modalElement.classList.contains('active')) {
+        closeSettingsModal();
+    }
+}
+
+function handleOverlayClick(e) {
+    if (e.target.id === 'settingsModalOverlay') {
+        closeSettingsModal();
+    }
 }
 
 // ========================================
@@ -255,9 +441,11 @@ function showSelectedAvatar() {
     const img = document.getElementById('selectedAvatarImg');
     const name = document.getElementById('selectedAvatarName');
     
-    img.src = selectedChampion.url;
-    name.textContent = selectedChampion.displayName;
-    display.style.display = 'flex';
+    if (display && img && name) {
+        img.src = selectedChampion.url;
+        name.textContent = selectedChampion.displayName;
+        display.style.display = 'flex';
+    }
 }
 
 // ========================================
@@ -269,7 +457,9 @@ function clearSelectedAvatar() {
     hasChanges = true;
     
     const display = document.getElementById('selectedAvatarDisplay');
-    display.style.display = 'none';
+    if (display) {
+        display.style.display = 'none';
+    }
     
     // Remove selection styling
     document.querySelectorAll('.champion-avatar-option').forEach(opt => {
@@ -310,6 +500,8 @@ async function handleSaveSettings(e) {
     const errorEl = document.getElementById('usernameError');
     const publicToggle = document.getElementById('publicToggle');
     
+    if (!usernameInput || !errorEl || !publicToggle) return;
+    
     const username = usernameInput.value.trim();
     const isPublic = publicToggle.checked;
     
@@ -319,7 +511,7 @@ async function handleSaveSettings(e) {
         errorEl.textContent = validation.error;
         errorEl.style.display = 'block';
         usernameInput.focus();
-        return;
+        return false;
     }
     
     // Hide error
@@ -362,32 +554,13 @@ async function handleSaveSettings(e) {
     
     // Reload preview
     loadCurrentProfile();
-}
-
-// ========================================
-// HANDLE CLEAR PROFILE
-// ========================================
-
-function handleClearProfile() {
-    if (!confirm('⚠️ Are you sure you want to clear your profile data? This will remove your username, avatar, and privacy settings. Your vote history will remain.')) {
-        return;
-    }
     
-    // Clear profile data
-    localStorage.removeItem('username');
-    localStorage.removeItem('avatar');
-    localStorage.removeItem('isPublic');
-    localStorage.removeItem('profileTipShown');
-    
-    console.log('🗑️ Profile data cleared');
-    
-    // Show notification
-    showNotification('Profile data cleared. Reloading...', 'info');
-    
-    // Reload page
+    // Close modal after short delay
     setTimeout(() => {
-        window.location.reload();
-    }, 1500);
+        closeSettingsModal();
+    }, 1000);
+    
+    return true;
 }
 
 // ========================================
@@ -395,6 +568,13 @@ function handleClearProfile() {
 // ========================================
 
 function showNotification(message, type = 'success') {
+    // Use global notification if available
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Fallback notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
@@ -417,7 +597,7 @@ function showNotification(message, type = 'success') {
         font-size: 0.95rem;
         font-weight: 600;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
+        z-index: 100000;
         animation: slideIn 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
     `;
@@ -431,14 +611,13 @@ function showNotification(message, type = 'success') {
 }
 
 // ========================================
-// HIDE LOADING OVERLAY
+// EXPORT AND GLOBAL ACCESS
 // ========================================
 
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
+export { closeSettingsModal };
 
-console.log('✅ Settings.js loaded');
+// Make globally accessible
+window.openSettingsModal = openSettingsModal;
+window.closeSettingsModal = closeSettingsModal;
+
+console.log('✅ Settings modal module loaded');

@@ -1149,3 +1149,18 @@
     color: #C8AA6E;
     transform: rotate(90deg);
 }
+/* ========================================
+   SETTINGS ICON (PROFILE CARD)
+   ======================================== */
+
+.profile-settings-icon {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-profile-card:hover .profile-settings-icon {
+    color: #C8AA6E;
+    transform: rotate(90deg);
+}

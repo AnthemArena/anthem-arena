@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a></li>
             </ul>
             
-         <!-- ✅ NEW: PROFILE + RANK DISPLAY WITH SETTINGS ICON -->
+     <!-- ✅ NEW: PROFILE + RANK DISPLAY WITH SETTINGS ICON -->
 <div class="nav-profile-container" id="navProfileContainer" style="display: none;">
-    <a href="/settings.html" class="nav-profile-card" id="navProfileCard" title="Profile Settings">
+    <a href="#" class="nav-profile-card" id="navProfileCard" title="Profile Settings" onclick="window.openSettingsModal(); return false;">
         <div class="profile-avatar" id="navProfileAvatar">
             🎵
         </div>
