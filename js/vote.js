@@ -17,6 +17,7 @@ import { getAllTournamentStats } from './music-gallery.js';
 import { getBookForSong } from './bookMappings.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
 import { updateNavRank } from './navigation.js';
+import { ensureUsername } from './username-system.js';
 // ✅ Import global notification system for achievement/level-up toasts
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
@@ -198,6 +199,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ⭐ NEW: Get user ID first
     userId = await getUserId();
     console.log('👤 User ID:', userId);
+
+
 
     // ✅ ADD THIS: Initialize founding member tracking
     await initFoundingMemberTracking();
@@ -1523,6 +1526,49 @@ async function submitVote(songId) {
         
         // ✅ NEW: Also save in userVotes format for homepage/matches pages
         saveVoteForOtherPages(currentMatch.id, songId);
+
+     
+       // ========================================
+        // ✅ NEW: LOG ACTIVITY IF PUBLIC PROFILE
+        // ========================================
+        const username = localStorage.getItem('username');
+        const isPublic = localStorage.getItem('isPublic') === 'true';
+        const avatarJson = localStorage.getItem('avatar');
+        
+        // Parse avatar (could be emoji or URL)
+        let avatar;
+        try {
+            avatar = JSON.parse(avatarJson);
+        } catch {
+            // Fallback for old emoji-only format
+            avatar = { type: 'emoji', value: avatarJson || '🎵' };
+        }
+        
+        if (isPublic && username) {
+            try {
+                const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+                const activityId = `${userId}_${currentMatch.id}`;
+                
+                await setDoc(doc(db, 'activity', activityId), {
+                    activityId: activityId,
+                    userId: userId,
+                    username: username,
+                    avatar: avatar,
+                    matchId: currentMatch.id,
+                    matchTitle: `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`,
+                    songId: songId,
+                    songTitle: votedSong.name,
+                    timestamp: Date.now(),
+                    round: currentMatch.round,
+                    tournamentId: ACTIVE_TOURNAMENT
+                });
+                
+                console.log('✅ Activity logged to Firebase');
+            } catch (activityError) {
+                console.warn('⚠️ Could not log activity:', activityError);
+                // Don't block vote submission if activity logging fails
+            }
+        }
         
         // ========================================
         // ✅ NEW: CALCULATE AND AWARD XP
@@ -1581,7 +1627,7 @@ async function submitVote(songId) {
         // Update UI with fresh vote count
         updateVoteCountsUI();
 
-        // ✅ Hide spinner before showing modal
+// ✅ Hide spinner before showing modal
         hideLoadingSpinner();
 
         // ✅ SAFETY CHECK: Ensure we have valid data before showing modal
@@ -1596,14 +1642,16 @@ async function submitVote(songId) {
         } else {
             // Show modal with correct numbers
             showPostVoteModal(songName, songData, xpData, rank);
-        }
+        } // ✅ CLOSE THE ELSE BLOCK HERE
+
+       
 
         // Load other live matches
         await loadOtherLiveMatches();
 
         console.log('✅ Vote submitted successfully!');
         
-    } catch (error) {
+    } catch (error) { // ✅ NOW THE CATCH PROPERLY PAIRS WITH TRY
         hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
@@ -1617,6 +1665,17 @@ async function submitVote(songId) {
             btn.style.cursor = 'pointer';
         });
     }
+
+    // ✅ Show one-time tip to set username
+const hasUsername = localStorage.getItem('username');
+const tipShown = localStorage.getItem('profileTipShown');
+
+if (!hasUsername && !tipShown) {
+    setTimeout(() => {
+        showProfileTip();
+        localStorage.setItem('profileTipShown', 'true');
+    }, 2000); // 2 seconds after post-vote modal
+}
 }
 
 
@@ -2676,6 +2735,7 @@ function closePostVoteModal() {
         modal.style.display = 'none';
         document.body.style.overflow = '';
     }
+    
 }
 
 /**
@@ -2830,4 +2890,43 @@ async function trackMatchView(matchId) {
     }
 }
 
-   
+   /**
+ * Show one-time profile tip
+ */
+function showProfileTip() {
+    const tip = document.createElement('div');
+    tip.className = 'profile-tip';
+    tip.innerHTML = `
+        <div class="tip-content">
+            <span class="tip-icon">💡</span>
+            <div class="tip-text">
+                <strong>Set your username to appear on leaderboards!</strong>
+                <p>Click your profile in the top-right corner</p>
+            </div>
+            <button class="tip-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+        </div>
+    `;
+    
+    tip.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95));
+        color: #0a0a0a;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        z-index: 9999;
+        max-width: 350px;
+        animation: slideInRight 0.4s ease;
+        font-family: 'Lora', serif;
+    `;
+    
+    document.body.appendChild(tip);
+    
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+        tip.style.animation = 'slideOutRight 0.4s ease';
+        setTimeout(() => tip.remove(), 400);
+    }, 8000);
+}

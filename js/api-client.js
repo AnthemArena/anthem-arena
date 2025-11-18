@@ -134,3 +134,32 @@ export async function getTotalVotes() {
         return { totalVotes: 0, milestoneReached: false, timestamp: Date.now() };
     }
 }
+/**
+ * Get activity feed (cached at edge)
+ */
+export async function getActivityFeed(limit = 50) {
+    try {
+        console.log(`📊 Fetching activity feed (limit: ${limit})...`);
+        
+        const response = await fetch(`${API_BASE}/activity?limit=${limit}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const cacheStatus = response.headers.get('X-Cache');
+        
+        console.log(`✅ Activity feed loaded: ${data.length} items (Cache: ${cacheStatus || 'UNKNOWN'})`);
+        
+        return Array.isArray(data) ? data : [];
+        
+    } catch (error) {
+        console.error('❌ Error fetching activity feed:', error);
+        return [];
+    }
+}

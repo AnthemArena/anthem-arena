@@ -1,9 +1,8 @@
 // ========================================
-// NAVIGATION WITH RANK SYSTEM
+// NAVIGATION WITH RANK SYSTEM + PROFILE
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
-// ❌ Removed: calculateUserXP, Firebase imports (not needed here)
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
@@ -24,22 +23,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="/matches">Matches</a></li>
                 <li><a href="/stats">Stats</a></li>
                 <li><a href="/about">About</a></li>
+                <li><a href="/activity.html" class="nav-link">
+                    <i class="fas fa-users"></i> Community
+                </a></li>
             </ul>
             
-            <!-- ✅ RANK DISPLAY -->
-            <div class="nav-rank-container" id="navRankContainer" style="display: none;">
-                <a href="/my-votes" class="nav-rank-mini" id="navRankMini" title="Your rank">
-                    <div class="rank-level-badge">
-                        <span class="rank-level-number">1</span>
-                    </div>
-                    <div class="rank-mini-info">
-                        <div class="rank-mini-progress">
-                            <div class="rank-mini-bar" style="width: 0%"></div>
-                        </div>
-                        <span class="rank-mini-title">New Voter</span>
-                    </div>
-                </a>
+         <!-- ✅ NEW: PROFILE + RANK DISPLAY WITH SETTINGS ICON -->
+<div class="nav-profile-container" id="navProfileContainer" style="display: none;">
+    <a href="/settings.html" class="nav-profile-card" id="navProfileCard" title="Profile Settings">
+        <div class="profile-avatar" id="navProfileAvatar">
+            🎵
+        </div>
+        <div class="profile-info">
+            <div class="profile-username" id="navProfileUsername">Guest</div>
+            <div class="profile-rank-mini">
+                <div class="rank-progress-bar">
+                    <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
+                </div>
+                <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
             </div>
+        </div>
+        <i class="fas fa-cog profile-settings-icon"></i>
+    </a>
+</div>
             
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
                 <span class="hamburger"></span>
@@ -56,11 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-links a').forEach(link => {
         const linkPath = link.getAttribute('href').replace(/\/$/, '') || '/';
         
-        // Normalize paths for comparison
         const normalizedCurrent = currentPath === '' ? '/' : currentPath;
         const normalizedLink = linkPath === '' ? '/' : linkPath;
         
-        // Check if current page matches link
         if (normalizedCurrent === normalizedLink || 
             normalizedCurrent.startsWith(normalizedLink + '/') ||
             (normalizedLink === '/' && (normalizedCurrent === '/' || normalizedCurrent === '/index'))) {
@@ -79,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.toggle('menu-open');
         });
         
-        // Close menu when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.main-nav')) {
                 navLinks.classList.remove('active');
@@ -88,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Close menu when clicking a link
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function() {
                 navLinks.classList.remove('active');
@@ -98,93 +100,102 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ✅ LOAD RANK DISPLAY
-    console.log('🎯 Calling updateNavRank...');
-    updateNavRank();
+    // ✅ LOAD PROFILE + RANK DISPLAY
+    console.log('🎯 Calling updateNavProfile...');
+    updateNavProfile();
 });
 
 // ========================================
-// UPDATE NAVIGATION RANK DISPLAY
+// UPDATE NAVIGATION PROFILE + RANK DISPLAY
 // ========================================
 
-// ========================================
-// UPDATE NAVIGATION RANK DISPLAY
-// ========================================
-
-async function updateNavRank() {
-    const navRankContainer = document.getElementById('navRankContainer');
-    const navRank = document.getElementById('navRankMini');
+async function updateNavProfile() {
+    const navProfileContainer = document.getElementById('navProfileContainer');
+    const navProfileCard = document.getElementById('navProfileCard');
     
-    console.log('🔍 Updating nav rank display...');
+    console.log('🔍 Updating nav profile display...');
     
-    if (!navRank || !navRankContainer) {
-        console.error('❌ Rank elements not found in DOM');
+    if (!navProfileCard || !navProfileContainer) {
+        console.error('❌ Profile elements not found in DOM');
         return;
     }
     
     try {
-        // Get user ID
-        const userId = localStorage.getItem('tournamentUserId');
-        
-        if (!userId) {
-            console.warn('⚠️ No voter ID found');
-            navRankContainer.style.display = 'none';
-            return;
-        }
-        
-        // ✅ Get XP from localStorage (instant, no Firebase call needed)
+        // Get user data from localStorage
+        const username = localStorage.getItem('username');
+        const avatarJson = localStorage.getItem('avatar');
         const currentXP = getUserXPFromStorage();
-        console.log('Current XP:', currentXP);
         
-        if (currentXP === 0) {
-            // No XP yet - hide rank display
-            console.log('⚠️ No XP found - hiding rank display');
-            navRankContainer.style.display = 'none';
+        // ✅ Check if user has voted at least once
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const hasVoted = Object.keys(userVotes).length > 0;
+        
+        if (!hasVoted) {
+            console.log('⚠️ User hasn\'t voted yet - hiding profile');
+            navProfileContainer.style.display = 'none';
             return;
         }
         
-        // Display rank
-        displayRank(currentXP);
-        navRankContainer.style.display = 'flex';
+        // ✅ Parse avatar
+        let avatar;
+        try {
+            avatar = JSON.parse(avatarJson);
+        } catch {
+            avatar = { type: 'emoji', value: '🎵' };
+        }
         
-        console.log('✅ Rank display updated successfully');
+        // ✅ Display avatar
+        const avatarEl = document.getElementById('navProfileAvatar');
+        if (avatarEl) {
+            if (avatar && avatar.type === 'url') {
+                avatarEl.innerHTML = `
+                    <img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <span class="nav-avatar-fallback" style="display: none;">👤</span>
+                `;
+            } else {
+                avatarEl.textContent = avatar?.value || '🎵';
+            }
+        }
+        
+        // ✅ Display username
+        const usernameEl = document.getElementById('navProfileUsername');
+        if (usernameEl) {
+            usernameEl.textContent = username || 'Voter';
+        }
+        
+        // ✅ Display rank
+        if (currentXP > 0) {
+            const rank = getUserRank(currentXP);
+            
+            const levelEl = document.getElementById('navRankLevel');
+            const progressEl = document.getElementById('navRankProgress');
+            
+            if (levelEl) {
+                levelEl.textContent = `Lv. ${rank.currentLevel.level}`;
+            }
+            
+            if (progressEl) {
+                progressEl.style.width = `${rank.progressPercentage}%`;
+            }
+            
+            // Update tooltip
+            const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+            if (rank.nextLevel) {
+                navProfileCard.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (${rank.progressXP}/${rank.xpForNextLevel} to next level)`;
+            } else {
+                navProfileCard.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (Maximum level!)`;
+            }
+        }
+        
+        // ✅ Show profile container
+        navProfileContainer.style.display = 'flex';
+        
+        console.log('✅ Profile display updated successfully');
         
     } catch (error) {
-        console.error('❌ Error updating nav rank:', error);
-        navRankContainer.style.display = 'none';
-    }
-}
-
-function displayRank(xp) {
-    const navRank = document.getElementById('navRankMini');
-    if (!navRank) return;
-    
-    const rank = getUserRank(xp);
-    
-    // Update level number
-    const levelNumber = navRank.querySelector('.rank-level-number');
-    if (levelNumber) {
-        levelNumber.textContent = rank.currentLevel.level;
-    }
-    
-    // Update progress bar
-    const progressBar = navRank.querySelector('.rank-mini-bar');
-    if (progressBar) {
-        progressBar.style.width = `${rank.progressPercentage}%`;
-    }
-    
-    // Update title (remove emoji for cleaner look in nav)
-    const titleSpan = navRank.querySelector('.rank-mini-title');
-    if (titleSpan) {
-        const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
-        titleSpan.textContent = cleanTitle;
-    }
-    
-    // Update tooltip
-    if (rank.nextLevel) {
-        navRank.title = `${rank.currentLevel.title} - Level ${rank.currentLevel.level}\n${xp.toLocaleString()} XP (${rank.progressXP}/${rank.xpForNextLevel} to next level)`;
-    } else {
-        navRank.title = `${rank.currentLevel.title} - Level ${rank.currentLevel.level}\n${xp.toLocaleString()} XP (Maximum level!)`;
+        console.error('❌ Error updating nav profile:', error);
+        navProfileContainer.style.display = 'none';
     }
 }
 
@@ -192,7 +203,10 @@ function displayRank(xp) {
 // EXPORT FOR USE IN OTHER FILES
 // ========================================
 
-export { updateNavRank };
+export { updateNavProfile };
 
-// ✅ Make updateNavRank globally available for rank-system.js to call
-window.updateNavRank = updateNavRank;
+// ✅ Make updateNavProfile globally available
+window.updateNavProfile = updateNavProfile;
+
+// ✅ Keep backward compatibility
+window.updateNavRank = updateNavProfile;

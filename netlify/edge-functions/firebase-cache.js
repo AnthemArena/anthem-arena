@@ -34,6 +34,12 @@ export default async (request, context) => {
   if (pathname === "/api/view-stats") {
     return handleViewStats(matchId);
   }
+
+    
+  // ✅ ADD THIS NEW BLOCK:
+  if (pathname === "/api/activity") {
+    return handleActivityFeed(request);
+  }
   
   // ✅ Check for cache bypass (after voting)
   const bypassCache = url.searchParams.get('_refresh') !== null;
@@ -408,6 +414,95 @@ async function handleTotalVotes(request) {
 }
 
 // ========================================
+// ✅ NEW: ACTIVITY FEED HANDLER
+// ========================================
+
+async function handleActivityFeed(request) {
+  const url = new URL(request.url);
+  const limit = parseInt(url.searchParams.get('limit')) || 50;
+  const bypassCache = url.searchParams.get('_refresh') !== null;
+  
+  const cacheKey = `activity-feed-${limit}`;
+  
+  // Check cache (unless bypassed)
+  if (!bypassCache) {
+    const cached = edgeCache.get(cacheKey);
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp) < CACHE_DURATION * 1000) {
+      console.log(`✅ CACHE HIT: ${cacheKey}`);
+      return new Response(JSON.stringify(cached.data), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+          "X-Cache": "HIT",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+  }
+  
+  console.log(`${bypassCache ? '🔄 CACHE BYPASS' : '❌ CACHE MISS'}: ${cacheKey}`);
+  
+  try {
+    // Query activity collection using structured query
+    const activityUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
+    
+    const response = await fetch(activityUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        structuredQuery: {
+          from: [{ collectionId: 'activity' }],
+          orderBy: [{ 
+            field: { fieldPath: 'timestamp' }, 
+            direction: 'DESCENDING' 
+          }],
+          limit: limit
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Firebase error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Transform results
+    const activities = data
+      .filter(item => item.document)
+      .map(item => convertDocument(item.document));
+    
+    console.log(`✅ Fetched ${activities.length} activity items`);
+    
+    // Cache result
+    edgeCache.set(cacheKey, { data: activities, timestamp: Date.now() });
+    
+    return new Response(JSON.stringify(activities), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+        "X-Cache": bypassCache ? "REFRESH" : "MISS",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Activity feed error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+  }
+}
+
+// ========================================
 // ✅ NEW: ATTACH VOTE COUNTS
 // ========================================
 
@@ -593,11 +688,17 @@ function extractValue(field) {
   return null;
 }
 
+
+
+// ========================================
+// CONFIGURE ROUTES
+// ========================================
+
 // ========================================
 // CONFIGURE ROUTES
 // ========================================
 
 // Update config to include new endpoint
 export const config = {
-  path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats", "/api/total-votes"]
+  path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats", "/api/total-votes", "/api/activity"]
 };
