@@ -214,8 +214,8 @@ export function addXP(xpToAdd, source = 'vote') {
         }
         
         // Update nav if available
-        if (window.updateNavRank) {
-            window.updateNavRank();
+        if (window.updateNavProfile) {
+            window.updateNavProfile();
         }
     }
     

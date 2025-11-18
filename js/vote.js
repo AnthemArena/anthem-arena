@@ -16,7 +16,7 @@ import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 import { getAllTournamentStats } from './music-gallery.js';
 import { getBookForSong } from './bookMappings.js';
 import { calculateVoteXP, addXP, getUserRank } from './rank-system.js';
-import { updateNavRank } from './navigation.js';
+import { updateNavProfile  } from './navigation.js';
 import { ensureUsername } from './username-system.js';
 // ✅ Import global notification system for achievement/level-up toasts
 import './global-notifications.js';
@@ -1591,10 +1591,10 @@ async function submitVote(songId) {
         console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
 
         // ✅ Update nav display immediately (with safety check)
-        if (window.updateNavRank) {
-            window.updateNavRank();
+        if (window.updateNavProfile) {
+            window.updateNavProfile();
         } else {
-            console.warn('⚠️ updateNavRank not available yet');
+            console.warn('⚠️ updateNavProfile not available yet');
         }
 
         // ✅ ADD THIS: Check for founding member badge
@@ -1792,8 +1792,8 @@ if (newlyUnlocked.length > 0) {
     }
     
     // Update navigation rank (achievements award XP)
-    if (window.updateNavRank) {
-        window.updateNavRank();
+    if (window.updateNavProfile) {
+        window.updateNavProfile();
     }
 }
         
