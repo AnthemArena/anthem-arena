@@ -286,59 +286,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========================================
     // LOAD COMPETITOR DATA (JSON + FIREBASE)
     // ========================================
-    // ========================================
-    // LOAD COMPETITOR DATA (JSON + FIREBASE)
-    // ========================================
-    async function getCompetitorData(songId) {
-        try {
-            // Make sure song data is loaded
-            if (allSongsData.length === 0) {
-                const response = await fetch('/data/music-videos.json');
-                allSongsData = await response.json();
-            }
-            
-            // Find the song in the loaded data
-            const songData = allSongsData.find(v => v.id === songId);
-            
-            if (!songData) {
-                console.warn(`⚠️ No JSON data found for song ID: ${songId}`);
-                // Return minimal data so the page doesn't break
-                return {
-                    id: songId,
-                    stats: { championships: 0 },
-                    accolade: 'competitor',
-                    liveStats: {
-                        wins: 0,
-                        losses: 0,
-                        winRecord: "0-0",
-                        winRate: "0%",
-                        totalMatches: 0
-                    }
-                };
-            }
-            
-            // Get live tournament stats from Firebase (shared with gallery)
-            const tournamentStats = await getAllTournamentStats();
-            const liveStats = tournamentStats[songId] || {
-                wins: 0,
-                losses: 0,
-                winRecord: "0-0",
-                winRate: "0%",
-                totalMatches: 0
-            };
-            
-            console.log(`✅ Loaded data for ${songData.shortTitle}: ${liveStats.winRecord}`);
-            
-            return {
-                ...songData,
-                liveStats
-            };
-            
-        } catch (error) {
-            console.error('❌ Error loading competitor data:', error);
-            return null;
+  // ========================================
+// LOAD COMPETITOR DATA (JSON + FIREBASE)
+// ========================================
+async function getCompetitorData(songSeed) {  // ← Parameter is actually a seed number
+    try {
+        // Make sure song data is loaded
+        if (allSongsData.length === 0) {
+            const response = await fetch('/data/music-videos.json');
+            allSongsData = await response.json();
         }
+        
+        // ✅ FIX: Find by seed, not by id
+        const songData = allSongsData.find(v => v.seed === songSeed);
+        
+        if (!songData) {
+            console.warn(`⚠️ No JSON data found for seed: ${songSeed}`);
+            // Return minimal data so the page doesn't break
+            return {
+                seed: songSeed,
+                stats: { championships: 0 },
+                accolade: 'competitor',
+                liveStats: {
+                    wins: 0,
+                    losses: 0,
+                    winRecord: "0-0",
+                    winRate: "0%",
+                    totalMatches: 0
+                }
+            };
+        }
+        
+        // Get live tournament stats from Firebase (shared with gallery)
+        const tournamentStats = await getAllTournamentStats();
+        const liveStats = tournamentStats[songData.id] || {
+            wins: 0,
+            losses: 0,
+            winRecord: "0-0",
+            winRate: "0%",
+            totalMatches: 0
+        };
+        
+        console.log(`✅ Loaded data for ${songData.shortTitle} (seed ${songSeed}): ${liveStats.winRecord}`);
+        
+        return {
+            ...songData,
+            liveStats
+        };
+        
+    } catch (error) {
+        console.error('❌ Error loading competitor data:', error);
+        return null;
     }
+}
     
 
 // ========================================
