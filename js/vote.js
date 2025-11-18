@@ -551,6 +551,9 @@ async function updateCompetitorInfo(match) {
 
     async function loadMatchData(matchId) {
     try {
+             // ✅ Show spinner immediately
+        showLoadingSpinner('Loading match...');
+        
         console.log('📥 Loading match data from edge cache...');
 
         // ⭐ Load song data from JSON first
@@ -562,6 +565,8 @@ async function updateCompetitorInfo(match) {
         const matchData = await getMatch(matchId);
         
         if (!matchData) {
+                        hideLoadingSpinner(); // ✅ Hide spinner on error
+
             console.error('❌ Match not found:', matchId);
             showNotification('Match not found', 'error');
             return;
@@ -629,12 +634,17 @@ await updateCompetitorInfo(currentMatch);
             // ✅ NEW: Load other live matches (always, not just after voting)
 await loadOtherLiveMatches();
 
+     // ✅ Hide spinner when everything is loaded
+        hideLoadingSpinner();
+
             // ========================================
             // ✨ NEW: START REAL-TIME UPDATES
             // ========================================
         // ✨ Real-time updates will start AFTER user votes (not before)
             
         } catch (error) {
+                    hideLoadingSpinner(); // ✅ Hide spinner on error
+
             console.error('❌ Error loading match:', error);
             showNotification('Error loading match data', 'error');
         }
@@ -1261,6 +1271,40 @@ function trackShare(platform, context) {
     }, 500);
 }
 
+// ========================================
+// LOADING SPINNER HELPERS
+// ========================================
+
+/**
+ * Show loading spinner with custom message
+ * @param {string} message - Text to display under spinner
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+        }, 200); // Match fadeOut animation
+    }
+}
     // ========================================
     // ✨ NEW: SHOW VOTE URGENCY INDICATORS
     // ========================================
@@ -1433,8 +1477,8 @@ async function submitVote(songId) {
     });
     
     try {
-        // Show loading state
-        showNotification('Submitting your vote...', 'info');
+        // ✅ Show spinner with voting message
+        showLoadingSpinner('Submitting your vote...');
         
         // Determine which song was voted for (song1 or song2)
         const votedForSong1 = songId === 'song1';
@@ -1449,6 +1493,7 @@ async function submitVote(songId) {
         // Check if vote already exists (extra safety)
         const existingVote = await getDoc(voteRef);
         if (existingVote.exists()) {
+            hideLoadingSpinner(); // ✅ Hide spinner
             console.warn('⚠️ Vote already exists!');
             showNotification('You have already voted in this match!', 'error');
             disableVoting(existingVote.data().choice);
@@ -1488,73 +1533,78 @@ async function submitVote(songId) {
             isFirstVoteInMatch: checkIfFirstVoter()
         });
         
-       const newTotalXP = addXP(xpData.totalXP);
-const rank = getUserRank(newTotalXP);
+        const newTotalXP = addXP(xpData.totalXP);
+        const rank = getUserRank(newTotalXP);
 
-// ✅ Track voting streak
-updateVotingStreak();
+        // ✅ Track voting streak
+        updateVotingStreak();
 
-// ✅ NEW: Check for achievement unlocks
-await checkForAchievementUnlocks();
+        // ✅ NEW: Check for achievement unlocks
+        await checkForAchievementUnlocks();
 
-console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
+        console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
 
-// ✅ Update nav display immediately (with safety check)
-if (window.updateNavRank) {
-    window.updateNavRank();
-} else {
-    console.warn('⚠️ updateNavRank not available yet');
-}
+        // ✅ Update nav display immediately (with safety check)
+        if (window.updateNavRank) {
+            window.updateNavRank();
+        } else {
+            console.warn('⚠️ updateNavRank not available yet');
+        }
 
-// ✅ ADD THIS: Check for founding member badge
-const earnedFoundingBadge = awardFoundingMemberBadge();
-if (earnedFoundingBadge) {
-    console.log('👑 User earned Founding Member badge!');
-    // Toast will show automatically from founding-member-tracker.js
-}
+        // ✅ ADD THIS: Check for founding member badge
+        const earnedFoundingBadge = awardFoundingMemberBadge();
+        if (earnedFoundingBadge) {
+            console.log('👑 User earned Founding Member badge!');
+            // Toast will show automatically from founding-member-tracker.js
+        }
         
-       // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
-const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
-const songSeed = votedSong.seed;
-const songName = votedSong.name || votedSong.shortTitle || votedSong.title || 'Your Song';
-const songData = allSongsData.find(s => s.seed === songSeed) || votedSong;
+        // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
+        const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+        const songSeed = votedSong.seed;
+        const songName = votedSong.name || votedSong.shortTitle || votedSong.title || 'Your Song';
+        const songData = allSongsData.find(s => s.seed === songSeed) || votedSong;
 
-console.log('📊 Song data for modal:', { songName, songSeed, songData });
+        console.log('📊 Song data for modal:', { songName, songSeed, songData });
 
-// Reload with cache bypass to get fresh vote count
-await reloadMatchData(true);
+        // ✅ Update spinner message
+        showLoadingSpinner('Refreshing results...');
 
-// Show success notification
-showNotification(`✅ Vote cast for "${songName}"!`, 'success');
+        // Reload with cache bypass to get fresh vote count
+        await reloadMatchData(true);
 
-// Show voted indicator
-disableVoting(songId);
+        // Show success notification
+        showNotification(`✅ Vote cast for "${songName}"!`, 'success');
 
-// Update UI with fresh vote count
-updateVoteCountsUI();
+        // Show voted indicator
+        disableVoting(songId);
 
-// ✅ SAFETY CHECK: Ensure we have valid data before showing modal
-if (!songName || !songData || !xpData || !rank) {
-    console.error('❌ Missing data for post-vote modal:', {
-        songName,
-        songData: !!songData,
-        xpData: !!xpData,
-        rank: !!rank
-    });
-    showNotification('Vote recorded but modal failed to load', 'warning');
-} else {
-    // Show modal with correct numbers
-    showPostVoteModal(songName, songData, xpData, rank);
-}
+        // Update UI with fresh vote count
+        updateVoteCountsUI();
+
+        // ✅ Hide spinner before showing modal
+        hideLoadingSpinner();
+
+        // ✅ SAFETY CHECK: Ensure we have valid data before showing modal
+        if (!songName || !songData || !xpData || !rank) {
+            console.error('❌ Missing data for post-vote modal:', {
+                songName,
+                songData: !!songData,
+                xpData: !!xpData,
+                rank: !!rank
+            });
+            showNotification('Vote recorded but modal failed to load', 'warning');
+        } else {
+            // Show modal with correct numbers
+            showPostVoteModal(songName, songData, xpData, rank);
+        }
 
         // Load other live matches
         await loadOtherLiveMatches();
 
-       
-
         console.log('✅ Vote submitted successfully!');
         
     } catch (error) {
+        hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
         
