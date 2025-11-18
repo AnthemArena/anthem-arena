@@ -339,44 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
     }
-    // ========================================
-    // UPDATE COMPETITOR DISPLAY WITH STATS
-    // ========================================
-    async function updateCompetitorInfo(match) {
-        try {
-            console.log('🎯 Starting updateCompetitorInfo...');
-            
-            // Load full data for both competitors
-            const [comp1Data, comp2Data, h2hRecord] = await Promise.all([
-                getCompetitorData(match.competitor1.seed),
-                getCompetitorData(match.competitor2.seed),
-            ]);
-            
-            console.log('H2H Record:', h2hRecord);
-            
-            if (!comp1Data || !comp2Data) {
-                console.error('❌ Could not load competitor data');
-                return;
-            }
-            
-            // Get elements
-            const comp1Desc = document.getElementById('competitor1-description');
-            const comp1Meta = document.getElementById('competitor1-meta');
-            const comp2Desc = document.getElementById('competitor2-description');
-            const comp2Meta = document.getElementById('competitor2-meta');
-            
-            // Update with H2H data
-            updateCompetitorDescription(comp1Data, match.competitor1, match.round, comp1Desc, h2hRecord);
-            updateCompetitorMeta(comp1Data, match.competitor1, comp1Meta);
-            
-            updateCompetitorDescription(comp2Data, match.competitor2, match.round, comp2Desc, h2hRecord);
-            updateCompetitorMeta(comp2Data, match.competitor2, comp2Meta);
-            
-            console.log('✅ Competitor info updated with H2H stats');
-        } catch (error) {
-            console.error('❌ Error updating competitor info:', error);
-        }
-    }
+    
 
 // ========================================
 // UPDATE COMPETITOR DESCRIPTION (NOW ACCOMPLISHMENTS ONLY)
