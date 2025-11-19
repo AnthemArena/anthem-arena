@@ -623,6 +623,26 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             showBulletin(notification);
             recentlyShownBulletins.set(bulletinKey, Date.now());
 
+            // ✅ SAVE TO FIRESTORE for notification center
+const userId = localStorage.getItem('tournamentUserId');
+if (userId && userId !== 'anonymous' && notification.matchId) {
+    await saveNotification(userId, {
+        type: notification.type,
+        priority: notification.priority,
+        message: notification.message,
+        detail: notification.detail,
+        icon: notification.icon || icons[notification.type],
+        matchId: notification.matchId,
+        matchTitle: notification.song && notification.opponent ? 
+                   `${notification.song} vs ${notification.opponent}` : '',
+        thumbnailUrl: notification.thumbnailUrl,  // ✅ Include thumbnail
+        ctaText: notification.cta,
+        ctaAction: notification.action || 'navigate',
+        targetUrl: notification.targetUrl || `/vote.html?match=${notification.matchId}`,
+        shownAsToast: true
+    });
+}
+
             // ✅ NEW: Persist to sessionStorage (survives page refresh, expires on tab close)
 try {
     const persistedData = Object.fromEntries(recentlyShownBulletins);
