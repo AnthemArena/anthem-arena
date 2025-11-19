@@ -1550,13 +1550,17 @@ try {
  // ========================================
 // ✅ LOG ACTIVITY IF PUBLIC PROFILE
 // ========================================
+// ========================================
+// ✅ LOG ACTIVITY IF PUBLIC PROFILE
+// ========================================
 if (isPublic && username !== 'Anonymous') {
     try {
         const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
         const otherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
         const activityId = `${userId}_${currentMatch.id}`;
         
-        // ✅ Get clean song names
+        // ✅ Get the YouTube video ID (not "song1" or "song2")
+        const votedVideoId = votedSong.videoId;
         const votedSongName = votedSong.name || 'Unknown Song';
         const otherSongName = otherSong.name || 'Unknown Song';
         
@@ -1564,9 +1568,11 @@ if (isPublic && username !== 'Anonymous') {
         const matchTitle = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
         
         console.log('📝 Logging activity:', {
-            matchTitle,
-            votedSongName,
-            votedSong: votedSong.videoId
+            matchId: currentMatch.id,
+            matchTitle: matchTitle,
+            votedVideoId: votedVideoId,
+            votedSongName: votedSongName,
+            round: currentMatch.round
         });
         
         await setDoc(doc(db, 'activity', activityId), {
@@ -1575,17 +1581,26 @@ if (isPublic && username !== 'Anonymous') {
             username: username,
             avatar: avatar,
             matchId: currentMatch.id,
-            matchTitle: matchTitle,  // ✅ "The Line vs Fantastic"
-            songId: votedSong.videoId,  // ✅ Use videoId not songId
-            songTitle: votedSongName,  // ✅ "The Line"
+            matchTitle: matchTitle,           // ✅ "The Line vs Fantastic"
+            songId: votedVideoId,             // ✅ YouTube video ID (e.g., "E2Rj2gQAyPA")
+            songTitle: votedSongName,         // ✅ "The Line"
             timestamp: Date.now(),
             round: currentMatch.round,
             tournamentId: ACTIVE_TOURNAMENT
         });
         
-        console.log('✅ Activity logged:', matchTitle);
+        console.log('✅ Activity logged successfully:', {
+            matchTitle,
+            videoId: votedVideoId,
+            songName: votedSongName
+        });
     } catch (activityError) {
         console.error('❌ Could not log activity:', activityError);
+        console.error('Activity data that failed:', {
+            matchId: currentMatch?.id,
+            userId: userId,
+            username: username
+        });
         // Don't block vote submission if activity logging fails
     }
 }

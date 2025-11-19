@@ -16,16 +16,24 @@ async function loadMusicData() {
         const response = await fetch('/data/music-videos.json');
         const data = await response.json();
         
-        // Create a lookup map: songId -> video data
+        // Create multiple lookup maps for flexibility
         data.forEach(song => {
+            // Map by numeric ID
             musicData[song.id] = song;
-            // Also map by seed if songId is stored as seed
+            
+            // Map by seed
             if (song.seed) {
                 musicData[song.seed] = song;
+            }
+            
+            // ✅ NEW: Map by YouTube video ID (this is what activity.songId contains!)
+            if (song.videoId) {
+                musicData[song.videoId] = song;
             }
         });
         
         console.log(`✅ Loaded ${data.length} songs for thumbnails`);
+        console.log('📋 Sample video IDs mapped:', Object.keys(musicData).filter(k => k.includes('-') || k.length > 15).slice(0, 3));
     } catch (error) {
         console.error('❌ Error loading music data:', error);
     }
@@ -53,15 +61,30 @@ function renderAvatar(avatar) {
 /**
  * Get YouTube thumbnail URL from song data
  */
+/**
+ * Get YouTube thumbnail URL from song data
+ */
 function getYoutubeThumbnail(songId) {
+    // ✅ Look up by videoId (which is what songId actually contains)
     const song = musicData[songId];
+    
+    if (!song) {
+        console.warn(`⚠️ No song found for ID: ${songId}`);
+    }
     
     if (song && song.videoId) {
         // Use maxresdefault for best quality, fallback to hqdefault
-        return `https://img.youtube.com/vi/${song.videoId}/maxresdefault.jpg`;
+        return `https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg`;
+    }
+    
+    // If songId IS the videoId already, use it directly
+    if (songId && songId.length === 11) {
+        console.log(`📺 Using songId directly as videoId: ${songId}`);
+        return `https://img.youtube.com/vi/${songId}/mqdefault.jpg`;
     }
     
     // Fallback placeholder
+    console.warn(`❌ No thumbnail available for songId: ${songId}`);
     return 'https://via.placeholder.com/640x360/0a0a0a/C8AA6E?text=🎵';
 }
 
@@ -70,6 +93,11 @@ function getYoutubeThumbnail(songId) {
  */
 function getSongTitle(songId, fallbackTitle) {
     const song = musicData[songId];
+    
+    if (!song && fallbackTitle) {
+        console.log(`📝 Using fallback title for ${songId}: ${fallbackTitle}`);
+    }
+    
     return song?.shortTitle || song?.title || fallbackTitle || 'Unknown Song';
 }
 
