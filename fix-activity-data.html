@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fix Activity Data</title>
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        async function fixActivityData() {
+            console.log('🔧 Starting activity data fix...');
+            
+            // Load music data
+            const musicResponse = await fetch('/data/music-videos.json');
+            const musicData = await musicResponse.json();
+            
+            // Create lookup by seed
+            const musicBySeed = {};
+            musicData.forEach(song => {
+                musicBySeed[song.seed] = song;
+            });
+            
+            // Load matches to get match context
+            const matchesResponse = await fetch('/.netlify/functions/get-matches');
+            const matches = await matchesResponse.json();
+            
+            // Create lookup by matchId
+            const matchMap = {};
+            matches.forEach(match => {
+                matchMap[match.id || match.matchId] = match;
+            });
+            
+            console.log(`📊 Loaded ${musicData.length} songs and ${matches.length} matches`);
+            
+            // ✅ NEW: Load user profiles to get usernames
+            console.log('👤 Loading user profiles...');
+            const profilesRef = collection(db, 'profiles');
+            const profilesSnapshot = await getDocs(profilesRef);
+            
+            const userProfiles = {};
+            profilesSnapshot.forEach(profileDoc => {
+                const profile = profileDoc.data();
+                userProfiles[profileDoc.id] = profile;
+            });
+            
+            console.log(`✅ Loaded ${profilesSnapshot.size} user profiles`);
+            
+            // Get all activity documents
+            const activityRef = collection(db, 'activity');
+            const snapshot = await getDocs(activityRef);
+            
+            console.log(`📄 Found ${snapshot.size} activity documents to check`);
+            
+            let fixedSongs = 0;
+            let fixedUsernames = 0;
+            let skipped = 0;
+            let errors = 0;
+            
+            for (const activityDoc of snapshot.docs) {
+                const activity = activityDoc.data();
+                const activityId = activityDoc.id;
+                
+                try {
+                    const updates = {};
+                    let needsUpdate = false;
+                    
+                    // ========================================
+                    // FIX 1: Song data (songId, matchTitle, songTitle)
+                    // ========================================
+                    const needsSongFix = 
+                        !activity.songId || 
+                        activity.songId === 'song1' || 
+                        activity.songId === 'song2' ||
+                        !activity.matchTitle ||
+                        activity.matchTitle.includes('Match round-') ||
+                        activity.matchTitle.includes('Song 1') ||
+                        activity.matchTitle.includes('Song 2');
+                    
+                    if (needsSongFix) {
+                        const match = matchMap[activity.matchId];
+                        if (!match) {
+                            console.warn(`⚠️ Match not found: ${activity.matchId}`);
+                            errors++;
+                            continue;
+                        }
+                        
+                        // Determine which song was voted for
+                        const votedForSong1 = activity.songId === 'song1';
+                        const votedSong = votedForSong1 ? match.song1 : match.song2;
+                        const otherSong = votedForSong1 ? match.song2 : match.song1;
+                        
+                        if (!votedSong || !otherSong) {
+                            console.warn(`⚠️ Missing song data for match: ${activity.matchId}`);
+                            errors++;
+                            continue;
+                        }
+                        
+                        updates.songId = votedSong.videoId;
+                        updates.songTitle = votedSong.shortTitle || votedSong.title;
+                        updates.matchTitle = `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`;
+                        
+                        needsUpdate = true;
+                        fixedSongs++;
+                        console.log(`🎵 Fixed song data for ${activityId}`);
+                    }
+                    
+                    // ========================================
+                    // ✅ FIX 2: Username backfill
+                    // ========================================
+                    const currentUsername = activity.username || 'Anonymous';
+                    const userId = activity.userId;
+                    
+                    if (userId && userProfiles[userId]) {
+                        const profile = userProfiles[userId];
+                        const profileUsername = profile.username || 'Anonymous';
+                        const profileAvatar = profile.avatar;
+                        
+                        // Update if:
+                        // 1. Activity shows "Anonymous" but profile has a username
+                        // 2. Username has changed in profile
+                        if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
+                            updates.username = profileUsername;
+                            needsUpdate = true;
+                            fixedUsernames++;
+                            console.log(`👤 Updated username for ${activityId}: "${currentUsername}" → "${profileUsername}"`);
+                        }
+                        
+                        // Also update avatar if it's changed
+                        if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
+                            updates.avatar = profileAvatar;
+                            needsUpdate = true;
+                            console.log(`🖼️ Updated avatar for ${activityId}`);
+                        }
+                    }
+                    
+                    // ========================================
+                    // Apply updates if needed
+                    // ========================================
+                    if (needsUpdate) {
+                        await updateDoc(doc(db, 'activity', activityId), updates);
+                        console.log(`✅ Updated ${activityId}:`, updates);
+                    } else {
+                        skipped++;
+                    }
+                    
+                } catch (error) {
+                    console.error(`❌ Error fixing ${activityId}:`, error);
+                    errors++;
+                }
+            }
+            
+            console.log(`\n🎉 COMPLETE!`);
+            console.log(`🎵 Fixed song data: ${fixedSongs}`);
+            console.log(`👤 Fixed usernames: ${fixedUsernames}`);
+            console.log(`⏭️ Skipped (already correct): ${skipped}`);
+            console.log(`❌ Errors: ${errors}`);
+            
+            alert(`Activity data fix complete!\n\n🎵 Song data fixed: ${fixedSongs}\n👤 Usernames updated: ${fixedUsernames}\n⏭️ Skipped: ${skipped}\n❌ Errors: ${errors}`);
+        }
+        
+        // Auto-run on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('fix-btn');
+            btn.addEventListener('click', fixActivityData);
+        });
+    </script>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #C8AA6E;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #C8AA6E; }
+        .info {
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid #C8AA6E;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #D4B87A;
+        }
+        .info ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        button {
+            background: #C8AA6E;
+            color: #0a0a0a;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #D4B87A;
+        }
+        .warning {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid #ffaa00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix Activity Data</h1>
+    
+    <div class="info">
+        <h3>What this script does:</h3>
+        <ul>
+            <li>✅ Fixes song data (video IDs, match titles, song names)</li>
+            <li>✅ Updates usernames from "Anonymous" to actual usernames</li>
+            <li>✅ Updates avatars to match current profile settings</li>
+            <li>✅ Skips documents that are already correct</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <strong>⚠️ Important:</strong> This is a one-time fix. Open browser console (F12) to see detailed progress.
+    </div>
+    
+    <button id="fix-btn">🚀 Run Fix Now</button>
+    
+    <div style="margin-top: 2rem; color: rgba(200, 170, 110, 0.6); font-size: 0.9rem;">
+        <p><strong>After running:</strong></p>
+        <ol>
+            <li>Wait for the alert showing completion</li>
+            <li>Refresh the activity page</li>
+            <li>Delete this HTML file from your site</li>
+        </ol>
+    </div>
+</body>
+</html>
