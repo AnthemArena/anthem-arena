@@ -1525,30 +1525,60 @@ function showBulletin(notification) {
         }, 100);
         
     }
-    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
-    else {
-        banner.innerHTML = `
-            <div class="bulletin-toast-content">
-                <div class="bulletin-thumbnail">
-                    ${notification.thumbnailUrl ? 
-                        `<img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">` :
-                        `<div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>`
-                    }
-                    <div class="thumbnail-overlay">${icon}</div>
-                </div>
-                <div class="bulletin-toast-text">
-                    <div class="bulletin-message">${notification.message}</div>
-                    <div class="bulletin-detail">${notification.detail}</div>
-                </div>
-                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+   // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
+else {
+    // ✅ Determine what to show: song thumbnail, user avatar, or icon
+    let thumbnailHtml = '';
+    
+    if (notification.thumbnailUrl) {
+        // Song thumbnail
+        thumbnailHtml = `
+            <div class="bulletin-thumbnail">
+                <img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">
+                <div class="thumbnail-overlay">${icon}</div>
             </div>
-            <button class="bulletin-toast-cta" onclick="window.handleBulletinCTA()">${notification.cta}</button>
         `;
+    } else if (notification.username || notification.triggerUsername) {
+        // User avatar
+        const username = notification.username || notification.triggerUsername;
+        const initial = username.charAt(0).toUpperCase();
+        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+        const colorIndex = username.charCodeAt(0) % colors.length;
+        const bgColor = colors[colorIndex];
         
-        banner.className = `bulletin-banner ${notification.type}`;
-        
-        setTimeout(() => banner.classList.add('show'), 10);
+        thumbnailHtml = `
+            <div class="bulletin-thumbnail">
+                <div class="thumbnail-img" style="background: ${bgColor}; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: white;">
+                    ${initial}
+                </div>
+                <div class="thumbnail-overlay">${icon}</div>
+            </div>
+        `;
+    } else {
+        // Generic music icon
+        thumbnailHtml = `
+            <div class="bulletin-thumbnail">
+                <div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>
+                <div class="thumbnail-overlay">${icon}</div>
+            </div>
+        `;
     }
+    
+    banner.innerHTML = `
+        <div class="bulletin-toast-content">
+            ${thumbnailHtml}
+            <div class="bulletin-toast-text">
+                <div class="bulletin-message">${notification.message}</div>
+                <div class="bulletin-detail">${notification.detail}</div>
+            </div>
+            <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+        </div>
+        <button class="bulletin-toast-cta" onclick="window.handleBulletinCTA()">${notification.cta}</button>
+    `;
+    
+    banner.className = `bulletin-banner ${notification.type}`;
+    setTimeout(() => banner.classList.add('show'), 10);
+}
     
     console.log(`📢 Bulletin shown: ${notification.type}`);
 }

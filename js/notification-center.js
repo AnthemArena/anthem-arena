@@ -111,14 +111,51 @@ async function loadNotifications() {
 
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
-const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
-
+    const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
+    
+    // ✅ Determine what image to show
+    let imageHtml = '';
+    
+    if (notification.thumbnailUrl) {
+        // Song thumbnail with icon overlay
+        imageHtml = `
+            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; margin-right: 8px;">
+                <img src="${notification.thumbnailUrl}" 
+                     style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(200, 155, 60, 0.3);">
+                <div style="position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: linear-gradient(135deg, #C8AA6E, #B89A5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #1a1a2e;">
+                    ${notification.icon}
+                </div>
+            </div>
+        `;
+    } else if (notification.triggerUsername) {
+        // User avatar with first letter
+        const initial = notification.triggerUsername.charAt(0).toUpperCase();
+        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+        const colorIndex = notification.triggerUsername.charCodeAt(0) % colors.length;
+        const bgColor = colors[colorIndex];
+        
+        imageHtml = `
+            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; margin-right: 8px;">
+                <div style="width: 100%; height: 100%; border-radius: 50%; background: ${bgColor}; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white; border: 2px solid rgba(200, 155, 60, 0.3);">
+                    ${initial}
+                </div>
+                <div style="position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: linear-gradient(135deg, #C8AA6E, #B89A5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #1a1a2e;">
+                    ${notification.icon}
+                </div>
+            </div>
+        `;
+    } else {
+        // Fallback to just icon
+        imageHtml = `<span class="notification-item-icon" style="font-size: 20px; margin-right: 8px;">${notification.icon}</span>`;
+    }
     
     return `
         <div class="notification-item ${unreadClass}" data-id="${notification.id}">
-            <div class="notification-item-header">
-                <span class="notification-item-icon">${notification.icon}</span>
-                <div class="notification-item-message">${notification.message}</div>
+            <div class="notification-item-header" style="display: flex; align-items: center;">
+                ${imageHtml}
+                <div style="flex: 1; min-width: 0;">
+                    <div class="notification-item-message">${notification.message}</div>
+                </div>
                 <button class="notification-item-dismiss" data-id="${notification.id}">✕</button>
             </div>
             ${notification.detail ? `<div class="notification-item-detail">${notification.detail}</div>` : ''}
