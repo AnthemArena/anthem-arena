@@ -288,61 +288,6 @@ async function updateCtaButtonsWithPrivacy() {
     }
 }
 
-// ========================================
-// UPDATE CTA BUTTONS BASED ON PRIVACY
-// ========================================
-
-async function updateCtaButtonsWithPrivacy() {
-    const buttons = document.querySelectorAll('.notification-item-cta[data-target-user]');
-    
-    const { getAvailableActions } = await import('./notification-storage.js');
-    
-    for (const btn of buttons) {
-        const targetUserId = btn.dataset.targetUser;
-        const action = btn.dataset.action;
-        const notifId = btn.dataset.id;
-        
-        if (!targetUserId) continue;
-        
-        try {
-            const permissions = await getAvailableActions(targetUserId);
-            
-            // Get notification data for context
-            const userId = localStorage.getItem('tournamentUserId');
-            const notifications = await getUnreadNotifications(userId);
-            const notification = notifications.find(n => n.id === notifId);
-            
-            if (action === 'send-emote') {
-                if (permissions.canEmote) {
-                    btn.innerHTML = notification?.ctaText || 'Send Emote';
-                    btn.disabled = false;
-                } else {
-                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Emotes Disabled</span>`;
-                    btn.disabled = true;
-                    btn.title = permissions.emoteReason || 'Cannot send emote';
-                    btn.style.cursor = 'not-allowed';
-                    btn.style.opacity = '0.5';
-                }
-            } else if (action === 'open-message') {
-                if (permissions.canMessage) {
-                    btn.innerHTML = notification?.ctaText || 'Reply';
-                    btn.disabled = false;
-                } else {
-                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Messages Disabled</span>`;
-                    btn.disabled = true;
-                    btn.title = permissions.messageReason || 'Cannot send message';
-                    btn.style.cursor = 'not-allowed';
-                    btn.style.opacity = '0.5';
-                }
-            }
-        } catch (error) {
-            console.warn('Could not check permissions for button', error);
-            // On error, show button as enabled (fail open)
-            btn.innerHTML = notification?.ctaText || 'Action';
-            btn.disabled = false;
-        }
-    }
-}
 
 function attachNotificationListeners() {
     document.querySelectorAll('.notification-item-cta').forEach(btn => {
