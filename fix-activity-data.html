@@ -5,7 +5,7 @@
     <title>Fix Activity Data</title>
     <script type="module">
         import { db } from './js/firebase-config.js';
-        import { collection, getDocs, doc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         async function fixActivityData() {
             console.log('🔧 Starting activity data fix...');
@@ -16,14 +16,24 @@
                 const musicResponse = await fetch('/data/music-videos.json');
                 const musicData = await musicResponse.json();
                 
-                const musicBySeed = {};
-                const musicByVideoId = {};
-                musicData.forEach(song => {
-                    if (song.seed) musicBySeed[song.seed] = song;
-                    if (song.videoId) musicByVideoId[song.videoId] = song;
+                console.log(`✅ Loaded ${musicData.length} songs`);
+                
+                // Load matches from tournaments/2025-worlds-anthems/matches
+                console.log('🏆 Loading matches from tournament...');
+                const matchMap = {};
+                const TOURNAMENT_ID = '2025-worlds-anthems';
+                
+                const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+                const matchesSnapshot = await getDocs(matchesRef);
+                
+                matchesSnapshot.forEach(matchDoc => {
+                    const match = matchDoc.data();
+                    matchMap[matchDoc.id] = match;
+                    if (match.matchId) matchMap[match.matchId] = match;
                 });
                 
-                console.log(`✅ Loaded ${musicData.length} songs`);
+                console.log(`✅ Loaded ${matchesSnapshot.size} matches`);
+                console.log(`🔍 Sample match IDs:`, Object.keys(matchMap).slice(0, 5));
                 
                 // Load user profiles
                 console.log('👤 Loading user profiles...');
@@ -72,12 +82,9 @@
                             activity.matchTitle.includes('Song 2');
                         
                         if (needsSongFix) {
-                            // Fetch the specific match document
-                            const matchRef = doc(db, 'matches', activity.matchId);
-                            const matchSnap = await getDoc(matchRef);
+                            const match = matchMap[activity.matchId];
                             
-                            if (matchSnap.exists()) {
-                                const match = matchSnap.data();
+                            if (match) {
                                 const song1 = match.song1;
                                 const song2 = match.song2;
                                 
@@ -92,10 +99,13 @@
                                     
                                     needsUpdate = true;
                                     fixedSongs++;
-                                    console.log(`🎵 Fixed song data for ${activityId}: ${updates.matchTitle}`);
+                                    console.log(`🎵 Fixed: ${updates.matchTitle}`);
+                                } else {
+                                    console.warn(`⚠️ Match missing song data: ${activity.matchId}`);
                                 }
                             } else {
                                 console.warn(`⚠️ Match not found: ${activity.matchId}`);
+                                errors++;
                             }
                         }
                         
@@ -114,7 +124,7 @@
                                 updates.username = profileUsername;
                                 needsUpdate = true;
                                 fixedUsernames++;
-                                console.log(`👤 Updated username: "${currentUsername}" → "${profileUsername}"`);
+                                console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
                             }
                             
                             if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
@@ -189,6 +199,16 @@
         button:hover {
             background: #D4B87A;
         }
+        .progress {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: none;
+        }
+        .progress.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -201,5 +221,9 @@
     </div>
     
     <button id="fix-btn">🚀 Run Fix Now</button>
+    
+    <div id="progress" class="progress">
+        <p>Running... check console (F12) for details</p>
+    </div>
 </body>
 </html>
