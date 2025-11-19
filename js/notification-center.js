@@ -143,6 +143,74 @@ function attachNotificationListeners() {
             const action = btn.dataset.action;
             const url = btn.dataset.url;
             
+            // ✅ HANDLE EMOTE ACTIONS
+            if (action === 'send-emote') {
+                const userId = localStorage.getItem('tournamentUserId');
+                const notifications = await getUnreadNotifications(userId);
+                const notification = notifications.find(n => n.id === id);
+                
+                if (notification && notification.ctaData) {
+                    // Show loading state
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Sending...';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                    
+                    // Send the emote
+                    const { sendEmoteReaction } = await import('./emote-system.js');
+                    const success = await sendEmoteReaction(
+                        notification.ctaData.targetUsername,
+                        notification.ctaData.targetUserId,
+                        notification.ctaData.emoteType,
+                        notification.ctaData.matchData || {
+                            matchId: notification.matchId,
+                            matchTitle: notification.matchTitle,
+                            songTitle: notification.detail
+                        }
+                    );
+                    
+                    if (success) {
+                        // Success - mark as read and dismiss
+                        btn.textContent = '✓ Sent!';
+                        btn.style.background = '#27ae60';
+                        btn.style.opacity = '1';
+                        
+                        await markNotificationRead(id);
+                        await dismissNotification(id);
+                        
+                        // Remove from UI
+                        setTimeout(() => {
+                            const item = btn.closest('.notification-item');
+                            if (item) {
+                                item.style.opacity = '0';
+                                item.style.transform = 'translateX(20px)';
+                                item.style.transition = 'all 0.3s ease';
+                                setTimeout(() => {
+                                    item.remove();
+                                    checkIfEmpty();
+                                }, 300);
+                            }
+                        }, 800);
+                        
+                        await updateBadgeCount();
+                    } else {
+                        // Failed
+                        btn.textContent = '✗ Failed';
+                        btn.style.background = '#e74c3c';
+                        btn.style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                            btn.style.background = '';
+                        }, 2000);
+                    }
+                    
+                    return; // Don't continue to navigate
+                }
+            }
+            
+            // ✅ HANDLE NAVIGATION
             await markNotificationRead(id);
             await updateBadgeCount();
             
