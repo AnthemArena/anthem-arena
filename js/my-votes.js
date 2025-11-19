@@ -155,16 +155,38 @@ async function loadVoteHistory() {
     try {
         console.log('📥 Loading vote history for user:', userId);
         
-        // ✅ OPTIMIZED: Load votes from localStorage (instant, free)
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const voteIds = Object.keys(userVotes);
+        // ✅ FETCH FROM FIREBASE (source of truth)
+        const { db } = await import('./firebase-config.js');
+        const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         
-        if (voteIds.length === 0) {
+        const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
+        const votesSnapshot = await getDocs(votesQuery);
+        
+        if (votesSnapshot.empty) {
+            console.log('📭 No votes found in Firebase');
             showNoVotesState();
             return;
         }
         
-        console.log(`✅ Found ${voteIds.length} votes in localStorage`);
+        console.log(`✅ Found ${votesSnapshot.size} votes in Firebase`);
+        
+        // Convert Firebase votes to the format expected by the rest of the code
+        const userVotes = {};
+        votesSnapshot.forEach(doc => {
+            const voteData = doc.data();
+            userVotes[voteData.matchId] = {
+                songId: voteData.choice, // 'song1' or 'song2'
+                timestamp: voteData.timestamp,
+                matchId: voteData.matchId
+            };
+        });
+        
+        // ✅ Also sync to localStorage for offline access
+        localStorage.setItem('userVotes', JSON.stringify(userVotes));
+        
+        const voteIds = Object.keys(userVotes);
+        
+        console.log(`✅ Processing ${voteIds.length} votes`);
         
         // ✅ Get ALL matches from edge cache (single call)
         const allMatches = await getAllMatches();
@@ -175,7 +197,7 @@ async function loadVoteHistory() {
             matchMap.set(match.matchId, match);
         });
         
-        // Build vote history from localStorage + cached matches
+        // Build vote history from Firebase votes + cached matches
         const votePromises = voteIds.map(async (matchId) => {
             const voteData = userVotes[matchId];
             const matchData = matchMap.get(matchId);
@@ -199,22 +221,22 @@ async function loadVoteHistory() {
             // Categorize vote type
             let voteType = 'balanced';
             if (votedSongPercentage < 40) {
-                voteType = 'underdog'; // Voted for the less popular song
+                voteType = 'underdog';
             } else if (votedSongPercentage > 60) {
-                voteType = 'mainstream'; // Voted for the more popular song
+                voteType = 'mainstream';
             } else {
-                voteType = 'closeCall'; // Close match (40-60%)
+                voteType = 'closeCall';
             }
             
             const isCompleted = matchData.status === 'completed';
             const status = isCompleted ? 'completed' : 'live';
             
-            // Get the song data for the one they voted for
+            // Get the song data
             const votedSong = votedForSong === 'song1' ? matchData.song1 : matchData.song2;
             const opponentSong = votedForSong === 'song1' ? matchData.song2 : matchData.song1;
             
-            // Determine song journey status (non-competitive)
-            let songStatus = 'active'; // Default for ongoing matches
+            // Determine song journey status
+            let songStatus = 'active';
             if (isCompleted && matchData.winnerId) {
                 const votedSongId = votedSong.id;
                 songStatus = matchData.winnerId === votedSongId ? 'advanced' : 'eliminated';
@@ -224,8 +246,7 @@ async function loadVoteHistory() {
                 id: matchId,
                 matchId: matchId,
                 choice: votedForSong,
-// ✅ NO Firebase reads - just validation
-timestamp: normalizeTimestamp(voteData.timestamp),
+                timestamp: normalizeTimestamp(voteData.timestamp),
                 round: matchData.round || 1,
                 votedForSeed: votedSong.seed,
                 votedForName: votedSong.shortTitle || votedSong.title,
@@ -238,7 +259,7 @@ timestamp: normalizeTimestamp(voteData.timestamp),
                 votedSongPercentage: votedSongPercentage,
                 status: status,
                 isCompleted: isCompleted,
-                songStatus: songStatus // 'active', 'advanced', 'eliminated'
+                songStatus: songStatus
             };
         });
         
@@ -255,8 +276,7 @@ timestamp: normalizeTimestamp(voteData.timestamp),
         // Display votes
         displayVotes();
 
-            await loadAchievements();
-
+        await loadAchievements();
         
         // Hide loading state
         document.getElementById('loadingState').style.display = 'none';
