@@ -41,28 +41,27 @@
                 </p>
             </div>
 
-            <div class="activity-stats">
-                <div class="stat-card">
-                    <span class="stat-icon">🔓</span>
-                    <div class="stat-info">
-                        <div class="stat-value" id="revealed-count">0</div>
-                        <div class="stat-label">Votes Revealed</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🔒</span>
-                    <div class="stat-info">
-                        <div class="stat-value" id="locked-count">0</div>
-                        <div class="stat-label">Votes Locked</div>
-                    </div>
-                </div>
-            </div>
+           <div class="activity-stats">
+    <div class="stat-card">
+        <span class="stat-icon">🗳️</span>
+        <div class="stat-info">
+            <div class="stat-value" id="revealed-count">0</div>
+            <div class="stat-label">Total Votes</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <div class="stat-info">
+            <div class="stat-value" id="locked-count">0</div>
+            <div class="stat-label">Unique Voters</div>
+        </div>
+    </div>
+</div>
 
-            <div class="activity-filters">
-                <button class="filter-btn active" data-filter="all">All Matches</button>
-                <button class="filter-btn" data-filter="locked">🔒 Locked</button>
-                <button class="filter-btn" data-filter="revealed">🔓 Revealed</button>
-            </div>
+          <div class="activity-filters">
+    <button class="filter-btn active" data-filter="all">All Matches</button>
+    <button class="filter-btn" data-filter="my-votes">My Votes</button>
+</div>
 
             <div id="activity-feed" class="activity-feed">
                 <!-- Activity cards will be inserted here -->

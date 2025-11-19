@@ -74,20 +74,29 @@ function getSongTitle(songId, fallbackTitle) {
 }
 
 // ========================================
-// INITIALIZE PAGE
+// INITIALIZE PAGE - Load tournaments first
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎭 Activity page loaded');
     
-    // Load music data first
-    await loadMusicData();
+    // Show loading
+    document.getElementById('loading-overlay').style.display = 'flex';
+    
+    // Load data in parallel
+    await Promise.all([
+        loadMusicData(),
+        loadTournamentNames()
+    ]);
     
     // Load activity feed
     await loadActivityFeed();
     
     // Setup filter buttons
     setupFilters();
+    
+    // Hide loading
+    document.getElementById('loading-overlay').style.display = 'none';
 });
 
 // ========================================
@@ -127,14 +136,17 @@ async function loadActivityFeed() {
 function renderActivityFeed(activities) {
     const container = document.getElementById('activity-feed');
     
+    // Get current user ID for "my votes" filter
+    const currentUserId = localStorage.getItem('userId');
+    
     const filteredActivities = activities.filter(activity => {
         if (currentFilter === 'all') return true;
-        // Add more filter logic if needed
+        if (currentFilter === 'my-votes') return activity.userId === currentUserId;
         return true;
     });
     
     if (filteredActivities.length === 0) {
-        container.innerHTML = '<p class="no-results">No activity found</p>';
+        container.innerHTML = '<p class="no-results">No activity found for this filter</p>';
         return;
     }
     
@@ -145,15 +157,25 @@ function renderActivityFeed(activities) {
     container.innerHTML = html;
 }
 
+
 // ========================================
-// RENDER VOTE CARD
+// RENDER VOTE CARD - Include full match context with "vs"
 // ========================================
 
 function renderVoteCard(activity) {
     const thumbnailUrl = getYoutubeThumbnail(activity.songId);
     const songTitle = getSongTitle(activity.songId, activity.songTitle);
     const tournamentName = formatTournamentName(activity.tournamentId);
-    const matchName = activity.matchTitle || `Match ${activity.matchId}`;
+    
+    // Parse match title to get both songs
+    const matchTitle = activity.matchTitle || '';
+    const songs = matchTitle.split(' vs ');
+    const song1 = songs[0] || 'Song 1';
+    const song2 = songs[1] || 'Song 2';
+    
+    // Check which song was voted for and highlight it
+    const votedSong = activity.songTitle || songTitle;
+    const isVotedForSong1 = song1.includes(votedSong) || votedSong.includes(song1);
     
     return `
         <div class="vote-card">
@@ -172,7 +194,11 @@ function renderVoteCard(activity) {
             </div>
             
             <div class="vote-song">
-                <div class="song-title">${songTitle}</div>
+                <div class="song-title">
+                    <span class="${isVotedForSong1 ? 'voted-song' : ''}">${song1}</span>
+                    <span class="vs-separator">vs</span>
+                    <span class="${!isVotedForSong1 ? 'voted-song' : ''}">${song2}</span>
+                </div>
             </div>
             
             <div class="match-info">
@@ -190,16 +216,31 @@ function renderVoteCard(activity) {
     `;
 }
 
+
 // ========================================
-// HELPER FUNCTIONS
+// FORMAT TOURNAMENT NAME - Fetch from Firebase
 // ========================================
 
+let tournamentCache = {};
+
+async function loadTournamentNames() {
+    try {
+        const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        const tournamentsSnapshot = await getDocs(collection(window.db, 'tournaments'));
+        
+        tournamentsSnapshot.forEach(doc => {
+            const data = doc.data();
+            tournamentCache[data.id] = data.name;
+        });
+        
+        console.log(`✅ Loaded ${Object.keys(tournamentCache).length} tournament names`);
+    } catch (error) {
+        console.error('❌ Error loading tournament names:', error);
+    }
+}
+
 function formatTournamentName(tournamentId) {
-    const names = {
-        '2025-worlds-anthems': '2025 Worlds Anthems',
-        '2024-worlds-anthems': '2024 Worlds Anthems'
-    };
-    return names[tournamentId] || tournamentId;
+    return tournamentCache[tournamentId] || tournamentId;
 }
 
 function getTimeAgo(timestamp) {
@@ -213,7 +254,7 @@ function getTimeAgo(timestamp) {
 }
 
 // ========================================
-// FILTER LOGIC
+// FILTER LOGIC - Add "My Votes" filter
 // ========================================
 
 function setupFilters() {
@@ -235,13 +276,16 @@ function setupFilters() {
 }
 
 // ========================================
-// UPDATE STATS
+// UPDATE STATS - Show total votes and unique voters
 // ========================================
 
 function updateStats() {
-    // For now, just show total activity
+    // Total votes
     document.getElementById('revealed-count').textContent = allActivities.length;
-    document.getElementById('locked-count').textContent = 0;
+    
+    // Unique voters (count unique userIds)
+    const uniqueVoters = new Set(allActivities.map(a => a.userId)).size;
+    document.getElementById('locked-count').textContent = uniqueVoters;
 }
 
 // ========================================

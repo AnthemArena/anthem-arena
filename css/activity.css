@@ -598,3 +598,36 @@
 .vote-card:nth-child(8) { animation-delay: 0.4s; }
 .vote-card:nth-child(9) { animation-delay: 0.45s; }
 .vote-card:nth-child(10) { animation-delay: 0.5s; }
+
+.song-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.song-title span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vs-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    font-size: 0.85rem;
+    font-style: italic;
+    flex-shrink: 0;
+}
+
+.voted-song {
+    color: #C8AA6E !important;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+}
