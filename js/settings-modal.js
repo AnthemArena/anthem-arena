@@ -543,14 +543,14 @@ async function handleSaveSettings(e) {
         }
     }
     
-    // Save to localStorage
+    // Save to localStorage (backward compatible)
     localStorage.setItem('username', username);
     localStorage.setItem('isPublic', isPublic ? 'true' : 'false');
     localStorage.setItem('avatar', JSON.stringify(avatar));
     
     // ✅ NEW: Save to Firebase profiles collection
     try {
-        const userId = localStorage.getItem('userId');
+        const userId = localStorage.getItem('tournamentUserId');
         if (userId) {
             await setDoc(doc(db, 'profiles', userId), {
                 username: username,

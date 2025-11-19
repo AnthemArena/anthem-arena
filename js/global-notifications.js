@@ -1,5 +1,6 @@
 console.log('🔔 global-notifications.js loaded');
 
+import { getActivityFeed } from './api-client.js';
 
 
 // ========================================
@@ -45,7 +46,9 @@ const COOLDOWN_MINUTES = {
     'level-up': 0,       // ✅ Keep - one-time
     trending: 30,        // ✅ Keep - good for engagement
     votesurge: 30,       // ✅ Keep
-    mostviewed: 60       // 🔽 Reduce from 90 - still low priority but more active
+    mostviewed: 60,       // 🔽 Reduce from 90 - still low priority but more active
+        'live-activity': 5  // ✅ NEW: Show live votes every 5 minutes max
+
 };
 
 
@@ -228,9 +231,7 @@ if (userId) {
     }
 }
 
-        // ========================================
-        // NON-VOTER ENGAGEMENT SYSTEM
-        // ========================================
+     
         
        // ========================================
 // NON-VOTER ENGAGEMENT SYSTEM
@@ -632,6 +633,89 @@ try {
         console.error('Error checking bulletin:', error);
     }
 }
+
+// ========================================
+// REAL-TIME VOTE NOTIFICATIONS
+// ========================================
+
+let lastActivityCheck = 0;
+let lastSeenActivityId = null;
+const ACTIVITY_CHECK_INTERVAL = 30000; // Check every 30 seconds
+
+async function checkRecentVotes() {
+    try {
+        // Throttle checks
+        const now = Date.now();
+        if (now - lastActivityCheck < ACTIVITY_CHECK_INTERVAL) return;
+        lastActivityCheck = now;
+        
+        // Get recent activity (limit to 10 most recent)
+        const activities = await getActivityFeed(10);
+        
+        if (!activities || activities.length === 0) return;
+        
+        // Get the most recent activity
+        const latestActivity = activities[0];
+        
+        // Skip if we've already shown this one
+        if (lastSeenActivityId === latestActivity.activityId) return;
+        
+        // Filter out own votes
+        const userId = localStorage.getItem('tournamentUserId');
+        if (latestActivity.userId === userId) return;
+        
+        // Skip anonymous votes
+        if (latestActivity.username === 'Anonymous') return;
+        
+        // Check if vote is recent (last 2 minutes)
+        const twoMinutesAgo = now - 120000;
+        if (latestActivity.timestamp < twoMinutesAgo) return;
+        
+        // Check if we've already shown this specific vote
+        const voteKey = `vote-toast-${latestActivity.activityId}`;
+        if (recentlyShownBulletins.has(voteKey)) return;
+        
+        // Get thumbnail URL from songId
+        const thumbnailUrl = latestActivity.songId 
+            ? `https://img.youtube.com/vi/${latestActivity.songId}/mqdefault.jpg`
+            : null;
+        
+        // Show toast notification
+        notifications.push({
+            priority: 7, // Lower priority than user's own matches
+            type: 'live-activity',
+            matchId: latestActivity.matchId,
+            username: latestActivity.username,
+            song: latestActivity.songTitle,
+            matchTitle: latestActivity.matchTitle,
+            thumbnailUrl: thumbnailUrl,
+            message: `${latestActivity.username} just voted!`,
+            detail: `Voted for "${latestActivity.songTitle}"`,
+            cta: 'View Match',
+            action: 'navigate',
+            targetUrl: `/vote.html?match=${latestActivity.matchId}`
+        });
+        
+        // Track to avoid duplicates
+        recentlyShownBulletins.set(voteKey, now);
+        lastSeenActivityId = latestActivity.activityId;
+        
+        console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle}`);
+        
+    } catch (error) {
+        console.error('Error checking recent votes:', error);
+    }
+}
+
+// Add to polling - check every 30 seconds
+setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL);
+
+// Also check on page visibility change (when user returns to tab)
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        checkRecentVotes();
+    }
+});
 
 // ========================================
 // SMART WELCOME TIMING
@@ -1768,6 +1852,21 @@ window.testBulletin = function(type = 'winning') {
             action: 'navigate',
             targetUrl: '/matches.html'
         },
+        // Add to testNotifications object in window.testBulletin function:
+'live-activity': {
+    priority: 7,
+    type: 'live-activity',
+    matchId: 'round-1-match-4',
+    username: 'SummonerElite',
+    song: 'RISE',
+    matchTitle: 'RISE vs GODS',
+    thumbnailUrl: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
+    message: 'SummonerElite just voted!',
+    detail: 'Voted for "RISE" in RISE vs GODS',
+    cta: 'View Match',
+    action: 'navigate',
+    targetUrl: '/vote.html?match=round-1-match-4'
+},
 
          // ✅ ADD THESE NEW TEST CASES:
         novotes: {
