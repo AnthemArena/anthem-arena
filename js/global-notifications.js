@@ -7,9 +7,19 @@ import {
     getRecentUnshownNotifications, 
     markNotificationShown,
     getUnreadCount,
-        collection,  // ← ADD THIS
-
+    markNotificationRead,
+    dismissNotification
 } from './notification-storage.js';
+
+// ✅ Import Firestore functions separately
+import { db } from './firebase-config.js';
+import { 
+    collection, 
+    query, 
+    where, 
+    getDocs,
+    limit
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 
 // ========================================
