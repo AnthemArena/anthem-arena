@@ -1547,31 +1547,48 @@ try {
     // ========================================
     // ✅ LOG ACTIVITY IF PUBLIC PROFILE
     // ========================================
-    if (isPublic && username !== 'Anonymous') {
-        try {
-            const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
-            const activityId = `${userId}_${currentMatch.id}`;
-            
-            await setDoc(doc(db, 'activity', activityId), {
-                activityId: activityId,
-                userId: userId,
-                username: username,
-                avatar: avatar,
-                matchId: currentMatch.id,
-                matchTitle: `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`,
-                songId: songId,
-                songTitle: votedSong.name,
-                timestamp: Date.now(),
-                round: currentMatch.round,
-                tournamentId: ACTIVE_TOURNAMENT
-            });
-            
-            console.log('✅ Activity logged to Firebase');
-        } catch (activityError) {
-            console.warn('⚠️ Could not log activity:', activityError);
-            // Don't block vote submission if activity logging fails
-        }
+ // ========================================
+// ✅ LOG ACTIVITY IF PUBLIC PROFILE
+// ========================================
+if (isPublic && username !== 'Anonymous') {
+    try {
+        const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+        const otherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
+        const activityId = `${userId}_${currentMatch.id}`;
+        
+        // ✅ Get clean song names
+        const votedSongName = votedSong.name || 'Unknown Song';
+        const otherSongName = otherSong.name || 'Unknown Song';
+        
+        // ✅ Create proper matchTitle with both songs
+        const matchTitle = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
+        
+        console.log('📝 Logging activity:', {
+            matchTitle,
+            votedSongName,
+            votedSong: votedSong.videoId
+        });
+        
+        await setDoc(doc(db, 'activity', activityId), {
+            activityId: activityId,
+            userId: userId,
+            username: username,
+            avatar: avatar,
+            matchId: currentMatch.id,
+            matchTitle: matchTitle,  // ✅ "The Line vs Fantastic"
+            songId: votedSong.videoId,  // ✅ Use videoId not songId
+            songTitle: votedSongName,  // ✅ "The Line"
+            timestamp: Date.now(),
+            round: currentMatch.round,
+            tournamentId: ACTIVE_TOURNAMENT
+        });
+        
+        console.log('✅ Activity logged:', matchTitle);
+    } catch (activityError) {
+        console.error('❌ Could not log activity:', activityError);
+        // Don't block vote submission if activity logging fails
     }
+}
         
         // ========================================
         // ✅ NEW: CALCULATE AND AWARD XP
