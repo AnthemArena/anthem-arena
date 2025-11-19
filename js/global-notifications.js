@@ -1,6 +1,13 @@
 console.log('🔔 global-notifications.js loaded');
 
 import { getActivityFeed } from './api-client.js';
+import { sendEmoteReaction, checkNewReactions, markReactionSeen } from './emote-system.js';
+import { 
+    saveNotification, 
+    getRecentUnshownNotifications, 
+    markNotificationShown,
+    getUnreadCount
+} from './notification-storage.js';
 
 
 // ========================================
@@ -680,27 +687,137 @@ async function checkRecentVotes() {
             ? `https://img.youtube.com/vi/${latestActivity.songId}/mqdefault.jpg`
             : null;
         
-        // Show toast notification
-        notifications.push({
-            priority: 7, // Lower priority than user's own matches
-            type: 'live-activity',
+        // ========================================
+        // CHECK USER'S VOTE STATUS IN THIS MATCH
+        // ========================================
+        
+        // Check if current user has voted in this match
+        const userVoteKey = `vote-${latestActivity.matchId}`;
+        const userVotedSongId = localStorage.getItem(userVoteKey);
+        const hasVoted = !!userVotedSongId;
+        
+        let message, detail, cta, icon;
+        
+        if (!hasVoted) {
+            // ========================================
+            // USER HASN'T VOTED YET - INVITE THEM IN
+            // ========================================
+            message = `${latestActivity.username} just voted!`;
+            detail = `New vote in ${latestActivity.matchTitle}`;
+            cta = 'Cast Your Vote!';
+            icon = '🗳️';
+            
+        } else {
+            // User HAS voted - check if they're allies or opponents
+            const isAlly = userVotedSongId === latestActivity.songId;
+            
+            if (isAlly) {
+                // ========================================
+                // ALLY - They voted for YOUR song!
+                // ========================================
+                const allyMessages = [
+                    `Reinforcements! ${latestActivity.username} just backed "${latestActivity.songTitle}"!`,
+                    `${latestActivity.username} joined your side! Voted for "${latestActivity.songTitle}"`,
+                    `Your choice is gaining momentum! ${latestActivity.username} voted "${latestActivity.songTitle}"`,
+                    `Alliance formed! ${latestActivity.username} also picked "${latestActivity.songTitle}"`
+                ];
+                
+                const allyDetails = [
+                    `${latestActivity.matchTitle}`,
+                    `Standing with you in ${latestActivity.matchTitle}`,
+                    `Fighting for the same side!`
+                ];
+                
+                const allyButtons = [
+                    'Send Thanks! 🤝',
+                    'Give Props 👊',
+                    'Show Support ✨',
+                    'High Five! 🙌'
+                ];
+                
+                message = allyMessages[Math.floor(Math.random() * allyMessages.length)];
+                detail = allyDetails[Math.floor(Math.random() * allyDetails.length)];
+                cta = allyButtons[Math.floor(Math.random() * allyButtons.length)];
+                icon = '🤝';
+                
+            } else {
+              // ========================================
+    // OPPONENT - They voted AGAINST your song!
+    // ========================================
+    
+    // Keep it simple and social - focus on the PERSON'S ACTION
+    const opponentMessages = [
+        `${latestActivity.username} just voted against you!`,
+        `${latestActivity.username} challenged your pick with "${latestActivity.songTitle}"`,
+        `Rival spotted! ${latestActivity.username} backed "${latestActivity.songTitle}"`,
+        `${latestActivity.username} picked the other side in "${latestActivity.songTitle}"`
+    ];
+    
+    const opponentDetails = [
+        `In ${latestActivity.matchTitle}`,
+        `The battle continues in ${latestActivity.matchTitle}`,
+        `${latestActivity.matchTitle} - rivalry grows`
+    ];
+    
+     const opponentButtons = [
+        'View Match 👀',
+        'Check the Battle ⚡',
+        'See the Score 📊',
+        'Go to Match 🎯'
+    ];
+    
+    message = opponentMessages[Math.floor(Math.random() * opponentMessages.length)];
+    detail = opponentDetails[Math.floor(Math.random() * opponentDetails.length)];
+    cta = opponentButtons[Math.floor(Math.random() * opponentButtons.length)];
+    icon = '⚔️';
+}
+        }
+        
+// Build notification data
+const isAlly = hasVoted && userVotedSongId === latestActivity.songId;
+const notificationData = {
+    priority: 7,
+    type: 'live-activity',
+    matchId: latestActivity.matchId,
+    matchTitle: latestActivity.matchTitle,
+    username: latestActivity.username,
+    triggerUserId: latestActivity.userId,
+    triggerUsername: latestActivity.username,
+    song: latestActivity.songTitle,
+    thumbnailUrl: thumbnailUrl,
+    message: message,
+    detail: detail,
+    icon: icon,
+    ctaText: cta,
+    ctaAction: hasVoted ? (isAlly ? 'send-emote' : 'navigate') : 'navigate',
+    ctaData: hasVoted && isAlly ? {
+        targetUsername: latestActivity.username,
+        targetUserId: latestActivity.userId,
+        emoteType: 'thanks',
+        matchData: {
             matchId: latestActivity.matchId,
-            username: latestActivity.username,
-            song: latestActivity.songTitle,
             matchTitle: latestActivity.matchTitle,
-            thumbnailUrl: thumbnailUrl,
-            message: `${latestActivity.username} just voted!`,
-            detail: `Voted for "${latestActivity.songTitle}"`,
-            cta: 'View Match',
-            action: 'navigate',
-            targetUrl: `/vote.html?match=${latestActivity.matchId}`
-        });
+            songTitle: latestActivity.songTitle
+        }
+    } : {},
+    targetUrl: `/vote.html?match=${latestActivity.matchId}`,
+    relationship: hasVoted ? (isAlly ? 'ally' : 'opponent') : null,
+    shownAsToast: true
+};
+
+// Save to Firestore for notification center
+if (userId && userId !== 'anonymous') {
+    await saveNotification(userId, notificationData);
+}
+
+// Show as toast immediately
+notifications.push(notificationData);
         
         // Track to avoid duplicates
         recentlyShownBulletins.set(voteKey, now);
         lastSeenActivityId = latestActivity.activityId;
         
-        console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle}`);
+        console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle} (${hasVoted ? (userVotedSongId === latestActivity.songId ? 'ALLY' : 'OPPONENT') : 'NOT VOTED'})`);
         
     } catch (error) {
         console.error('Error checking recent votes:', error);
@@ -716,6 +833,7 @@ document.addEventListener('visibilitychange', () => {
         checkRecentVotes();
     }
 });
+
 
 // ========================================
 // SMART WELCOME TIMING
@@ -1489,6 +1607,18 @@ window.handleBulletinCTA = function() {
         return;
     }
     
+    // ✅ PRIORITY 2: Handle emote sending (NEW!)
+    if (currentBulletin.action === 'send-emote' && currentBulletin.emoteData) {
+        window.handleEmoteClick(
+            currentBulletin.emoteData.targetUsername,
+            currentBulletin.emoteData.targetUserId,
+            currentBulletin.emoteData.emoteType,
+            currentBulletin.emoteData.matchData
+        );
+        hideBulletin();
+        return;
+    }
+    
     // Handle all match-specific alerts
     if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
@@ -1861,9 +1991,10 @@ window.testBulletin = function(type = 'winning') {
     song: 'RISE',
     matchTitle: 'RISE vs GODS',
     thumbnailUrl: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
-    message: 'SummonerElite just voted!',
-    detail: 'Voted for "RISE" in RISE vs GODS',
-    cta: 'View Match',
+    message: 'Reinforcements! SummonerElite just backed "RISE"!',
+    detail: 'Standing with you in RISE vs GODS',
+    cta: 'Send Thanks! 🤝',
+    icon: '🤝',
     action: 'navigate',
     targetUrl: '/vote.html?match=round-1-match-4'
 },
@@ -1944,3 +2075,130 @@ window.testBulletin = function(type = 'winning') {
 };
 
 console.log('✅ global-notifications.js fully loaded with toast-style bulletins');
+
+
+// Handle emote button clicks from notifications
+window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType, matchData) {
+    console.log(`🎭 Sending ${emoteType} to ${targetUsername}`);
+    
+    const success = await sendEmoteReaction(targetUsername, targetUserId, emoteType, matchData);
+    
+    if (success) {
+        // Show confirmation toast
+        showQuickToast(`✅ Sent to ${targetUsername}!`, 2000);
+    } else {
+        showQuickToast(`⚠️ Could not send reaction`, 2000);
+    }
+};
+
+// Quick toast for confirmations
+function showQuickToast(message, duration = 2000) {
+    const toast = document.createElement('div');
+    toast.className = 'quick-toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 10001;
+        animation: slideUp 0.3s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideDown 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Check for incoming reactions on page load
+async function checkIncomingReactions() {
+    const reactions = await checkNewReactions();
+    
+    if (reactions.length === 0) return;
+    
+    // Show notification for each new reaction
+    reactions.forEach(reaction => {
+        const emoteIcons = {
+            'thanks': '🤝',
+            'props': '👊',
+            'rivalry': '⚔️',
+            'hype': '🔥'
+        };
+        
+        notifications.push({
+            priority: 8, // High priority - someone messaged you!
+            type: 'emote-received',
+            reactionId: reaction.id,
+            fromUsername: reaction.fromUsername,
+            emoteType: reaction.type,
+            icon: emoteIcons[reaction.type] || '✨',
+            message: `${emoteIcons[reaction.type]} ${reaction.fromUsername} sent you ${reaction.type}!`,
+            detail: `"${reaction.message}" in ${reaction.matchTitle}`,
+            cta: 'View Match',
+            action: 'navigate',
+            targetUrl: `/vote.html?match=${reaction.matchId}`,
+            onShow: () => markReactionSeen(reaction.id) // Mark as seen when shown
+        });
+    });
+    
+    console.log(`📬 Loaded ${reactions.length} new reactions`);
+
+    
+}
+
+// ========================================
+// CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
+// ========================================
+
+async function checkMissedNotifications() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') return;
+    
+    console.log('🔍 Checking for missed notifications...');
+    
+    const missedNotifications = await getRecentUnshownNotifications(userId, 60);
+    
+    if (missedNotifications.length === 0) {
+        console.log('✅ No missed notifications');
+        return;
+    }
+    
+    console.log(`📬 Found ${missedNotifications.length} missed notifications`);
+    
+    missedNotifications.forEach(notification => {
+        notifications.push({
+            priority: notification.priority,
+            type: notification.type,
+            matchId: notification.matchId,
+            matchTitle: notification.matchTitle,
+            username: notification.triggerUsername,
+            userId: notification.triggerUserId,
+            message: `While you were away: ${notification.message}`,
+            detail: notification.detail,
+            icon: notification.icon,
+            cta: notification.ctaText,
+            action: notification.ctaAction,
+            targetUrl: notification.targetUrl,
+            emoteData: notification.ctaAction === 'send-emote' ? notification.ctaData : null,
+            onShow: () => markNotificationShown(notification.id)
+        });
+    });
+}
+
+// Run on page load
+setTimeout(() => {
+    checkMissedNotifications();
+}, 2000);
+
+// Check on page load and every 2 minutes
+checkIncomingReactions();
+setInterval(checkIncomingReactions, 120000);
