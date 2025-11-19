@@ -226,101 +226,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ========================================
-// ⭐ UPDATED: FIREBASE ANONYMOUS AUTH
-// ========================================
+    // ⭐ NEW: USER IDENTIFICATION SYSTEM
+    // ========================================
 
-import { auth } from './firebase-config.js';
-import { signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-/**
- * Get or create anonymous Firebase user
- * Returns Firebase UID for secure identification
- */
-async function getUserId() {
-    // ✅ CHECK FOR EXISTING USER ID FIRST (preserve old votes)
-    const existingUserId = localStorage.getItem('tournamentUserId');
-    
-    // If user already has an ID (old IP-based system), KEEP IT
-    if (existingUserId && !existingUserId.startsWith('fallback_')) {
-        console.log('👤 Using existing user ID (preserving old votes):', existingUserId);
-        return existingUserId;
+    /**
+     * Get or generate a unique user identifier
+     * Combines IP address + browser fingerprint for better security
+     */
+    async function getUserId() {
+        // Check localStorage first
+        const stored = localStorage.getItem('tournamentUserId');
+        if (stored) {
+            console.log('🆔 Using stored user ID:', stored);
+            return stored;
+        }
+        
+        console.log('🆔 Generating new user ID...');
+        
+        // Get IP address
+        let ipAddress = 'unknown';
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            ipAddress = data.ip;
+            console.log('📍 IP Address:', ipAddress);
+        } catch (error) {
+            console.warn('⚠️ Could not get IP address:', error);
+        }
+        
+        // Generate browser fingerprint
+        const fingerprint = generateBrowserFingerprint();
+        console.log('🔐 Browser fingerprint:', fingerprint);
+        
+        // Combine IP + fingerprint and hash it
+        const combined = `${ipAddress}_${fingerprint}_salt2025`;
+        const userId = btoa(combined).substring(0, 32);
+        
+        // Store it
+        localStorage.setItem('tournamentUserId', userId);
+        
+        console.log('✅ Generated user ID:', userId);
+        return userId;
     }
-    
-    // NEW USERS ONLY: Use Firebase Anonymous Auth
-    return new Promise((resolve, reject) => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            try {
-                if (user) {
-                    // Already signed in - use Firebase UID
-                    const userId = user.uid;
-                    localStorage.setItem('tournamentUserId', userId);
-                    console.log('✅ Authenticated user:', userId);
-                    unsubscribe();
-                    resolve(userId);
-                } else {
-                    // Not signed in - sign in anonymously
-                    console.log('🔐 Signing in anonymously...');
-                    const result = await signInAnonymously(auth);
-                    const userId = result.user.uid;
-                    
-                    localStorage.setItem('tournamentUserId', userId);
-                    console.log('✅ Anonymous auth successful:', userId);
-                    unsubscribe(); // Stop listening
-                    resolve(userId);
-                }
-            } catch (error) {
-                console.error('❌ Firebase auth failed:', error);
-                unsubscribe();
-                
-                // Fallback to old IP-based system if Firebase fails
-                console.warn('⚠️ Falling back to IP-based authentication');
-                const fallbackId = await generateFallbackUserId();
-                resolve(fallbackId);
-            }
-        }, reject);
-    });
-}
 
-/**
- * Fallback user ID generation (only used if Firebase fails)
- */
-async function generateFallbackUserId() {
-    const stored = localStorage.getItem('tournamentUserId');
-    if (stored && !stored.startsWith('fallback_')) return stored;
-    
-    let ipAddress = 'unknown';
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        ipAddress = data.ip;
-    } catch (error) {
-        console.warn('⚠️ Could not get IP address');
+    /**
+     * Generate a browser fingerprint from device characteristics
+     */
+    function generateBrowserFingerprint() {
+        const components = [
+            navigator.userAgent,
+            navigator.language,
+            navigator.platform,
+            screen.width + 'x' + screen.height,
+            screen.colorDepth,
+            new Date().getTimezoneOffset(),
+            !!window.sessionStorage,
+            !!window.localStorage,
+            navigator.hardwareConcurrency || 0
+        ].join('|');
+        
+        // Simple hash
+        return btoa(components).substring(0, 16);
     }
-    
-    const fingerprint = generateBrowserFingerprint();
-    const combined = `${ipAddress}_${fingerprint}_${Date.now()}`;
-    const userId = 'fallback_' + btoa(combined).substring(0, 28);
-    
-    localStorage.setItem('tournamentUserId', userId);
-    console.log('⚠️ Using fallback user ID:', userId);
-    return userId;
-}
-
-/**
- * Generate browser fingerprint (fallback only)
- */
-function generateBrowserFingerprint() {
-    const components = [
-        navigator.userAgent,
-        navigator.language,
-        navigator.platform,
-        screen.width + 'x' + screen.height,
-        screen.colorDepth,
-        new Date().getTimezoneOffset()
-    ].join('|');
-    
-    return btoa(components).substring(0, 16);
-}
 
     // ========================================
     // LOAD COMPETITOR DATA (JSON + FIREBASE)
