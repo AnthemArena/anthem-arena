@@ -5,7 +5,7 @@
     <title>Fix Activity Data</title>
     <script type="module">
         import { db } from './js/firebase-config.js';
-        import { collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         async function fixActivityData() {
             console.log('🔧 Starting activity data fix...');
@@ -14,25 +14,31 @@
             const musicResponse = await fetch('/data/music-videos.json');
             const musicData = await musicResponse.json();
             
-            // Create lookup by seed
+            // Create lookup by seed and videoId
             const musicBySeed = {};
+            const musicByVideoId = {};
             musicData.forEach(song => {
-                musicBySeed[song.seed] = song;
+                if (song.seed) musicBySeed[song.seed] = song;
+                if (song.videoId) musicByVideoId[song.videoId] = song;
             });
             
-            // Load matches to get match context
-            const matchesResponse = await fetch('/.netlify/functions/get-matches');
-            const matches = await matchesResponse.json();
+            console.log(`📊 Loaded ${musicData.length} songs`);
             
-            // Create lookup by matchId
+            // ✅ Load matches directly from Firebase instead of Netlify function
+            console.log('🏆 Loading matches from Firebase...');
+            const matchesRef = collection(db, 'matches');
+            const matchesSnapshot = await getDocs(matchesRef);
+            
             const matchMap = {};
-            matches.forEach(match => {
-                matchMap[match.id || match.matchId] = match;
+            matchesSnapshot.forEach(matchDoc => {
+                const match = matchDoc.data();
+                matchMap[matchDoc.id] = match;
+                if (match.matchId) matchMap[match.matchId] = match;
             });
             
-            console.log(`📊 Loaded ${musicData.length} songs and ${matches.length} matches`);
+            console.log(`✅ Loaded ${matchesSnapshot.size} matches from Firebase`);
             
-            // ✅ NEW: Load user profiles to get usernames
+            // ✅ Load user profiles to get usernames
             console.log('👤 Loading user profiles...');
             const profilesRef = collection(db, 'profiles');
             const profilesSnapshot = await getDocs(profilesRef);
@@ -84,20 +90,23 @@
                             continue;
                         }
                         
-                        // Determine which song was voted for
-                        const votedForSong1 = activity.songId === 'song1';
-                        const votedSong = votedForSong1 ? match.song1 : match.song2;
-                        const otherSong = votedForSong1 ? match.song2 : match.song1;
+                        // Determine which song was voted for based on current songId
+                        let votedForSong1 = activity.songId === 'song1';
                         
-                        if (!votedSong || !otherSong) {
+                        const song1 = match.song1;
+                        const song2 = match.song2;
+                        
+                        if (!song1 || !song2) {
                             console.warn(`⚠️ Missing song data for match: ${activity.matchId}`);
                             errors++;
                             continue;
                         }
                         
+                        const votedSong = votedForSong1 ? song1 : song2;
+                        
                         updates.songId = votedSong.videoId;
                         updates.songTitle = votedSong.shortTitle || votedSong.title;
-                        updates.matchTitle = `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`;
+                        updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
                         
                         needsUpdate = true;
                         fixedSongs++;
@@ -105,7 +114,7 @@
                     }
                     
                     // ========================================
-                    // ✅ FIX 2: Username backfill
+                    // FIX 2: Username backfill
                     // ========================================
                     const currentUsername = activity.username || 'Anonymous';
                     const userId = activity.userId;
@@ -115,9 +124,7 @@
                         const profileUsername = profile.username || 'Anonymous';
                         const profileAvatar = profile.avatar;
                         
-                        // Update if:
-                        // 1. Activity shows "Anonymous" but profile has a username
-                        // 2. Username has changed in profile
+                        // Update if profile has a username but activity shows "Anonymous"
                         if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
                             updates.username = profileUsername;
                             needsUpdate = true;
@@ -158,7 +165,6 @@
             alert(`Activity data fix complete!\n\n🎵 Song data fixed: ${fixedSongs}\n👤 Usernames updated: ${fixedUsernames}\n⏭️ Skipped: ${skipped}\n❌ Errors: ${errors}`);
         }
         
-        // Auto-run on page load
         window.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('fix-btn');
             btn.addEventListener('click', fixActivityData);
