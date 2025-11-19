@@ -22,17 +22,26 @@ export async function sendMessage(toUserId, toUsername, messageText, context = {
     
     if (!fromUserId || fromUserId === 'anonymous') {
         console.error('❌ Must be logged in to send messages');
-        return false;
+        return { success: false, reason: 'You must be logged in to send messages' };
+    }
+    
+    // ✅ CHECK PRIVACY SETTINGS FIRST
+    const { canUserSendMessage } = await import('./privacy-helper.js');
+    const canSend = await canUserSendMessage(fromUserId, toUserId);
+    
+    if (!canSend) {
+        console.warn('❌ User privacy settings block messaging');
+        return { success: false, reason: 'This user has disabled messages from non-friends' };
     }
     
     if (!messageText || messageText.trim().length === 0) {
         console.error('❌ Message cannot be empty');
-        return false;
+        return { success: false, reason: 'Message cannot be empty' };
     }
     
     if (messageText.length > 300) {
         console.error('❌ Message too long (max 300 characters)');
-        return false;
+        return { success: false, reason: 'Message too long (max 300 characters)' };
     }
     
     try {
@@ -55,12 +64,11 @@ export async function sendMessage(toUserId, toUsername, messageText, context = {
         await addDoc(collection(db, 'messages'), messageData);
         
         console.log(`✅ Message sent to ${toUsername}`);
-        return true;
-        
+return { success: true };
+
     } catch (error) {
         console.error('❌ Error sending message:', error);
-        return false;
-    }
+return { success: false, reason: 'Failed to send message' };    }
 }
 
 // ========================================

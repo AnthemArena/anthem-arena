@@ -110,6 +110,9 @@ async function loadNotifications() {
     }).join('');
     
     attachNotificationListeners();
+
+    // ✅ Check privacy settings for action buttons
+    await updateCtaButtonsWithPrivacy();
 }
 
 function renderNotificationItem(notification) {
@@ -152,6 +155,32 @@ function renderNotificationItem(notification) {
         imageHtml = `<span class="notification-item-icon" style="font-size: 20px; margin-right: 8px;">${notification.icon}</span>`;
     }
     
+    // ✅ Determine CTA button HTML based on action availability
+    let ctaHtml = '';
+    
+    if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
+        // Will be populated by async check
+        ctaHtml = `
+            <button class="notification-item-cta" 
+                    data-id="${notification.id}"
+                    data-action="${notification.ctaAction}"
+                    data-target-user="${notification.triggerUserId}"
+                    data-url="${notification.targetUrl || ''}">
+                <span class="cta-loading">Checking...</span>
+            </button>
+        `;
+    } else {
+        // Standard navigation button
+        ctaHtml = `
+            <button class="notification-item-cta" 
+                    data-id="${notification.id}"
+                    data-action="${notification.ctaAction}"
+                    data-url="${notification.targetUrl || ''}">
+                ${notification.ctaText}
+            </button>
+        `;
+    }
+    
     return `
         <div class="notification-item ${unreadClass}" data-id="${notification.id}">
             <div class="notification-item-header" style="display: flex; align-items: center;">
@@ -164,15 +193,66 @@ function renderNotificationItem(notification) {
             ${notification.detail ? `<div class="notification-item-detail">${notification.detail}</div>` : ''}
             <div class="notification-item-footer">
                 <span class="notification-item-time">${timeAgo}</span>
-                <button class="notification-item-cta" 
-                        data-id="${notification.id}"
-                        data-action="${notification.ctaAction}"
-                        data-url="${notification.targetUrl || ''}">
-                    ${notification.ctaText}
-                </button>
+                ${ctaHtml}
             </div>
         </div>
     `;
+}
+
+// ========================================
+// UPDATE CTA BUTTONS BASED ON PRIVACY
+// ========================================
+
+async function updateCtaButtonsWithPrivacy() {
+    const buttons = document.querySelectorAll('.notification-item-cta[data-target-user]');
+    
+    const { getAvailableActions } = await import('./notification-storage.js');
+    
+    for (const btn of buttons) {
+        const targetUserId = btn.dataset.targetUser;
+        const action = btn.dataset.action;
+        const notifId = btn.dataset.id;
+        
+        if (!targetUserId) continue;
+        
+        try {
+            const permissions = await getAvailableActions(targetUserId);
+            
+            // Get notification data for context
+            const userId = localStorage.getItem('tournamentUserId');
+            const notifications = await getUnreadNotifications(userId);
+            const notification = notifications.find(n => n.id === notifId);
+            
+            if (action === 'send-emote') {
+                if (permissions.canEmote) {
+                    btn.innerHTML = notification?.ctaText || 'Send Emote';
+                    btn.disabled = false;
+                } else {
+                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Emotes Disabled</span>`;
+                    btn.disabled = true;
+                    btn.title = permissions.emoteReason || 'Cannot send emote';
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.opacity = '0.5';
+                }
+            } else if (action === 'open-message') {
+                if (permissions.canMessage) {
+                    btn.innerHTML = notification?.ctaText || 'Reply';
+                    btn.disabled = false;
+                } else {
+                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Messages Disabled</span>`;
+                    btn.disabled = true;
+                    btn.title = permissions.messageReason || 'Cannot send message';
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.opacity = '0.5';
+                }
+            }
+        } catch (error) {
+            console.warn('Could not check permissions for button', error);
+            // On error, show button as enabled (fail open)
+            btn.innerHTML = notification?.ctaText || 'Action';
+            btn.disabled = false;
+        }
+    }
 }
 
 function attachNotificationListeners() {
@@ -526,10 +606,10 @@ function showMessageComposer(toUserId, toUsername, context = {}) {
         sendBtn.disabled = true;
         sendBtn.style.opacity = '0.6';
         
-        // Send message
-        const success = await sendMessage(toUserId, toUsername, message, context);
+       // Send message
+        const result = await sendMessage(toUserId, toUsername, message, context);
         
-        if (success) {
+        if (result.success) {
             // Success feedback
             sendBtn.textContent = '✓ Sent!';
             sendBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
@@ -542,10 +622,18 @@ function showMessageComposer(toUserId, toUsername, context = {}) {
                 showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
             }, 1000);
             
-        } else {
+         } else {
             // Error feedback
             sendBtn.textContent = '✗ Failed';
             sendBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            
+            // ✅ Show reason if available
+            if (result.reason) {
+                input.placeholder = result.reason;
+                input.style.borderColor = '#e74c3c';
+            }
+            
+            showQuickToast(result.reason || '⚠️ Could not send message', 3000);
             
             setTimeout(() => {
                 sendBtn.textContent = 'Send 💬';
