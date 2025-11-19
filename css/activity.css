@@ -1,138 +1,14 @@
 /* ========================================
-   ACTIVITY PAGE STYLES - BLACK & GOLD THEME
-   ======================================== */
-
-.activity-page {
-    padding: 2rem 0 4rem;
-    min-height: 100vh;
-    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95), rgba(5, 5, 5, 0.98));
-}
-
-.page-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.page-header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #C8AA6E;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-.page-subtitle {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 1.1rem;
-    line-height: 1.6;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-/* ========================================
-   STATS CARDS
-   ======================================== */
-
-.activity-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(200, 170, 110, 0.3);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    border-color: rgba(200, 170, 110, 0.5);
-    background: rgba(0, 0, 0, 0.7);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.2);
-}
-
-.stat-icon {
-    font-size: 2rem;
-}
-
-.stat-info {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #C8AA6E;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-    font-family: 'Cinzel', serif;
-}
-
-.stat-label {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* ========================================
-   FILTERS
-   ======================================== */
-
-.activity-filters {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 0.75rem 1.5rem;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(200, 170, 110, 0.3);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.7);
-    font-family: 'Lora', serif;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.filter-btn:hover {
-    background: rgba(200, 170, 110, 0.1);
-    border-color: rgba(200, 170, 110, 0.5);
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, #C8AA6E 0%, #B89A5E 100%);
-    border-color: #C8AA6E;
-    color: #0a0a0a;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
-}
-
-/* ========================================
-   ACTIVITY FEED - HORIZONTAL STACKED CARDS
+   ACTIVITY FEED - WIDER HORIZONTAL CARDS
    ======================================== */
 
 .activity-feed {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-width: 1000px;
+    max-width: 1400px; /* ✅ Increased from 1000px */
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .vote-card {
@@ -143,7 +19,8 @@
     transition: all 0.3s ease;
     display: flex;
     flex-direction: row;
-    height: 140px;
+    min-height: 140px; /* ✅ Changed from fixed height */
+    height: auto; /* ✅ Allow height to flex */
 }
 
 .vote-card:hover {
@@ -155,8 +32,8 @@
 /* Thumbnail Section - Fixed width on left */
 .vote-thumbnail {
     position: relative;
-    width: 240px;
-    min-width: 240px;
+    width: 280px; /* ✅ Increased from 240px */
+    min-width: 280px;
     background: #000;
     overflow: hidden;
 }
@@ -172,15 +49,14 @@
     transform: scale(1.05);
 }
 
-/* NO PLAY BUTTON - Removed completely */
-
 /* Card Content - Takes remaining space */
 .vote-content {
-    padding: 1rem 1.25rem;
+    padding: 1.25rem 1.5rem; /* ✅ Increased padding */
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 0.75rem; /* ✅ Added gap */
     min-width: 0; /* Allow flex items to shrink */
 }
 
@@ -188,13 +64,13 @@
 .vote-user {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.875rem; /* ✅ Increased gap */
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
+    width: 44px; /* ✅ Slightly larger */
+    height: 44px;
+    min-width: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -218,13 +94,15 @@
 .user-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .username {
     font-weight: 700;
     color: #C8AA6E;
-    font-size: 1rem;
-    margin-bottom: 0.15rem;
+    font-size: 1.05rem; /* ✅ Slightly larger */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -232,7 +110,8 @@
 
 .vote-time {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 /* Song Info - Middle row */
@@ -240,67 +119,73 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 0.5rem;
+    min-width: 0;
 }
 
 .song-title {
     font-family: 'Cinzel', serif;
-    font-size: 1.1rem;
+    font-size: 1.25rem; /* ✅ Larger */
+    font-weight: 600;
     color: #fff;
-    margin-bottom: 0.5rem;
     line-height: 1.3;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* ✅ Allow 2 lines */
+    -webkit-box-orient: vertical;
 }
 
 .match-info {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.75rem; /* ✅ Increased gap */
     align-items: center;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
 }
 
 .match-badge {
     background: rgba(200, 170, 110, 0.15);
     color: #C8AA6E;
-    padding: 0.25rem 0.65rem;
+    padding: 0.35rem 0.75rem; /* ✅ More padding */
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: 0.8rem; /* ✅ Slightly larger */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     border: 1px solid rgba(200, 170, 110, 0.3);
+    white-space: nowrap;
 }
 
 .tournament-name {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    white-space: nowrap;
 }
 
-/* Vote Action - Bottom row (optional) */
+/* Vote Action - Bottom row */
 .vote-action {
     display: flex;
     align-items: center;
+    margin-top: auto; /* ✅ Push to bottom */
 }
 
 .view-match-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1.25rem; /* ✅ More padding */
     background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(200, 170, 110, 0.1));
     border: 1px solid rgba(200, 170, 110, 0.4);
     border-radius: 8px;
     color: #C8AA6E;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.9rem; /* ✅ Slightly larger */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .view-match-btn:hover {
@@ -311,119 +196,34 @@
 }
 
 /* ========================================
-   EMPTY STATE
+   RESPONSIVE - Better mobile handling
    ======================================== */
 
-.no-activity {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(200, 170, 110, 0.3);
-    border-radius: 12px;
+@media (max-width: 968px) {
+    .activity-feed {
+        max-width: 100%;
+        padding: 0 0.5rem;
+    }
+    
+    .vote-card {
+        min-height: 120px;
+    }
+    
+    .vote-thumbnail {
+        width: 220px;
+        min-width: 220px;
+    }
+    
+    .vote-content {
+        padding: 1rem;
+    }
+    
+    .song-title {
+        font-size: 1.1rem;
+    }
 }
-
-.empty-icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.no-activity h3 {
-    font-family: 'Cinzel', serif;
-    color: #C8AA6E;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-    letter-spacing: 0.05em;
-}
-
-.no-activity p {
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 1.5rem;
-}
-
-.btn-primary {
-    display: inline-block;
-    padding: 0.875rem 2rem;
-    background: linear-gradient(135deg, #C8AA6E 0%, #B89A5E 100%);
-    color: #0a0a0a;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #D4B87A 0%, #C8AA6E 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(200, 170, 110, 0.5);
-}
-
-/* ========================================
-   ERROR STATE
-   ======================================== */
-
-.error-message {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: rgba(220, 50, 50, 0.1);
-    border: 1px solid rgba(220, 50, 50, 0.3);
-    border-radius: 12px;
-}
-
-.error-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 1rem;
-    color: #dc3232;
-}
-
-.error-message p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-}
-
-.no-results {
-    text-align: center;
-    padding: 3rem;
-    color: rgba(255, 255, 255, 0.5);
-    font-style: italic;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 768px) {
-    .page-header h1 {
-        font-size: 2rem;
-    }
-    
-    .page-subtitle {
-        font-size: 1rem;
-    }
-    
-    .activity-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .stat-value {
-        font-size: 1.75rem;
-    }
-    
-    .activity-filters {
-        flex-direction: column;
-    }
-    
-    .filter-btn {
-        width: 100%;
-        text-align: center;
-    }
-    
     .vote-card {
         flex-direction: column;
         height: auto;
@@ -440,69 +240,49 @@
         top: 0;
         left: 0;
     }
+    
+    .user-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .song-title {
+        font-size: 1rem;
+        -webkit-line-clamp: 3; /* More lines on mobile */
+    }
 }
 
 @media (max-width: 480px) {
-    .activity-page {
-        padding: 1rem 0 3rem;
-    }
-    
-    .page-header {
-        margin-bottom: 2rem;
-    }
-    
-    .page-header h1 {
-        font-size: 1.75rem;
-    }
-    
     .vote-content {
-        padding: 1rem;
-    }
-    
-    .stat-card {
-        padding: 1rem;
+        padding: 0.875rem;
     }
     
     .user-avatar {
         width: 36px;
         height: 36px;
         min-width: 36px;
-        font-size: 1rem;
+    }
+    
+    .username {
+        font-size: 0.95rem;
     }
     
     .song-title {
-        font-size: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .match-info {
+        gap: 0.5rem;
+    }
+    
+    .match-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .view-match-btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
     }
 }
-
-/* ========================================
-   ANIMATIONS
-   ======================================== */
-
-@keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.vote-card {
-    animation: fadeInRight 0.4s ease;
-    animation-fill-mode: both;
-}
-
-/* Stagger animation */
-.vote-card:nth-child(1) { animation-delay: 0.05s; }
-.vote-card:nth-child(2) { animation-delay: 0.1s; }
-.vote-card:nth-child(3) { animation-delay: 0.15s; }
-.vote-card:nth-child(4) { animation-delay: 0.2s; }
-.vote-card:nth-child(5) { animation-delay: 0.25s; }
-.vote-card:nth-child(6) { animation-delay: 0.3s; }
-.vote-card:nth-child(7) { animation-delay: 0.35s; }
-.vote-card:nth-child(8) { animation-delay: 0.4s; }
-.vote-card:nth-child(9) { animation-delay: 0.45s; }
-.vote-card:nth-child(10) { animation-delay: 0.5s; }

@@ -1470,120 +1470,108 @@ async function submitVote(songId) {
         return;
     }
     
-    // Disable voting buttons immediately
-    hasVoted = true;
-    const voteButtons = document.querySelectorAll('.vote-btn');
-    voteButtons.forEach(btn => {
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-        btn.style.cursor = 'not-allowed';
+   // Disable voting buttons immediately
+hasVoted = true;
+const voteButtons = document.querySelectorAll('.vote-btn');
+voteButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+});
+
+try {
+    // ✅ Show spinner with voting message
+    showLoadingSpinner('Submitting your vote...');
+    
+    // Determine which song was voted for (song1 or song2)
+    const votedForSong1 = songId === 'song1';
+    
+    console.log('🗳️ Voting for:', votedForSong1 ? 'Song 1' : 'Song 2');
+    console.log('👤 User ID:', userId);
+    
+    // ⭐ Get user profile data ONCE (used for both vote record and activity)
+    const username = localStorage.getItem('username') || 'Anonymous';
+    const isPublic = localStorage.getItem('isPublic') === 'true';
+    const avatarJson = localStorage.getItem('avatar');
+    
+    // Parse avatar (could be emoji or URL object)
+    let avatar;
+    try {
+        avatar = JSON.parse(avatarJson);
+    } catch {
+        // Fallback for old emoji-only format or null
+        avatar = { type: 'emoji', value: avatarJson || '🎵' };
+    }
+    
+    // ⭐ Create vote record in Firebase
+    const voteId = `${currentMatch.id}_${userId}`;
+    const voteRef = doc(db, 'votes', voteId);
+    
+    // Check if vote already exists (extra safety)
+    const existingVote = await getDoc(voteRef);
+    if (existingVote.exists()) {
+        hideLoadingSpinner();
+        console.warn('⚠️ Vote already exists!');
+        showNotification('You have already voted in this match!', 'error');
+        disableVoting(existingVote.data().choice);
+        return;
+    }
+    
+    // Save vote to Firebase with username and avatar
+    await setDoc(voteRef, {
+        tournament: ACTIVE_TOURNAMENT,
+        matchId: currentMatch.id,
+        userId: userId,
+        username: username,  // ✅ Included
+        avatar: avatar,      // ✅ Included
+        choice: songId,
+        timestamp: new Date().toISOString(),
+        round: currentMatch.round,
+        // Store song details for analytics
+        votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
+        votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
     });
     
-    try {
-        // ✅ Show spinner with voting message
-        showLoadingSpinner('Submitting your vote...');
-        
-        // Determine which song was voted for (song1 or song2)
-        const votedForSong1 = songId === 'song1';
-        
-        console.log('🗳️ Voting for:', votedForSong1 ? 'Song 1' : 'Song 2');
-        console.log('👤 User ID:', userId);
-        
-        // ⭐ NEW: Create vote record in Firebase
-        const voteId = `${currentMatch.id}_${userId}`;
-        const voteRef = doc(db, 'votes', voteId);
-        
-        // Check if vote already exists (extra safety)
-        const existingVote = await getDoc(voteRef);
-        if (existingVote.exists()) {
-            hideLoadingSpinner(); // ✅ Hide spinner
-            console.warn('⚠️ Vote already exists!');
-            showNotification('You have already voted in this match!', 'error');
-            disableVoting(existingVote.data().choice);
-            return;
-        }
-        
-       // ✅ Get user profile data
-const username = localStorage.getItem('username') || 'Anonymous';
-const avatarJson = localStorage.getItem('avatar');
+    console.log('✅ Vote record created in Firebase');
+    
+    // ✅ Use API client to submit vote (updates match counts)
+    await submitVoteToAPI(currentMatch.id, songId);
+    console.log('✅ Vote submitted via API client');
+    
+    // Save vote locally as backup
+    localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
+    
+    // ✅ Also save in userVotes format for homepage/matches pages
+    saveVoteForOtherPages(currentMatch.id, songId);
 
-// Parse avatar (could be emoji or URL object)
-let avatar;
-try {
-    avatar = JSON.parse(avatarJson);
-} catch {
-    // Fallback for old emoji-only format or null
-    avatar = { type: 'emoji', value: avatarJson || '🎵' };
-}
-
-await setDoc(voteRef, {
-    tournament: ACTIVE_TOURNAMENT,
-    matchId: currentMatch.id,
-    userId: userId,
-    username: username,  // ✅ ADD THIS
-    avatar: avatar,      // ✅ ADD THIS
-    choice: songId,
-    timestamp: new Date().toISOString(),
-    round: currentMatch.round,
-    // Store song details for analytics
-    votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
-    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
-});
-        
-        console.log('✅ Vote record created in Firebase');
-        
-        // ✅ NEW: Use API client to submit vote (updates match counts)
-        await submitVoteToAPI(currentMatch.id, songId);
-        console.log('✅ Vote submitted via API client');
-        
-        // Save vote locally as backup
-        localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
-        
-        // ✅ NEW: Also save in userVotes format for homepage/matches pages
-        saveVoteForOtherPages(currentMatch.id, songId);
-
-     
-       // ========================================
-        // ✅ NEW: LOG ACTIVITY IF PUBLIC PROFILE
-        // ========================================
-        const username = localStorage.getItem('username');
-        const isPublic = localStorage.getItem('isPublic') === 'true';
-        const avatarJson = localStorage.getItem('avatar');
-        
-        // Parse avatar (could be emoji or URL)
-        let avatar;
+    // ========================================
+    // ✅ LOG ACTIVITY IF PUBLIC PROFILE
+    // ========================================
+    if (isPublic && username !== 'Anonymous') {
         try {
-            avatar = JSON.parse(avatarJson);
-        } catch {
-            // Fallback for old emoji-only format
-            avatar = { type: 'emoji', value: avatarJson || '🎵' };
+            const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+            const activityId = `${userId}_${currentMatch.id}`;
+            
+            await setDoc(doc(db, 'activity', activityId), {
+                activityId: activityId,
+                userId: userId,
+                username: username,
+                avatar: avatar,
+                matchId: currentMatch.id,
+                matchTitle: `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`,
+                songId: songId,
+                songTitle: votedSong.name,
+                timestamp: Date.now(),
+                round: currentMatch.round,
+                tournamentId: ACTIVE_TOURNAMENT
+            });
+            
+            console.log('✅ Activity logged to Firebase');
+        } catch (activityError) {
+            console.warn('⚠️ Could not log activity:', activityError);
+            // Don't block vote submission if activity logging fails
         }
-        
-        if (isPublic && username) {
-            try {
-                const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
-                const activityId = `${userId}_${currentMatch.id}`;
-                
-                await setDoc(doc(db, 'activity', activityId), {
-                    activityId: activityId,
-                    userId: userId,
-                    username: username,
-                    avatar: avatar,
-                    matchId: currentMatch.id,
-                    matchTitle: `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`,
-                    songId: songId,
-                    songTitle: votedSong.name,
-                    timestamp: Date.now(),
-                    round: currentMatch.round,
-                    tournamentId: ACTIVE_TOURNAMENT
-                });
-                
-                console.log('✅ Activity logged to Firebase');
-            } catch (activityError) {
-                console.warn('⚠️ Could not log activity:', activityError);
-                // Don't block vote submission if activity logging fails
-            }
-        }
+    }
         
         // ========================================
         // ✅ NEW: CALCULATE AND AWARD XP
