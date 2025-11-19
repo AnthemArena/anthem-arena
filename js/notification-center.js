@@ -1,11 +1,14 @@
 console.log('🔔 notification-center.js loaded');
 
 import { 
+    
     getUnreadNotifications, 
     getUnreadCount, 
     markNotificationRead, 
     dismissNotification 
 } from './notification-storage.js';
+import { sendMessage } from './message-system.js';
+
 
 export async function initNotificationCenter() {
     const bell = document.getElementById('notificationBell');
@@ -247,6 +250,32 @@ function attachNotificationListeners() {
                 }
             }
             
+           // ✅ HANDLE MESSAGE REPLY
+            if (action === 'open-message') {
+                const userId = localStorage.getItem('tournamentUserId');
+                const notifications = await getUnreadNotifications(userId);
+                const notification = notifications.find(n => n.id === id);
+                
+                if (notification && notification.ctaData) {
+                    // Show message composer
+                    await markNotificationRead(id);
+                    await updateBadgeCount();
+                    
+                    showMessageComposer(
+                        notification.ctaData.fromUserId,
+                        notification.ctaData.fromUsername,
+                        {
+                            matchId: notification.matchId,
+                            matchTitle: notification.matchTitle,
+                            replyTo: notification.ctaData.originalMessage,
+                            notificationId: id
+                        }
+                    );
+                    
+                    return; // Don't navigate
+                }
+            }
+            
             // ✅ HANDLE NAVIGATION
             await markNotificationRead(id);
             await updateBadgeCount();
@@ -317,3 +346,299 @@ function getTimeAgo(timestamp) {
     if (days < 7) return `${days}d ago`;
     return 'Over a week ago';
 }
+// ========================================
+// MESSAGE COMPOSER
+// ========================================
+
+function showMessageComposer(toUserId, toUsername, context = {}) {
+    // Remove existing composer if any
+    const existing = document.getElementById('messageComposer');
+    if (existing) existing.remove();
+    
+    // Create composer overlay
+    const composer = document.createElement('div');
+    composer.id = 'messageComposer';
+    composer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    composer.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; color: #C8AA6E; font-size: 1.2rem;">
+                    💬 Message ${toUsername}
+                </h3>
+                <button id="closeComposer" style="
+                    background: none;
+                    border: none;
+                    color: #888;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">×</button>
+            </div>
+            
+            ${context.replyTo ? `
+                <div style="
+                    background: rgba(200, 170, 110, 0.1);
+                    border-left: 3px solid #C8AA6E;
+                    padding: 12px;
+                    margin-bottom: 16px;
+                    border-radius: 4px;
+                    font-size: 0.9rem;
+                    color: #aaa;
+                ">
+                    <div style="color: #C8AA6E; font-weight: 600; margin-bottom: 4px;">
+                        Replying to:
+                    </div>
+                    "${context.replyTo}"
+                </div>
+            ` : ''}
+            
+            ${context.matchTitle ? `
+                <div style="
+                    background: rgba(200, 170, 110, 0.05);
+                    padding: 8px 12px;
+                    margin-bottom: 16px;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                    color: #888;
+                ">
+                    📍 About: ${context.matchTitle}
+                </div>
+            ` : ''}
+            
+            <textarea id="messageInput" 
+                placeholder="Type your message... (max 300 characters)"
+                maxlength="300"
+                style="
+                    width: 100%;
+                    height: 120px;
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 2px solid rgba(200, 170, 110, 0.3);
+                    border-radius: 8px;
+                    padding: 12px;
+                    color: #fff;
+                    font-family: inherit;
+                    font-size: 1rem;
+                    resize: vertical;
+                    margin-bottom: 12px;
+                "
+            ></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="charCount" style="color: #888; font-size: 0.85rem;">0/300</span>
+                <div style="display: flex; gap: 8px;">
+                    <button id="cancelMessage" style="
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        color: #fff;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">Cancel</button>
+                    <button id="sendMessage" style="
+                        background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                        border: none;
+                        color: #1a1a2e;
+                        padding: 10px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 700;
+                        box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+                    ">Send 💬</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(composer);
+    
+    // Get elements
+    const input = document.getElementById('messageInput');
+    const charCount = document.getElementById('charCount');
+    const sendBtn = document.getElementById('sendMessage');
+    const cancelBtn = document.getElementById('cancelMessage');
+    const closeBtn = document.getElementById('closeComposer');
+    
+    // Focus input
+    input.focus();
+    
+    // Character counter
+    input.addEventListener('input', () => {
+        const length = input.value.length;
+        charCount.textContent = `${length}/300`;
+        charCount.style.color = length > 280 ? '#e74c3c' : '#888';
+    });
+    
+    // Close handlers
+    const closeComposer = () => {
+        composer.style.animation = 'fadeOut 0.2s ease';
+        setTimeout(() => composer.remove(), 200);
+    };
+    
+    closeBtn.addEventListener('click', closeComposer);
+    cancelBtn.addEventListener('click', closeComposer);
+    composer.addEventListener('click', (e) => {
+        if (e.target === composer) closeComposer();
+    });
+    
+    // Send message
+    sendBtn.addEventListener('click', async () => {
+        const message = input.value.trim();
+        
+        if (!message) {
+            input.style.borderColor = '#e74c3c';
+            setTimeout(() => {
+                input.style.borderColor = 'rgba(200, 170, 110, 0.3)';
+            }, 1000);
+            return;
+        }
+        
+        // Show loading state
+        sendBtn.textContent = 'Sending...';
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.6';
+        
+        // Send message
+        const success = await sendMessage(toUserId, toUsername, message, context);
+        
+        if (success) {
+            // Success feedback
+            sendBtn.textContent = '✓ Sent!';
+            sendBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
+            
+            // Close after 1 second
+            setTimeout(() => {
+                closeComposer();
+                
+                // Show success toast
+                showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
+            }, 1000);
+            
+        } else {
+            // Error feedback
+            sendBtn.textContent = '✗ Failed';
+            sendBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            
+            setTimeout(() => {
+                sendBtn.textContent = 'Send 💬';
+                sendBtn.disabled = false;
+                sendBtn.style.opacity = '1';
+                sendBtn.style.background = 'linear-gradient(135deg, #C8AA6E, #B89A5E)';
+            }, 2000);
+        }
+    });
+    
+    // Send on Enter (Shift+Enter for new line)
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendBtn.click();
+        }
+    });
+}
+
+// Helper function for quick toasts
+function showQuickToast(message, duration = 2000) {
+    const existing = document.getElementById('quickToast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.id = 'quickToast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+        color: #1a1a2e;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10002;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from { 
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from { 
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to { 
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+`;
+document.head.appendChild(style);

@@ -10,8 +10,8 @@ import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, lim
 // {
 //   notificationId: "auto-generated",
 //   userId: "user123",
-//   type: "causal-event" | "live-activity" | "match-status" | "achievement" | "emote-received",
-//   priority: 10,
+//   type: "causal-event" | "live-activity" | "match-status" | "achievement" | "emote-received" | "message-received",
+// //   priority: 10,
 //   
 //   message: "SummonerElite flipped the match!",
 //   detail: "RISE is now trailing in RISE vs GODS",
@@ -241,6 +241,38 @@ export async function getUnreadCount(userId) {
         console.error('❌ Error getting unread count:', error);
         return 0;
     }
+}
+
+// ========================================
+// SAVE MESSAGE NOTIFICATION
+// ========================================
+
+export async function saveMessageNotification(toUserId, fromUsername, fromUserId, messageText, context = {}) {
+    return await saveNotification(toUserId, {
+        type: 'message-received',
+        priority: 8, // High priority
+        message: `💬 ${fromUsername} sent you a message`,
+        detail: messageText.length > 60 ? messageText.substring(0, 60) + '...' : messageText,
+        icon: '💬',
+        
+        // Sender info
+        triggerUsername: fromUsername,
+        triggerUserId: fromUserId,
+        
+        // Context
+        matchId: context.matchId || null,
+        matchTitle: context.matchTitle || null,
+        
+        // Action
+        ctaText: 'Reply',
+        ctaAction: 'open-message',
+        ctaData: {
+            fromUsername,
+            fromUserId,
+            originalMessage: messageText
+        },
+        targetUrl: `/messages.html?user=${fromUserId}`
+    });
 }
 
 // ========================================

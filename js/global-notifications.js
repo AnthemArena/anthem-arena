@@ -828,16 +828,29 @@ const notificationData = {
 // Save to Firestore for notification center
 if (userId && userId !== 'anonymous') {
     await saveNotification(userId, notificationData);
+
+    // Also add a "Send Message" quick action
+if (latestActivity.userId !== userId) {
+    // Don't send message option to yourself
+    notificationData.secondaryCta = {
+        text: 'Send Message',
+        action: 'open-message',
+        data: {
+            fromUsername: latestActivity.username,
+            fromUserId: latestActivity.userId
+        }
+    };
+}
 }
 
 // Show as toast immediately
-notifications.push(notificationData);
+showBulletin(notificationData);  // ✅ Correct - use the function to display toast
         
-        // Track to avoid duplicates
-        recentlyShownBulletins.set(voteKey, now);
-        lastSeenActivityId = latestActivity.activityId;
-        
-        console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle} (${hasVoted ? (userVotedSongId === latestActivity.songId ? 'ALLY' : 'OPPONENT') : 'NOT VOTED'})`);
+// Track to avoid duplicates
+recentlyShownBulletins.set(voteKey, now);
+lastSeenActivityId = latestActivity.activityId;
+
+console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle} (${hasVoted ? (userVotedSongId === latestActivity.songId ? 'ALLY' : 'OPPONENT') : 'NOT VOTED'})`);
         
     } catch (error) {
         console.error('Error checking recent votes:', error);
