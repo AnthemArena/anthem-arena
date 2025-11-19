@@ -1532,20 +1532,28 @@ function showNoVotesState() {
     const noVotesState = document.getElementById('noVotesState');
     if (noVotesState) noVotesState.style.display = 'block';
     
-    // Hide stats sections
+    // Hide votes grid (correct ID)
+    const votesGrid = document.getElementById('votesGrid');
+    if (votesGrid) votesGrid.style.display = 'none';
+    
+    // Hide stats sections (correct ID)
+    const statsHeroSection = document.getElementById('statsHeroSection');
+    if (statsHeroSection) statsHeroSection.style.display = 'none';
+    
     const statsOverview = document.getElementById('statsOverview');
     if (statsOverview) statsOverview.style.display = 'none';
     
     const filtersSection = document.getElementById('filtersSection');
     if (filtersSection) filtersSection.style.display = 'none';
     
-    const statsHeroSection = document.getElementById('statsHeroSection');
-    if (statsHeroSection) statsHeroSection.style.display = 'none';
-    
     const achievementsSection = document.getElementById('achievementsSection');
     if (achievementsSection) achievementsSection.style.display = 'none';
     
-    // Hide section header (share button, etc.)
+    // Also try votes-list for backwards compatibility
+    const votesList = document.getElementById('votes-list');
+    if (votesList) votesList.style.display = 'none';
+    
+    // Hide section header
     const sectionHeader = document.querySelector('.votes-section .section-header');
     if (sectionHeader) sectionHeader.style.display = 'none';
 }
