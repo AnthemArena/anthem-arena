@@ -3,6 +3,8 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { db } from './firebase-config.js';
+import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Champion list (same as username-system.js)
 const CHAMPIONS = [
@@ -545,6 +547,23 @@ async function handleSaveSettings(e) {
     localStorage.setItem('username', username);
     localStorage.setItem('isPublic', isPublic ? 'true' : 'false');
     localStorage.setItem('avatar', JSON.stringify(avatar));
+    
+    // ✅ NEW: Save to Firebase profiles collection
+    try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            await setDoc(doc(db, 'profiles', userId), {
+                username: username,
+                avatar: avatar,
+                isPublic: isPublic,
+                updatedAt: Date.now()
+            });
+            console.log('✅ Profile saved to Firebase');
+        }
+    } catch (error) {
+        console.warn('⚠️ Could not save profile to Firebase:', error);
+        // Don't block the save if Firebase fails
+    }
     
     hasChanges = false;
     
