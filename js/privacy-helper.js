@@ -1,77 +1,32 @@
 console.log('🔒 privacy-helper.js loaded');
 
+import { db } from './firebase-config.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
 // ========================================
-// CHECK USER PRIVACY SETTINGS
+// CACHE FOR PRIVACY SETTINGS
 // ========================================
 
-export function canSendFriendRequest(targetUserId) {
-    // TODO: Check target user's allowFriendRequests setting from Firebase
-    // For now, check localStorage (will work for current user only)
-    const allowFriendRequests = localStorage.getItem('allowFriendRequests');
-    return allowFriendRequests === null || allowFriendRequests === 'true';
-}
+const privacyCache = new Map();
+const CACHE_DURATION = 60000; // 1 minute
 
-export function canSendMessage(currentUserId, targetUserId, areFriends = false) {
-    // TODO: Fetch target user's messagePrivacy from Firebase
-    // For now, check localStorage (will work for current user only)
-    const messagePrivacy = localStorage.getItem('messagePrivacy') || 'everyone';
-    
-    if (currentUserId === targetUserId) {
-        return false; // Can't message yourself
-    }
-    
-    switch (messagePrivacy) {
-        case 'everyone':
-            return true;
-        case 'friends':
-            return areFriends;
-        case 'nobody':
-            return false;
-        default:
-            return true;
-    }
-}
+// ========================================
+// GET DEFAULT PRIVACY SETTINGS
+// ========================================
 
-export function canSendEmote(currentUserId, targetUserId, areFriends = false) {
-    const emotePrivacy = localStorage.getItem('emotePrivacy') || 'everyone';
-    
-    if (currentUserId === targetUserId) {
-        return false; // Can't emote yourself
-    }
-    
-    switch (emotePrivacy) {
-        case 'everyone':
-            return true;
-        case 'friends':
-            return areFriends;
-        case 'nobody':
-            return false;
-        default:
-            return true;
-    }
-}
-
-export function shouldShowOnlineStatus(userId) {
-    // TODO: Fetch from Firebase
-    const showOnlineStatus = localStorage.getItem('showOnlineStatus');
-    return showOnlineStatus === null || showOnlineStatus === 'true';
-}
-
-export function isProfilePublic(userId) {
-    // TODO: Fetch from Firebase
-    const isPublic = localStorage.getItem('isPublic');
-    return isPublic === null || isPublic === 'true';
+function getDefaultPrivacySettings() {
+    return {
+        isPublic: true,
+        allowFriendRequests: true,
+        messagePrivacy: 'everyone',
+        showOnlineStatus: true,
+        emotePrivacy: 'everyone'
+    };
 }
 
 // ========================================
 // FETCH USER PRIVACY SETTINGS FROM FIREBASE
 // ========================================
-
-import { db } from './firebase-config.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-const privacyCache = new Map();
-const CACHE_DURATION = 60000; // 1 minute
 
 export async function getUserPrivacySettings(userId) {
     if (!userId) return getDefaultPrivacySettings();
@@ -102,16 +57,6 @@ export async function getUserPrivacySettings(userId) {
     }
     
     return getDefaultPrivacySettings();
-}
-
-function getDefaultPrivacySettings() {
-    return {
-        isPublic: true,
-        allowFriendRequests: true,
-        messagePrivacy: 'everyone',
-        showOnlineStatus: true,
-        emotePrivacy: 'everyone'
-    };
 }
 
 // ========================================
@@ -157,4 +102,14 @@ export async function canUserSendEmote(currentUserId, targetUserId, areFriends =
         default:
             return true;
     }
+}
+
+export async function shouldShowOnlineStatus(userId) {
+    const privacy = await getUserPrivacySettings(userId);
+    return privacy.showOnlineStatus;
+}
+
+export async function isProfilePublic(userId) {
+    const privacy = await getUserPrivacySettings(userId);
+    return privacy.isPublic;
 }

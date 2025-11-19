@@ -115,6 +115,35 @@ async function loadNotifications() {
     await updateCtaButtonsWithPrivacy();
 }
 
+// ========================================
+// RENDER CTA BUTTON (WITH PRIVACY CHECK PLACEHOLDER)
+// ========================================
+
+function renderCtaButton(notification) {
+    // ✅ For actions that need privacy check
+    if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
+        return `
+            <button class="notification-item-cta" 
+                    data-id="${notification.id}"
+                    data-action="${notification.ctaAction}"
+                    data-target-user="${notification.triggerUserId || ''}"
+                    data-url="${notification.targetUrl || ''}">
+                <span class="cta-loading" style="opacity: 0.6;">Checking...</span>
+            </button>
+        `;
+    }
+    
+    // ✅ Standard navigation button
+    return `
+        <button class="notification-item-cta" 
+                data-id="${notification.id}"
+                data-action="${notification.ctaAction}"
+                data-url="${notification.targetUrl || ''}">
+            ${notification.ctaText}
+        </button>
+    `;
+}
+
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
@@ -191,12 +220,72 @@ function renderNotificationItem(notification) {
                 <button class="notification-item-dismiss" data-id="${notification.id}">✕</button>
             </div>
             ${notification.detail ? `<div class="notification-item-detail">${notification.detail}</div>` : ''}
-            <div class="notification-item-footer">
+<div class="notification-item-footer">
                 <span class="notification-item-time">${timeAgo}</span>
-                ${ctaHtml}
+                ${renderCtaButton(notification)}
             </div>
         </div>
     `;
+}
+
+// ========================================
+// UPDATE CTA BUTTONS BASED ON PRIVACY
+// ========================================
+
+async function updateCtaButtonsWithPrivacy() {
+    const buttons = document.querySelectorAll('.notification-item-cta[data-target-user]');
+    
+    const { getAvailableActions } = await import('./notification-storage.js');
+    
+    for (const btn of buttons) {
+        const targetUserId = btn.dataset.targetUser;
+        const action = btn.dataset.action;
+        const notifId = btn.dataset.id;
+        
+        if (!targetUserId) continue;
+        
+        try {
+            const permissions = await getAvailableActions(targetUserId);
+            
+            // Get notification data for context
+            const userId = localStorage.getItem('tournamentUserId');
+            const notifications = await getUnreadNotifications(userId);
+            const notification = notifications.find(n => n.id === notifId);
+            
+            if (action === 'send-emote') {
+                if (permissions.canEmote) {
+                    btn.innerHTML = notification?.ctaText || 'Send Emote';
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                } else {
+                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Emotes Disabled</span>`;
+                    btn.disabled = true;
+                    btn.title = permissions.emoteReason || 'Cannot send emote';
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.opacity = '0.5';
+                }
+            } else if (action === 'open-message') {
+                if (permissions.canMessage) {
+                    btn.innerHTML = notification?.ctaText || 'Reply';
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                } else {
+                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Messages Disabled</span>`;
+                    btn.disabled = true;
+                    btn.title = permissions.messageReason || 'Cannot send message';
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.opacity = '0.5';
+                }
+            }
+        } catch (error) {
+            console.warn('Could not check permissions for button', error);
+            // On error, show button as enabled (fail open)
+            btn.innerHTML = notification?.ctaText || 'Action';
+            btn.disabled = false;
+        }
+    }
 }
 
 // ========================================
@@ -622,7 +711,7 @@ function showMessageComposer(toUserId, toUsername, context = {}) {
                 showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
             }, 1000);
             
-         } else {
+       } else {
             // Error feedback
             sendBtn.textContent = '✗ Failed';
             sendBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
@@ -631,15 +720,17 @@ function showMessageComposer(toUserId, toUsername, context = {}) {
             if (result.reason) {
                 input.placeholder = result.reason;
                 input.style.borderColor = '#e74c3c';
+                showQuickToast(result.reason, 3000);
+            } else {
+                showQuickToast('⚠️ Could not send message', 2000);
             }
-            
-            showQuickToast(result.reason || '⚠️ Could not send message', 3000);
             
             setTimeout(() => {
                 sendBtn.textContent = 'Send 💬';
                 sendBtn.disabled = false;
                 sendBtn.style.opacity = '1';
                 sendBtn.style.background = 'linear-gradient(135deg, #C8AA6E, #B89A5E)';
+                input.style.borderColor = 'rgba(200, 170, 110, 0.3)';
             }, 2000);
         }
     });

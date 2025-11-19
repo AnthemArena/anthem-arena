@@ -1381,3 +1381,19 @@
         max-height: 500px;
     }
 }
+/* Disabled CTA button styling */
+.notification-item-cta:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    background: rgba(100, 100, 100, 0.3) !important;
+}
+
+.notification-item-cta:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.cta-loading {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}

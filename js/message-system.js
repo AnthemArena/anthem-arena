@@ -64,11 +64,12 @@ export async function sendMessage(toUserId, toUsername, messageText, context = {
         await addDoc(collection(db, 'messages'), messageData);
         
         console.log(`✅ Message sent to ${toUsername}`);
-return { success: true };
-
+        return { success: true };
+        
     } catch (error) {
         console.error('❌ Error sending message:', error);
-return { success: false, reason: 'Failed to send message' };    }
+        return { success: false, reason: 'Failed to send message' };
+    }
 }
 
 // ========================================
