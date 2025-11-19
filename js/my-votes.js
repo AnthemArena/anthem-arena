@@ -1522,18 +1522,32 @@ function setupFilters() {
 // ========================================
 
 function showNoVotesState() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('noVotesState').style.display = 'block';
+    console.log('📭 No votes found - showing empty state');
     
-    // Keep stats hidden (they're hidden by default now)
-    document.getElementById('statsOverview').style.display = 'none';
-    document.getElementById('filtersSection').style.display = 'none';
+    // Hide loading state
+    const loadingState = document.getElementById('loadingState');
+    if (loadingState) loadingState.style.display = 'none';
+    
+    // Show no votes state
+    const noVotesState = document.getElementById('noVotesState');
+    if (noVotesState) noVotesState.style.display = 'block';
+    
+    // Hide stats sections
+    const statsOverview = document.getElementById('statsOverview');
+    if (statsOverview) statsOverview.style.display = 'none';
+    
+    const filtersSection = document.getElementById('filtersSection');
+    if (filtersSection) filtersSection.style.display = 'none';
+    
+    const statsHeroSection = document.getElementById('statsHeroSection');
+    if (statsHeroSection) statsHeroSection.style.display = 'none';
+    
+    const achievementsSection = document.getElementById('achievementsSection');
+    if (achievementsSection) achievementsSection.style.display = 'none';
     
     // Hide section header (share button, etc.)
     const sectionHeader = document.querySelector('.votes-section .section-header');
     if (sectionHeader) sectionHeader.style.display = 'none';
-    
-    console.log('📭 No votes found - showing empty state');
 }
 
 // ========================================

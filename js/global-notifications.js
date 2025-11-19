@@ -6,7 +6,9 @@ import {
     saveNotification, 
     getRecentUnshownNotifications, 
     markNotificationShown,
-    getUnreadCount
+    getUnreadCount,
+        collection,  // ← ADD THIS
+
 } from './notification-storage.js';
 
 
