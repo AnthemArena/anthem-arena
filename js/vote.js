@@ -1503,17 +1503,32 @@ async function submitVote(songId) {
             return;
         }
         
-        await setDoc(voteRef, {
-            tournament: ACTIVE_TOURNAMENT,
-            matchId: currentMatch.id,
-            userId: userId,
-            choice: songId,
-            timestamp: new Date().toISOString(),
-            round: currentMatch.round,
-            // Store song details for analytics
-            votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
-            votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
-        });
+       // ✅ Get user profile data
+const username = localStorage.getItem('username') || 'Anonymous';
+const avatarJson = localStorage.getItem('avatar');
+
+// Parse avatar (could be emoji or URL object)
+let avatar;
+try {
+    avatar = JSON.parse(avatarJson);
+} catch {
+    // Fallback for old emoji-only format or null
+    avatar = { type: 'emoji', value: avatarJson || '🎵' };
+}
+
+await setDoc(voteRef, {
+    tournament: ACTIVE_TOURNAMENT,
+    matchId: currentMatch.id,
+    userId: userId,
+    username: username,  // ✅ ADD THIS
+    avatar: avatar,      // ✅ ADD THIS
+    choice: songId,
+    timestamp: new Date().toISOString(),
+    round: currentMatch.round,
+    // Store song details for analytics
+    votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
+    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+});
         
         console.log('✅ Vote record created in Firebase');
         
