@@ -34,13 +34,27 @@ export async function sendMessage(toUserId, toUsername, messageText, context = {
     }
     
     // ✅ CHECK PRIVACY SETTINGS FIRST
-    const { canUserSendMessage } = await import('./privacy-helper.js');
-    const canSend = await canUserSendMessage(fromUserId, toUserId);
+const { canUserSendMessage } = await import('./privacy-helper.js');
+
+// TODO: Check if users are actually friends (when friends system is built)
+const areFriends = false; // For now, assume not friends
+
+const canSend = await canUserSendMessage(fromUserId, toUserId, areFriends);
+
+if (!canSend) {
+    console.warn('❌ User privacy settings block messaging');
     
-    if (!canSend) {
-        console.warn('❌ User privacy settings block messaging');
-        return { success: false, reason: 'This user has disabled messages from non-friends' };
+    // Get the actual reason
+    const { getUserPrivacySettings } = await import('./privacy-helper.js');
+    const privacy = await getUserPrivacySettings(toUserId);
+    
+    let reason = 'This user has disabled messages';
+    if (privacy.messagePrivacy === 'friends') {
+        reason = 'This user only accepts messages from friends';
     }
+    
+    return { success: false, reason };
+}
     
     if (!messageText || messageText.trim().length === 0) {
         console.error('❌ Message cannot be empty');

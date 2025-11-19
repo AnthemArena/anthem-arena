@@ -113,3 +113,58 @@ export async function isProfilePublic(userId) {
     const privacy = await getUserPrivacySettings(userId);
     return privacy.isPublic;
 }
+// ========================================
+// CHECK USER MESSAGE PRIVACY (FOR NOTIFICATIONS)
+// Returns object with canMessage boolean and reason
+// ========================================
+
+/**
+ * Check if a user can receive messages based on their privacy settings
+ * Used by notification system to show/hide Reply buttons
+ * @param {string} toUserId - User receiving the message
+ * @param {string} fromUserId - User sending the message (optional, defaults to current user)
+ * @returns {Object} { canMessage: boolean, reason: string }
+ */
+export async function checkUserMessagePrivacy(toUserId, fromUserId = null) {
+    try {
+        // If no fromUserId provided, use current user
+        if (!fromUserId) {
+            fromUserId = localStorage.getItem('tournamentUserId');
+        }
+        
+        console.log('🔍 Privacy check: from', fromUserId, '→ to', toUserId);
+        
+        // Get recipient's privacy settings
+        const privacy = await getUserPrivacySettings(toUserId);
+        
+        console.log('🔒 Message privacy setting:', privacy.messagePrivacy);
+        
+        // Check privacy settings
+        if (privacy.messagePrivacy === 'nobody') {
+            console.log('❌ User has disabled all messages');
+            return { canMessage: false, reason: 'disabled' };
+        }
+        
+        if (privacy.messagePrivacy === 'friends') {
+            console.log('🔍 Checking if users are friends...');
+            
+            // TODO: Check actual friendship when friends system is built
+            const areFriends = false; // For now, assume NOT friends
+            
+            if (!areFriends) {
+                console.log('❌ Not friends, messages blocked');
+                return { canMessage: false, reason: 'friends-only' };
+            }
+            
+            console.log('✅ Users are friends, messages allowed');
+        }
+        
+        console.log('✅ Messages allowed');
+        return { canMessage: true, reason: 'allowed' };
+        
+    } catch (error) {
+        console.error('❌ Error checking message privacy:', error);
+        // Default to allowing messages on error (fail open)
+        return { canMessage: true, reason: 'error' };
+    }
+}
