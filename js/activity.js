@@ -159,36 +159,32 @@ function renderVoteCard(activity) {
         <div class="vote-card">
             <div class="vote-thumbnail">
                 <img src="${thumbnailUrl}" alt="${songTitle}" loading="lazy" />
-                <div class="thumbnail-overlay">
-                    <div class="play-icon">▶</div>
+            </div>
+            
+            <div class="vote-user">
+                <div class="user-avatar">
+                    ${renderAvatar(activity.avatar)}
+                </div>
+                <div class="user-info">
+                    <div class="username">${activity.username || 'Anonymous'}</div>
+                    <div class="vote-time">${getTimeAgo(activity.timestamp)}</div>
                 </div>
             </div>
             
-            <div class="vote-content">
-                <div class="vote-user">
-                    <div class="user-avatar">
-                        ${renderAvatar(activity.avatar)}
-                    </div>
-                    <div class="user-info">
-                        <div class="username">${activity.username || 'Anonymous'}</div>
-                        <div class="vote-time">${getTimeAgo(activity.timestamp)}</div>
-                    </div>
-                </div>
-                
-                <div class="vote-song">
-                    <div class="song-title">${songTitle}</div>
-                    <div class="match-info">
-                        <span class="match-badge">Round ${activity.round}</span>
-                        <span class="tournament-name">${tournamentName}</span>
-                    </div>
-                </div>
-                
-                <div class="vote-action">
-                    <a href="/vote.html?id=${activity.matchId}" class="view-match-btn">
-                        <span>View Match</span>
-                        <span>→</span>
-                    </a>
-                </div>
+            <div class="vote-song">
+                <div class="song-title">${songTitle}</div>
+            </div>
+            
+            <div class="match-info">
+                <span class="match-badge">Round ${activity.round}</span>
+                <span class="tournament-name">${tournamentName}</span>
+            </div>
+            
+            <div class="vote-action">
+                <a href="/vote.html?id=${activity.matchId}" class="view-match-btn">
+                    <span>View Match</span>
+                    <span>→</span>
+                </a>
             </div>
         </div>
     `;
