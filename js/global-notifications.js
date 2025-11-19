@@ -2155,7 +2155,7 @@ async function checkIncomingReactions() {
     
 }
 
-// ========================================
+/// ========================================
 // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
 // ========================================
 
@@ -2174,8 +2174,9 @@ async function checkMissedNotifications() {
     
     console.log(`📬 Found ${missedNotifications.length} missed notifications`);
     
+    // Show each missed notification as a toast
     missedNotifications.forEach(notification => {
-        notifications.push({
+        showBulletin({
             priority: notification.priority,
             type: notification.type,
             matchId: notification.matchId,

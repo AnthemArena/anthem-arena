@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <!-- Notification Bell -->
                     <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 16px;">
-                        <span style="font-size: 20px;">Bell</span>
+                        <span style="font-size: 20px;">🔔</span>
                         <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
                     </div>
                     
@@ -64,12 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="notificationPanel" class="notification-panel" style="display: none;">
             <div class="notification-panel-header">
                 <h3>Notifications</h3>
-                <button id="closeNotificationPanel" class="close-btn">Cross</button>
+                <button id="closeNotificationPanel" class="close-btn">X</button>
             </div>
             
             <div class="notification-panel-content" id="notificationPanelContent">
                 <div class="notification-empty">
-                    <span style="font-size: 48px; opacity: 0.3;">Bell</span>
+                    <span style="font-size: 48px; opacity: 0.3;">🔔</span>
                     <p>No new notifications</p>
                 </div>
             </div>
