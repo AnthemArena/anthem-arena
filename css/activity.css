@@ -124,176 +124,121 @@
 }
 
 /* ========================================
-   ACTIVITY FEED
+   ACTIVITY FEED - SINGLE VOTE CARDS
    ======================================== */
 
 .activity-feed {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 }
 
-.activity-card {
-    background: rgba(0, 0, 0, 0.5);
+.vote-card {
+    background: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(200, 170, 110, 0.3);
     border-radius: 12px;
-    padding: 1.5rem;
+    overflow: hidden;
     transition: all 0.3s ease;
-}
-
-.activity-card:hover {
-    border-color: rgba(200, 170, 110, 0.5);
-    background: rgba(0, 0, 0, 0.7);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
-}
-
-/* Locked state styling */
-.activity-card.locked {
-    border-color: rgba(255, 170, 0, 0.3);
-}
-
-.activity-card.locked:hover {
-    border-color: rgba(255, 170, 0, 0.5);
-    box-shadow: 0 4px 20px rgba(255, 170, 0, 0.2);
-}
-
-/* Revealed state styling */
-.activity-card.revealed {
-    border-color: rgba(0, 200, 150, 0.3);
-}
-
-.activity-card.revealed:hover {
-    border-color: rgba(0, 200, 150, 0.5);
-    box-shadow: 0 4px 20px rgba(0, 200, 150, 0.2);
-}
-
-/* ========================================
-   MATCH HEADER
-   ======================================== */
-
-.match-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.match-header h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.3rem;
-    color: #C8AA6E;
-    margin: 0;
-    flex: 1;
-    min-width: 200px;
-    letter-spacing: 0.02em;
-}
-
-.round-badge {
-    background: rgba(200, 170, 110, 0.2);
-    color: #C8AA6E;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.your-pick {
-    background: rgba(0, 200, 150, 0.2);
-    color: #00c896;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    border: 1px solid rgba(0, 200, 150, 0.3);
-}
-
-/* ========================================
-   VOTE COUNT BADGE
-   ======================================== */
-
-.vote-count-badge {
-    background: rgba(255, 170, 0, 0.1);
-    border: 1px solid rgba(255, 170, 0, 0.3);
-    color: #ffaa00;
-    padding: 0.75rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-/* ========================================
-   ACTIVITY LIST
-   ======================================== */
-
-.activity-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
 }
 
-.activity-item {
+.vote-card:hover {
+    border-color: rgba(200, 170, 110, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.3);
+}
+
+/* Thumbnail Section */
+.vote-thumbnail {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    background: #000;
+    overflow: hidden;
+}
+
+.vote-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.vote-card:hover .vote-thumbnail img {
+    transform: scale(1.05);
+}
+
+.thumbnail-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(200, 170, 110, 0.1);
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    align-items: flex-end;
+    padding: 1rem;
 }
 
-.activity-item:hover {
-    background: rgba(0, 0, 0, 0.5);
-    border-color: rgba(200, 170, 110, 0.3);
-}
-
-/* Locked activity items */
-.activity-item.locked {
-    opacity: 0.8;
-}
-
-/* Revealed activity items */
-.activity-item.same-pick {
-    background: rgba(0, 200, 150, 0.1);
-    border-left: 3px solid #00c896;
-    border-color: rgba(0, 200, 150, 0.3);
-}
-
-.activity-item.same-pick:hover {
-    background: rgba(0, 200, 150, 0.15);
-}
-
-.activity-item.different-pick {
-    background: rgba(0, 0, 0, 0.3);
-}
-
-.user-avatar {
-    font-size: 1.8rem;
-    width: 40px;
-    height: 40px;
+.play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(200, 170, 110, 0.9);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(200, 170, 110, 0.1));
-    border: 1px solid rgba(200, 170, 110, 0.3);
+    font-size: 24px;
+    color: #0a0a0a;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vote-card:hover .play-icon {
+    opacity: 1;
+}
+
+/* Card Content */
+.vote-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* User Info */
+.vote-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(200, 170, 110, 0.1));
+    border: 2px solid rgba(200, 170, 110, 0.5);
+    font-size: 1.5rem;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .user-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
@@ -301,92 +246,99 @@
     font-size: 1.5rem;
 }
 
-.activity-text {
+.user-info {
     flex: 1;
+    min-width: 0;
+}
+
+.username {
+    font-weight: 700;
+    color: #C8AA6E;
+    font-size: 1.05rem;
+    margin-bottom: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vote-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+/* Song Info */
+.vote-song {
+    flex: 1;
+}
+
+.song-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.match-info {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     gap: 0.5rem;
-    font-size: 0.95rem;
-}
-
-.activity-text strong {
-    color: #C8AA6E;
-    font-weight: 600;
-}
-
-.time-ago {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
-}
-
-.lock-icon {
-    font-size: 1.2rem;
-    color: #ffaa00;
-    flex-shrink: 0;
-}
-
-.agreement {
-    background: rgba(0, 200, 150, 0.2);
-    color: #00c896;
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid rgba(0, 200, 150, 0.3);
-}
-
-.more-voters {
-    text-align: center;
-    padding: 0.5rem;
-    color: rgba(255, 255, 255, 0.5);
+    align-items: center;
     font-size: 0.9rem;
-    font-style: italic;
+    color: rgba(255, 255, 255, 0.6);
 }
 
-/* ========================================
-   CALL TO ACTION BUTTONS
-   ======================================== */
-
-.cta-vote {
-    display: block;
-    width: 100%;
-    padding: 0.875rem;
-    background: linear-gradient(135deg, #ffaa00, #ff8800);
-    color: #0a0a0a;
-    text-align: center;
-    border-radius: 8px;
+.match-badge {
+    background: rgba(200, 170, 110, 0.15);
+    color: #C8AA6E;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
     font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
+    letter-spacing: 0.03em;
+    border: 1px solid rgba(200, 170, 110, 0.3);
 }
 
-.cta-vote:hover {
-    background: linear-gradient(135deg, #ffbb00, #ff9900);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 170, 0, 0.5);
+.tournament-name {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
 }
 
-.view-match-link {
-    display: block;
-    text-align: center;
+/* Vote Action */
+.vote-action {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(200, 170, 110, 0.15);
+}
+
+.view-match-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(200, 170, 110, 0.1));
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    border-radius: 8px;
     color: #C8AA6E;
     text-decoration: none;
-    font-size: 0.95rem;
-    padding: 0.5rem;
-    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    transition: all 0.3s ease;
 }
 
-.view-match-link:hover {
+.view-match-btn:hover {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(200, 170, 110, 0.2));
+    border-color: rgba(200, 170, 110, 0.6);
     color: #D4B87A;
-    text-decoration: underline;
+    transform: translateY(-2px);
 }
 
 /* ========================================
@@ -394,6 +346,7 @@
    ======================================== */
 
 .no-activity {
+    grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
     background: rgba(0, 0, 0, 0.5);
@@ -446,6 +399,7 @@
    ======================================== */
 
 .error-message {
+    grid-column: 1 / -1;
     text-align: center;
     padding: 3rem 2rem;
     background: rgba(220, 50, 50, 0.1);
@@ -467,6 +421,7 @@
 }
 
 .no-results {
+    grid-column: 1 / -1;
     text-align: center;
     padding: 3rem;
     color: rgba(255, 255, 255, 0.5);
@@ -476,6 +431,12 @@
 /* ========================================
    RESPONSIVE
    ======================================== */
+
+@media (max-width: 1200px) {
+    .activity-feed {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
 
 @media (max-width: 768px) {
     .page-header h1 {
@@ -503,27 +464,8 @@
         text-align: center;
     }
     
-    .match-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .match-header h3 {
-        font-size: 1.1rem;
-    }
-    
-    .activity-item {
-        padding: 0.5rem;
-    }
-    
-    .user-avatar {
-        width: 35px;
-        height: 35px;
-        font-size: 1.5rem;
-    }
-    
-    .activity-text {
-        font-size: 0.9rem;
+    .activity-feed {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -540,12 +482,22 @@
         font-size: 1.75rem;
     }
     
-    .activity-card {
+    .vote-content {
         padding: 1rem;
     }
     
     .stat-card {
         padding: 1rem;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    .song-title {
+        font-size: 1rem;
     }
 }
 
@@ -553,10 +505,10 @@
    ANIMATIONS
    ======================================== */
 
-@keyframes slideDown {
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -564,18 +516,15 @@
     }
 }
 
-.activity-card {
-    animation: slideDown 0.3s ease;
-}
-
-/* Stagger animation for activity items */
-.activity-item {
-    animation: slideDown 0.2s ease;
+.vote-card {
+    animation: fadeInUp 0.4s ease;
     animation-fill-mode: both;
 }
 
-.activity-item:nth-child(1) { animation-delay: 0.05s; }
-.activity-item:nth-child(2) { animation-delay: 0.1s; }
-.activity-item:nth-child(3) { animation-delay: 0.15s; }
-.activity-item:nth-child(4) { animation-delay: 0.2s; }
-.activity-item:nth-child(5) { animation-delay: 0.25s; }
+/* Stagger animation */
+.vote-card:nth-child(1) { animation-delay: 0.05s; }
+.vote-card:nth-child(2) { animation-delay: 0.1s; }
+.vote-card:nth-child(3) { animation-delay: 0.15s; }
+.vote-card:nth-child(4) { animation-delay: 0.2s; }
+.vote-card:nth-child(5) { animation-delay: 0.25s; }
+.vote-card:nth-child(6) { animation-delay: 0.3s; }

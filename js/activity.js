@@ -5,11 +5,34 @@
 import { getActivityFeed } from './api-client.js';
 
 let allActivities = [];
-let myVotes = {};
 let currentFilter = 'all';
+let musicData = {}; // Cache for music video data
 
 /**
- * Render avatar (emoji or image URL)
+ * Load music data on page init
+ */
+async function loadMusicData() {
+    try {
+        const response = await fetch('/data/music-videos.json');
+        const data = await response.json();
+        
+        // Create a lookup map: songId -> video data
+        data.forEach(song => {
+            musicData[song.id] = song;
+            // Also map by seed if songId is stored as seed
+            if (song.seed) {
+                musicData[song.seed] = song;
+            }
+        });
+        
+        console.log(`✅ Loaded ${data.length} songs for thumbnails`);
+    } catch (error) {
+        console.error('❌ Error loading music data:', error);
+    }
+}
+
+/**
+ * Render avatar (emoji or champion image)
  */
 function renderAvatar(avatar) {
     // Handle old emoji-only format
@@ -19,12 +42,35 @@ function renderAvatar(avatar) {
     
     // Handle new format {type: 'emoji'|'url', value: '...'}
     if (avatar && avatar.type === 'url') {
-        return `<img src="${avatar.value}" alt="Avatar" onerror="this.style.display='none'; this.nextSibling.style.display='flex';" />
+        return `<img src="${avatar.value}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                 <span class="avatar-fallback" style="display: none;">👤</span>`;
     }
     
     // Default to emoji
     return avatar?.value || '🎵';
+}
+
+/**
+ * Get YouTube thumbnail URL from song data
+ */
+function getYoutubeThumbnail(songId) {
+    const song = musicData[songId];
+    
+    if (song && song.videoId) {
+        // Use maxresdefault for best quality, fallback to hqdefault
+        return `https://img.youtube.com/vi/${song.videoId}/maxresdefault.jpg`;
+    }
+    
+    // Fallback placeholder
+    return 'https://via.placeholder.com/640x360/0a0a0a/C8AA6E?text=🎵';
+}
+
+/**
+ * Get song title from music data (fallback if activity doesn't have it)
+ */
+function getSongTitle(songId, fallbackTitle) {
+    const song = musicData[songId];
+    return song?.shortTitle || song?.title || fallbackTitle || 'Unknown Song';
 }
 
 // ========================================
@@ -34,8 +80,8 @@ function renderAvatar(avatar) {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎭 Activity page loaded');
     
-    // Get user's votes from localStorage
-    myVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    // Load music data first
+    await loadMusicData();
     
     // Load activity feed
     await loadActivityFeed();
@@ -60,14 +106,11 @@ async function loadActivityFeed() {
             return;
         }
         
-        // Group by match
-        const groupedByMatch = groupActivitiesByMatch(allActivities);
-        
         // Render feed
-        renderActivityFeed(groupedByMatch);
+        renderActivityFeed(allActivities);
         
         // Update stats
-        updateStats(groupedByMatch);
+        updateStats();
         
         console.log(`✅ Loaded ${allActivities.length} activity items`);
         
@@ -78,138 +121,104 @@ async function loadActivityFeed() {
 }
 
 // ========================================
-// GROUP ACTIVITIES BY MATCH
-// ========================================
-
-function groupActivitiesByMatch(activities) {
-    const grouped = {};
-    
-    activities.forEach(activity => {
-        if (!grouped[activity.matchId]) {
-            grouped[activity.matchId] = {
-                matchId: activity.matchId,
-                matchTitle: activity.matchTitle,
-                round: activity.round,
-                activities: []
-            };
-        }
-        grouped[activity.matchId].activities.push(activity);
-    });
-    
-    return Object.values(grouped);
-}
-
-// ========================================
 // RENDER ACTIVITY FEED
 // ========================================
 
-function renderActivityFeed(groupedActivities) {
+function renderActivityFeed(activities) {
     const container = document.getElementById('activity-feed');
     
-    if (groupedActivities.length === 0) {
-        container.innerHTML = '<p class="no-results">No activity matches this filter</p>';
+    const filteredActivities = activities.filter(activity => {
+        if (currentFilter === 'all') return true;
+        // Add more filter logic if needed
+        return true;
+    });
+    
+    if (filteredActivities.length === 0) {
+        container.innerHTML = '<p class="no-results">No activity found</p>';
         return;
     }
     
-    const html = groupedActivities
-        .filter(group => filterGroup(group))
-        .map(group => renderMatchActivityCard(group))
+    const html = filteredActivities
+        .map(activity => renderVoteCard(activity))
         .join('');
     
     container.innerHTML = html;
 }
 
 // ========================================
-// RENDER MATCH ACTIVITY CARD
+// RENDER VOTE CARD
 // ========================================
 
-function renderMatchActivityCard(group) {
-    const iHaveVoted = myVotes[group.matchId] !== undefined;
-    const activityCount = group.activities.length;
-    const myVote = myVotes[group.matchId];
+function renderVoteCard(activity) {
+    const thumbnailUrl = getYoutubeThumbnail(activity.songId);
+    const songTitle = getSongTitle(activity.songId, activity.songTitle);
+    const tournamentName = formatTournamentName(activity.tournamentId);
+    const matchName = activity.matchTitle || `Match ${activity.matchId}`;
     
-    if (!iHaveVoted) {
-        // 🔒 LOCKED STATE
-        return `
-            <div class="activity-card locked" data-state="locked">
-                <div class="match-header">
-                    <h3>🎵 ${group.matchTitle}</h3>
-                    <span class="round-badge">Round ${group.round}</span>
+    return `
+        <div class="vote-card">
+            <div class="vote-thumbnail">
+                <img src="${thumbnailUrl}" alt="${songTitle}" loading="lazy" />
+                <div class="thumbnail-overlay">
+                    <div class="play-icon">▶</div>
                 </div>
-                
-                <div class="vote-count-badge">
-                    👥 ${activityCount} ${activityCount === 1 ? 'person' : 'people'} voted • 🔒 Vote to see picks
-                </div>
-                
-                <div class="activity-list">
-                    ${group.activities.slice(0, 5).map(activity => `
-                        <div class="activity-item locked">
-<div class="user-avatar">${renderAvatar(activity.avatar)}</div>
-                            <div class="activity-text">
-                                <strong>${activity.username}</strong> voted
-                                <span class="time-ago">${getTimeAgo(activity.timestamp)}</span>
-                            </div>
-                            <div class="lock-icon">🔒</div>
-                        </div>
-                    `).join('')}
-                    ${activityCount > 5 ? `<div class="more-voters">+ ${activityCount - 5} more</div>` : ''}
-                </div>
-                
-                <a href="/vote.html?id=${group.matchId}" class="cta-vote">
-                    🗳️ Vote to Reveal Picks
-                </a>
             </div>
-        `;
-    } else {
-        // 🔓 REVEALED STATE
-        const mySongId = myVote.songId;
-        
-        return `
-            <div class="activity-card revealed" data-state="revealed">
-                <div class="match-header">
-                    <h3>🎵 ${group.matchTitle}</h3>
-                    <span class="round-badge">Round ${group.round}</span>
-                    <span class="your-pick">✓ You voted: ${myVote.songTitle}</span>
+            
+            <div class="vote-content">
+                <div class="vote-user">
+                    <div class="user-avatar">
+                        ${renderAvatar(activity.avatar)}
+                    </div>
+                    <div class="user-info">
+                        <div class="username">${activity.username || 'Anonymous'}</div>
+                        <div class="vote-time">${getTimeAgo(activity.timestamp)}</div>
+                    </div>
                 </div>
                 
-                <div class="activity-list">
-                    ${group.activities.map(activity => {
-                        const matchesMyPick = activity.songId === mySongId;
-                        return `
-                            <div class="activity-item revealed ${matchesMyPick ? 'same-pick' : 'different-pick'}">
-<div class="user-avatar">${renderAvatar(activity.avatar)}</div>
-                                <div class="activity-text">
-                                    <strong>${activity.username}</strong> → ${activity.songTitle}
-                                    <span class="time-ago">${getTimeAgo(activity.timestamp)}</span>
-                                    ${matchesMyPick ? '<span class="agreement">🤝 Same pick!</span>' : ''}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                <div class="vote-song">
+                    <div class="song-title">${songTitle}</div>
+                    <div class="match-info">
+                        <span class="match-badge">Round ${activity.round}</span>
+                        <span class="tournament-name">${tournamentName}</span>
+                    </div>
                 </div>
                 
-                <a href="/vote.html?id=${group.matchId}" class="view-match-link">
-                    View Full Match Results →
-                </a>
+                <div class="vote-action">
+                    <a href="/vote.html?id=${activity.matchId}" class="view-match-btn">
+                        <span>View Match</span>
+                        <span>→</span>
+                    </a>
+                </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
+
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+function formatTournamentName(tournamentId) {
+    const names = {
+        '2025-worlds-anthems': '2025 Worlds Anthems',
+        '2024-worlds-anthems': '2024 Worlds Anthems'
+    };
+    return names[tournamentId] || tournamentId;
+}
+
+function getTimeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    return `${Math.floor(seconds / 604800)}w ago`;
 }
 
 // ========================================
 // FILTER LOGIC
 // ========================================
-
-function filterGroup(group) {
-    const iHaveVoted = myVotes[group.matchId] !== undefined;
-    
-    if (currentFilter === 'locked') {
-        return !iHaveVoted;
-    } else if (currentFilter === 'revealed') {
-        return iHaveVoted;
-    }
-    return true; // 'all'
-}
 
 function setupFilters() {
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -224,8 +233,7 @@ function setupFilters() {
             currentFilter = btn.dataset.filter;
             
             // Re-render
-            const groupedByMatch = groupActivitiesByMatch(allActivities);
-            renderActivityFeed(groupedByMatch);
+            renderActivityFeed(allActivities);
         });
     });
 }
@@ -234,25 +242,10 @@ function setupFilters() {
 // UPDATE STATS
 // ========================================
 
-function updateStats(groupedActivities) {
-    const revealed = groupedActivities.filter(g => myVotes[g.matchId] !== undefined).length;
-    const locked = groupedActivities.filter(g => myVotes[g.matchId] === undefined).length;
-    
-    document.getElementById('revealed-count').textContent = revealed;
-    document.getElementById('locked-count').textContent = locked;
-}
-
-// ========================================
-// HELPER: TIME AGO
-// ========================================
-
-function getTimeAgo(timestamp) {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+function updateStats() {
+    // For now, just show total activity
+    document.getElementById('revealed-count').textContent = allActivities.length;
+    document.getElementById('locked-count').textContent = 0;
 }
 
 // ========================================
