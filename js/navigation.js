@@ -141,44 +141,105 @@ async function updateNavProfile() {
     const navProfileContainer = document.getElementById('navProfileContainer');
     const navProfileCard = document.getElementById('navProfileCard');
     
-    console.log('Updating nav profile display...');
+    console.log('🔄 Updating nav profile display...');
     
     if (!navProfileCard || !navProfileContainer) {
-        console.error('Profile elements not found in DOM');
+        console.error('❌ Profile elements not found in DOM');
         return;
     }
     
     try {
-        const username = localStorage.getItem('username');
-        const avatarJson = localStorage.getItem('avatar');
-        const currentXP = getUserXPFromStorage();
+        // Get user ID
+        const userId = localStorage.getItem('tournamentUserId');
         
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const hasVoted = Object.keys(userVotes).length > 0;
+        // Try to get username from localStorage first
+        let username = localStorage.getItem('username') || localStorage.getItem('tournamentUsername');
+        let avatarJson = localStorage.getItem('avatar');
+        let avatar;
+        
+        // If not in localStorage, try loading from Firebase
+        if (!username && userId) {
+            console.log('📥 Loading profile from Firebase...');
+            try {
+                const { db } = await import('./firebase-config.js');
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                
+                const profileDoc = await getDoc(doc(db, 'profiles', userId));
+                
+                if (profileDoc.exists()) {
+                    const profile = profileDoc.data();
+                    username = profile.username;
+                    avatar = profile.avatar;
+                    
+                    // Sync to localStorage for future
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('tournamentUsername', username);
+                    localStorage.setItem('avatar', JSON.stringify(avatar));
+                    
+                    console.log('✅ Profile loaded from Firebase:', username);
+                }
+            } catch (error) {
+                console.warn('⚠️ Could not load profile from Firebase:', error);
+            }
+        }
+        
+        // Parse avatar if from localStorage
+        if (!avatar && avatarJson) {
+            try {
+                avatar = JSON.parse(avatarJson);
+            } catch {
+                avatar = { type: 'emoji', value: '🎵' };
+            }
+        }
+        
+        // Check if user has voted (check BOTH localStorage AND Firebase)
+        const userVotesLocal = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const hasVotedLocal = Object.keys(userVotesLocal).length > 0;
+        
+        let hasVotedFirebase = false;
+        
+        if (userId && !hasVotedLocal) {
+            console.log('🔍 Checking Firebase for votes...');
+            try {
+                const { db } = await import('./firebase-config.js');
+                const { collection, query, where, getDocs, limit } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                
+                // Check if user has any votes in Firebase
+                const votesQuery = query(
+                    collection(db, 'votes'), 
+                    where('userId', '==', userId),
+                    limit(1)
+                );
+                const votesSnapshot = await getDocs(votesQuery);
+                hasVotedFirebase = !votesSnapshot.empty;
+                
+                if (hasVotedFirebase) {
+                    console.log('✅ User has votes in Firebase');
+                }
+            } catch (error) {
+                console.warn('⚠️ Could not check Firebase votes:', error);
+            }
+        }
+        
+        const hasVoted = hasVotedLocal || hasVotedFirebase;
         
         if (!hasVoted) {
-            console.log('User hasn\'t voted yet - hiding profile');
+            console.log('❌ User hasn\'t voted yet - hiding profile');
             navProfileContainer.style.display = 'none';
             return;
         }
         
-        let avatar;
-        try {
-            avatar = JSON.parse(avatarJson);
-        } catch {
-            avatar = { type: 'emoji', value: 'Music Note' };
-        }
-        
+        // Display profile
         const avatarEl = document.getElementById('navProfileAvatar');
         if (avatarEl) {
             if (avatar && avatar.type === 'url') {
                 avatarEl.innerHTML = `
                     <img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                    <span class="nav-avatar-fallback" style="display: none;">Person</span>
+                    <span class="nav-avatar-fallback" style="display: none;">🎵</span>
                 `;
             } else {
-                avatarEl.textContent = avatar?.value || 'Music Note';
+                avatarEl.textContent = avatar?.value || '🎵';
             }
         }
         
@@ -186,6 +247,9 @@ async function updateNavProfile() {
         if (usernameEl) {
             usernameEl.textContent = username || 'Voter';
         }
+        
+        // Update rank display
+        const currentXP = getUserXPFromStorage();
         
         if (currentXP > 0) {
             const rank = getUserRank(currentXP);
@@ -210,10 +274,10 @@ async function updateNavProfile() {
         }
         
         navProfileContainer.style.display = 'flex';
-        console.log('Profile display updated successfully');
+        console.log('✅ Profile display updated successfully');
         
     } catch (error) {
-        console.error('Error updating nav profile:', error);
+        console.error('❌ Error updating nav profile:', error);
         navProfileContainer.style.display = 'none';
     }
 }
