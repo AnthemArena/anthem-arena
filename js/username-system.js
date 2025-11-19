@@ -287,9 +287,10 @@ window.saveUsername = async function() {
     }
     
     // Save to localStorage
-    localStorage.setItem('username', username);
-    localStorage.setItem('isPublic', makePublic ? 'true' : 'false');
-    localStorage.setItem('avatar', JSON.stringify(avatar));
+localStorage.setItem('username', username);
+localStorage.setItem('tournamentUsername', username); // ✅ Keep in sync
+localStorage.setItem('isPublic', makePublic ? 'true' : 'false');
+localStorage.setItem('avatar', JSON.stringify(avatar));
     
     console.log(`✅ Username set: ${username} (public: ${makePublic})`);
     console.log(`✅ Avatar:`, avatar);

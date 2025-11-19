@@ -18,7 +18,15 @@ import {
 
 export async function sendMessage(toUserId, toUsername, messageText, context = {}) {
     const fromUserId = localStorage.getItem('tournamentUserId');
-    const fromUsername = localStorage.getItem('tournamentUsername');
+    let fromUsername = localStorage.getItem('tournamentUsername');
+    
+    // ✅ Fallback to 'username' if 'tournamentUsername' is not set
+    if (!fromUsername) {
+        fromUsername = localStorage.getItem('username');
+        if (fromUsername) {
+            localStorage.setItem('tournamentUsername', fromUsername);
+        }
+    }
     
     if (!fromUserId || fromUserId === 'anonymous') {
         console.error('❌ Must be logged in to send messages');

@@ -200,6 +200,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     userId = await getUserId();
     console.log('👤 User ID:', userId);
 
+        // ✅ NEW: Sync username on page load
+    syncUsernameOnLoad();
+
 
 
     // ✅ ADD THIS: Initialize founding member tracking
@@ -2964,4 +2967,29 @@ function showProfileTip() {
         tip.style.animation = 'slideOutRight 0.4s ease';
         setTimeout(() => tip.remove(), 400);
     }, 8000);
+}
+// ========================================
+// SYNC USERNAME ON PAGE LOAD
+// ========================================
+
+/**
+ * Ensure username and tournamentUsername stay in sync
+ */
+function syncUsernameOnLoad() {
+    const username = localStorage.getItem('username');
+    const tournamentUsername = localStorage.getItem('tournamentUsername');
+    
+    if (username && !tournamentUsername) {
+        // username exists but tournamentUsername doesn't
+        localStorage.setItem('tournamentUsername', username);
+        console.log('✅ Synced tournamentUsername from username:', username);
+    } else if (!username && tournamentUsername) {
+        // tournamentUsername exists but username doesn't
+        localStorage.setItem('username', tournamentUsername);
+        console.log('✅ Synced username from tournamentUsername:', tournamentUsername);
+    } else if (username && tournamentUsername && username !== tournamentUsername) {
+        // Both exist but don't match - username takes priority
+        localStorage.setItem('tournamentUsername', username);
+        console.log('✅ Resolved mismatch - set both to:', username);
+    }
 }
