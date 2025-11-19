@@ -628,3 +628,55 @@
         height: 40px;
     }
 }
+/* Privacy Settings Grid */
+.privacy-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Select Dropdown Styling */
+.privacy-select {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.privacy-select:hover {
+    border-color: rgba(200, 170, 110, 0.5);
+}
+
+.privacy-select:focus {
+    outline: none;
+    border-color: #C8AA6E;
+    box-shadow: 0 0 0 3px rgba(200, 170, 110, 0.1);
+}
+
+.privacy-select option {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0.5rem;
+}
+
+/* Select wrapper for alignment */
+.select-wrapper {
+    display: flex;
+    align-items: flex-start;
+    padding: 0;
+}
+
+.select-wrapper .toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

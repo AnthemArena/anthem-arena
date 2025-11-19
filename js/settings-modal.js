@@ -135,44 +135,94 @@ function createModalHTML() {
                         </div>
 
                      <!-- Avatar Section -->
-<div class="settings-section">
-    <h3><i class="fas fa-image"></i> Avatar</h3>
-    <p class="section-description">Choose a League champion</p>
-    
-    <div class="avatar-search-wrapper">
-        <input 
-            type="text" 
-            id="avatarSearch" 
-            placeholder="Search champions..." 
-            autocomplete="off"
-        />
-        <span class="search-icon">🔍</span>
-    </div>
-    
-    <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
-        <img id="selectedAvatarImg" src="" alt="Selected avatar" />
-        <span id="selectedAvatarName">No champion selected</span>
-        <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    
-    <!-- ✅ PRIVACY TOGGLE MOVED HERE (before avatar grid) -->
-    <div style="margin: 1.5rem 0; padding-top: 1rem; border-top: 1px solid rgba(200, 155, 60, 0.2);">
-        <label class="toggle-label">
-            <input type="checkbox" id="publicToggle" class="toggle-input" />
-            <span class="toggle-slider"></span>
-            <div class="toggle-info">
-                <strong>Make my votes public</strong>
-                <p>Appear in Community Activity feed</p>
-            </div>
-        </label>
-    </div>
-    
-    <div class="avatar-grid" id="avatarGrid">
-        <!-- Champion grid will be inserted here -->
-    </div>
-</div>
+                        <div class="settings-section">
+                            <h3><i class="fas fa-image"></i> Avatar</h3>
+                            <p class="section-description">Choose a League champion</p>
+                            
+                            <div class="avatar-search-wrapper">
+                                <input 
+                                    type="text" 
+                                    id="avatarSearch" 
+                                    placeholder="Search champions..." 
+                                    autocomplete="off"
+                                />
+                                <span class="search-icon">🔍</span>
+                            </div>
+                            
+                            <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
+                                <img id="selectedAvatarImg" src="" alt="Selected avatar" />
+                                <span id="selectedAvatarName">No champion selected</span>
+                                <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="avatar-grid" id="avatarGrid">
+                                <!-- Champion grid will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Privacy & Social Settings -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-shield-alt"></i> Privacy & Social</h3>
+                            <p class="section-description">Control who can interact with you</p>
+                            
+                            <div class="privacy-settings">
+                                <!-- Public Profile -->
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="publicToggle" class="toggle-input" />
+                                    <span class="toggle-slider"></span>
+                                    <div class="toggle-info">
+                                        <strong>🌐 Public Profile</strong>
+                                        <p>Show your votes in Community Activity feed</p>
+                                    </div>
+                                </label>
+                                
+                                <!-- Allow Friend Requests -->
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="allowFriendRequestsToggle" class="toggle-input" />
+                                    <span class="toggle-slider"></span>
+                                    <div class="toggle-info">
+                                        <strong>👥 Allow Friend Requests</strong>
+                                        <p>Let others send you friend requests</p>
+                                    </div>
+                                </label>
+                                
+                                <!-- Message Privacy -->
+                                <div class="toggle-label select-wrapper">
+                                    <div class="toggle-info" style="flex: 1;">
+                                        <strong>💬 Who Can Message You?</strong>
+                                        <select id="messagePrivacySelect" class="privacy-select">
+                                            <option value="everyone">Everyone</option>
+                                            <option value="friends">Friends Only</option>
+                                            <option value="nobody">Nobody</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Show Online Status -->
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="showOnlineStatusToggle" class="toggle-input" />
+                                    <span class="toggle-slider"></span>
+                                    <div class="toggle-info">
+                                        <strong>🟢 Show Online Status</strong>
+                                        <p>Let friends see when you're active</p>
+                                    </div>
+                                </label>
+                                
+                                <!-- Emote Privacy -->
+                                <div class="toggle-label select-wrapper">
+                                    <div class="toggle-info" style="flex: 1;">
+                                        <strong>🎭 Who Can Send You Emotes?</strong>
+                                        <select id="emotePrivacySelect" class="privacy-select">
+                                            <option value="everyone">Everyone</option>
+                                            <option value="friends">Friends Only</option>
+                                            <option value="nobody">Nobody</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Form Actions -->
                         <div class="form-actions">
@@ -202,17 +252,31 @@ function createModalHTML() {
 // ========================================
 
 function loadCurrentProfile() {
-   const username = localStorage.getItem('username') || '';
-const avatarJson = localStorage.getItem('avatar');
-
-// ✅ Default to public if not set
-let isPublic = localStorage.getItem('isPublic');
-if (isPublic === null) {
-    // First time - default to public
-    localStorage.setItem('isPublic', 'true');
-    isPublic = 'true';
-}
-isPublic = isPublic === 'true';
+    const username = localStorage.getItem('username') || '';
+    const avatarJson = localStorage.getItem('avatar');
+    
+    // ✅ Load privacy settings with defaults
+    const privacyDefaults = {
+        isPublic: 'true',
+        allowFriendRequests: 'true',
+        messagePrivacy: 'everyone',
+        showOnlineStatus: 'true',
+        emotePrivacy: 'everyone'
+    };
+    
+    // Load or set defaults
+    Object.keys(privacyDefaults).forEach(key => {
+        if (localStorage.getItem(key) === null) {
+            localStorage.setItem(key, privacyDefaults[key]);
+        }
+    });
+    
+    const isPublic = localStorage.getItem('isPublic') === 'true';
+    const allowFriendRequests = localStorage.getItem('allowFriendRequests') === 'true';
+    const messagePrivacy = localStorage.getItem('messagePrivacy') || 'everyone';
+    const showOnlineStatus = localStorage.getItem('showOnlineStatus') === 'true';
+    const emotePrivacy = localStorage.getItem('emotePrivacy') || 'everyone';
+    
     const currentXP = getUserXPFromStorage();
     const rank = getUserRank(currentXP);
     
@@ -229,8 +293,14 @@ isPublic = isPublic === 'true';
     
     // Update form fields
     document.getElementById('usernameInput').value = username;
-// ✅ Set toggle (will be true by default for new users)
-document.getElementById('publicToggle').checked = isPublic;    
+    
+    // ✅ Set all privacy toggles
+    document.getElementById('publicToggle').checked = isPublic;
+    document.getElementById('allowFriendRequestsToggle').checked = allowFriendRequests;
+    document.getElementById('messagePrivacySelect').value = messagePrivacy;
+    document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
+    document.getElementById('emotePrivacySelect').value = emotePrivacy;
+    
     // Show selected avatar if exists
     if (avatar && avatar.type === 'url') {
         selectedChampion = {
@@ -241,7 +311,7 @@ document.getElementById('publicToggle').checked = isPublic;
         showSelectedAvatar();
     }
     
-    console.log('✅ Profile loaded in modal');
+    console.log('✅ Profile loaded with privacy settings');
 }
 
 // ========================================
@@ -353,19 +423,25 @@ function setupEventListeners() {
         clearBtn.addEventListener('click', clearSelectedAvatar);
     }
     
-    // Track changes
-    const usernameInput = document.getElementById('usernameInput');
-    const publicToggle = document.getElementById('publicToggle');
+   // Track changes on all inputs
+    const trackableInputs = [
+        'usernameInput',
+        'publicToggle',
+        'allowFriendRequestsToggle',
+        'messagePrivacySelect',
+        'showOnlineStatusToggle',
+        'emotePrivacySelect'
+    ];
     
-    if (usernameInput) {
-        usernameInput.removeEventListener('input', trackChanges);
-        usernameInput.addEventListener('input', trackChanges);
-    }
-    
-    if (publicToggle) {
-        publicToggle.removeEventListener('change', trackChanges);
-        publicToggle.addEventListener('change', trackChanges);
-    }
+    trackableInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            const eventType = element.tagName === 'SELECT' ? 'change' : 
+                             element.type === 'checkbox' ? 'change' : 'input';
+            element.removeEventListener(eventType, trackChanges);
+            element.addEventListener(eventType, trackChanges);
+        }
+    });
     
     // ESC key to close
     document.removeEventListener('keydown', handleEscapeKey);
@@ -506,12 +582,19 @@ async function handleSaveSettings(e) {
     
     const usernameInput = document.getElementById('usernameInput');
     const errorEl = document.getElementById('usernameError');
-    const publicToggle = document.getElementById('publicToggle');
     
-    if (!usernameInput || !errorEl || !publicToggle) return;
+    if (!usernameInput || !errorEl) return;
     
     const username = usernameInput.value.trim();
-    const isPublic = publicToggle.checked;
+    
+    // ✅ Get all privacy settings
+    const privacySettings = {
+        isPublic: document.getElementById('publicToggle')?.checked ?? true,
+        allowFriendRequests: document.getElementById('allowFriendRequestsToggle')?.checked ?? true,
+        messagePrivacy: document.getElementById('messagePrivacySelect')?.value ?? 'everyone',
+        showOnlineStatus: document.getElementById('showOnlineStatusToggle')?.checked ?? true,
+        emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
+    };
     
     // Validate username
     const validation = validateUsername(username);
@@ -545,20 +628,30 @@ async function handleSaveSettings(e) {
     
     // Save to localStorage (backward compatible)
     localStorage.setItem('username', username);
-    localStorage.setItem('isPublic', isPublic ? 'true' : 'false');
     localStorage.setItem('avatar', JSON.stringify(avatar));
     
-    // ✅ NEW: Save to Firebase profiles collection
+    // ✅ Save all privacy settings
+    Object.keys(privacySettings).forEach(key => {
+        const value = privacySettings[key];
+        if (typeof value === 'boolean') {
+            localStorage.setItem(key, value ? 'true' : 'false');
+        } else {
+            localStorage.setItem(key, value);
+        }
+    });
+    
+// ✅ Save to Firebase profiles collection
     try {
         const userId = localStorage.getItem('tournamentUserId');
         if (userId) {
             await setDoc(doc(db, 'profiles', userId), {
                 username: username,
                 avatar: avatar,
-                isPublic: isPublic,
+                // ✅ Save all privacy settings
+                privacy: privacySettings,
                 updatedAt: Date.now()
             });
-            console.log('✅ Profile saved to Firebase');
+            console.log('✅ Profile saved to Firebase with privacy settings');
         }
     } catch (error) {
         console.warn('⚠️ Could not save profile to Firebase:', error);
@@ -567,7 +660,7 @@ async function handleSaveSettings(e) {
     
     hasChanges = false;
     
-    console.log('✅ Settings saved:', { username, isPublic, avatar });
+    console.log('✅ Settings saved:', { username, avatar, privacy: privacySettings });
     
     // Update navigation
     if (window.updateNavProfile) {
