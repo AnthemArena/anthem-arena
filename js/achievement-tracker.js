@@ -5,12 +5,160 @@
 import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES } from './achievements.js';
 import { addXP } from './rank-system.js';
 
+// ========================================
+// FIREBASE ACHIEVEMENT STORAGE
+// ========================================
+
+/**
+ * Save unlocked achievement to Firebase profile
+ */
+export async function unlockAchievementInFirebase(achievementId, xpReward = 0) {
+    const { db } = await import('./firebase-config.js');
+    const { doc, setDoc, getDoc, arrayUnion } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) {
+        console.warn('⚠️ No user ID - cannot save achievement');
+        return false;
+    }
+    
+    try {
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        const now = new Date().toISOString();
+        
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            
+            // Check if already unlocked
+            if (profile.unlockedAchievements?.includes(achievementId)) {
+                console.log('ℹ️ Achievement already unlocked:', achievementId);
+                return false;
+            }
+            
+            // Add to unlocked list
+            await setDoc(profileRef, {
+                unlockedAchievements: arrayUnion(achievementId),
+                [`achievementDetails.${achievementId}`]: {
+                    unlockedAt: now,
+                    xpReward: xpReward
+                },
+                lastAchievementUnlock: now
+            }, { merge: true });
+            
+            console.log('✅ Achievement unlocked in Firebase:', achievementId);
+            
+            // Also save to localStorage as cache
+            const localAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+            if (!localAchievements.includes(achievementId)) {
+                localAchievements.push(achievementId);
+                localStorage.setItem('unlockedAchievements', JSON.stringify(localAchievements));
+            }
+            
+            return true;
+            
+        } else {
+            // Create new profile with first achievement
+            await setDoc(profileRef, {
+                userId: userId,
+                unlockedAchievements: [achievementId],
+                [`achievementDetails.${achievementId}`]: {
+                    unlockedAt: now,
+                    xpReward: xpReward
+                },
+                createdAt: now,
+                lastAchievementUnlock: now
+            });
+            
+            console.log('✅ Profile created with first achievement:', achievementId);
+            
+            // Save to localStorage
+            localStorage.setItem('unlockedAchievements', JSON.stringify([achievementId]));
+            
+            return true;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error unlocking achievement in Firebase:', error);
+        return false;
+    }
+}
+
+/**
+ * Get all unlocked achievements from Firebase
+ */
+export async function getUnlockedAchievementsFromFirebase() {
+    const { db } = await import('./firebase-config.js');
+    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) return [];
+    
+    try {
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            const unlockedAchievements = profile.unlockedAchievements || [];
+            
+            // Sync to localStorage as cache
+            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            
+            return unlockedAchievements;
+        }
+        
+        return [];
+        
+    } catch (error) {
+        console.error('❌ Error fetching achievements from Firebase:', error);
+        // Fallback to localStorage
+        return JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+    }
+}
+
+/**
+ * Check if user is a founding member (from Firebase profile)
+ */
+export async function checkFoundingMemberStatus() {
+    const { db } = await import('./firebase-config.js');
+    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) return false;
+    
+    try {
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            return profile.foundingMember === true;
+        }
+        
+        return false;
+        
+    } catch (error) {
+        console.error('❌ Error checking founding member status:', error);
+        // Fallback to localStorage
+        return localStorage.getItem('foundingMember') === 'true';
+    }
+}
+
+// ========================================
+// ACHIEVEMENT CALCULATION
+// ========================================
+
 /**
  * Calculate stats needed for achievement checking
  * @param {Array} allVotes - User's complete vote history
  * @returns {Object} - Stats object
  */
-export function calculateAchievementStats(allVotes) {
+export async function calculateAchievementStats(allVotes) {
+  // Check founding member status from Firebase
+  const isFoundingMember = await checkFoundingMemberStatus();
+  
   const stats = {
     totalVotes: allVotes.length,
     underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
@@ -25,12 +173,10 @@ export function calculateAchievementStats(allVotes) {
     prophesied: false,
     maxSongVotes: 0,
     sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
-    uniqueArtists: 0, // ✅ NEW
-    uniqueYears: 0, // ✅ NEW
-    comebackVotes: 0, // ✅ NEW
-    // ✅ ADD THIS:
-    isFoundingMember: localStorage.getItem('foundingMember') === 'true'
-
+    uniqueArtists: 0,
+    uniqueYears: 0,
+    comebackVotes: 0,
+    isFoundingMember: isFoundingMember // ✅ From Firebase now
   };
   
   // Calculate early votes (match had <10 votes when user voted)
@@ -47,7 +193,7 @@ export function calculateAchievementStats(allVotes) {
     return hour >= 0 && hour < 5;
   }).length;
   
-  // ✅ Calculate comeback votes (voted for song that was losing <40%)
+  // Calculate comeback votes (voted for song that was losing <40%)
   stats.comebackVotes = allVotes.filter(v => {
     return v.votedSongPercentage < 40;
   }).length;
@@ -62,7 +208,7 @@ export function calculateAchievementStats(allVotes) {
   });
   stats.maxSongVotes = Math.max(...Object.values(songVoteCounts), 0);
   
-  // ✅ Calculate unique artists
+  // Calculate unique artists
   const uniqueArtists = new Set();
   allVotes.forEach(v => {
     if (v.votedForArtist) {
@@ -71,7 +217,7 @@ export function calculateAchievementStats(allVotes) {
   });
   stats.uniqueArtists = uniqueArtists.size;
   
-  // ✅ Calculate unique years
+  // Calculate unique years
   const uniqueYears = new Set();
   allVotes.forEach(v => {
     const match = v.match;
@@ -88,21 +234,33 @@ export function calculateAchievementStats(allVotes) {
 }
 
 /**
- * Check which achievements user has unlocked
+ * Check which achievements user has unlocked (Firebase-based)
  * @param {Array} allVotes - User's vote history
  * @returns {Object} - Achievement status
  */
-export function checkAchievements(allVotes) {
-  const stats = calculateAchievementStats(allVotes);
+export async function checkAchievements(allVotes) {
+  const stats = await calculateAchievementStats(allVotes);
   const unlocked = [];
   const locked = [];
   const newlyUnlocked = [];
   
-  // Get previously unlocked achievements
-  const previouslyUnlocked = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+  // ✅ Get previously unlocked achievements from Firebase
+  const previouslyUnlocked = await getUnlockedAchievementsFromFirebase();
   
-  Object.values(ACHIEVEMENTS).forEach(achievement => {
-    const isUnlocked = achievement.condition(stats);
+  for (const achievement of Object.values(ACHIEVEMENTS)) {
+    // Check condition (may be async)
+    let isUnlocked = false;
+    try {
+      if (typeof achievement.condition === 'function') {
+        isUnlocked = await achievement.condition(stats);
+      } else {
+        isUnlocked = achievement.condition;
+      }
+    } catch (error) {
+      console.error(`Error checking achievement ${achievement.id}:`, error);
+      continue;
+    }
+    
     const wasUnlocked = previouslyUnlocked.includes(achievement.id);
     
     // Always calculate progress
@@ -125,18 +283,25 @@ export function checkAchievements(allVotes) {
         progress
       });
     }
-  });
+  }
   
-  // Save newly unlocked achievements
+  // ✅ Save newly unlocked achievements to Firebase
   if (newlyUnlocked.length > 0) {
-    const updatedUnlocked = [...previouslyUnlocked, ...newlyUnlocked.map(a => a.id)];
-    localStorage.setItem('unlockedAchievements', JSON.stringify(updatedUnlocked));
+    console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
     
-    // Award XP for achievements
-    const achievementXP = newlyUnlocked.reduce((sum, a) => sum + a.xp, 0);
-    if (achievementXP > 0) {
-      addXP(achievementXP);
-      console.log(`✨ Achievement XP awarded: +${achievementXP}`);
+    for (const achievement of newlyUnlocked) {
+      const unlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
+      
+      if (unlocked) {
+        // Award XP
+        if (achievement.xp > 0) {
+          addXP(achievement.xp);
+          console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
+        }
+        
+        // Show unlock notification
+        showAchievementUnlock(achievement);
+      }
     }
   }
   

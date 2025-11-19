@@ -3,6 +3,119 @@
 // Music-focused achievements with League inspiration
 // ========================================
 
+// ========================================
+// FIREBASE ACHIEVEMENT STORAGE
+// ========================================
+
+/**
+ * Save unlocked achievement to Firebase profile
+ */
+export async function unlockAchievementInFirebase(achievementId, xpReward = 0) {
+    const { db } = await import('./firebase-config.js');
+    const { doc, setDoc, getDoc, arrayUnion } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) {
+        console.warn('⚠️ No user ID - cannot save achievement');
+        return false;
+    }
+    
+    try {
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        const now = new Date().toISOString();
+        
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            
+            // Check if already unlocked
+            if (profile.unlockedAchievements?.includes(achievementId)) {
+                console.log('ℹ️ Achievement already unlocked:', achievementId);
+                return false;
+            }
+            
+            // Add to unlocked list
+            await setDoc(profileRef, {
+                unlockedAchievements: arrayUnion(achievementId),
+                [`achievementDetails.${achievementId}`]: {
+                    unlockedAt: now,
+                    xpReward: xpReward
+                },
+                lastAchievementUnlock: now
+            }, { merge: true });
+            
+            console.log('✅ Achievement unlocked in Firebase:', achievementId);
+            
+            // Also save to localStorage as cache
+            const localAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+            if (!localAchievements.includes(achievementId)) {
+                localAchievements.push(achievementId);
+                localStorage.setItem('unlockedAchievements', JSON.stringify(localAchievements));
+            }
+            
+            return true;
+            
+        } else {
+            // Create new profile with first achievement
+            await setDoc(profileRef, {
+                userId: userId,
+                unlockedAchievements: [achievementId],
+                [`achievementDetails.${achievementId}`]: {
+                    unlockedAt: now,
+                    xpReward: xpReward
+                },
+                createdAt: now,
+                lastAchievementUnlock: now
+            });
+            
+            console.log('✅ Profile created with first achievement:', achievementId);
+            
+            // Save to localStorage
+            localStorage.setItem('unlockedAchievements', JSON.stringify([achievementId]));
+            
+            return true;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error unlocking achievement in Firebase:', error);
+        return false;
+    }
+}
+
+/**
+ * Get all unlocked achievements from Firebase
+ */
+export async function getUnlockedAchievementsFromFirebase() {
+    const { db } = await import('./firebase-config.js');
+    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) return [];
+    
+    try {
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            const unlockedAchievements = profile.unlockedAchievements || [];
+            
+            // Sync to localStorage as cache
+            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            
+            return unlockedAchievements;
+        }
+        
+        return [];
+        
+    } catch (error) {
+        console.error('❌ Error fetching achievements from Firebase:', error);
+        // Fallback to localStorage
+        return JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+    }
+}
+
 export const ACHIEVEMENTS = {
   
   // ========================================

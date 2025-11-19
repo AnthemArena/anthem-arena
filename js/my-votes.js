@@ -276,7 +276,11 @@ async function loadVoteHistory() {
         // Display votes
         displayVotes();
 
-        await loadAchievements();
+        await // Check for newly unlocked achievements
+await checkAchievements(allVotes);
+
+// Load and display all achievements
+await loadAchievements();
         
         // Hide loading state
         document.getElementById('loadingState').style.display = 'none';
@@ -408,64 +412,74 @@ if (profileIcon) profileIcon.innerHTML = tasteProfile.icon;
 }
 
 
-// Call this function after loadVoteHistory() completes
 async function loadAchievements() {
-    if (allVotes.length === 0) {
-        document.getElementById('achievementsSection').style.display = 'none';
-        return;
-    }
+    const { getUnlockedAchievementsFromFirebase } = await import('./achievement-tracker.js');
     
-    try {
-        const { unlocked, locked, completionPercentage } = checkAchievements(allVotes);
-
-        console.log('🏆 Unlocked achievements:', unlocked.map(a => a.id));
-console.log('🔒 Locked achievements:', locked.map(a => a.id));
-        
-        console.log(`🏆 Achievements: ${unlocked.length} unlocked, ${locked.length} locked, ${completionPercentage}% complete`);
-        
-
-        // ✅ NEW: Hide section if no unlocked achievements yet
-        if (unlocked.length === 0) {
-            document.getElementById('achievementsSection').style.display = 'none';
-            console.log('📭 No achievements unlocked yet - section hidden');
-            return;
+    console.log('🏆 Loading achievements from Firebase...');
+    
+    // Get unlocked achievements from Firebase
+    const unlockedAchievements = await getUnlockedAchievementsFromFirebase();
+    
+    console.log(`✅ Loaded ${unlockedAchievements.length} unlocked achievements`);
+    
+    const achievementsGrid = document.getElementById('achievementsGrid');
+    if (!achievementsGrid) return;
+    
+    achievementsGrid.innerHTML = '';
+    
+    // Group achievements by category
+    const groupedAchievements = {};
+    
+    Object.values(ACHIEVEMENTS).forEach(achievement => {
+        const category = achievement.category || 'general';
+        if (!groupedAchievements[category]) {
+            groupedAchievements[category] = [];
         }
-
-         // Update completion percentage
-        const completionEl = document.getElementById('achievementCompletion');
-        if (completionEl) {
-            completionEl.textContent = `${unlocked.length} Unlocked`; // ✅ Show count instead of %
+        groupedAchievements[category].push(achievement);
+    });
+    
+    // Display each category
+    Object.entries(groupedAchievements).forEach(([category, achievements]) => {
+        const categoryInfo = ACHIEVEMENT_CATEGORIES[category];
+        const categoryName = categoryInfo?.name || category;
+        
+        const categorySection = document.createElement('div');
+        categorySection.className = 'achievement-category';
+        categorySection.innerHTML = `<h3 class="category-title">${categoryName}</h3>`;
+        
+        const categoryGrid = document.createElement('div');
+        categoryGrid.className = 'category-grid';
+        
+        achievements.forEach(achievement => {
+            const isUnlocked = unlockedAchievements.includes(achievement.id);
+            
+            const achievementCard = document.createElement('div');
+            achievementCard.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'} rarity-${achievement.rarity}`;
+            
+            achievementCard.innerHTML = `
+                <div class="achievement-icon">${isUnlocked ? achievement.icon : '🔒'}</div>
+                <div class="achievement-info">
+                    <div class="achievement-title">${isUnlocked ? achievement.name : '???'}</div>
+                    <div class="achievement-description">${isUnlocked ? achievement.description : 'Hidden achievement'}</div>
+                    ${achievement.xp ? `<div class="achievement-xp">+${achievement.xp} XP</div>` : ''}
+                </div>
+            `;
+            
+            categoryGrid.appendChild(achievementCard);
+        });
+        
+        categorySection.appendChild(categoryGrid);
+        achievementsGrid.appendChild(categorySection);
+    });
+    
+    // Update achievements section header with count
+    const achievementsSection = document.getElementById('achievementsSection');
+    if (achievementsSection) {
+        const totalAchievements = Object.keys(ACHIEVEMENTS).length;
+        const sectionHeader = achievementsSection.querySelector('.section-header h2');
+        if (sectionHeader) {
+            sectionHeader.textContent = `Achievements (${unlockedAchievements.length}/${totalAchievements})`;
         }
-        
-       // Group achievements by category, keeping unlock status
-// ✅ Group achievements by category - ONLY show unlocked (since all are hidden)
-const byCategory = {};
-
-unlocked.forEach(ach => {
-    if (!byCategory[ach.category]) byCategory[ach.category] = [];
-    byCategory[ach.category].push({ ...ach, isUnlocked: true });
-});
-
-// ❌ Don't show locked achievements - they're hidden!
-// locked.forEach(ach => {
-//     if (!byCategory[ach.category]) byCategory[ach.category] = [];
-//     byCategory[ach.category].push({ ...ach, isUnlocked: false });
-// });
-        
-        // Render categories
-        const container = document.getElementById('achievementCategoriesContainer');
-        container.innerHTML = Object.entries(byCategory)
-            .map(([categoryId, achievements]) => {
-                const categoryInfo = getCategoryInfo(categoryId);
-                return createAchievementCategory(categoryId, categoryInfo, achievements);
-            })
-            .join('');
-        
-        // Show section
-        document.getElementById('achievementsSection').style.display = 'block';
-        
-    } catch (error) {
-        console.error('❌ Error loading achievements:', error);
     }
 }
 
