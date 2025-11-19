@@ -26,5 +26,9 @@ const auth = getAuth(app);
 
 console.log('✅ Firebase connected!');
 
+// ✅ Make available globally for console scripts
+window.db = db;
+window.auth = auth;
+
 // Make available to other files
 export { db, auth };

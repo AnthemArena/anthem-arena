@@ -132,47 +132,45 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                        <!-- Avatar Section -->
-                        <div class="settings-section">
-                            <h3><i class="fas fa-image"></i> Avatar</h3>
-                            <p class="section-description">Choose a League champion</p>
-                            
-                            <div class="avatar-search-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="avatarSearch" 
-                                    placeholder="Search champions..." 
-                                    autocomplete="off"
-                                />
-                                <span class="search-icon">🔍</span>
-                            </div>
-                            
-                            <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
-                                <img id="selectedAvatarImg" src="" alt="Selected avatar" />
-                                <span id="selectedAvatarName">No champion selected</span>
-                                <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="avatar-grid" id="avatarGrid">
-                                <!-- Champion grid will be inserted here -->
-                            </div>
-                        </div>
-
-                        <!-- Privacy Section -->
-                        <div class="settings-section">
-                            <h3><i class="fas fa-shield-alt"></i> Privacy</h3>
-                            
-                            <label class="toggle-label">
-                                <input type="checkbox" id="publicToggle" class="toggle-input" />
-                                <span class="toggle-slider"></span>
-                                <div class="toggle-info">
-                                    <strong>Make my votes public</strong>
-                                    <p>Appear in Community Activity feed</p>
-                                </div>
-                            </label>
-                        </div>
+                     <!-- Avatar Section -->
+<div class="settings-section">
+    <h3><i class="fas fa-image"></i> Avatar</h3>
+    <p class="section-description">Choose a League champion</p>
+    
+    <div class="avatar-search-wrapper">
+        <input 
+            type="text" 
+            id="avatarSearch" 
+            placeholder="Search champions..." 
+            autocomplete="off"
+        />
+        <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
+        <img id="selectedAvatarImg" src="" alt="Selected avatar" />
+        <span id="selectedAvatarName">No champion selected</span>
+        <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- ✅ PRIVACY TOGGLE MOVED HERE (before avatar grid) -->
+    <div style="margin: 1.5rem 0; padding-top: 1rem; border-top: 1px solid rgba(200, 155, 60, 0.2);">
+        <label class="toggle-label">
+            <input type="checkbox" id="publicToggle" class="toggle-input" />
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>Make my votes public</strong>
+                <p>Appear in Community Activity feed</p>
+            </div>
+        </label>
+    </div>
+    
+    <div class="avatar-grid" id="avatarGrid">
+        <!-- Champion grid will be inserted here -->
+    </div>
+</div>
 
                         <!-- Form Actions -->
                         <div class="form-actions">
@@ -202,9 +200,17 @@ function createModalHTML() {
 // ========================================
 
 function loadCurrentProfile() {
-    const username = localStorage.getItem('username') || '';
-    const avatarJson = localStorage.getItem('avatar');
-    const isPublic = localStorage.getItem('isPublic') === 'true';
+   const username = localStorage.getItem('username') || '';
+const avatarJson = localStorage.getItem('avatar');
+
+// ✅ Default to public if not set
+let isPublic = localStorage.getItem('isPublic');
+if (isPublic === null) {
+    // First time - default to public
+    localStorage.setItem('isPublic', 'true');
+    isPublic = 'true';
+}
+isPublic = isPublic === 'true';
     const currentXP = getUserXPFromStorage();
     const rank = getUserRank(currentXP);
     
@@ -221,8 +227,8 @@ function loadCurrentProfile() {
     
     // Update form fields
     document.getElementById('usernameInput').value = username;
-    document.getElementById('publicToggle').checked = isPublic;
-    
+// ✅ Set toggle (will be true by default for new users)
+document.getElementById('publicToggle').checked = isPublic;    
     // Show selected avatar if exists
     if (avatar && avatar.type === 'url') {
         selectedChampion = {
