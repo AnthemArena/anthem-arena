@@ -2108,16 +2108,19 @@ console.log('✅ global-notifications.js fully loaded with toast-style bulletins
 
 
 // Handle emote button clicks from notifications
-// Handle emote button clicks from notifications
 window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType, matchData) {
     console.log(`🎭 Sending ${emoteType} to ${targetUsername}`);
     
     // Find the button that was clicked (from bulletin)
     const ctaButton = document.querySelector('.bulletin-toast-cta');
     
+    let originalText = 'Send';  // ✅ DEFAULT FALLBACK
+    
     if (ctaButton) {
+        // ✅ SAVE THE ORIGINAL TEXT
+        originalText = ctaButton.textContent;
+        
         // Show loading state
-        const originalText = ctaButton.textContent;
         ctaButton.textContent = 'Sending...';
         ctaButton.disabled = true;
         ctaButton.style.opacity = '0.6';
@@ -2156,7 +2159,7 @@ window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType
         // Reset button after 2 seconds
         setTimeout(() => {
             if (ctaButton) {
-                ctaButton.textContent = originalText;
+                ctaButton.textContent = originalText;  // ✅ NOW DEFINED
                 ctaButton.style.background = '';
                 ctaButton.disabled = false;
             }
