@@ -2078,16 +2078,59 @@ console.log('✅ global-notifications.js fully loaded with toast-style bulletins
 
 
 // Handle emote button clicks from notifications
+// Handle emote button clicks from notifications
 window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType, matchData) {
     console.log(`🎭 Sending ${emoteType} to ${targetUsername}`);
+    
+    // Find the button that was clicked (from bulletin)
+    const ctaButton = document.querySelector('.bulletin-toast-cta');
+    
+    if (ctaButton) {
+        // Show loading state
+        const originalText = ctaButton.textContent;
+        ctaButton.textContent = 'Sending...';
+        ctaButton.disabled = true;
+        ctaButton.style.opacity = '0.6';
+    }
     
     const success = await sendEmoteReaction(targetUsername, targetUserId, emoteType, matchData);
     
     if (success) {
-        // Show confirmation toast
+        // Success feedback
+        if (ctaButton) {
+            ctaButton.textContent = '✓ Sent!';
+            ctaButton.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
+            ctaButton.disabled = false;
+            ctaButton.style.opacity = '1';
+        }
+        
+        // Show toast
         showQuickToast(`✅ Sent to ${targetUsername}!`, 2000);
+        
+        // Hide bulletin after 1 second
+        setTimeout(() => {
+            hideBulletin();
+        }, 1000);
+        
     } else {
+        // Error feedback
+        if (ctaButton) {
+            ctaButton.textContent = '✗ Failed';
+            ctaButton.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            ctaButton.disabled = false;
+            ctaButton.style.opacity = '1';
+        }
+        
         showQuickToast(`⚠️ Could not send reaction`, 2000);
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+            if (ctaButton) {
+                ctaButton.textContent = originalText;
+                ctaButton.style.background = '';
+                ctaButton.disabled = false;
+            }
+        }, 2000);
     }
 };
 
