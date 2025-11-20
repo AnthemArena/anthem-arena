@@ -198,17 +198,28 @@ function renderVoteCard(activity) {
     // Parse match title to get both songs
     const matchTitle = activity.matchTitle || '';
     const songs = matchTitle.split(' vs ');
-    const song1 = songs[0] || 'Song 1';
-    const song2 = songs[1] || 'Song 2';
+    const song1 = songs[0]?.trim() || 'Song 1';
+    const song2 = songs[1]?.trim() || 'Song 2';
     
-    // Check which song was voted for and highlight it
-    const votedSong = activity.songTitle || songTitle;
-    const isVotedForSong1 = song1.includes(votedSong) || votedSong.includes(song1);
+    // Determine which song was voted for
+    const votedSong = (activity.songTitle || songTitle).trim();
+    
+    // More precise matching
+    const song1Lower = song1.toLowerCase();
+    const song2Lower = song2.toLowerCase();
+    const votedLower = votedSong.toLowerCase();
+    
+    const isVotedForSong1 = song1Lower.includes(votedLower) || votedLower.includes(song1Lower);
+    const isVotedForSong2 = song2Lower.includes(votedLower) || votedLower.includes(song2Lower);
+    
+    // Default to song1 if we can't determine
+    const votedForSong1 = isVotedForSong1 || (!isVotedForSong2 && !isVotedForSong1);
     
     return `
         <div class="vote-card">
             <div class="vote-thumbnail">
                 <img src="${thumbnailUrl}" alt="${songTitle}" loading="lazy" />
+                <div class="vote-indicator">✓</div>
             </div>
             
             <div class="vote-user">
@@ -223,9 +234,9 @@ function renderVoteCard(activity) {
             
             <div class="vote-song">
                 <div class="song-title">
-                    <span class="${isVotedForSong1 ? 'voted-song' : ''}">${song1}</span>
+                    <span class="${votedForSong1 ? 'voted-song' : 'not-voted-song'}">${song1}</span>
                     <span class="vs-separator">vs</span>
-                    <span class="${!isVotedForSong1 ? 'voted-song' : ''}">${song2}</span>
+                    <span class="${!votedForSong1 ? 'voted-song' : 'not-voted-song'}">${song2}</span>
                 </div>
             </div>
             
