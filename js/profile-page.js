@@ -68,40 +68,31 @@ async function loadProfile(username) {
     try {
         console.log('📥 Loading profile for:', username);
         
-        // Show loading state
         showLoadingState();
         
-        // Fetch profile from Firebase
         const profile = await fetchUserProfile(username);
         
         if (!profile) {
-            console.warn('⚠️ Profile not found for:', username);
             showNotFoundState();
             return;
         }
         
-        console.log('✅ Profile loaded:', profile);
-        
-        // Store profile data
         currentProfile = profile;
         isOwnProfile = (username === currentUsername);
         
-        console.log('🔍 Is own profile?', isOwnProfile);
-        
-        // Render profile
         await renderProfile(profile);
         
-        // Load content
+        // Load Overview tab content
         await Promise.all([
             loadProfileStats(profile.userId),
+            loadParticipationData(profile.userId),  // ✅ NEW
             loadFeaturedAchievements(profile.userId),
-            loadFavoriteSongs(profile.userId),
-            loadRecentPosts(profile.userId),
-            loadAllPosts(profile.userId),
-            loadAllAchievements(profile.userId)
+            loadRecentVotes(profile.userId, 5),
+            loadFavoriteSongs(profile.userId)
         ]);
         
-        // Show profile content
+        setupVoteFilters();
+        
         showProfileContent();
         
     } catch (error) {
@@ -327,25 +318,42 @@ function renderProfileActions() {
 
 async function loadProfileStats(userId) {
     try {
-        // Total votes
+        console.log('📊 Loading stats for user:', userId);
+        
+        // 1. Total votes
         const voteCount = await getVoteCountForUser(userId);
         document.getElementById('statTotalVotes').textContent = voteCount;
         
-        // Voting streak
-        const streak = await getVotingStreakForUser(userId);
-        document.getElementById('statStreak').textContent = streak;
+        // 2. Participation (will be loaded by loadParticipationData)
+        // Placeholder for now
+        document.getElementById('statParticipation').textContent = '...';
         
-        // Songs alive
-        const songsAlive = await getSongsAliveForUser(userId);
-        document.getElementById('statSongsAlive').textContent = songsAlive;
+        // 3. Achievements count
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        const achievementsCount = profileDoc.exists() 
+            ? (profileDoc.data().unlockedAchievements || []).length 
+            : 0;
+        document.getElementById('statAchievements').textContent = achievementsCount;
         
-        // Followers (TODO: implement followers system)
-        const followers = await getFollowerCount(userId);
-        document.getElementById('statFollowers').textContent = followers;
+        // 4. Activity level
+        const activityLevel = getActivityLevel(voteCount);
+        document.getElementById('statActivityLevel').textContent = activityLevel;
+        
+        console.log('✅ Stats loaded');
         
     } catch (error) {
         console.error('❌ Error loading stats:', error);
     }
+}
+
+// Helper: Get activity level label
+function getActivityLevel(voteCount) {
+    if (voteCount === 0) return 'Just Started';
+    if (voteCount < 5) return 'Getting Started';
+    if (voteCount < 15) return 'Active Voter';
+    if (voteCount < 30) return 'Dedicated Fan';
+    if (voteCount < 50) return 'Super Fan';
+    return 'Music Curator';
 }
 
 // ========================================
@@ -476,6 +484,98 @@ async function loadFavoriteSongs(userId) {
 }
 
 // ========================================
+// LOAD ALL FAVORITE SONGS (for Songs tab)
+// ========================================
+
+async function loadAllFavoriteSongs(userId) {
+    try {
+        const votes = await getVotesForUser(userId);
+        
+        if (votes.length === 0) {
+            document.getElementById('allFavoriteSongs').innerHTML = `
+                <div class="no-content">
+                    <i class="fas fa-music"></i>
+                    <p>No votes yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Count song votes
+        const songCounts = {};
+        
+        votes.forEach(vote => {
+            const match = vote.match;
+            if (!match) return;
+            
+            const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
+            if (!votedSong) return;
+            
+            const songId = votedSong.id;
+            
+            if (!songCounts[songId]) {
+                songCounts[songId] = {
+                    id: songId,
+                    name: votedSong.shortTitle || votedSong.title,
+                    artist: votedSong.artist,
+                    videoId: votedSong.videoId,
+                    seed: votedSong.seed,
+                    thumbnail: votedSong.thumbnail,
+                    count: 0
+                };
+            }
+            
+            songCounts[songId].count++;
+        });
+        
+        // Sort by count
+        const allSongs = Object.values(songCounts)
+            .sort((a, b) => b.count - a.count);
+        
+        if (allSongs.length === 0) {
+            document.getElementById('allFavoriteSongs').innerHTML = `
+                <div class="no-content">
+                    <i class="fas fa-music"></i>
+                    <p>No votes yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const container = document.getElementById('allFavoriteSongs');
+        container.innerHTML = allSongs.map((song, index) => {
+            const medals = ['🥇', '🥈', '🥉'];
+            const rank = medals[index] || `#${index + 1}`;
+            
+            return `
+                <div class="favorite-song-card">
+                    <div class="song-rank">${rank}</div>
+                    <img 
+                        src="${song.thumbnail}" 
+                        alt="${song.name}"
+                        class="song-thumbnail"
+                        loading="lazy"
+                    />
+                    <div class="song-details">
+                        <div class="song-title">${song.name}</div>
+                        <div class="song-meta">
+                            <span>${song.artist}</span>
+                            <span class="song-meta-separator">•</span>
+                            <span>Seed #${song.seed}</span>
+                            <span class="song-meta-separator">•</span>
+                            <span class="song-vote-count">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('❌ Error loading all favorite songs:', error);
+    }
+}
+
+// ========================================
 // LOAD RECENT POSTS
 // ========================================
 
@@ -588,6 +688,304 @@ async function loadAllAchievements(userId) {
 }
 
 // ========================================
+// LOAD RECENT VOTES (for Overview tab)
+// ========================================
+
+async function loadRecentVotes(userId, limit = 5) {
+    try {
+        console.log(`📥 Loading recent ${limit} votes for user:`, userId);
+        
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId),
+            orderBy('timestamp', 'desc'),
+            limit(limit)
+        );
+        
+        const snapshot = await getDocs(votesQuery);
+        
+        const recentVotesContainer = document.getElementById('recentVotes');
+        
+        if (snapshot.empty) {
+            recentVotesContainer.innerHTML = `
+                <div class="no-content">
+                    <i class="fas fa-vote-yea"></i>
+                    <p>No votes yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Get all matches for lookup
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+        
+        // Render votes
+        const votesHTML = snapshot.docs
+            .map(doc => renderVoteCard(doc.data(), matchMap))
+            .join('');
+        
+        recentVotesContainer.innerHTML = votesHTML;
+        
+        console.log(`✅ Loaded ${snapshot.size} recent votes`);
+        
+    } catch (error) {
+        console.error('❌ Error loading recent votes:', error);
+        document.getElementById('recentVotes').innerHTML = `
+            <div class="no-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Could not load recent votes</p>
+            </div>
+        `;
+    }
+}
+
+// ========================================
+// LOAD ALL VOTES (for Votes tab)
+// ========================================
+
+let currentVoteFilter = 'all';
+let allUserVotes = [];
+
+async function loadAllVotes(userId) {
+    try {
+        console.log(`📥 Loading all votes for user:`, userId);
+        
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId),
+            orderBy('timestamp', 'desc')
+        );
+        
+        const snapshot = await getDocs(votesQuery);
+        
+        // Update count badge
+        document.getElementById('votesCount').textContent = snapshot.size;
+        
+        if (snapshot.empty) {
+            document.getElementById('allVotes').innerHTML = `
+                <div class="no-content">
+                    <i class="fas fa-vote-yea"></i>
+                    <p>No votes yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Get all matches for lookup
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+        
+        // Store votes for filtering
+        allUserVotes = snapshot.docs.map(doc => ({
+            voteData: doc.data(),
+            match: matchMap.get(doc.data().matchId)
+        }));
+        
+        // Render with current filter
+        renderFilteredVotes(currentVoteFilter);
+        
+        console.log(`✅ Loaded ${snapshot.size} total votes`);
+        
+    } catch (error) {
+        console.error('❌ Error loading all votes:', error);
+        document.getElementById('allVotes').innerHTML = `
+            <div class="no-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Could not load votes</p>
+            </div>
+        `;
+    }
+}
+
+// ========================================
+// RENDER FILTERED VOTES
+// ========================================
+
+function renderFilteredVotes(filter) {
+    const allVotesContainer = document.getElementById('allVotes');
+    
+    if (!allUserVotes || allUserVotes.length === 0) {
+        allVotesContainer.innerHTML = `
+            <div class="no-content">
+                <i class="fas fa-vote-yea"></i>
+                <p>No votes yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Filter votes
+    let filteredVotes = allUserVotes;
+    
+    if (filter !== 'all') {
+        filteredVotes = allUserVotes.filter(({ voteData, match }) => {
+            const status = getVoteStatus(voteData, match);
+            return status === filter;
+        });
+    }
+    
+    if (filteredVotes.length === 0) {
+        allVotesContainer.innerHTML = `
+            <div class="no-content">
+                <i class="fas fa-filter"></i>
+                <p>No ${filter} votes found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create match map for rendering
+    const matchMap = new Map(allUserVotes.map(v => [v.voteData.matchId, v.match]));
+    
+    // Render votes
+    const votesHTML = filteredVotes
+        .map(({ voteData }) => renderVoteCard(voteData, matchMap))
+        .join('');
+    
+    allVotesContainer.innerHTML = votesHTML;
+}
+
+// ========================================
+// RENDER VOTE CARD (Activity style)
+// ========================================
+
+function renderVoteCard(vote, matchMap) {
+    const match = matchMap.get(vote.matchId);
+    
+    if (!match) {
+        return `
+            <div class="vote-card-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Match data not found</p>
+            </div>
+        `;
+    }
+    
+    const { song1, song2, winner } = match;
+    
+    // Determine vote status
+    const status = getVoteStatus(vote, match);
+    const statusConfig = {
+        won: { emoji: '✅', label: 'WON', class: 'won' },
+        lost: { emoji: '❌', label: 'LOST', class: 'lost' },
+        pending: { emoji: '⏳', label: 'PENDING', class: 'pending' }
+    };
+    
+    const statusInfo = statusConfig[status];
+    
+    // Get chosen and opponent songs
+    const votedForSong1 = vote.choice === 'song1';
+    const chosenSong = votedForSong1 ? song1 : song2;
+    const opponentSong = votedForSong1 ? song2 : song1;
+    
+    // Format timestamp
+    const timeAgo = formatTimeAgo(vote.timestamp);
+    
+    return `
+        <div class="vote-card ${status}">
+            <div class="vote-header">
+                <div class="vote-status-badge ${statusInfo.class}">
+                    ${statusInfo.emoji} ${statusInfo.label}
+                </div>
+                <div class="vote-timestamp">${timeAgo}</div>
+            </div>
+            
+            <div class="vote-matchup">
+                <!-- Chosen Song (Left) -->
+                <div class="vote-song chosen">
+                    <div class="vote-song-thumbnail">
+                        <img src="${chosenSong.thumbnail}" alt="${chosenSong.title}" loading="lazy">
+                        <div class="vote-icon">👍</div>
+                    </div>
+                    <div class="vote-song-info">
+                        <div class="vote-song-title">${chosenSong.shortTitle || chosenSong.title}</div>
+                        <div class="vote-song-meta">${chosenSong.champion} • Seed #${chosenSong.seed}</div>
+                    </div>
+                </div>
+                
+                <!-- VS Separator -->
+                <div class="vote-vs">VS</div>
+                
+                <!-- Opponent Song (Right) -->
+                <div class="vote-song opponent">
+                    <div class="vote-song-thumbnail">
+                        <img src="${opponentSong.thumbnail}" alt="${opponentSong.title}" loading="lazy">
+                    </div>
+                    <div class="vote-song-info">
+                        <div class="vote-song-title">${opponentSong.shortTitle || opponentSong.title}</div>
+                        <div class="vote-song-meta">${opponentSong.champion} • Seed #${opponentSong.seed}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vote-footer">
+                <span class="vote-round">Round ${match.round}</span>
+                <a href="/vote.html?id=${vote.matchId}" class="view-match-link">
+                    View Match →
+                </a>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
+// HELPER: Determine vote status
+// ========================================
+
+function getVoteStatus(vote, match) {
+    if (!match || !match.winner) {
+        return 'pending';
+    }
+    
+    return match.winner === vote.choice ? 'won' : 'lost';
+}
+
+// ========================================
+// HELPER: Format time ago
+// ========================================
+
+function formatTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    if (days < 30) return `${Math.floor(days / 7)}w ago`;
+    return `${Math.floor(days / 30)}mo ago`;
+}
+
+// ========================================
+// SETUP VOTE FILTERS
+// ========================================
+
+function setupVoteFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update filter and re-render
+            currentVoteFilter = btn.dataset.filter;
+            renderFilteredVotes(currentVoteFilter);
+            
+            console.log(`🔍 Filter changed to: ${currentVoteFilter}`);
+        });
+    });
+}
+
+// ========================================
 // RENDER POST CARD
 // ========================================
 
@@ -639,85 +1037,7 @@ async function getVoteCountForUser(userId) {
     }
 }
 
-async function getVotingStreakForUser(userId) {
-    try {
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId),
-            orderBy('timestamp', 'desc')
-        );
-        
-        const snapshot = await getDocs(votesQuery);
-        
-        if (snapshot.empty) return 0;
-        
-        const votes = snapshot.docs.map(doc => doc.data());
-        
-        // Get unique voting days
-        const votingDays = [...new Set(votes.map(v => {
-            const date = new Date(v.timestamp);
-            return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-        }))].sort().reverse();
-        
-        if (votingDays.length === 0) return 0;
-        
-        // Calculate streak
-        let streak = 1;
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
-        
-        // If no vote today, check if voted yesterday
-        let checkDate = votingDays[0] === todayStr ? new Date() : new Date(Date.now() - 86400000);
-        
-        for (let i = 0; i < votingDays.length - 1; i++) {
-            const currentDay = new Date(votingDays[i]);
-            const nextDay = new Date(votingDays[i + 1]);
-            
-            const dayDiff = Math.floor((currentDay - nextDay) / 86400000);
-            
-            if (dayDiff === 1) {
-                streak++;
-            } else {
-                break;
-            }
-        }
-        
-        return streak;
-    } catch (error) {
-        console.error('❌ Error calculating streak:', error);
-        return 0;
-    }
-}
 
-async function getSongsAliveForUser(userId) {
-    try {
-        const votes = await getVotesForUser(userId);
-        
-        // Get unique songs user voted for that are still active
-        const uniqueSongs = new Set();
-        
-        votes.forEach(vote => {
-            if (!vote.match) return;
-            
-            const votedSong = vote.choice === 'song1' ? vote.match.song1 : vote.match.song2;
-            if (!votedSong) return;
-            
-            // Check if song is still in tournament (not eliminated)
-            const isEliminated = vote.match.status === 'completed' && 
-                               vote.match.winnerId && 
-                               vote.match.winnerId !== votedSong.id;
-            
-            if (!isEliminated) {
-                uniqueSongs.add(votedSong.id);
-            }
-        });
-        
-        return uniqueSongs.size;
-    } catch (error) {
-        console.error('❌ Error calculating songs alive:', error);
-        return 0;
-    }
-}
 
 async function getVotesForUser(userId) {
     try {
@@ -748,10 +1068,6 @@ async function getVotesForUser(userId) {
     }
 }
 
-async function getFollowerCount(userId) {
-    // TODO: Implement followers system
-    return 0;
-}
 
 function formatJoinDate(date) {
     const now = new Date();
@@ -790,7 +1106,7 @@ function setupTabs() {
     const tabPanels = document.querySelectorAll('.tab-panel');
     
     tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const targetTab = btn.dataset.tab;
             
             // Remove active from all
@@ -800,6 +1116,23 @@ function setupTabs() {
             // Add active to clicked
             btn.classList.add('active');
             document.getElementById(`tab-${targetTab}`).classList.add('active');
+            
+            // Lazy load tab content
+            if (targetTab === 'votes' && allUserVotes.length === 0) {
+                await loadAllVotes(currentProfile.userId);
+            }
+            
+            if (targetTab === 'participation' && window.participationData) {
+                renderParticipationTab();  // ✅ NEW
+            }
+            
+            if (targetTab === 'achievements' && document.getElementById('allAchievements').querySelector('.no-content')) {
+                await loadAllAchievements(currentProfile.userId);
+            }
+            
+            if (targetTab === 'songs' && document.getElementById('allFavoriteSongs').querySelector('.no-content')) {
+                await loadAllFavoriteSongs(currentProfile.userId);
+            }
         });
     });
 }
@@ -919,6 +1252,168 @@ async function getUserXPForUser(userId) {
     }
     
     return 0;
+}
+
+// ========================================
+// CALCULATE TOURNAMENT PARTICIPATION
+// ========================================
+
+async function calculateTournamentParticipation(userId) {
+    try {
+        // Total possible matches per round (hardcoded for now - could fetch from config)
+        const TOTAL_MATCHES_BY_ROUND = {
+            1: 29,
+            2: 16,
+            3: 8,
+            4: 4,
+            5: 2,
+            6: 1
+        };
+        
+        // Get user's votes
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId)
+        );
+        
+        const snapshot = await getDocs(votesQuery);
+        
+        if (snapshot.empty) {
+            return {
+                overallPercentage: 0,
+                byRound: [],
+                totalVotes: 0,
+                totalPossible: 60
+            };
+        }
+        
+        // Count votes by round
+        const votesByRound = {};
+        snapshot.docs.forEach(doc => {
+            const vote = doc.data();
+            const round = vote.round || 1;
+            votesByRound[round] = (votesByRound[round] || 0) + 1;
+        });
+        
+        // Calculate participation by round
+        const byRound = Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => {
+            const voted = votesByRound[round] || 0;
+            const percentage = total > 0 ? Math.round((voted / total) * 100) : 0;
+            
+            return {
+                round: parseInt(round),
+                roundName: getRoundName(parseInt(round)),
+                voted,
+                total,
+                percentage
+            };
+        });
+        
+        // Calculate overall participation
+        const totalPossible = Object.values(TOTAL_MATCHES_BY_ROUND).reduce((a, b) => a + b, 0);
+        const totalVotes = snapshot.size;
+        const overallPercentage = Math.round((totalVotes / totalPossible) * 100);
+        
+        return {
+            overallPercentage,
+            byRound,
+            totalVotes,
+            totalPossible
+        };
+        
+    } catch (error) {
+        console.error('❌ Error calculating participation:', error);
+        return {
+            overallPercentage: 0,
+            byRound: [],
+            totalVotes: 0,
+            totalPossible: 60
+        };
+    }
+}
+
+// Helper: Get round name
+function getRoundName(roundNumber) {
+    const roundNames = {
+        1: 'Round 1',
+        2: 'Round 2',
+        3: 'Sweet 16',
+        4: 'Quarterfinals',
+        5: 'Semifinals',
+        6: 'Finals'
+    };
+    return roundNames[roundNumber] || `Round ${roundNumber}`;
+}
+
+// ========================================
+// LOAD PARTICIPATION DATA
+// ========================================
+
+async function loadParticipationData(userId) {
+    try {
+        console.log('📊 Loading participation data...');
+        
+        const participation = await calculateTournamentParticipation(userId);
+        
+        // Update overall participation stat card
+document.getElementById('statParticipation').textContent = `${participation.overallPercentage}%`;        
+        // Update participation tab (lazy loaded when clicked)
+        window.participationData = participation;
+        
+        console.log('✅ Participation data loaded:', participation);
+        
+    } catch (error) {
+        console.error('❌ Error loading participation:', error);
+    }
+}
+
+// ========================================
+// RENDER PARTICIPATION TAB
+// ========================================
+
+function renderParticipationTab() {
+    const participation = window.participationData;
+    
+    if (!participation) {
+        console.warn('⚠️ No participation data available');
+        return;
+    }
+    
+    // Animate circular progress
+    const circle = document.getElementById('participationCircle');
+    const circumference = 565.48; // 2 * π * 90
+    const offset = circumference - (circumference * participation.overallPercentage / 100);
+    
+    setTimeout(() => {
+        circle.style.strokeDashoffset = offset;
+    }, 100);
+    
+    // Update percentage display
+    document.getElementById('overallParticipation').textContent = `${participation.overallPercentage}%`;
+    
+    // Update summary text
+    const summary = document.getElementById('participationSummary');
+    summary.textContent = `You've voted in ${participation.totalVotes} out of ${participation.totalPossible} total matches across all rounds.`;
+    
+    // Render rounds breakdown
+    const roundsContainer = document.getElementById('roundsBreakdown');
+    
+    roundsContainer.innerHTML = participation.byRound.map(round => `
+        <div class="round-participation-card">
+            <div class="round-header-row">
+                <div class="round-name">${round.roundName}</div>
+                <div class="round-stats">
+                    <span class="round-votes">${round.voted}</span>
+                    <span>/</span>
+                    <span>${round.total}</span>
+                </div>
+            </div>
+            <div class="round-progress-container">
+                <div class="round-progress-fill" style="width: ${round.percentage}%"></div>
+                <div class="round-percentage-badge">${round.percentage}%</div>
+            </div>
+        </div>
+    `).join('');
 }
 
 // ========================================

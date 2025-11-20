@@ -1203,3 +1203,548 @@
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #f0e6d2, #c8aa6e);
 }
+/* Participation level - smaller text stat */
+.stat-value.participation-text {
+    font-size: 1.5rem; /* Smaller than numbers */
+    color: #c8aa6e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .stat-value.participation-text {
+        font-size: 1.2rem;
+    }
+}
+/* ========================================
+   VOTES TAB - FILTER BUTTONS
+   ======================================== */
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tab-header h3 {
+    font-family: 'Cinzel', serif;
+    color: #f0e6d2;
+    font-size: 1.8rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.75rem 1.5rem;
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    color: rgba(240, 230, 210, 0.7);
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.filter-btn:hover {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #c8aa6e;
+    color: #c8aa6e;
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
+    border-color: #c8aa6e;
+    color: #000;
+    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
+}
+
+.filter-btn i {
+    font-size: 1rem;
+}
+
+/* ========================================
+   VOTE CARDS - ACTIVITY STYLE
+   ======================================== */
+
+.recent-votes-list,
+.votes-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.vote-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vote-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #c8aa6e, #f0e6d2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vote-card:hover {
+    border-color: #c8aa6e;
+    transform: translateX(8px);
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
+}
+
+.vote-card:hover::before {
+    opacity: 1;
+}
+
+/* Status-specific colors */
+.vote-card.won::before {
+    background: linear-gradient(180deg, #00d26a, #00aa55);
+}
+
+.vote-card.lost::before {
+    background: linear-gradient(180deg, #ff4655, #cc3344);
+}
+
+.vote-card.pending::before {
+    background: linear-gradient(180deg, #ffa500, #ff8c00);
+}
+
+.vote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.vote-status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vote-status-badge.won {
+    background: rgba(0, 210, 106, 0.2);
+    color: #00d26a;
+    border: 2px solid #00d26a;
+}
+
+.vote-status-badge.lost {
+    background: rgba(255, 70, 85, 0.2);
+    color: #ff4655;
+    border: 2px solid #ff4655;
+}
+
+.vote-status-badge.pending {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 2px solid #ffa500;
+}
+
+.vote-timestamp {
+    color: rgba(240, 230, 210, 0.5);
+    font-size: 0.9rem;
+}
+
+/* Vote Matchup */
+.vote-matchup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.vote-song {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(200, 170, 110, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.vote-song.chosen {
+    background: rgba(200, 170, 110, 0.15);
+    border: 2px solid rgba(200, 170, 110, 0.4);
+}
+
+.vote-song-thumbnail {
+    width: 80px;
+    height: 45px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+}
+
+.vote-song-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vote-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vote-song-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.vote-song-title {
+    color: #f0e6d2;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vote-song-meta {
+    color: rgba(240, 230, 210, 0.6);
+    font-size: 0.85rem;
+}
+
+.vote-vs {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #c8aa6e;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ========================================
+   RESPONSIVE - VOTE CARDS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .vote-matchup {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .vote-vs {
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+    
+    .vote-song {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .vote-song-thumbnail {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
+}
+
+/* Participation level - smaller text stat */
+.stat-value.participation-text {
+    font-size: 1.5rem;
+    color: #c8aa6e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .stat-value.participation-text {
+        font-size: 1.2rem;
+    }
+}
+/* Vote Footer */
+.vote-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.vote-round {
+    color: rgba(240, 230, 210, 0.6);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.view-match-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.view-match-link:hover {
+    color: #f0e6d2;
+    transform: translateX(4px);
+}
+
+.vote-card-error {
+    background: rgba(255, 70, 85, 0.1);
+    border: 2px solid rgba(255, 70, 85, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #ff4655;
+}
+
+.vote-card-error i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+/* ========================================
+   PARTICIPATION TAB
+   ======================================== */
+
+.participation-overview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    padding: 3rem;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 16px;
+    margin-bottom: 3rem;
+}
+
+.participation-circle {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.participation-circle svg {
+    transform: rotate(0deg);
+}
+
+.participation-circle circle {
+    transition: stroke-dashoffset 1.5s ease;
+}
+
+.participation-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: 700;
+    color: #f0e6d2;
+    font-family: 'Cinzel', serif;
+}
+
+.participation-summary h3 {
+    font-family: 'Cinzel', serif;
+    color: #f0e6d2;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.participation-summary p {
+    color: rgba(240, 230, 210, 0.7);
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* Rounds Breakdown */
+.rounds-breakdown {
+    margin-top: 2rem;
+}
+
+.rounds-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.round-participation-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.round-participation-card:hover {
+    border-color: #c8aa6e;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(200, 170, 110, 0.2);
+}
+
+.round-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.round-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #f0e6d2;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.round-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(240, 230, 210, 0.7);
+    font-size: 1.1rem;
+}
+
+.round-votes {
+    font-weight: 700;
+    color: #c8aa6e;
+}
+
+.round-progress-container {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    background: rgba(200, 170, 110, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.round-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c8aa6e, #f0e6d2);
+    border-radius: 6px;
+    transition: width 1s ease;
+    box-shadow: 0 0 10px rgba(200, 170, 110, 0.5);
+}
+
+.round-percentage-badge {
+    position: absolute;
+    top: -8px;
+    right: 0;
+    transform: translateY(-100%);
+    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
+    color: #000;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .participation-overview {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .participation-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .participation-percentage {
+        font-size: 2.5rem;
+    }
+    
+    .participation-summary h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Update grid for 4 cards */
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+@media (max-width: 1200px) {
+    .profile-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
