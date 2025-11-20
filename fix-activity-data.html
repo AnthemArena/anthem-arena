@@ -142,53 +142,54 @@
                         const updates = {};
                         let needsUpdate = false;
                         
-                        // ========================================
-                        // FIX 1: Song data
-                        // ========================================
-                        const needsSongFix = 
-                            !activity.songId || 
-                            activity.songId === 'song1' || 
-                            activity.songId === 'song2' ||
-                            !activity.matchTitle ||
-                            activity.matchTitle.includes('Match round-') ||
-                            activity.matchTitle.includes('Song 1') ||
-                            activity.matchTitle.includes('Song 2');
-                        
-                        if (needsSongFix) {
-                            const match = matchMap[activity.matchId];
-                            
-                            if (match) {
-                                const song1 = match.song1;
-                                const song2 = match.song2;
-                                
-                                if (song1 && song2) {
-                                    // ✅ Get choice from votes
-                                    const voteKey = `${activity.matchId}_${activity.userId}`;
-                                    const choice = votesMap.get(voteKey) || activity.choice;
-                                    
-                                    // Determine which song was voted for
-                                    const votedForSong1 = choice === 'song1';
-                                    const votedSong = votedForSong1 ? song1 : song2;
-                                    
-                                    updates.songId = votedSong.videoId;
-                                    updates.songTitle = votedSong.shortTitle || votedSong.title;
-                                    updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
-                                    
-                                    needsUpdate = true;
-                                    fixedSongs++;
-                                    console.log(`🎵 Fixed: ${updates.matchTitle} (voted: ${votedSong.shortTitle})`);
-                                } else {
-                                    console.warn(`⚠️ Match missing song data: ${activity.matchId}`);
-                                }
-                            } else {
-                                console.warn(`⚠️ Match not found: ${activity.matchId}`);
-                                errors++;
-                            }
-                        }
-                        
-                        // ========================================
-                        // ✅ FIX 2: Add choice field if missing
-                        // ========================================
+                       // ========================================
+// FIX 1: Song data
+// ========================================
+const needsSongFix = 
+    !activity.songId || 
+    activity.songId === 'song1' || 
+    activity.songId === 'song2' ||
+    !activity.matchTitle ||
+    activity.matchTitle.includes('Match round-') ||
+    activity.matchTitle.includes('Song 1') ||
+    activity.matchTitle.includes('Song 2');
+
+// Get match data for this activity
+const match = matchMap[activity.matchId];
+
+if (match && match.song1 && match.song2) {
+    const song1 = match.song1;
+    const song2 = match.song2;
+    
+    // ✅ Get choice from votes
+    const voteKey = `${activity.matchId}_${activity.userId}`;
+    const choice = votesMap.get(voteKey) || activity.choice;
+    
+    // Determine which song was voted for
+    const votedForSong1 = choice === 'song1';
+    const votedSong = votedForSong1 ? song1 : song2;
+    
+    // ✅ ALWAYS check if songId matches the voted song
+    const correctVideoId = votedSong.videoId;
+    const needsSongIdFix = activity.songId !== correctVideoId;
+    
+    if (needsSongFix || needsSongIdFix) {
+        updates.songId = correctVideoId;
+        updates.songTitle = votedSong.shortTitle || votedSong.title;
+        updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
+        
+        needsUpdate = true;
+        fixedSongs++;
+        console.log(`🎵 Fixed: ${updates.matchTitle} (voted: ${votedSong.shortTitle || votedSong.title}, videoId: ${correctVideoId})`);
+    }
+} else if (needsSongFix) {
+    console.warn(`⚠️ Match not found or missing song data: ${activity.matchId}`);
+    errors++;
+}
+
+// ========================================
+// ✅ FIX 2: Add choice field if missing
+// ========================================
                         if (!activity.choice) {
                             const voteKey = `${activity.matchId}_${activity.userId}`;
                             const choice = votesMap.get(voteKey);

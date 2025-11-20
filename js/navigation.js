@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="/music-gallery">Music Gallery</a></li>
                 <li><a href="/matches">Matches</a></li>
                 <li><a href="/stats">Stats</a></li>
-                <li><a href="/about">About</a></li>
                 <li><a href="/activity.html" class="nav-link">
                     Community
                 </a></li>
