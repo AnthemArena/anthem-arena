@@ -191,8 +191,10 @@ function renderActivityFeed(activities) {
 // ========================================
 
 function renderVoteCard(activity) {
-    const thumbnailUrl = getYoutubeThumbnail(activity.songId);
-    const songTitle = getSongTitle(activity.songId, activity.songTitle);
+    // The voted song's ID and title
+    const votedSongId = activity.songId;
+    const votedSongTitle = getSongTitle(activity.songId, activity.songTitle);
+    const thumbnailUrl = getYoutubeThumbnail(votedSongId);
     const tournamentName = formatTournamentName(activity.tournamentId);
     
     // Parse match title to get both songs
@@ -201,46 +203,59 @@ function renderVoteCard(activity) {
     const song1 = songs[0]?.trim() || 'Song 1';
     const song2 = songs[1]?.trim() || 'Song 2';
     
-    // Determine which song was voted for
-    const votedSong = (activity.songTitle || songTitle).trim();
+    // DEBUG - Check what we're comparing
+    console.log('=== Vote Card Debug ===');
+    console.log('Match Title:', matchTitle);
+    console.log('Song 1:', song1);
+    console.log('Song 2:', song2);
+    console.log('Voted Song Title:', votedSongTitle);
+    console.log('Voted Song ID:', votedSongId);
     
-    // BETTER MATCHING: Compare the actual voted song title more precisely
-    // The songId corresponds to the actual vote, so use that as source of truth
-    const votedLower = votedSong.toLowerCase();
-    const song1Lower = song1.toLowerCase();
-    const song2Lower = song2.toLowerCase();
+    // Determine which song was voted for by comparing titles
+    const votedLower = votedSongTitle.toLowerCase().trim();
+    const song1Lower = song1.toLowerCase().trim();
+    const song2Lower = song2.toLowerCase().trim();
     
-    // Check for exact or very close matches
     let votedForSong1 = false;
     
-    // First try: exact match
+    // Method 1: Exact match
     if (votedLower === song1Lower) {
         votedForSong1 = true;
+        console.log('✓ Exact match with Song 1');
     } else if (votedLower === song2Lower) {
         votedForSong1 = false;
-    } 
-    // Second try: voted song contains one of the options
+        console.log('✓ Exact match with Song 2');
+    }
+    // Method 2: Voted song contains one option (but not the other)
     else if (votedLower.includes(song1Lower) && !votedLower.includes(song2Lower)) {
         votedForSong1 = true;
+        console.log('✓ Voted song contains Song 1');
     } else if (votedLower.includes(song2Lower) && !votedLower.includes(song1Lower)) {
         votedForSong1 = false;
+        console.log('✓ Voted song contains Song 2');
     }
-    // Third try: one of the options contains the voted song
+    // Method 3: One option contains the voted song (but not the other)
     else if (song1Lower.includes(votedLower) && !song2Lower.includes(votedLower)) {
         votedForSong1 = true;
+        console.log('✓ Song 1 contains voted song');
     } else if (song2Lower.includes(votedLower) && !song1Lower.includes(votedLower)) {
         votedForSong1 = false;
+        console.log('✓ Song 2 contains voted song');
     }
-    // Last resort: default to song1 (but log this for debugging)
+    // Method 4: Fallback - check if voted song ID matches song1 or song2
     else {
-        console.warn('Could not match voted song:', votedSong, 'between', song1, 'and', song2);
+        console.warn('⚠️ Could not match by title. Voted:', votedSongTitle, '| Song1:', song1, '| Song2:', song2);
+        // Default to song1 as fallback
         votedForSong1 = true;
     }
+    
+    console.log('Result: votedForSong1 =', votedForSong1);
+    console.log('======================\n');
     
     return `
         <div class="vote-card">
             <div class="vote-thumbnail">
-                <img src="${thumbnailUrl}" alt="${songTitle}" loading="lazy" />
+                <img src="${thumbnailUrl}" alt="${votedSongTitle}" loading="lazy" />
             </div>
             
             <div class="vote-user">
