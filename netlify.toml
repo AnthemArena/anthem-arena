@@ -86,6 +86,12 @@
   to = "/blog.html"
   status = 200
 
+  # ✅ ADD THIS: Profile routes with username
+[[redirects]]
+  from = "/@:username"
+  to = "/profile.html?user=:username"
+  status = 200
+
 # Existing routes
 [[redirects]]
   from = "/vote"

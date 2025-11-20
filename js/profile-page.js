@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get current user info
     currentUserId = localStorage.getItem('tournamentUserId');
     currentUsername = localStorage.getItem('username');
+
+     // ✅ ADD DEBUG LOGGING
+    console.log('🔍 Current User ID:', currentUserId);
+    console.log('🔍 Current Username:', currentUsername);
+    console.log('🔍 localStorage keys:', Object.keys(localStorage));
     
     // Get target username from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,8 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('👤 Target username:', targetUsername);
     console.log('👤 Current user:', currentUsername);
     
-    // Check if user has setup their profile
+     // Check if user has setup their profile
     if (!targetUsername) {
+        console.warn('⚠️ No target username - showing guest state');
         showGuestState();
         return;
     }
