@@ -2313,3 +2313,529 @@ text-align: center;
         font-size: 1rem;
     }
 }
+/* Activity Ticker */
+.activity-ticker {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.08), rgba(200, 170, 110, 0.12));
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    padding: 0.75rem 1.5rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    animation: slideIn 0.5s ease;
+}
+
+.ticker-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #C8AA6E;
+}
+
+.ticker-content .pulse {
+    color: #4CAF50;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.ticker-content .highlight {
+    color: #fff;
+    font-weight: 600;
+}
+
+.ticker-content .time-ago {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.refresh-btn {
+    margin-left: auto;
+    background: rgba(200, 170, 110, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.refresh-btn:hover {
+    background: rgba(200, 170, 110, 0.2);
+    transform: scale(1.05);
+}
+
+.refresh-btn.spinning i {
+    animation: spin 0.5s linear;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mini Activity Feed */
+.mini-activity-feed {
+    background: rgba(200, 170, 110, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.header-left h3 {
+    color: #C8AA6E;
+    font-size: 1.3rem;
+    margin: 0 0 0.25rem 0;
+}
+
+.cache-indicator {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.feed-header .see-all {
+    color: #C8AA6E;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: gap 0.3s ease;
+}
+
+.feed-header .see-all:hover {
+    gap: 0.5rem;
+}
+
+.feed-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.mini-activity-card {
+    background: rgba(10, 10, 10, 0.5);
+    border: 1px solid rgba(200, 170, 110, 0.15);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mini-activity-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(200, 170, 110, 0.4);
+}
+
+.mini-thumbnail {
+    width: 60px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.mini-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mini-user {
+    font-weight: 600;
+    color: #C8AA6E;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-song {
+    font-size: 0.85rem;
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-time {
+    color: #666;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.empty-feed {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+}
+
+.empty-feed i {
+    font-size: 3rem;
+    color: rgba(200, 170, 110, 0.3);
+    margin-bottom: 1rem;
+}
+
+.start-voting-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(200, 170, 110, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.start-voting-btn:hover {
+    background: rgba(200, 170, 110, 0.2);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .feed-content {
+        grid-template-columns: 1fr;
+    }
+}
+/* ========================================
+   ACTIVITY TICKER
+   ======================================== */
+.activity-ticker {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.08), rgba(200, 170, 110, 0.12));
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    padding: 0.75rem 1.5rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    animation: slideIn 0.5s ease;
+}
+
+.ticker-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #C8AA6E;
+}
+
+.ticker-content .pulse {
+    color: #4CAF50;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.ticker-content .highlight {
+    color: #fff;
+    font-weight: 600;
+}
+
+.ticker-content .time-ago {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.refresh-btn {
+    margin-left: auto;
+    background: rgba(200, 170, 110, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.refresh-btn:hover {
+    background: rgba(200, 170, 110, 0.2);
+    transform: scale(1.05);
+}
+
+.refresh-btn.spinning i {
+    animation: spin 0.5s linear;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   MINI ACTIVITY FEED
+   ======================================== */
+.mini-activity-feed {
+    background: rgba(200, 170, 110, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.header-left h3 {
+    color: #C8AA6E;
+    font-size: 1.3rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cache-indicator {
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.feed-header .see-all {
+    color: #C8AA6E;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: gap 0.3s ease;
+    white-space: nowrap;
+}
+
+.feed-header .see-all:hover {
+    gap: 0.5rem;
+}
+
+.feed-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.mini-activity-card {
+    background: rgba(10, 10, 10, 0.5);
+    border: 1px solid rgba(200, 170, 110, 0.15);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mini-activity-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(200, 170, 110, 0.4);
+}
+
+.mini-thumbnail {
+    width: 60px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 1px solid rgba(200, 170, 110, 0.1);
+}
+
+.mini-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mini-user {
+    font-weight: 600;
+    color: #C8AA6E;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-song {
+    font-size: 0.85rem;
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-time {
+    color: #666;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Empty state */
+.empty-feed {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+}
+
+.empty-feed i {
+    font-size: 3rem;
+    color: rgba(200, 170, 110, 0.3);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-feed p {
+    margin: 1rem 0;
+}
+
+.start-voting-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(200, 170, 110, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.start-voting-btn:hover {
+    background: rgba(200, 170, 110, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Loading spinner for feed */
+.feed-content .loading-spinner {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .activity-ticker {
+        padding: 0.6rem 1rem;
+    }
+    
+    .ticker-content {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+    }
+    
+    .refresh-btn {
+        padding: 0.35rem 0.5rem;
+    }
+    
+    .mini-activity-feed {
+        padding: 1rem;
+    }
+    
+    .feed-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-left h3 {
+        font-size: 1.1rem;
+    }
+    
+    .feed-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .mini-activity-card {
+        padding: 0.6rem;
+    }
+    
+    .mini-thumbnail {
+        width: 50px;
+        height: 38px;
+    }
+    
+    .mini-user,
+    .mini-song {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .activity-ticker {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .ticker-content {
+        font-size: 0.8rem;
+    }
+    
+    .ticker-content strong,
+    .ticker-content .highlight {
+        display: block;
+    }
+    
+    .ticker-content .time-ago {
+        font-size: 0.75rem;
+    }
+}

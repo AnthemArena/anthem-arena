@@ -43,7 +43,7 @@ let currentFilters = {
     search: '',
     tournament: 'all',
     round: 'all',
-    status: 'all',
+    status: 'live',
     sort: 'recent' // ← Changed from 'date-desc'
 };
 document.addEventListener('DOMContentLoaded', async () => {
@@ -65,6 +65,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Setup filter event listeners
         setupFilterListeners();
+
+        // ✅ SET STATUS FILTER TO 'LIVE' BY DEFAULT
+const statusFilter = document.getElementById('status-filter');
+if (statusFilter) {
+    statusFilter.value = 'live';
+}
         
         // Apply initial filtering and sorting
         if (allMatches.length > 0) {
@@ -84,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Setup filter event listeners
 function setupFilterListeners() {
     const searchInput = document.getElementById('search-input');
     const tournamentFilter = document.getElementById('tournament-filter');
@@ -621,9 +626,9 @@ case 'recent':
         return 0;
     });
     
-    // 🔍 DEBUG: Log sorted results
+   // 🔍 DEBUG: Log sorted results
     console.log('🔍 SORTED MATCHES (first 10):');
-    result.slice(0, 10).forEach((m, i) => {
+    votePrioritized.slice(0, 10).forEach((m, i) => {  // ✅ Fixed variable name
         const date = new Date(m.date);
         const now = new Date();
         const hoursAway = Math.ceil((date - now) / (1000 * 60 * 60));
@@ -631,7 +636,7 @@ case 'recent':
         console.log(`${i + 1}. ${m.matchId} | Date: ${m.date} | ${daysAway}d ${hoursAway % 24}h away`);
     });
     
-    return result;
+    return votePrioritized;  // ✅ Return the correct variable
             
         case 'votes-desc':
             return sorted.sort((a, b) => {
@@ -662,19 +667,18 @@ function clearFilters() {
     if (searchInput) searchInput.value = '';
     if (tournamentFilter) tournamentFilter.value = 'all';
     if (roundFilter) roundFilter.value = 'all';
-    if (statusFilter) statusFilter.value = 'all';
+    if (statusFilter) statusFilter.value = 'live'; // ✅ Changed from 'all' to 'live'
     if (sortFilter) sortFilter.value = 'recent';
 
     currentFilters = {
         search: '',
         tournament: 'all',
         round: 'all',
-        status: 'all',
+        status: 'live', // ✅ Changed from 'all' to 'live'
         sort: 'recent'
     };
 
-    // ✅ FIXED: Use filterMatches() instead of displayMatches()
-    filterMatches(); // ← This applies sorting!
+    filterMatches();
 }
 
 function displayMatches(matches) {

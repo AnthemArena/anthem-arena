@@ -14,8 +14,228 @@ let allLiveMatches = [];
 const ROUND_CONFIG = {
     roundName: "ROUND 2",
     roundDescription: "Single Elimination • 16 Matches",
-    endDate: new Date('2025-11-24T19:00:00Z') // Updated for Round 2 - adjust this date as needed
+    endDate: new Date('2025-11-24T19:00:00Z')
 };
+
+// ========================================
+// LIVE ACTIVITY TICKER (using edge cache)
+// ========================================
+let currentActivityIndex = 0;
+let activityData = [];
+let tickerRotationInterval = null;
+
+async function initializeActivityTicker() {
+    const countdownBanner = document.querySelector('.countdown-banner');
+    
+    if (!countdownBanner) {
+        console.log('⚠️ Countdown banner not found, ticker not initialized');
+        return;
+    }
+    
+    // Create ticker element
+    const ticker = document.createElement('div');
+    ticker.className = 'activity-ticker';
+    ticker.innerHTML = `
+        <div class="ticker-content">
+            <i class="fa-solid fa-circle-dot pulse"></i>
+            <span id="tickerText">Loading community activity...</span>
+            <button id="refreshActivity" class="refresh-btn" title="Refresh activity">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </div>
+    `;
+    
+    countdownBanner.insertAdjacentElement('afterend', ticker);
+    
+    // Load activity from edge cache
+    await loadActivityData();
+    
+    // Rotate through different activities every 8 seconds
+    rotateActivityDisplay();
+    tickerRotationInterval = setInterval(rotateActivityDisplay, 8000);
+    
+    // Add refresh button handler
+    const refreshBtn = document.getElementById('refreshActivity');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            refreshBtn.classList.add('spinning');
+            await loadActivityData(true); // Force refresh
+            refreshBtn.classList.remove('spinning');
+        });
+    }
+}
+
+async function loadActivityData(forceRefresh = false) {
+    try {
+        // Use edge cache endpoint with optional cache bypass
+        const url = forceRefresh 
+            ? '/api/activity?limit=10&_refresh=true' 
+            : '/api/activity?limit=10';
+        
+        console.log(`📥 Fetching activity from: ${url}`);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch activity: ${response.status}`);
+        }
+        
+        activityData = await response.json();
+        currentActivityIndex = 0;
+        
+        console.log(`✅ Loaded ${activityData.length} activities (Cache: ${response.headers.get('X-Cache') || 'unknown'})`);
+        
+        if (activityData.length > 0) {
+            displayActivityInTicker(activityData[0]);
+        } else {
+            const tickerText = document.getElementById('tickerText');
+            if (tickerText) {
+                tickerText.innerHTML = `Be the first to vote! <a href="/vote.html" style="color: #C8AA6E;">Start voting now</a>`;
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error loading activity:', error);
+        const tickerText = document.getElementById('tickerText');
+        if (tickerText) {
+            tickerText.innerHTML = `Unable to load activity. <a href="/vote.html" style="color: #C8AA6E;">Start voting</a>`;
+        }
+    }
+}
+
+function rotateActivityDisplay() {
+    if (activityData.length === 0) return;
+    
+    currentActivityIndex = (currentActivityIndex + 1) % activityData.length;
+    displayActivityInTicker(activityData[currentActivityIndex]);
+}
+
+function displayActivityInTicker(activity) {
+    const tickerText = document.getElementById('tickerText');
+    if (!tickerText) return;
+    
+    const username = activity.username || 'Someone';
+    const timeAgo = getTimeAgo(activity.timestamp);
+    const songName = activity.votedForName || activity.songTitle || 'a song';
+    
+    tickerText.innerHTML = `
+        <strong>${username}</strong> voted for 
+        <span class="highlight">${songName}</span> 
+        <span class="time-ago">${timeAgo}</span>
+    `;
+}
+
+// ========================================
+// MINI ACTIVITY FEED (using edge cache)
+// ========================================
+async function displayMiniActivityFeed() {
+    const container = document.querySelector('.social-container');
+    const unvotedSection = document.querySelector('#unvotedSection');
+    
+    if (!container || !unvotedSection) {
+        console.log('⚠️ Container or unvoted section not found');
+        return;
+    }
+    
+    const feedSection = document.createElement('div');
+    feedSection.className = 'mini-activity-feed';
+    feedSection.innerHTML = `
+        <div class="feed-header">
+            <div class="header-left">
+                <h3><i class="fa-solid fa-fire"></i> Community Activity</h3>
+                <span class="cache-indicator" id="cacheIndicator">Live updates</span>
+            </div>
+            <a href="/activity.html" class="see-all">See All <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div id="miniFeedContent" class="feed-content">
+            <div class="loading-spinner">Loading...</div>
+        </div>
+    `;
+    
+    container.insertBefore(feedSection, unvotedSection);
+    
+    // Load activity feed
+    await loadMiniFeed();
+}
+
+async function loadMiniFeed() {
+    const feedContent = document.getElementById('miniFeedContent');
+    const cacheIndicator = document.getElementById('cacheIndicator');
+    
+    if (!feedContent) return;
+    
+    try {
+        // Fetch from edge cache (30 second cache)
+        const response = await fetch('/api/activity?limit=6');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.status}`);
+        }
+        
+        const activities = await response.json();
+        
+        // Update cache indicator
+        if (cacheIndicator) {
+            const cacheStatus = response.headers.get('X-Cache');
+            cacheIndicator.textContent = cacheStatus === 'HIT' ? 'Cached (fresh)' : 'Just updated';
+        }
+        
+        if (activities.length === 0) {
+            feedContent.innerHTML = `
+                <div class="empty-feed">
+                    <i class="fa-solid fa-users"></i>
+                    <p>No votes yet! Be the first to participate.</p>
+                    <a href="/vote.html" class="start-voting-btn">Start Voting</a>
+                </div>
+            `;
+            return;
+        }
+        
+        feedContent.innerHTML = activities.map((activity, index) => {
+            const username = activity.username || 'Anonymous';
+            const timeAgo = getTimeAgo(activity.timestamp);
+            const thumbnail = `https://img.youtube.com/vi/${activity.songId}/default.jpg`;
+            const songName = activity.votedForName || activity.songTitle || 'Unknown';
+            
+            return `
+                <div class="mini-activity-card" style="animation-delay: ${index * 0.1}s">
+                    <img src="${thumbnail}" alt="${songName}" class="mini-thumbnail" loading="lazy">
+                    <div class="mini-info">
+                        <div class="mini-user">${username}</div>
+                        <div class="mini-song">${songName}</div>
+                    </div>
+                    <div class="mini-time">${timeAgo}</div>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('❌ Error loading mini feed:', error);
+        feedContent.innerHTML = `
+            <div class="empty-feed">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+                <p>Unable to load activity right now.</p>
+            </div>
+        `;
+    }
+}
+
+function getTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (seconds < 60) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return 'recently';
+}
+
 // ========================================
 // INITIALIZE ON PAGE LOAD
 // ========================================
@@ -31,13 +251,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ✅ Initialize dismissible social banner
     initializeSocialBanner();
     
+    // ✅ Initialize activity ticker (waits for countdown banner)
+    await initializeActivityTicker();
+    
     try {
         await loadLiveMatches();
+        
+        // ✅ Add mini activity feed after matches load
+        await displayMiniActivityFeed();
+        
     } catch (error) {
         console.error('❌ Error loading live matches:', error);
         showErrorState();
     }
 });
+
+// ========================================
+// CLEANUP
+// ========================================
+window.addEventListener('beforeunload', () => {
+    if (tickerRotationInterval) {
+        clearInterval(tickerRotationInterval);
+    }
+});
+
+// ... (rest of your existing code - social banner, countdown, matches, etc.)
 
 // ========================================
 // SOCIAL BANNER MANAGEMENT
