@@ -67,18 +67,20 @@ function getYoutubeThumbnail(songId) {
 // INITIALIZE
 // ========================================
 
+// Around line 65-80, update DOMContentLoaded:
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 Profile page loading...');
     
-    // Get current user
-    const userId = localStorage.getItem('userId');
-    const currentUsername = localStorage.getItem('username');
+    // ✅ FIX: Get userId with fallback
+    const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    const currentUsername = localStorage.getItem('username') || localStorage.getItem('tournamentUsername');
     
     console.log('🔍 Current User ID:', userId);
     console.log('🔍 Current Username:', currentUsername);
     console.log('🔍 localStorage keys:', Object.keys(localStorage));
     
-    // ✅ LOAD MUSIC DATA FIRST
+    // Load music data first
     await loadMusicData();
     
     // Get target username from URL
@@ -136,7 +138,7 @@ async function loadProfile(username) {
         
          // ✅ ADD THIS: Render follow button
         await updateFollowButton();
-        
+
         setupVoteFilters();
         
         showProfileContent();
@@ -398,11 +400,13 @@ function renderProfileActions() {
 async function loadProfileStats(userId) {
     try {
         console.log('📊 Loading stats for user:', userId);
-        
-        const currentUserId = localStorage.getItem('userId');
+         // ✅ FIX: Get current user ID with fallback
+        const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
         const isViewingOwnProfile = (userId === currentUserId);
         
         console.log('🔍 Is viewing own profile?', isViewingOwnProfile);
+        console.log('🔍 Current user ID:', currentUserId);
+        console.log('🔍 Profile user ID:', userId);
         
         // Get votes count
         const votesQuery = query(
@@ -986,6 +990,12 @@ function renderVoteCard(vote, matchMap) {
     }
     
     const { song1, song2, winner } = match;
+
+     // ✅ FIX: Get champion with fallback
+    const getChampion = (song) => {
+        if (!song) return 'Unknown';
+        return song.champion || song.artist || 'League of Legends';
+    };
     
     // ✅ GET THUMBNAILS FROM YOUTUBE (like activity.js)
     const getThumbnail = (song) => {
@@ -1102,9 +1112,22 @@ function getVoteStatus(vote, match) {
         return 'live';
     }
     
-    // Check if match has a winner
-    if (!match.winner || match.winner === '') {
-        return 'live';  // ✅ Changed from 'pending' to 'live'
+    // ✅ DEBUG: Log match winner status
+    console.log('🔍 Vote status check:', {
+        matchId: match.id,
+        winner: match.winner,
+        voteChoice: vote.choice,
+        round: match.round
+    });
+    
+    // Check if match has a winner (multiple possible formats)
+    const hasWinner = match.winner && 
+                     match.winner !== '' && 
+                     match.winner !== 'pending' &&
+                     match.winner !== null;
+    
+    if (!hasWinner) {
+        return 'live';
     }
     
     // Match is complete - check if user won or lost
