@@ -691,15 +691,16 @@ async function loadAllAchievements(userId) {
 // LOAD RECENT VOTES (for Overview tab)
 // ========================================
 
-async function loadRecentVotes(userId, limit = 5) {
+// ✅ AFTER - Change parameter name to "limitCount"
+async function loadRecentVotes(userId, limitCount = 5) {
     try {
-        console.log(`📥 Loading recent ${limit} votes for user:`, userId);
+        console.log(`📥 Loading recent ${limitCount} votes for user:`, userId);
         
         const votesQuery = query(
             collection(db, 'votes'),
             where('userId', '==', userId),
             orderBy('timestamp', 'desc'),
-            limit(limit)
+            limit(limitCount)  // ✅ Now limit() is the Firestore function, limitCount is the value
         );
         
         const snapshot = await getDocs(votesQuery);
