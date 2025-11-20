@@ -1579,18 +1579,19 @@ if (isPublic && username !== 'Anonymous') {
         });
         
         await setDoc(doc(db, 'activity', activityId), {
-            activityId: activityId,
-            userId: userId,
-            username: username,
-            avatar: avatar,
-            matchId: currentMatch.id,
-            matchTitle: matchTitle,           // ✅ "The Line vs Fantastic"
-            songId: votedVideoId,             // ✅ YouTube video ID (e.g., "E2Rj2gQAyPA")
-            songTitle: votedSongName,         // ✅ "The Line"
-            timestamp: Date.now(),
-            round: currentMatch.round,
-            tournamentId: ACTIVE_TOURNAMENT
-        });
+    activityId: activityId,
+    userId: userId,
+    username: username,
+    avatar: avatar,
+    matchId: currentMatch.id,
+    matchTitle: matchTitle,
+    songId: votedVideoId,
+    songTitle: votedSongName,
+    choice: songId,  // ✅ ADD THIS LINE - "song1" or "song2"
+    timestamp: Date.now(),
+    round: currentMatch.round,
+    tournamentId: ACTIVE_TOURNAMENT
+});
         
         console.log('✅ Activity logged successfully:', {
             matchTitle,

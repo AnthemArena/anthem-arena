@@ -1,229 +1,201 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Fix Activity Data</title>
-    <script type="module">
-        import { db } from './js/firebase-config.js';
-        import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+<script type="module">
+    import { db } from './js/firebase-config.js';
+    import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    
+    async function fixActivityData() {
+        console.log('🔧 Starting activity data fix...');
         
-        async function fixActivityData() {
-            console.log('🔧 Starting activity data fix...');
+        try {
+            // Load music data from JSON
+            console.log('🎵 Loading music data...');
+            const musicResponse = await fetch('/data/music-videos.json');
+            const musicData = await musicResponse.json();
             
-            try {
-                // Load music data from JSON
-                console.log('🎵 Loading music data...');
-                const musicResponse = await fetch('/data/music-videos.json');
-                const musicData = await musicResponse.json();
+            console.log(`✅ Loaded ${musicData.length} songs`);
+            
+            // Load matches from tournaments/2025-worlds-anthems/matches
+            console.log('🏆 Loading matches from tournament...');
+            const matchMap = {};
+            const TOURNAMENT_ID = '2025-worlds-anthems';
+            
+            const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+            const matchesSnapshot = await getDocs(matchesRef);
+            
+            matchesSnapshot.forEach(matchDoc => {
+                const match = matchDoc.data();
+                matchMap[matchDoc.id] = match;
+                if (match.matchId) matchMap[match.matchId] = match;
+            });
+            
+            console.log(`✅ Loaded ${matchesSnapshot.size} matches`);
+            
+            // ✅ NEW: Load votes to get choice field
+            console.log('🗳️ Loading votes...');
+            const votesRef = collection(db, 'votes');
+            const votesSnapshot = await getDocs(votesRef);
+            
+            const votesMap = new Map();
+            votesSnapshot.forEach(voteDoc => {
+                const voteData = voteDoc.data();
+                const key = `${voteData.matchId}_${voteData.userId}`;
+                votesMap.set(key, voteData.choice); // "song1" or "song2"
+            });
+            
+            console.log(`✅ Loaded ${votesMap.size} votes for choice mapping`);
+            
+            // Load user profiles
+            console.log('👤 Loading user profiles...');
+            const profilesRef = collection(db, 'profiles');
+            const profilesSnapshot = await getDocs(profilesRef);
+            
+            const userProfiles = {};
+            profilesSnapshot.forEach(profileDoc => {
+                const profile = profileDoc.data();
+                userProfiles[profileDoc.id] = profile;
+            });
+            
+            console.log(`✅ Loaded ${profilesSnapshot.size} user profiles`);
+            
+            // Get all activity documents
+            console.log('📄 Loading activity documents...');
+            const activityRef = collection(db, 'activity');
+            const activitySnapshot = await getDocs(activityRef);
+            
+            console.log(`✅ Found ${activitySnapshot.size} activity documents`);
+            
+            let fixedSongs = 0;
+            let fixedUsernames = 0;
+            let fixedChoices = 0;
+            let skipped = 0;
+            let errors = 0;
+            
+            // Process each activity document
+            for (const activityDoc of activitySnapshot.docs) {
+                const activity = activityDoc.data();
+                const activityId = activityDoc.id;
                 
-                console.log(`✅ Loaded ${musicData.length} songs`);
-                
-                // Load matches from tournaments/2025-worlds-anthems/matches
-                console.log('🏆 Loading matches from tournament...');
-                const matchMap = {};
-                const TOURNAMENT_ID = '2025-worlds-anthems';
-                
-                const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
-                const matchesSnapshot = await getDocs(matchesRef);
-                
-                matchesSnapshot.forEach(matchDoc => {
-                    const match = matchDoc.data();
-                    matchMap[matchDoc.id] = match;
-                    if (match.matchId) matchMap[match.matchId] = match;
-                });
-                
-                console.log(`✅ Loaded ${matchesSnapshot.size} matches`);
-                console.log(`🔍 Sample match IDs:`, Object.keys(matchMap).slice(0, 5));
-                
-                // Load user profiles
-                console.log('👤 Loading user profiles...');
-                const profilesRef = collection(db, 'profiles');
-                const profilesSnapshot = await getDocs(profilesRef);
-                
-                const userProfiles = {};
-                profilesSnapshot.forEach(profileDoc => {
-                    const profile = profileDoc.data();
-                    userProfiles[profileDoc.id] = profile;
-                });
-                
-                console.log(`✅ Loaded ${profilesSnapshot.size} user profiles`);
-                
-                // Get all activity documents
-                console.log('📄 Loading activity documents...');
-                const activityRef = collection(db, 'activity');
-                const activitySnapshot = await getDocs(activityRef);
-                
-                console.log(`✅ Found ${activitySnapshot.size} activity documents`);
-                
-                let fixedSongs = 0;
-                let fixedUsernames = 0;
-                let skipped = 0;
-                let errors = 0;
-                
-                // Process each activity document
-                for (const activityDoc of activitySnapshot.docs) {
-                    const activity = activityDoc.data();
-                    const activityId = activityDoc.id;
+                try {
+                    const updates = {};
+                    let needsUpdate = false;
                     
-                    try {
-                        const updates = {};
-                        let needsUpdate = false;
+                    // ========================================
+                    // FIX 1: Song data
+                    // ========================================
+                    const needsSongFix = 
+                        !activity.songId || 
+                        activity.songId === 'song1' || 
+                        activity.songId === 'song2' ||
+                        !activity.matchTitle ||
+                        activity.matchTitle.includes('Match round-') ||
+                        activity.matchTitle.includes('Song 1') ||
+                        activity.matchTitle.includes('Song 2');
+                    
+                    if (needsSongFix) {
+                        const match = matchMap[activity.matchId];
                         
-                        // ========================================
-                        // FIX 1: Song data
-                        // ========================================
-                        const needsSongFix = 
-                            !activity.songId || 
-                            activity.songId === 'song1' || 
-                            activity.songId === 'song2' ||
-                            !activity.matchTitle ||
-                            activity.matchTitle.includes('Match round-') ||
-                            activity.matchTitle.includes('Song 1') ||
-                            activity.matchTitle.includes('Song 2');
-                        
-                        if (needsSongFix) {
-                            const match = matchMap[activity.matchId];
+                        if (match) {
+                            const song1 = match.song1;
+                            const song2 = match.song2;
                             
-                            if (match) {
-                                const song1 = match.song1;
-                                const song2 = match.song2;
+                            if (song1 && song2) {
+                                // ✅ Get choice from votes
+                                const voteKey = `${activity.matchId}_${activity.userId}`;
+                                const choice = votesMap.get(voteKey) || activity.choice;
                                 
-                                if (song1 && song2) {
-                                    // Determine which song was voted for
-                                    const votedForSong1 = activity.songId === 'song1';
-                                    const votedSong = votedForSong1 ? song1 : song2;
-                                    
-                                    updates.songId = votedSong.videoId;
-                                    updates.songTitle = votedSong.shortTitle || votedSong.title;
-                                    updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
-                                    
-                                    needsUpdate = true;
-                                    fixedSongs++;
-                                    console.log(`🎵 Fixed: ${updates.matchTitle}`);
-                                } else {
-                                    console.warn(`⚠️ Match missing song data: ${activity.matchId}`);
-                                }
+                                // Determine which song was voted for
+                                const votedForSong1 = choice === 'song1';
+                                const votedSong = votedForSong1 ? song1 : song2;
+                                
+                                updates.songId = votedSong.videoId;
+                                updates.songTitle = votedSong.shortTitle || votedSong.title;
+                                updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
+                                
+                                needsUpdate = true;
+                                fixedSongs++;
+                                console.log(`🎵 Fixed: ${updates.matchTitle} (voted: ${votedSong.shortTitle})`);
                             } else {
-                                console.warn(`⚠️ Match not found: ${activity.matchId}`);
-                                errors++;
+                                console.warn(`⚠️ Match missing song data: ${activity.matchId}`);
                             }
-                        }
-                        
-                        // ========================================
-                        // FIX 2: Username backfill
-                        // ========================================
-                        const currentUsername = activity.username || 'Anonymous';
-                        const userId = activity.userId;
-                        
-                        if (userId && userProfiles[userId]) {
-                            const profile = userProfiles[userId];
-                            const profileUsername = profile.username || 'Anonymous';
-                            const profileAvatar = profile.avatar;
-                            
-                            if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
-                                updates.username = profileUsername;
-                                needsUpdate = true;
-                                fixedUsernames++;
-                                console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
-                            }
-                            
-                            if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
-                                updates.avatar = profileAvatar;
-                                needsUpdate = true;
-                            }
-                        }
-                        
-                        // ========================================
-                        // Apply updates
-                        // ========================================
-                        if (needsUpdate) {
-                            await updateDoc(doc(db, 'activity', activityId), updates);
-                            console.log(`✅ Updated ${activityId}`);
                         } else {
-                            skipped++;
+                            console.warn(`⚠️ Match not found: ${activity.matchId}`);
+                            errors++;
+                        }
+                    }
+                    
+                    // ========================================
+                    // ✅ FIX 2: Add choice field if missing
+                    // ========================================
+                    if (!activity.choice) {
+                        const voteKey = `${activity.matchId}_${activity.userId}`;
+                        const choice = votesMap.get(voteKey);
+                        
+                        if (choice) {
+                            updates.choice = choice;
+                            needsUpdate = true;
+                            fixedChoices++;
+                            console.log(`🗳️ Added choice: ${choice} for ${activity.songTitle}`);
+                        } else {
+                            console.warn(`⚠️ No vote found for activity ${activityId}`);
+                        }
+                    }
+                    
+                    // ========================================
+                    // FIX 3: Username backfill
+                    // ========================================
+                    const currentUsername = activity.username || 'Anonymous';
+                    const userId = activity.userId;
+                    
+                    if (userId && userProfiles[userId]) {
+                        const profile = userProfiles[userId];
+                        const profileUsername = profile.username || 'Anonymous';
+                        const profileAvatar = profile.avatar;
+                        
+                        if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
+                            updates.username = profileUsername;
+                            needsUpdate = true;
+                            fixedUsernames++;
+                            console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
                         }
                         
-                    } catch (error) {
-                        console.error(`❌ Error fixing ${activityId}:`, error);
-                        errors++;
+                        if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
+                            updates.avatar = profileAvatar;
+                            needsUpdate = true;
+                        }
                     }
+                    
+                    // ========================================
+                    // Apply updates
+                    // ========================================
+                    if (needsUpdate) {
+                        await updateDoc(doc(db, 'activity', activityId), updates);
+                        console.log(`✅ Updated ${activityId}`);
+                    } else {
+                        skipped++;
+                    }
+                    
+                } catch (error) {
+                    console.error(`❌ Error fixing ${activityId}:`, error);
+                    errors++;
                 }
-                
-                console.log(`\n🎉 COMPLETE!`);
-                console.log(`🎵 Fixed song data: ${fixedSongs}`);
-                console.log(`👤 Fixed usernames: ${fixedUsernames}`);
-                console.log(`⏭️ Skipped: ${skipped}`);
-                console.log(`❌ Errors: ${errors}`);
-                
-                alert(`Fix complete!\n\n🎵 Songs: ${fixedSongs}\n👤 Usernames: ${fixedUsernames}\n⏭️ Skipped: ${skipped}\n❌ Errors: ${errors}`);
-                
-            } catch (error) {
-                console.error('❌ Fatal error:', error);
-                alert(`Error: ${error.message}`);
             }
+            
+            console.log(`\n🎉 COMPLETE!`);
+            console.log(`🎵 Fixed song data: ${fixedSongs}`);
+            console.log(`🗳️ Fixed choice field: ${fixedChoices}`);
+            console.log(`👤 Fixed usernames: ${fixedUsernames}`);
+            console.log(`⏭️ Skipped: ${skipped}`);
+            console.log(`❌ Errors: ${errors}`);
+            
+            alert(`Fix complete!\n\n🎵 Songs: ${fixedSongs}\n🗳️ Choices: ${fixedChoices}\n👤 Usernames: ${fixedUsernames}\n⏭️ Skipped: ${skipped}\n❌ Errors: ${errors}`);
+            
+        } catch (error) {
+            console.error('❌ Fatal error:', error);
+            alert(`Error: ${error.message}`);
         }
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('fix-btn');
-            btn.addEventListener('click', fixActivityData);
-        });
-    </script>
-    <style>
-        body {
-            font-family: monospace;
-            background: #0a0a0a;
-            color: #C8AA6E;
-            padding: 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 { color: #C8AA6E; }
-        .info {
-            background: rgba(200, 170, 110, 0.1);
-            border: 1px solid #C8AA6E;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-        }
-        button {
-            background: #C8AA6E;
-            color: #0a0a0a;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 1rem;
-        }
-        button:hover {
-            background: #D4B87A;
-        }
-        .progress {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #1a1a1a;
-            border-radius: 8px;
-            display: none;
-        }
-        .progress.active {
-            display: block;
-        }
-    </style>
-</head>
-<body>
-    <h1>🔧 Fix Activity Data</h1>
+    }
     
-    <div class="info">
-        <p>✅ Fixes song names and video IDs</p>
-        <p>✅ Updates Anonymous → your username</p>
-        <p>✅ Updates avatars</p>
-    </div>
-    
-    <button id="fix-btn">🚀 Run Fix Now</button>
-    
-    <div id="progress" class="progress">
-        <p>Running... check console (F12) for details</p>
-    </div>
-</body>
-</html>
+    window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('fix-btn');
+        btn.addEventListener('click', fixActivityData);
+    });
+</script>
