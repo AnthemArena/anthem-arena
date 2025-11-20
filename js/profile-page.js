@@ -24,20 +24,62 @@ let currentUserId = null;
 let currentUsername = null;
 
 // ========================================
+// MUSIC DATA CACHE (for thumbnails)
+// ========================================
+
+let musicData = {};
+
+async function loadMusicData() {
+    try {
+        const response = await fetch('/data/music-videos.json');
+        const data = await response.json();
+        
+        // Create lookup maps
+        data.forEach(song => {
+            musicData[song.id] = song;
+            musicData[song.seed] = song;
+            musicData[song.videoId] = song;
+        });
+        
+        console.log(`✅ Loaded ${data.length} songs for thumbnails`);
+    } catch (error) {
+        console.error('❌ Error loading music data:', error);
+    }
+}
+
+function getYoutubeThumbnail(songId) {
+    const song = musicData[songId];
+    
+    if (song && song.videoId) {
+        return `https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg`;
+    }
+    
+    // If songId IS the videoId (11 characters)
+    if (songId && songId.length === 11) {
+        return `https://img.youtube.com/vi/${songId}/mqdefault.jpg`;
+    }
+    
+    // Fallback
+    return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
+}
+
+// ========================================
 // INITIALIZE
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 Profile page loading...');
     
-    // Get current user info
-    currentUserId = localStorage.getItem('tournamentUserId');
-    currentUsername = localStorage.getItem('username');
-
-     // ✅ ADD DEBUG LOGGING
-    console.log('🔍 Current User ID:', currentUserId);
+    // Get current user
+    const userId = localStorage.getItem('userId');
+    const currentUsername = localStorage.getItem('username');
+    
+    console.log('🔍 Current User ID:', userId);
     console.log('🔍 Current Username:', currentUsername);
     console.log('🔍 localStorage keys:', Object.keys(localStorage));
+    
+    // ✅ LOAD MUSIC DATA FIRST
+    await loadMusicData();
     
     // Get target username from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -46,18 +88,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('👤 Target username:', targetUsername);
     console.log('👤 Current user:', currentUsername);
     
-     // Check if user has setup their profile
     if (!targetUsername) {
-        console.warn('⚠️ No target username - showing guest state');
-        showGuestState();
+        showNotFoundState();
         return;
     }
     
+    // Setup tabs
+    setupTabs();
+    
     // Load profile
     await loadProfile(targetUsername);
-    
-    // Setup tab switching
-    setupTabs();
 });
 
 // ========================================
@@ -892,19 +932,36 @@ function renderVoteCard(vote, matchMap) {
     }
     
     const { song1, song2, winner } = match;
-
-    // ✅ DEBUG: Log thumbnails
-    console.log('🖼️ Thumbnails:', {
-        song1: song1.thumbnail,
-        song2: song2.thumbnail
-    });
+    
+    // ✅ GET THUMBNAILS FROM YOUTUBE (like activity.js)
+    const getThumbnail = (song) => {
+        if (!song) return 'https://via.placeholder.com/160x90?text=No+Image';
+        
+        // Try to get from music data using videoId
+        if (song.videoId) {
+            return getYoutubeThumbnail(song.videoId);
+        }
+        
+        // Try to get from music data using song ID
+        if (song.id) {
+            return getYoutubeThumbnail(song.id);
+        }
+        
+        // Fallback: check if thumbnail is already a string URL
+        if (typeof song.thumbnail === 'string' && song.thumbnail.includes('http')) {
+            return song.thumbnail;
+        }
+        
+        // Last resort placeholder
+        return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵';
+    };
     
     // Determine vote status
     const status = getVoteStatus(vote, match);
     const statusConfig = {
         won: { emoji: '✅', label: 'WON', class: 'won' },
         lost: { emoji: '❌', label: 'LOST', class: 'lost' },
-        live: { emoji: '🔴', label: 'LIVE', class: 'live' }  // ✅ Changed from 'pending'
+        live: { emoji: '🔴', label: 'LIVE', class: 'live' }
     };
     
     const statusInfo = statusConfig[status];
@@ -914,11 +971,22 @@ function renderVoteCard(vote, matchMap) {
     const chosenSong = votedForSong1 ? song1 : song2;
     const opponentSong = votedForSong1 ? song2 : song1;
     
+    // ✅ Get thumbnails
+    const chosenThumbnail = getThumbnail(chosenSong);
+    const opponentThumbnail = getThumbnail(opponentSong);
+    
     // Format timestamp
     const timeAgo = formatTimeAgo(vote.timestamp);
-
-        const tournamentName = match.tournamentName || 'League of Legends';  // ✅ NEW
-
+    
+    // Get tournament name
+    const tournamentName = match.tournamentName || 'League of Legends';
+    
+    console.log('🖼️ Thumbnails:', {
+        chosenSong: chosenSong.title,
+        chosenThumbnail,
+        opponentSong: opponentSong.title,
+        opponentThumbnail
+    });
     
     return `
         <div class="vote-card ${status}">
@@ -933,7 +1001,7 @@ function renderVoteCard(vote, matchMap) {
                 <!-- Chosen Song (Left) -->
                 <div class="vote-song chosen">
                     <div class="vote-song-thumbnail">
-                        <img src="${chosenSong.thumbnail}" alt="${chosenSong.title}" loading="lazy">
+                        <img src="${chosenThumbnail}" alt="${chosenSong.title}" loading="lazy">
                     </div>
                     <div class="vote-song-info">
                         <div class="vote-song-title">${chosenSong.shortTitle || chosenSong.title}</div>
@@ -947,7 +1015,7 @@ function renderVoteCard(vote, matchMap) {
                 <!-- Opponent Song (Right) -->
                 <div class="vote-song opponent">
                     <div class="vote-song-thumbnail">
-                        <img src="${opponentSong.thumbnail}" alt="${opponentSong.title}" loading="lazy">
+                        <img src="${opponentThumbnail}" alt="${opponentSong.title}" loading="lazy">
                     </div>
                     <div class="vote-song-info">
                         <div class="vote-song-title">${opponentSong.shortTitle || opponentSong.title}</div>
@@ -957,8 +1025,7 @@ function renderVoteCard(vote, matchMap) {
             </div>
             
             <div class="vote-footer">
-                            <span class="vote-tournament">${tournamentName}</span>  <!-- ✅ NEW -->
-
+                <span class="vote-tournament">${tournamentName}</span>
                 <span class="vote-round">Round ${match.round}</span>
                 <a href="/vote.html?id=${vote.matchId}" class="view-match-link">
                     View Match →
@@ -998,13 +1065,20 @@ function getVoteStatus(vote, match) {
 // HELPER: Format time ago
 // ========================================
 
+// ========================================
+// HELPER: Format time ago
+// ========================================
+
 function formatTimeAgo(timestamp) {
-    // Handle both Firestore Timestamp objects and raw milliseconds
     let timeInMs;
     
+    // Handle different timestamp formats
     if (timestamp && typeof timestamp === 'object' && timestamp.toMillis) {
         // Firestore Timestamp object
         timeInMs = timestamp.toMillis();
+    } else if (typeof timestamp === 'string') {
+        // ISO string (e.g., "2025-11-20T17:25:36.202Z")
+        timeInMs = new Date(timestamp).getTime();
     } else if (typeof timestamp === 'number') {
         // Raw timestamp in milliseconds
         timeInMs = timestamp;
@@ -1016,7 +1090,7 @@ function formatTimeAgo(timestamp) {
     const now = Date.now();
     const diff = now - timeInMs;
     
-    // Handle future timestamps (shouldn't happen, but just in case)
+    // Handle future timestamps
     if (diff < 0) {
         return 'Just now';
     }
