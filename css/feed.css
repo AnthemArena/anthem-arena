@@ -1,0 +1,577 @@
+/* ========================================
+   SOCIAL FEED STYLES
+   Black & Gold Theme
+   ======================================== */
+
+:root {
+    --gold: #C8AA6E;
+    --gold-dark: #a88a4d;
+    --gold-light: #e0d0a0;
+    --black: #000000;
+    --black-soft: rgba(0, 0, 0, 0.95);
+    --grey-dark: #1a1a1a;
+    --grey: #2a2a2a;
+    --grey-light: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+}
+
+/* ========================================
+   LAYOUT
+   ======================================== */
+
+body {
+    background: var(--black);
+    color: var(--text-primary);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.feed-container {
+    max-width: 700px;
+    margin: 80px auto 40px;
+    padding: 0 20px;
+}
+
+/* ========================================
+   FEED HEADER
+   ======================================== */
+
+.feed-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.feed-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    color: var(--gold);
+    margin: 0 0 20px;
+    text-shadow: 0 0 20px rgba(200, 170, 110, 0.3);
+}
+
+.feed-title i {
+    margin-right: 10px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Filter Tabs */
+.feed-filters {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: var(--grey-dark);
+    color: var(--text-secondary);
+    border: 2px solid var(--grey-light);
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--black);
+    border-color: var(--gold);
+    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.4);
+}
+
+/* ========================================
+   CREATE POST BOX
+   ======================================== */
+
+.create-post-box {
+    background: var(--black-soft);
+    border: 2px solid var(--grey-light);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.create-post-box .post-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    object-fit: cover;
+}
+
+.post-input {
+    flex: 1;
+    background: var(--grey-dark);
+    border: 2px solid var(--grey-light);
+    border-radius: 25px;
+    padding: 12px 20px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.post-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(200, 170, 110, 0.3);
+}
+
+.post-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-left: 65px; /* Align with input */
+}
+
+.post-btn {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--black);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.5);
+}
+
+.post-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.char-count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.char-count.warning {
+    color: #f39c12;
+}
+
+.char-count.danger {
+    color: var(--danger);
+}
+
+/* ========================================
+   FEED POSTS
+   ======================================== */
+
+.feed-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feed-post {
+    background: var(--black-soft);
+    border: 2px solid var(--grey-light);
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.feed-post:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.post-meta {
+    flex: 1;
+}
+
+.username {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 2px;
+    cursor: pointer;
+}
+
+.username:hover {
+    text-decoration: underline;
+}
+
+.post-time {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.follow-btn {
+    background: transparent;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    padding: 6px 16px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.follow-btn:hover {
+    background: var(--gold);
+    color: var(--black);
+}
+
+.follow-btn.following {
+    background: var(--gold);
+    color: var(--black);
+}
+
+.follow-btn.following:hover {
+    background: transparent;
+    color: var(--gold);
+}
+
+/* Post Content */
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-text {
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 15px;
+}
+
+/* Vote Badge */
+.vote-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--black);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+/* Match Embed */
+.match-embed {
+    background: var(--grey-dark);
+    border: 2px solid var(--grey-light);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.match-embed:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(200, 170, 110, 0.2);
+}
+
+.match-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin: 0 0 10px;
+}
+
+.match-songs {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.song-info {
+    flex: 1;
+    padding: 10px;
+    background: var(--grey);
+    border-radius: 8px;
+}
+
+.song-info.picked {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
+}
+
+.song-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.vs-divider {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Post Actions */
+.post-actions-bar {
+    display: flex;
+    gap: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--grey-light);
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: var(--grey-dark);
+    color: var(--gold);
+}
+
+.action-btn.liked {
+    color: var(--danger);
+}
+
+.action-btn.liked i {
+    animation: heartbeat 0.3s ease;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+.action-btn i {
+    font-size: 1.1rem;
+}
+
+/* ========================================
+   LOADING & EMPTY STATES
+   ======================================== */
+
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.loading-state i,
+.empty-state i {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    margin: 0 0 10px;
+}
+
+.empty-state p {
+    margin: 0 0 20px;
+}
+
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--black);
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(200, 170, 110, 0.5);
+}
+
+/* ========================================
+   LOAD MORE
+   ======================================== */
+
+.load-more-container {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.load-more-btn {
+    background: var(--grey-dark);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    padding: 12px 40px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.load-more-btn:hover {
+    background: var(--gold);
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   ONLINE SIDEBAR (Optional)
+   ======================================== */
+
+.online-sidebar {
+    position: fixed;
+    right: 20px;
+    top: 100px;
+    width: 250px;
+    background: var(--black-soft);
+    border: 2px solid var(--grey-light);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.1rem;
+    margin: 0 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.online-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.online-users {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.online-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.online-user:hover {
+    background: var(--grey-dark);
+}
+
+.online-user img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid var(--success);
+}
+
+.online-user span {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1200px) {
+    .online-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .feed-container {
+        margin-top: 70px;
+        padding: 0 15px;
+    }
+    
+    .feed-title {
+        font-size: 1.8rem;
+    }
+    
+    .filter-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+    
+    .match-songs {
+        flex-direction: column;
+    }
+    
+    .vs-divider {
+        transform: rotate(90deg);
+    }
+}

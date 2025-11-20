@@ -5,17 +5,15 @@
 [build]
   publish = "."
   command = "echo 'Static site - no build needed'"
+  functions = "netlify/functions"           # ← Added: regular functions directory
+  edge_functions = "netlify/edge-functions"  # ← Added: edge functions directory
 
 [build.environment]
   NODE_VERSION = "18"
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
-# ========================================
-# PLUGINS - REMOVED (CAUSING BUILD ISSUES)
-# ========================================
-
-# All plugins commented out to fix deployment
-# You can enable Netlify's built-in optimization instead
+# Firebase credentials are set securely in Netlify UI (All scopes)
+# No secrets in this file
 
 # ========================================
 # EDGE FUNCTIONS

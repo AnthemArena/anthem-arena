@@ -1554,7 +1554,7 @@ try {
 // ✅ LOG ACTIVITY IF PUBLIC PROFILE
 // ========================================
 // ========================================
-// ✅ LOG ACTIVITY IF PUBLIC PROFILE
+// ✅ LOG ACTIVITY IF PUBLIC PROFILE + CREATE SOCIAL FEED POST
 // ========================================
 if (isPublic && username !== 'Anonymous') {
     try {
@@ -1562,7 +1562,7 @@ if (isPublic && username !== 'Anonymous') {
         const otherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
         const activityId = `${userId}_${currentMatch.id}`;
         
-        // ✅ Get the YouTube video ID (not "song1" or "song2")
+        // ✅ Get the YouTube video ID and song details
         const votedVideoId = votedSong.videoId;
         const votedSongName = votedSong.name || 'Unknown Song';
         const otherSongName = otherSong.name || 'Unknown Song';
@@ -1578,26 +1578,49 @@ if (isPublic && username !== 'Anonymous') {
             round: currentMatch.round
         });
         
+        // ———————— LOG ACTIVITY TO FIRESTORE ————————
         await setDoc(doc(db, 'activity', activityId), {
-    activityId: activityId,
-    userId: userId,
-    username: username,
-    avatar: avatar,
-    matchId: currentMatch.id,
-    matchTitle: matchTitle,
-    songId: votedVideoId,
-    songTitle: votedSongName,
-    choice: songId,  // ✅ ADD THIS LINE - "song1" or "song2"
-    timestamp: Date.now(),
-    round: currentMatch.round,
-    tournamentId: ACTIVE_TOURNAMENT
-});
+            activityId: activityId,
+            userId: userId,
+            username: username,
+            avatar: avatar,
+            matchId: currentMatch.id,
+            matchTitle: matchTitle,
+            songId: votedVideoId,
+            songTitle: votedSongName,
+            choice: songId,  // "song1" or "song2"
+            timestamp: Date.now(),
+            round: currentMatch.round,
+            tournamentId: ACTIVE_TOURNAMENT
+        });
         
         console.log('✅ Activity logged successfully:', {
             matchTitle,
             videoId: votedVideoId,
             songName: votedSongName
         });
+
+        // ———————— NEW: CREATE SOCIAL FEED POST ————————
+        try {
+            const { createVotePost } = await import('./social-feed.js');
+            
+            await createVotePost({
+                matchId: currentMatch.id,
+                matchTitle: matchTitle,
+                songId: votedVideoId,           // Actual YouTube video ID
+                songTitle: votedSongName,
+                choice: songId,                 // 'song1' or 'song2' – useful for display logic
+                tournamentId: ACTIVE_TOURNAMENT,
+                round: currentMatch.round
+            });
+            
+            console.log('✅ Social feed post created successfully');
+            
+        } catch (postError) {
+            console.error('⚠️ Could not create social feed post:', postError);
+            // Do NOT throw or block the vote – social post is non-critical
+        }
+
     } catch (activityError) {
         console.error('❌ Could not log activity:', activityError);
         console.error('Activity data that failed:', {
@@ -1605,7 +1628,7 @@ if (isPublic && username !== 'Anonymous') {
             userId: userId,
             username: username
         });
-        // Don't block vote submission if activity logging fails
+        // Don't block vote submission if activity or feed post fails
     }
 }
         

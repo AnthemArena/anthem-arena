@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Feed - League Music Tournament</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Your existing stylesheets -->
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    
+    <!-- Feed-specific styles -->
+    <link rel="stylesheet" href="/css/feed.css">
+</head>
+<body>
+    <!-- Your existing navigation -->
+    <nav id="main-nav"></nav>
+    
+    <div class="feed-container">
+        <!-- Feed Header -->
+        <div class="feed-header">
+            <h1 class="feed-title">
+                <i class="fa-solid fa-fire"></i>
+                Community Feed
+            </h1>
+            
+            <!-- Filter Tabs -->
+            <div class="feed-filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fa-solid fa-globe"></i>
+                    All Activity
+                </button>
+                <button class="filter-btn" data-filter="following">
+                    <i class="fa-solid fa-users"></i>
+                    Following
+                </button>
+                <button class="filter-btn" data-filter="trending">
+                    <i class="fa-solid fa-fire"></i>
+                    Trending
+                </button>
+            </div>
+        </div>
+        
+        <!-- Create Post Box (if logged in) -->
+        <div class="create-post-box" id="createPostBox" style="display: none;">
+            <div class="post-header">
+                <img src="" alt="Your avatar" class="user-avatar" id="createPostAvatar">
+                <input type="text" 
+                       placeholder="Share your thoughts on the tournament..." 
+                       class="post-input"
+                       id="postInput"
+                       maxlength="280">
+            </div>
+            <div class="post-actions">
+                <button class="post-btn" id="submitPostBtn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Post
+                </button>
+                <span class="char-count" id="charCount">280</span>
+            </div>
+        </div>
+        
+        <!-- Feed Posts -->
+        <div class="feed-posts" id="feedPosts">
+            <!-- Loading state -->
+            <div class="loading-state" id="loadingState">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading feed...</p>
+            </div>
+            
+            <!-- Empty state -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fa-solid fa-comment-slash"></i>
+                <h3>No posts yet</h3>
+                <p>Be the first to vote and share your picks!</p>
+                <a href="/vote.html" class="cta-btn">
+                    <i class="fa-solid fa-trophy"></i>
+                    Start Voting
+                </a>
+            </div>
+            
+            <!-- Posts will be inserted here dynamically -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+            <button class="load-more-btn" id="loadMoreBtn">
+                <i class="fa-solid fa-chevron-down"></i>
+                Load More Posts
+            </button>
+        </div>
+    </div>
+    
+    <!-- Who's Online Sidebar (optional) -->
+    <aside class="online-sidebar" id="onlineSidebar">
+        <h3 class="sidebar-title">
+            <i class="fa-solid fa-circle online-indicator"></i>
+            Who's Online
+        </h3>
+        <div class="online-users" id="onlineUsers">
+            <!-- Populated dynamically -->
+        </div>
+    </aside>
+    
+    <!-- Scripts -->
+    <script type="module" src="/js/navigation.js"></script>
+    <script type="module" src="/js/feed-page.js"></script>
+</body>
+</html>
