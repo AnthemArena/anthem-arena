@@ -17,10 +17,10 @@ const CACHE_DURATION = 60000; // 1 minute
 function getDefaultPrivacySettings() {
     return {
         isPublic: true,
-        allowFriendRequests: true,
-        messagePrivacy: 'everyone',
+        allowFollows: true,  // ✅ Changed from allowFriendRequests
+        messagePrivacy: 'everyone',  // 'everyone', 'followers', 'nobody'
         showOnlineStatus: true,
-        emotePrivacy: 'everyone'
+        emotePrivacy: 'everyone'  // 'everyone', 'followers', 'nobody'
     };
 }
 
@@ -44,6 +44,14 @@ export async function getUserPrivacySettings(userId) {
             const data = profileDoc.data();
             const privacy = data.privacy || getDefaultPrivacySettings();
             
+            // ✅ Migrate old 'friends' settings to 'followers'
+            if (privacy.messagePrivacy === 'friends') {
+                privacy.messagePrivacy = 'followers';
+            }
+            if (privacy.emotePrivacy === 'friends') {
+                privacy.emotePrivacy = 'followers';
+            }
+            
             // Cache it
             privacyCache.set(userId, {
                 data: privacy,
@@ -60,10 +68,37 @@ export async function getUserPrivacySettings(userId) {
 }
 
 // ========================================
+// CHECK IF USER A FOLLOWS USER B
+// ========================================
+
+async function isFollowing(followerUserId, followingUserId) {
+    try {
+        const { isFollowing: checkFollow } = await import('./follow-system.js');
+        
+        // Temporarily store current user
+        const originalUserId = localStorage.getItem('userId');
+        
+        // Set followerUserId as current user for the check
+        localStorage.setItem('userId', followerUserId);
+        
+        const following = await checkFollow(followingUserId);
+        
+        // Restore original user
+        localStorage.setItem('userId', originalUserId);
+        
+        return following;
+        
+    } catch (error) {
+        console.warn('⚠️ Could not check follow status:', error);
+        return false;
+    }
+}
+
+// ========================================
 // CHECK IF ACTION IS ALLOWED (WITH FIREBASE)
 // ========================================
 
-export async function canUserSendMessage(currentUserId, targetUserId, areFriends = false) {
+export async function canUserSendMessage(currentUserId, targetUserId, areFollowing = false) {
     if (currentUserId === targetUserId) return false;
     
     const privacy = await getUserPrivacySettings(targetUserId);
@@ -71,8 +106,12 @@ export async function canUserSendMessage(currentUserId, targetUserId, areFriends
     switch (privacy.messagePrivacy) {
         case 'everyone':
             return true;
-        case 'friends':
-            return areFriends;
+        case 'followers':  // ✅ Changed from 'friends'
+            // If not provided, check follow status
+            if (areFollowing === false) {
+                areFollowing = await isFollowing(currentUserId, targetUserId);
+            }
+            return areFollowing;
         case 'nobody':
             return false;
         default:
@@ -80,14 +119,7 @@ export async function canUserSendMessage(currentUserId, targetUserId, areFriends
     }
 }
 
-export async function canUserSendFriendRequest(currentUserId, targetUserId) {
-    if (currentUserId === targetUserId) return false;
-    
-    const privacy = await getUserPrivacySettings(targetUserId);
-    return privacy.allowFriendRequests;
-}
-
-export async function canUserSendEmote(currentUserId, targetUserId, areFriends = false) {
+export async function canUserSendEmote(currentUserId, targetUserId, areFollowing = false) {
     if (currentUserId === targetUserId) return false;
     
     const privacy = await getUserPrivacySettings(targetUserId);
@@ -95,8 +127,12 @@ export async function canUserSendEmote(currentUserId, targetUserId, areFriends =
     switch (privacy.emotePrivacy) {
         case 'everyone':
             return true;
-        case 'friends':
-            return areFriends;
+        case 'followers':  // ✅ Changed from 'friends'
+            // If not provided, check follow status
+            if (areFollowing === false) {
+                areFollowing = await isFollowing(currentUserId, targetUserId);
+            }
+            return areFollowing;
         case 'nobody':
             return false;
         default:
@@ -113,6 +149,7 @@ export async function isProfilePublic(userId) {
     const privacy = await getUserPrivacySettings(userId);
     return privacy.isPublic;
 }
+
 // ========================================
 // CHECK USER MESSAGE PRIVACY (FOR NOTIFICATIONS)
 // Returns object with canMessage boolean and reason
@@ -129,7 +166,7 @@ export async function checkUserMessagePrivacy(toUserId, fromUserId = null) {
     try {
         // If no fromUserId provided, use current user
         if (!fromUserId) {
-            fromUserId = localStorage.getItem('tournamentUserId');
+            fromUserId = localStorage.getItem('userId');
         }
         
         console.log('🔍 Privacy check: from', fromUserId, '→ to', toUserId);
@@ -145,18 +182,18 @@ export async function checkUserMessagePrivacy(toUserId, fromUserId = null) {
             return { canMessage: false, reason: 'disabled' };
         }
         
-        if (privacy.messagePrivacy === 'friends') {
-            console.log('🔍 Checking if users are friends...');
+        if (privacy.messagePrivacy === 'followers') {  // ✅ Changed from 'friends'
+            console.log('🔍 Checking if user is following...');
             
-            // TODO: Check actual friendship when friends system is built
-            const areFriends = false; // For now, assume NOT friends
+            // ✅ Check if fromUserId follows toUserId
+            const areFollowing = await isFollowing(fromUserId, toUserId);
             
-            if (!areFriends) {
-                console.log('❌ Not friends, messages blocked');
-                return { canMessage: false, reason: 'friends-only' };
+            if (!areFollowing) {
+                console.log('❌ Not following, messages blocked');
+                return { canMessage: false, reason: 'followers-only' };
             }
             
-            console.log('✅ Users are friends, messages allowed');
+            console.log('✅ User is following, messages allowed');
         }
         
         console.log('✅ Messages allowed');
@@ -166,5 +203,19 @@ export async function checkUserMessagePrivacy(toUserId, fromUserId = null) {
         console.error('❌ Error checking message privacy:', error);
         // Default to allowing messages on error (fail open)
         return { canMessage: true, reason: 'error' };
+    }
+}
+
+// ========================================
+// CLEAR PRIVACY CACHE (call when settings are updated)
+// ========================================
+
+export function clearPrivacyCache(userId = null) {
+    if (userId) {
+        privacyCache.delete(userId);
+        console.log(`🗑️ Cleared privacy cache for user: ${userId}`);
+    } else {
+        privacyCache.clear();
+        console.log('🗑️ Cleared entire privacy cache');
     }
 }

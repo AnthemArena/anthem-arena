@@ -57,47 +57,54 @@
         <!-- Profile Content -->
         <div id="profileContent" class="profile-content" style="display: none;">
             
-            <!-- Profile Header -->
-            <section class="profile-header">
-                <div class="profile-banner"></div>
-                
-                <div class="profile-info-container">
-                    <div class="profile-avatar-large" id="profileAvatar">
-                        🎵
-                    </div>
-                    
-                    <div class="profile-details">
-                        <div class="profile-username-row">
-                            <h1 class="profile-username" id="profileUsername">Username</h1>
-                            <div class="profile-badges" id="profileBadges">
-                                <!-- Badges will be inserted here -->
-                            </div>
-                        </div>
-                        
-                        <div class="profile-rank" id="profileRank">
-                            <i class="fas fa-star"></i> Level 1 - New Voter
-                        </div>
-                        
-                        <p class="profile-bio" id="profileBio">
-                            <!-- Bio will be inserted here -->
-                        </p>
-                        
-                        <div class="profile-meta">
-                            <span class="profile-meta-item" id="profileJoined">
-                                <i class="fas fa-calendar"></i> Joined Recently
-                            </span>
-                            <span class="profile-meta-item" id="profileVotes">
-                                <i class="fas fa-trophy"></i> 0 votes
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Profile Actions -->
-                    <div class="profile-actions" id="profileActions">
-                        <!-- Buttons will be inserted here based on ownership -->
-                    </div>
+           <!-- Profile Header -->
+<section class="profile-header">
+    <div class="profile-banner"></div>
+    
+    <div class="profile-info-container">
+        <div class="profile-avatar-large" id="profileAvatar">
+            🎵
+        </div>
+        
+        <div class="profile-details">
+            <div class="profile-username-row">
+                <h1 class="profile-username" id="profileUsername">Username</h1>
+                <div class="profile-badges" id="profileBadges">
+                    <!-- Badges will be inserted here -->
                 </div>
-            </section>
+            </div>
+            
+            <div class="profile-rank" id="profileRank">
+                <i class="fas fa-star"></i> Level 1 - New Voter
+            </div>
+            
+            <p class="profile-bio" id="profileBio">
+                <!-- Bio will be inserted here -->
+            </p>
+            
+            <div class="profile-meta">
+                <span class="profile-meta-item" id="profileJoined">
+                    <i class="fas fa-calendar"></i> Joined Recently
+                </span>
+                <span class="profile-meta-item" id="profileVotes">
+                    <i class="fas fa-trophy"></i> 0 votes
+                </span>
+                <!-- ✅ ADD: Follow Stats -->
+                <span class="profile-meta-item profile-follow-stats">
+                    <i class="fas fa-users"></i>
+                    <span id="followerCount">0</span> Followers
+                    <span class="profile-meta-separator">•</span>
+                    <span id="followingCount">0</span> Following
+                </span>
+            </div>
+        </div>
+        
+        <!-- Profile Actions -->
+        <div class="profile-actions" id="profileActions">
+            <!-- Follow button will be inserted here by JS -->
+        </div>
+    </div>
+</section>
             
 <!-- Stats Grid (4 cards) -->
 <!-- Stats Grid (4 cards with Font Awesome icons) -->

@@ -129,8 +129,13 @@ async function loadProfile(username) {
             loadFeaturedAchievements(profile.userId),
             loadRecentVotes(profile.userId, 5),
             loadFavoriteSongs(profile.userId),
-            preloadTabCounts(profile.userId)  // ✅ NEW: Preload counts
+            preloadTabCounts(profile.userId),  // ✅ NEW: Preload counts
+                        updateFollowCounts()  // ✅ ADD THIS
+
         ]);
+        
+         // ✅ ADD THIS: Render follow button
+        await updateFollowButton();
         
         setupVoteFilters();
         
@@ -382,45 +387,94 @@ function renderProfileActions() {
 // LOAD PROFILE STATS
 // ========================================
 
+// ========================================
+// LOAD PROFILE STATS
+// ========================================
+
+// ========================================
+// LOAD PROFILE STATS
+// ========================================
+
 async function loadProfileStats(userId) {
     try {
         console.log('📊 Loading stats for user:', userId);
         
-        // 1. Total votes
-        const voteCount = await getVoteCountForUser(userId);
-        document.getElementById('statTotalVotes').textContent = voteCount;
+        const currentUserId = localStorage.getItem('userId');
+        const isViewingOwnProfile = (userId === currentUserId);
         
-        // 2. Participation (will be loaded by loadParticipationData)
-        // Placeholder for now
-        document.getElementById('statParticipation').textContent = '...';
+        console.log('🔍 Is viewing own profile?', isViewingOwnProfile);
         
-        // 3. Achievements count
+        // Get votes count
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId)
+        );
+        const votesSnapshot = await getDocs(votesQuery);
+        const votesCount = votesSnapshot.size;
+        
+        // Get achievements count
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        const achievementsCount = profileDoc.exists() 
-            ? (profileDoc.data().unlockedAchievements || []).length 
-            : 0;
+        const unlockedAchievements = profileDoc.exists() 
+            ? (profileDoc.data().unlockedAchievements || [])
+            : [];
+        const achievementsCount = unlockedAchievements.length;
+        
+        // ✅ GET RANK - Different logic for own profile vs others
+        const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+        
+        let currentXP;
+        let rank;
+        
+        if (isViewingOwnProfile) {
+            // ✅ For your own profile: Use stored XP (faster, includes bonuses)
+            currentXP = getUserXPFromStorage();
+            rank = getUserRank(currentXP);
+            console.log('✅ Using stored XP for own profile:', currentXP);
+        } else {
+            // ✅ For other profiles: Calculate XP from their votes
+            const allVotes = votesSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            
+            const xpData = calculateUserXP(allVotes);
+            currentXP = xpData.totalXP;
+            rank = getUserRank(currentXP);
+            console.log('✅ Calculated XP for other user:', currentXP, xpData);
+        }
+        
+        // Update stats display
+        document.getElementById('statTotalVotes').textContent = votesCount;
         document.getElementById('statAchievements').textContent = achievementsCount;
         
-        // 4. Activity level
-        const activityLevel = getActivityLevel(voteCount);
-        document.getElementById('statActivityLevel').textContent = activityLevel;
+        // ✅ UPDATE ACTIVITY LEVEL WITH RANK
+        const activityLevelEl = document.getElementById('statActivityLevel');
+        if (activityLevelEl) {
+            // Remove emoji from rank title
+            const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+            
+            // Two-line display: Level number + Title
+            activityLevelEl.innerHTML = `
+                <span style="font-size: 1.5rem; font-weight: 700; color: #c8aa6e; display: block;">Lv. ${rank.currentLevel.level}</span>
+                <span style="font-size: 1rem; font-weight: 600; color: rgba(240, 230, 210, 0.8); display: block; margin-top: 4px;">${cleanTitle}</span>
+            `;
+        }
         
-        console.log('✅ Stats loaded');
+        console.log('✅ Stats loaded:', {
+            userId,
+            isOwnProfile: isViewingOwnProfile,
+            votes: votesCount,
+            achievements: achievementsCount,
+            xp: currentXP,
+            level: rank.currentLevel.level,
+            title: rank.currentLevel.title
+        });
         
     } catch (error) {
         console.error('❌ Error loading stats:', error);
     }
 }
 
-// Helper: Get activity level label
-function getActivityLevel(voteCount) {
-    if (voteCount === 0) return 'Just Started';
-    if (voteCount < 5) return 'Getting Started';
-    if (voteCount < 15) return 'Active Voter';
-    if (voteCount < 30) return 'Dedicated Fan';
-    if (voteCount < 50) return 'Super Fan';
-    return 'Music Curator';
-}
 
 // ========================================
 // LOAD FEATURED ACHIEVEMENTS
@@ -1490,6 +1544,97 @@ function getRoundName(roundNumber) {
         6: 'Finals'
     };
     return roundNames[roundNumber] || `Round ${roundNumber}`;
+}
+
+// ========================================
+// FOLLOW SYSTEM INTEGRATION
+// ========================================
+
+async function renderFollowButton(targetUserId, targetUsername) {
+    const currentUserId = localStorage.getItem('userId');
+    
+    // Don't show follow button on own profile
+    if (!currentUserId || currentUserId === targetUserId) {
+        return '';
+    }
+    
+    const { isFollowing } = await import('./follow-system.js');
+    const following = await isFollowing(targetUserId);
+    
+    return `
+        <button class="profile-follow-btn ${following ? 'following' : ''}" 
+                id="followBtn"
+                data-user-id="${targetUserId}"
+                data-username="${targetUsername}">
+            ${following ? 
+                '<i class="fas fa-user-check"></i> Following' : 
+                '<i class="fas fa-user-plus"></i> Follow'
+            }
+        </button>
+    `;
+}
+
+async function updateFollowButton() {
+    if (!currentProfile) return;
+    
+    const profileActions = document.querySelector('.profile-actions');
+    if (profileActions) {
+        const followBtn = await renderFollowButton(currentProfile.userId, currentProfile.username);
+        profileActions.innerHTML = followBtn;
+        
+        // Attach click handler
+        const btn = document.getElementById('followBtn');
+        if (btn) {
+            btn.addEventListener('click', handleFollowClick);
+        }
+    }
+}
+
+async function handleFollowClick(e) {
+    const btn = e.currentTarget;
+    const targetUserId = btn.dataset.userId;
+    const targetUsername = btn.dataset.username;
+    const isCurrentlyFollowing = btn.classList.contains('following');
+    
+    btn.disabled = true;
+    
+    if (isCurrentlyFollowing) {
+        const { unfollowUser } = await import('./follow-system.js');
+        const result = await unfollowUser(targetUserId);
+        
+        if (result.success) {
+            btn.classList.remove('following');
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+            await updateFollowCounts(); // Refresh counts
+        }
+    } else {
+        const { followUser } = await import('./follow-system.js');
+        const result = await followUser(targetUserId, targetUsername);
+        
+        if (result.success) {
+            btn.classList.add('following');
+            btn.innerHTML = '<i class="fas fa-user-check"></i> Following';
+            await updateFollowCounts(); // Refresh counts
+        }
+    }
+    
+    btn.disabled = false;
+}
+
+async function updateFollowCounts() {
+    if (!currentProfile) return;
+    
+    const { getFollowerCount, getFollowingCount } = await import('./follow-system.js');
+    
+    const followerCount = await getFollowerCount(currentProfile.userId);
+    const followingCount = await getFollowingCount(currentProfile.userId);
+    
+    // Update counts in the profile header
+    const followerCountEl = document.getElementById('followerCount');
+    const followingCountEl = document.getElementById('followingCount');
+    
+    if (followerCountEl) followerCountEl.textContent = followerCount;
+    if (followingCountEl) followingCountEl.textContent = followingCount;
 }
 
 // ========================================

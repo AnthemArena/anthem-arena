@@ -182,66 +182,56 @@ function createModalHTML() {
                         </div>
 
                         <!-- Privacy & Social Settings -->
-                        <div class="settings-section">
-                            <h3><i class="fas fa-shield-alt"></i> Privacy & Social</h3>
-                            <p class="section-description">Control who can interact with you</p>
-                            
-                            <div class="privacy-settings">
-                                <!-- Public Profile -->
-                                <label class="toggle-label">
-                                    <input type="checkbox" id="publicToggle" class="toggle-input" />
-                                    <span class="toggle-slider"></span>
-                                    <div class="toggle-info">
-                                        <strong>🌐 Public Profile</strong>
-                                        <p>Show your votes in Community Activity feed</p>
-                                    </div>
-                                </label>
-                                
-                                <!-- Allow Friend Requests -->
-                                <label class="toggle-label">
-                                    <input type="checkbox" id="allowFriendRequestsToggle" class="toggle-input" />
-                                    <span class="toggle-slider"></span>
-                                    <div class="toggle-info">
-                                        <strong>👥 Allow Friend Requests</strong>
-                                        <p>Let others send you friend requests</p>
-                                    </div>
-                                </label>
-                                
-                                <!-- Message Privacy -->
-                                <div class="toggle-label select-wrapper">
-                                    <div class="toggle-info" style="flex: 1;">
-                                        <strong>💬 Who Can Message You?</strong>
-                                        <select id="messagePrivacySelect" class="privacy-select">
-                                            <option value="everyone">Everyone</option>
-                                            <option value="friends">Friends Only</option>
-                                            <option value="nobody">Nobody</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <!-- Show Online Status -->
-                                <label class="toggle-label">
-                                    <input type="checkbox" id="showOnlineStatusToggle" class="toggle-input" />
-                                    <span class="toggle-slider"></span>
-                                    <div class="toggle-info">
-                                        <strong>🟢 Show Online Status</strong>
-                                        <p>Let friends see when you're active</p>
-                                    </div>
-                                </label>
-                                
-                                <!-- Emote Privacy -->
-                                <div class="toggle-label select-wrapper">
-                                    <div class="toggle-info" style="flex: 1;">
-                                        <strong>🎭 Who Can Send You Emotes?</strong>
-                                        <select id="emotePrivacySelect" class="privacy-select">
-                                            <option value="everyone">Everyone</option>
-                                            <option value="friends">Friends Only</option>
-                                            <option value="nobody">Nobody</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<div class="settings-section">
+    <h3><i class="fas fa-shield-alt"></i> Privacy & Social</h3>
+    <p class="section-description">Control who can interact with you</p>
+    
+    <div class="privacy-settings">
+        <!-- Public Profile -->
+        <label class="toggle-label">
+            <input type="checkbox" id="publicToggle" class="toggle-input" />
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>🌐 Public Profile</strong>
+                <p>Show your votes in Community Activity feed</p>
+            </div>
+        </label>
+        
+        <!-- Message Privacy -->
+        <div class="toggle-label select-wrapper">
+            <div class="toggle-info" style="flex: 1;">
+                <strong>💬 Who Can Message You?</strong>
+                <select id="messagePrivacySelect" class="privacy-select">
+                    <option value="everyone">Everyone</option>
+                    <option value="followers">People You Follow</option>
+                    <option value="nobody">Nobody</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Show Online Status -->
+        <label class="toggle-label">
+            <input type="checkbox" id="showOnlineStatusToggle" class="toggle-input" />
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>🟢 Show Online Status</strong>
+                <p>Let others see when you're active</p>
+            </div>
+        </label>
+        
+        <!-- Emote Privacy -->
+        <div class="toggle-label select-wrapper">
+            <div class="toggle-info" style="flex: 1;">
+                <strong>🎭 Who Can Send You Emotes?</strong>
+                <select id="emotePrivacySelect" class="privacy-select">
+                    <option value="everyone">Everyone</option>
+                    <option value="followers">People You Follow</option>
+                    <option value="nobody">Nobody</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 
                         <!-- Form Actions -->
                         <div class="form-actions">
@@ -279,7 +269,7 @@ function loadCurrentProfile() {
     // ✅ Load privacy settings with defaults
     const privacyDefaults = {
         isPublic: 'true',
-        allowFriendRequests: 'true',
+    allowFollows: 'true',  // ✅ Changed from allowFriendRequests
         messagePrivacy: 'everyone',
         showOnlineStatus: 'true',
         emotePrivacy: 'everyone'
@@ -293,7 +283,7 @@ function loadCurrentProfile() {
     });
     
     const isPublic = localStorage.getItem('isPublic') === 'true';
-    const allowFriendRequests = localStorage.getItem('allowFriendRequests') === 'true';
+const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Changed
     const messagePrivacy = localStorage.getItem('messagePrivacy') || 'everyone';
     const showOnlineStatus = localStorage.getItem('showOnlineStatus') === 'true';
     const emotePrivacy = localStorage.getItem('emotePrivacy') || 'everyone';
@@ -323,12 +313,11 @@ function loadCurrentProfile() {
         updateBioCharCount(); // Update character count
     }
     
-    // ✅ Set all privacy toggles
-    document.getElementById('publicToggle').checked = isPublic;
-    document.getElementById('allowFriendRequestsToggle').checked = allowFriendRequests;
-    document.getElementById('messagePrivacySelect').value = messagePrivacy;
-    document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
-    document.getElementById('emotePrivacySelect').value = emotePrivacy;
+  // ✅ Set all privacy toggles
+document.getElementById('publicToggle').checked = isPublic;
+document.getElementById('messagePrivacySelect').value = messagePrivacy;
+document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
+document.getElementById('emotePrivacySelect').value = emotePrivacy;
     
     // Show selected avatar if exists
     if (avatar && avatar.type === 'url') {
@@ -474,7 +463,6 @@ function setupEventListeners() {
     const trackableInputs = [
         'usernameInput',
         'publicToggle',
-        'allowFriendRequestsToggle',
         'messagePrivacySelect',
         'showOnlineStatusToggle',
         'emotePrivacySelect'
@@ -647,7 +635,6 @@ async function handleSaveSettings(e) {
     // ✅ Get all privacy settings
     const privacySettings = {
         isPublic: document.getElementById('publicToggle')?.checked ?? true,
-        allowFriendRequests: document.getElementById('allowFriendRequestsToggle')?.checked ?? true,
         messagePrivacy: document.getElementById('messagePrivacySelect')?.value ?? 'everyone',
         showOnlineStatus: document.getElementById('showOnlineStatusToggle')?.checked ?? true,
         emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
