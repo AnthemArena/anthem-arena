@@ -190,6 +190,10 @@ function renderActivityFeed(activities) {
 // RENDER VOTE CARD - Include full match context with "vs"
 // ========================================
 
+// ========================================
+// RENDER VOTE CARD - Include full match context with "vs"
+// ========================================
+
 function renderVoteCard(activity) {
     // The voted song's ID and title
     const votedSongId = activity.songId;
@@ -203,53 +207,15 @@ function renderVoteCard(activity) {
     const song1 = songs[0]?.trim() || 'Song 1';
     const song2 = songs[1]?.trim() || 'Song 2';
     
-    // DEBUG - Check what we're comparing
+    // ✅ USE THE DATABASE FIELD AS SOURCE OF TRUTH
+    const votedForSong1 = activity.choice === 'song1';
+    
+    // DEBUG
     console.log('=== Vote Card Debug ===');
-    console.log('Match Title:', matchTitle);
-    console.log('Song 1:', song1);
-    console.log('Song 2:', song2);
-    console.log('Voted Song Title:', votedSongTitle);
-    console.log('Voted Song ID:', votedSongId);
-    
-    // Determine which song was voted for by comparing titles
-    const votedLower = votedSongTitle.toLowerCase().trim();
-    const song1Lower = song1.toLowerCase().trim();
-    const song2Lower = song2.toLowerCase().trim();
-    
-    let votedForSong1 = false;
-    
-    // Method 1: Exact match
-    if (votedLower === song1Lower) {
-        votedForSong1 = true;
-        console.log('✓ Exact match with Song 1');
-    } else if (votedLower === song2Lower) {
-        votedForSong1 = false;
-        console.log('✓ Exact match with Song 2');
-    }
-    // Method 2: Voted song contains one option (but not the other)
-    else if (votedLower.includes(song1Lower) && !votedLower.includes(song2Lower)) {
-        votedForSong1 = true;
-        console.log('✓ Voted song contains Song 1');
-    } else if (votedLower.includes(song2Lower) && !votedLower.includes(song1Lower)) {
-        votedForSong1 = false;
-        console.log('✓ Voted song contains Song 2');
-    }
-    // Method 3: One option contains the voted song (but not the other)
-    else if (song1Lower.includes(votedLower) && !song2Lower.includes(votedLower)) {
-        votedForSong1 = true;
-        console.log('✓ Song 1 contains voted song');
-    } else if (song2Lower.includes(votedLower) && !song1Lower.includes(votedLower)) {
-        votedForSong1 = false;
-        console.log('✓ Song 2 contains voted song');
-    }
-    // Method 4: Fallback - check if voted song ID matches song1 or song2
-    else {
-        console.warn('⚠️ Could not match by title. Voted:', votedSongTitle, '| Song1:', song1, '| Song2:', song2);
-        // Default to song1 as fallback
-        votedForSong1 = true;
-    }
-    
-    console.log('Result: votedForSong1 =', votedForSong1);
+    console.log('Choice from DB:', activity.choice);
+    console.log('Voted for Song 1?', votedForSong1);
+    console.log('Song 1:', song1, votedForSong1 ? '← VOTED' : '');
+    console.log('Song 2:', song2, !votedForSong1 ? '← VOTED' : '');
     console.log('======================\n');
     
     return `
