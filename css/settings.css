@@ -680,3 +680,39 @@
     flex-direction: column;
     gap: 0.5rem;
 }
+/* Bio textarea styling */
+.settings-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    color: #f0e6d2;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.3s ease;
+}
+
+.settings-form textarea:focus {
+    outline: none;
+    border-color: #c8aa6e;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.settings-form textarea::placeholder {
+    color: rgba(240, 230, 210, 0.4);
+}
+
+.form-hint {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+#bioCharCount {
+    color: #c8aa6e;
+    font-weight: 600;
+}

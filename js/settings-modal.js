@@ -134,7 +134,7 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                     <!-- Avatar Section -->
+                  <!-- Avatar Section -->
                         <div class="settings-section">
                             <h3><i class="fas fa-image"></i> Avatar</h3>
                             <p class="section-description">Choose a League champion</p>
@@ -159,6 +159,25 @@ function createModalHTML() {
                             
                             <div class="avatar-grid" id="avatarGrid">
                                 <!-- Champion grid will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-pen"></i> Bio</h3>
+                            <p class="section-description">Tell others about yourself (optional)</p>
+                            
+                            <div class="form-group">
+                                <textarea 
+                                    id="bioInput" 
+                                    placeholder="Music enthusiast, League fan, proud underdog supporter..." 
+                                    maxlength="200"
+                                    rows="3"
+                                    autocomplete="off"
+                                ></textarea>
+                                <div class="form-hint">
+                                    <span id="bioCharCount">0</span>/200 characters
+                                </div>
                             </div>
                         </div>
 
@@ -254,6 +273,8 @@ function createModalHTML() {
 function loadCurrentProfile() {
     const username = localStorage.getItem('username') || '';
     const avatarJson = localStorage.getItem('avatar');
+        const bio = localStorage.getItem('bio') || ''; // ✅ ADD THIS
+
     
     // ✅ Load privacy settings with defaults
     const privacyDefaults = {
@@ -293,6 +314,14 @@ function loadCurrentProfile() {
     
     // Update form fields
     document.getElementById('usernameInput').value = username;
+
+     
+    // ✅ ADD BIO LOADING
+    const bioInput = document.getElementById('bioInput');
+    if (bioInput) {
+        bioInput.value = bio;
+        updateBioCharCount(); // Update character count
+    }
     
     // ✅ Set all privacy toggles
     document.getElementById('publicToggle').checked = isPublic;
@@ -369,6 +398,17 @@ function renderChampionGrid() {
     grid.innerHTML = html;
 }
 
+// In settings-modal.js, add this function near setupEventListeners()
+
+function updateBioCharCount() {
+    const bioInput = document.getElementById('bioInput');
+    const charCount = document.getElementById('bioCharCount');
+    
+    if (bioInput && charCount) {
+        charCount.textContent = bioInput.value.length;
+    }
+}
+
 // ========================================
 // SETUP EVENT LISTENERS
 // ========================================
@@ -422,6 +462,13 @@ function setupEventListeners() {
         clearBtn.removeEventListener('click', clearSelectedAvatar);
         clearBtn.addEventListener('click', clearSelectedAvatar);
     }
+
+       // ✅ ADD BIO INPUT TRACKING
+    const bioInput = document.getElementById('bioInput');
+    if (bioInput) {
+        bioInput.removeEventListener('input', handleBioInput);
+        bioInput.addEventListener('input', handleBioInput);
+    }
     
    // Track changes on all inputs
     const trackableInputs = [
@@ -446,6 +493,12 @@ function setupEventListeners() {
     // ESC key to close
     document.removeEventListener('keydown', handleEscapeKey);
     document.addEventListener('keydown', handleEscapeKey);
+}
+
+// ✅ ADD THIS NEW FUNCTION
+function handleBioInput() {
+    hasChanges = true;
+    updateBioCharCount();
 }
 
 function trackChanges() {
@@ -581,11 +634,15 @@ async function handleSaveSettings(e) {
     e.preventDefault();
     
     const usernameInput = document.getElementById('usernameInput');
+        const bioInput = document.getElementById('bioInput'); // ✅ ADD THIS
+
     const errorEl = document.getElementById('usernameError');
     
     if (!usernameInput || !errorEl) return;
     
     const username = usernameInput.value.trim();
+        const bio = bioInput?.value.trim() || ''; // ✅ ADD THIS
+
     
     // ✅ Get all privacy settings
     const privacySettings = {
@@ -627,42 +684,47 @@ async function handleSaveSettings(e) {
     }
     
     // Save to localStorage (backward compatible)
-    localStorage.setItem('username', username);
-    localStorage.setItem('avatar', JSON.stringify(avatar));
-    
-    // ✅ Save all privacy settings
-    Object.keys(privacySettings).forEach(key => {
-        const value = privacySettings[key];
-        if (typeof value === 'boolean') {
-            localStorage.setItem(key, value ? 'true' : 'false');
-        } else {
-            localStorage.setItem(key, value);
-        }
-    });
-    
-// ✅ Save to Firebase profiles collection
-   // ✅ Save to Firebase profiles collection
-    try {
-        const userId = localStorage.getItem('tournamentUserId');
-        if (userId) {
-            await setDoc(doc(db, 'profiles', userId), {
-                username: username,
-                avatar: avatar,
-                // ✅ Save all privacy settings
-                privacy: privacySettings,
-                updatedAt: Date.now()
-            });
-            console.log('✅ Profile saved to Firebase with privacy settings');
-            
-            // ✅ NEW: Automatically backfill old votes/activity
-            await backfillUserHistory(userId, username, avatar, privacySettings.isPublic);
-        }
-    } catch (error) {
-        console.warn('⚠️ Could not save profile to Firebase:', error);
-        // Don't block the save if Firebase fails
+localStorage.setItem('username', username);
+localStorage.setItem('avatar', JSON.stringify(avatar));
+localStorage.setItem('bio', bio); // ✅ ALREADY CORRECT
+
+// ✅ Save all privacy settings
+Object.keys(privacySettings).forEach(key => {
+    const value = privacySettings[key];
+    if (typeof value === 'boolean') {
+        localStorage.setItem(key, value ? 'true' : 'false');
+    } else {
+        localStorage.setItem(key, value);
     }
-    
-    hasChanges = false;
+});
+
+// ✅ Save to Firebase profiles collection
+try {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (userId) {
+        await setDoc(doc(db, 'profiles', userId), {
+            username: username,
+            avatar: avatar,
+            bio: bio, // ✅ ALREADY CORRECT
+            // ✅ Save all privacy settings
+            privacy: privacySettings,
+            updatedAt: Date.now()
+        });
+        console.log('✅ Profile saved to Firebase with privacy settings');
+        
+        // ✅ NEW: Automatically backfill old votes/activity
+        await backfillUserHistory(userId, username, avatar, privacySettings.isPublic);
+        
+        // ✅ ADD THIS: Invalidate profile cache after save
+        invalidateProfileCache(username);
+        console.log('🗑️ Profile cache invalidated');
+    }
+} catch (error) {
+    console.warn('⚠️ Could not save profile to Firebase:', error);
+    // Don't block the save if Firebase fails
+}
+
+hasChanges = false;
     
     console.log('✅ Settings saved:', { username, avatar, privacy: privacySettings });
     
@@ -863,6 +925,26 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
     } catch (error) {
         console.error('❌ Backfill error:', error);
         // Don't block the profile save if backfill fails
+    }
+}
+
+// ========================================
+// CACHE INVALIDATION HELPER
+// ========================================
+
+/**
+ * Invalidate profile cache after editing
+ */
+function invalidateProfileCache(username) {
+    if (!username) return;
+    
+    const cacheKey = `profile-${username}`;
+    
+    try {
+        localStorage.removeItem(cacheKey);
+        console.log(`🗑️ Invalidated cache for ${username}`);
+    } catch (e) {
+        console.warn('Could not invalidate cache:', e);
     }
 }
 

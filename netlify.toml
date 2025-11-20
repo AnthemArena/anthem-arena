@@ -20,8 +20,36 @@
 # ========================================
 
 [[edge_functions]]
-  path = "/api/*"
+  path = "/api/matches"
   function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/match/*"
+  function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/track-view"
+  function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/view-stats"
+  function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/total-votes"
+  function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/activity"
+  function = "firebase-cache"
+
+[[edge_functions]]
+  path = "/api/feed"
+  function = "feed"
+
+[[edge_functions]]
+  path = "/api/profile"
+  function = "profile"
 
 # ========================================
 # HEADERS - CRITICAL FIX
@@ -82,6 +110,11 @@
 [[redirects]]
   from = "/my-votes"
   to = "/my-votes.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile"
+  to = "/profile.html"
   status = 200
 
 # ========================================

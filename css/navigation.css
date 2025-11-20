@@ -1533,3 +1533,20 @@
         font-size: 0.75rem;
     }
 }
+.nav-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-profile-link:hover {
+    background: rgba(200, 170, 110, 0.1);
+}
+
+.nav-profile-link:hover .nav-username {
+    color: #c8aa6e;
+}

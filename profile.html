@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Anthem Arena</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/profile.css">
+    
+    <!-- Firebase -->
+    <script type="module" src="/js/firebase-config.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="nav-container"></div>
+    
+    <!-- Main Content -->
+    <main class="profile-page">
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading profile...</p>
+        </div>
+        
+        <!-- 404 State -->
+        <div id="notFoundState" class="not-found-state" style="display: none;">
+            <div class="not-found-icon">👤</div>
+            <h2>User Not Found</h2>
+            <p>This user doesn't exist or hasn't set up their profile yet.</p>
+            <a href="/feed.html" class="btn-primary">Back to Feed</a>
+        </div>
+        
+        <!-- Guest State -->
+        <div id="guestState" class="guest-state" style="display: none;">
+            <div class="guest-icon">🎵</div>
+            <h2>Set Up Your Profile</h2>
+            <p>Create a username to view your profile and connect with others!</p>
+            <button class="btn-primary" onclick="window.openUsernamePrompt()">Create Profile</button>
+        </div>
+        
+        <!-- Profile Content -->
+        <div id="profileContent" class="profile-content" style="display: none;">
+            
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-banner"></div>
+                
+                <div class="profile-info-container">
+                    <div class="profile-avatar-large" id="profileAvatar">
+                        🎵
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="profile-username-row">
+                            <h1 class="profile-username" id="profileUsername">Username</h1>
+                            <div class="profile-badges" id="profileBadges">
+                                <!-- Badges will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <div class="profile-rank" id="profileRank">
+                            <i class="fas fa-star"></i> Level 1 - New Voter
+                        </div>
+                        
+                        <p class="profile-bio" id="profileBio">
+                            <!-- Bio will be inserted here -->
+                        </p>
+                        
+                        <div class="profile-meta">
+                            <span class="profile-meta-item" id="profileJoined">
+                                <i class="fas fa-calendar"></i> Joined Recently
+                            </span>
+                            <span class="profile-meta-item" id="profileVotes">
+                                <i class="fas fa-trophy"></i> 0 votes
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Actions -->
+                    <div class="profile-actions" id="profileActions">
+                        <!-- Buttons will be inserted here based on ownership -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Quick Stats Grid -->
+            <section class="profile-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statTotalVotes">0</div>
+                        <div class="stat-label">Total Votes</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-music"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statSongsAlive">0</div>
+                        <div class="stat-label">Songs Alive</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statFollowers">0</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Profile Tabs -->
+            <section class="profile-tabs">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="overview">
+                        <i class="fas fa-home"></i> Overview
+                    </button>
+                    <button class="tab-btn" data-tab="posts">
+                        <i class="fas fa-pen"></i> Posts <span class="tab-count" id="postsCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="achievements">
+                        <i class="fas fa-trophy"></i> Achievements <span class="tab-count" id="achievementsCount">0</span>
+                    </button>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="tabs-content">
+                    
+                    <!-- Overview Tab -->
+                    <div class="tab-panel active" id="tab-overview">
+                        
+                        <!-- Featured Achievements -->
+                        <div class="overview-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-star"></i> Featured Achievements
+                            </h3>
+                            <div id="featuredAchievements" class="featured-achievements-grid">
+                                <div class="no-content">
+                                    <i class="fas fa-lock"></i>
+                                    <p>No achievements unlocked yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Favorite Songs -->
+                        <div class="overview-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-music"></i> Most Supported Songs
+                            </h3>
+                            <div id="favoriteSongs" class="favorite-songs-list">
+                                <div class="no-content">
+                                    <i class="fas fa-music"></i>
+                                    <p>No votes yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Posts -->
+                        <div class="overview-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-pen"></i> Recent Activity
+                            </h3>
+                            <div id="recentPosts" class="recent-posts-list">
+                                <div class="no-content">
+                                    <i class="fas fa-pen"></i>
+                                    <p>No posts yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Posts Tab -->
+                    <div class="tab-panel" id="tab-posts">
+                        <div id="allPosts" class="posts-feed">
+                            <div class="no-content">
+                                <i class="fas fa-pen"></i>
+                                <p>No posts yet</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievements Tab -->
+                    <div class="tab-panel" id="tab-achievements">
+                        <div id="allAchievements" class="achievements-grid">
+                            <div class="no-content">
+                                <i class="fas fa-trophy"></i>
+                                <p>No achievements unlocked yet</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
+            
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    
+    <!-- Scripts -->
+    <script type="module" src="/js/navigation.js"></script>
+    <script type="module" src="/js/footer.js"></script>
+    <script type="module" src="/js/profile-page.js"></script>
+</body>
+</html>
