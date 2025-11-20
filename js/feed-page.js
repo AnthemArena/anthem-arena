@@ -240,36 +240,39 @@ function createPostElement(post) {
 // RENDER POST CONTENT
 // ========================================
 
+// ========================================
+// RENDER POST CONTENT
+// ========================================
+
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        // Vote post with match embed
+        // NEW: Show the smart context-aware text!
+        const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
+        
         return `
-            <div class="vote-badge">
-                <i class="fa-solid fa-check-circle"></i>
-                Voted in match
-            </div>
+            <p class="post-text vote-text">
+                <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
+            </p>
             
             <div class="match-embed" data-match-id="${post.matchId}">
-                <h4 class="match-title">${post.matchTitle}</h4>
+                <h4 class="match-title">${escapeHtml(post.matchTitle)}</h4>
                 <div class="match-songs">
                     <div class="song-info ${post.choice === 'song1' ? 'picked' : ''}">
-                        <div class="song-title">${post.songTitle}</div>
+                        <div class="song-title">${escapeHtml(post.votedSongName || post.songTitle)}</div>
                     </div>
                     <div class="vs-divider">VS</div>
                     <div class="song-info ${post.choice === 'song2' ? 'picked' : ''}">
-                        <div class="song-title">${post.choice === 'song1' ? 'Other Song' : post.songTitle}</div>
+                        <div class="song-title">${escapeHtml(post.opponentSongName || 'Other Song')}</div>
                     </div>
                 </div>
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        // Text post
         return `<p class="post-text">${escapeHtml(post.content)}</p>`;
     }
     
     return '';
 }
-
 // ========================================
 // SETUP POST INTERACTIONS
 // ========================================

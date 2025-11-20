@@ -575,3 +575,16 @@ body {
         transform: rotate(90deg);
     }
 }
+.vote-text {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vote-text i {
+    color: var(--gold);
+}

@@ -1757,11 +1757,20 @@ async function checkForAchievementUnlocks() {
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const voteIds = Object.keys(userVotes);
         
-        if (voteIds.length === 0) return;
+        if (voteIds.length === 0) {
+            console.log('ℹ️ No votes found in history');
+            return;
+        }
         
-// ✅ FIX: Get match data to properly categorize votes
-const allMatches = await getMatchesForThisPageLoad();  // ✅ NEW
-const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
+        // ✅ FIX: Get match data to properly categorize votes
+        const allMatches = await getMatchesForThisPageLoad();
+        
+        if (!allMatches || allMatches.length === 0) {
+            console.warn('⚠️ No match data available for achievement checking');
+            return;
+        }
+        
+        const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
         
         // Build proper vote history with match context
         const allVotes = voteIds.map(matchId => {
@@ -1811,56 +1820,80 @@ const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
                 round: matchData.round || 1,
                 votedForSeed: votedForSong?.seed,
                 votedForName: votedForSong?.shortTitle || votedForSong?.title,
+                votedForArtist: votedForSong?.artist,
+                votedSongPercentage,
                 choice: voteData.songId,
                 match: matchData
             };
         });
         
+        // ✅ DEFENSIVE: Import and check achievements safely
+        const { checkAchievements } = await import('./achievement-tracker.js');
+        
+        if (typeof checkAchievements !== 'function') {
+            console.error('❌ checkAchievements is not a function');
+            return;
+        }
+        
         // Check achievements with proper data
-        const { newlyUnlocked } = checkAchievements(allVotes);
+        const achievementResult = await checkAchievements(allVotes);
         
-     // Show notifications for newly unlocked achievements
-if (newlyUnlocked.length > 0) {
-    console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
-    
-    // ✅ Limit to 3 toasts max per vote session to prevent spam
-    const MAX_TOASTS_PER_SESSION = 3;
-    const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
-    
-    // Stagger notifications by 2.5 seconds each
-    toastsToShow.forEach((achievement, index) => {
-        setTimeout(() => {
-            showAchievementUnlock(achievement);
-        }, index * 2500); // ✅ Increased from 2000ms to 2500ms for better spacing
-    });
-    
-    // Log if any were skipped
-    if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
-        console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
+        // ✅ DEFENSIVE: Handle undefined/null results
+        if (!achievementResult) {
+            console.warn('⚠️ checkAchievements returned undefined');
+            return;
+        }
         
-        // Optional: Show a summary toast after the individual ones
-        setTimeout(() => {
-            if (window.showBulletin) {
-                window.showBulletin({
-                    type: 'achievement',
-                    message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
-                    detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
-                    cta: 'View All Achievements',
-                    ctaAction: () => window.location.href = 'my-votes.html',
-                    duration: 4000
-                });
+        const newlyUnlocked = achievementResult.newlyUnlocked || [];
+        
+        // Show notifications for newly unlocked achievements
+        if (newlyUnlocked && newlyUnlocked.length > 0) {
+            console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
+            
+            // ✅ Limit to 3 toasts max per vote session to prevent spam
+            const MAX_TOASTS_PER_SESSION = 3;
+            const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
+            
+            // Stagger notifications by 2.5 seconds each
+            toastsToShow.forEach((achievement, index) => {
+                setTimeout(() => {
+                    if (window.showAchievementUnlock && typeof window.showAchievementUnlock === 'function') {
+                        window.showAchievementUnlock(achievement);
+                    }
+                }, index * 2500);
+            });
+            
+            // Log if any were skipped
+            if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
+                console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
+                
+                // Optional: Show a summary toast after the individual ones
+                setTimeout(() => {
+                    if (window.showBulletin && typeof window.showBulletin === 'function') {
+                        window.showBulletin({
+                            type: 'achievement',
+                            message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
+                            detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
+                            cta: 'View All Achievements',
+                            ctaAction: () => window.location.href = 'my-votes.html',
+                            duration: 4000
+                        });
+                    }
+                }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
             }
-        }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
-    }
-    
-    // Update navigation rank (achievements award XP)
-    if (window.updateNavProfile) {
-        window.updateNavProfile();
-    }
-}
+            
+            // Update navigation rank (achievements award XP)
+            if (window.updateNavProfile && typeof window.updateNavProfile === 'function') {
+                window.updateNavProfile();
+            }
+        } else {
+            console.log('✅ No new achievements unlocked this vote');
+        }
         
     } catch (error) {
         console.error('⚠️ Error checking achievements:', error);
+        console.error('Stack trace:', error.stack);
+        // Don't block vote submission if achievements fail
     }
 }
 /**
