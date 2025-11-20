@@ -146,8 +146,8 @@
     flex-direction: row;
     align-items: center;
     gap: 1.25rem;
-    padding: 0.875rem 1.25rem;
-    height: 70px;
+    padding: 1.25rem;
+    min-height: 90px;
 }
 
 .vote-card:hover {
@@ -158,14 +158,14 @@
 }
 
 /* ========================================
-   CIRCULAR THUMBNAIL - Small on left
+   SQUARE THUMBNAIL - Fixed on left
    ======================================== */
 
 .vote-thumbnail {
     position: relative;
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
     border-radius: 8px;
     overflow: hidden;
     background: #000;
@@ -182,11 +182,50 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
     transition: transform 0.3s ease;
 }
 
 .vote-card:hover .vote-thumbnail img {
     transform: scale(1.1);
+}
+
+/* ========================================
+   VOTE INDICATOR - Checkmark on thumbnail
+   ======================================== */
+
+.vote-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: rgba(76, 175, 80, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    animation: voteBadgePulse 2s ease-in-out infinite;
+}
+
+@keyframes voteBadgePulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 2px 12px rgba(76, 175, 80, 0.7);
+    }
+}
+
+.vote-card:hover .vote-indicator {
+    background: rgba(76, 175, 80, 1);
+    transform: scale(1.15);
 }
 
 /* ========================================
@@ -248,7 +287,7 @@
 }
 
 /* ========================================
-   SONG INFO - Title (main focus)
+   SONG INFO - Title with VS display
    ======================================== */
 
 .vote-song {
@@ -261,12 +300,75 @@
 
 .song-title {
     font-family: 'Cinzel', serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    line-height: 1.4;
+}
+
+.song-title span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.vs-separator {
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 400;
+    font-size: 0.8rem;
+    font-style: italic;
+    flex-shrink: 0;
+    padding: 0 0.25rem;
+}
+
+/* Voted song - green highlight */
+.voted-song {
+    color: #4CAF50 !important;
+    font-weight: 700;
+    text-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
+    position: relative;
+    padding-left: 1.25rem;
+}
+
+.voted-song::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+    font-size: 1rem;
+    font-weight: bold;
+    animation: checkPulse 2s ease-in-out infinite;
+}
+
+@keyframes checkPulse {
+    0%, 100% { 
+        opacity: 0.8; 
+        transform: scale(1); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.15); 
+    }
+}
+
+/* Non-voted song - dimmed */
+.not-voted-song {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-weight: 400;
+}
+
+/* Hover effects */
+.vote-card:hover .voted-song {
+    color: #5FD068 !important;
+    text-shadow: 0 0 16px rgba(76, 175, 80, 0.6);
+}
+
+.vote-card:hover .not-voted-song {
+    color: rgba(255, 255, 255, 0.25) !important;
 }
 
 /* ========================================
@@ -438,7 +540,6 @@
     .vote-card {
         gap: 1rem;
         padding: 0.75rem 1rem;
-        height: auto;
         min-height: 70px;
     }
     
@@ -492,9 +593,9 @@
     }
     
     .vote-thumbnail {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
     }
     
     .vote-user {
@@ -565,6 +666,12 @@
     .song-title {
         font-size: 0.95rem;
     }
+    
+    .vote-thumbnail {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+    }
 }
 
 /* ========================================
@@ -598,144 +705,3 @@
 .vote-card:nth-child(8) { animation-delay: 0.4s; }
 .vote-card:nth-child(9) { animation-delay: 0.45s; }
 .vote-card:nth-child(10) { animation-delay: 0.5s; }
-
-.song-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.song-title span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.vs-separator {
-    color: rgba(255, 255, 255, 0.4);
-    font-weight: 400;
-    font-size: 0.85rem;
-    font-style: italic;
-    flex-shrink: 0;
-}
-
-.voted-song {
-    color: #4CAF50 !important;
-    font-weight: 700;
-    text-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
-    position: relative;
-    padding-left: 1.25rem;
-}
-
-/* Add checkmark before voted song */
-.voted-song::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #4CAF50;
-    font-size: 1rem;
-    font-weight: bold;
-    animation: checkPulse 2s ease-in-out infinite;
-}
-
-@keyframes checkPulse {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.15); }
-}
-
-/* Style for non-voted song */
-.not-voted-song {
-    color: rgba(255, 255, 255, 0.4) !important;
-    font-weight: 400;
-}
-/* ========================================
-   VOTE INDICATOR - Checkmark on thumbnail
-   ======================================== */
-
-.vote-indicator {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    background: rgba(76, 175, 80, 0.95);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    animation: voteBadgePulse 2s ease-in-out infinite;
-}
-
-@keyframes voteBadgePulse {
-    0%, 100% { 
-        transform: scale(1);
-        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-    }
-    50% { 
-        transform: scale(1.1);
-        box-shadow: 0 2px 12px rgba(76, 175, 80, 0.7);
-    }
-}
-
-/* Hover effect */
-.vote-card:hover .vote-indicator {
-    background: rgba(76, 175, 80, 1);
-    transform: scale(1.15);
-}
-.song-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    line-height: 1.4;
-}
-
-.song-title span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.vs-separator {
-    color: rgba(255, 255, 255, 0.35);
-    font-weight: 400;
-    font-size: 0.8rem;
-    font-style: italic;
-    flex-shrink: 0;
-    padding: 0 0.25rem;
-}
-/* Highlight the entire card when hovering over voted song */
-.vote-card:hover .voted-song {
-    color: #5FD068 !important;
-    text-shadow: 0 0 16px rgba(76, 175, 80, 0.6);
-}
-
-.vote-card:hover .not-voted-song {
-    color: rgba(255, 255, 255, 0.25) !important;
-}
-.vote-card {
-    padding: 1.25rem; /* up from 1rem */
-}
-
-.vote-thumbnail {
-    height: 100px; /* up from 70px */
-}
-
-.song-title {
-    font-size: 1.1rem; /* up from 1rem */
-}

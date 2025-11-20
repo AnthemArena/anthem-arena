@@ -204,16 +204,38 @@ function renderVoteCard(activity) {
     // Determine which song was voted for
     const votedSong = (activity.songTitle || songTitle).trim();
     
-    // More precise matching
+    // BETTER MATCHING: Compare the actual voted song title more precisely
+    // The songId corresponds to the actual vote, so use that as source of truth
+    const votedLower = votedSong.toLowerCase();
     const song1Lower = song1.toLowerCase();
     const song2Lower = song2.toLowerCase();
-    const votedLower = votedSong.toLowerCase();
     
-    const isVotedForSong1 = song1Lower.includes(votedLower) || votedLower.includes(song1Lower);
-    const isVotedForSong2 = song2Lower.includes(votedLower) || votedLower.includes(song2Lower);
+    // Check for exact or very close matches
+    let votedForSong1 = false;
     
-    // Default to song1 if we can't determine
-    const votedForSong1 = isVotedForSong1 || (!isVotedForSong2 && !isVotedForSong1);
+    // First try: exact match
+    if (votedLower === song1Lower) {
+        votedForSong1 = true;
+    } else if (votedLower === song2Lower) {
+        votedForSong1 = false;
+    } 
+    // Second try: voted song contains one of the options
+    else if (votedLower.includes(song1Lower) && !votedLower.includes(song2Lower)) {
+        votedForSong1 = true;
+    } else if (votedLower.includes(song2Lower) && !votedLower.includes(song1Lower)) {
+        votedForSong1 = false;
+    }
+    // Third try: one of the options contains the voted song
+    else if (song1Lower.includes(votedLower) && !song2Lower.includes(votedLower)) {
+        votedForSong1 = true;
+    } else if (song2Lower.includes(votedLower) && !song1Lower.includes(votedLower)) {
+        votedForSong1 = false;
+    }
+    // Last resort: default to song1 (but log this for debugging)
+    else {
+        console.warn('Could not match voted song:', votedSong, 'between', song1, 'and', song2);
+        votedForSong1 = true;
+    }
     
     return `
         <div class="vote-card">
