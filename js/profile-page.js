@@ -294,10 +294,36 @@ async function renderProfile(profile) {
     // Username
     document.getElementById('profileUsername').textContent = profile.username;
     
-    // Rank
-    const xp = await getUserXPForUser(profile.userId);
+    // ✅ FIXED: Rank with proper XP detection
+    const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+    
+    // Get current user ID with fallback
+    const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    const isViewingOwnProfile = (profile.userId === currentUserId);
+    
+    let xp;
+    
+    if (isViewingOwnProfile) {
+        // ✅ Use stored XP for own profile
+        xp = getUserXPFromStorage();
+        console.log('✅ Using stored XP for rank display:', xp);
+    } else {
+        // ✅ Calculate XP from votes for other profiles
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', profile.userId)
+        );
+        const votesSnapshot = await getDocs(votesQuery);
+        const allVotes = votesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const xpData = calculateUserXP(allVotes);
+        xp = xpData.totalXP;
+        console.log('✅ Calculated XP for rank display:', xp);
+    }
+    
     const rank = getUserRank(xp);
     const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+    
     document.getElementById('profileRank').innerHTML = `
         <i class="fas fa-star"></i> Level ${rank.currentLevel.level} - ${cleanTitle}
     `;
@@ -1107,31 +1133,37 @@ function renderVoteCard(vote, matchMap) {
 // HELPER: Determine vote status
 // ========================================
 
+// ========================================
+// HELPER: Determine vote status
+// ========================================
+
 function getVoteStatus(vote, match) {
     if (!match) {
         return 'live';
     }
     
-    // ✅ DEBUG: Log match winner status
-    console.log('🔍 Vote status check:', {
-        matchId: match.id,
-        winner: match.winner,
-        voteChoice: vote.choice,
-        round: match.round
-    });
-    
-    // Check if match has a winner (multiple possible formats)
-    const hasWinner = match.winner && 
-                     match.winner !== '' && 
-                     match.winner !== 'pending' &&
-                     match.winner !== null;
-    
-    if (!hasWinner) {
+    // ✅ Check if match is completed
+    if (match.status !== 'completed' && !match.winnerId) {
         return 'live';
     }
     
-    // Match is complete - check if user won or lost
-    return match.winner === vote.choice ? 'won' : 'lost';
+    // ✅ Determine which song the user voted for
+    const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
+    
+    // ✅ Check if the voted song won (compare IDs)
+    const userWon = match.winnerId === votedSong.id;
+    
+    console.log('🔍 Vote status check:', {
+        matchId: match.id,
+        status: match.status,
+        winnerId: match.winnerId,
+        voteChoice: vote.choice,
+        votedSongId: votedSong.id,
+        userWon: userWon,
+        round: match.round
+    });
+    
+    return userWon ? 'won' : 'lost';
 }
 
 // ========================================
@@ -1434,49 +1466,6 @@ function invalidateProfileCache(username) {
     console.log(`🗑️ Invalidated cache for ${username}`);
 }
 
-/**
- * Get user XP with cache fallback
- */
-async function getUserXPForUser(userId) {
-    // If viewing own profile, use localStorage (most up-to-date)
-    if (userId === currentUserId) {
-        return getUserXPFromStorage();
-    }
-    
-    // Check cache first
-    const cacheKey = `xp-${userId}`;
-    const cached = localStorage.getItem(cacheKey);
-    
-    if (cached) {
-        const { xp, timestamp } = JSON.parse(cached);
-        const age = Date.now() - timestamp;
-        
-        // Use cache if less than 5 minutes old
-        if (age < 300000) {
-            return xp;
-        }
-    }
-    
-    // Fetch from Firebase
-    try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-            const xp = userDoc.data().xp || 0;
-            
-            // Cache it
-            localStorage.setItem(cacheKey, JSON.stringify({
-                xp,
-                timestamp: Date.now()
-            }));
-            
-            return xp;
-        }
-    } catch (error) {
-        console.warn('⚠️ Could not fetch XP for user:', error);
-    }
-    
-    return 0;
-}
 
 // ========================================
 // CALCULATE TOURNAMENT PARTICIPATION
