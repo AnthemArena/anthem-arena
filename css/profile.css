@@ -1942,3 +1942,84 @@
         width: 100%;
     }
 }
+/* Status-specific colors */
+.vote-card.won::before {
+    background: linear-gradient(180deg, #00d26a, #00aa55);
+}
+
+.vote-card.lost::before {
+    background: linear-gradient(180deg, #ff4655, #cc3344);
+}
+
+.vote-card.live::before {  /* ✅ Changed from 'pending' */
+    background: linear-gradient(180deg, #ffa500, #ff8c00);
+}
+
+.vote-status-badge.won {
+    background: rgba(0, 210, 106, 0.2);
+    color: #00d26a;
+    border: 2px solid #00d26a;
+}
+
+.vote-status-badge.lost {
+    background: rgba(255, 70, 85, 0.2);
+    color: #ff4655;
+    border: 2px solid #ff4655;
+}
+
+.vote-status-badge.live {  /* ✅ Changed from 'pending' */
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 2px solid #ffa500;
+}
+/* Vote Footer */
+.vote-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+    flex-wrap: wrap;  /* ✅ Allow wrapping on small screens */
+    gap: 0.75rem;
+}
+
+.vote-tournament {  /* ✅ NEW */
+    color: #c8aa6e;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
+}
+
+.vote-round {
+    color: rgba(240, 230, 210, 0.6);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.view-match-link {
+    color: #c8aa6e;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-left: auto;  /* ✅ Push to right */
+}
+
+@media (max-width: 768px) {
+    .vote-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .view-match-link {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}

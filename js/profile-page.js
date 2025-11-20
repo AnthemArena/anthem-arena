@@ -82,13 +82,14 @@ async function loadProfile(username) {
         
         await renderProfile(profile);
         
-        // Load Overview tab content
+        // Load Overview tab content + PRELOAD COUNTS
         await Promise.all([
             loadProfileStats(profile.userId),
-            loadParticipationData(profile.userId),  // ✅ NEW
+            loadParticipationData(profile.userId),
             loadFeaturedAchievements(profile.userId),
             loadRecentVotes(profile.userId, 5),
-            loadFavoriteSongs(profile.userId)
+            loadFavoriteSongs(profile.userId),
+            preloadTabCounts(profile.userId)  // ✅ NEW: Preload counts
         ]);
         
         setupVoteFilters();
@@ -98,6 +99,31 @@ async function loadProfile(username) {
     } catch (error) {
         console.error('❌ Error loading profile:', error);
         showNotFoundState();
+    }
+}
+
+// ✅ NEW FUNCTION: Preload tab counts
+async function preloadTabCounts(userId) {
+    try {
+        // Get vote count
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId)
+        );
+        const votesSnapshot = await getDocs(votesQuery);
+        document.getElementById('votesCount').textContent = votesSnapshot.size;
+        
+        // Get achievements count
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        const achievementsCount = profileDoc.exists() 
+            ? (profileDoc.data().unlockedAchievements || []).length 
+            : 0;
+        document.getElementById('achievementsCount').textContent = achievementsCount;
+        
+        console.log('✅ Tab counts preloaded');
+        
+    } catch (error) {
+        console.error('❌ Error preloading counts:', error);
     }
 }
 
@@ -866,13 +892,19 @@ function renderVoteCard(vote, matchMap) {
     }
     
     const { song1, song2, winner } = match;
+
+    // ✅ DEBUG: Log thumbnails
+    console.log('🖼️ Thumbnails:', {
+        song1: song1.thumbnail,
+        song2: song2.thumbnail
+    });
     
     // Determine vote status
     const status = getVoteStatus(vote, match);
     const statusConfig = {
         won: { emoji: '✅', label: 'WON', class: 'won' },
         lost: { emoji: '❌', label: 'LOST', class: 'lost' },
-        pending: { emoji: '⏳', label: 'PENDING', class: 'pending' }
+        live: { emoji: '🔴', label: 'LIVE', class: 'live' }  // ✅ Changed from 'pending'
     };
     
     const statusInfo = statusConfig[status];
@@ -884,6 +916,9 @@ function renderVoteCard(vote, matchMap) {
     
     // Format timestamp
     const timeAgo = formatTimeAgo(vote.timestamp);
+
+        const tournamentName = match.tournamentName || 'League of Legends';  // ✅ NEW
+
     
     return `
         <div class="vote-card ${status}">
@@ -899,7 +934,6 @@ function renderVoteCard(vote, matchMap) {
                 <div class="vote-song chosen">
                     <div class="vote-song-thumbnail">
                         <img src="${chosenSong.thumbnail}" alt="${chosenSong.title}" loading="lazy">
-                        <div class="vote-icon">👍</div>
                     </div>
                     <div class="vote-song-info">
                         <div class="vote-song-title">${chosenSong.shortTitle || chosenSong.title}</div>
@@ -923,6 +957,8 @@ function renderVoteCard(vote, matchMap) {
             </div>
             
             <div class="vote-footer">
+                            <span class="vote-tournament">${tournamentName}</span>  <!-- ✅ NEW -->
+
                 <span class="vote-round">Round ${match.round}</span>
                 <a href="/vote.html?id=${vote.matchId}" class="view-match-link">
                     View Match →
@@ -936,11 +972,21 @@ function renderVoteCard(vote, matchMap) {
 // HELPER: Determine vote status
 // ========================================
 
+// ========================================
+// HELPER: Determine vote status
+// ========================================
+
 function getVoteStatus(vote, match) {
-    if (!match || !match.winner) {
-        return 'pending';
+    if (!match) {
+        return 'live';
     }
     
+    // Check if match has a winner
+    if (!match.winner || match.winner === '') {
+        return 'live';  // ✅ Changed from 'pending' to 'live'
+    }
+    
+    // Match is complete - check if user won or lost
     return match.winner === vote.choice ? 'won' : 'lost';
 }
 
@@ -948,20 +994,46 @@ function getVoteStatus(vote, match) {
 // HELPER: Format time ago
 // ========================================
 
+// ========================================
+// HELPER: Format time ago
+// ========================================
+
 function formatTimeAgo(timestamp) {
+    // Handle both Firestore Timestamp objects and raw milliseconds
+    let timeInMs;
+    
+    if (timestamp && typeof timestamp === 'object' && timestamp.toMillis) {
+        // Firestore Timestamp object
+        timeInMs = timestamp.toMillis();
+    } else if (typeof timestamp === 'number') {
+        // Raw timestamp in milliseconds
+        timeInMs = timestamp;
+    } else {
+        console.warn('⚠️ Invalid timestamp:', timestamp);
+        return 'Unknown';
+    }
+    
     const now = Date.now();
-    const diff = now - timestamp;
+    const diff = now - timeInMs;
     
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+    // Handle future timestamps (shouldn't happen, but just in case)
+    if (diff < 0) {
+        return 'Just now';
+    }
     
-    if (minutes < 1) return 'Just now';
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30);
+    
+    if (seconds < 60) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     if (days < 7) return `${days}d ago`;
-    if (days < 30) return `${Math.floor(days / 7)}w ago`;
-    return `${Math.floor(days / 30)}mo ago`;
+    if (weeks < 4) return `${weeks}w ago`;
+    return `${months}mo ago`;
 }
 
 // ========================================
