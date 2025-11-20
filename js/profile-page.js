@@ -1003,6 +1003,10 @@ function renderFilteredVotes(filter) {
 // RENDER VOTE CARD (Activity style)
 // ========================================
 
+// ========================================
+// RENDER VOTE CARD (Activity style)
+// ========================================
+
 function renderVoteCard(vote, matchMap) {
     const match = matchMap.get(vote.matchId);
     
@@ -1015,12 +1019,12 @@ function renderVoteCard(vote, matchMap) {
         `;
     }
     
-    const { song1, song2, winner } = match;
+    const { song1, song2 } = match;
 
-     // ✅ FIX: Get champion with fallback
-    const getChampion = (song) => {
+    // ✅ Helper to get artist/champion name with fallback
+    const getArtistName = (song) => {
         if (!song) return 'Unknown';
-        return song.champion || song.artist || 'League of Legends';
+        return song.artist || song.champion || 'League of Legends';
     };
     
     // ✅ GET THUMBNAILS FROM YOUTUBE (like activity.js)
@@ -1074,8 +1078,10 @@ function renderVoteCard(vote, matchMap) {
     console.log('🖼️ Thumbnails:', {
         chosenSong: chosenSong.title,
         chosenThumbnail,
+        chosenArtist: getArtistName(chosenSong),
         opponentSong: opponentSong.title,
-        opponentThumbnail
+        opponentThumbnail,
+        opponentArtist: getArtistName(opponentSong)
     });
     
     return `
@@ -1095,7 +1101,7 @@ function renderVoteCard(vote, matchMap) {
                     </div>
                     <div class="vote-song-info">
                         <div class="vote-song-title">${chosenSong.shortTitle || chosenSong.title}</div>
-                        <div class="vote-song-meta">${chosenSong.champion} • Seed #${chosenSong.seed}</div>
+                        <div class="vote-song-meta">${getArtistName(chosenSong)} • Seed #${chosenSong.seed}</div>
                     </div>
                 </div>
                 
@@ -1109,7 +1115,7 @@ function renderVoteCard(vote, matchMap) {
                     </div>
                     <div class="vote-song-info">
                         <div class="vote-song-title">${opponentSong.shortTitle || opponentSong.title}</div>
-                        <div class="vote-song-meta">${opponentSong.champion} • Seed #${opponentSong.seed}</div>
+                        <div class="vote-song-meta">${getArtistName(opponentSong)} • Seed #${opponentSong.seed}</div>
                     </div>
                 </div>
             </div>
