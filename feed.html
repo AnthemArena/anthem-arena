@@ -3,25 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Feed - League Music Tournament</title>
+    <title>Community Feed - League Music Tournament | Anthem Arena</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Join the League of Legends music tournament community. See recent votes, follow other fans, and share your picks!">
+    <link rel="canonical" href="https://anthemarena.com/feed">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://anthemarena.com/feed">
+    <meta property="og:title" content="Community Feed | Anthem Arena">
+    <meta property="og:description" content="See what the community is voting for in the LoL music tournament!">
+    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Your existing stylesheets -->
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/navigation.css">
-    
-    <!-- Feed-specific styles -->
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/feed.css">
 </head>
 <body>
-    <!-- Your existing navigation -->
-    <nav id="main-nav"></nav>
     
+    <!-- Navigation -->
+    <div id="nav-placeholder"></div>
+    
+    <!-- Feed Container -->
     <div class="feed-container">
         <!-- Feed Header -->
         <div class="feed-header">
@@ -108,8 +129,36 @@
         </div>
     </aside>
     
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+    
+    <!-- Loading Spinner Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-container">
+            <div class="tournament-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <i class="fas fa-trophy spinner-icon"></i>
+            </div>
+            <p class="spinner-text" id="spinner-text">Loading feed...</p>
+        </div>
+    </div>
+    
     <!-- Scripts -->
+    <!-- Core Scripts -->
     <script type="module" src="/js/navigation.js"></script>
+    <script src="/js/footer.js"></script>
+    
+    <!-- Notification System -->
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
+    
+    <!-- Settings & Features -->
+    <script type="module" src="/js/settings-modal.js"></script>
+    
+    <!-- Feed Specific -->
     <script type="module" src="/js/feed-page.js"></script>
 </body>
 </html>
