@@ -223,30 +223,105 @@ async function updateNavProfile() {
         
         const hasVoted = hasVotedLocal || hasVotedFirebase;
         
+        // ========================================
+        // STATE 1: NOT VOTED YET - Show Locked Profile
+        // ========================================
+        
         if (!hasVoted) {
-            console.log('❌ User hasn\'t voted yet - hiding profile');
-            navProfileContainer.style.display = 'none';
+            console.log('🔒 User hasn\'t voted yet - showing locked state');
+            
+            navProfileCard.innerHTML = `
+                <div class="profile-locked-state">
+                    <div class="locked-icon">🔒</div>
+                    <div class="locked-info">
+                        <div class="locked-title">Profile Locked</div>
+                        <div class="locked-subtitle">Vote to unlock!</div>
+                    </div>
+                </div>
+            `;
+            
+            navProfileCard.title = 'Cast your first vote to unlock your profile and start earning XP!';
+            navProfileCard.style.cursor = 'default';
+            navProfileCard.onclick = (e) => {
+                e.preventDefault();
+                if (window.showNotification) {
+                    window.showNotification('🔒 Cast your first vote to unlock your profile!', 'info');
+                }
+            };
+            
+            navProfileContainer.style.display = 'flex';
             return;
         }
         
-        // Display profile
-        const avatarEl = document.getElementById('navProfileAvatar');
-        if (avatarEl) {
-            if (avatar && avatar.type === 'url') {
-                avatarEl.innerHTML = `
-                    <img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                    <span class="nav-avatar-fallback" style="display: none;">🎵</span>
-                `;
-            } else {
-                avatarEl.textContent = avatar?.value || '🎵';
-            }
+        // ========================================
+        // STATE 2: VOTED BUT NO USERNAME - Show Claim Profile
+        // ========================================
+        
+        if (!username) {
+            console.log('📢 User has voted but no username - showing claim prompt');
+            
+            navProfileCard.innerHTML = `
+                <div class="profile-claim-state">
+                    <div class="claim-icon">✨</div>
+                    <div class="claim-info">
+                        <div class="claim-title">Claim Your Profile!</div>
+                        <div class="claim-subtitle">Set username & avatar</div>
+                    </div>
+                    <div class="claim-arrow">→</div>
+                </div>
+            `;
+            
+            navProfileCard.title = 'Click to set your username and claim your profile!';
+            navProfileCard.style.cursor = 'pointer';
+            navProfileCard.onclick = (e) => {
+                e.preventDefault();
+                window.openSettingsModal();
+            };
+            
+            navProfileContainer.style.display = 'flex';
+            return;
         }
         
-        const usernameEl = document.getElementById('navProfileUsername');
-        if (usernameEl) {
-            usernameEl.textContent = username || 'Voter';
-        }
+        // ========================================
+        // STATE 3: FULL PROFILE - Show Normal Profile
+        // ========================================
+        
+        console.log('✅ Showing full profile for:', username);
+        
+        // Restore original profile card HTML
+        navProfileCard.innerHTML = `
+            <div class="profile-avatar" id="navProfileAvatar">
+                ${avatar && avatar.type === 'url' 
+                    ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
+                           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                       <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
+                    : avatar?.value || '🎵'
+                }
+            </div>
+            
+            <!-- Notification Bell -->
+            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 16px;">
+                <span style="font-size: 20px;">🔔</span>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-username" id="navProfileUsername">${username}</div>
+                <div class="profile-rank-mini">
+                    <div class="rank-progress-bar">
+                        <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
+                    </div>
+                    <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
+                </div>
+            </div>
+            <i class="fas fa-cog profile-settings-icon"></i>
+        `;
+        
+        navProfileCard.style.cursor = 'pointer';
+        navProfileCard.onclick = (e) => {
+            e.preventDefault();
+            window.openSettingsModal();
+        };
         
         // Update rank display
         const currentXP = getUserXPFromStorage();

@@ -332,20 +332,19 @@ function closeUsernameModal() {
 }
 
 /**
- * Backfill past votes to activity collection
+ * Backfill past votes to activity collection AND update existing records
  */
 async function backfillUserActivity(username, avatar, isPublic) {
     if (!isPublic) return;
     
     try {
-        console.log('🔄 Backfilling past votes to activity feed...');
+        console.log('🔄 Backfilling past votes and updating activity feed...');
         
         const { db } = await import('./firebase-config.js');
-        const { doc, setDoc } = await import(
+        const { doc, setDoc, collection, query, where, getDocs, updateDoc } = await import(
             'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
         );
         
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const userId = localStorage.getItem('tournamentUserId');
         
         if (!userId) {
@@ -353,56 +352,120 @@ async function backfillUserActivity(username, avatar, isPublic) {
             return;
         }
         
-        const voteIds = Object.keys(userVotes);
+        let updatedVotes = 0;
+        let updatedActivity = 0;
+        let createdActivity = 0;
         
-        if (voteIds.length === 0) {
-            console.log('📭 No past votes to backfill');
-            return;
-        }
+        // ========================================
+        // 1. UPDATE OLD VOTES IN FIREBASE
+        // ========================================
         
-        console.log(`📦 Backfilling ${voteIds.length} past votes...`);
+        const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
+        const votesSnapshot = await getDocs(votesQuery);
         
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
+        console.log(`📊 Found ${votesSnapshot.size} votes in Firebase`);
         
-        let backfilled = 0;
-        
-        for (const matchId of voteIds) {
-            const voteData = userVotes[matchId];
-            const matchData = matchMap.get(matchId);
+        for (const voteDoc of votesSnapshot.docs) {
+            const voteData = voteDoc.data();
             
-            if (!matchData) {
-                console.warn(`⚠️ Match ${matchId} not found, skipping`);
-                continue;
+            // Update if missing username or is "Anonymous"
+            if (!voteData.username || voteData.username === 'Anonymous') {
+                try {
+                    await updateDoc(doc(db, 'votes', voteDoc.id), {
+                        username: username,
+                        avatar: avatar,
+                        isPublic: isPublic,
+                        backfilledAt: new Date().toISOString()
+                    });
+                    updatedVotes++;
+                } catch (error) {
+                    console.warn(`⚠️ Failed to update vote:`, error);
+                }
             }
-            
-            const votedSong = voteData.songId === 'song1' ? matchData.song1 : matchData.song2;
-            
-            const activityId = `${userId}_${matchId}`;
-            
-            await setDoc(doc(db, 'activity', activityId), {
-                activityId: activityId,
-                userId: userId,
-                username: username,
-                avatar: avatar,
-                matchId: matchId,
-                matchTitle: `${matchData.song1?.shortTitle || 'Song 1'} vs ${matchData.song2?.shortTitle || 'Song 2'}`,
-                songId: voteData.songId,
-                songTitle: votedSong?.shortTitle || voteData.songTitle,
-                timestamp: voteData.timestamp || Date.now(),
-                round: matchData.round || 1,
-                tournamentId: '2025-worlds-anthems',
-                backfilled: true
-            });
-            
-            backfilled++;
         }
         
-        console.log(`✅ Successfully backfilled ${backfilled} votes!`);
+        // ========================================
+        // 2. UPDATE OLD ACTIVITY RECORDS
+        // ========================================
         
-        if (window.showNotification) {
-            window.showNotification(`✨ ${backfilled} past votes added to activity feed!`, 'success');
+        const activityQuery = query(collection(db, 'activity'), where('userId', '==', userId));
+        const activitySnapshot = await getDocs(activityQuery);
+        
+        console.log(`📊 Found ${activitySnapshot.size} activity records`);
+        
+        for (const activityDoc of activitySnapshot.docs) {
+            const activityData = activityDoc.data();
+            
+            // Update if missing username or is "Anonymous"
+            if (!activityData.username || activityData.username === 'Anonymous') {
+                try {
+                    await updateDoc(doc(db, 'activity', activityDoc.id), {
+                        username: username,
+                        avatar: avatar,
+                        isPublic: isPublic,
+                        backfilledAt: new Date().toISOString()
+                    });
+                    updatedActivity++;
+                } catch (error) {
+                    console.warn(`⚠️ Failed to update activity:`, error);
+                }
+            }
+        }
+        
+        // ========================================
+        // 3. CREATE ACTIVITY FOR VOTES WITHOUT IT
+        // ========================================
+        
+        // If votes exist but no activity, create activity records
+        if (votesSnapshot.size > 0 && activitySnapshot.size === 0) {
+            console.log('📝 Creating activity records from votes...');
+            
+            const { getAllMatches } = await import('./api-client.js');
+            const allMatches = await getAllMatches();
+            const matchMap = new Map(allMatches.map(m => [m.id, m]));
+            
+            for (const voteDoc of votesSnapshot.docs) {
+                const vote = voteDoc.data();
+                const match = matchMap.get(vote.matchId);
+                
+                if (!match) {
+                    console.warn(`⚠️ Match ${vote.matchId} not found, skipping`);
+                    continue;
+                }
+                
+                const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
+                const activityId = `${vote.matchId}_${vote.userId}`;
+                
+                try {
+                    await setDoc(doc(db, 'activity', activityId), {
+                        userId: userId,
+                        username: username,
+                        avatar: avatar,
+                        isPublic: isPublic,
+                        matchId: vote.matchId,
+                        songId: votedSong.videoId,
+                        songTitle: votedSong.shortTitle || votedSong.title,
+                        matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
+                        tournamentId: '2025-worlds-anthems',
+                        round: match.round || 1,
+                        timestamp: new Date(vote.timestamp).getTime(),
+                        createdFrom: 'auto-backfill'
+                    });
+                    
+                    createdActivity++;
+                } catch (error) {
+                    console.warn(`⚠️ Failed to create activity:`, error);
+                }
+            }
+        }
+        
+        console.log(`\n✅ Backfill complete!`);
+        console.log(`   Updated ${updatedVotes} votes`);
+        console.log(`   Updated ${updatedActivity} activity records`);
+        console.log(`   Created ${createdActivity} new activity records`);
+        
+        if (window.showNotification && (updatedVotes > 0 || updatedActivity > 0 || createdActivity > 0)) {
+            window.showNotification(`✨ ${updatedVotes + updatedActivity + createdActivity} past votes linked to your profile!`, 'success');
         }
         
     } catch (error) {

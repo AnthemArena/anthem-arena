@@ -1397,3 +1397,139 @@
     font-size: 0.85rem;
     opacity: 0.6;
 }
+/* ========================================
+   PROFILE LOCKED STATE
+   ======================================== */
+
+.profile-locked-state {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(50, 50, 50, 0.8), rgba(30, 30, 30, 0.8));
+    border-radius: 8px;
+    border: 2px solid rgba(100, 100, 100, 0.3);
+}
+
+.locked-icon {
+    font-size: 28px;
+    opacity: 0.6;
+    animation: lockPulse 2s ease-in-out infinite;
+}
+
+@keyframes lockPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.locked-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.locked-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #999;
+}
+
+.locked-subtitle {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* ========================================
+   PROFILE CLAIM STATE
+   ======================================== */
+
+.profile-claim-state {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(180, 150, 90, 0.2));
+    border-radius: 8px;
+    border: 2px solid rgba(200, 170, 110, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: claimGlow 2s ease-in-out infinite;
+}
+
+.profile-claim-state:hover {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(180, 150, 90, 0.3));
+    border-color: rgba(200, 170, 110, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+}
+
+@keyframes claimGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(200, 170, 110, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(200, 170, 110, 0.6); }
+}
+
+.claim-icon {
+    font-size: 28px;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.2) rotate(-10deg); }
+    75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.claim-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.claim-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #C8AA6E;
+    text-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
+}
+
+.claim-subtitle {
+    font-size: 0.8rem;
+    color: #B8AA8E;
+}
+
+.claim-arrow {
+    font-size: 1.2rem;
+    color: #C8AA6E;
+    animation: arrowBounce 1s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .profile-locked-state,
+    .profile-claim-state {
+        padding: 6px 12px;
+        gap: 8px;
+    }
+    
+    .locked-icon,
+    .claim-icon {
+        font-size: 24px;
+    }
+    
+    .locked-title,
+    .claim-title {
+        font-size: 0.85rem;
+    }
+    
+    .locked-subtitle,
+    .claim-subtitle {
+        font-size: 0.75rem;
+    }
+}
