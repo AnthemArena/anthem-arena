@@ -145,10 +145,10 @@ async function updateNavProfile() {
     const navProfileContainer = document.getElementById('navProfileContainer');
     const navProfileCard = document.getElementById('navProfileCard');
     
-    console.log('🔄 Updating nav profile display...');
+    console.log('Updating nav profile display...');
     
     if (!navProfileCard || !navProfileContainer) {
-        console.error('❌ Profile elements not found in DOM');
+        console.error('Profile elements not found in DOM');
         return;
     }
     
@@ -163,7 +163,7 @@ async function updateNavProfile() {
         
         // If not in localStorage, try loading from Firebase
         if (!username && userId) {
-            console.log('📥 Loading profile from Firebase...');
+            console.log('Loading profile from Firebase...');
             try {
                 const { db } = await import('./firebase-config.js');
                 const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -180,10 +180,10 @@ async function updateNavProfile() {
                     localStorage.setItem('tournamentUsername', username);
                     localStorage.setItem('avatar', JSON.stringify(avatar));
                     
-                    console.log('✅ Profile loaded from Firebase:', username);
+                    console.log('Profile loaded from Firebase:', username);
                 }
             } catch (error) {
-                console.warn('⚠️ Could not load profile from Firebase:', error);
+                console.warn('Could not load profile from Firebase:', error);
             }
         }
         
@@ -192,7 +192,7 @@ async function updateNavProfile() {
             try {
                 avatar = JSON.parse(avatarJson);
             } catch {
-                avatar = { type: 'emoji', value: '🎵' };
+                avatar = { type: 'emoji', value: 'Music Note' };
             }
         }
         
@@ -203,12 +203,11 @@ async function updateNavProfile() {
         let hasVotedFirebase = false;
         
         if (userId && !hasVotedLocal) {
-            console.log('🔍 Checking Firebase for votes...');
+            console.log('Checking Firebase for votes...');
             try {
                 const { db } = await import('./firebase-config.js');
                 const { collection, query, where, getDocs, limit } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
                 
-                // Check if user has any votes in Firebase
                 const votesQuery = query(
                     collection(db, 'votes'), 
                     where('userId', '==', userId),
@@ -218,10 +217,10 @@ async function updateNavProfile() {
                 hasVotedFirebase = !votesSnapshot.empty;
                 
                 if (hasVotedFirebase) {
-                    console.log('✅ User has votes in Firebase');
+                    console.log('User has votes in Firebase');
                 }
             } catch (error) {
-                console.warn('⚠️ Could not check Firebase votes:', error);
+                console.warn('Could not check Firebase votes:', error);
             }
         }
         
@@ -232,11 +231,11 @@ async function updateNavProfile() {
         // ========================================
         
         if (!hasVoted) {
-            console.log('🔒 User hasn\'t voted yet - showing locked state');
+            console.log("User hasn't voted yet - showing locked state");
             
             navProfileCard.innerHTML = `
                 <div class="profile-locked-state">
-                    <div class="locked-icon">🔒</div>
+                    <div class="locked-icon">Locked</div>
                     <div class="locked-info">
                         <div class="locked-title">Profile Locked</div>
                         <div class="locked-subtitle">Vote to unlock!</div>
@@ -249,7 +248,7 @@ async function updateNavProfile() {
             navProfileCard.onclick = (e) => {
                 e.preventDefault();
                 if (window.showNotification) {
-                    window.showNotification('🔒 Cast your first vote to unlock your profile!', 'info');
+                    window.showNotification('Cast your first vote to unlock your profile!', 'info');
                 }
             };
             
@@ -262,16 +261,16 @@ async function updateNavProfile() {
         // ========================================
         
         if (!username) {
-            console.log('📢 User has voted but no username - showing claim prompt');
+            console.log('User has voted but no username - showing claim prompt');
             
             navProfileCard.innerHTML = `
                 <div class="profile-claim-state">
-                    <div class="claim-icon">✨</div>
+                    <div class="claim-icon">Sparkles</div>
                     <div class="claim-info">
                         <div class="claim-title">Claim Your Profile!</div>
                         <div class="claim-subtitle">Set username & avatar</div>
                     </div>
-                    <div class="claim-arrow">→</div>
+                    <div class="claim-arrow">Right Arrow</div>
                 </div>
             `;
             
@@ -289,47 +288,50 @@ async function updateNavProfile() {
         // ========================================
         // STATE 3: FULL PROFILE - Show Normal Profile
         // ========================================
-        
-        console.log('✅ Showing full profile for:', username);
-        
+
+        console.log('Showing full profile for:', username);
+
         // Restore original profile card HTML
         navProfileCard.innerHTML = `
-            <div class="profile-avatar" id="navProfileAvatar">
-                ${avatar && avatar.type === 'url' 
-                    ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
-                           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                       <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
-                    : avatar?.value || '🎵'
-                }
-            </div>
+            <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
+                <div class="profile-avatar" id="navProfileAvatar">
+                    ${avatar && avatar.type === 'url' 
+                        ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
+                               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                           <span class="nav-avatar-fallback" style="display: none;">Music Note</span>`
+                        : `<span class="nav-avatar-emoji">${avatar?.value || 'Music Note'}</span>`
+                    }
+                </div>
+                
+                <div class="profile-info">
+                    <div class="profile-username" id="navProfileUsername">${username}</div>
+                    <div class="profile-rank-mini">
+                        <div class="rank-progress-bar">
+                            <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
+                        </div>
+                        <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
+                    </div>
+                </div>
+            </a>
             
             <!-- Notification Bell -->
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 16px;">
-                <span style="font-size: 20px;">🔔</span>
+            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer;">
+                <span style="font-size: 20px;">Bell</span>
                 <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
             </div>
             
-            <div class="profile-info">
-                <div class="profile-username" id="navProfileUsername">${username}</div>
-                <div class="profile-rank-mini">
-                    <div class="rank-progress-bar">
-                        <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
-                    </div>
-                    <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
-                </div>
-            </div>
-            <i class="fas fa-cog profile-settings-icon"></i>
+            <!-- Settings Button -->
+            <button class="nav-settings-btn" onclick="window.openSettingsModal()" title="Profile Settings">
+                <i class="fas fa-cog"></i>
+            </button>
         `;
-        
-        navProfileCard.style.cursor = 'pointer';
-        navProfileCard.onclick = (e) => {
-            e.preventDefault();
-            window.openSettingsModal();
-        };
-        
+
+        // Remove old onclick handler
+        navProfileCard.onclick = null;
+
         // Update rank display
         const currentXP = getUserXPFromStorage();
-        
+
         if (currentXP > 0) {
             const rank = getUserRank(currentXP);
             
@@ -345,21 +347,24 @@ async function updateNavProfile() {
             }
             
             const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
-            if (rank.nextLevel) {
-                navProfileCard.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (${rank.progressXP}/${rank.xpForNextLevel} to next level)`;
-            } else {
-                navProfileCard.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (Maximum level!)`;
+            const profileLink = navProfileCard.querySelector('.nav-profile-link');
+            if (profileLink) {
+                if (rank.nextLevel) {
+                    profileLink.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (${rank.progressXP}/${rank.xpForNextLevel} to next level)\n\nClick to view your profile`;
+                } else {
+                    profileLink.title = `${cleanTitle} - Level ${rank.currentLevel.level}\n${currentXP.toLocaleString()} XP (Maximum level!)\n\nClick to view your profile`;
+                }
             }
         }
-        
+
         navProfileContainer.style.display = 'flex';
-        console.log('✅ Profile display updated successfully');
-        
-    } catch (error) {
-        console.error('❌ Error updating nav profile:', error);
-        navProfileContainer.style.display = 'none';
+        console.log('Profile display updated successfully');
+
+    } catch (err) {
+        console.error('Unexpected error in updateNavProfile:', err);
     }
-}
+} // ← This closes the async function
+  // ← This was missing in your original code!
 
 // ========================================
 // EXPORT FOR USE IN OTHER FILES

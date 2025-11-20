@@ -148,11 +148,10 @@ function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
     
-    // ✅ Determine what image to show
+    // Determine what image to show
     let imageHtml = '';
     
     if (notification.thumbnailUrl) {
-        // Song thumbnail with icon overlay
         imageHtml = `
             <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; margin-right: 8px;">
                 <img src="${notification.thumbnailUrl}" 
@@ -163,7 +162,6 @@ function renderNotificationItem(notification) {
             </div>
         `;
     } else if (notification.triggerUsername) {
-        // User avatar with first letter
         const initial = notification.triggerUsername.charAt(0).toUpperCase();
         const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
         const colorIndex = notification.triggerUsername.charCodeAt(0) % colors.length;
@@ -180,15 +178,12 @@ function renderNotificationItem(notification) {
             </div>
         `;
     } else {
-        // Fallback to just icon
         imageHtml = `<span class="notification-item-icon" style="font-size: 20px; margin-right: 8px;">${notification.icon}</span>`;
     }
     
-    // ✅ Determine CTA button HTML based on action availability
+    // Determine CTA button HTML
     let ctaHtml = '';
-    
     if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
-        // Will be populated by async check
         ctaHtml = `
             <button class="notification-item-cta" 
                     data-id="${notification.id}"
@@ -199,7 +194,6 @@ function renderNotificationItem(notification) {
             </button>
         `;
     } else {
-        // Standard navigation button
         ctaHtml = `
             <button class="notification-item-cta" 
                     data-id="${notification.id}"
@@ -216,13 +210,24 @@ function renderNotificationItem(notification) {
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
                     <div class="notification-item-message">${notification.message}</div>
+                    
+                    <!-- ADD THIS: Clickable username below message -->
+                    ${notification.triggerUsername ? `
+                        <a href="/profile?user=${notification.triggerUsername}" 
+                           style="color: #C8AA6E; text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-block; font-size: 0.85rem;"
+                           onclick="event.stopPropagation();">
+                            User ${notification.triggerUsername}
+                        </a>
+                    ` : ''}
                 </div>
-                <button class="notification-item-dismiss" data-id="${notification.id}">✕</button>
+                <button class="notification-item-dismiss" data-id="${notification.id}">Dismiss</button>
             </div>
+            
             ${notification.detail ? `<div class="notification-item-detail">${notification.detail}</div>` : ''}
-<div class="notification-item-footer">
+            
+            <div class="notification-item-footer">
                 <span class="notification-item-time">${timeAgo}</span>
-                ${renderCtaButton(notification)}
+            ${renderCtaButton(notification)}
             </div>
         </div>
     `;
@@ -502,6 +507,13 @@ function showMessageComposer(toUserId, toUsername, context = {}) {
                 <h3 style="margin: 0; color: #C8AA6E; font-size: 1.2rem;">
                     💬 Message ${toUsername}
                 </h3>
+                  <a href="/profile?user=${toUsername}" 
+                   style="color: #888; text-decoration: none; font-size: 0.85rem; border: 1px solid rgba(200, 170, 110, 0.3); padding: 4px 8px; border-radius: 4px; transition: all 0.2s;"
+                   onmouseover="this.style.color='#C8AA6E'; this.style.borderColor='#C8AA6E';"
+                   onmouseout="this.style.color='#888'; this.style.borderColor='rgba(200, 170, 110, 0.3)';">
+                    👤 View Profile
+                </a>
+            </div>
                 <button id="closeComposer" style="
                     background: none;
                     border: none;

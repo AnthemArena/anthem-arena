@@ -834,7 +834,14 @@ const notificationData = {
     } : {},
     targetUrl: `/vote.html?match=${latestActivity.matchId}`,
     relationship: hasVoted ? (isAlly ? 'ally' : 'opponent') : null,
-    shownAsToast: true
+    shownAsToast: true,
+    
+    // ✅ NEW: Add secondary action to view profile
+    secondaryCta: {
+        text: `View ${latestActivity.username}'s Profile`,
+        action: 'navigate',
+        url: `/profile?user=${latestActivity.username}`
+    }
 };
 
 // Save to Firestore for notification center
@@ -1246,6 +1253,28 @@ function showBulletin(notification) {
     transform: scale(0.98);
 }
 
+.bulletin-toast-cta-secondary {
+    width: 100%;
+    background: rgba(200, 170, 110, 0.15);
+    color: #C8AA6E;
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    padding: 0.75rem;
+    border-radius: 0 0 12px 12px;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: -1px; /* Overlap border with primary CTA */
+}
+
+.bulletin-toast-cta-secondary:hover {
+    background: rgba(200, 170, 110, 0.25);
+    border-color: #C8AA6E;
+}
+
 /* ========================================
    ACHIEVEMENT-SPECIFIC TOAST STYLING
 ======================================== */
@@ -1525,6 +1554,12 @@ function showBulletin(notification) {
             <button class="bulletin-toast-cta level-cta" onclick="window.handleBulletinCTA()">
                 ${notification.cta || 'View Progress'}
             </button>
+            ${notification.secondaryCta ? `
+                <button class="bulletin-toast-cta-secondary" 
+                        onclick="window.location.href='${notification.secondaryCta.url}'">
+                    ${notification.secondaryCta.text}
+                </button>
+            ` : ''}
         `;
         
         banner.className = 'bulletin-banner level-up show';
