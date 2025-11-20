@@ -241,7 +241,6 @@ function renderVoteCard(activity) {
         <div class="vote-card">
             <div class="vote-thumbnail">
                 <img src="${thumbnailUrl}" alt="${songTitle}" loading="lazy" />
-                <div class="vote-indicator">✓</div>
             </div>
             
             <div class="vote-user">

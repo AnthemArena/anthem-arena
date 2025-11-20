@@ -191,44 +191,6 @@
 }
 
 /* ========================================
-   VOTE INDICATOR - Checkmark on thumbnail
-   ======================================== */
-
-.vote-indicator {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    background: rgba(76, 175, 80, 0.95);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    animation: voteBadgePulse 2s ease-in-out infinite;
-}
-
-@keyframes voteBadgePulse {
-    0%, 100% { 
-        transform: scale(1);
-        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-    }
-    50% { 
-        transform: scale(1.1);
-        box-shadow: 0 2px 12px rgba(76, 175, 80, 0.7);
-    }
-}
-
-.vote-card:hover .vote-indicator {
-    background: rgba(76, 175, 80, 1);
-    transform: scale(1.15);
-}
-
-/* ========================================
    USER INFO - Avatar + Username + Time
    ======================================== */
 
@@ -285,7 +247,6 @@
     font-size: 0.75rem;
     white-space: nowrap;
 }
-
 /* ========================================
    SONG INFO - Title with VS display
    ======================================== */
@@ -325,50 +286,25 @@
     padding: 0 0.25rem;
 }
 
-/* Voted song - green highlight */
+/* Voted song - keep gold */
 .voted-song {
-    color: #4CAF50 !important;
-    font-weight: 700;
-    text-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
-    position: relative;
-    padding-left: 1.25rem;
+    color: #C8AA6E !important;
+    font-weight: 600;
 }
 
-.voted-song::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #4CAF50;
-    font-size: 1rem;
-    font-weight: bold;
-    animation: checkPulse 2s ease-in-out infinite;
-}
-
-@keyframes checkPulse {
-    0%, 100% { 
-        opacity: 0.8; 
-        transform: scale(1); 
-    }
-    50% { 
-        opacity: 1; 
-        transform: scale(1.15); 
-    }
-}
-
-/* Non-voted song - dimmed */
+/* Non-voted song - dimmed gray */
 .not-voted-song {
     color: rgba(255, 255, 255, 0.4) !important;
     font-weight: 400;
 }
 
-/* Hover effects */
+/* Hover effects - subtle enhancement */
 .vote-card:hover .voted-song {
-    color: #5FD068 !important;
-    text-shadow: 0 0 16px rgba(76, 175, 80, 0.6);
+    color: #D4B87A !important;
 }
 
 .vote-card:hover .not-voted-song {
-    color: rgba(255, 255, 255, 0.25) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* ========================================
