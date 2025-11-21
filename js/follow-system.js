@@ -19,7 +19,7 @@ import {
 // ========================================
 
 export async function followUser(targetUserId, targetUsername) {
-    const currentUserId = localStorage.getItem('userId');
+    const currentUserId = localStorage.getItem('tournamentUserId');
     const currentUsername = localStorage.getItem('username');
     
     if (!currentUserId || currentUserId === 'anonymous') {
@@ -71,7 +71,7 @@ export async function followUser(targetUserId, targetUsername) {
 // ========================================
 
 export async function unfollowUser(targetUserId) {
-    const currentUserId = localStorage.getItem('userId');
+    const currentUserId = localStorage.getItem('tournamentUserId');
     
     if (!currentUserId || currentUserId === 'anonymous') {
         console.error('❌ Must be logged in to unfollow users');
@@ -96,7 +96,7 @@ export async function unfollowUser(targetUserId) {
 // ========================================
 
 export async function isFollowing(targetUserId) {
-    const currentUserId = localStorage.getItem('userId');
+    const currentUserId = localStorage.getItem('tournamentUserId');
     
     if (!currentUserId || currentUserId === 'anonymous') {
         return false;
