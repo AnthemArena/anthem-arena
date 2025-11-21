@@ -2,6 +2,7 @@
 // FEED PAGE - UI CONTROLLER
 // League Music Tournament
 // ========================================
+import { initializeFeedWidgets, setupSidebarInteractions } from './feed-widgets.js';
 
 import { 
     getFeed, 
