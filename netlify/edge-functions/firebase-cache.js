@@ -454,24 +454,32 @@ async function handleActivityFeed(request) {
       body: JSON.stringify({
         structuredQuery: {
           from: [{ collectionId: 'activity' }],
-          // ✅ ADD THIS WHERE CLAUSE
           where: {
-            fieldFilter: {
-              field: { fieldPath: 'isPublic' },
-              op: 'EQUAL',
-              value: { booleanValue: true }
+            compositeFilter: {
+              op: 'AND',
+              filters: [
+                {
+                  fieldFilter: {
+                    field: { fieldPath: 'isPublic' },
+                    op: 'EQUAL',
+                    value: { booleanValue: true }
+                  }
+                }
+              ]
             }
           },
-          orderBy: [{ 
-            field: { fieldPath: 'timestamp' }, 
-            direction: 'DESCENDING' 
-          }],
+          orderBy: [
+            { field: { fieldPath: 'isPublic' }, direction: 'ASCENDING' },
+            { field: { fieldPath: 'timestamp' }, direction: 'DESCENDING' }
+          ],
           limit: limit
         }
       })
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Firebase response:', errorText);
       throw new Error(`Firebase error: ${response.status}`);
     }
     
