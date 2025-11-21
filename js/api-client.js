@@ -137,7 +137,7 @@ export async function getTotalVotes() {
 /**
  * Get activity feed (cached at edge)
  */
-export async function getActivityFeed(limit = 50) {
+export async function getActivityFeed(limit = 200) {  // Default now 200
     try {
         console.log(`📊 Fetching activity feed (limit: ${limit})...`);
         

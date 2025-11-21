@@ -146,7 +146,7 @@ async function loadActivityFeed() {
         console.log('📥 Loading activity feed...');
         
         // Fetch from edge-cached API
-        allActivities = await getActivityFeed(100);
+        allActivities = await getActivityFeed(200);
         
         if (allActivities.length === 0) {
             document.getElementById('no-activity').style.display = 'flex';
@@ -175,7 +175,7 @@ function renderActivityFeed(activities) {
     const container = document.getElementById('activity-feed');
     
     // Get current user ID for "my votes" filter
-    const currentUserId = localStorage.getItem('userId');
+const currentUserId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
     
     const filteredActivities = activities.filter(activity => {
         if (currentFilter === 'all') return true;
