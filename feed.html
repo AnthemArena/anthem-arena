@@ -3,163 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Feed - League Music Tournament | Anthem Arena</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Join the League of Legends music tournament community. See recent votes, follow other fans, and share your picks!">
-    <link rel="canonical" href="https://anthemarena.com/feed">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://anthemarena.com/feed">
-    <meta property="og:title" content="Community Feed | Anthem Arena">
-    <meta property="og:description" content="See what the community is voting for in the LoL music tournament!">
-    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Stylesheets -->
+    <title>Community Feed | Anthem Arena</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="/css/settings.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/settings.css">
     <link rel="stylesheet" href="/css/feed.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    
-    <!-- Navigation -->
     <div id="nav-placeholder"></div>
-    
-    <!-- Feed Container -->
-    <div class="feed-container">
-        <!-- Feed Header -->
-        <div class="feed-header">
-            <h1 class="feed-title">
-                <i class="fa-solid fa-fire"></i>
-                Community Feed
-            </h1>
-            
-            <!-- Filter Tabs -->
-            <div class="feed-filters">
-                <button class="filter-btn active" data-filter="all">
-                    <i class="fa-solid fa-globe"></i>
-                    All Activity
-                </button>
-                <button class="filter-btn" data-filter="following">
-                    <i class="fa-solid fa-users"></i>
-                    Following
-                </button>
-                <button class="filter-btn" data-filter="trending">
-                    <i class="fa-solid fa-fire"></i>
-                    Trending
-                </button>
-            </div>
-        </div>
-        
-        <!-- Create Post Box (if logged in) -->
-        <div class="create-post-box" id="createPostBox" style="display: none;">
-            <div class="post-header">
-                <img src="" alt="Your avatar" class="user-avatar" id="createPostAvatar">
-                <input type="text" 
-                       placeholder="Share your thoughts on the tournament..." 
-                       class="post-input"
-                       id="postInput"
-                       maxlength="280">
-            </div>
-            <div class="post-actions">
-                <button class="post-btn" id="submitPostBtn">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    Post
-                </button>
-                <span class="char-count" id="charCount">280</span>
-            </div>
-        </div>
-        
-        <!-- Feed Posts -->
-        <div class="feed-posts" id="feedPosts">
-            <!-- Loading state -->
-            <div class="loading-state" id="loadingState">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <p>Loading feed...</p>
-            </div>
-            
-            <!-- Empty state -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <i class="fa-solid fa-comment-slash"></i>
-                <h3>No posts yet</h3>
-                <p>Be the first to vote and share your picks!</p>
-                <a href="/vote.html" class="cta-btn">
-                    <i class="fa-solid fa-trophy"></i>
-                    Start Voting
-                </a>
-            </div>
-            
-            <!-- Posts will be inserted here dynamically -->
-        </div>
-        
-        <!-- Load More Button -->
-        <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-            <button class="load-more-btn" id="loadMoreBtn">
-                <i class="fa-solid fa-chevron-down"></i>
-                Load More Posts
-            </button>
-        </div>
-    </div>
-    
-    <!-- Who's Online Sidebar (optional) -->
-    <aside class="online-sidebar" id="onlineSidebar">
-        <h3 class="sidebar-title">
-            <i class="fa-solid fa-circle online-indicator"></i>
-            Who's Online
-        </h3>
-        <div class="online-users" id="onlineUsers">
-            <!-- Populated dynamically -->
-        </div>
-    </aside>
-    
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
-    
-    <!-- Loading Spinner Overlay -->
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
-        <div class="spinner-container">
-            <div class="tournament-spinner">
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-                <i class="fas fa-trophy spinner-icon"></i>
-            </div>
-            <p class="spinner-text" id="spinner-text">Loading feed...</p>
-        </div>
-    </div>
-    
-    <!-- Scripts -->
-    <!-- Core Scripts -->
     <script type="module" src="/js/navigation.js"></script>
+
+    <!-- 3-COLUMN LAYOUT -->
+    <main class="feed-page-layout">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside class="feed-sidebar-left">
+            <!-- User Profile Card -->
+            <div class="sidebar-profile-card">
+                <div class="profile-header-bg"></div>
+                <div class="profile-content">
+                    <img id="sidebarAvatar" src="" alt="Avatar" class="sidebar-avatar">
+                    <h3 id="sidebarUsername" class="sidebar-username">Loading...</h3>
+                    <p id="sidebarBio" class="sidebar-bio">Music Tournament Enthusiast</p>
+                    
+                    <div class="profile-stats">
+                        <a href="/profile" class="stat-item">
+                            <span class="stat-value" id="sidebarVotes">0</span>
+                            <span class="stat-label">Votes</span>
+                        </a>
+                        <a href="/profile?tab=following" class="stat-item">
+                            <span class="stat-value" id="sidebarFollowing">0</span>
+                            <span class="stat-label">Following</span>
+                        </a>
+                        <a href="/profile?tab=followers" class="stat-item">
+                            <span class="stat-value" id="sidebarFollowers">0</span>
+                            <span class="stat-label">Followers</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Nav -->
+            <nav class="sidebar-nav">
+                <a href="/profile" class="nav-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="sidebarNotifications">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
+                    <span class="nav-badge" id="sidebarNotifBadge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" id="sidebarMessages">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Messages</span>
+                    <span class="nav-badge" id="sidebarMsgBadge" style="display: none;">0</span>
+                </a>
+                <a href="/activity" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Activity</span>
+                </a>
+                <a href="/matches" class="nav-item">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Matches</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- CENTER FEED -->
+        <section class="feed-center">
+            <div class="feed-header">
+                <h1 class="feed-title"><i class="fa-solid fa-users"></i> Community Feed</h1>
+                
+                <!-- Filter Tabs -->
+                <div class="feed-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fa-solid fa-globe"></i> All Posts
+                    </button>
+                    <button class="filter-btn" data-filter="following">
+                        <i class="fa-solid fa-user-group"></i> Following
+                    </button>
+                    <button class="filter-btn" data-filter="trending">
+                        <i class="fa-solid fa-fire"></i> Trending
+                    </button>
+                </div>
+            </div>
+
+            <!-- Create Post -->
+            <div id="createPostBox" class="create-post-box" style="display: none;">
+                <div class="post-header">
+                    <img id="createPostAvatar" src="" alt="You" class="user-avatar">
+                    <input type="text" id="postInput" class="post-input" placeholder="Share your thoughts..." maxlength="280">
+                </div>
+                <div class="post-actions">
+                    <span id="charCount" class="char-count">280</span>
+                    <button id="submitPostBtn" class="post-btn" disabled>
+                        <i class="fa-solid fa-paper-plane"></i> Post
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feed Posts -->
+            <div id="feedPosts" class="feed-posts">
+                <div id="loadingState" class="loading-state">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <p>Loading feed...</p>
+                </div>
+                
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fa-solid fa-box-open"></i>
+                    <h3>No Posts Yet</h3>
+                    <p>Be the first to share your vote or start a conversation!</p>
+                    <a href="/matches" class="cta-btn">
+                        <i class="fa-solid fa-play"></i> Start Voting
+                    </a>
+                </div>
+            </div>
+
+            <!-- Load More -->
+            <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+                <button id="loadMoreBtn" class="load-more-btn">
+                    <i class="fa-solid fa-arrow-down"></i> Load More
+                </button>
+            </div>
+        </section>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="feed-sidebar-right">
+            <!-- Live Matches -->
+            <div class="sidebar-widget live-matches-widget">
+                <div class="widget-header">
+                    <h3><i class="fa-solid fa-circle" style="color: #e74c3c; animation: pulse 2s infinite;"></i> Live Matches</h3>
+                </div>
+                <div id="liveMatchesWidget" class="widget-content">
+                    <p class="widget-loading">Loading matches...</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="sidebar-widget recent-activity-widget">
+                <div class="widget-header">
+                    <h3><i class="fa-solid fa-bolt"></i> Recent Activity</h3>
+                </div>
+                <div id="recentActivityWidget" class="widget-content">
+                    <p class="widget-loading">Loading activity...</p>
+                </div>
+            </div>
+
+            <!-- Tournament Stats -->
+            <div class="sidebar-widget stats-widget">
+                <div class="widget-header">
+                    <h3><i class="fa-solid fa-chart-bar"></i> Tournament Stats</h3>
+                </div>
+                <div class="widget-content">
+                    <div class="stat-row">
+                        <span class="stat-label">Total Votes</span>
+                        <span class="stat-value" id="widgetTotalVotes">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Active Voters</span>
+                        <span class="stat-value" id="widgetActiveVoters">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Matches Completed</span>
+                        <span class="stat-value" id="widgetCompletedMatches">-</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
-    
-    <!-- Notification System -->
     <script type="module" src="/js/notification-storage.js"></script>
     <script type="module" src="/js/notification-center.js"></script>
     <script type="module" src="/js/global-notifications.js"></script>
-    
-    <!-- Settings & Features -->
+    <script type="module" src="/js/feed.js"></script>
+    <script type="module" src="/js/feed-widgets.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
-    
-    
-    <!-- Feed Specific -->
-    <script type="module" src="/js/feed-page.js"></script>
 </body>
 </html>

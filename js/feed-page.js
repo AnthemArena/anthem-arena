@@ -28,6 +28,10 @@ const POSTS_PER_PAGE = 20;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 Feed page loading...');
+
+      // Initialize widgets FIRST
+    await initializeFeedWidgets();
+    setupSidebarInteractions();
     
     // Check if user is logged in
     checkLoginStatus();
