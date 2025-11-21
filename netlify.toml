@@ -86,10 +86,21 @@
   to = "/blog.html"
   status = 200
 
-  # ✅ ADD THIS: Profile routes with username
+# Profile routes with username
 [[redirects]]
   from = "/@:username"
   to = "/profile.html?user=:username"
+  status = 200
+
+# Activity and Feed routes
+[[redirects]]
+  from = "/activity"
+  to = "/activity.html"
+  status = 200
+
+[[redirects]]
+  from = "/feed"
+  to = "/feed.html"
   status = 200
 
 # Existing routes

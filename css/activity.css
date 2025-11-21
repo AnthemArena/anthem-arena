@@ -87,8 +87,14 @@
    FILTERS
    ======================================== */
 
+/* ========================================
+   FILTERS - CENTERED
+   ======================================== */
+
 .activity-filters {
     display: flex;
+    justify-content: center;  /* ← Add this */
+    align-items: center;      /* ← Add this */
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
