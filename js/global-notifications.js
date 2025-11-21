@@ -719,92 +719,91 @@ async function checkRecentVotes() {
             ? `https://img.youtube.com/vi/${latestActivity.songId}/mqdefault.jpg`
             : null;
         
-        // ========================================
-        // CHECK USER'S VOTE STATUS IN THIS MATCH
-        // ========================================
-        
-        // Check if current user has voted in this match
-        const userVoteKey = `vote-${latestActivity.matchId}`;
-        const userVotedSongId = localStorage.getItem(userVoteKey);
-        const hasVoted = !!userVotedSongId;
-        
-        let message, detail, cta, icon;
-        
-        if (!hasVoted) {
-            // ========================================
-            // USER HASN'T VOTED YET - INVITE THEM IN
-            // ========================================
-            message = `${latestActivity.username} just voted!`;
-            detail = `New vote in ${latestActivity.matchTitle}`;
-            cta = 'Cast Your Vote!';
-            icon = '🗳️';
-            
-        } else {
-            // User HAS voted - check if they're allies or opponents
-            const isAlly = userVotedSongId === latestActivity.songId;
-            
-            if (isAlly) {
-                // ========================================
-                // ALLY - They voted for YOUR song!
-                // ========================================
-                const allyMessages = [
-                    `Reinforcements! ${latestActivity.username} just backed "${latestActivity.songTitle}"!`,
-                    `${latestActivity.username} joined your side! Voted for "${latestActivity.songTitle}"`,
-                    `Your choice is gaining momentum! ${latestActivity.username} voted "${latestActivity.songTitle}"`,
-                    `Alliance formed! ${latestActivity.username} also picked "${latestActivity.songTitle}"`
-                ];
-                
-                const allyDetails = [
-                    `${latestActivity.matchTitle}`,
-                    `Standing with you in ${latestActivity.matchTitle}`,
-                    `Fighting for the same side!`
-                ];
-                
-                const allyButtons = [
-                    'Send Thanks! 🤝',
-                    'Give Props 👊',
-                    'Show Support ✨',
-                    'High Five! 🙌'
-                ];
-                
-                message = allyMessages[Math.floor(Math.random() * allyMessages.length)];
-                detail = allyDetails[Math.floor(Math.random() * allyDetails.length)];
-                cta = allyButtons[Math.floor(Math.random() * allyButtons.length)];
-                icon = '🤝';
-                
-            } else {
-              // ========================================
-    // OPPONENT - They voted AGAINST your song!
+// ========================================
+// CHECK USER'S VOTE STATUS IN THIS MATCH
+// ========================================
+
+// Check if current user has voted in this match
+const userVoteKey = `vote-${latestActivity.matchId}`;
+const userVotedSongId = localStorage.getItem(userVoteKey);
+const hasVoted = !!userVotedSongId;
+
+let message, detail, cta, icon;
+
+if (!hasVoted) {
     // ========================================
+    // USER HASN'T VOTED YET - INVITE THEM IN
+    // ========================================
+    message = `${latestActivity.username} just voted!`;
+    detail = `New vote in ${latestActivity.matchTitle}`;
+    cta = 'Cast Your Vote!';
+    icon = '🗳️';
     
-    // Keep it simple and social - focus on the PERSON'S ACTION
-    const opponentMessages = [
-        `${latestActivity.username} just voted against you!`,
-        `${latestActivity.username} challenged your pick with "${latestActivity.songTitle}"`,
-        `Rival spotted! ${latestActivity.username} backed "${latestActivity.songTitle}"`,
-        `${latestActivity.username} picked the other side in "${latestActivity.songTitle}"`
-    ];
+} else {
+    // User HAS voted - check if they're allies or opponents
+    const isAlly = userVotedSongId === latestActivity.songId;
     
-    const opponentDetails = [
-        `In ${latestActivity.matchTitle}`,
-        `The battle continues in ${latestActivity.matchTitle}`,
-        `${latestActivity.matchTitle} - rivalry grows`
-    ];
-    
-     const opponentButtons = [
-        'View Match 👀',
-        'Check the Battle ⚡',
-        'See the Score 📊',
-        'Go to Match 🎯'
-    ];
-    
-    message = opponentMessages[Math.floor(Math.random() * opponentMessages.length)];
-    detail = opponentDetails[Math.floor(Math.random() * opponentDetails.length)];
-    cta = opponentButtons[Math.floor(Math.random() * opponentButtons.length)];
-    icon = '⚔️';
-}
-        }
+    if (isAlly) {
+        // ========================================
+        // ALLY - They voted for YOUR song!
+        // ========================================
+        const allyMessages = [
+            `Reinforcements! ${latestActivity.username} just backed "${latestActivity.songTitle}"!`,
+            `${latestActivity.username} joined your side! Voted for "${latestActivity.songTitle}"`,
+            `Your choice is gaining momentum! ${latestActivity.username} voted "${latestActivity.songTitle}"`,
+            `Alliance formed! ${latestActivity.username} also picked "${latestActivity.songTitle}"`
+        ];
         
+        const allyDetails = [
+            `${latestActivity.matchTitle}`,
+            `Standing with you in ${latestActivity.matchTitle}`,
+            `Fighting for the same side!`
+        ];
+        
+        const allyButtons = [
+            'Send Thanks! 🤝',
+            'Give Props 👊',
+            'Show Support ✨',
+            'High Five! 🙌'
+        ];
+        
+        message = allyMessages[Math.floor(Math.random() * allyMessages.length)];
+        detail = allyDetails[Math.floor(Math.random() * allyDetails.length)];
+        cta = allyButtons[Math.floor(Math.random() * allyButtons.length)];
+        icon = '🤝';
+        
+    } else {
+        // ========================================
+        // OPPONENT - They voted AGAINST your song!
+        // ========================================
+        const opponentMessages = [
+            `${latestActivity.username} just voted against you!`,
+            `${latestActivity.username} challenged your pick with "${latestActivity.songTitle}"`,
+            `Rival spotted! ${latestActivity.username} backed "${latestActivity.songTitle}"`,
+            `${latestActivity.username} picked the other side in "${latestActivity.songTitle}"`
+        ];
+        
+        const opponentDetails = [
+            `In ${latestActivity.matchTitle}`,
+            `The battle continues in ${latestActivity.matchTitle}`,
+            `${latestActivity.matchTitle} - rivalry grows`
+        ];
+        
+        const opponentButtons = [
+            'View Match 👀',
+            'Check the Battle ⚡',
+            'See the Score 📊',
+            'Go to Match 🎯'
+        ];
+        
+        message = opponentMessages[Math.floor(Math.random() * opponentMessages.length)];
+        detail = opponentDetails[Math.floor(Math.random() * opponentDetails.length)];
+        cta = opponentButtons[Math.floor(Math.random() * opponentButtons.length)];
+        icon = '⚔️';
+    }
+}
+
+// ✅ NOW message, detail, cta, and icon are ALL defined before use
 // Build notification data
 const isAlly = hasVoted && userVotedSongId === latestActivity.songId;
 const notificationData = {
@@ -820,7 +819,8 @@ const notificationData = {
     message: message,
     detail: detail,
     icon: icon,
-    ctaText: cta,
+    cta: cta,  // ✅ NOW DEFINED!
+    ctaText: cta,  // ✅ ADD THIS TOO - some parts of code use ctaText
     ctaAction: hasVoted ? (isAlly ? 'send-emote' : 'navigate') : 'navigate',
     ctaData: hasVoted && isAlly ? {
         targetUsername: latestActivity.username,
