@@ -2133,6 +2133,13 @@ async function renderFollowButton(targetUserId, targetUsername) {
 
 async function updateFollowButton() {
     if (!currentProfile) return;
+
+      // ✅ ADD THIS: Don't overwrite on own profile
+    const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    if (currentProfile.userId === currentUserId) {
+        console.log('👤 Own profile - skipping follow button');
+        return;
+    }
     
     const profileActions = document.querySelector('.profile-actions');
     if (profileActions) {
