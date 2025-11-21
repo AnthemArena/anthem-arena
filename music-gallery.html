@@ -37,6 +37,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
+         <link rel="stylesheet" href="/css/main.css">
+
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/moments-gallery.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -54,6 +56,12 @@
       "url": "https://anthemarena.com/music-gallery"
     }
     </script>
+
+      <!-- ✅ CRITICAL: Load global systems FIRST -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
 <body>
 
@@ -330,9 +338,7 @@
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-    <script type="module" src="/js/global-notifications.js"></script>
+    <script type="module" src="/js/rank-system.js"></script>
 
     <script type="module" src="/js/music-gallery.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>

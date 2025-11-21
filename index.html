@@ -127,6 +127,13 @@
 }
 </script>
 <meta name="p:domain_verify" content="62697b3c9ef42c0a2961241e1ee4bdca"/>
+
+<!-- ✅ CRITICAL: Load global systems FIRST in HEAD -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
+
 </head>
 
 
@@ -134,8 +141,6 @@
 <body>
     <div id="nav-placeholder"></div>
     
-    <script type="module" src="/js/firebase-config.js"></script>
-    <script type="module" src="/js/rank-system.js"></script>
     <script type="module" src="/js/navigation.js"></script>
 
     <!-- HERO SECTION -->
@@ -493,9 +498,8 @@ No account required—just <a href="/matches.html">watch, vote, and crown the ch
 
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-    <script type="module" src="/js/global-notifications.js"></script>
+  
+    <script type="module" src="/js/rank-system.js"></script>
 
     <script type="module" src="/js/homepage.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>

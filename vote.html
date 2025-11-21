@@ -38,12 +38,11 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
-    <link rel="stylesheet" href="/css/vote.css">
     <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="/css/settings.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/activity.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Schema.org Structured Data - VoteAction -->
     <script type="application/ld+json">
@@ -63,6 +62,13 @@
     }
     </script>
 </head>
+
+  <!-- ✅ CRITICAL: Load global systems FIRST (correct order!) -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
+
 <body>
 
     <div id="nav-placeholder"></div>
@@ -409,29 +415,30 @@
         </div>
     </section>
 
+    <!-- ========================================
+         LOADING SPINNER (Must be in DOM before scripts)
+         ======================================== -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-container">
+            <div class="tournament-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <i class="fas fa-trophy spinner-icon"></i>
+            </div>
+            <p class="spinner-text" id="spinner-text">Loading...</p>
+        </div>
+    </div>
+
+
 <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-        <script type="module" src="/js/global-notifications.js"></script>
+    <script type="module" src="/js/rank-system.js"></script>
             <script type="module" src="/js/match-card-renderer.js"></script>
-
 
     <script type="module" src="/js/vote.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
 
-    <!-- Loading Spinner Overlay -->
-<div id="loading-overlay" class="loading-overlay" style="display: none;">
-    <div class="spinner-container">
-        <div class="tournament-spinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <i class="fas fa-trophy spinner-icon"></i>
-        </div>
-        <p class="spinner-text" id="spinner-text">Loading...</p>
-    </div>
-</div>
 </body>
 </html>

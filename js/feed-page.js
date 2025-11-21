@@ -2,7 +2,7 @@
 // FEED PAGE - UI CONTROLLER
 // League Music Tournament
 // ========================================
-import { initializeFeedWidgets, setupSidebarInteractions } from './feed-widgets.js';
+import { initializeFeedWidgets } from './feed-widgets.js';
 
 import { 
     getFeed, 
@@ -13,6 +13,40 @@ import {
     unfollowUser,
     isFollowing 
 } from './social-feed.js';
+
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+/**
+ * Show loading spinner with custom message
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
+    }
+}
 
 // ========================================
 // STATE
@@ -29,27 +63,53 @@ const POSTS_PER_PAGE = 20;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 Feed page loading...');
+    
+    // ✅ Show full-page spinner
+    showLoadingSpinner('Loading feed...');
 
-      // Initialize widgets FIRST
-    await initializeFeedWidgets();
-    setupSidebarInteractions();
-    
-    // Check if user is logged in
-    checkLoginStatus();
-    
-    // Setup filter buttons
-    setupFilters();
-    
-    // Setup create post box
-    setupCreatePost();
-    
-    // Load initial feed
-    await loadFeed();
-    
-    // Setup load more button
-    setupLoadMore();
-    
-    console.log('✅ Feed page ready');
+    try {
+        // Initialize widgets FIRST
+        await initializeFeedWidgets();
+        
+        // Check if user is logged in
+        checkLoginStatus();
+        
+        // Setup filter buttons
+        setupFilters();
+        
+        // Setup create post box
+        setupCreatePost();
+        
+        // Load initial feed
+        await loadFeed();
+        
+        // Setup load more button
+        setupLoadMore();
+        
+        console.log('✅ Feed page ready');
+        
+        // ✅ Hide spinner when done
+        hideLoadingSpinner();
+        
+    } catch (error) {
+        console.error('❌ Error loading feed:', error);
+        
+        // ✅ Hide spinner on error
+        hideLoadingSpinner();
+        
+        // Show error message
+        const feedContainer = document.getElementById('feedPosts');
+        if (feedContainer) {
+            feedContainer.innerHTML = `
+                <div class="error-state">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <h3>Error Loading Feed</h3>
+                    <p>Could not load the feed. Please try refreshing the page.</p>
+                    <button onclick="location.reload()" class="btn-retry">Retry</button>
+                </div>
+            `;
+        }
+    }
 });
 
 // ========================================

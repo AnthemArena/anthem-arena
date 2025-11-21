@@ -10,6 +10,38 @@ import { db } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { createMatchCard } from './match-card-renderer.js';
 
+/**
+ * Show loading spinner with custom message
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
+    }
+}
+
+
+
 // ========================================
 // VOTE TRACKING HELPERS
 // ========================================
@@ -47,11 +79,13 @@ let currentFilters = {
     sort: 'recent' // ← Changed from 'date-desc'
 };
 document.addEventListener('DOMContentLoaded', async () => {
+    // ✅ FIXED: Show full-page spinner
+    showLoadingSpinner('Loading matches...');
+    
     console.log('League Music Tournament matches page loaded successfully');
     
     try {
-        // ✅ Show loading state
-        showMatchesLoading();
+        // ❌ REMOVE: showMatchesLoading();
         
         // Load matches from Firebase
         await loadMatchesFromFirebase();
@@ -67,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupFilterListeners();
 
         // ✅ SET STATUS FILTER TO 'LIVE' BY DEFAULT
-const statusFilter = document.getElementById('status-filter');
-if (statusFilter) {
-    statusFilter.value = 'live';
-}
+        const statusFilter = document.getElementById('status-filter');
+        if (statusFilter) {
+            statusFilter.value = 'live';
+        }
         
         // Apply initial filtering and sorting
         if (allMatches.length > 0) {
@@ -79,13 +113,15 @@ if (statusFilter) {
             showNoMatches();
         }
         
-        // ✅ Hide loading, show matches
-        hideMatchesLoading();
+        // ✅ FIXED: Hide spinner and show content
+        hideLoadingSpinner();
         showMatchesSections();
         
     } catch (error) {
         console.error('❌ Error initializing matches page:', error);
-        hideMatchesLoading();
+        
+        // ✅ FIXED: Hide spinner on error
+        hideLoadingSpinner();
         showMatchesError(error);
     }
 });
@@ -827,25 +863,15 @@ function showNotification(message, type = 'info') {
 // LOADING STATE HELPERS
 // ========================================
 
+
 function showMatchesLoading() {
-    const loadingState = document.getElementById('matchesLoadingState');
-    if (loadingState) {
-        loadingState.style.display = 'block';
-    }
-    
-    // Hide main sections while loading
-    hideMatchesSections();
-    
-    console.log('⏳ Showing matches loading state');
+    // Now handled by full-page spinner
+    console.log('⏳ Loading matches...');
 }
 
 function hideMatchesLoading() {
-    const loadingState = document.getElementById('matchesLoadingState');
-    if (loadingState) {
-        loadingState.style.display = 'none';
-    }
-    
-    console.log('✅ Hiding matches loading state');
+    // Now handled by full-page spinner
+    console.log('✅ Matches loaded');
 }
 
 function showMatchesSections() {

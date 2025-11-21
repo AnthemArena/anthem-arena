@@ -13,18 +13,21 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="/css/profile.css">
-    <!-- Stylesheets -->
+  <!-- Styles -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/profile.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
 
     
     <!-- Firebase -->
+<!-- ✅ CRITICAL: Load global systems FIRST (all in head) -->
     <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
 <body>
     <div id="nav-placeholder"></div>
@@ -307,12 +310,27 @@
         </div>
     </main>
     
+     <!-- ✅ ADD THIS: Loading Spinner Overlay (BEFORE footer) -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-container">
+            <div class="tournament-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <i class="fas fa-trophy spinner-icon"></i>
+            </div>
+            <p class="spinner-text" id="spinner-text">Loading...</p>
+        </div>
+    </div>
+    
     <!-- Footer -->
  <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>    
     <!-- Scripts -->
+
+        <script type="module" src="/js/rank-system.js"></script>
+
     <script type="module" src="/js/profile-page.js"></script>
-        <script type="module" src="/js/global-notifications.js"></script>
 
     <!-- Near the bottom, before </body> -->
 <script type="module" src="/js/settings-modal.js"></script>

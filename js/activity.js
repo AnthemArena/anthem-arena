@@ -8,6 +8,38 @@ let allActivities = [];
 let currentFilter = 'all';
 let musicData = {}; // Cache for music video data
 
+
+
+/**
+ * Show loading spinner with custom message
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
+    }
+}
+
 /**
  * Load music data on page init
  */
@@ -112,14 +144,19 @@ function getSongTitle(songId, fallbackTitle) {
 }
 
 // ========================================
+// HELPER FUNCTIONS (add at top of file, after imports)
+// ========================================
+
+
+// ========================================
 // INITIALIZE PAGE - Load tournaments first
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎭 Activity page loaded');
     
-    // Show loading
-    document.getElementById('loading-overlay').style.display = 'flex';
+    // ✅ FIXED: Use helper function
+    showLoadingSpinner('Loading community activity...');
     
     // Load data in parallel
     await Promise.all([
@@ -133,8 +170,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup filter buttons
     setupFilters();
     
-    // Hide loading
-    document.getElementById('loading-overlay').style.display = 'none';
+    // ✅ FIXED: Use helper function
+    hideLoadingSpinner();
 });
 
 // ========================================

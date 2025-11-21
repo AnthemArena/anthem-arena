@@ -58,6 +58,12 @@
       "itemListElement": []
     }
     </script>
+
+     <!-- ✅ CRITICAL: Load global systems FIRST -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
 <body>
 
@@ -190,26 +196,13 @@
             </div>
     </section>
 
-        <!-- ✨ NEW: LOADING STATE -->
-    <section class="matches-loading-state" id="matchesLoadingState">
-        <div class="container">
-            <div class="loading-content">
-                <div class="loader"></div>
-                <p class="loading-text">Loading matches...</p>
-                <p class="loading-subtext">Fetching tournament data</p>
-            </div>
-        </div>
-    </section>
+
 
     <!-- MATCHES GRID -->
     <section class="matches-section">
         <div class="container">
           <div class="matches-grid" id="matches-grid">
-    <!-- Loading state -->
-    <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading matches from tournament...</p>
-    </div>
+   
 </div>
 
 
@@ -260,12 +253,25 @@
     </section>
 
 
+    <!-- Add to matches.html before footer -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="spinner-container">
+        <div class="tournament-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <i class="fas fa-trophy spinner-icon"></i>
+        </div>
+        <p class="spinner-text" id="spinner-text">Loading matches...</p>
+    </div>
+</div>
+
+
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-    <script type="module" src="/js/global-notifications.js"></script>
+
+    <script type="module" src="/js/rank-system.js"></script>
 
 <script type="module" src="/js/matches.js"></script>
 <script type="module" src="/js/settings-modal.js"></script>

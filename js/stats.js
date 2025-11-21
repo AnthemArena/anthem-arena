@@ -13,6 +13,37 @@ import {
     getSeedPerformance
 } from './stats-queries.js';
 
+/**
+ * Show loading spinner with custom message
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
+    }
+}
+
+
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 // State
@@ -113,27 +144,53 @@ window.closeSongDetail = function() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // ✅ FIXED: Show spinner with correct message
+    showLoadingSpinner('Loading statistics...');
+    
     console.log('📊 Stats page loaded');
     
-    // Load JSON data first (for YouTube stats)
-    await loadSongData();
-    
-    // Load all stats from Firebase
-    await loadAllStats();
-    
-    // Render stats sections
-    renderAllStats();
-    
-    // Setup tab navigation
-    setupTabs();
-    
-    console.log('✅ Stats page ready');
-
-       // Start auto-refresh after data loads
-    setTimeout(() => {
-        startAutoRefresh();
-    }, 2000);
-
+    try {
+        // Load JSON data first (for YouTube stats)
+        await loadSongData();
+        
+        // Load all stats from Firebase
+        await loadAllStats();
+        
+        // Render stats sections
+        renderAllStats();
+        
+        // Setup tab navigation
+        setupTabs();
+        
+        console.log('✅ Stats page ready');
+        
+        // ✅ FIXED: Hide spinner before starting auto-refresh
+        hideLoadingSpinner();
+        
+        // Start auto-refresh after data loads
+        setTimeout(() => {
+            startAutoRefresh();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('❌ Error loading stats:', error);
+        
+        // ✅ FIXED: Hide spinner on error
+        hideLoadingSpinner();
+        
+        // Show error message
+        const overviewTab = document.getElementById('overview-stats');
+        if (overviewTab) {
+            overviewTab.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Error Loading Statistics</h3>
+                    <p>Could not load tournament data. Please try refreshing the page.</p>
+                    <button onclick="location.reload()" class="btn-retry">Retry</button>
+                </div>
+            `;
+        }
+    }
 });
 
 // ========================================

@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Activity | Anthem Arena</title>
- <link rel="stylesheet" href="/css/main.css">
+ <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
-        <link rel="stylesheet" href="/css/activity.css"> <!-- ✅ ADD THIS LINE -->
-
-
+    <link rel="stylesheet" href="/css/activity.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+       
+    <!-- ✅ CRITICAL: Load global systems FIRST (correct order!) -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 
      <!-- ✅ ADD THIS: Expose Firebase to console -->
     <script type="module">
@@ -24,13 +30,12 @@
 
 </head>
 <body>
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="spinner"></div>
-        <p id="spinner-text">Loading activity...</p>
-    </div>
+
 
   <div id="nav-placeholder"></div>
     <script type="module" src="/js/navigation.js"></script>
+
+
     <main class="activity-page">
         <div class="container-wide">
             <div class="page-header">
@@ -76,11 +81,24 @@
         </div>
     </main>
 
+    <!-- ✅ FIXED: Tournament spinner (hidden by default) -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-container">
+            <div class="tournament-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <i class="fas fa-trophy spinner-icon"></i>
+            </div>
+            <p class="spinner-text" id="spinner-text">Loading activity...</p>
+        </div>
+    </div>
+    
+
  <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-    <script type="module" src="/js/global-notifications.js"></script>
+
+    <script type="module" src="/js/rank-system.js"></script>
 
     <script type="module" src="/js/activity.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>

@@ -70,6 +70,8 @@ function getYoutubeThumbnail(songId) {
 // Around line 65-80, update DOMContentLoaded:
 
 document.addEventListener('DOMContentLoaded', async () => {
+        showLoadingSpinner('Loading profile...');
+
     console.log('🎵 Profile page loading...');
     
     // ✅ FIX: Get userId with fallback
@@ -110,11 +112,12 @@ async function loadProfile(username) {
     try {
         console.log('📥 Loading profile for:', username);
         
-        showLoadingState();
         
         const profile = await fetchUserProfile(username);
         
         if (!profile) {
+                        hideLoadingSpinner(); // ✅ Hide spinner before showing error
+
             showNotFoundState();
             return;
         }
@@ -140,11 +143,14 @@ async function loadProfile(username) {
         await updateFollowButton();
 
         setupVoteFilters();
-        
+                hideLoadingSpinner(); // ✅ Hide spinner when done
+
         showProfileContent();
         
     } catch (error) {
         console.error('❌ Error loading profile:', error);
+                hideLoadingSpinner(); // ✅ Hide spinner on error
+
         showNotFoundState();
     }
 }
