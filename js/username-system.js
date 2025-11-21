@@ -28,13 +28,16 @@ const CHAMPIONS = [
 const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
 
 /**
- * Check if user has a username, prompt if not
+ * Check if user has a username - NO LONGER SHOWS PROMPT
+ * Username is auto-generated on first visit in vote.js
  */
 export function ensureUsername() {
     const username = localStorage.getItem('username');
     
-    if (!username) {
-        showUsernamePrompt();
+    // If somehow no username exists, return a fallback
+    if (!username || username === 'Anonymous') {
+        console.warn('⚠️ No username found, returning fallback');
+        return 'Anonymous';
     }
     
     return username;
@@ -470,6 +473,20 @@ async function backfillUserActivity(username, avatar, isPublic) {
         
     } catch (error) {
         console.error('❌ Error backfilling activity:', error);
+    }
+}
+
+/**
+ * Show username modal manually (called from settings)
+ * @param {boolean} isFirstTime - If true, shows "Skip" button
+ */
+export function showUsernameModal(isFirstTime = false) {
+    showUsernamePrompt();
+    
+    // Hide skip button if not first time
+    if (!isFirstTime) {
+        const skipBtn = document.querySelector('.modal-btn.secondary');
+        if (skipBtn) skipBtn.style.display = 'none';
     }
 }
 
