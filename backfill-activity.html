@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backfill Activity Records</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #C8AA6E;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #C8AA6E; }
+        .info {
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid #C8AA6E;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        button {
+            background: #C8AA6E;
+            color: #0a0a0a;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #D4B87A;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: none;
+        }
+        .progress.active {
+            display: block;
+        }
+        .log {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .log-success { color: #4caf50; }
+        .log-warning { color: #ff9800; }
+        .log-error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Backfill Activity Records</h1>
+    
+    <div class="info">
+        <p><strong>This script will:</strong></p>
+        <p>✅ Find all votes that don't have activity records</p>
+        <p>✅ Create activity records for those votes</p>
+        <p>✅ Pull username/avatar from user profiles</p>
+        <p>✅ Match votes to tournament songs</p>
+        <p>✅ Skip votes that already have activity records</p>
+        <p><strong>⚠️ Safe to run multiple times</strong></p>
+    </div>
+    
+    <button id="backfill-btn">🚀 Run Backfill Now</button>
+    
+    <div id="progress" class="progress">
+        <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { collection, getDocs, doc, setDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // ========================================
+        // LOGGING
+        // ========================================
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const line = document.createElement('div');
+            
+            if (type === 'success') line.className = 'log-success';
+            if (type === 'warning') line.className = 'log-warning';
+            if (type === 'error') line.className = 'log-error';
+            
+            line.textContent = message;
+            logDiv.appendChild(line);
+            console.log(message);
+            
+            // Auto-scroll to bottom
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // ========================================
+        // MAIN BACKFILL FUNCTION
+        // ========================================
+        async function backfillActivityRecords() {
+            const btn = document.getElementById('backfill-btn');
+            const progress = document.getElementById('progress');
+            const logDiv = document.getElementById('log');
+            
+            btn.disabled = true;
+            progress.classList.add('active');
+            logDiv.innerHTML = '';
+            
+            log('🔧 Starting activity backfill...');
+            
+            try {
+                const TOURNAMENT_ID = '2025-worlds-anthems';
+                
+                // ========================================
+                // STEP 1: Load all profiles
+                // ========================================
+                log('👤 Loading user profiles...');
+                const profilesRef = collection(db, 'profiles');
+                const profilesSnapshot = await getDocs(profilesRef);
+                
+                const userProfiles = new Map();
+                profilesSnapshot.forEach(profileDoc => {
+                    userProfiles.set(profileDoc.id, profileDoc.data());
+                });
+                
+                log(`✅ Loaded ${userProfiles.size} user profiles`);
+                
+                // ========================================
+                // STEP 2: Load tournament matches
+                // ========================================
+                log('🏆 Loading tournament matches...');
+                const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+                const matchesSnapshot = await getDocs(matchesRef);
+                
+                const matchMap = new Map();
+                matchesSnapshot.forEach(matchDoc => {
+                    const match = matchDoc.data();
+                    matchMap.set(matchDoc.id, match);
+                    if (match.matchId) {
+                        matchMap.set(match.matchId, match);
+                    }
+                });
+                
+                log(`✅ Loaded ${matchMap.size} matches`);
+                
+                // ========================================
+                // STEP 3: Load existing activity records
+                // ========================================
+                log('📄 Loading existing activity records...');
+                const activityRef = collection(db, 'activity');
+                const activitySnapshot = await getDocs(activityRef);
+                
+                const existingActivityIds = new Set();
+                activitySnapshot.forEach(activityDoc => {
+                    existingActivityIds.add(activityDoc.id);
+                });
+                
+                log(`✅ Found ${existingActivityIds.size} existing activity records`);
+                
+                // ========================================
+                // STEP 4: Load all votes
+                // ========================================
+                log('🗳️ Loading all votes...');
+                const votesRef = collection(db, 'votes');
+                const votesSnapshot = await getDocs(votesRef);
+                
+                log(`✅ Loaded ${votesSnapshot.size} votes`);
+                
+                // ========================================
+                // STEP 5: Find votes without activity
+                // ========================================
+                log('\n🔍 Finding votes without activity records...');
+                
+                const votesNeedingActivity = [];
+                
+                votesSnapshot.forEach(voteDoc => {
+                    const vote = voteDoc.data();
+                    const activityId = `${vote.userId}_${vote.matchId}`;
+                    
+                    // Check if activity record already exists
+                    if (!existingActivityIds.has(activityId)) {
+                        votesNeedingActivity.push({
+                            voteId: voteDoc.id,
+                            vote: vote,
+                            activityId: activityId
+                        });
+                    }
+                });
+                
+                log(`🔍 Found ${votesNeedingActivity.length} votes without activity records`, 'warning');
+                
+                if (votesNeedingActivity.length === 0) {
+                    log('✨ All votes already have activity records!', 'success');
+                    alert('All votes already have activity records!');
+                    btn.disabled = false;
+                    return;
+                }
+                
+                // ========================================
+                // STEP 6: Create activity records
+                // ========================================
+                log('\n📝 Creating activity records...');
+                
+                let created = 0;
+                let skipped = 0;
+                let errors = 0;
+                
+                for (const { vote, activityId } of votesNeedingActivity) {
+                    try {
+                        // Get match data
+                        const match = matchMap.get(vote.matchId);
+                        
+                        if (!match || !match.song1 || !match.song2) {
+                            log(`⚠️ Skipped: No match data for ${vote.matchId}`, 'warning');
+                            skipped++;
+                            continue;
+                        }
+                        
+                        // Get user profile
+                        const profile = userProfiles.get(vote.userId);
+                        const username = profile?.username || vote.username || 'Anonymous';
+                        const avatar = profile?.avatar || vote.avatar || { type: 'emoji', value: '🎵' };
+                        const isPublic = profile?.privacy?.isPublic ?? true;
+                        
+                        // Determine voted song
+                        const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
+                        
+                        // Create activity record
+                        const activityData = {
+                            activityId: activityId,
+                            userId: vote.userId,
+                            username: username,
+                            avatar: avatar,
+                            isPublic: isPublic,
+                            matchId: vote.matchId,
+                            choice: vote.choice,
+                            songId: votedSong.videoId,
+                            songTitle: votedSong.shortTitle || votedSong.title,
+                            matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
+                            tournamentId: TOURNAMENT_ID,
+                            round: match.round || 1,
+                            timestamp: vote.timestamp || Date.now(),
+                            createdFrom: 'backfill-script'
+                        };
+                        
+                        await setDoc(doc(db, 'activity', activityId), activityData);
+                        
+                        created++;
+                        
+                        if (created % 10 === 0) {
+                            log(`✅ Created ${created}/${votesNeedingActivity.length}...`);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error creating activity for vote:', vote, error);
+                        log(`❌ Error: ${error.message}`, 'error');
+                        errors++;
+                    }
+                }
+                
+                // ========================================
+                // COMPLETE
+                // ========================================
+                log('\n🎉 BACKFILL COMPLETE!', 'success');
+                log(`✅ Created: ${created} activity records`, 'success');
+                if (skipped > 0) log(`⚠️ Skipped: ${skipped} (missing match data)`, 'warning');
+                if (errors > 0) log(`❌ Errors: ${errors}`, 'error');
+                
+                alert(
+                    `Backfill complete!\n\n` +
+                    `✅ Created: ${created}\n` +
+                    `⚠️ Skipped: ${skipped}\n` +
+                    `❌ Errors: ${errors}`
+                );
+                
+            } catch (error) {
+                console.error('❌ Fatal error:', error);
+                log(`❌ Fatal Error: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Attach event listener
+        document.getElementById('backfill-btn').addEventListener('click', backfillActivityRecords);
+    </script>
+</body>
+</html>
