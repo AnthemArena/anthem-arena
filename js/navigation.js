@@ -10,7 +10,7 @@ const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Navigation DOMContentLoaded fired');
     
-    const navHTML = `
+   const navHTML = `
     <nav class="main-nav">
         <div class="nav-container">
             <a href="/index.html" class="logo-link">
@@ -18,18 +18,27 @@ document.addEventListener('DOMContentLoaded', function() {
             </a>
            <ul class="nav-links">
     <li><a href="/">Home</a></li>
-    <li><a href="/my-votes">My Votes</a></li>
     <li><a href="/brackets">Brackets</a></li>
-    <li><a href="/music-gallery">Music Gallery</a></li>
     <li><a href="/matches">Matches</a></li>
+    <li><a href="/music-gallery">Music Gallery</a></li>
+    
+    <li class="nav-separator"></li>
+    
     <li><a href="/stats">Stats</a></li>
+    <li><a href="/activity.html" class="nav-link">
+        <i class="fa-solid fa-chart-line"></i>
+        Activity
+    </a></li>
+    
+    <li class="nav-separator"></li>
+    
     <li><a href="/feed.html" class="nav-link">
         <i class="fa-solid fa-users"></i>
         Feed
     </a></li>
-    <li><a href="/activity.html" class="nav-link">
-        <i class="fa-solid fa-chart-line"></i>
-        Activity
+    <li><a href="/profile" class="nav-link">
+        <i class="fa-solid fa-user"></i>
+        My Profile
     </a></li>
 </ul>
             

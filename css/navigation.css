@@ -1732,3 +1732,32 @@
         padding: 0.25rem;
     }
 }
+/* Navigation Separators - Black & Gold Theme */
+.nav-separator {
+    width: 1px;
+    height: 24px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(200, 170, 110, 0.3) 20%,
+        rgba(200, 170, 110, 0.6) 50%,
+        rgba(200, 170, 110, 0.3) 80%,
+        transparent
+    );
+    margin: 0 12px;
+    align-self: center;
+    pointer-events: none;
+}
+
+/* Optional: Add glow effect on hover of nearby links */
+.nav-links li:has(+ .nav-separator) a:hover,
+.nav-links .nav-separator + li a:hover {
+    text-shadow: 0 0 8px rgba(200, 170, 110, 0.5);
+}
+
+/* Mobile: Hide separators on small screens */
+@media (max-width: 768px) {
+    .nav-separator {
+        display: none;
+    }
+}
