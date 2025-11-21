@@ -641,3 +641,36 @@
 .vote-card:nth-child(8) { animation-delay: 0.4s; }
 .vote-card:nth-child(9) { animation-delay: 0.45s; }
 .vote-card:nth-child(10) { animation-delay: 0.5s; }
+/* ========================================
+   USER AVATAR & USERNAME LINKS
+   ======================================== */
+
+.user-avatar-link {
+    text-decoration: none;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.user-avatar-link:hover {
+    transform: scale(1.08);
+}
+
+.username-link {
+    text-decoration: none;
+    display: block;
+}
+
+.username-link .username {
+    color: #C8AA6E;
+    transition: color 0.2s ease;
+}
+
+.username-link:hover .username {
+    color: #D4B87A;
+    text-decoration: underline;
+}
+
+/* Ensure champion avatars in activity feed are clickable */
+.user-avatar-link .champion-avatar {
+    cursor: pointer;
+}

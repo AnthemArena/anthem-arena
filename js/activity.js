@@ -234,15 +234,19 @@ function renderVoteCard(activity) {
                 <img src="${thumbnailUrl}" alt="${votedSongTitle}" loading="lazy" />
             </div>
             
-            <div class="vote-user">
-                <div class="user-avatar">
-                    ${renderAvatar(activity.avatar)}
-                </div>
-                <div class="user-info">
-                    <div class="username">${activity.username || 'Anonymous'}</div>
-                    <div class="vote-time">${getTimeAgo(activity.timestamp)}</div>
-                </div>
-            </div>
+        <div class="vote-user">
+    <a href="/profile.html?user=${encodeURIComponent(activity.username || 'Anonymous')}" class="user-avatar-link">
+        <div class="user-avatar">
+            ${renderAvatar(activity.avatar)}
+        </div>
+    </a>
+    <div class="user-info">
+        <a href="/profile.html?user=${encodeURIComponent(activity.username || 'Anonymous')}" class="username-link">
+            <div class="username">${activity.username || 'Anonymous'}</div>
+        </a>
+        <div class="vote-time">${getTimeAgo(activity.timestamp)}</div>
+    </div>
+</div>
             
             <div class="vote-song">
                 <div class="song-title">
