@@ -87,34 +87,50 @@ export async function unlockAchievementInFirebase(achievementId, xpReward = 0) {
 
 /**
  * Get all unlocked achievements from Firebase
+ * @param {string} userId - Optional userId, defaults to current user
  */
-export async function getUnlockedAchievementsFromFirebase() {
+export async function getUnlockedAchievementsFromFirebase(userId = null) {
     const { db } = await import('./firebase-config.js');
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
     
-    const userId = localStorage.getItem('tournamentUserId');
-    if (!userId) return [];
+    // ✅ Use provided userId or fall back to localStorage
+    const targetUserId = userId || localStorage.getItem('tournamentUserId');
+    
+    if (!targetUserId) {
+        console.warn('⚠️ No userId provided for achievements');
+        return [];
+    }
     
     try {
-        const profileRef = doc(db, 'profiles', userId);
+        const profileRef = doc(db, 'profiles', targetUserId);
         const profileDoc = await getDoc(profileRef);
         
         if (profileDoc.exists()) {
             const profile = profileDoc.data();
             const unlockedAchievements = profile.unlockedAchievements || [];
             
-            // Sync to localStorage as cache
-            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            console.log(`✅ Loaded ${unlockedAchievements.length} achievements for user:`, targetUserId);
+            
+            // ✅ Only sync to localStorage if it's the current user
+            if (!userId || userId === localStorage.getItem('tournamentUserId')) {
+                localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            }
             
             return unlockedAchievements;
         }
         
+        console.warn('⚠️ Profile document does not exist for:', targetUserId);
         return [];
         
     } catch (error) {
         console.error('❌ Error fetching achievements from Firebase:', error);
-        // Fallback to localStorage
-        return JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+        
+        // ✅ Only fallback to localStorage for current user
+        if (!userId || userId === localStorage.getItem('tournamentUserId')) {
+            return JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+        }
+        
+        return [];
     }
 }
 
