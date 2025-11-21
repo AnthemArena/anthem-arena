@@ -59,18 +59,32 @@ async function loadUserProfile() {
             avatarEl.src = avatar.imageUrl;
         }
         
-        // Load stats
+        // ✅ Load user's actual profile data from Firebase
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            const profileData = profileDoc.data();
+            
+            // ✅ Set bio from profile
+            const bioEl = document.getElementById('sidebarBio');
+            if (bioEl && profileData.bio) {
+                bioEl.textContent = profileData.bio;
+            }
+            
+            // ✅ Set following/followers from profile
+            const following = profileData.following || [];
+            const followers = profileData.followers || [];
+            
+            document.getElementById('sidebarFollowing').textContent = following.length;
+            document.getElementById('sidebarFollowers').textContent = followers.length;
+        }
+        
+        // Load vote count
         const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
         const votesSnapshot = await getDocs(votesQuery);
         document.getElementById('sidebarVotes').textContent = votesSnapshot.size;
-        
-        // Load following/followers
-        const userDoc = await getDocs(query(collection(db, 'users'), where('userId', '==', userId), limit(1)));
-        if (!userDoc.empty) {
-            const userData = userDoc.docs[0].data();
-            document.getElementById('sidebarFollowing').textContent = userData.following?.length || 0;
-            document.getElementById('sidebarFollowers').textContent = userData.followers?.length || 0;
-        }
         
         // Load notification badge
         const { getUnreadCount } = await import('./notification-storage.js');
@@ -287,41 +301,50 @@ async function loadTournamentStats() {
 // ========================================
 
 export function setupSidebarInteractions() {
-    // Notifications button
-    const notifBtn = document.getElementById('sidebarNotifications');
-    if (notifBtn) {
-        notifBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (window.openNotificationPanel) {
-                window.openNotificationPanel();
-            } else {
-                console.warn('Notification panel not available');
-            }
-        });
-    }
+    console.log('🔧 Setting up sidebar interactions...');
     
-    // Messages button - opens notifications and switches to messages tab
-    const msgBtn = document.getElementById('sidebarMessages');
-    if (msgBtn) {
-        msgBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (window.openNotificationPanel) {
-                window.openNotificationPanel();
+    // Wait for notification center to be ready
+    setTimeout(() => {
+        // Notifications button
+        const notifBtn = document.getElementById('sidebarNotifications');
+        if (notifBtn) {
+            notifBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('🔔 Notifications clicked');
                 
-                // Switch to messages tab after panel opens
-                setTimeout(() => {
-                    const messagesTab = document.querySelector('[data-tab="messages"]');
-                    if (messagesTab) {
-                        messagesTab.click();
-                    }
-                }, 150);
-            } else {
-                console.warn('Notification panel not available');
-            }
-        });
-    }
+                if (window.openNotificationPanel) {
+                    window.openNotificationPanel();
+                } else {
+                    console.warn('⚠️ Notification panel not ready yet');
+                }
+            });
+            console.log('✅ Notifications button handler attached');
+        }
+        
+        // Messages button - opens notifications and switches to messages tab
+        const msgBtn = document.getElementById('sidebarMessages');
+        if (msgBtn) {
+            msgBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('💬 Messages clicked');
+                
+                if (window.openNotificationPanel) {
+                    window.openNotificationPanel();
+                    
+                    // Switch to messages tab after panel opens
+                    setTimeout(() => {
+                        const messagesTab = document.querySelector('[data-tab="messages"]');
+                        if (messagesTab) {
+                            messagesTab.click();
+                        }
+                    }, 150);
+                } else {
+                    console.warn('⚠️ Notification panel not ready yet');
+                }
+            });
+            console.log('✅ Messages button handler attached');
+        }
+    }, 500); // Wait 500ms for notification center to initialize
 }
 
 // ========================================

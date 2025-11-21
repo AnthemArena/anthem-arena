@@ -1156,3 +1156,19 @@ body {
     border-color: rgba(200, 170, 110, 0.6);
     transform: scale(1.05);
 }
+/* Activity Item with Song Thumbnail */
+.activity-song-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: all 0.2s ease;
+}
+
+.activity-item-mini:hover .activity-song-thumbnail {
+    border-color: rgba(200, 170, 110, 0.6);
+    transform: scale(1.05);
+}
