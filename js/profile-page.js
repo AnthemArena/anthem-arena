@@ -17,6 +17,41 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
 
+// ========================================
+// HELPER FUNCTIONS - Loading Spinner
+// ========================================
+
+/**
+ * Show loading spinner with custom message
+ */
+function showLoadingSpinner(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const spinnerText = document.getElementById('spinner-text');
+    
+    if (overlay && spinnerText) {
+        spinnerText.textContent = message;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Hide loading spinner
+ */
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 200);
+    }
+}
+
+
 // State
 let currentProfile = null;
 let isOwnProfile = false;
