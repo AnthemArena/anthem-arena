@@ -583,7 +583,6 @@ async function updateProfileNotificationBadge() {
 // ========================================
 // HANDLE FOLLOW BUTTON CLICK
 // ========================================
-
 async function handleFollowClick(e) {
     const btn = e.currentTarget;
     const targetUserId = btn.dataset.userId;
@@ -597,7 +596,6 @@ async function handleFollowClick(e) {
     
     try {
         if (isCurrentlyFollowing) {
-            // Unfollow
             const { unfollowUser } = await import('./follow-system.js');
             const result = await unfollowUser(targetUserId);
             
@@ -606,7 +604,6 @@ async function handleFollowClick(e) {
                 btn.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
                 await updateFollowCounts();
                 
-                // Show toast
                 if (window.showQuickToast) {
                     window.showQuickToast(`Unfollowed ${targetUsername}`, 2000);
                 }
@@ -614,7 +611,6 @@ async function handleFollowClick(e) {
                 throw new Error('Failed to unfollow');
             }
         } else {
-            // Follow
             const { followUser } = await import('./follow-system.js');
             const result = await followUser(targetUserId, targetUsername);
             
@@ -623,7 +619,6 @@ async function handleFollowClick(e) {
                 btn.innerHTML = '<i class="fas fa-user-check"></i> Following';
                 await updateFollowCounts();
                 
-                // Show toast
                 if (window.showQuickToast) {
                     window.showQuickToast(`✅ Now following ${targetUsername}!`, 2000);
                 }
@@ -2151,36 +2146,7 @@ async function updateFollowButton() {
     }
 }
 
-async function handleFollowClick(e) {
-    const btn = e.currentTarget;
-    const targetUserId = btn.dataset.userId;
-    const targetUsername = btn.dataset.username;
-    const isCurrentlyFollowing = btn.classList.contains('following');
-    
-    btn.disabled = true;
-    
-    if (isCurrentlyFollowing) {
-        const { unfollowUser } = await import('./follow-system.js');
-        const result = await unfollowUser(targetUserId);
-        
-        if (result.success) {
-            btn.classList.remove('following');
-            btn.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
-            await updateFollowCounts(); // Refresh counts
-        }
-    } else {
-        const { followUser } = await import('./follow-system.js');
-        const result = await followUser(targetUserId, targetUsername);
-        
-        if (result.success) {
-            btn.classList.add('following');
-            btn.innerHTML = '<i class="fas fa-user-check"></i> Following';
-            await updateFollowCounts(); // Refresh counts
-        }
-    }
-    
-    btn.disabled = false;
-}
+
 
 async function updateFollowCounts() {
     if (!currentProfile) return;
