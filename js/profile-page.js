@@ -557,17 +557,37 @@ async function loadProfileStats(userId) {
 // LOAD FEATURED ACHIEVEMENTS
 // ========================================
 
+// ========================================
+// LOAD FEATURED ACHIEVEMENTS
+// ========================================
+
 async function loadFeaturedAchievements(userId) {
     try {
+        console.log('🏆 Loading featured achievements for:', userId);
+        
+        // ✅ Don't try to load achievements for fallback profiles
+        if (!userId || userId === 'unknown') {
+            console.log('⚠️ Skipping achievements for fallback profile');
+            return;
+        }
+        
         const unlockedIds = await getUnlockedAchievementsFromFirebase(userId);
+        console.log('🏆 Unlocked achievement IDs:', unlockedIds);
         
         if (unlockedIds.length === 0) {
+            console.log('⚠️ No achievements unlocked yet');
             return; // Keep no-content state
         }
         
         // Get top 3 achievements (highest rarity/XP)
         const unlockedAchievements = unlockedIds
-            .map(id => ACHIEVEMENTS[id])
+            .map(id => {
+                const ach = ACHIEVEMENTS[id];
+                if (!ach) {
+                    console.warn(`⚠️ Achievement not found in ACHIEVEMENTS object: ${id}`);
+                }
+                return ach;
+            })
             .filter(Boolean)
             .sort((a, b) => {
                 const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
@@ -578,9 +598,17 @@ async function loadFeaturedAchievements(userId) {
             })
             .slice(0, 3);
         
+        console.log('🏆 Featured achievements to display:', unlockedAchievements);
+        
         const container = document.getElementById('featuredAchievements');
         
+        if (!container) {
+            console.error('❌ featuredAchievements container not found!');
+            return;
+        }
+        
         if (unlockedAchievements.length === 0) {
+            console.log('⚠️ No valid achievements to display');
             return; // Keep no-content state
         }
         
@@ -598,10 +626,20 @@ async function loadFeaturedAchievements(userId) {
             </div>
         `).join('');
         
+        console.log('✅ Featured achievements rendered');
+        
     } catch (error) {
         console.error('❌ Error loading featured achievements:', error);
     }
 }
+
+// ========================================
+// LOAD FAVORITE SONGS
+// ========================================
+
+// ========================================
+// LOAD FAVORITE SONGS
+// ========================================
 
 // ========================================
 // LOAD FAVORITE SONGS
@@ -628,12 +666,16 @@ async function loadFavoriteSongs(userId) {
             const songId = votedSong.id;
             
             if (!songCounts[songId]) {
+                // ✅ Look up song data from musicData cache
+                const songData = musicData[votedSong.videoId] || musicData[songId] || votedSong;
+                
                 songCounts[songId] = {
                     id: songId,
                     name: votedSong.shortTitle || votedSong.title,
                     artist: votedSong.artist,
                     videoId: votedSong.videoId,
                     seed: votedSong.seed,
+                    thumbnail: songData.thumbnail || `https://img.youtube.com/vi/${votedSong.videoId}/mqdefault.jpg`, // ✅ Use thumbnail from JSON
                     count: 0
                 };
             }
@@ -657,10 +699,11 @@ async function loadFavoriteSongs(userId) {
             <div class="favorite-song-card">
                 <div class="song-rank">${medals[index] || (index + 1)}</div>
                 <img 
-                    src="https://img.youtube.com/vi/${song.videoId}/mqdefault.jpg" 
+                    src="${song.thumbnail}" 
                     alt="${song.name}"
                     class="song-thumbnail"
                     loading="lazy"
+                    onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵'"
                 />
                 <div class="song-details">
                     <div class="song-title">${song.name}</div>
@@ -679,6 +722,10 @@ async function loadFavoriteSongs(userId) {
         console.error('❌ Error loading favorite songs:', error);
     }
 }
+
+// ========================================
+// LOAD ALL FAVORITE SONGS (for Songs tab)
+// ========================================
 
 // ========================================
 // LOAD ALL FAVORITE SONGS (for Songs tab)
@@ -711,13 +758,16 @@ async function loadAllFavoriteSongs(userId) {
             const songId = votedSong.id;
             
             if (!songCounts[songId]) {
+                // ✅ Look up song data from musicData cache
+                const songData = musicData[votedSong.videoId] || musicData[songId] || votedSong;
+                
                 songCounts[songId] = {
                     id: songId,
                     name: votedSong.shortTitle || votedSong.title,
                     artist: votedSong.artist,
                     videoId: votedSong.videoId,
                     seed: votedSong.seed,
-                    thumbnail: votedSong.thumbnail,
+                    thumbnail: songData.thumbnail || `https://img.youtube.com/vi/${votedSong.videoId}/mqdefault.jpg`, // ✅ Use thumbnail from JSON
                     count: 0
                 };
             }
@@ -752,6 +802,7 @@ async function loadAllFavoriteSongs(userId) {
                         alt="${song.name}"
                         class="song-thumbnail"
                         loading="lazy"
+                        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵'"
                     />
                     <div class="song-details">
                         <div class="song-title">${song.name}</div>
