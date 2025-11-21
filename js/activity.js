@@ -43,21 +43,31 @@ async function loadMusicData() {
  * Render avatar (emoji or champion image)
  */
 function renderAvatar(avatar) {
-    // Handle old emoji-only format
+    // Handle old emoji-only format (legacy string)
     if (typeof avatar === 'string') {
         return avatar;
     }
     
-    // Handle new format {type: 'emoji'|'url', value: '...'}
-    if (avatar && avatar.type === 'url') {
-        return `<img src="${avatar.value}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <span class="avatar-fallback" style="display: none;">👤</span>`;
+    // ✅ NEW: Handle champion avatar format
+    if (avatar && avatar.type === 'champion' && avatar.imageUrl) {
+        return `<img src="${avatar.imageUrl}" alt="${avatar.championId}" class="champion-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="avatar-fallback" style="display: none;">🎵</span>`;
     }
     
-    // Default to emoji
-    return avatar?.value || '🎵';
+    // Handle old URL format (if any exist)
+    if (avatar && avatar.type === 'url' && avatar.value) {
+        return `<img src="${avatar.value}" alt="Avatar" class="champion-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="avatar-fallback" style="display: none;">🎵</span>`;
+    }
+    
+    // Handle emoji format
+    if (avatar && avatar.type === 'emoji' && avatar.value) {
+        return avatar.value;
+    }
+    
+    // Default fallback to music note
+    return '🎵';
 }
-
 /**
  * Get YouTube thumbnail URL from song data
  */
