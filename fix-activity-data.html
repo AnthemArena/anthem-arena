@@ -206,27 +206,38 @@ if (match && match.song1 && match.song2) {
                         
                         // ========================================
                         // FIX 3: Username backfill
-                        // ========================================
-                        const currentUsername = activity.username || 'Anonymous';
-                        const userId = activity.userId;
-                        
-                        if (userId && userProfiles[userId]) {
-                            const profile = userProfiles[userId];
-                            const profileUsername = profile.username || 'Anonymous';
-                            const profileAvatar = profile.avatar;
-                            
-                            if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
-                                updates.username = profileUsername;
-                                needsUpdate = true;
-                                fixedUsernames++;
-                                console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
-                            }
-                            
-                            if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
-                                updates.avatar = profileAvatar;
-                                needsUpdate = true;
-                            }
-                        }
+                      // ========================================
+// FIX 3: Username & Avatar backfill
+// ========================================
+const currentUsername = activity.username || 'Anonymous';
+const userId = activity.userId;
+
+if (userId) {
+    // Check if user has a profile
+    if (userProfiles[userId]) {
+        // ✅ User has profile - update activity to match
+        const profile = userProfiles[userId];
+        const profileUsername = profile.username || 'Anonymous';
+        const profileAvatar = profile.avatar;
+        
+        if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
+            updates.username = profileUsername;
+            needsUpdate = true;
+            fixedUsernames++;
+            console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
+        }
+        
+        if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
+            updates.avatar = profileAvatar;
+            needsUpdate = true;
+        }
+    } else {
+        // ⚠️ User has NO profile - they voted before auto-generation
+        console.warn(`⚠️ User ${userId} has no profile - voted before auto-generation system`);
+        // The activity will keep "Anonymous" until they visit again
+        // vote.js will create their profile on next visit
+    }
+}
                         
                         // ========================================
                         // Apply updates
