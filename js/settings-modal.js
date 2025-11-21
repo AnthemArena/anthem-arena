@@ -785,11 +785,15 @@ function showNotification(message, type = 'success') {
 // AUTO-BACKFILL USER HISTORY
 // ========================================
 
+// ========================================
+// AUTO-BACKFILL USER HISTORY
+// ========================================
+
 /**
- * Automatically update all old votes/activity when user sets username
+ * Automatically update all old votes/activity when user updates profile
  */
 async function backfillUserHistory(userId, username, avatar, isPublic) {
-    console.log('🔄 Checking for old votes/activity to update...');
+    console.log('🔄 Updating all votes/activity with new profile...');
     
     try {
         const { collection, query, where, getDocs, doc, updateDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -799,54 +803,44 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
         let createdActivity = 0;
         
         // ========================================
-        // 1. UPDATE OLD VOTES
+        // 1. UPDATE ALL VOTES (not just Anonymous)
         // ========================================
         
         const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
         const votesSnapshot = await getDocs(votesQuery);
         
         for (const voteDoc of votesSnapshot.docs) {
-            const voteData = voteDoc.data();
-            
-            // Only update if missing username or is "Anonymous"
-            if (!voteData.username || voteData.username === 'Anonymous') {
-                try {
-                    await updateDoc(doc(db, 'votes', voteDoc.id), {
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        backfilledAt: new Date().toISOString()
-                    });
-                    updatedVotes++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to update vote ${voteDoc.id}:`, error);
-                }
+            try {
+                await updateDoc(doc(db, 'votes', voteDoc.id), {
+                    username: username,
+                    avatar: avatar,
+                    isPublic: isPublic,
+                    updatedAt: Date.now()
+                });
+                updatedVotes++;
+            } catch (error) {
+                console.warn(`⚠️ Failed to update vote ${voteDoc.id}:`, error);
             }
         }
         
         // ========================================
-        // 2. UPDATE OLD ACTIVITY RECORDS
+        // 2. UPDATE ALL ACTIVITY RECORDS
         // ========================================
         
         const activityQuery = query(collection(db, 'activity'), where('userId', '==', userId));
         const activitySnapshot = await getDocs(activityQuery);
         
         for (const activityDoc of activitySnapshot.docs) {
-            const activityData = activityDoc.data();
-            
-            // Only update if missing username or is "Anonymous"
-            if (!activityData.username || activityData.username === 'Anonymous') {
-                try {
-                    await updateDoc(doc(db, 'activity', activityDoc.id), {
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        backfilledAt: new Date().toISOString()
-                    });
-                    updatedActivity++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to update activity ${activityDoc.id}:`, error);
-                }
+            try {
+                await updateDoc(doc(db, 'activity', activityDoc.id), {
+                    username: username,
+                    avatar: avatar,
+                    isPublic: isPublic,
+                    updatedAt: Date.now()
+                });
+                updatedActivity++;
+            } catch (error) {
+                console.warn(`⚠️ Failed to update activity ${activityDoc.id}:`, error);
             }
         }
         
@@ -858,33 +852,42 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
         if (votesSnapshot.size > 0 && activitySnapshot.size === 0 && isPublic) {
             console.log('📝 No activity records found - creating from votes...');
             
-            // Get matches for context
-            const response = await fetch('/api/matches');
-            const matches = await response.json();
-            const matchMap = new Map(matches.map(m => [m.id, m]));
+            // Get tournament matches for context
+            const TOURNAMENT_ID = '2025-worlds-anthems';
+            const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+            const matchesSnapshot = await getDocs(matchesRef);
+            
+            const matchMap = new Map();
+            matchesSnapshot.forEach(matchDoc => {
+                const match = matchDoc.data();
+                matchMap.set(matchDoc.id, match);
+                if (match.matchId) matchMap.set(match.matchId, match);
+            });
             
             for (const voteDoc of votesSnapshot.docs) {
                 const vote = voteDoc.data();
                 const match = matchMap.get(vote.matchId);
                 
-                if (!match) continue;
+                if (!match || !match.song1 || !match.song2) continue;
                 
                 const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
-                const activityId = `${vote.matchId}_${vote.userId}`;
+                const activityId = `${userId}_${vote.matchId}`;
                 
                 try {
                     await setDoc(doc(db, 'activity', activityId), {
+                        activityId: activityId,
                         userId: userId,
                         username: username,
                         avatar: avatar,
                         isPublic: isPublic,
                         matchId: vote.matchId,
+                        choice: vote.choice,
                         songId: votedSong.videoId,
                         songTitle: votedSong.shortTitle || votedSong.title,
                         matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
-                        tournamentId: '2025-worlds-anthems',
+                        tournamentId: TOURNAMENT_ID,
                         round: match.round || 1,
-                        timestamp: new Date(vote.timestamp).getTime(),
+                        timestamp: vote.timestamp || Date.now(),
                         createdFrom: 'auto-backfill'
                     });
                     
@@ -900,13 +903,13 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
         // ========================================
         
         if (updatedVotes > 0 || updatedActivity > 0 || createdActivity > 0) {
-            console.log(`\n🎉 Backfill complete!`);
+            console.log(`\n🎉 Profile backfill complete!`);
             console.log(`   ✅ Updated ${updatedVotes} votes`);
             console.log(`   ✅ Updated ${updatedActivity} activity records`);
             console.log(`   ✅ Created ${createdActivity} new activity records`);
-            console.log(`\n💡 Your voting history is now linked to "${username}"!`);
+            console.log(`\n💡 All your history now shows "${username}"!`);
         } else {
-            console.log('ℹ️ No old records needed updating');
+            console.log('ℹ️ No records found to update');
         }
         
     } catch (error) {
