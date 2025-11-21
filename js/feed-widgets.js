@@ -3,6 +3,8 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+// At the top of feed-widgets.js
+import { createMatchCard } from './match-card-renderer.js';
 import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
@@ -86,6 +88,7 @@ async function loadUserProfile() {
     }
 }
 
+
 // ========================================
 // RIGHT SIDEBAR - Live Matches Widget
 // ========================================
@@ -94,34 +97,41 @@ async function loadLiveMatches() {
     const container = document.getElementById('liveMatchesWidget');
     
     try {
-        // Fetch matches from API
-        const response = await fetch('/api/matches');
-        const allMatches = await response.json();
-        
-        // Filter live matches
-        const liveMatches = allMatches
-            .filter(m => m.status === 'live')
-            .slice(0, 5);
+        // Fetch from live-matches edge function
+        const response = await fetch('/api/live-matches');
+        const data = await response.json();
+        const liveMatches = data.matches || [];
         
         if (liveMatches.length === 0) {
             container.innerHTML = '<p class="widget-loading">No live matches right now</p>';
             return;
         }
         
-        // Render live matches
-        container.innerHTML = liveMatches.map(match => `
-            <div class="live-match-item" onclick="window.location.href='/vote?match=${match.matchId}'">
-                <div class="match-vs">
-                    <span>${truncate(match.song1.shortTitle || match.song1.title, 15)}</span>
-                    <span class="match-vs-separator">vs</span>
-                    <span>${truncate(match.song2.shortTitle || match.song2.title, 15)}</span>
-                </div>
-                <div class="match-stats">
-                    <span>${match.totalVotes || 0} votes</span>
-                    <span>Round ${match.round}</span>
-                </div>
-            </div>
-        `).join('');
+        // Clear container
+        container.innerHTML = '';
+        
+        // Render up to 3 live matches using match cards
+        liveMatches.slice(0, 3).forEach(match => {
+            // Transform API data to match card format
+            const matchData = transformToMatchCardFormat(match);
+            
+            // Create match card (reusing existing renderer)
+            const card = createMatchCard(matchData);
+            
+            // Make it compact for widget
+            card.classList.add('widget-match-card');
+            
+            container.appendChild(card);
+        });
+        
+        // Add "View All" link if more than 3
+        if (liveMatches.length > 3) {
+            const viewAllLink = document.createElement('a');
+            viewAllLink.href = '/matches';
+            viewAllLink.className = 'widget-view-all';
+            viewAllLink.innerHTML = `<i class="fa-solid fa-arrow-right"></i> View all ${liveMatches.length} matches`;
+            container.appendChild(viewAllLink);
+        }
         
         console.log('✅ Live matches loaded');
         
@@ -129,6 +139,40 @@ async function loadLiveMatches() {
         console.error('❌ Error loading live matches:', error);
         container.innerHTML = '<p class="widget-loading">Failed to load matches</p>';
     }
+}
+
+// Transform live-matches API format to match card format
+function transformToMatchCardFormat(apiMatch) {
+    return {
+        id: apiMatch.id || apiMatch.matchId,
+        tournament: apiMatch.tournament || '2025-worlds-anthems',
+        round: apiMatch.round,
+        status: apiMatch.status,
+        date: apiMatch.startDate,
+        endDate: apiMatch.endDate,
+        totalVotes: apiMatch.totalVotes || 0,
+        hasVoted: false,  // Widget shows all matches regardless
+        
+        competitor1: {
+            seed: apiMatch.song1?.seed || 1,
+            name: apiMatch.song1?.shortTitle || apiMatch.song1?.title || 'Song 1',
+            source: apiMatch.song1?.artist || 'Artist',
+            videoId: apiMatch.song1?.videoId,
+            votes: apiMatch.song1?.votes || 0,
+            percentage: apiMatch.song1?.percentage || 0,
+            leading: (apiMatch.song1?.votes || 0) > (apiMatch.song2?.votes || 0)
+        },
+        
+        competitor2: {
+            seed: apiMatch.song2?.seed || 2,
+            name: apiMatch.song2?.shortTitle || apiMatch.song2?.title || 'Song 2',
+            source: apiMatch.song2?.artist || 'Artist',
+            videoId: apiMatch.song2?.videoId,
+            votes: apiMatch.song2?.votes || 0,
+            percentage: apiMatch.song2?.percentage || 0,
+            leading: (apiMatch.song2?.votes || 0) > (apiMatch.song1?.votes || 0)
+        }
+    };
 }
 
 // ========================================

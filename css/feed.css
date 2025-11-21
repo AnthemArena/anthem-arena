@@ -1052,3 +1052,81 @@ body {
         padding: 0 15px;
     }
 }
+/* ========================================
+   3-COLUMN LAYOUT (Twitter/X Style)
+   ======================================== */
+
+.feed-page-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr 350px;
+    column-gap: 40px;  /* ← Bigger gap between columns */
+    max-width: 1400px;
+    margin: 80px auto 40px;
+    padding: 0 20px;
+    min-height: 100vh;
+}
+
+.feed-center {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;  /* ← Centers the feed in the middle column */
+    padding: 0 15px;  /* ← Adds breathing room on sides */
+}
+/* ========================================
+   WIDGET MATCH CARDS (Compact Version)
+   ======================================== */
+
+.widget-match-card {
+    margin-bottom: 12px;
+    transform: scale(0.85);  /* Slightly smaller */
+    transform-origin: center;
+}
+
+.widget-match-card .match-header {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+}
+
+.widget-match-card .competitor-thumbnail {
+    height: 60px;  /* Smaller thumbnails */
+}
+
+.widget-match-card .competitor-title {
+    font-size: 0.9rem;
+}
+
+.widget-match-card .competitor-source {
+    font-size: 0.75rem;
+}
+
+.widget-match-card .match-footer {
+    padding: 8px 12px;
+}
+
+.widget-match-card .vote-now-btn,
+.widget-match-card .view-results-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+/* View All Link */
+.widget-view-all {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(200, 170, 110, 0.2);
+    transition: all 0.2s ease;
+}
+
+.widget-view-all:hover {
+    color: var(--gold-light);
+    background: rgba(200, 170, 110, 0.1);
+}
+
+.widget-view-all i {
+    margin-left: 4px;
+}
