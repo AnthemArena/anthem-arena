@@ -48,15 +48,15 @@ export async function followUser(targetUserId, targetUsername) {
         
         // ✅ Send notification to the followed user
         const { saveNotification } = await import('./notification-storage.js');
-        await saveNotification({
-            userId: targetUserId,
-            type: 'new-follower',
-            message: `${currentUsername} started following you`,
-            triggerUserId: currentUserId,
-            triggerUsername: currentUsername,
-            targetUrl: `/profile?user=${currentUsername}`,
-            priority: 3
-        });
+        await saveNotification(targetUserId, {
+    type: 'new-follower',
+    message: `${currentUsername} started following you`,
+    triggerUserId: currentUserId,
+    triggerUsername: currentUsername,
+    targetUrl: `/profile.html?user=${currentUsername}`,
+    priority: 3,
+    icon: '👤'
+});
         
         return { success: true };
         
