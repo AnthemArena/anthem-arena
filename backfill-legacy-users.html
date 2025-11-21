@@ -52,6 +52,9 @@
             font-size: 0.9rem;
             line-height: 1.6;
         }
+        .log-success { color: #4caf50; }
+        .log-warning { color: #ff9800; }
+        .log-error { color: #f44336; }
     </style>
 </head>
 <body>
@@ -59,7 +62,7 @@
     
     <div class="info">
         <p><strong>This script will:</strong></p>
-        <p>✅ Find users who voted before auto-generation</p>
+        <p>✅ Find users who voted but have no profile</p>
         <p>✅ Create profiles with generated usernames (e.g., "EpicSummoner42")</p>
         <p>✅ Assign random champion avatars</p>
         <p>✅ Update all their activity records</p>
@@ -75,7 +78,7 @@
 
     <script type="module">
         import { db } from './js/firebase-config.js';
-        import { collection, getDocs, doc, setDoc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { collection, getDocs, doc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // ========================================
         // USERNAME GENERATOR (same as vote.js)
@@ -139,13 +142,20 @@
         // ========================================
         // LOGGING
         // ========================================
-        function log(message, color = '#C8AA6E') {
+        function log(message, type = 'info') {
             const logDiv = document.getElementById('log');
             const line = document.createElement('div');
-            line.style.color = color;
+            
+            if (type === 'success') line.className = 'log-success';
+            if (type === 'warning') line.className = 'log-warning';
+            if (type === 'error') line.className = 'log-error';
+            
             line.textContent = message;
             logDiv.appendChild(line);
             console.log(message);
+            
+            // Auto-scroll to bottom
+            logDiv.scrollTop = logDiv.scrollHeight;
         }
         
         // ========================================
@@ -201,96 +211,75 @@
                     userId => !existingProfiles.has(userId)
                 );
                 
-                log(`🔍 Found ${legacyUserIds.length} legacy users without profiles`, '#ff9800');
+                log(`🔍 Found ${legacyUserIds.length} legacy users without profiles`, 'warning');
                 
                 if (legacyUserIds.length === 0) {
-                    log('✨ No legacy users to backfill!', '#4caf50');
+                    log('✨ No legacy users to backfill!', 'success');
                     alert('All users already have profiles!');
                     btn.disabled = false;
                     return;
                 }
                 
-// ========================================
-// STEP 4: Create profiles for legacy users
-// ========================================
-log('\n👤 Creating profiles for legacy users...');
-const createdProfiles = new Map();
-
-// First, gather all activities per user to find their earliest timestamp
-const userActivityMap = new Map();
-
-activitySnapshot.forEach(activityDoc => {
-    const activity = activityDoc.data();
-    const userId = activity.userId;
-    
-    if (!userActivityMap.has(userId)) {
-        userActivityMap.set(userId, []);
-    }
-    userActivityMap.get(userId).push(activity);
-});
-
-for (const userId of legacyUserIds) {
-    const username = generateUsername();
-    const avatar = getRandomChampion();
-    
-    // Find the earliest timestamp from this user's activities
-    const userActivities = userActivityMap.get(userId) || [];
-    let joinedAt = Date.now();
-    
-    if (userActivities.length > 0) {
-        joinedAt = Math.min(...userActivities.map(a => a.timestamp || Date.now()));
-    }
-    
-    const profile = {
-        userId: userId,
-        username: username,
-        avatar: avatar,
-        bio: '',
-        joinedAt: joinedAt, // ✅ Use earliest vote timestamp
-        privacy: {
-            isPublic: true,
-            messagePrivacy: 'everyone',
-            showOnlineStatus: true,
-            emotePrivacy: 'everyone'
-        },
-        stats: {
-            totalVotes: 0,
-            winStreak: 0
-        }
-    };
-    
-    await setDoc(doc(db, 'profiles', userId), profile);
-    createdProfiles.set(userId, profile);
-    
-    log(`✅ Created: ${username} (${avatar.championId})`, '#4caf50');
-}
-
-log(`\n🎉 Created ${createdProfiles.size} profiles!`);
-
-// ========================================
-// STEP 5: Update activity records
-// ========================================
-log('\n📝 Updating activity records...');
-let updatedActivity = 0;
-
-for (const activityDoc of activitySnapshot.docs) {
-    const activity = activityDoc.data();
-    const userId = activity.userId;
-    
-    if (createdProfiles.has(userId)) {
-        const profile = createdProfiles.get(userId);
-        
-        await updateDoc(doc(db, 'activity', activityDoc.id), {
-            username: profile.username,
-            avatar: profile.avatar,
-            isPublic: profile.privacy.isPublic
-        });
-        
-        updatedActivity++;
-    }
-}
-
-log(`✅ Updated ${updatedActivity} activity records`);
+                // ========================================
+                // STEP 4: Create profiles for legacy users
+                // ========================================
+                log('\n👤 Creating profiles for legacy users...');
+                const createdProfiles = new Map();
+                
+                for (const userId of legacyUserIds) {
+                    const username = generateUsername();
+                    const avatar = getRandomChampion();
+                    
+                    const profile = {
+                        userId: userId,
+                        username: username,
+                        avatar: avatar,
+                        bio: '',
+                        joinedAt: Date.now(),
+                        privacy: {
+                            isPublic: true,
+                            messagePrivacy: 'everyone',
+                            showOnlineStatus: true,
+                            emotePrivacy: 'everyone'
+                        },
+                        stats: {
+                            totalVotes: 0,
+                            winStreak: 0
+                        }
+                    };
+                    
+                    await setDoc(doc(db, 'profiles', userId), profile);
+                    createdProfiles.set(userId, profile);
+                    
+                    log(`✅ Created: ${username} (${avatar.championId})`, 'success');
+                }
+                
+                log(`\n🎉 Created ${createdProfiles.size} profiles!`, 'success');
+                
+                // ========================================
+                // STEP 5: Update activity records
+                // ========================================
+                log('\n📝 Updating activity records...');
+                let updatedActivity = 0;
+                
+                for (const activityDoc of activitySnapshot.docs) {
+                    const activity = activityDoc.data();
+                    const userId = activity.userId;
+                    
+                    if (createdProfiles.has(userId)) {
+                        const profile = createdProfiles.get(userId);
+                        
+                        await updateDoc(doc(db, 'activity', activityDoc.id), {
+                            username: profile.username,
+                            avatar: profile.avatar
+                        });
+                        
+                        updatedActivity++;
+                    }
+                }
+                
+                log(`✅ Updated ${updatedActivity} activity records`, 'success');
+                
                 // ========================================
                 // STEP 6: Update vote records
                 // ========================================
@@ -308,22 +297,23 @@ log(`✅ Updated ${updatedActivity} activity records`);
                         const profile = createdProfiles.get(userId);
                         
                         await updateDoc(doc(db, 'votes', voteDoc.id), {
-                            username: profile.username
+                            username: profile.username,
+                            avatar: profile.avatar
                         });
                         
                         updatedVotes++;
                     }
                 }
                 
-                log(`✅ Updated ${updatedVotes} vote records`);
+                log(`✅ Updated ${updatedVotes} vote records`, 'success');
                 
                 // ========================================
                 // COMPLETE
                 // ========================================
-                log('\n🎉 BACKFILL COMPLETE!', '#4caf50');
-                log(`👤 Profiles created: ${createdProfiles.size}`, '#4caf50');
-                log(`📝 Activity records updated: ${updatedActivity}`, '#4caf50');
-                log(`🗳️ Vote records updated: ${updatedVotes}`, '#4caf50');
+                log('\n🎉 BACKFILL COMPLETE!', 'success');
+                log(`👤 Profiles created: ${createdProfiles.size}`, 'success');
+                log(`📝 Activity records updated: ${updatedActivity}`, 'success');
+                log(`🗳️ Vote records updated: ${updatedVotes}`, 'success');
                 
                 alert(
                     `Backfill complete!\n\n` +
@@ -334,7 +324,7 @@ log(`✅ Updated ${updatedActivity} activity records`);
                 
             } catch (error) {
                 console.error('❌ Fatal error:', error);
-                log(`❌ Error: ${error.message}`, '#f44336');
+                log(`❌ Error: ${error.message}`, 'error');
                 alert(`Error: ${error.message}`);
             } finally {
                 btn.disabled = false;
