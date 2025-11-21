@@ -454,25 +454,11 @@ async function handleActivityFeed(request) {
       body: JSON.stringify({
         structuredQuery: {
           from: [{ collectionId: 'activity' }],
-          where: {
-            compositeFilter: {
-              op: 'AND',
-              filters: [
-                {
-                  fieldFilter: {
-                    field: { fieldPath: 'isPublic' },
-                    op: 'EQUAL',
-                    value: { booleanValue: true }
-                  }
-                }
-              ]
-            }
-          },
+          // ✅ No where clause - fetch all activities
           orderBy: [
-            { field: { fieldPath: 'isPublic' }, direction: 'ASCENDING' },
             { field: { fieldPath: 'timestamp' }, direction: 'DESCENDING' }
           ],
-          limit: limit
+          limit: limit * 2  // Fetch extra to account for filtering
         }
       })
     });
@@ -485,11 +471,14 @@ async function handleActivityFeed(request) {
     
     const data = await response.json();
     
+    // ✅ Filter client-side: show everything except explicitly private
     const activities = data
       .filter(item => item.document)
-      .map(item => convertDocument(item.document));
+      .map(item => convertDocument(item.document))
+      .filter(activity => activity.isPublic !== false)  // Hides only false, shows true/undefined
+      .slice(0, limit);  // Trim to requested limit after filtering
     
-    console.log(`✅ Fetched ${activities.length} PUBLIC activity items`);
+    console.log(`✅ Fetched ${activities.length} public activity items (filtered from ${data.length} total)`);
     
     edgeCache.set(cacheKey, { data: activities, timestamp: Date.now() });
     
