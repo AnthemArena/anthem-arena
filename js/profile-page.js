@@ -400,7 +400,7 @@ async function renderProfile(profile) {
     `;
     
     // Render action buttons
-    renderProfileActions();
+renderProfileActions(isViewingOwnProfile);
 }
 
 // ========================================
@@ -434,7 +434,8 @@ function renderProfileBadges(profile) {
 // RENDER PROFILE ACTIONS
 // ========================================
 
-async function renderProfileActions() {
+async function renderProfileActions(isOwnProfile) {
+    console.log('🎬 renderProfileActions called, isOwnProfile =', isOwnProfile);
     const actionsEl = document.getElementById('profileActions');
     if (!actionsEl) return;
     
