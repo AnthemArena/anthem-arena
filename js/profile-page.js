@@ -470,6 +470,10 @@ function renderProfileActions() {
 // LOAD PROFILE STATS
 // ========================================
 
+// ========================================
+// LOAD PROFILE STATS
+// ========================================
+
 async function loadProfileStats(userId) {
     try {
         console.log('📊 Loading stats for user:', userId);
@@ -489,7 +493,24 @@ async function loadProfileStats(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         const votesCount = votesSnapshot.size;
         
-        // Get achievements count
+        // ✅ NEW: Check for newly unlocked achievements (only for own profile)
+        if (isViewingOwnProfile && votesCount > 0) {
+            console.log('🏆 Checking for newly unlocked achievements...');
+            
+            // Get full vote data for achievement checking
+            const votes = votesSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            
+            // Import and run achievement checker
+            const { checkAchievements } = await import('./achievement-tracker.js');
+            await checkAchievements(votes);
+            
+            console.log('✅ Achievement check complete');
+        }
+        
+        // Get achievements count (might have changed after checking)
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
         const unlockedAchievements = profileDoc.exists() 
             ? (profileDoc.data().unlockedAchievements || [])
