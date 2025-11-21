@@ -446,7 +446,6 @@ async function handleActivityFeed(request) {
   console.log(`${bypassCache ? '🔄 CACHE BYPASS' : '❌ CACHE MISS'}: ${cacheKey}`);
   
   try {
-    // Query activity collection using structured query
     const activityUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
     
     const response = await fetch(activityUrl, {
@@ -455,6 +454,14 @@ async function handleActivityFeed(request) {
       body: JSON.stringify({
         structuredQuery: {
           from: [{ collectionId: 'activity' }],
+          // ✅ ADD THIS WHERE CLAUSE
+          where: {
+            fieldFilter: {
+              field: { fieldPath: 'isPublic' },
+              op: 'EQUAL',
+              value: { booleanValue: true }
+            }
+          },
           orderBy: [{ 
             field: { fieldPath: 'timestamp' }, 
             direction: 'DESCENDING' 
@@ -470,14 +477,12 @@ async function handleActivityFeed(request) {
     
     const data = await response.json();
     
-    // Transform results
     const activities = data
       .filter(item => item.document)
       .map(item => convertDocument(item.document));
     
-    console.log(`✅ Fetched ${activities.length} activity items`);
+    console.log(`✅ Fetched ${activities.length} PUBLIC activity items`);
     
-    // Cache result
     edgeCache.set(cacheKey, { data: activities, timestamp: Date.now() });
     
     return new Response(JSON.stringify(activities), {
@@ -501,7 +506,6 @@ async function handleActivityFeed(request) {
     });
   }
 }
-
 // ========================================
 // ✅ NEW: ATTACH VOTE COUNTS
 // ========================================
