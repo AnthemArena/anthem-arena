@@ -49,6 +49,273 @@ export async function initNotificationCenter() {
     console.log('✅ Notification center initialized');
 }
 
+// ========================================
+// TAB SYSTEM FOR NOTIFICATION CENTER
+// ========================================
+
+let currentTab = 'all';
+
+export async function initNotificationCenterWithTabs() {
+    const bell = document.getElementById('notificationBell');
+    const badge = document.getElementById('notificationBadge');
+    const panel = document.getElementById('notificationPanel');
+    const overlay = document.getElementById('notificationOverlay');
+    const closeBtn = document.getElementById('closeNotificationPanel');
+    
+    if (!bell || !panel) {
+        console.log('⚠️ Notification center elements not found');
+        return;
+    }
+    
+    // Add tabs to panel header
+    addTabsToPanel(panel);
+    
+    await updateBadgeCount();
+    
+    bell.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const isOpen = panel.style.display === 'block';
+        
+        if (isOpen) {
+            closePanel();
+        } else {
+            await openPanel();
+        }
+    });
+    
+    closeBtn?.addEventListener('click', closePanel);
+    overlay?.addEventListener('click', closePanel);
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panel.style.display === 'block') {
+            closePanel();
+        }
+    });
+    
+    setInterval(updateBadgeCount, 120000);
+    
+    // Make globally accessible
+    window.openNotificationPanel = openPanel;
+    window.closeNotificationPanel = closePanel;
+    
+    console.log('✅ Notification center with tabs initialized');
+}
+
+function addTabsToPanel(panel) {
+    // Find the panel header
+    const header = panel.querySelector('.notification-panel-header');
+    if (!header) return;
+    
+    // Add tabs container
+    const tabsHTML = `
+        <div class="notification-tabs" style="
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            border-bottom: 2px solid rgba(200, 170, 110, 0.2);
+        ">
+            <button class="notif-tab active" data-tab="all">
+                <i class="fa-solid fa-bell"></i> All
+            </button>
+            <button class="notif-tab" data-tab="votes">
+                <i class="fa-solid fa-chart-line"></i> Votes
+            </button>
+            <button class="notif-tab" data-tab="achievements">
+                <i class="fa-solid fa-trophy"></i> Achievements
+            </button>
+            <button class="notif-tab" data-tab="messages">
+                <i class="fa-solid fa-envelope"></i> Messages
+                <span class="tab-badge" id="messageTabBadge" style="display: none;"></span>
+            </button>
+        </div>
+    `;
+    
+    header.insertAdjacentHTML('beforeend', tabsHTML);
+    
+    // Add tab styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .notif-tab {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+        
+        .notif-tab:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(200, 170, 110, 0.1);
+        }
+        
+        .notif-tab.active {
+            color: #C8AA6E;
+            border-bottom-color: #C8AA6E;
+        }
+        
+        .tab-badge {
+            background: #e74c3c;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add tab click handlers
+    setupTabListeners();
+}
+
+function setupTabListeners() {
+    document.querySelectorAll('.notif-tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+            // Update active state
+            document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Load content for this tab
+            currentTab = tab.dataset.tab;
+            await loadNotificationsByTab(currentTab);
+        });
+    });
+}
+
+async function loadNotificationsByTab(tab) {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') return;
+    
+    const content = document.getElementById('notificationPanelContent');
+    if (!content) return;
+    
+    content.innerHTML = '<div class="notification-empty"><p>Loading...</p></div>';
+    
+    if (tab === 'messages') {
+        await loadMessagesTab(content, userId);
+    } else {
+        await loadNotificationsTab(content, userId, tab);
+    }
+}
+
+async function loadMessagesTab(content, userId) {
+    const { getRecentConversations } = await import('./message-system.js');
+    const conversations = await getRecentConversations(20);
+    
+    if (conversations.length === 0) {
+        content.innerHTML = `
+            <div class="notification-empty">
+                <span style="font-size: 48px; opacity: 0.3;">💬</span>
+                <p>No messages yet</p>
+                <p style="font-size: 0.85rem; color: #888; margin-top: 8px;">
+                    Messages from other users will appear here
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    content.innerHTML = conversations.map(conv => `
+        <div class="notification-item message-item ${conv.unreadCount > 0 ? 'unread' : ''}" 
+             data-user-id="${conv.userId}"
+             onclick="openConversationModal('${conv.userId}', '${conv.username}')"
+             style="cursor: pointer;">
+            <div class="notification-item-header" style="display: flex; align-items: center;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: white;
+                    margin-right: 12px;
+                    flex-shrink: 0;
+                ">
+                    ${conv.username.charAt(0).toUpperCase()}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div class="notification-item-message" style="font-weight: 600; color: #C8AA6E;">
+                        ${conv.username}
+                    </div>
+                    <div class="notification-item-detail" style="
+                        color: rgba(255, 255, 255, 0.7);
+                        font-size: 0.85rem;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    ">
+                        ${conv.lastMessage}
+                    </div>
+                </div>
+                ${conv.unreadCount > 0 ? `
+                    <span class="unread-badge" style="
+                        background: #e74c3c;
+                        color: white;
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        margin-left: 8px;
+                    ">${conv.unreadCount}</span>
+                ` : ''}
+            </div>
+            <div class="notification-item-footer">
+                <span class="notification-item-time">${getTimeAgo(conv.lastMessageTime)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadNotificationsTab(content, userId, tab) {
+    const notifications = await getUnreadNotifications(userId);
+    
+    // Filter by tab
+    let filtered = notifications;
+    if (tab === 'votes') {
+        filtered = notifications.filter(n => 
+            n.type === 'causal-event' || n.type === 'live-activity'
+        );
+    } else if (tab === 'achievements') {
+        filtered = notifications.filter(n => n.type === 'achievement');
+    }
+    
+    if (filtered.length === 0) {
+        content.innerHTML = `
+            <div class="notification-empty">
+                <span style="font-size: 48px; opacity: 0.3;">🔔</span>
+                <p>No ${tab === 'all' ? '' : tab} notifications</p>
+            </div>
+        `;
+        return;
+    }
+    
+    content.innerHTML = filtered.map(notification => {
+        return renderNotificationItem(notification);
+    }).join('');
+    
+    attachNotificationListeners();
+    await updateCtaButtonsWithPrivacy();
+}
+
+// Global function for opening conversations
+window.openConversationModal = function(userId, username) {
+    showMessageComposer(userId, username, {});
+};
+
 async function updateBadgeCount() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') return;

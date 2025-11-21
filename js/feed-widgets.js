@@ -179,6 +179,10 @@ function transformToMatchCardFormat(apiMatch) {
 // RIGHT SIDEBAR - Recent Activity Widget
 // ========================================
 
+// ========================================
+// RIGHT SIDEBAR - Recent Activity Widget
+// ========================================
+
 async function loadRecentActivity() {
     const container = document.getElementById('recentActivityWidget');
     
@@ -199,20 +203,41 @@ async function loadRecentActivity() {
             return;
         }
         
-        // Render activities
+        // ✅ Load music videos data for thumbnails
+        let musicVideos = [];
+        try {
+            const response = await fetch('/data/music-videos.json');
+            musicVideos = await response.json();
+        } catch (error) {
+            console.warn('⚠️ Could not load music videos data:', error);
+        }
+        
+        // Render activities with thumbnails
         container.innerHTML = activities.map(activity => {
             const avatarUrl = getAvatarUrl(activity.avatar);
             const timeAgo = getTimeAgo(activity.timestamp);
-            const action = `voted for ${truncate(activity.songTitle, 20)}`;
+            const action = `voted for`;
+            
+            // ✅ Find thumbnail for the song
+            const songVideo = musicVideos.find(v => v.id === activity.songId);
+            const thumbnailUrl = songVideo?.videoId 
+                ? `https://img.youtube.com/vi/${songVideo.videoId}/mqdefault.jpg`
+                : null;
             
             return `
                 <div class="activity-item-mini" onclick="window.location.href='/vote?match=${activity.matchId}'">
                     <img src="${avatarUrl}" alt="${activity.username}" class="activity-avatar-mini">
                     <div class="activity-info-mini">
                         <div class="activity-username">${activity.username}</div>
-                        <div class="activity-action">${action}</div>
+                        <div class="activity-action">${action} ${truncate(activity.songTitle, 18)}</div>
                         <div class="activity-time">${timeAgo}</div>
                     </div>
+                    ${thumbnailUrl ? `
+                        <img src="${thumbnailUrl}" 
+                             alt="${activity.songTitle}" 
+                             class="activity-song-thumbnail"
+                             loading="lazy">
+                    ` : ''}
                 </div>
             `;
         }).join('');
@@ -257,23 +282,43 @@ async function loadTournamentStats() {
 // SETUP SIDEBAR INTERACTIONS
 // ========================================
 
+// ========================================
+// SETUP SIDEBAR INTERACTIONS
+// ========================================
+
 export function setupSidebarInteractions() {
     // Notifications button
     const notifBtn = document.getElementById('sidebarNotifications');
     if (notifBtn) {
         notifBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.openNotificationPanel?.();
+            
+            if (window.openNotificationPanel) {
+                window.openNotificationPanel();
+            } else {
+                console.warn('Notification panel not available');
+            }
         });
     }
     
-    // Messages button (placeholder)
+    // Messages button - opens notifications and switches to messages tab
     const msgBtn = document.getElementById('sidebarMessages');
     if (msgBtn) {
         msgBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (window.showNotification) {
-                window.showNotification('Messages coming soon!', 'info');
+            
+            if (window.openNotificationPanel) {
+                window.openNotificationPanel();
+                
+                // Switch to messages tab after panel opens
+                setTimeout(() => {
+                    const messagesTab = document.querySelector('[data-tab="messages"]');
+                    if (messagesTab) {
+                        messagesTab.click();
+                    }
+                }, 150);
+            } else {
+                console.warn('Notification panel not available');
             }
         });
     }

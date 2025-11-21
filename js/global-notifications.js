@@ -1824,12 +1824,66 @@ function initBulletinSystem() {
     console.log('✅ Bulletin system initialized with live activity');
 }
 
+// ========================================
+// INITIALIZATION WITH NOTIFICATION CENTER
+// ========================================
+
+async function initializeNotificationSystem() {
+    console.log('🎯 Initializing complete notification system...');
+    
+    // Initialize notification center with tabs first
+    try {
+        const { initNotificationCenterWithTabs } = await import('./notification-center.js');
+        await initNotificationCenterWithTabs();
+        console.log('✅ Notification center with tabs ready');
+    } catch (error) {
+        console.warn('⚠️ Could not load notification center:', error);
+        // Continue anyway - toasts will still work
+    }
+    
+    // Initialize bulletin system (toasts)
+    initBulletinSystem();
+    
+    console.log('✅ Complete notification system ready');
+}
+
 // Start when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBulletinSystem);
+    document.addEventListener('DOMContentLoaded', initializeNotificationSystem);
 } else {
-    initBulletinSystem();
+    initializeNotificationSystem();
 }
+
+
+// ========================================
+// EXPOSE NOTIFICATION CENTER FUNCTIONS
+// ========================================
+
+// Make notification panel accessible globally
+window.openNotificationPanel = function() {
+    const panel = document.getElementById('notificationPanel');
+    const overlay = document.getElementById('notificationOverlay');
+    
+    if (panel && overlay) {
+        panel.style.display = 'block';
+        overlay.style.display = 'block';
+        
+        // Load notifications
+        if (window.loadNotificationPanel) {
+            window.loadNotificationPanel();
+        }
+    }
+};
+
+window.closeNotificationPanel = function() {
+    const panel = document.getElementById('notificationPanel');
+    const overlay = document.getElementById('notificationOverlay');
+    
+    if (panel && overlay) {
+        panel.style.display = 'none';
+        overlay.style.display = 'none';
+    }
+};
 
 // ========================================
 // PERIODIC CLEANUP OF EXPIRED DISMISSALS

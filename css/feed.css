@@ -1130,3 +1130,29 @@ body {
 .widget-view-all i {
     margin-left: 4px;
 }
+/* Activity Item with Song Thumbnail */
+.activity-item-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.activity-song-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.activity-item-mini:hover .activity-song-thumbnail {
+    border-color: rgba(200, 170, 110, 0.6);
+    transform: scale(1.05);
+}
