@@ -2194,3 +2194,90 @@
         display: none;
     }
 }
+/* ========================================
+   PROFILE ACTION BUTTONS
+   ======================================== */
+
+.profile-action-btn {
+    position: relative;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-action-btn.primary {
+    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    color: #1a1a2e;
+}
+
+.profile-action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.4);
+}
+
+.profile-action-btn.secondary {
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+}
+
+.profile-action-btn.secondary:hover {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #C8AA6E;
+}
+
+.profile-action-btn.follow {
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+}
+
+.profile-action-btn.follow:hover {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #C8AA6E;
+}
+
+.profile-action-btn.follow.following {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #C8AA6E;
+}
+
+.profile-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Notification badge on profile button */
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.5);
+    border: 2px solid #1a1a2e;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

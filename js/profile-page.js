@@ -430,33 +430,416 @@ function renderProfileBadges(profile) {
 // RENDER PROFILE ACTIONS
 // ========================================
 
-function renderProfileActions() {
+// ========================================
+// RENDER PROFILE ACTIONS
+// ========================================
+
+async function renderProfileActions() {
     const actionsEl = document.getElementById('profileActions');
+    if (!actionsEl) return;
     
     if (isOwnProfile) {
-        // Own profile - show edit buttons
+        // ========================================
+        // OWN PROFILE - Show Notifications + Settings
+        // ========================================
         actionsEl.innerHTML = `
+            <button class="profile-action-btn secondary" id="profileNotificationBtn" onclick="window.openNotificationPanel()">
+                <i class="fas fa-bell"></i> Notifications
+                <span class="notification-badge" id="profileNotificationBadge" style="display: none;">0</span>
+            </button>
             <button class="profile-action-btn primary" onclick="window.openSettingsModal()">
-                <i class="fas fa-cog"></i> Edit Profile
+                <i class="fas fa-cog"></i> Settings
             </button>
-            <a href="/my-votes.html" class="profile-action-btn secondary">
-                <i class="fas fa-chart-line"></i> Detailed Analytics
-            </a>
         `;
-    } else {
-        // Other user's profile - show follow/message buttons
-        const isFollowing = false; // TODO: Check if following
         
+        // Update notification badge count
+        updateProfileNotificationBadge();
+        
+    } else {
+        // ========================================
+        // OTHER USER'S PROFILE - Show Follow + Message (with privacy checks)
+        // ========================================
+        
+        // Show loading state initially
         actionsEl.innerHTML = `
-            <button class="profile-action-btn follow" onclick="window.toggleFollow('${currentProfile.userId}')">
-                <i class="fas fa-user-plus"></i> Follow
+            <button class="profile-action-btn follow" disabled style="opacity: 0.6;">
+                <i class="fas fa-spinner fa-spin"></i> Loading...
             </button>
-            <button class="profile-action-btn secondary" onclick="window.sendMessage('${currentProfile.userId}')">
-                <i class="fas fa-envelope"></i> Message
+            <button class="profile-action-btn secondary" disabled style="opacity: 0.6;">
+                <i class="fas fa-spinner fa-spin"></i> Loading...
             </button>
         `;
+        
+        try {
+            // Check follow status
+            const { isFollowing } = await import('./follow-system.js');
+            const following = await isFollowing(currentProfile.userId);
+            
+            // Check privacy permissions
+            const { getAvailableActions } = await import('./notification-storage.js');
+            const permissions = await getAvailableActions(currentProfile.userId);
+            
+            console.log('🔐 Permissions for profile actions:', permissions);
+            
+            // Build Follow button
+            const followBtn = `
+                <button class="profile-action-btn follow ${following ? 'following' : ''}" 
+                        id="profileFollowBtn"
+                        data-user-id="${currentProfile.userId}"
+                        data-username="${currentProfile.username}">
+                    ${following ? 
+                        '<i class="fas fa-user-check"></i> Following' : 
+                        '<i class="fas fa-user-plus"></i> Follow'
+                    }
+                </button>
+            `;
+            
+            // Build Message button (with privacy check)
+            let messageBtn;
+            if (permissions.canMessage) {
+                messageBtn = `
+                    <button class="profile-action-btn secondary" id="profileMessageBtn"
+                            data-user-id="${currentProfile.userId}"
+                            data-username="${currentProfile.username}">
+                        <i class="fas fa-envelope"></i> Message
+                    </button>
+                `;
+            } else {
+                // Show disabled button with reason
+                const reason = permissions.messageReason || 'Messages disabled';
+                messageBtn = `
+                    <button class="profile-action-btn secondary" 
+                            disabled 
+                            style="opacity: 0.5; cursor: not-allowed;"
+                            title="${reason}">
+                        <i class="fas fa-lock"></i> ${reason.includes('followers') ? 'Follow to Message' : 'Messages Off'}
+                    </button>
+                `;
+            }
+            
+            actionsEl.innerHTML = followBtn + messageBtn;
+            
+            // Attach event listeners
+            const followButton = document.getElementById('profileFollowBtn');
+            if (followButton) {
+                followButton.addEventListener('click', handleFollowClick);
+            }
+            
+            const messageButton = document.getElementById('profileMessageBtn');
+            if (messageButton && permissions.canMessage) {
+                messageButton.addEventListener('click', handleMessageClick);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading profile actions:', error);
+            
+            // Fallback to basic buttons on error
+            actionsEl.innerHTML = `
+                <button class="profile-action-btn follow" id="profileFollowBtn"
+                        data-user-id="${currentProfile.userId}"
+                        data-username="${currentProfile.username}">
+                    <i class="fas fa-user-plus"></i> Follow
+                </button>
+                <button class="profile-action-btn secondary" id="profileMessageBtn"
+                        data-user-id="${currentProfile.userId}"
+                        data-username="${currentProfile.username}">
+                    <i class="fas fa-envelope"></i> Message
+                </button>
+            `;
+            
+            document.getElementById('profileFollowBtn')?.addEventListener('click', handleFollowClick);
+            document.getElementById('profileMessageBtn')?.addEventListener('click', handleMessageClick);
+        }
     }
 }
+
+// ========================================
+// UPDATE PROFILE NOTIFICATION BADGE
+// ========================================
+
+async function updateProfileNotificationBadge() {
+    try {
+        const { getUnreadCount } = await import('./notification-storage.js');
+        const userId = localStorage.getItem('tournamentUserId');
+        
+        if (!userId || userId === 'anonymous') return;
+        
+        const count = await getUnreadCount(userId);
+        const badge = document.getElementById('profileNotificationBadge');
+        
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.warn('Could not update notification badge:', error);
+    }
+}
+
+// ========================================
+// HANDLE FOLLOW BUTTON CLICK
+// ========================================
+
+async function handleFollowClick(e) {
+    const btn = e.currentTarget;
+    const targetUserId = btn.dataset.userId;
+    const targetUsername = btn.dataset.username;
+    const isCurrentlyFollowing = btn.classList.contains('following');
+    
+    // Disable button during action
+    btn.disabled = true;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    
+    try {
+        if (isCurrentlyFollowing) {
+            // Unfollow
+            const { unfollowUser } = await import('./follow-system.js');
+            const result = await unfollowUser(targetUserId);
+            
+            if (result.success) {
+                btn.classList.remove('following');
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+                await updateFollowCounts();
+                
+                // Show toast
+                if (window.showQuickToast) {
+                    window.showQuickToast(`Unfollowed ${targetUsername}`, 2000);
+                }
+            } else {
+                throw new Error('Failed to unfollow');
+            }
+        } else {
+            // Follow
+            const { followUser } = await import('./follow-system.js');
+            const result = await followUser(targetUserId, targetUsername);
+            
+            if (result.success) {
+                btn.classList.add('following');
+                btn.innerHTML = '<i class="fas fa-user-check"></i> Following';
+                await updateFollowCounts();
+                
+                // Show toast
+                if (window.showQuickToast) {
+                    window.showQuickToast(`✅ Now following ${targetUsername}!`, 2000);
+                }
+            } else {
+                throw new Error('Failed to follow');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Follow action failed:', error);
+        btn.innerHTML = originalHTML;
+        
+        if (window.showQuickToast) {
+            window.showQuickToast('⚠️ Action failed, please try again', 2000);
+        }
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ========================================
+// HANDLE MESSAGE BUTTON CLICK
+// ========================================
+
+async function handleMessageClick(e) {
+    const btn = e.currentTarget;
+    const targetUserId = btn.dataset.userId;
+    const targetUsername = btn.dataset.username;
+    
+    try {
+        // Open message composer
+        showProfileMessageComposer(targetUserId, targetUsername);
+    } catch (error) {
+        console.error('❌ Error opening message composer:', error);
+        alert('Could not open message composer. Please try again.');
+    }
+}
+
+// ========================================
+// MESSAGE COMPOSER MODAL
+// ========================================
+
+function showProfileMessageComposer(toUserId, toUsername) {
+    const existing = document.getElementById('messageComposer');
+    if (existing) existing.remove();
+    
+    const composer = document.createElement('div');
+    composer.id = 'messageComposer';
+    composer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    composer.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; color: #C8AA6E; font-size: 1.2rem;">
+                    💬 Message ${toUsername}
+                </h3>
+                <button id="closeComposer" style="
+                    background: none;
+                    border: none;
+                    color: #888;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                ">×</button>
+            </div>
+            
+            <textarea id="messageInput" 
+                placeholder="Type your message... (max 300 characters)"
+                maxlength="300"
+                style="
+                    width: 100%;
+                    height: 120px;
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 2px solid rgba(200, 170, 110, 0.3);
+                    border-radius: 8px;
+                    padding: 12px;
+                    color: #fff;
+                    font-family: inherit;
+                    font-size: 1rem;
+                    resize: vertical;
+                    margin-bottom: 12px;
+                    box-sizing: border-box;
+                "
+            ></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="charCount" style="color: #888; font-size: 0.85rem;">0/300</span>
+                <div style="display: flex; gap: 8px;">
+                    <button id="cancelMessage" style="
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        color: #fff;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    ">Cancel</button>
+                    <button id="sendMessage" style="
+                        background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                        border: none;
+                        color: #1a1a2e;
+                        padding: 10px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 700;
+                    ">Send 💬</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(composer);
+    
+    const input = document.getElementById('messageInput');
+    const charCount = document.getElementById('charCount');
+    const sendBtn = document.getElementById('sendMessage');
+    const cancelBtn = document.getElementById('cancelMessage');
+    const closeBtn = document.getElementById('closeComposer');
+    
+    input.focus();
+    
+    input.addEventListener('input', () => {
+        const length = input.value.length;
+        charCount.textContent = `${length}/300`;
+    });
+    
+    const closeComposer = () => {
+        composer.style.animation = 'fadeOut 0.2s ease';
+        setTimeout(() => composer.remove(), 200);
+    };
+    
+    closeBtn.addEventListener('click', closeComposer);
+    cancelBtn.addEventListener('click', closeComposer);
+    composer.addEventListener('click', (e) => {
+        if (e.target === composer) closeComposer();
+    });
+    
+    sendBtn.addEventListener('click', async () => {
+        const message = input.value.trim();
+        if (!message) return;
+        
+        sendBtn.textContent = 'Sending...';
+        sendBtn.disabled = true;
+        
+        try {
+            const { sendMessage } = await import('./message-system.js');
+            const result = await sendMessage(toUserId, toUsername, message, { source: 'profile' });
+            
+            if (result.success) {
+                sendBtn.textContent = '✓ Sent!';
+                setTimeout(() => {
+                    closeComposer();
+                    if (window.showQuickToast) {
+                        window.showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
+                    }
+                }, 1000);
+            } else {
+                throw new Error(result.error || 'Failed to send');
+            }
+        } catch (error) {
+            console.error('❌ Send message error:', error);
+            sendBtn.textContent = '✗ Failed';
+            setTimeout(() => {
+                sendBtn.textContent = 'Send 💬';
+                sendBtn.disabled = false;
+            }, 2000);
+        }
+    });
+}
+
+// ========================================
+// OPEN NOTIFICATION PANEL
+// ========================================
+
+window.openNotificationPanel = async function() {
+    try {
+        // Click the notification bell if it exists in nav
+        const bell = document.getElementById('notificationBell');
+        if (bell) {
+            bell.click();
+        } else {
+            // Initialize notification center if not already loaded
+            const { initNotificationCenter } = await import('./notification-center.js');
+            await initNotificationCenter();
+            
+            // Try clicking again after init
+            setTimeout(() => {
+                const bellAfterInit = document.getElementById('notificationBell');
+                if (bellAfterInit) {
+                    bellAfterInit.click();
+                }
+            }, 100);
+        }
+    } catch (error) {
+        console.error('❌ Could not open notifications:', error);
+        alert('Notifications are not available at the moment.');
+    }
+};
 
 // ========================================
 // LOAD PROFILE STATS
@@ -1596,9 +1979,17 @@ function invalidateProfileCache(username) {
 // CALCULATE TOURNAMENT PARTICIPATION
 // ========================================
 
+// ========================================
+// CALCULATE TOURNAMENT PARTICIPATION (CURRENT TOURNAMENT ONLY)
+// ========================================
+
 async function calculateTournamentParticipation(userId) {
     try {
-        // Total possible matches per round (hardcoded for now - could fetch from config)
+        console.log('📊 Loading participation data...');
+        
+        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
+        
+        // Total possible matches per round
         const TOTAL_MATCHES_BY_ROUND = {
             1: 29,
             2: 16,
@@ -1607,6 +1998,13 @@ async function calculateTournamentParticipation(userId) {
             5: 2,
             6: 1
         };
+        
+        // Get ALL matches to filter by tournament
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
+        
+        console.log(`📊 Found ${tournamentMatches.length} matches in current tournament`);
         
         // Get user's votes
         const votesQuery = query(
@@ -1619,18 +2017,37 @@ async function calculateTournamentParticipation(userId) {
         if (snapshot.empty) {
             return {
                 overallPercentage: 0,
-                byRound: [],
+                byRound: Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => ({
+                    round: parseInt(round),
+                    roundName: getRoundName(parseInt(round)),
+                    voted: 0,
+                    total,
+                    percentage: 0
+                })),
                 totalVotes: 0,
                 totalPossible: 60
             };
         }
         
-        // Count votes by round
+        // Filter votes to only include current tournament matches
+        const tournamentVotes = snapshot.docs
+            .map(doc => doc.data())
+            .filter(vote => {
+                // Check if this vote's match is in the current tournament
+                const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
+                return match !== undefined;
+            });
+        
+        console.log(`📊 User has ${tournamentVotes.length} votes in current tournament (${snapshot.size} total votes)`);
+        
+        // Count votes by round (only current tournament)
         const votesByRound = {};
-        snapshot.docs.forEach(doc => {
-            const vote = doc.data();
-            const round = vote.round || 1;
-            votesByRound[round] = (votesByRound[round] || 0) + 1;
+        tournamentVotes.forEach(vote => {
+            const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
+            if (match) {
+                const round = match.round || vote.round || 1;
+                votesByRound[round] = (votesByRound[round] || 0) + 1;
+            }
         });
         
         // Calculate participation by round
@@ -1647,10 +2064,17 @@ async function calculateTournamentParticipation(userId) {
             };
         });
         
-        // Calculate overall participation
+        // Calculate overall participation (current tournament only)
         const totalPossible = Object.values(TOTAL_MATCHES_BY_ROUND).reduce((a, b) => a + b, 0);
-        const totalVotes = snapshot.size;
+        const totalVotes = tournamentVotes.length;
         const overallPercentage = Math.round((totalVotes / totalPossible) * 100);
+        
+        console.log('✅ Participation calculated:', {
+            overallPercentage,
+            totalVotes,
+            totalPossible,
+            byRound
+        });
         
         return {
             overallPercentage,
@@ -1800,6 +2224,10 @@ document.getElementById('statParticipation').textContent = `${participation.over
 // RENDER PARTICIPATION TAB
 // ========================================
 
+// ========================================
+// RENDER PARTICIPATION TAB
+// ========================================
+
 function renderParticipationTab() {
     const participation = window.participationData;
     
@@ -1820,9 +2248,14 @@ function renderParticipationTab() {
     // Update percentage display
     document.getElementById('overallParticipation').textContent = `${participation.overallPercentage}%`;
     
-    // Update summary text
+    // Update summary text with tournament name
     const summary = document.getElementById('participationSummary');
-    summary.textContent = `You've voted in ${participation.totalVotes} out of ${participation.totalPossible} total matches across all rounds.`;
+    summary.innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <strong style="color: #c8aa6e; font-size: 1.1rem;">🏆 2025 Worlds Anthems Championship</strong>
+        </div>
+        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches in this tournament.</p>
+    `;
     
     // Render rounds breakdown
     const roundsContainer = document.getElementById('roundsBreakdown');
