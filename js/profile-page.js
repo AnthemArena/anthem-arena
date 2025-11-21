@@ -215,32 +215,24 @@ async function fetchUserProfile(username) {
         
         // ✅ Try direct Firebase as fallback
         try {
-            return await fetchUserProfileDirect(username);
+            const profile = await fetchUserProfileDirect(username);
+            if (profile) return profile;
         } catch (fallbackError) {
             console.error('❌ Direct Firebase also failed:', fallbackError);
         }
         
-        // ✅ Try localStorage fallback
-        const cacheKey = `profile-${username}`;
-        const cached = localStorage.getItem(cacheKey);
-        
-        if (cached) {
-            const { profile, timestamp, ttl } = JSON.parse(cached);
-            const age = Date.now() - timestamp;
-            
-            // Use stale cache if less than 5 minutes old
-            if (age < 300000) {
-                console.log('📦 Using stale localStorage cache');
-                return profile;
-            }
-        }
-        
-        return null;
+        // ✅ Last resort: generate fallback profile
+        console.log('🔧 Using fallback profile generation');
+        return generateFallbackProfile(username);
     }
 }
 
 // ========================================
 // DIRECT FIREBASE FALLBACK (temporary until edge function deployed)
+// ========================================
+
+// ========================================
+// DIRECT FIREBASE FALLBACK (with user generation)
 // ========================================
 
 async function fetchUserProfileDirect(username) {
@@ -256,7 +248,9 @@ async function fetchUserProfileDirect(username) {
         
         if (snapshot.empty) {
             console.warn('⚠️ No profile found for username:', username);
-            return null;
+            
+            // ✅ FALLBACK: Generate temporary profile for users without one
+            return generateFallbackProfile(username);
         }
         
         const profileDoc = snapshot.docs[0];
@@ -276,6 +270,46 @@ async function fetchUserProfileDirect(username) {
         console.error('❌ Error fetching profile from Firebase:', error);
         return null;
     }
+}
+
+// ========================================
+// GENERATE FALLBACK PROFILE
+// ========================================
+
+function generateFallbackProfile(username) {
+    console.log('🔧 Generating fallback profile for:', username);
+    
+    // Champion avatar pool
+    const champions = [
+        { championId: 'Ahri', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ahri.png' },
+        { championId: 'Akali', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Akali.png' },
+        { championId: 'Yasuo', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Yasuo.png' },
+        { championId: 'Jinx', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Jinx.png' },
+        { championId: 'Lux', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Lux.png' },
+        { championId: 'Ezreal', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ezreal.png' },
+        { championId: 'Zed', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Zed.png' },
+        { championId: 'KSante', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/KSante.png' }
+    ];
+    
+    // Use username hash to consistently pick same champion
+    const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const champion = champions[hash % champions.length];
+    
+    return {
+        userId: 'unknown',
+        username: username,
+        avatar: {
+            type: 'champion',
+            championId: champion.championId,
+            imageUrl: champion.imageUrl
+        },
+        bio: 'New to Anthem Arena',
+        privacy: {
+            isPublic: true
+        },
+        createdAt: Date.now(),
+        isFallback: true  // Flag to indicate this is a generated profile
+    };
 }
 
 // ========================================
@@ -335,6 +369,19 @@ async function renderProfile(profile) {
         bioEl.style.display = 'block';
     } else {
         bioEl.style.display = 'none';
+    }
+
+    // ✅ NEW: Show fallback notice if this is a generated profile
+    if (profile.isFallback) {
+        const bioEl = document.getElementById('profileBio');
+        bioEl.innerHTML = `
+            <div style="padding: 1rem; background: rgba(200, 170, 110, 0.1); border-radius: 8px; border: 1px solid rgba(200, 170, 110, 0.3);">
+                <p style="margin: 0; color: rgba(240, 230, 210, 0.7); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> This user hasn't set up their profile yet. Their activity and votes are still tracked!
+                </p>
+            </div>
+        `;
+        bioEl.style.display = 'block';
     }
     
     // Badges
