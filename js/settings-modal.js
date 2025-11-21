@@ -622,15 +622,14 @@ async function handleSaveSettings(e) {
     e.preventDefault();
     
     const usernameInput = document.getElementById('usernameInput');
-        const bioInput = document.getElementById('bioInput'); // ✅ ADD THIS
-
+    const bioInput = document.getElementById('bioInput');
     const errorEl = document.getElementById('usernameError');
+    const saveBtn = e.target.querySelector('button[type="submit"]') || e.submitter;
     
     if (!usernameInput || !errorEl) return;
     
     const username = usernameInput.value.trim();
-        const bio = bioInput?.value.trim() || ''; // ✅ ADD THIS
-
+    const bio = bioInput?.value.trim() || '';
     
     // ✅ Get all privacy settings
     const privacySettings = {
@@ -670,68 +669,113 @@ async function handleSaveSettings(e) {
         }
     }
     
-    // Save to localStorage (backward compatible)
-localStorage.setItem('username', username);
-localStorage.setItem('avatar', JSON.stringify(avatar));
-localStorage.setItem('bio', bio); // ✅ ALREADY CORRECT
-
-// ✅ Save all privacy settings
-Object.keys(privacySettings).forEach(key => {
-    const value = privacySettings[key];
-    if (typeof value === 'boolean') {
-        localStorage.setItem(key, value ? 'true' : 'false');
-    } else {
-        localStorage.setItem(key, value);
-    }
-});
-
-// ✅ Save to Firebase profiles collection
-try {
-    const userId = localStorage.getItem('tournamentUserId');
-    if (userId) {
-        await setDoc(doc(db, 'profiles', userId), {
-            username: username,
-            avatar: avatar,
-            bio: bio, // ✅ ALREADY CORRECT
-            // ✅ Save all privacy settings
-            privacy: privacySettings,
-            updatedAt: Date.now()
+    // ========================================
+    // SAVE WITH LOADING STATES
+    // ========================================
+    const originalBtnText = saveBtn ? saveBtn.innerHTML : '';
+    
+    try {
+        // Disable button and show loading
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+        }
+        
+        // Save to localStorage (backward compatible)
+        localStorage.setItem('username', username);
+        localStorage.setItem('avatar', JSON.stringify(avatar));
+        localStorage.setItem('bio', bio);
+        
+        // Save all privacy settings
+        Object.keys(privacySettings).forEach(key => {
+            const value = privacySettings[key];
+            if (typeof value === 'boolean') {
+                localStorage.setItem(key, value ? 'true' : 'false');
+            } else {
+                localStorage.setItem(key, value);
+            }
         });
-        console.log('✅ Profile saved to Firebase with privacy settings');
         
-        // ✅ NEW: Automatically backfill old votes/activity
-        await backfillUserHistory(userId, username, avatar, privacySettings.isPublic);
+        // Save to Firebase profiles collection
+        const userId = localStorage.getItem('tournamentUserId');
+        if (userId) {
+            await setDoc(doc(db, 'profiles', userId), {
+                username: username,
+                avatar: avatar,
+                bio: bio,
+                privacy: privacySettings,
+                updatedAt: Date.now()
+            });
+            console.log('✅ Profile saved to Firebase with privacy settings');
+            
+            // Show updating history state
+            if (saveBtn) {
+                saveBtn.innerHTML = '<span class="spinner"></span> Updating history...';
+            }
+            
+            // Automatically backfill old votes/activity (batched)
+            await backfillUserHistory(userId, username, avatar, privacySettings.isPublic);
+            
+            // Invalidate profile cache after save
+            invalidateProfileCache(username);
+            console.log('🗑️ Profile cache invalidated');
+        }
         
-        // ✅ ADD THIS: Invalidate profile cache after save
-        invalidateProfileCache(username);
-        console.log('🗑️ Profile cache invalidated');
+        hasChanges = false;
+        
+        console.log('✅ Settings saved:', { username, avatar, privacy: privacySettings });
+        
+        // Update navigation
+        if (window.updateNavProfile) {
+            window.updateNavProfile();
+        }
+        
+        // Show success state
+        if (saveBtn) {
+            saveBtn.innerHTML = '✅ Saved!';
+            saveBtn.style.background = '#4caf50';
+        }
+        
+        // Show success notification
+        showNotification('✅ Profile updated successfully!', 'success');
+        
+        // Reload preview
+        loadCurrentProfile();
+        
+        // Close modal after short delay
+        setTimeout(() => {
+            closeSettingsModal();
+            if (saveBtn) {
+                saveBtn.innerHTML = originalBtnText;
+                saveBtn.style.background = '';
+                saveBtn.disabled = false;
+            }
+        }, 1500);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Error saving settings:', error);
+        
+        // Show error state
+        if (saveBtn) {
+            saveBtn.innerHTML = '❌ Error';
+            saveBtn.style.background = '#f44336';
+        }
+        
+        showNotification('❌ Failed to save profile', 'error');
+        
+        // Reset button after delay
+        setTimeout(() => {
+            if (saveBtn) {
+                saveBtn.innerHTML = originalBtnText;
+                saveBtn.style.background = '';
+                saveBtn.disabled = false;
+            }
+        }, 2000);
+        
+        return false;
     }
-} catch (error) {
-    console.warn('⚠️ Could not save profile to Firebase:', error);
-    // Don't block the save if Firebase fails
-}
-
-hasChanges = false;
-    
-    console.log('✅ Settings saved:', { username, avatar, privacy: privacySettings });
-    
-    // Update navigation
-    if (window.updateNavProfile) {
-        window.updateNavProfile();
-    }
-    
-    // Show success notification
-    showNotification('✅ Profile updated successfully!', 'success');
-    
-    // Reload preview
-    loadCurrentProfile();
-    
-    // Close modal after short delay
-    setTimeout(() => {
-        closeSettingsModal();
-    }, 1000);
-    
-    return true;
 }
 
 // ========================================
@@ -792,129 +836,94 @@ function showNotification(message, type = 'success') {
 /**
  * Automatically update all old votes/activity when user updates profile
  */
+/**
+ * Automatically update all old votes/activity when user updates profile
+ * Uses batched writes for better performance
+ */
 async function backfillUserHistory(userId, username, avatar, isPublic) {
     console.log('🔄 Updating all votes/activity with new profile...');
     
     try {
-        const { collection, query, where, getDocs, doc, updateDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        const { collection, query, where, getDocs, writeBatch } = 
+            await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         
-        let updatedVotes = 0;
-        let updatedActivity = 0;
-        let createdActivity = 0;
+        const updates = {
+            username,
+            avatar,
+            isPublic,
+            updatedAt: Date.now()
+        };
+        
+        let totalUpdated = 0;
         
         // ========================================
-        // 1. UPDATE ALL VOTES (not just Anonymous)
+        // 1. UPDATE VOTES (batched)
         // ========================================
-        
         const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
         const votesSnapshot = await getDocs(votesQuery);
         
-        for (const voteDoc of votesSnapshot.docs) {
-            try {
-                await updateDoc(doc(db, 'votes', voteDoc.id), {
-                    username: username,
-                    avatar: avatar,
-                    isPublic: isPublic,
-                    updatedAt: Date.now()
-                });
-                updatedVotes++;
-            } catch (error) {
-                console.warn(`⚠️ Failed to update vote ${voteDoc.id}:`, error);
+        if (votesSnapshot.size > 0) {
+            // Firebase batch limit is 500 operations
+            const BATCH_SIZE = 500;
+            let batch = writeBatch(db);
+            let batchCount = 0;
+            
+            for (const voteDoc of votesSnapshot.docs) {
+                batch.update(voteDoc.ref, updates);
+                batchCount++;
+                totalUpdated++;
+                
+                // Commit batch if we hit the limit
+                if (batchCount === BATCH_SIZE) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    batchCount = 0;
+                }
             }
+            
+            // Commit remaining updates
+            if (batchCount > 0) {
+                await batch.commit();
+            }
+            
+            console.log(`✅ Updated ${votesSnapshot.size} votes`);
         }
         
         // ========================================
-        // 2. UPDATE ALL ACTIVITY RECORDS
+        // 2. UPDATE ACTIVITY (batched)
         // ========================================
-        
         const activityQuery = query(collection(db, 'activity'), where('userId', '==', userId));
         const activitySnapshot = await getDocs(activityQuery);
         
-        for (const activityDoc of activitySnapshot.docs) {
-            try {
-                await updateDoc(doc(db, 'activity', activityDoc.id), {
-                    username: username,
-                    avatar: avatar,
-                    isPublic: isPublic,
-                    updatedAt: Date.now()
-                });
-                updatedActivity++;
-            } catch (error) {
-                console.warn(`⚠️ Failed to update activity ${activityDoc.id}:`, error);
-            }
-        }
-        
-        // ========================================
-        // 3. CREATE ACTIVITY FOR VOTES WITHOUT IT
-        // ========================================
-        
-        // If votes exist but no activity, create activity records
-        if (votesSnapshot.size > 0 && activitySnapshot.size === 0 && isPublic) {
-            console.log('📝 No activity records found - creating from votes...');
+        if (activitySnapshot.size > 0) {
+            const BATCH_SIZE = 500;
+            let batch = writeBatch(db);
+            let batchCount = 0;
             
-            // Get tournament matches for context
-            const TOURNAMENT_ID = '2025-worlds-anthems';
-            const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
-            const matchesSnapshot = await getDocs(matchesRef);
-            
-            const matchMap = new Map();
-            matchesSnapshot.forEach(matchDoc => {
-                const match = matchDoc.data();
-                matchMap.set(matchDoc.id, match);
-                if (match.matchId) matchMap.set(match.matchId, match);
-            });
-            
-            for (const voteDoc of votesSnapshot.docs) {
-                const vote = voteDoc.data();
-                const match = matchMap.get(vote.matchId);
+            for (const activityDoc of activitySnapshot.docs) {
+                batch.update(activityDoc.ref, updates);
+                batchCount++;
+                totalUpdated++;
                 
-                if (!match || !match.song1 || !match.song2) continue;
-                
-                const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
-                const activityId = `${userId}_${vote.matchId}`;
-                
-                try {
-                    await setDoc(doc(db, 'activity', activityId), {
-                        activityId: activityId,
-                        userId: userId,
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        matchId: vote.matchId,
-                        choice: vote.choice,
-                        songId: votedSong.videoId,
-                        songTitle: votedSong.shortTitle || votedSong.title,
-                        matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
-                        tournamentId: TOURNAMENT_ID,
-                        round: match.round || 1,
-                        timestamp: vote.timestamp || Date.now(),
-                        createdFrom: 'auto-backfill'
-                    });
-                    
-                    createdActivity++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to create activity for ${vote.matchId}:`, error);
+                if (batchCount === BATCH_SIZE) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    batchCount = 0;
                 }
             }
+            
+            if (batchCount > 0) {
+                await batch.commit();
+            }
+            
+            console.log(`✅ Updated ${activitySnapshot.size} activity records`);
         }
         
-        // ========================================
-        // SUMMARY
-        // ========================================
-        
-        if (updatedVotes > 0 || updatedActivity > 0 || createdActivity > 0) {
-            console.log(`\n🎉 Profile backfill complete!`);
-            console.log(`   ✅ Updated ${updatedVotes} votes`);
-            console.log(`   ✅ Updated ${updatedActivity} activity records`);
-            console.log(`   ✅ Created ${createdActivity} new activity records`);
-            console.log(`\n💡 All your history now shows "${username}"!`);
-        } else {
-            console.log('ℹ️ No records found to update');
-        }
+        console.log(`\n🎉 Profile backfill complete! Updated ${totalUpdated} total records`);
         
     } catch (error) {
         console.error('❌ Backfill error:', error);
-        // Don't block the profile save if backfill fails
+        // Don't throw - profile save succeeded even if backfill fails
     }
 }
 
