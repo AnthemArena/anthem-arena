@@ -300,26 +300,29 @@ export async function checkAchievements(allVotes) {
       });
     }
   }
-  
   // ✅ Save newly unlocked achievements to Firebase
-  if (newlyUnlocked.length > 0) {
-    console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
+if (newlyUnlocked.length > 0) {
+  console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
+  
+  for (const achievement of newlyUnlocked) {
+    // ✅ Only proceed if actually newly unlocked (not duplicate)
+    const wasActuallyUnlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
     
-    for (const achievement of newlyUnlocked) {
-      const unlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
-      
-      if (unlocked) {
-        // Award XP
-        if (achievement.xp > 0) {
-          addXP(achievement.xp);
-          console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
-        }
-        
-        // Show unlock notification
-        showAchievementUnlock(achievement);
+    // ✅ Only award XP if it was NEWLY unlocked (Firebase returns true for new unlocks)
+    if (wasActuallyUnlocked) {
+      // Award XP
+      if (achievement.xp > 0) {
+        addXP(achievement.xp);
+        console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
       }
+      
+      // Show unlock notification
+      showAchievementUnlock(achievement);
+    } else {
+      console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
     }
   }
+}
   
   return {
     unlocked,
