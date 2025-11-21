@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fix Activity Data</title>
+    <title>Backfill Legacy Users</title>
     <style>
         body {
             font-family: monospace;
@@ -34,6 +34,10 @@
         button:hover {
             background: #D4B87A;
         }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .progress {
             margin-top: 1rem;
             padding: 1rem;
@@ -44,234 +48,279 @@
         .progress.active {
             display: block;
         }
+        .log {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
-    <h1>🔧 Fix Activity Data</h1>
+    <h1>🔧 Backfill Legacy Users</h1>
     
     <div class="info">
-        <p>✅ Fixes song names and video IDs</p>
-        <p>✅ Adds missing choice field (song1/song2)</p>
-        <p>✅ Updates Anonymous → your username</p>
-        <p>✅ Updates avatars</p>
+        <p><strong>This script will:</strong></p>
+        <p>✅ Find users who voted before auto-generation</p>
+        <p>✅ Create profiles with generated usernames (e.g., "EpicSummoner42")</p>
+        <p>✅ Assign random champion avatars</p>
+        <p>✅ Update all their activity records</p>
+        <p>✅ Update all their vote records</p>
+        <p><strong>⚠️ Safe to run multiple times - skips existing profiles</strong></p>
     </div>
     
-    <button id="fix-btn">🚀 Run Fix Now</button>
+    <button id="backfill-btn">🚀 Run Backfill Now</button>
     
     <div id="progress" class="progress">
-        <p>Running... check console (F12) for details</p>
+        <div class="log" id="log"></div>
     </div>
 
     <script type="module">
         import { db } from './js/firebase-config.js';
-        import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { collection, getDocs, doc, setDoc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
-        async function fixActivityData() {
-            console.log('🔧 Starting activity data fix...');
+        // ========================================
+        // USERNAME GENERATOR (same as vote.js)
+        // ========================================
+        const ADJECTIVES = [
+            'Epic', 'Legendary', 'Supreme', 'Elite', 'Mystic', 
+            'Shadow', 'Golden', 'Silver', 'Radiant', 'Ancient',
+            'Mighty', 'Swift', 'Brave', 'Bold', 'Fierce',
+            'Noble', 'Royal', 'Divine', 'Cosmic', 'Thunder'
+        ];
+        
+        const NOUNS = [
+            'Warrior', 'Knight', 'Mage', 'Hunter', 'Assassin',
+            'Champion', 'Legend', 'Hero', 'Guardian', 'Summoner',
+            'Slayer', 'Duelist', 'Ranger', 'Striker', 'Blade',
+            'Storm', 'Phoenix', 'Dragon', 'Tiger', 'Wolf'
+        ];
+        
+        const CHAMPIONS = [
+            'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie',
+            'Aphelios', 'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Blitzcrank', 'Brand',
+            'Braum', 'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki', 'Darius',
+            'Diana', 'Draven', 'DrMundo', 'Ekko', 'Elise', 'Evelynn', 'Ezreal', 'Fiddlesticks',
+            'Fiora', 'Fizz', 'Galio', 'Gangplank', 'Garen', 'Gnar', 'Gragas', 'Graves',
+            'Gwen', 'Hecarim', 'Heimerdinger', 'Illaoi', 'Irelia', 'Ivern', 'Janna', 'JarvanIV',
+            'Jax', 'Jayce', 'Jhin', 'Jinx', 'Kaisa', 'Kalista', 'Karma', 'Karthus',
+            'Kassadin', 'Katarina', 'Kayle', 'Kayn', 'Kennen', 'Khazix', 'Kindred', 'Kled',
+            'KogMaw', 'Leblanc', 'LeeSin', 'Leona', 'Lillia', 'Lissandra', 'Lucian', 'Lulu',
+            'Lux', 'Malphite', 'Malzahar', 'Maokai', 'MasterYi', 'Milio', 'MissFortune', 'MonkeyKing',
+            'Mordekaiser', 'Morgana', 'Naafiri', 'Nami', 'Nasus', 'Nautilus', 'Neeko', 'Nidalee',
+            'Nilah', 'Nocturne', 'Nunu', 'Olaf', 'Orianna', 'Ornn', 'Pantheon', 'Poppy',
+            'Pyke', 'Qiyana', 'Quinn', 'Rakan', 'Rammus', 'RekSai', 'Rell', 'Renata',
+            'Renekton', 'Rengar', 'Riven', 'Rumble', 'Ryze', 'Samira', 'Sejuani', 'Senna',
+            'Seraphine', 'Sett', 'Shaco', 'Shen', 'Shyvana', 'Singed', 'Sion', 'Sivir',
+            'Skarner', 'Sona', 'Soraka', 'Swain', 'Sylas', 'Syndra', 'TahmKench', 'Taliyah',
+            'Talon', 'Taric', 'Teemo', 'Thresh', 'Tristana', 'Trundle', 'Tryndamere', 'TwistedFate',
+            'Twitch', 'Udyr', 'Urgot', 'Varus', 'Vayne', 'Veigar', 'Velkoz', 'Vex',
+            'Vi', 'Viego', 'Viktor', 'Vladimir', 'Volibear', 'Warwick', 'Xayah', 'Xerath',
+            'XinZhao', 'Yasuo', 'Yone', 'Yorick', 'Yuumi', 'Zac', 'Zed', 'Zeri',
+            'Ziggs', 'Zilean', 'Zoe', 'Zyra'
+        ];
+        
+        const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
+        
+        function generateUsername() {
+            const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+            const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+            const number = Math.floor(Math.random() * 100);
+            return `${adjective}${noun}${number}`;
+        }
+        
+        function getRandomChampion() {
+            const champion = CHAMPIONS[Math.floor(Math.random() * CHAMPIONS.length)];
+            return {
+                type: 'champion',
+                championId: champion,
+                imageUrl: `${CHAMPION_CDN}${champion}.png`
+            };
+        }
+        
+        // ========================================
+        // LOGGING
+        // ========================================
+        function log(message, color = '#C8AA6E') {
+            const logDiv = document.getElementById('log');
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = message;
+            logDiv.appendChild(line);
+            console.log(message);
+        }
+        
+        // ========================================
+        // MAIN BACKFILL FUNCTION
+        // ========================================
+        async function backfillLegacyUsers() {
+            const btn = document.getElementById('backfill-btn');
+            const progress = document.getElementById('progress');
+            const logDiv = document.getElementById('log');
+            
+            btn.disabled = true;
+            progress.classList.add('active');
+            logDiv.innerHTML = '';
+            
+            log('🔧 Starting legacy user backfill...');
             
             try {
-                // Load music data from JSON
-                console.log('🎵 Loading music data...');
-                const musicResponse = await fetch('/data/music-videos.json');
-                const musicData = await musicResponse.json();
-                
-                console.log(`✅ Loaded ${musicData.length} songs`);
-                
-                // Load matches from tournaments/2025-worlds-anthems/matches
-                console.log('🏆 Loading matches from tournament...');
-                const matchMap = {};
-                const TOURNAMENT_ID = '2025-worlds-anthems';
-                
-                const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
-                const matchesSnapshot = await getDocs(matchesRef);
-                
-                matchesSnapshot.forEach(matchDoc => {
-                    const match = matchDoc.data();
-                    matchMap[matchDoc.id] = match;
-                    if (match.matchId) matchMap[match.matchId] = match;
-                });
-                
-                console.log(`✅ Loaded ${matchesSnapshot.size} matches`);
-                
-                // ✅ NEW: Load votes to get choice field
-                console.log('🗳️ Loading votes...');
-                const votesRef = collection(db, 'votes');
-                const votesSnapshot = await getDocs(votesRef);
-                
-                const votesMap = new Map();
-                votesSnapshot.forEach(voteDoc => {
-                    const voteData = voteDoc.data();
-                    const key = `${voteData.matchId}_${voteData.userId}`;
-                    votesMap.set(key, voteData.choice); // "song1" or "song2"
-                });
-                
-                console.log(`✅ Loaded ${votesMap.size} votes for choice mapping`);
-                
-                // Load user profiles
-                console.log('👤 Loading user profiles...');
+                // ========================================
+                // STEP 1: Load existing profiles
+                // ========================================
+                log('👤 Loading existing profiles...');
                 const profilesRef = collection(db, 'profiles');
                 const profilesSnapshot = await getDocs(profilesRef);
                 
-                const userProfiles = {};
+                const existingProfiles = new Set();
                 profilesSnapshot.forEach(profileDoc => {
-                    const profile = profileDoc.data();
-                    userProfiles[profileDoc.id] = profile;
+                    existingProfiles.add(profileDoc.id);
                 });
                 
-                console.log(`✅ Loaded ${profilesSnapshot.size} user profiles`);
+                log(`✅ Found ${existingProfiles.size} existing profiles`);
                 
-                // Get all activity documents
-                console.log('📄 Loading activity documents...');
+                // ========================================
+                // STEP 2: Find all unique userIds from activity
+                // ========================================
+                log('📄 Loading activity documents...');
                 const activityRef = collection(db, 'activity');
                 const activitySnapshot = await getDocs(activityRef);
                 
-                console.log(`✅ Found ${activitySnapshot.size} activity documents`);
+                const allUserIds = new Set();
+                activitySnapshot.forEach(activityDoc => {
+                    const activity = activityDoc.data();
+                    if (activity.userId) {
+                        allUserIds.add(activity.userId);
+                    }
+                });
                 
-                let fixedSongs = 0;
-                let fixedUsernames = 0;
-                let fixedChoices = 0;
-                let skipped = 0;
-                let errors = 0;
+                log(`✅ Found ${allUserIds.size} unique users in activity`);
                 
-                // Process each activity document
+                // ========================================
+                // STEP 3: Find legacy users (no profile)
+                // ========================================
+                const legacyUserIds = Array.from(allUserIds).filter(
+                    userId => !existingProfiles.has(userId)
+                );
+                
+                log(`🔍 Found ${legacyUserIds.length} legacy users without profiles`, '#ff9800');
+                
+                if (legacyUserIds.length === 0) {
+                    log('✨ No legacy users to backfill!', '#4caf50');
+                    alert('All users already have profiles!');
+                    btn.disabled = false;
+                    return;
+                }
+                
+                // ========================================
+                // STEP 4: Create profiles for legacy users
+                // ========================================
+                log('\n👤 Creating profiles for legacy users...');
+                const createdProfiles = new Map();
+                
+                for (const userId of legacyUserIds) {
+                    const username = generateUsername();
+                    const avatar = getRandomChampion();
+                    
+                    const profile = {
+                        userId: userId,
+                        username: username,
+                        avatar: avatar,
+                        bio: '',
+                        joinedAt: Date.now(),
+                        privacy: {
+                            profileVisibility: 'public',
+                            showActivity: true,
+                            allowFollows: true
+                        },
+                        stats: {
+                            totalVotes: 0,
+                            winStreak: 0
+                        }
+                    };
+                    
+                    await setDoc(doc(db, 'profiles', userId), profile);
+                    createdProfiles.set(userId, profile);
+                    
+                    log(`✅ Created: ${username} (${avatar.championId})`, '#4caf50');
+                }
+                
+                log(`\n🎉 Created ${createdProfiles.size} profiles!`);
+                
+                // ========================================
+                // STEP 5: Update activity records
+                // ========================================
+                log('\n📝 Updating activity records...');
+                let updatedActivity = 0;
+                
                 for (const activityDoc of activitySnapshot.docs) {
                     const activity = activityDoc.data();
-                    const activityId = activityDoc.id;
+                    const userId = activity.userId;
                     
-                    try {
-                        const updates = {};
-                        let needsUpdate = false;
+                    if (createdProfiles.has(userId)) {
+                        const profile = createdProfiles.get(userId);
                         
-                       // ========================================
-// FIX 1: Song data
-// ========================================
-const needsSongFix = 
-    !activity.songId || 
-    activity.songId === 'song1' || 
-    activity.songId === 'song2' ||
-    !activity.matchTitle ||
-    activity.matchTitle.includes('Match round-') ||
-    activity.matchTitle.includes('Song 1') ||
-    activity.matchTitle.includes('Song 2');
-
-// Get match data for this activity
-const match = matchMap[activity.matchId];
-
-if (match && match.song1 && match.song2) {
-    const song1 = match.song1;
-    const song2 = match.song2;
-    
-    // ✅ Get choice from votes
-    const voteKey = `${activity.matchId}_${activity.userId}`;
-    const choice = votesMap.get(voteKey) || activity.choice;
-    
-    // Determine which song was voted for
-    const votedForSong1 = choice === 'song1';
-    const votedSong = votedForSong1 ? song1 : song2;
-    
-    // ✅ ALWAYS check if songId matches the voted song
-    const correctVideoId = votedSong.videoId;
-    const needsSongIdFix = activity.songId !== correctVideoId;
-    
-    if (needsSongFix || needsSongIdFix) {
-        updates.songId = correctVideoId;
-        updates.songTitle = votedSong.shortTitle || votedSong.title;
-        updates.matchTitle = `${song1.shortTitle || song1.title} vs ${song2.shortTitle || song2.title}`;
-        
-        needsUpdate = true;
-        fixedSongs++;
-        console.log(`🎵 Fixed: ${updates.matchTitle} (voted: ${votedSong.shortTitle || votedSong.title}, videoId: ${correctVideoId})`);
-    }
-} else if (needsSongFix) {
-    console.warn(`⚠️ Match not found or missing song data: ${activity.matchId}`);
-    errors++;
-}
-
-// ========================================
-// ✅ FIX 2: Add choice field if missing
-// ========================================
-                        if (!activity.choice) {
-                            const voteKey = `${activity.matchId}_${activity.userId}`;
-                            const choice = votesMap.get(voteKey);
-                            
-                            if (choice) {
-                                updates.choice = choice;
-                                needsUpdate = true;
-                                fixedChoices++;
-                                console.log(`🗳️ Added choice: ${choice} for ${activity.songTitle}`);
-                            } else {
-                                console.warn(`⚠️ No vote found for activity ${activityId}`);
-                            }
-                        }
+                        await updateDoc(doc(db, 'activity', activityDoc.id), {
+                            username: profile.username,
+                            avatar: profile.avatar
+                        });
                         
-                        // ========================================
-                        // FIX 3: Username backfill
-                      // ========================================
-// FIX 3: Username & Avatar backfill
-// ========================================
-const currentUsername = activity.username || 'Anonymous';
-const userId = activity.userId;
-
-if (userId) {
-    // Check if user has a profile
-    if (userProfiles[userId]) {
-        // ✅ User has profile - update activity to match
-        const profile = userProfiles[userId];
-        const profileUsername = profile.username || 'Anonymous';
-        const profileAvatar = profile.avatar;
-        
-        if (profileUsername !== 'Anonymous' && currentUsername !== profileUsername) {
-            updates.username = profileUsername;
-            needsUpdate = true;
-            fixedUsernames++;
-            console.log(`👤 Updated: "${currentUsername}" → "${profileUsername}"`);
-        }
-        
-        if (profileAvatar && JSON.stringify(activity.avatar) !== JSON.stringify(profileAvatar)) {
-            updates.avatar = profileAvatar;
-            needsUpdate = true;
-        }
-    } else {
-        // ⚠️ User has NO profile - they voted before auto-generation
-        console.warn(`⚠️ User ${userId} has no profile - voted before auto-generation system`);
-        // The activity will keep "Anonymous" until they visit again
-        // vote.js will create their profile on next visit
-    }
-}
-                        
-                        // ========================================
-                        // Apply updates
-                        // ========================================
-                        if (needsUpdate) {
-                            await updateDoc(doc(db, 'activity', activityId), updates);
-                            console.log(`✅ Updated ${activityId}`);
-                        } else {
-                            skipped++;
-                        }
-                        
-                    } catch (error) {
-                        console.error(`❌ Error fixing ${activityId}:`, error);
-                        errors++;
+                        updatedActivity++;
                     }
                 }
                 
-                console.log(`\n🎉 COMPLETE!`);
-                console.log(`🎵 Fixed song data: ${fixedSongs}`);
-                console.log(`🗳️ Fixed choice field: ${fixedChoices}`);
-                console.log(`👤 Fixed usernames: ${fixedUsernames}`);
-                console.log(`⏭️ Skipped: ${skipped}`);
-                console.log(`❌ Errors: ${errors}`);
+                log(`✅ Updated ${updatedActivity} activity records`);
                 
-                alert(`Fix complete!\n\n🎵 Songs: ${fixedSongs}\n🗳️ Choices: ${fixedChoices}\n👤 Usernames: ${fixedUsernames}\n⏭️ Skipped: ${skipped}\n❌ Errors: ${errors}`);
+                // ========================================
+                // STEP 6: Update vote records
+                // ========================================
+                log('\n🗳️ Updating vote records...');
+                const votesRef = collection(db, 'votes');
+                const votesSnapshot = await getDocs(votesRef);
+                
+                let updatedVotes = 0;
+                
+                for (const voteDoc of votesSnapshot.docs) {
+                    const vote = voteDoc.data();
+                    const userId = vote.userId;
+                    
+                    if (createdProfiles.has(userId)) {
+                        const profile = createdProfiles.get(userId);
+                        
+                        await updateDoc(doc(db, 'votes', voteDoc.id), {
+                            username: profile.username
+                        });
+                        
+                        updatedVotes++;
+                    }
+                }
+                
+                log(`✅ Updated ${updatedVotes} vote records`);
+                
+                // ========================================
+                // COMPLETE
+                // ========================================
+                log('\n🎉 BACKFILL COMPLETE!', '#4caf50');
+                log(`👤 Profiles created: ${createdProfiles.size}`, '#4caf50');
+                log(`📝 Activity records updated: ${updatedActivity}`, '#4caf50');
+                log(`🗳️ Vote records updated: ${updatedVotes}`, '#4caf50');
+                
+                alert(
+                    `Backfill complete!\n\n` +
+                    `👤 Profiles created: ${createdProfiles.size}\n` +
+                    `📝 Activity updated: ${updatedActivity}\n` +
+                    `🗳️ Votes updated: ${updatedVotes}`
+                );
                 
             } catch (error) {
                 console.error('❌ Fatal error:', error);
+                log(`❌ Error: ${error.message}`, '#f44336');
                 alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
             }
         }
         
-        // Attach event listener after DOM loads
-        document.getElementById('fix-btn').addEventListener('click', fixActivityData);
+        // Attach event listener
+        document.getElementById('backfill-btn').addEventListener('click', backfillLegacyUsers);
     </script>
 </body>
 </html>
