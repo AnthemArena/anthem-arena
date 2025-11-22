@@ -184,10 +184,6 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                        // ========================================
-// ADD THIS: Banner Selection Field
-// ========================================
-
 <div class="setting-group">
     <label for="bannerSelect">
         <i class="fas fa-image"></i> Profile Banner
