@@ -685,22 +685,24 @@ async function handleSaveSettings(e) {
         emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
     };
     
-    // ✅ NEW: Get banner selection
-    const bannerSelect = document.getElementById('bannerSelect')?.value || 'auto';
-    let banner;
-    
-    if (bannerSelect === 'auto') {
-        banner = { type: 'auto' };
-    } else if (bannerSelect === 'default') {
-        banner = { type: 'default' };
-    } else {
-        // Specific champion splash
-        banner = {
-            type: 'champion',
-            championId: bannerSelect,
-            skinNumber: 0
-        };
-    }
+    // ✅ FIXED: Get banner selection with proper default
+const bannerSelect = document.getElementById('bannerSelect');
+const bannerValue = bannerSelect ? bannerSelect.value : 'auto';
+
+let banner;
+if (bannerValue === 'default') {
+    banner = { type: 'default' };
+} else if (bannerValue === 'auto' || !bannerValue) {
+    // ✅ Explicitly save 'auto' type
+    banner = { type: 'auto' };
+} else {
+    // Specific champion splash
+    banner = {
+        type: 'champion',
+        championId: bannerValue,
+        skinNumber: 0
+    };
+}
     
     // Validate username
     const validation = validateUsername(username);
@@ -866,6 +868,8 @@ function updateBannerPreview(selection) {
     const bannerPreview = document.getElementById('bannerPreview');
     if (!bannerPreview) return;
     
+    console.log('🖼️ Updating banner preview:', selection);
+    
     if (selection === 'default') {
         // Gold gradient
         bannerPreview.style.background = `
@@ -877,18 +881,35 @@ function updateBannerPreview(selection) {
         `;
         bannerPreview.style.backgroundImage = '';
         
-    } else if (selection === 'auto') {
+    } else if (selection === 'auto' || !selection) {
         // Show current avatar's champion (if champion avatar)
         const currentAvatar = getCurrentAvatarSelection();
         
-        if (currentAvatar.type === 'champion') {
-            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${currentAvatar.championId}_0.jpg`;
-            bannerPreview.style.backgroundImage = `
-                linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
-                url('${splashUrl}')
-            `;
+        // ✅ Check both selectedChampion and stored avatar
+        if (currentAvatar.type === 'champion' || currentAvatar.type === 'url') {
+            const championId = currentAvatar.championId || (currentAvatar.name ? currentAvatar.name.replace(/['\s]/g, '') : null);
+            
+            if (championId) {
+                const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+                bannerPreview.style.backgroundImage = `
+                    linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
+                    url('${splashUrl}')
+                `;
+                bannerPreview.style.backgroundSize = 'cover';
+                bannerPreview.style.backgroundPosition = 'center 30%';
+            } else {
+                // Fallback to gradient
+                bannerPreview.style.background = `
+                    linear-gradient(135deg, 
+                        rgba(200, 170, 110, 0.9) 0%, 
+                        rgba(26, 26, 46, 0.95) 50%,
+                        rgba(10, 10, 10, 0.98) 100%
+                    )
+                `;
+                bannerPreview.style.backgroundImage = '';
+            }
         } else {
-            // Fallback to gradient if avatar is emoji
+            // Fallback to gradient for emoji avatars
             bannerPreview.style.background = `
                 linear-gradient(135deg, 
                     rgba(200, 170, 110, 0.9) 0%, 
@@ -906,24 +927,41 @@ function updateBannerPreview(selection) {
             linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
             url('${splashUrl}')
         `;
+        bannerPreview.style.backgroundSize = 'cover';
+        bannerPreview.style.backgroundPosition = 'center 30%';
     }
-    
-    bannerPreview.style.backgroundSize = 'cover';
-    bannerPreview.style.backgroundPosition = 'center 30%';
 }
 
 function getCurrentAvatarSelection() {
-    const avatarType = document.querySelector('input[name="avatarType"]:checked')?.value;
-    
-    if (avatarType === 'champion') {
-        const selectedChampion = document.querySelector('.avatar-option.selected[data-type="champion"]');
+    // Check if user selected a champion in this session
+    if (window.selectedChampion) {
+        // Extract championId from the champion name
+        const championId = window.selectedChampion.name ? window.selectedChampion.name.replace(/['\s]/g, '') : null;
         return {
             type: 'champion',
-            championId: selectedChampion?.dataset.champion
+            championId: championId,
+            name: window.selectedChampion.name
         };
     }
     
-    return { type: 'emoji' };
+    // Otherwise, get from localStorage
+    try {
+        const avatar = JSON.parse(localStorage.getItem('avatar') || '{}');
+        
+        if (avatar.type === 'url' && avatar.name) {
+            // Extract championId from champion name
+            const championId = avatar.name.replace(/['\s]/g, '');
+            return {
+                type: 'champion',
+                championId: championId,
+                name: avatar.name
+            };
+        }
+        
+        return avatar;
+    } catch {
+        return { type: 'emoji', value: '🎵' };
+    }
 }
 
 // ✅ Call this when settings modal opens
