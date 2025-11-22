@@ -469,6 +469,9 @@ function renderPostContent(post) {
 
 async function setupPostInteractions(postElement, post) {
     const currentUserId = localStorage.getItem('tournamentUserId');
+
+        // ✅ NEW: Setup post menu (edit/delete)
+    setupPostMenu(postElement, post);
     
     // ✅ NEW: Make username and avatar clickable → go to profile
     const username = postElement.querySelector('.username');
@@ -961,6 +964,348 @@ function setupLoadMore() {
     loadMoreBtn.addEventListener('click', () => {
         renderPosts(lastLoadedIndex, POSTS_PER_PAGE);
     });
+}
+
+// ========================================
+// CREATE POST ELEMENT (UPDATED with Edit/Delete)
+// ========================================
+
+function createPostElement(post) {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'feed-post';
+    postDiv.dataset.postId = post.postId;
+    
+    // Format time
+    const timeAgo = getTimeAgo(post.timestamp);
+    
+    // Get avatar URL
+    const avatarUrl = getAvatarUrl(post.avatar);
+    
+    // Determine if current user
+    const currentUserId = localStorage.getItem('tournamentUserId');
+    const isOwnPost = post.userId === currentUserId;
+    
+    // ✅ Check if post is editable (within 15 minutes)
+    const postAge = Date.now() - post.timestamp;
+    const isEditable = isOwnPost && postAge < (15 * 60 * 1000); // 15 minutes
+    const editedIndicator = post.editedAt ? '<span class="edited-indicator">• Edited</span>' : '';
+    
+    // Build HTML
+    postDiv.innerHTML = `
+        <div class="post-header">
+            <img src="${avatarUrl}" alt="${post.username}" class="user-avatar" data-user-id="${post.userId}">
+            <div class="post-meta">
+                <span class="username" data-user-id="${post.userId}">${post.username}</span>
+                <span class="post-time">${timeAgo}${editedIndicator}</span>
+            </div>
+            ${isOwnPost ? `
+                <div class="post-menu">
+                    <button class="post-menu-btn" data-post-id="${post.postId}">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                    <div class="post-menu-dropdown" id="menu-${post.postId}" style="display: none;">
+                        ${isEditable ? `
+                            <button class="menu-item edit-post-btn" data-post-id="${post.postId}">
+                                <i class="fa-solid fa-pen"></i> Edit Post
+                            </button>
+                        ` : ''}
+                        <button class="menu-item delete-post-btn" data-post-id="${post.postId}">
+                            <i class="fa-solid fa-trash"></i> Delete Post
+                        </button>
+                    </div>
+                </div>
+            ` : !isOwnPost ? `
+                <button class="follow-btn" data-user-id="${post.userId}" data-username="${post.username}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Follow
+                </button>
+            ` : ''}
+        </div>
+        
+        <div class="post-content" data-post-id="${post.postId}">
+            ${renderPostContent(post)}
+        </div>
+        
+        <div class="post-actions-bar">
+            <button class="action-btn like-btn" data-post-id="${post.postId}" data-post-author-id="${post.userId}">
+                <i class="fa-regular fa-heart"></i>
+                <span class="like-count">${post.likeCount || 0}</span>
+            </button>
+            <button class="action-btn comment-btn" data-post-id="${post.postId}">
+                <i class="fa-regular fa-comment"></i>
+                <span class="comment-count">${post.commentCount || 0}</span>
+            </button>
+            <button class="action-btn share-btn" data-post-id="${post.postId}">
+                <i class="fa-solid fa-share"></i>
+                Share
+            </button>
+        </div>
+        
+        <!-- Comments Section -->
+        <div class="post-comments" id="comments-${post.postId}" style="display: none;">
+            <div class="comments-list" id="comments-list-${post.postId}">
+                <!-- Comments load here -->
+            </div>
+            <div class="comment-input-box">
+                <img src="${getAvatarUrl(JSON.parse(localStorage.getItem('avatar') || '{}'))}" alt="You" class="comment-avatar">
+                <input type="text" class="comment-input" placeholder="Write a comment..." maxlength="280" data-post-id="${post.postId}">
+                <button class="send-comment-btn" data-post-id="${post.postId}">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Setup interactions
+    setupPostInteractions(postDiv, post);
+    
+    return postDiv;
+}
+
+// ========================================
+// ✅ NEW: SETUP POST MENU
+// ========================================
+
+function setupPostMenu(postElement, post) {
+    const menuBtn = postElement.querySelector('.post-menu-btn');
+    const menuDropdown = postElement.querySelector('.post-menu-dropdown');
+    
+    if (!menuBtn || !menuDropdown) return;
+    
+    // Toggle menu
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Close other open menus
+        document.querySelectorAll('.post-menu-dropdown').forEach(menu => {
+            if (menu !== menuDropdown) {
+                menu.style.display = 'none';
+            }
+        });
+        
+        // Toggle this menu
+        menuDropdown.style.display = menuDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.post-menu')) {
+            menuDropdown.style.display = 'none';
+        }
+    });
+    
+    // Edit button
+    const editBtn = menuDropdown.querySelector('.edit-post-btn');
+    if (editBtn) {
+        editBtn.addEventListener('click', async () => {
+            menuDropdown.style.display = 'none';
+            await openEditPostModal(post);
+        });
+    }
+    
+    // Delete button
+    const deleteBtn = menuDropdown.querySelector('.delete-post-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+            menuDropdown.style.display = 'none';
+            await deletePost(post.postId, postElement);
+        });
+    }
+}
+
+// ========================================
+// ✅ NEW: DELETE POST
+// ========================================
+
+async function deletePost(postId, postElement) {
+    // Confirm deletion
+    if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete from Firestore
+        const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        await deleteDoc(doc(db, 'posts', postId));
+        
+        console.log('✅ Post deleted from Firestore');
+        
+        // Animate removal
+        postElement.style.transition = 'all 0.3s ease';
+        postElement.style.opacity = '0';
+        postElement.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            postElement.remove();
+            
+            // Remove from currentPosts array
+            const index = currentPosts.findIndex(p => p.postId === postId);
+            if (index > -1) {
+                currentPosts.splice(index, 1);
+            }
+            
+            // Show success notification
+            if (window.showNotification) {
+                window.showNotification('Post deleted successfully', 'success');
+            }
+        }, 300);
+        
+    } catch (error) {
+        console.error('❌ Error deleting post:', error);
+        if (window.showNotification) {
+            window.showNotification('Failed to delete post', 'error');
+        }
+    }
+}
+
+// ========================================
+// ✅ NEW: OPEN EDIT POST MODAL
+// ========================================
+
+async function openEditPostModal(post) {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'edit-post-modal';
+    modal.innerHTML = `
+        <div class="edit-post-overlay"></div>
+        <div class="edit-post-container">
+            <div class="edit-post-header">
+                <h3><i class="fa-solid fa-pen"></i> Edit Post</h3>
+                <button class="close-edit-modal">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="edit-post-body">
+                <textarea 
+                    class="edit-post-input" 
+                    maxlength="280" 
+                    placeholder="What's on your mind?"
+                >${post.content || post.text || ''}</textarea>
+                <div class="edit-post-footer">
+                    <span class="edit-char-count">
+                        <span id="editCharCount">${(post.content || post.text || '').length}</span>/280
+                    </span>
+                    <button class="btn-save-edit" disabled>
+                        <i class="fa-solid fa-check"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Get elements
+    const overlay = modal.querySelector('.edit-post-overlay');
+    const closeBtn = modal.querySelector('.close-edit-modal');
+    const textarea = modal.querySelector('.edit-post-input');
+    const charCount = modal.querySelector('#editCharCount');
+    const saveBtn = modal.querySelector('.btn-save-edit');
+    
+    // Focus textarea
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    
+    // Track changes
+    const originalContent = textarea.value;
+    
+    textarea.addEventListener('input', () => {
+        const length = textarea.value.length;
+        charCount.textContent = length;
+        
+        // Enable save only if content changed and not empty
+        const hasChanged = textarea.value.trim() !== originalContent.trim();
+        const isValid = textarea.value.trim().length > 0;
+        saveBtn.disabled = !hasChanged || !isValid;
+    });
+    
+    // Close handlers
+    const closeModal = () => {
+        modal.style.animation = 'fadeOut 0.2s ease';
+        setTimeout(() => modal.remove(), 200);
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    
+    // Save handler
+    saveBtn.addEventListener('click', async () => {
+        const newContent = textarea.value.trim();
+        
+        if (!newContent) {
+            alert('Post cannot be empty');
+            return;
+        }
+        
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        
+        try {
+            // Update in Firestore
+            const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            
+            await updateDoc(doc(db, 'posts', post.postId), {
+                content: newContent,
+                text: newContent, // Update both fields for compatibility
+                editedAt: Date.now()
+            });
+            
+            console.log('✅ Post updated');
+            
+            // Update in UI
+            const postElement = document.querySelector(`[data-post-id="${post.postId}"]`);
+            if (postElement) {
+                const contentDiv = postElement.querySelector('.post-content');
+                if (contentDiv) {
+                    // Update content
+                    const textEl = contentDiv.querySelector('.post-text');
+                    if (textEl) {
+                        textEl.textContent = newContent;
+                    }
+                    
+                    // Add "Edited" indicator
+                    const timeEl = postElement.querySelector('.post-time');
+                    if (timeEl && !timeEl.querySelector('.edited-indicator')) {
+                        timeEl.innerHTML += ' <span class="edited-indicator">• Edited</span>';
+                    }
+                }
+            }
+            
+            // Update in currentPosts array
+            const postIndex = currentPosts.findIndex(p => p.postId === post.postId);
+            if (postIndex > -1) {
+                currentPosts[postIndex].content = newContent;
+                currentPosts[postIndex].text = newContent;
+                currentPosts[postIndex].editedAt = Date.now();
+            }
+            
+            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            
+            if (window.showNotification) {
+                window.showNotification('Post updated successfully', 'success');
+            }
+            
+            setTimeout(closeModal, 1000);
+            
+        } catch (error) {
+            console.error('❌ Error updating post:', error);
+            saveBtn.innerHTML = '<i class="fa-solid fa-times"></i> Error';
+            
+            if (window.showNotification) {
+                window.showNotification('Failed to update post', 'error');
+            }
+            
+            setTimeout(() => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Changes';
+            }, 2000);
+        }
+    });
+    
+    // Show modal with animation
+    setTimeout(() => {
+        modal.style.opacity = '1';
+    }, 10);
 }
 
 // ========================================
