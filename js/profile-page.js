@@ -2830,6 +2830,7 @@ function escapeHtml(text) {
 }
 
 
+
 // ========================================
 // RENDER SOCIAL LINKS
 // ========================================
@@ -2951,5 +2952,32 @@ export { invalidateProfileCache };
 
 // Make globally accessible
 window.invalidateProfileCache = invalidateProfileCache;
+
+// ========================================
+// HELPER FUNCTIONS FOR POSTS
+// ========================================
+
+function getAvatarUrl(avatar) {
+    if (!avatar) {
+        return createEmojiAvatar('🎵');
+    }
+    
+    if (avatar.type === 'url') return avatar.value;
+    if (avatar.type === 'champion') return avatar.imageUrl;
+    if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
+    
+    return createEmojiAvatar('🎵');
+}
+
+function createEmojiAvatar(emoji) {
+    return `data:image/svg+xml,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+            <rect width="50" height="50" fill="#C8AA6E"/>
+            <text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text>
+        </svg>
+    `)}`;
+}
+
+console.log('✅ Profile page module loaded');
 
 console.log('✅ Profile page module loaded');
