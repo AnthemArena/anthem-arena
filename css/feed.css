@@ -1693,7 +1693,7 @@ body {
     color: #c8aa6e;
 }
 /* ========================================
-   SONG MENTIONS & TOOLTIPS
+   SONG MENTIONS & TOOLTIPS (SIMPLIFIED)
    ======================================== */
 
 .song-mention {
@@ -1716,25 +1716,21 @@ body {
     bottom: calc(100% + 12px);
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-    border: 1px solid rgba(200, 170, 110, 0.6);
-    border-radius: 12px;
-    padding: 1rem;
-    min-width: 300px;
-    max-width: 350px;
+    background: #000;
+    border: 2px solid rgba(200, 170, 110, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
     box-shadow: 
-        0 12px 32px rgba(0, 0, 0, 0.7),
-        0 0 24px rgba(200, 170, 110, 0.25);
+        0 12px 32px rgba(0, 0, 0, 0.8),
+        0 0 24px rgba(200, 170, 110, 0.3);
     z-index: 10000;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
 .song-mention:hover .song-tooltip {
     opacity: 1;
-    pointer-events: auto;
 }
 
 /* Arrow */
@@ -1748,25 +1744,9 @@ body {
     border-top-color: rgba(200, 170, 110, 0.6);
 }
 
-.tooltip-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0.75rem;
-    color: #f0e6d2;
-    font-weight: 700;
-    font-size: 0.95rem;
-}
-
-.tooltip-header i {
-    color: #c8aa6e;
-}
-
 .tooltip-thumbnail {
-    position: relative;
-    margin-bottom: 0.75rem;
-    border-radius: 8px;
-    overflow: hidden;
+    width: 320px;
+    height: auto;
 }
 
 .tooltip-thumbnail img {
@@ -1775,57 +1755,8 @@ body {
     display: block;
 }
 
-.play-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
-    text-decoration: none;
-}
-
-.play-overlay:hover {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.play-overlay i {
-    font-size: 3rem;
-    color: #fff;
-    opacity: 0.9;
-    transition: all 0.3s ease;
-}
-
-.play-overlay:hover i {
-    transform: scale(1.1);
-    opacity: 1;
-}
-
-.tooltip-artists {
-    font-size: 0.85rem;
-    color: rgba(240, 230, 210, 0.7);
-    margin-bottom: 0.75rem;
-}
-
-.tooltip-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #c8aa6e;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.tooltip-link:hover {
-    color: #f0e6d2;
-}
-
 @media (max-width: 768px) {
-    .song-tooltip {
-        min-width: 280px;
-        max-width: 90vw;
+    .tooltip-thumbnail {
+        width: 280px;
     }
 }

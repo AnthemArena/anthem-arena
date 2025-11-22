@@ -581,6 +581,10 @@ function renderPostContent(post) {
 // ✅ SONG TOOLTIP SYSTEM (FIXED)
 // ========================================
 
+// ========================================
+// ✅ SONG TOOLTIP SYSTEM (SIMPLIFIED)
+// ========================================
+
 function setupSongTooltips() {
     const mentions = document.querySelectorAll('.song-mention');
     
@@ -592,7 +596,7 @@ function setupSongTooltips() {
             if (mention.querySelector('.song-tooltip')) return;
             
             const songName = mention.dataset.songName;
-            const videoId = mention.dataset.videoId; // ✅ Changed from youtubeId
+            const videoId = mention.dataset.videoId;
             const artist = mention.dataset.artist;
             const year = mention.dataset.year;
             
@@ -602,33 +606,12 @@ function setupSongTooltips() {
             const tooltip = document.createElement('div');
             tooltip.className = 'song-tooltip';
             tooltip.innerHTML = `
-                <div class="tooltip-header">
-                    <i class="fas fa-music"></i>
-                    ${songName} ${year ? `(${year})` : ''}
-                </div>
-                
                 <div class="tooltip-thumbnail">
                     <img 
                         src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" 
                         alt="${songName}"
                     >
-                    <a href="https://www.youtube.com/watch?v=${videoId}" 
-                       target="_blank" 
-                       class="play-overlay"
-                       onclick="event.stopPropagation()">
-                        <i class="fas fa-play-circle"></i>
-                    </a>
                 </div>
-                
-                ${artist ? `<div class="tooltip-artists">${artist}</div>` : ''}
-                
-                <a href="https://www.youtube.com/watch?v=${videoId}" 
-                   target="_blank" 
-                   class="tooltip-link"
-                   onclick="event.stopPropagation()">
-                    <i class="fab fa-youtube"></i>
-                    Watch on YouTube
-                </a>
             `;
             
             mention.style.position = 'relative';
