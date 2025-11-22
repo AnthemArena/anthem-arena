@@ -208,12 +208,13 @@ async function preloadTabCounts(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         document.getElementById('votesCount').textContent = votesSnapshot.size;
         
-        // ✅ FIXED: Get achievements count from subcollection
-        const achievementsRef = collection(db, 'profiles', userId, 'achievements');
-        const achievementsSnapshot = await getDocs(achievementsRef);
-        const achievementsCount = achievementsSnapshot.size;
-        
-        document.getElementById('achievementsCount').textContent = achievementsCount;
+      // Get achievements count from profile document array
+const profileDoc = await getDoc(doc(db, 'profiles', userId));
+const achievementsCount = profileDoc.exists() 
+    ? (profileDoc.data().unlockedAchievements || []).length 
+    : 0;
+
+document.getElementById('achievementsCount').textContent = achievementsCount;
         
         console.log('✅ Tab counts preloaded:', {
             votes: votesSnapshot.size,
@@ -961,10 +962,11 @@ async function loadProfileStats(userId) {
         
 
         
-      // ✅ NEW - Query achievements subcollection
-const achievementsRef = collection(db, 'profiles', userId, 'achievements');
-const achievementsSnapshot = await getDocs(achievementsRef);
-const achievementsCount = achievementsSnapshot.size;
+     // Get achievements count from profile document array
+const profileDoc = await getDoc(doc(db, 'profiles', userId));
+const achievementsCount = profileDoc.exists() 
+    ? (profileDoc.data().unlockedAchievements || []).length 
+    : 0;
 
 console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
         
