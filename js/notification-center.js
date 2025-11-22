@@ -107,28 +107,26 @@ function addTabsToPanel(panel) {
     if (!header) return;
     
     // Add tabs container
-    const tabsHTML = `
-        <div class="notification-tabs" style="
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            border-bottom: 2px solid rgba(200, 170, 110, 0.2);
-        ">
-            <button class="notif-tab active" data-tab="all">
-                <i class="fa-solid fa-bell"></i> All
-            </button>
-            <button class="notif-tab" data-tab="votes">
-                <i class="fa-solid fa-chart-line"></i> Votes
-            </button>
-            <button class="notif-tab" data-tab="achievements">
-                <i class="fa-solid fa-trophy"></i> Achievements
-            </button>
-            <button class="notif-tab" data-tab="messages">
-                <i class="fa-solid fa-envelope"></i> Messages
-                <span class="tab-badge" id="messageTabBadge" style="display: none;"></span>
-            </button>
-        </div>
-    `;
+   const tabsHTML = `
+    <div class="notification-tabs" style="...">
+        <button class="notif-tab active" data-tab="all">
+            <i class="fa-solid fa-bell"></i> All
+        </button>
+        <button class="notif-tab" data-tab="votes">
+            <i class="fa-solid fa-chart-line"></i> Votes
+        </button>
+        <button class="notif-tab" data-tab="social">
+            <i class="fa-solid fa-heart"></i> Social
+        </button>
+        <button class="notif-tab" data-tab="achievements">
+            <i class="fa-solid fa-trophy"></i> Achievements
+        </button>
+        <button class="notif-tab" data-tab="messages">
+            <i class="fa-solid fa-envelope"></i> Messages
+            <span class="tab-badge" id="messageTabBadge" style="display: none;"></span>
+        </button>
+    </div>
+`;
     
     header.insertAdjacentHTML('beforeend', tabsHTML);
     
@@ -291,6 +289,10 @@ async function loadNotificationsTab(content, userId, tab) {
         );
     } else if (tab === 'achievements') {
         filtered = notifications.filter(n => n.type === 'achievement');
+    } else if (tab === 'social') {  // ✅ NEW TAB
+        filtered = notifications.filter(n => 
+            n.type === 'like' || n.type === 'comment' || n.type === 'follow'
+        );
     }
     
     if (filtered.length === 0) {
@@ -414,6 +416,19 @@ function renderCtaButton(notification) {
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
+
+     // ✅ ADD THESE ICONS:
+    const typeIcons = {
+        'like': '❤️',
+        'comment': '💬',
+        'follow': '👤',
+        'achievement': '🏆',
+        'live-activity': '🎯',
+        'causal-event': '⚡',
+        'message-received': '💬'
+    };
+    
+    const icon = notification.icon || typeIcons[notification.type] || '📢';
     
     // Determine what image to show
     let imageHtml = '';

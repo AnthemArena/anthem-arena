@@ -193,7 +193,7 @@ function createModalHTML() {
     
     <div class="social-inputs">
         <div class="social-input-row">
-            <i class="fab fa-x-twitter"></i>
+<i class="fab fa-twitter"></i>
             <input 
                 type="text" 
                 id="socialTwitter" 

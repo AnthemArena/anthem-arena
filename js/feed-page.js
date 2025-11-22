@@ -75,6 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize widgets FIRST
         await initializeFeedWidgets();
         
+        // ✅ NEW: Make profile widget fully clickable
+        makeProfileWidgetClickable();
+        
         // Check if user is logged in
         checkLoginStatus();
         
@@ -115,6 +118,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
+
+// ========================================
+// ✅ NEW: MAKE PROFILE WIDGET CLICKABLE
+// ========================================
+
+function makeProfileWidgetClickable() {
+    const profileWidget = document.querySelector('.profile-widget');
+    if (profileWidget) {
+        profileWidget.style.cursor = 'pointer';
+        profileWidget.addEventListener('click', (e) => {
+            // Don't trigger if clicking on a button or link inside
+            if (e.target.closest('button, a')) return;
+            
+            window.location.href = '/profile.html';
+        });
+    }
+}
 
 // ========================================
 // LOGIN STATUS
@@ -266,7 +286,7 @@ function createPostElement(post) {
     // Build HTML
     postDiv.innerHTML = `
         <div class="post-header">
-            <img src="${avatarUrl}" alt="${post.username}" class="user-avatar">
+            <img src="${avatarUrl}" alt="${post.username}" class="user-avatar" data-user-id="${post.userId}">
             <div class="post-meta">
                 <span class="username" data-user-id="${post.userId}">${post.username}</span>
                 <span class="post-time">${timeAgo}</span>
@@ -284,7 +304,7 @@ function createPostElement(post) {
         </div>
         
         <div class="post-actions-bar">
-            <button class="action-btn like-btn" data-post-id="${post.postId}">
+            <button class="action-btn like-btn" data-post-id="${post.postId}" data-post-author-id="${post.userId}">
                 <i class="fa-regular fa-heart"></i>
                 <span class="like-count">${post.likeCount || 0}</span>
             </button>
@@ -297,6 +317,20 @@ function createPostElement(post) {
                 Share
             </button>
         </div>
+        
+        <!-- ✅ NEW: Comments Section (Initially Hidden) -->
+        <div class="post-comments" id="comments-${post.postId}" style="display: none;">
+            <div class="comments-list" id="comments-list-${post.postId}">
+                <!-- Comments load here -->
+            </div>
+            <div class="comment-input-box">
+                <img src="${getAvatarUrl(JSON.parse(localStorage.getItem('avatar') || '{}'))}" alt="You" class="comment-avatar">
+                <input type="text" class="comment-input" placeholder="Write a comment..." maxlength="280" data-post-id="${post.postId}">
+                <button class="send-comment-btn" data-post-id="${post.postId}">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
     `;
     
     // Setup interactions
@@ -304,10 +338,6 @@ function createPostElement(post) {
     
     return postDiv;
 }
-
-// ========================================
-// RENDER POST CONTENT
-// ========================================
 
 // ========================================
 // RENDER POST CONTENT
@@ -342,9 +372,407 @@ function renderPostContent(post) {
     
     return '';
 }
+
 // ========================================
 // SETUP POST INTERACTIONS
 // ========================================
+
+async function setupPostInteractions(postElement, post) {
+    const currentUserId = localStorage.getItem('tournamentUserId');
+    
+    // ✅ NEW: Make username and avatar clickable → go to profile
+    const username = postElement.querySelector('.username');
+    const avatar = postElement.querySelector('.user-avatar');
+    
+    const goToProfile = () => {
+        const targetUserId = post.userId;
+        
+        if (targetUserId === currentUserId) {
+            // Go to own profile
+            window.location.href = '/profile.html';
+        } else {
+            // Go to other user's profile
+            window.location.href = `/profile.html?user=${targetUserId}`;
+        }
+    };
+    
+    if (username) {
+        username.style.cursor = 'pointer';
+        username.addEventListener('click', goToProfile);
+    }
+    
+    if (avatar) {
+        avatar.style.cursor = 'pointer';
+        avatar.addEventListener('click', goToProfile);
+    }
+    
+    // Like button
+    const likeBtn = postElement.querySelector('.like-btn');
+    const likeIcon = likeBtn.querySelector('i');
+    const likeCount = likeBtn.querySelector('.like-count');
+    
+    // Check if already liked
+    const alreadyLiked = await hasLikedPost(post.postId);
+    if (alreadyLiked) {
+        likeIcon.classList.remove('fa-regular');
+        likeIcon.classList.add('fa-solid');
+        likeBtn.classList.add('liked');
+    }
+    
+    likeBtn.addEventListener('click', async () => {
+        const isLiked = likeBtn.classList.contains('liked');
+        const postAuthorId = likeBtn.dataset.postAuthorId;
+        
+        if (isLiked) {
+            // Unlike
+            const success = await unlikePost(post.postId);
+            if (success) {
+                likeIcon.classList.remove('fa-solid');
+                likeIcon.classList.add('fa-regular');
+                likeBtn.classList.remove('liked');
+                likeCount.textContent = Math.max(0, parseInt(likeCount.textContent) - 1);
+            }
+        } else {
+            // Like
+            const success = await likePost(post.postId);
+            if (success) {
+                likeIcon.classList.remove('fa-regular');
+                likeIcon.classList.add('fa-solid');
+                likeBtn.classList.add('liked');
+                likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                
+                // ✅ NEW: Send notification to post author
+                if (postAuthorId && postAuthorId !== currentUserId) {
+                    await sendLikeNotification(postAuthorId, post);
+                }
+            }
+        }
+    });
+    
+    // Follow button
+    const followBtn = postElement.querySelector('.follow-btn');
+    if (followBtn) {
+        // Check if already following
+        const targetUserId = followBtn.dataset.userId;
+        const alreadyFollowing = await isFollowing(targetUserId);
+        
+        if (alreadyFollowing) {
+            followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
+            followBtn.classList.add('following');
+        }
+        
+        followBtn.addEventListener('click', async () => {
+            const targetUsername = followBtn.dataset.username;
+            const isFollowingNow = followBtn.classList.contains('following');
+            
+            if (isFollowingNow) {
+                // Unfollow
+                const success = await unfollowUser(targetUserId, targetUsername);
+                if (success) {
+                    followBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                    followBtn.classList.remove('following');
+                }
+            } else {
+                // Follow
+                const success = await followUser(targetUserId, targetUsername);
+                if (success) {
+                    followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
+                    followBtn.classList.add('following');
+                }
+            }
+        });
+    }
+    
+    // Match embed click - navigate to vote page
+    const matchEmbed = postElement.querySelector('.match-embed');
+    if (matchEmbed) {
+        matchEmbed.addEventListener('click', () => {
+            const matchId = matchEmbed.dataset.matchId;
+            window.location.href = `/vote.html?match=${matchId}`;
+        });
+    }
+    
+    // ✅ NEW: Comment button - toggle comments section
+    const commentBtn = postElement.querySelector('.comment-btn');
+    const commentsSection = postElement.querySelector(`#comments-${post.postId}`);
+    
+    commentBtn.addEventListener('click', async () => {
+        if (commentsSection.style.display === 'none') {
+            // Show comments
+            commentsSection.style.display = 'block';
+            
+            // Load comments if not loaded
+            await loadComments(post.postId);
+        } else {
+            // Hide comments
+            commentsSection.style.display = 'none';
+        }
+    });
+    
+    // ✅ NEW: Send comment button
+    const sendCommentBtn = postElement.querySelector('.send-comment-btn');
+    const commentInput = postElement.querySelector('.comment-input');
+    
+    sendCommentBtn.addEventListener('click', async () => {
+        await postComment(post.postId, commentInput);
+    });
+    
+    commentInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            await postComment(post.postId, commentInput);
+        }
+    });
+    
+    // Share button
+    const shareBtn = postElement.querySelector('.share-btn');
+    shareBtn.addEventListener('click', () => {
+        sharePost(post);
+    });
+}
+
+// ========================================
+// ✅ NEW: COMMENT SYSTEM
+// ========================================
+
+async function loadComments(postId) {
+    const commentsList = document.getElementById(`comments-list-${postId}`);
+    if (!commentsList) return;
+    
+    try {
+        const { db } = await import('./firebase-config.js');
+        const { collection, query, where, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        const commentsRef = collection(db, 'comments');
+        const q = query(
+            commentsRef,
+            where('postId', '==', postId),
+            orderBy('timestamp', 'asc')
+        );
+        
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+            commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first!</p>';
+            return;
+        }
+        
+        commentsList.innerHTML = '';
+        
+        snapshot.forEach(doc => {
+            const comment = doc.data();
+            const commentElement = createCommentElement(comment);
+            commentsList.appendChild(commentElement);
+        });
+        
+    } catch (error) {
+        console.error('❌ Error loading comments:', error);
+        commentsList.innerHTML = '<p class="error-text">Failed to load comments</p>';
+    }
+}
+
+function createCommentElement(comment) {
+    const div = document.createElement('div');
+    div.className = 'comment';
+    
+    const avatarUrl = getAvatarUrl(comment.avatar);
+    const timeAgo = getTimeAgo(comment.timestamp);
+    const currentUserId = localStorage.getItem('tournamentUserId');
+    
+    div.innerHTML = `
+        <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
+        <div class="comment-content">
+            <div class="comment-header">
+                <span class="comment-username" data-user-id="${comment.userId}">${comment.username}</span>
+                <span class="comment-time">${timeAgo}</span>
+            </div>
+            <p class="comment-text">${escapeHtml(comment.content)}</p>
+        </div>
+    `;
+    
+    // Make username/avatar clickable
+    const username = div.querySelector('.comment-username');
+    const avatar = div.querySelector('.comment-avatar');
+    
+    const goToProfile = () => {
+        if (comment.userId === currentUserId) {
+            window.location.href = '/profile.html';
+        } else {
+            window.location.href = `/profile.html?user=${comment.userId}`;
+        }
+    };
+    
+    username.style.cursor = 'pointer';
+    username.addEventListener('click', goToProfile);
+    avatar.style.cursor = 'pointer';
+    avatar.addEventListener('click', goToProfile);
+    
+    return div;
+}
+
+async function postComment(postId, inputElement) {
+    const content = inputElement.value.trim();
+    if (!content) return;
+    
+    const username = localStorage.getItem('username');
+    if (!username || username === 'Anonymous') {
+        if (window.showNotification) {
+            window.showNotification('Please set a username to comment', 'error');
+        }
+        return;
+    }
+    
+    try {
+        const userId = localStorage.getItem('tournamentUserId');
+        const avatarJson = localStorage.getItem('avatar');
+        
+        let avatar;
+        try {
+            avatar = JSON.parse(avatarJson);
+        } catch {
+            avatar = { type: 'emoji', value: '🎵' };
+        }
+        
+        const commentId = `comment_${userId}_${Date.now()}`;
+        const comment = {
+            commentId: commentId,
+            postId: postId,
+            userId: userId,
+            username: username,
+            avatar: avatar,
+            content: content,
+            timestamp: Date.now()
+        };
+        
+        // Save to Firestore
+        const { db } = await import('./firebase-config.js');
+        const { doc, setDoc, updateDoc, increment, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        comment.createdAt = Timestamp.now();
+        await setDoc(doc(db, 'comments', commentId), comment);
+        
+        // Update post comment count
+        const postRef = doc(db, 'posts', postId);
+        await updateDoc(postRef, {
+            commentCount: increment(1)
+        });
+        
+        console.log('✅ Comment posted');
+        
+        // Clear input
+        inputElement.value = '';
+        
+        // Reload comments
+        await loadComments(postId);
+        
+        // Update comment count in UI
+        const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+        if (commentCountSpan) {
+            commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+        }
+        
+        // ✅ NEW: Send notification to post author
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (postElement) {
+            // Get post from currentPosts array
+            const post = currentPosts.find(p => p.postId === postId);
+            if (post && post.userId !== userId) {
+                await sendCommentNotification(post.userId, post, content);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error posting comment:', error);
+        if (window.showNotification) {
+            window.showNotification('Failed to post comment', 'error');
+        }
+    }
+}
+// ========================================
+// ✅ UPDATED: NOTIFICATION SYSTEM (INTEGRATED)
+// ========================================
+
+async function sendLikeNotification(recipientUserId, post) {
+    try {
+        const currentUserId = localStorage.getItem('tournamentUserId');
+        const currentUsername = localStorage.getItem('username');
+        
+        if (!currentUsername || currentUsername === 'Anonymous') return;
+        if (recipientUserId === currentUserId) return; // Don't notify yourself
+        
+        // ✅ Use your existing notification system
+        const { saveNotification } = await import('./notification-storage.js');
+        
+        await saveNotification(recipientUserId, {
+            type: 'like',
+            priority: 6,
+            message: `❤️ ${currentUsername} liked your post`,
+            detail: post.content || post.text || 'your post',
+            icon: '❤️',
+            
+            // Sender info
+            triggerUsername: currentUsername,
+            triggerUserId: currentUserId,
+            
+            // Post context
+            matchId: post.matchId || null,
+            matchTitle: post.matchTitle || null,
+            
+            // Action
+            ctaText: 'View Post',
+            ctaAction: 'navigate',
+            targetUrl: `/feed.html#post-${post.postId}`
+        });
+        
+        console.log(`✅ Like notification sent to ${recipientUserId}`);
+        
+    } catch (error) {
+        console.error('❌ Error sending like notification:', error);
+    }
+}
+
+async function sendCommentNotification(recipientUserId, post, commentContent) {
+    try {
+        const currentUserId = localStorage.getItem('tournamentUserId');
+        const currentUsername = localStorage.getItem('username');
+        
+        if (!currentUsername || currentUsername === 'Anonymous') return;
+        if (recipientUserId === currentUserId) return; // Don't notify yourself
+        
+        // ✅ Use your existing notification system
+        const { saveNotification } = await import('./notification-storage.js');
+        
+        const preview = commentContent.length > 50 
+            ? commentContent.substring(0, 50) + '...' 
+            : commentContent;
+        
+        await saveNotification(recipientUserId, {
+            type: 'comment',
+            priority: 7,
+            message: `💬 ${currentUsername} commented on your post`,
+            detail: `"${preview}"`,
+            icon: '💬',
+            
+            // Sender info
+            triggerUsername: currentUsername,
+            triggerUserId: currentUserId,
+            
+            // Post context
+            matchId: post.matchId || null,
+            matchTitle: post.matchTitle || null,
+            
+            // Action
+            ctaText: 'View Comment',
+            ctaAction: 'navigate',
+            targetUrl: `/feed.html#post-${post.postId}`
+        });
+        
+        console.log(`✅ Comment notification sent to ${recipientUserId}`);
+        
+    } catch (error) {
+        console.error('❌ Error sending comment notification:', error);
+    }
+}
 
 // ========================================
 // UPDATE FEED HEADER BANNER
@@ -433,103 +861,6 @@ async function updateFeedHeaderBanner() {
     }
 }
 
-
-async function setupPostInteractions(postElement, post) {
-    // Like button
-    const likeBtn = postElement.querySelector('.like-btn');
-    const likeIcon = likeBtn.querySelector('i');
-    const likeCount = likeBtn.querySelector('.like-count');
-    
-    // Check if already liked
-    const alreadyLiked = await hasLikedPost(post.postId);
-    if (alreadyLiked) {
-        likeIcon.classList.remove('fa-regular');
-        likeIcon.classList.add('fa-solid');
-        likeBtn.classList.add('liked');
-    }
-    
-    likeBtn.addEventListener('click', async () => {
-        const isLiked = likeBtn.classList.contains('liked');
-        
-        if (isLiked) {
-            // Unlike
-            const success = await unlikePost(post.postId);
-            if (success) {
-                likeIcon.classList.remove('fa-solid');
-                likeIcon.classList.add('fa-regular');
-                likeBtn.classList.remove('liked');
-                likeCount.textContent = Math.max(0, parseInt(likeCount.textContent) - 1);
-            }
-        } else {
-            // Like
-            const success = await likePost(post.postId);
-            if (success) {
-                likeIcon.classList.remove('fa-regular');
-                likeIcon.classList.add('fa-solid');
-                likeBtn.classList.add('liked');
-                likeCount.textContent = parseInt(likeCount.textContent) + 1;
-            }
-        }
-    });
-    
-    // Follow button
-    const followBtn = postElement.querySelector('.follow-btn');
-    if (followBtn) {
-        // Check if already following
-        const targetUserId = followBtn.dataset.userId;
-        const alreadyFollowing = await isFollowing(targetUserId);
-        
-        if (alreadyFollowing) {
-            followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
-            followBtn.classList.add('following');
-        }
-        
-        followBtn.addEventListener('click', async () => {
-            const targetUsername = followBtn.dataset.username;
-            const isFollowingNow = followBtn.classList.contains('following');
-            
-            if (isFollowingNow) {
-                // Unfollow
-                const success = await unfollowUser(targetUserId, targetUsername);
-                if (success) {
-                    followBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
-                    followBtn.classList.remove('following');
-                }
-            } else {
-                // Follow
-                const success = await followUser(targetUserId, targetUsername);
-                if (success) {
-                    followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
-                    followBtn.classList.add('following');
-                }
-            }
-        });
-    }
-    
-    // Match embed click - navigate to vote page
-    const matchEmbed = postElement.querySelector('.match-embed');
-    if (matchEmbed) {
-        matchEmbed.addEventListener('click', () => {
-            const matchId = matchEmbed.dataset.matchId;
-            window.location.href = `/vote.html?match=${matchId}`;
-        });
-    }
-    
-    // Comment button (placeholder for Phase 2)
-    const commentBtn = postElement.querySelector('.comment-btn');
-    commentBtn.addEventListener('click', () => {
-        if (window.showNotification) {
-            window.showNotification('Comments coming soon!', 'info');
-        }
-    });
-    
-    // Share button
-    const shareBtn = postElement.querySelector('.share-btn');
-    shareBtn.addEventListener('click', () => {
-        sharePost(post);
-    });
-}
-
 // ========================================
 // LOAD MORE
 // ========================================
@@ -567,8 +898,7 @@ function setupCreatePost() {
         } else {
             charCount.classList.remove('warning', 'danger');
         }
-        
-        // Enable/disable submit
+// Enable/disable submit
         submitBtn.disabled = postInput.value.trim().length === 0 || remaining < 0;
     });
     

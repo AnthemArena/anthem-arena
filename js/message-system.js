@@ -84,6 +84,11 @@ if (!canSend) {
         };
         
         await addDoc(collection(db, 'messages'), messageData);
+
+        // ✅ ADD THIS:
+// Send notification to recipient
+const { saveMessageNotification } = await import('./notification-storage.js');
+await saveMessageNotification(toUserId, fromUsername, fromUserId, messageText, context);
         
         console.log(`✅ Message sent to ${toUsername}`);
         return { success: true };
