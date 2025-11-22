@@ -856,41 +856,57 @@ function renderPostContent(post) {
     if (post.type === 'vote') {
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
         
-        // Determine which song was picked
-        const isPicked1 = post.choice === 'song1';
+        // Get percentages (default to 50/50 if no matchState)
+        const userPct = post.matchState?.userPct ?? 50;
+        const opponentPct = 100 - userPct;
+        
+        // Get thumbnails
+        const votedThumbnail = post.votedThumbnail || 
+            (post.votedSongId ? `https://img.youtube.com/vi/${post.votedSongId}/mqdefault.jpg` : '');
+        
+        // We need opponent thumbnail - try to get from matchState or generate placeholder
+        const opponentThumbnail = post.opponentThumbnail || 
+            'https://img.youtube.com/vi/default/mqdefault.jpg';
         
         return `
             <p class="post-text vote-text">
                 <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
             </p>
             
-            <div class="match-embed" data-match-id="${post.matchId}">
-                <h4 class="match-title">${escapeHtml(post.matchTitle || 'Match')}</h4>
-                
-                <div class="match-songs">
-                    <div class="song-option ${isPicked1 ? 'picked' : ''}">
-                        <span class="song-name">${escapeHtml(post.votedSongName || 'Song 1')}</span>
-                        ${post.matchState ? `<span class="song-pct">${post.matchState.userPct}%</span>` : ''}
+            <div class="match-embed-card" data-match-id="${post.matchId}">
+                <div class="match-versus">
+                    <div class="match-song ${post.choice === 'song1' ? 'picked' : ''}">
+                        <div class="song-thumbnail">
+                            <img src="${votedThumbnail}" alt="${escapeHtml(post.votedSongName)}" loading="lazy">
+                        </div>
+                        <div class="song-details">
+                            <span class="song-name">${escapeHtml(post.votedSongName || 'Song 1')}</span>
+                            <span class="song-pct">${userPct}%</span>
+                        </div>
                     </div>
                     
-                    <span class="vs-badge">VS</span>
+                    <div class="vs-circle">VS</div>
                     
-                    <div class="song-option ${!isPicked1 ? 'picked' : ''}">
-                        <span class="song-name">${escapeHtml(post.opponentSongName || 'Song 2')}</span>
-                        ${post.matchState ? `<span class="song-pct">${100 - post.matchState.userPct}%</span>` : ''}
+                    <div class="match-song ${post.choice === 'song2' ? 'picked' : ''}">
+                        <div class="song-thumbnail">
+                            <img src="${opponentThumbnail}" alt="${escapeHtml(post.opponentSongName)}" loading="lazy">
+                        </div>
+                        <div class="song-details">
+                            <span class="song-name">${escapeHtml(post.opponentSongName || 'Song 2')}</span>
+                            <span class="song-pct">${opponentPct}%</span>
+                        </div>
                     </div>
                 </div>
                 
-                ${post.matchState ? `
-                    <div class="match-progress-bar">
-                        <div class="progress-fill ${post.matchState.isWinning ? 'winning' : 'losing'}" 
-                             style="width: ${post.matchState.userPct}%"></div>
+                <div class="match-progress">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${userPct}%"></div>
                     </div>
-                ` : ''}
-                
-                <div class="match-cta">
-                    <span>View Match →</span>
                 </div>
+                
+                <a href="/vote.html?id=${post.matchId}" class="match-view-btn">
+                    View Match
+                </a>
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {

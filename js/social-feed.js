@@ -190,12 +190,15 @@ const post = {
     votedSongName: voteData.votedSongName || voteData.songTitle,
     opponentSongName: voteData.opponentSongName,
     votedSongId: voteData.songId,
+        opponentSongId: voteData.opponentSongId,  // ✅ ADD THIS LINE
+
     // ✅ FIX: Generate thumbnail from songId, use null if missing
     votedThumbnail: voteData.songId 
         ? `https://img.youtube.com/vi/${voteData.songId}/mqdefault.jpg` 
         : null,
-    // ✅ FIX: Remove opponentThumbnail or set to null (we don't have opponent videoId)
-    opponentThumbnail: null,
+    opponentThumbnail: voteData.opponentSongId 
+        ? `https://img.youtube.com/vi/${voteData.opponentSongId}/mqdefault.jpg` 
+        : null,  // ✅ ADD THIS LINE
     choice: voteData.choice,
     tournamentId: voteData.tournamentId || '2025-worlds-anthems',
     round: voteData.round || 1,

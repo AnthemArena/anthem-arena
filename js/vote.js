@@ -1725,6 +1725,8 @@ try {
                 songTitle: votedSongName,
                 votedSongName: votedSongName,
                 opponentSongName: otherSongName,
+                    opponentSongId: otherSong.videoId,  // ✅ ADD THIS LINE
+
                 choice: songId,  // ✅ FIX: songId is 'song1' or 'song2' from function parameter
                 round: currentMatch.round,
                 tournamentId: ACTIVE_TOURNAMENT
