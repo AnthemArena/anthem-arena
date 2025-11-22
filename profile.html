@@ -170,6 +170,10 @@
         <button class="tab-btn" data-tab="votes">
             <i class="fas fa-vote-yea"></i> Votes <span class="tab-count" id="votesCount">0</span>
         </button>
+          <!-- ✅ NEW: Posts Tab -->
+    <button class="tab-btn" data-tab="posts">
+        <i class="fas fa-pen"></i> Posts <span class="tab-count" id="postsCount">0</span>
+    </button>
         <button class="tab-btn" data-tab="participation">
             <i class="fas fa-chart-bar"></i> Participation
         </button>
@@ -212,6 +216,16 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ✅ NEW: Featured Posts in Overview -->
+<div class="overview-section" id="featuredPostsOverview" style="display: none;">
+    <div class="section-header">
+        <h3 class="section-title">
+            <i class="fas fa-thumbtack"></i> Featured Posts
+        </h3>
+    </div>
+    <div id="featuredPostsOverviewGrid" class="posts-grid"></div>
+</div>
             
             <!-- Favorite Songs -->
             <div class="overview-section">
@@ -251,6 +265,34 @@
         <div class="no-content">
             <i class="fas fa-vote-yea"></i>
             <p>No votes yet</p>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ NEW: Posts Tab -->
+<div class="tab-panel" id="tab-posts">
+    <div class="tab-content">
+        <!-- Featured Posts Section -->
+        <div id="featuredPostsSection" style="display: none;">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-thumbtack"></i> Pinned Posts
+                </h3>
+            </div>
+            <div id="featuredPostsList" class="posts-grid"></div>
+        </div>
+        
+        <!-- All Posts -->
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-list"></i> All Posts
+            </h3>
+        </div>
+        <div id="allUserPosts" class="posts-list">
+            <div class="no-content">
+                <i class="fas fa-pen"></i>
+                <p>No posts yet</p>
+            </div>
         </div>
     </div>
 </div>

@@ -176,6 +176,8 @@ async function loadProfile(username) {
             loadFeaturedAchievements(profile.userId),
             loadRecentVotes(profile.userId, 5),
             loadFavoriteSongs(profile.userId),
+                loadFeaturedPosts(profile.userId),  // ✅ ADD THIS
+
             preloadTabCounts(profile.userId),  // ✅ NEW: Preload counts
                         updateFollowCounts()  // ✅ ADD THIS
 
@@ -208,16 +210,24 @@ async function preloadTabCounts(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         document.getElementById('votesCount').textContent = votesSnapshot.size;
         
-      // Get achievements count from profile document array
-const profileDoc = await getDoc(doc(db, 'profiles', userId));
-const achievementsCount = profileDoc.exists() 
-    ? (profileDoc.data().unlockedAchievements || []).length 
-    : 0;
-
-document.getElementById('achievementsCount').textContent = achievementsCount;
+        // ✅ Get posts count
+        const postsQuery = query(
+            collection(db, 'posts'),
+            where('userId', '==', userId)
+        );
+        const postsSnapshot = await getDocs(postsQuery);
+        document.getElementById('postsCount').textContent = postsSnapshot.size;
+        
+        // Get achievements count
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        const achievementsCount = profileDoc.exists() 
+            ? (profileDoc.data().unlockedAchievements || []).length 
+            : 0;
+        document.getElementById('achievementsCount').textContent = achievementsCount;
         
         console.log('✅ Tab counts preloaded:', {
             votes: votesSnapshot.size,
+            posts: postsSnapshot.size,
             achievements: achievementsCount
         });
         
@@ -1974,6 +1984,11 @@ function setupTabs() {
                 await loadAllVotes(currentProfile.userId);
             }
             
+              // ✅ NEW: Load posts tab
+            if (targetTab === 'posts') {
+                await loadAllUserPosts(currentProfile.userId);
+            }
+
             if (targetTab === 'participation' && window.participationData) {
                 renderParticipationTab();  // ✅ NEW
             }
@@ -2362,13 +2377,458 @@ function renderParticipationTab() {
     `).join('');
 }
 
-// ========================================
-// RENDER SOCIAL LINKS
-// ========================================
 
 // ========================================
-// RENDER SOCIAL LINKS
+// LOAD USER'S POSTS
 // ========================================
+
+async function loadUserPosts(userId, limitCount = null) {
+    try {
+        const postsQuery = limitCount 
+            ? query(
+                collection(db, 'posts'),
+                where('userId', '==', userId),
+                orderBy('timestamp', 'desc'),
+                limit(limitCount)
+              )
+            : query(
+                collection(db, 'posts'),
+                where('userId', '==', userId),
+                orderBy('timestamp', 'desc')
+              );
+        
+        const snapshot = await getDocs(postsQuery);
+        
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        
+    } catch (error) {
+        console.error('❌ Error loading posts:', error);
+        return [];
+    }
+}
+
+// ========================================
+// LOAD ALL POSTS (for Posts Tab)
+// ========================================
+
+async function loadAllUserPosts(userId) {
+    try {
+        console.log('📥 Loading all posts for user:', userId);
+        
+        const posts = await loadUserPosts(userId);
+        
+        // Update count badge
+        document.getElementById('postsCount').textContent = posts.length;
+        
+        const container = document.getElementById('allUserPosts');
+        
+        if (posts.length === 0) {
+            container.innerHTML = `
+                <div class="no-content">
+                    <i class="fas fa-pen"></i>
+                    <p>No posts yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Render posts
+        container.innerHTML = posts.map(post => renderProfilePostCard(post)).join('');
+        
+        // Setup interactions for each post
+        setupProfilePostInteractions();
+        
+        console.log(`✅ Loaded ${posts.length} posts`);
+        
+    } catch (error) {
+        console.error('❌ Error loading all posts:', error);
+        document.getElementById('allUserPosts').innerHTML = `
+            <div class="no-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Could not load posts</p>
+            </div>
+        `;
+    }
+}
+
+// ========================================
+// LOAD FEATURED (PINNED) POSTS
+// ========================================
+
+async function loadFeaturedPosts(userId) {
+    try {
+        console.log('📌 Loading featured posts for:', userId);
+        
+        // Get user's profile to see pinned posts
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        
+        if (!profileDoc.exists()) {
+            console.log('⚠️ No profile found for featured posts');
+            return;
+        }
+        
+        const pinnedPostIds = profileDoc.data().pinnedPosts || [];
+        
+        if (pinnedPostIds.length === 0) {
+            console.log('⚠️ No pinned posts');
+            return;
+        }
+        
+        // Fetch the actual posts
+        const pinnedPosts = [];
+        for (const postId of pinnedPostIds) {
+            const postDoc = await getDoc(doc(db, 'posts', postId));
+            if (postDoc.exists()) {
+                pinnedPosts.push({
+                    id: postDoc.id,
+                    ...postDoc.data(),
+                    isPinned: true
+                });
+            }
+        }
+        
+        if (pinnedPosts.length === 0) {
+            return;
+        }
+        
+        // Show in Overview tab
+        const overviewSection = document.getElementById('featuredPostsOverview');
+        const overviewGrid = document.getElementById('featuredPostsOverviewGrid');
+        
+        if (overviewSection && overviewGrid) {
+            overviewSection.style.display = 'block';
+            overviewGrid.innerHTML = pinnedPosts.map(post => renderProfilePostCard(post, true)).join('');
+        }
+        
+        // Show in Posts tab
+        const postsSection = document.getElementById('featuredPostsSection');
+        const postsList = document.getElementById('featuredPostsList');
+        
+        if (postsSection && postsList) {
+            postsSection.style.display = 'block';
+            postsList.innerHTML = pinnedPosts.map(post => renderProfilePostCard(post, true)).join('');
+        }
+        
+        // Setup interactions
+        setupProfilePostInteractions();
+        
+        console.log(`✅ Loaded ${pinnedPosts.length} featured posts`);
+        
+    } catch (error) {
+        console.error('❌ Error loading featured posts:', error);
+    }
+}
+
+// ========================================
+// RENDER PROFILE POST CARD
+// ========================================
+
+function renderProfilePostCard(post, isFeatured = false) {
+    const avatarUrl = getAvatarUrl(post.avatar);
+    const timeAgo = formatTimeAgo(post.timestamp);
+    const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    const isOwnPost = post.userId === currentUserId;
+    
+    // Check if post is editable (within 15 minutes)
+    const postAge = Date.now() - post.timestamp;
+    const isEditable = isOwnPost && postAge < (15 * 60 * 1000);
+    const editedIndicator = post.editedAt ? '<span class="edited-indicator">• Edited</span>' : '';
+    
+    // Pin indicator
+    const pinBadge = isFeatured ? '<span class="pin-badge"><i class="fas fa-thumbtack"></i> Pinned</span>' : '';
+    
+    return `
+        <div class="profile-post-card" data-post-id="${post.id}">
+            <div class="post-header">
+                <img src="${avatarUrl}" alt="${post.username}" class="post-avatar">
+                <div class="post-meta">
+                    <div class="post-username">${post.username}</div>
+                    <div class="post-timestamp">${timeAgo}${editedIndicator}</div>
+                </div>
+                ${pinBadge}
+                ${isOwnPost ? `
+                    <div class="post-actions-menu">
+                        <button class="post-menu-btn" data-post-id="${post.id}">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+                        <div class="post-menu-dropdown" style="display: none;">
+                            ${!isFeatured ? `
+                                <button class="menu-item pin-post-btn" data-post-id="${post.id}">
+                                    <i class="fa-solid fa-thumbtack"></i> Pin to Profile
+                                </button>
+                            ` : `
+                                <button class="menu-item unpin-post-btn" data-post-id="${post.id}">
+                                    <i class="fa-solid fa-thumbtack"></i> Unpin Post
+                                </button>
+                            `}
+                            ${isEditable ? `
+                                <button class="menu-item edit-post-btn" data-post-id="${post.id}">
+                                    <i class="fa-solid fa-pen"></i> Edit Post
+                                </button>
+                            ` : ''}
+                            <button class="menu-item delete-post-btn" data-post-id="${post.id}">
+                                <i class="fa-solid fa-trash"></i> Delete Post
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="post-content">
+                ${renderPostContent(post)}
+            </div>
+            
+            <div class="post-stats">
+                <span><i class="fa-solid fa-heart"></i> ${post.likeCount || 0}</span>
+                <span><i class="fa-solid fa-comment"></i> ${post.commentCount || 0}</span>
+            </div>
+            
+            <a href="/feed.html#post-${post.id}" class="view-post-link">
+                View Full Post →
+            </a>
+        </div>
+    `;
+}
+
+// ========================================
+// RENDER POST CONTENT (match feed version)
+// ========================================
+
+function renderPostContent(post) {
+    if (post.type === 'vote') {
+        const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
+        return `
+            <p class="post-text vote-text">
+                <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
+            </p>
+        `;
+    } else if (post.type === 'user_post' && post.content) {
+        return `<p class="post-text">${escapeHtml(post.content)}</p>`;
+    }
+    return '';
+}
+
+// ========================================
+// SETUP PROFILE POST INTERACTIONS
+// ========================================
+
+function setupProfilePostInteractions() {
+    // Post menus
+    document.querySelectorAll('.post-menu-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const postId = btn.dataset.postId;
+            const menu = btn.nextElementSibling;
+            
+            // Close other menus
+            document.querySelectorAll('.post-menu-dropdown').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+            
+            // Toggle this menu
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+    
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.post-actions-menu')) {
+            document.querySelectorAll('.post-menu-dropdown').forEach(m => {
+                m.style.display = 'none';
+            });
+        }
+    });
+    
+    // Pin post buttons
+    document.querySelectorAll('.pin-post-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            await pinPost(btn.dataset.postId);
+        });
+    });
+    
+    // Unpin post buttons
+    document.querySelectorAll('.unpin-post-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            await unpinPost(btn.dataset.postId);
+        });
+    });
+    
+    // Edit post buttons
+    document.querySelectorAll('.edit-post-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const postId = btn.dataset.postId;
+            // Redirect to feed page to edit
+            window.location.href = `/feed.html#edit-${postId}`;
+        });
+    });
+    
+    // Delete post buttons
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            await deleteProfilePost(btn.dataset.postId);
+        });
+    });
+}
+
+// ========================================
+// PIN POST TO PROFILE
+// ========================================
+
+async function pinPost(postId) {
+    const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    
+    if (!userId) {
+        alert('You must be logged in to pin posts');
+        return;
+    }
+    
+    try {
+        // Get current pinned posts
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        let pinnedPosts = [];
+        if (profileDoc.exists()) {
+            pinnedPosts = profileDoc.data().pinnedPosts || [];
+        }
+        
+        // Check limit (max 3 pinned posts)
+        if (pinnedPosts.length >= 3) {
+            alert('You can only pin up to 3 posts. Unpin one first.');
+            return;
+        }
+        
+        // Add this post
+        if (!pinnedPosts.includes(postId)) {
+            pinnedPosts.push(postId);
+        }
+        
+        // Update Firestore
+        const { setDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        await updateDoc(profileRef, {
+            pinnedPosts: pinnedPosts,
+            updatedAt: Date.now()
+        });
+        
+        console.log('✅ Post pinned');
+        
+        if (window.showNotification) {
+            window.showNotification('Post pinned to your profile!', 'success');
+        }
+        
+        // Reload posts
+        await loadAllUserPosts(userId);
+        await loadFeaturedPosts(userId);
+        
+    } catch (error) {
+        console.error('❌ Error pinning post:', error);
+        alert('Failed to pin post. Please try again.');
+    }
+}
+
+// ========================================
+// UNPIN POST FROM PROFILE
+// ========================================
+
+async function unpinPost(postId) {
+    const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    
+    if (!userId) return;
+    
+    try {
+        // Get current pinned posts
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (!profileDoc.exists()) return;
+        
+        let pinnedPosts = profileDoc.data().pinnedPosts || [];
+        
+        // Remove this post
+        pinnedPosts = pinnedPosts.filter(id => id !== postId);
+        
+        // Update Firestore
+        const { updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        await updateDoc(profileRef, {
+            pinnedPosts: pinnedPosts,
+            updatedAt: Date.now()
+        });
+        
+        console.log('✅ Post unpinned');
+        
+        if (window.showNotification) {
+            window.showNotification('Post unpinned', 'success');
+        }
+        
+        // Reload posts
+        await loadAllUserPosts(userId);
+        await loadFeaturedPosts(userId);
+        
+    } catch (error) {
+        console.error('❌ Error unpinning post:', error);
+        alert('Failed to unpin post. Please try again.');
+    }
+}
+
+// ========================================
+// DELETE POST FROM PROFILE
+// ========================================
+
+async function deleteProfilePost(postId) {
+    if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+        return;
+    }
+    
+    const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    
+    try {
+        // Delete from Firestore
+        const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        await deleteDoc(doc(db, 'posts', postId));
+        
+        // Remove from pinned posts if it was pinned
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            let pinnedPosts = profileDoc.data().pinnedPosts || [];
+            pinnedPosts = pinnedPosts.filter(id => id !== postId);
+            
+            const { updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            await updateDoc(profileRef, {
+                pinnedPosts: pinnedPosts,
+                updatedAt: Date.now()
+            });
+        }
+        
+        console.log('✅ Post deleted');
+        
+        if (window.showNotification) {
+            window.showNotification('Post deleted', 'success');
+        }
+        
+        // Reload posts
+        await loadAllUserPosts(userId);
+        await loadFeaturedPosts(userId);
+        
+    } catch (error) {
+        console.error('❌ Error deleting post:', error);
+        alert('Failed to delete post. Please try again.');
+    }
+}
+
+// Helper function (if not already present)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 
 // ========================================
 // RENDER SOCIAL LINKS

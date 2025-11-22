@@ -2515,3 +2515,133 @@
         justify-content: center;
     }
 }
+/* ========================================
+   PROFILE POSTS
+   ======================================== */
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.profile-post-card {
+    background: rgba(26, 26, 46, 0.5);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.profile-post-card:hover {
+    border-color: rgba(200, 170, 110, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.profile-post-card .post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.profile-post-card .post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-post-card .post-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-post-card .post-username {
+    font-weight: 600;
+    color: var(--gold);
+    font-size: 0.95rem;
+}
+
+.profile-post-card .post-timestamp {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-post-card .post-content {
+    margin-bottom: 1rem;
+}
+
+.profile-post-card .post-text {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.profile-post-card .post-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.profile-post-card .post-stats span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-post-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.view-post-link:hover {
+    color: var(--gold-hover);
+}
+
+.pin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(200, 170, 110, 0.2);
+    color: var(--gold);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.post-actions-menu {
+    position: relative;
+    margin-left: auto;
+}
+
+.edited-indicator {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+}
