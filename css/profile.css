@@ -25,14 +25,6 @@
     z-index: 0;
 }
 
-.profile-wrapper {
-    max-width: 100%;  /* ✅ Full width */
-    margin: 0;
-    padding: 0;  /* ✅ No padding */
-    position: relative;
-    z-index: 1;
-}
-
 /* ========================================
    LOADING & ERROR STATES
    ======================================== */
@@ -89,22 +81,23 @@
 }
 
 /* ========================================
-   PROFILE HEADER - PREMIUM BANNER
+   PROFILE HEADER - FULL WIDTH BANNER
    ======================================== */
 
-/* Full-width header */
 .profile-header {
+    width: 100%;
+    margin: 0 !important;
+    margin-bottom: 3rem !important;
+    padding: 0 !important;
     position: relative;
-    margin: 0;  /* ✅ No margins */
-    border-radius: 0;  /* ✅ Sharp edges */
+    border-radius: 0;
     overflow: hidden;
     background: #000;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    width: 100%;
 }
 
 .profile-banner {
-    height: 450px;
+    height: 400px;
     background: 
         linear-gradient(135deg, 
             rgba(200, 170, 110, 0.9) 0%, 
@@ -148,7 +141,7 @@
     align-items: start;
     background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, #0a0a0a 100%);
     position: relative;
-    margin-top: -150px;  /* ✅ CHANGED from -80px to overlap more */
+    margin-top: -120px;
 }
 
 /* Avatar - Premium Gold Border */
@@ -186,7 +179,6 @@
     opacity: 0.6;
     animation: rotate-border 4s linear infinite;
 }
-
 
 @keyframes rotate-border {
     to { transform: rotate(360deg); }
@@ -296,8 +288,26 @@
     font-size: 1.1rem;
 }
 
+/* Profile Follow Stats */
+.profile-follow-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.profile-follow-stats span:nth-child(2),
+.profile-follow-stats span:nth-child(4) {
+    color: #c8aa6e;
+    font-weight: 700;
+}
+
+.profile-meta-separator {
+    color: rgba(240, 230, 210, 0.4);
+    margin: 0 0.25rem;
+}
+
 /* ========================================
-   PROFILE ACTIONS - PREMIUM BUTTONS
+   PROFILE ACTIONS
    ======================================== */
 
 .profile-actions {
@@ -391,25 +401,42 @@
     border-color: #dc3232;
 }
 
+.profile-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* ========================================
-   STATS GRID - PREMIUM CARDS
+   PROFILE CONTENT WRAPPER
+   ======================================== */
+
+.profile-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+}
+
+/* ========================================
+   STATS GRID
    ======================================== */
 
 .profile-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin: 0 auto 3rem auto;
+    max-width: 1200px;
+    padding: 0 1rem;
 }
 
 .stat-card {
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     border: 2px solid rgba(200, 170, 110, 0.3);
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.75rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
@@ -468,6 +495,14 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
+.stat-value.participation-text {
+    font-size: 1.5rem;
+    color: #c8aa6e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .stat-label {
     color: rgba(240, 230, 210, 0.7);
     font-size: 0.95rem;
@@ -475,12 +510,39 @@
     letter-spacing: 1px;
 }
 
+/* Activity Level Card */
+#statActivityLevel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+#statActivityLevel span {
+    display: block;
+}
+
+#statActivityLevel span:first-child {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #c8aa6e;
+}
+
+#statActivityLevel span:last-child {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(240, 230, 210, 0.8);
+    margin-top: 4px;
+}
+
 /* ========================================
-   TABS - PREMIUM STYLE
+   TABS
    ======================================== */
 
 .profile-tabs {
-    margin-bottom: 2rem;
+    max-width: 1400px;
+    margin: 0 auto 2rem;
+    padding: 0 1rem;
 }
 
 .tabs-nav {
@@ -548,12 +610,14 @@
     color: #f0e6d2;
 }
 
-/* ========================================
-   TAB PANELS
-   ======================================== */
+.tabs-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
 .tab-panel {
     display: none;
+    padding: 2rem 1rem;
     animation: fadeIn 0.5s ease;
 }
 
@@ -600,7 +664,7 @@
 }
 
 /* ========================================
-   FEATURED ACHIEVEMENTS - PREMIUM CARDS
+   OVERVIEW SECTIONS
    ======================================== */
 
 .overview-section {
@@ -617,6 +681,7 @@
     gap: 1rem;
     text-transform: uppercase;
     letter-spacing: 2px;
+    padding-left: 0.5rem;
 }
 
 .section-title i {
@@ -624,6 +689,7 @@
     font-size: 2rem;
 }
 
+/* ACHIEVEMENTS */
 .featured-achievements-grid,
 .achievements-grid {
     display: grid;
@@ -746,10 +812,7 @@
     letter-spacing: 1px;
 }
 
-/* ========================================
-   FAVORITE SONGS - PREMIUM LIST
-   ======================================== */
-
+/* FAVORITE SONGS */
 .favorite-songs-list {
     display: flex;
     flex-direction: column;
@@ -836,467 +899,7 @@
     font-weight: 600;
 }
 
-/* ========================================
-   POSTS
-   ======================================== */
-
-.recent-posts-list,
-.posts-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.post-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: all 0.3s ease;
-}
-
-.post-card:hover {
-    border-color: #c8aa6e;
-    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.2);
-}
-
-.post-header {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    margin-bottom: 1.25rem;
-}
-
-.post-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(200, 170, 110, 0.05));
-    border: 2px solid #c8aa6e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.post-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.post-author-info {
-    flex: 1;
-}
-
-.post-author {
-    color: #f0e6d2;
-    font-weight: 600;
-    font-size: 1.1rem;
-    font-family: 'Cinzel', serif;
-}
-
-.post-timestamp {
-    color: rgba(240, 230, 210, 0.5);
-    font-size: 0.9rem;
-}
-
-.post-content {
-    color: rgba(240, 230, 210, 0.9);
-    line-height: 1.7;
-    margin-bottom: 1.25rem;
-    font-size: 1.05rem;
-}
-
-.post-actions {
-    display: flex;
-    gap: 2rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(200, 170, 110, 0.2);
-}
-
-.post-action-btn {
-    background: none;
-    border: none;
-    color: rgba(240, 230, 210, 0.6);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-}
-
-.post-action-btn:hover {
-    color: #c8aa6e;
-    background: rgba(200, 170, 110, 0.1);
-}
-
-.post-action-btn i {
-    font-size: 1.2rem;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 968px) {
-    .profile-info-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 1.5rem;
-        padding: 0 2rem 2rem;
-    }
-    
-    .profile-avatar-large {
-        margin: 0 auto;
-    }
-    
-    .profile-details {
-        padding-top: 1rem;
-    }
-    
-    .profile-username-row {
-        justify-content: center;
-    }
-    
-    .profile-actions {
-        padding-top: 0;
-        flex-direction: row;
-        justify-content: center;
-        gap: 1rem;
-    }
-    
-    .profile-meta {
-        justify-content: center;
-    }
-    
-    .profile-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .profile-page {
-        padding-top: 60px;
-    }
-
-    .profile-wrapper {
-        padding: 0 1rem 2rem;
-    }
-    
-    .profile-banner {
-        height: 250;
-    }
-    
-    .profile-avatar-large {
-        width: 120px;
-        height: 120px;
-        font-size: 3.5rem;
-    }
-    
-    .profile-info-container {
-        margin-top: -80px;
-        padding: 0 1rem 1.5rem;
-    }
-    
-    .profile-username {
-        font-size: 1.8rem;
-    }
-    
-    .profile-rank {
-        font-size: 1rem;
-    }
-    
-    .profile-bio {
-        font-size: 1rem;
-    }
-    
-    .profile-stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .stat-card {
-        padding: 1.5rem;
-    }
-    
-    .stat-value {
-        font-size: 2rem;
-    }
-    
-    .tabs-nav {
-        gap: 0.25rem;
-    }
-    
-    .tab-btn {
-        padding: 1rem 1.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .section-title {
-        font-size: 1.4rem;
-    }
-    
-    .featured-achievements-grid,
-    .achievements-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .favorite-song-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .song-rank {
-        width: 100%;
-        text-align: left;
-    }
-    
-    .song-thumbnail {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-username {
-        font-size: 1.5rem;
-    }
-    
-    .profile-action-btn {
-        font-size: 0.85rem;
-        padding: 0.75rem 1.5rem;
-    }
-    
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-    
-    .stat-value {
-        font-size: 1.8rem;
-    }
-    
-    .achievement-card {
-        padding: 1.5rem;
-    }
-    
-    .achievement-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2.5rem;
-    }
-    
-    .post-card {
-        padding: 1.5rem;
-    }
-
-      .profile-banner {
-        height: 200px;  /* ✅ Even shorter on very small screens */
-    }
-    
-    .profile-info-container {
-        margin-top: -60px;
-    }
-
-}
-
-/* ========================================
-   UTILITY CLASSES
-   ======================================== */
-
-.btn-primary {
-    padding: 1rem 2.5rem;
-    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(200, 170, 110, 0.5);
-}
-
-.btn-secondary {
-    padding: 1rem 2.5rem;
-    background: rgba(200, 170, 110, 0.1);
-    color: #c8aa6e;
-    border: 2px solid #c8aa6e;
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.btn-secondary:hover {
-    background: rgba(200, 170, 110, 0.2);
-    border-color: #f0e6d2;
-    color: #f0e6d2;
-    transform: translateY(-2px);
-}
-
-/* ========================================
-   PREMIUM EFFECTS
-   ======================================== */
-
-/* Gold glow on hover for interactive elements */
-.glow-on-hover {
-    transition: all 0.3s ease;
-}
-
-.glow-on-hover:hover {
-    filter: drop-shadow(0 0 10px rgba(200, 170, 110, 0.5));
-}
-
-/* Subtle animation for cards appearing */
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.stat-card,
-.achievement-card,
-.favorite-song-card,
-.post-card {
-    animation: slideUp 0.5s ease backwards;
-}
-
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-/* Premium scrollbar */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c8aa6e, #8a7a5e);
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #f0e6d2, #c8aa6e);
-}
-/* Participation level - smaller text stat */
-.stat-value.participation-text {
-    font-size: 1.5rem; /* Smaller than numbers */
-    color: #c8aa6e;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-@media (max-width: 768px) {
-    .stat-value.participation-text {
-        font-size: 1.2rem;
-    }
-}
-/* ========================================
-   VOTES TAB - FILTER BUTTONS
-   ======================================== */
-
-.tab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.tab-header h3 {
-    font-family: 'Cinzel', serif;
-    color: #f0e6d2;
-    font-size: 1.8rem;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 0.75rem 1.5rem;
-    background: rgba(200, 170, 110, 0.1);
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 12px;
-    color: rgba(240, 230, 210, 0.7);
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.filter-btn:hover {
-    background: rgba(200, 170, 110, 0.2);
-    border-color: #c8aa6e;
-    color: #c8aa6e;
-    transform: translateY(-2px);
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
-    border-color: #c8aa6e;
-    color: #000;
-    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
-}
-
-.filter-btn i {
-    font-size: 1rem;
-}
-
-/* ========================================
-   VOTE CARDS - ACTIVITY STYLE
-   ======================================== */
-
+/* VOTES */
 .recent-votes-list,
 .votes-feed {
     display: flex;
@@ -1336,7 +939,6 @@
     opacity: 1;
 }
 
-/* Status-specific colors */
 .vote-card.won::before {
     background: linear-gradient(180deg, #00d26a, #00aa55);
 }
@@ -1345,7 +947,7 @@
     background: linear-gradient(180deg, #ff4655, #cc3344);
 }
 
-.vote-card.pending::before {
+.vote-card.live::before {
     background: linear-gradient(180deg, #ffa500, #ff8c00);
 }
 
@@ -1380,232 +982,102 @@
     border: 2px solid #ff4655;
 }
 
-.vote-status-badge.pending {
+.vote-status-badge.live {
     background: rgba(255, 165, 0, 0.2);
     color: #ffa500;
     border: 2px solid #ffa500;
+    animation: pulse 2s infinite;
 }
 
-.vote-timestamp {
-    color: rgba(240, 230, 210, 0.5);
-    font-size: 0.9rem;
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
-/* Vote Matchup */
+.vote-round-info {
+    color: #c8aa6e;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .vote-matchup {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: 1.5rem;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 .vote-song {
     display: flex;
-    gap: 1rem;
-    align-items: center;
-    padding: 1rem;
-    background: rgba(200, 170, 110, 0.05);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.vote-song.chosen {
-    background: rgba(200, 170, 110, 0.15);
-    border: 2px solid rgba(200, 170, 110, 0.4);
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .vote-song-thumbnail {
-    width: 80px;
-    height: 45px;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    flex-shrink: 0;
-    border: 2px solid rgba(200, 170, 110, 0.3);
-}
-
-.vote-song-thumbnail img {
     width: 100%;
-    height: 100%;
+    height: 80px;
     object-fit: cover;
-}
-
-.vote-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.5rem;
-    background: rgba(0, 0, 0, 0.8);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.vote-song-info {
-    flex: 1;
-    min-width: 0;
+    border-radius: 8px;
+    border: 2px solid rgba(200, 170, 110, 0.3);
 }
 
 .vote-song-title {
     color: #f0e6d2;
     font-weight: 600;
     font-size: 1rem;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: center;
+    font-family: 'Cinzel', serif;
 }
 
-.vote-song-meta {
-    color: rgba(240, 230, 210, 0.6);
-    font-size: 0.85rem;
+.vote-song.voted .vote-song-thumbnail {
+    border-color: #c8aa6e;
+    box-shadow: 0 0 15px rgba(200, 170, 110, 0.5);
 }
 
 .vote-vs {
+    color: #c8aa6e;
     font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #c8aa6e;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* ========================================
-   RESPONSIVE - VOTE CARDS
-   ======================================== */
-
-@media (max-width: 768px) {
-    .tab-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .filter-buttons {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .filter-btn {
-        flex: 1;
-        justify-content: center;
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
-    }
-    
-    .vote-matchup {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .vote-vs {
-        text-align: center;
-        padding: 0.5rem 0;
-    }
-    
-    .vote-song {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .vote-song-thumbnail {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9;
-    }
-}
-
-/* Participation level - smaller text stat */
-.stat-value.participation-text {
     font-size: 1.5rem;
-    color: #c8aa6e;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-@media (max-width: 768px) {
-    .stat-value.participation-text {
-        font-size: 1.2rem;
-    }
-}
-/* Vote Footer */
 .vote-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(200, 170, 110, 0.2);
 }
 
-.vote-round {
-    color: rgba(240, 230, 210, 0.6);
+.vote-timestamp {
+    color: rgba(240, 230, 210, 0.5);
     font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.view-match-link {
-    color: #c8aa6e;
-    text-decoration: none;
-    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.3s ease;
 }
 
-.view-match-link:hover {
-    color: #f0e6d2;
-    transform: translateX(4px);
-}
-
-.vote-card-error {
-    background: rgba(255, 70, 85, 0.1);
-    border: 2px solid rgba(255, 70, 85, 0.3);
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    color: #ff4655;
-}
-
-.vote-card-error i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-/* ========================================
-   PARTICIPATION TAB
-   ======================================== */
-
+/* PARTICIPATION TAB */
 .participation-overview {
     display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 3rem;
-    padding: 3rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     border: 2px solid rgba(200, 170, 110, 0.3);
     border-radius: 16px;
-    margin-bottom: 3rem;
 }
 
 .participation-circle {
     position: relative;
     width: 200px;
     height: 200px;
-}
-
-.participation-circle svg {
-    transform: rotate(0deg);
-}
-
-.participation-circle circle {
-    transition: stroke-dashoffset 1.5s ease;
+    flex-shrink: 0;
 }
 
 .participation-percentage {
@@ -1615,8 +1087,12 @@
     transform: translate(-50%, -50%);
     font-size: 3rem;
     font-weight: 700;
-    color: #f0e6d2;
+    color: #c8aa6e;
     font-family: 'Cinzel', serif;
+}
+
+.participation-summary {
+    flex: 1;
 }
 
 .participation-summary h3 {
@@ -1634,7 +1110,6 @@
     line-height: 1.7;
 }
 
-/* Rounds Breakdown */
 .rounds-breakdown {
     margin-top: 2rem;
 }
@@ -1642,298 +1117,77 @@
 .rounds-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
-.round-participation-card {
+.round-item {
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: all 0.3s ease;
-}
-
-.round-participation-card:hover {
-    border-color: #c8aa6e;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(200, 170, 110, 0.2);
-}
-
-.round-header-row {
+    border-radius: 12px;
+    padding: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.round-item:hover {
+    border-color: #c8aa6e;
+    transform: translateX(8px);
 }
 
 .round-name {
     font-family: 'Cinzel', serif;
-    font-size: 1.5rem;
     color: #f0e6d2;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-.round-stats {
+.round-progress {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    color: rgba(240, 230, 210, 0.7);
-    font-size: 1.1rem;
+    gap: 1.5rem;
 }
 
-.round-votes {
-    font-weight: 700;
-    color: #c8aa6e;
-}
-
-.round-progress-container {
-    position: relative;
-    width: 100%;
+.round-bar {
+    width: 200px;
     height: 12px;
     background: rgba(200, 170, 110, 0.1);
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
-.round-progress-fill {
+.round-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, #c8aa6e, #f0e6d2);
-    border-radius: 6px;
+    border-radius: 10px;
     transition: width 1s ease;
-    box-shadow: 0 0 10px rgba(200, 170, 110, 0.5);
 }
 
-.round-percentage-badge {
-    position: absolute;
-    top: -8px;
-    right: 0;
-    transform: translateY(-100%);
-    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
-    color: #000;
-    padding: 0.4rem 0.8rem;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .participation-overview {
-        flex-direction: column;
-        text-align: center;
-        padding: 2rem;
-    }
-    
-    .participation-circle {
-        width: 150px;
-        height: 150px;
-    }
-    
-    .participation-percentage {
-        font-size: 2.5rem;
-    }
-    
-    .participation-summary h3 {
-        font-size: 1.5rem;
-    }
-}
-
-/* Update grid for 4 cards */
-.profile-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-@media (max-width: 1200px) {
-    .profile-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-/* ========================================
-   PROFILE CONTAINER - CENTERED & PADDED
-   ======================================== */
-
-.profile-container {
-    max-width: 1400px;  /* ✅ Slightly narrower */
-    margin: 0 auto;
-    padding: 2rem 3rem;  /* ✅ More side padding */
-    min-height: 100vh;
-}
-
-@media (max-width: 1440px) {
-    .profile-container {
-        padding: 2rem 2rem;  /* ✅ Reduce padding on smaller screens */
-    }
-}
-
-@media (max-width: 768px) {
-    .profile-container {
-        padding: 1.5rem 1rem;
-    }
-}
-
-/* ========================================
-   PROFILE STATS GRID - NARROWER CARDS
-   ======================================== */
-
-.profile-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin: 0 auto 3rem auto;  /* ✅ Center the grid */
-    max-width: 1200px;  /* ✅ Narrower grid */
-    padding: 0 1rem;  /* ✅ Prevent edge touching */
-}
-
-@media (max-width: 1200px) {
-    .profile-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 800px;
-    }
-}
-
-@media (max-width: 768px) {
-    .profile-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Stat Cards - Slightly Smaller */
-.stat-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    border-radius: 16px;
-    padding: 1.75rem;  /* ✅ Reduced from 2rem */
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;  /* ✅ Reduced gap */
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-icon {
-    font-size: 2.5rem;  /* ✅ Slightly smaller icons */
-    width: 60px;  /* ✅ Fixed width */
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(200, 170, 110, 0.1);
-    border-radius: 12px;
-    flex-shrink: 0;
-}
-
-.stat-icon i {
+.round-percentage {
     color: #c8aa6e;
-}
-/* ========================================
-   CENTER ALL TAB CONTENT
-   ======================================== */
-
-.profile-tabs {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 1rem;  /* ✅ Prevent edge touching */
+    font-weight: 700;
+    font-size: 1.1rem;
+    min-width: 50px;
+    text-align: right;
 }
 
-.tabs-content {
-    max-width: 1200px;  /* ✅ Narrower content area */
-    margin: 0 auto;
-}
-
-.tab-panel {
-    padding: 2rem 1rem;  /* ✅ Add horizontal padding */
-}
-
-/* Overview Sections - Centered */
-.overview-section {
-    margin-bottom: 3rem;
-    max-width: 100%;
-}
-
-.overview-section .section-title {
-    text-align: left;
-    margin-bottom: 1.5rem;
-    padding-left: 0.5rem;
-}
-
-/* Featured Achievements Grid - Centered */
-.featured-achievements-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    max-width: 100%;
-}
-
-/* Favorite Songs List - Centered */
-.favorite-songs-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 100%;
-}
-
-/* Recent Votes - Centered */
-.recent-votes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 100%;
-}
-
-/* Votes Feed - Centered */
-.votes-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 100%;
-}
-
-/* Achievements Grid - Centered */
-.achievements-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    max-width: 100%;
-}
-/* ========================================
-   TAB HEADER - CENTERED & RESPONSIVE
-   ======================================== */
-
+/* FILTER BUTTONS */
 .tab-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    max-width: 100%;
+    gap: 1rem;
 }
 
 .tab-header h3 {
     font-family: 'Cinzel', serif;
     color: #f0e6d2;
     font-size: 1.8rem;
-    margin: 0;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -1944,375 +1198,181 @@
     flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
-    .tab-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .filter-buttons {
-        width: 100%;
-    }
-}
-/* Status-specific colors */
-.vote-card.won::before {
-    background: linear-gradient(180deg, #00d26a, #00aa55);
-}
-
-.vote-card.lost::before {
-    background: linear-gradient(180deg, #ff4655, #cc3344);
-}
-
-.vote-card.live::before {  /* ✅ Changed from 'pending' */
-    background: linear-gradient(180deg, #ffa500, #ff8c00);
-}
-
-.vote-status-badge.won {
-    background: rgba(0, 210, 106, 0.2);
-    color: #00d26a;
-    border: 2px solid #00d26a;
-}
-
-.vote-status-badge.lost {
-    background: rgba(255, 70, 85, 0.2);
-    color: #ff4655;
-    border: 2px solid #ff4655;
-}
-
-.vote-status-badge.live {  /* ✅ Changed from 'pending' */
-    background: rgba(255, 165, 0, 0.2);
-    color: #ffa500;
-    border: 2px solid #ffa500;
-}
-/* Vote Footer */
-.vote-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(200, 170, 110, 0.2);
-    flex-wrap: wrap;  /* ✅ Allow wrapping on small screens */
-    gap: 0.75rem;
-}
-
-.vote-tournament {  /* ✅ NEW */
-    color: #c8aa6e;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Cinzel', serif;
-}
-
-.vote-round {
-    color: rgba(240, 230, 210, 0.6);
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.view-match-link {
-    color: #c8aa6e;
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    margin-left: auto;  /* ✅ Push to right */
-}
-
-@media (max-width: 768px) {
-    .vote-footer {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .view-match-link {
-        margin-left: 0;
-        align-self: flex-end;
-    }
-}
-/* Activity Level Card - Two Line Display */
-#statActivityLevel {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.2;
-}
-
-#statActivityLevel span {
-    display: block;
-}
-
-#statActivityLevel span:first-child {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #c8aa6e;
-}
-
-#statActivityLevel span:last-child {
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(240, 230, 210, 0.8);
-    margin-top: 4px;
-}
-/* ========================================
-   PROFILE ACTIONS - FOLLOW BUTTON
-   ======================================== */
-
-.profile-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    margin-left: auto;
-}
-
-.profile-follow-btn {
+.filter-btn {
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
-    border: none;
-    border-radius: 8px;
-    color: #0a0a0a;
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    color: rgba(240, 230, 210, 0.6);
     font-weight: 600;
-    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Cinzel', serif;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
-}
-
-.profile-follow-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(200, 170, 110, 0.4);
-}
-
-.profile-follow-btn:active {
-    transform: translateY(0);
-}
-
-.profile-follow-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Following State */
-.profile-follow-btn.following {
-    background: rgba(200, 170, 110, 0.2);
-    border: 2px solid #c8aa6e;
-    color: #c8aa6e;
-}
-
-.profile-follow-btn.following:hover {
-    background: rgba(255, 70, 85, 0.2);
-    border-color: #ff4655;
-    color: #ff4655;
-}
-
-.profile-follow-btn.following:hover::after {
-    content: ' Unfollow';
-}
-
-.profile-follow-btn.following:hover i {
-    display: none;
-}
-
-/* Follow Stats */
-.profile-follow-stats {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: rgba(240, 230, 210, 0.8);
     font-size: 0.9rem;
 }
 
-.profile-follow-stats span:first-child {
+.filter-btn:hover {
+    border-color: #c8aa6e;
     color: #c8aa6e;
-    font-weight: 700;
+    background: rgba(200, 170, 110, 0.15);
 }
 
-.profile-follow-stats span:nth-child(3) {
-    color: #c8aa6e;
-    font-weight: 700;
+.filter-btn.active {
+    background: linear-gradient(135deg, #c8aa6e, #f0e6d2);
+    color: #000;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1200px) {
+    .profile-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .profile-banner {
-        flex-direction: column;
-        align-items: flex-start;
+        height: 250px;
+    }
+    
+    .profile-info-container {
+        grid-template-columns: 1fr;
         gap: 1.5rem;
+        padding: 0 1.5rem 1.5rem;
+        margin-top: -80px;
+        text-align: center;
+    }
+    
+    .profile-avatar-large {
+        width: 120px;
+        height: 120px;
+        font-size: 4rem;
+        margin: 0 auto;
+    }
+    
+    .profile-details {
+        padding-top: 0;
+    }
+    
+    .profile-username {
+        font-size: 1.8rem;
+    }
+    
+    .profile-username-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .profile-meta {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
     }
     
     .profile-actions {
+        padding-top: 0;
         width: 100%;
-        margin-left: 0;
     }
     
-    .profile-follow-btn {
+    .profile-action-btn {
         width: 100%;
-        justify-content: center;
     }
     
-    .profile-follow-stats {
-        flex-direction: column;
-        align-items: flex-start;
+    .profile-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .tabs-nav {
         gap: 0.25rem;
     }
     
-    .profile-separator {
-        display: none;
-    }
-}
-/* Profile Follow Stats in Meta */
-.profile-follow-stats {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.profile-follow-stats span:nth-child(2),
-.profile-follow-stats span:nth-child(4) {
-    color: #c8aa6e;
-    font-weight: 700;
-}
-
-.profile-meta-separator {
-    color: rgba(240, 230, 210, 0.4);
-    margin: 0 0.25rem;
-}
-
-/* Make follow stats clickable (for future tabs) */
-.profile-follow-stats:hover {
-    color: #c8aa6e;
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .profile-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+    .tab-btn {
+        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
     }
     
-    .profile-meta-separator {
-        display: none;
+    .participation-overview {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .vote-matchup {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .vote-vs {
+        transform: rotate(90deg);
     }
 }
-/* ========================================
-   PROFILE ACTION BUTTONS
-   ======================================== */
 
-.profile-action-btn {
-    position: relative;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.profile-action-btn.primary {
-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
-    color: #1a1a2e;
-}
-
-.profile-action-btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.4);
-}
-
-.profile-action-btn.secondary {
-    background: rgba(200, 170, 110, 0.1);
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    color: #C8AA6E;
-}
-
-.profile-action-btn.secondary:hover {
-    background: rgba(200, 170, 110, 0.2);
-    border-color: #C8AA6E;
-}
-
-.profile-action-btn.follow {
-    background: rgba(200, 170, 110, 0.1);
-    border: 2px solid rgba(200, 170, 110, 0.3);
-    color: #C8AA6E;
-}
-
-.profile-action-btn.follow:hover {
-    background: rgba(200, 170, 110, 0.2);
-    border-color: #C8AA6E;
-}
-
-.profile-action-btn.follow.following {
-    background: rgba(200, 170, 110, 0.2);
-    border-color: #C8AA6E;
-}
-
-.profile-action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Notification badge on profile button */
-.notification-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.5);
-    border: 2px solid #1a1a2e;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-/* ========================================
-   PROFILE HEADER - FULL WIDTH
-   ======================================== */
-
-.profile-header {
-    width: 100%;
-    margin: 0;
-    position: relative;
-}
-
-.profile-banner {
-    height: 350px;  /* ✅ Your bigger banner */
-}
-
-/* ========================================
-   PROFILE CONTENT WRAPPER
-   ======================================== */
-
-.profile-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem 4rem;  /* ✅ No top padding */
+@media (max-width: 480px) {
+    .profile-page {
+        padding-top: 70px;
+    }
+    
+    .profile-banner {
+        height: 200px;
+    }
+    
+    .profile-info-container {
+        padding: 0 1rem 1rem;
+        margin-top: -60px;
+    }
+    
+    .profile-avatar-large {
+        width: 100px;
+        height: 100px;
+        font-size: 3rem;
+        border-width: 3px;
+    }
+    
+    .profile-username {
+        font-size: 1.5rem;
+    }
+    
+    .profile-rank {
+        font-size: 1rem;
+    }
+    
+    .profile-bio {
+        font-size: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .tab-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.85rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .featured-achievements-grid,
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
 }
