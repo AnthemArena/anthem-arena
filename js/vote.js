@@ -1658,31 +1658,26 @@ try {
         votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
     });
     
-    console.log('✅ Vote record created in Firebase');
+console.log('✅ CHECKPOINT 1: Vote record created in Firebase');
     
     // ✅ Use API client to submit vote (updates match counts)
     await submitVoteToAPI(currentMatch.id, songId);
-    console.log('✅ Vote submitted via API client');
+console.log('✅ CHECKPOINT 2: Vote submitted via API client');
     
     // Save vote locally as backup
     localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
     
     // ✅ Also save in userVotes format for homepage/matches pages
     saveVoteForOtherPages(currentMatch.id, songId);
+console.log('✅ CHECKPOINT 3: LocalStorage saved');
+console.log('✅ CHECKPOINT 4: About to enter activity block');
 
-    // ========================================
-    // ✅ LOG ACTIVITY IF PUBLIC PROFILE
-    // ========================================
- // ========================================
-// ✅ LOG ACTIVITY IF PUBLIC PROFILE
-// ========================================
-// ========================================
-// ✅ LOG ACTIVITY IF PUBLIC PROFILE + CREATE SOCIAL FEED POST
-// ========================================
 // ========================================
 // ✅ ALWAYS LOG ACTIVITY + CREATE SOCIAL POST
 // ========================================
 try {
+        console.log('✅ CHECKPOINT 5: Inside activity try block');
+
     const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
     const otherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
     const activityId = `${userId}_${currentMatch.id}`;
@@ -1694,21 +1689,22 @@ try {
     
     console.log('📝 Logging activity:', {
         matchId: currentMatch.id,
-        username: username,  // Auto-generated username
-        round: currentMatch.round
+        username: username,
+        round: currentMatch.round,
+        choice: songId  // ✅ This songId comes from function parameter
     });
     
     // ✅ ALWAYS log to activity collection
     await setDoc(doc(db, 'activity', activityId), {
         activityId: activityId,
         userId: userId,
-        username: username,  // Auto-generated (e.g., "EpicSummoner42")
+        username: username,
         avatar: avatar,
         matchId: currentMatch.id,
         matchTitle: matchTitle,
         songId: votedVideoId,
         songTitle: votedSongName,
-        choice: songId,
+        choice: songId,  // ✅ FIX: songId is from submitVote(songId) parameter
         timestamp: Date.now(),
         round: currentMatch.round,
         tournamentId: ACTIVE_TOURNAMENT,
@@ -1729,7 +1725,7 @@ try {
                 songTitle: votedSongName,
                 votedSongName: votedSongName,
                 opponentSongName: otherSongName,
-                choice: songId,
+                choice: songId,  // ✅ FIX: songId is 'song1' or 'song2' from function parameter
                 round: currentMatch.round,
                 tournamentId: ACTIVE_TOURNAMENT
             });
@@ -1737,6 +1733,8 @@ try {
             console.log('✅ Social feed post created for:', username);
         } catch (postError) {
             console.error('⚠️ Could not create social feed post:', postError);
+            console.error('Error details:', postError.message);
+            console.error('Stack trace:', postError.stack);
         }
     } else {
         console.log('ℹ️ User is private, skipping social post');
@@ -1744,6 +1742,8 @@ try {
     
 } catch (activityError) {
     console.error('❌ Could not log activity:', activityError);
+    console.error('Error details:', activityError.message);
+    console.error('Stack trace:', activityError.stack);
 }
         
         // ========================================
