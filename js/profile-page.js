@@ -2776,6 +2776,10 @@ async function pinPost(postId) {
 // UNPIN POST FROM PROFILE
 // ========================================
 
+// ========================================
+// UNPIN POST FROM PROFILE
+// ========================================
+
 async function unpinPost(postId) {
     const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
     
@@ -2841,43 +2845,56 @@ async function unpinPost(postId) {
             window.showNotification('Post unpinned', 'success');
         }
         
-        // ✅ CRITICAL FIX: Handle featured vs all posts differently
+        // ✅ CRITICAL FIX: Update BOTH featured sections (Overview + Posts tab)
         if (isFeaturedPost) {
-            console.log('📌 Unpinned from featured section - removing card');
+            console.log('📌 Unpinned from featured section - removing from ALL featured areas');
             
             // Close menu
             setTimeout(() => {
                 if (menu) menu.style.display = 'none';
             }, 500);
             
-            // Animate and remove from featured section
-            if (postCard) {
-                postCard.style.transition = 'all 0.3s ease';
-                postCard.style.opacity = '0';
-                postCard.style.transform = 'scale(0.95)';
-                
-                setTimeout(() => {
-                    postCard.remove();
-                    
-                    // Hide featured sections if empty
-                    const featuredSection = document.getElementById('featuredPostsSection');
-                    const featuredOverview = document.getElementById('featuredPostsOverview');
-                    const featuredList = document.getElementById('featuredPostsList');
-                    const featuredOverviewGrid = document.getElementById('featuredPostsOverviewGrid');
-                    
-                    if (featuredList && featuredList.children.length === 0) {
-                        if (featuredSection) featuredSection.style.display = 'none';
-                    }
-                    
-                    if (featuredOverviewGrid && featuredOverviewGrid.children.length === 0) {
-                        if (featuredOverview) featuredOverview.style.display = 'none';
-                    }
-                }, 300);
-            }
+            // ✅ Remove from BOTH featured sections
+            const allFeaturedCards = document.querySelectorAll(`.profile-post-card[data-post-id="${postId}"]`);
             
-            // DON'T reload all posts - just update the featured sections
-            setTimeout(async () => {
-                await loadFeaturedPosts(userId);
+            allFeaturedCards.forEach(card => {
+                const isInFeatured = card.closest('#featuredPostsList, #featuredPostsOverviewGrid');
+                
+                if (isInFeatured) {
+                    console.log('🎬 Animating removal of featured post card');
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                    }, 300);
+                }
+            });
+            
+            // ✅ Check and hide empty featured sections
+            setTimeout(() => {
+                // Posts Tab - Featured Section
+                const featuredSection = document.getElementById('featuredPostsSection');
+                const featuredList = document.getElementById('featuredPostsList');
+                
+                if (featuredList && featuredList.children.length === 0) {
+                    if (featuredSection) {
+                        console.log('📭 Hiding Posts tab featured section (empty)');
+                        featuredSection.style.display = 'none';
+                    }
+                }
+                
+                // Overview Tab - Featured Section
+                const featuredOverview = document.getElementById('featuredPostsOverview');
+                const featuredOverviewGrid = document.getElementById('featuredPostsOverviewGrid');
+                
+                if (featuredOverviewGrid && featuredOverviewGrid.children.length === 0) {
+                    if (featuredOverview) {
+                        console.log('📭 Hiding Overview tab featured section (empty)');
+                        featuredOverview.style.display = 'none';
+                    }
+                }
             }, 400);
             
         } else {
@@ -2923,6 +2940,38 @@ async function unpinPost(postId) {
                     }
                 }, 700);
             }
+            
+            // ✅ ALSO remove from featured sections if they exist in other tabs
+            const allFeaturedCards = document.querySelectorAll(`.profile-post-card[data-post-id="${postId}"]`);
+            
+            allFeaturedCards.forEach(card => {
+                const isInFeatured = card.closest('#featuredPostsList, #featuredPostsOverviewGrid');
+                
+                if (isInFeatured && card !== postCard) {
+                    console.log('🎬 Removing from other featured section');
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Check if sections are now empty
+                        const featuredSection = document.getElementById('featuredPostsSection');
+                        const featuredList = document.getElementById('featuredPostsList');
+                        const featuredOverview = document.getElementById('featuredPostsOverview');
+                        const featuredOverviewGrid = document.getElementById('featuredPostsOverviewGrid');
+                        
+                        if (featuredList && featuredList.children.length === 0) {
+                            if (featuredSection) featuredSection.style.display = 'none';
+                        }
+                        
+                        if (featuredOverviewGrid && featuredOverviewGrid.children.length === 0) {
+                            if (featuredOverview) featuredOverview.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            });
         }
         
     } catch (error) {
