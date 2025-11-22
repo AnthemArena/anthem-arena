@@ -18,7 +18,7 @@ async function loadChampionManifest() {
     if (championManifest) return championManifest;
     
     try {
-        const response = await fetch('/champion-packs/champion-manifest.json');
+const response = await fetch('../champion-packs/champion-manifest.json');
         if (!response.ok) throw new Error('Manifest not found');
         
         championManifest = await response.json();
@@ -58,7 +58,7 @@ async function loadChampionPack(championId = 'default') {
     try {
         console.log(`📦 Loading champion pack: ${championId}`);
         
-        const response = await fetch(`/champion-packs/${championId}.json`);
+const response = await fetch(`../champion-packs/${championId}.json`);
         
         if (!response.ok) {
             throw new Error(`Pack not found: ${championId}`);
