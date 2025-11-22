@@ -1987,10 +1987,14 @@ function showNotFoundState() {
     
     const notFound = document.getElementById('notFoundState');
     const guest = document.getElementById('guestState');
+        const header = document.getElementById('profileHeader');  // ✅ NEW
+
     const content = document.getElementById('profileContent');
     
     if (notFound) notFound.style.display = 'flex';
     if (guest) guest.style.display = 'none';
+        if (header) header.style.display = 'none';  // ✅ NEW
+
     if (content) content.style.display = 'none';
 }
 
@@ -1999,10 +2003,14 @@ function showGuestState() {
     
     const notFound = document.getElementById('notFoundState');
     const guest = document.getElementById('guestState');
+        const header = document.getElementById('profileHeader');  // ✅ NEW
+
     const content = document.getElementById('profileContent');
     
     if (notFound) notFound.style.display = 'none';
     if (guest) guest.style.display = 'flex';
+        if (header) header.style.display = 'none';  // ✅ NEW
+
     if (content) content.style.display = 'none';
 }
 
@@ -2011,10 +2019,14 @@ function showProfileContent() {
     
     const notFound = document.getElementById('notFoundState');
     const guest = document.getElementById('guestState');
+        const header = document.getElementById('profileHeader');  // ✅ NEW
+
     const content = document.getElementById('profileContent');
     
     if (notFound) notFound.style.display = 'none';
     if (guest) guest.style.display = 'none';
+        if (header) header.style.display = 'block';  // ✅ NEW
+
     if (content) content.style.display = 'block';
 }
 

@@ -187,15 +187,6 @@
     animation: rotate-border 4s linear infinite;
 }
 
-/* Add padding back to content below header */
-.profile-stats-grid,
-.profile-tabs {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 2rem;  /* ✅ Side padding for content */
-}
-
 
 @keyframes rotate-border {
     to { transform: rotate(360deg); }
@@ -2302,28 +2293,26 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+/* ========================================
+   PROFILE HEADER - FULL WIDTH
+   ======================================== */
+
+.profile-header {
+    width: 100%;
+    margin: 0;
+    position: relative;
+}
+
+.profile-banner {
+    height: 350px;  /* ✅ Your bigger banner */
+}
 
 /* ========================================
-   EMERGENCY FIX: Remove gaps around header
+   PROFILE CONTENT WRAPPER
    ======================================== */
 
 .profile-content {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
-
-.profile-header {
-    margin-left: -2rem !important;   /* Extend beyond container */
-    margin-right: -2rem !important;
-    margin-top: -2rem !important;    /* Pull up to top */
-    width: calc(100% + 4rem) !important;  /* Full width */
-}
-
-@media (max-width: 768px) {
-    .profile-header {
-        margin-left: -1rem !important;
-        margin-right: -1rem !important;
-        margin-top: -1rem !important;
-        width: calc(100% + 2rem) !important;
-    }
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;  /* ✅ No top padding */
 }
