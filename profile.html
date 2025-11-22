@@ -13,15 +13,17 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Styles -->
+  <!-- Styles -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/profile.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+
     
     <!-- Firebase -->
+<!-- ✅ CRITICAL: Load global systems FIRST (all in head) -->
     <script type="module" src="/js/firebase-config.js"></script>
     <script type="module" src="/js/notification-storage.js"></script>
     <script type="module" src="/js/notification-center.js"></script>
@@ -33,6 +35,8 @@
     
     <!-- Main Content -->
     <main class="profile-page">
+        
+    
         
         <!-- 404 State -->
         <div id="notFoundState" class="not-found-state" style="display: none;">
@@ -50,260 +54,259 @@
             <button class="btn-primary" onclick="window.openUsernamePrompt()">Create Profile</button>
         </div>
         
-        <!-- ✅ MOVED: Profile Header (OUTSIDE profile-content wrapper) -->
-        <section class="profile-header" id="profileHeader" style="display: none;">
-            <div class="profile-banner"></div>
-            
-            <div class="profile-info-container">
-                <div class="profile-avatar-large" id="profileAvatar">
-                    🎵
-                </div>
-                
-                <div class="profile-details">
-                    <div class="profile-username-row">
-                        <h1 class="profile-username" id="profileUsername">Username</h1>
-                        <div class="profile-badges" id="profileBadges">
-                            <!-- Badges will be inserted here -->
-                        </div>
-                    </div>
-                    
-                    <div class="profile-rank" id="profileRank">
-                        <i class="fas fa-star"></i> Level 1 - New Voter
-                    </div>
-                    
-                    <p class="profile-bio" id="profileBio">
-                        <!-- Bio will be inserted here -->
-                    </p>
-                    
-                    <div class="profile-meta">
-                        <span class="profile-meta-item" id="profileJoined">
-                            <i class="fas fa-calendar"></i> Joined Recently
-                        </span>
-                        <span class="profile-meta-item" id="profileVotes">
-                            <i class="fas fa-trophy"></i> 0 votes
-                        </span>
-                        <span class="profile-meta-item profile-follow-stats">
-                            <i class="fas fa-users"></i>
-                            <span id="followerCount">0</span> Followers
-                            <span class="profile-meta-separator">•</span>
-                            <span id="followingCount">0</span> Following
-                        </span>
-                    </div>
-                </div>
-                
-                <!-- Profile Actions -->
-                <div class="profile-actions" id="profileActions">
-                    <!-- Follow button will be inserted here by JS -->
-                </div>
-            </div>
-        </section>
-        
-        <!-- ✅ Profile Content Wrapper (Stats & Tabs ONLY) -->
+        <!-- Profile Content -->
         <div id="profileContent" class="profile-content" style="display: none;">
             
-            <!-- Stats Grid (4 cards) -->
-            <section class="profile-stats-grid">
-                
-                <!-- Total Votes -->
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-vote-yea"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="statTotalVotes">0</div>
-                        <div class="stat-label">Total Votes</div>
-                    </div>
+           <!-- Profile Header -->
+<section class="profile-header">
+    <div class="profile-banner"></div>
+    
+    <div class="profile-info-container">
+        <div class="profile-avatar-large" id="profileAvatar">
+            🎵
+        </div>
+        
+        <div class="profile-details">
+            <div class="profile-username-row">
+                <h1 class="profile-username" id="profileUsername">Username</h1>
+                <div class="profile-badges" id="profileBadges">
+                    <!-- Badges will be inserted here -->
                 </div>
-                
-                <!-- Participation -->
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="statParticipation">0%</div>
-                        <div class="stat-label">Participation</div>
-                    </div>
-                </div>
-                
-                <!-- Achievements -->
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="statAchievements">0</div>
-                        <div class="stat-label">Achievements</div>
-                    </div>
-                </div>
-                
-                <!-- Activity Level -->
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value participation-text" id="statActivityLevel">Just Started</div>
-                        <div class="stat-label">Activity Level</div>
-                    </div>
-                </div>
-                
-            </section>
+            </div>
             
-            <!-- Profile Tabs -->
-            <section class="profile-tabs">
-                <div class="tabs-nav">
-                    <button class="tab-btn active" data-tab="overview">
-                        <i class="fas fa-home"></i> Overview
-                    </button>
-                    <button class="tab-btn" data-tab="votes">
-                        <i class="fas fa-vote-yea"></i> Votes <span class="tab-count" id="votesCount">0</span>
-                    </button>
-                    <button class="tab-btn" data-tab="participation">
-                        <i class="fas fa-chart-bar"></i> Participation
-                    </button>
-                    <button class="tab-btn" data-tab="achievements">
-                        <i class="fas fa-trophy"></i> Achievements <span class="tab-count" id="achievementsCount">0</span>
-                    </button>
-                    <button class="tab-btn" data-tab="songs">
-                        <i class="fas fa-music"></i> Top Songs
-                    </button>
+            <div class="profile-rank" id="profileRank">
+                <i class="fas fa-star"></i> Level 1 - New Voter
+            </div>
+            
+            <p class="profile-bio" id="profileBio">
+                <!-- Bio will be inserted here -->
+            </p>
+            
+            <div class="profile-meta">
+                <span class="profile-meta-item" id="profileJoined">
+                    <i class="fas fa-calendar"></i> Joined Recently
+                </span>
+                <span class="profile-meta-item" id="profileVotes">
+                    <i class="fas fa-trophy"></i> 0 votes
+                </span>
+                <!-- ✅ ADD: Follow Stats -->
+                <span class="profile-meta-item profile-follow-stats">
+                    <i class="fas fa-users"></i>
+                    <span id="followerCount">0</span> Followers
+                    <span class="profile-meta-separator">•</span>
+                    <span id="followingCount">0</span> Following
+                </span>
+            </div>
+        </div>
+        
+        <!-- Profile Actions -->
+        <div class="profile-actions" id="profileActions">
+            <!-- Follow button will be inserted here by JS -->
+        </div>
+    </div>
+</section>
+            
+<!-- Stats Grid (4 cards) -->
+<!-- Stats Grid (4 cards with Font Awesome icons) -->
+<section class="profile-stats-grid">
+    
+    <!-- Total Votes -->
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-vote-yea"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value" id="statTotalVotes">0</div>
+            <div class="stat-label">Total Votes</div>
+        </div>
+    </div>
+    
+    <!-- Participation -->
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-chart-pie"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value" id="statParticipation">0%</div>
+            <div class="stat-label">Participation</div>
+        </div>
+    </div>
+    
+    <!-- Achievements -->
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value" id="statAchievements">0</div>
+            <div class="stat-label">Achievements</div>
+        </div>
+    </div>
+    
+    <!-- Activity Level -->
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-fire"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value participation-text" id="statActivityLevel">Just Started</div>
+            <div class="stat-label">Activity Level</div>
+        </div>
+    </div>
+    
+</section>
+            
+          <!-- Profile Tabs -->
+<section class="profile-tabs">
+    <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="overview">
+            <i class="fas fa-home"></i> Overview
+        </button>
+        <button class="tab-btn" data-tab="votes">
+            <i class="fas fa-vote-yea"></i> Votes <span class="tab-count" id="votesCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="participation">
+            <i class="fas fa-chart-bar"></i> Participation
+        </button>
+        <button class="tab-btn" data-tab="achievements">
+            <i class="fas fa-trophy"></i> Achievements <span class="tab-count" id="achievementsCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="songs">
+            <i class="fas fa-music"></i> Top Songs
+        </button>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="tabs-content">
+        
+        <!-- Overview Tab -->
+        <div class="tab-panel active" id="tab-overview">
+            
+            <!-- Featured Achievements -->
+            <div class="overview-section">
+                <h3 class="section-title">
+                    <i class="fas fa-star"></i> Featured Achievements
+                </h3>
+                <div id="featuredAchievements" class="featured-achievements-grid">
+                    <div class="no-content">
+                        <i class="fas fa-lock"></i>
+                        <p>No achievements unlocked yet</p>
+                    </div>
                 </div>
-                
-                <!-- Tab Content -->
-                <div class="tabs-content">
-                    
-                    <!-- Overview Tab -->
-                    <div class="tab-panel active" id="tab-overview">
-                        
-                        <!-- Featured Achievements -->
-                        <div class="overview-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-star"></i> Featured Achievements
-                            </h3>
-                            <div id="featuredAchievements" class="featured-achievements-grid">
-                                <div class="no-content">
-                                    <i class="fas fa-lock"></i>
-                                    <p>No achievements unlocked yet</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Recent Votes -->
-                        <div class="overview-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-history"></i> Recent Votes
-                            </h3>
-                            <div id="recentVotes" class="recent-votes-list">
-                                <div class="no-content">
-                                    <i class="fas fa-vote-yea"></i>
-                                    <p>No votes yet</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Favorite Songs -->
-                        <div class="overview-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-music"></i> Most Supported Songs
-                            </h3>
-                            <div id="favoriteSongs" class="favorite-songs-list">
-                                <div class="no-content">
-                                    <i class="fas fa-music"></i>
-                                    <p>No votes yet</p>
-                                </div>
-                            </div>
-                        </div>
-                        
+            </div>
+            
+            <!-- Recent Votes (NEW) -->
+            <div class="overview-section">
+                <h3 class="section-title">
+                    <i class="fas fa-history"></i> Recent Votes
+                </h3>
+                <div id="recentVotes" class="recent-votes-list">
+                    <div class="no-content">
+                        <i class="fas fa-vote-yea"></i>
+                        <p>No votes yet</p>
                     </div>
-                    
-                    <!-- Votes Tab -->
-                    <div class="tab-panel" id="tab-votes">
-                        <div class="tab-header">
-                            <h3>Voting History</h3>
-                            <div class="filter-buttons">
-                                <button class="filter-btn active" data-filter="all">
-                                    <i class="fas fa-list"></i> All
-                                </button>
-                                <button class="filter-btn" data-filter="won">
-                                    <i class="fas fa-check-circle"></i> Won
-                                </button>
-                                <button class="filter-btn" data-filter="lost">
-                                    <i class="fas fa-times-circle"></i> Lost
-                                </button>
-                                <button class="filter-btn" data-filter="live">
-                                    <i class="fas fa-circle"></i> Live
-                                </button>
-                            </div>
-                        </div>
-                        <div id="allVotes" class="votes-feed">
-                            <div class="no-content">
-                                <i class="fas fa-vote-yea"></i>
-                                <p>No votes yet</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Participation Tab -->
-                    <div class="tab-panel" id="tab-participation">
-                        
-                        <!-- Overall Participation -->
-                        <div class="participation-overview">
-                            <div class="participation-circle">
-                                <svg width="200" height="200" viewBox="0 0 200 200">
-                                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(200, 170, 110, 0.1)" stroke-width="20"/>
-                                    <circle id="participationCircle" cx="100" cy="100" r="90" fill="none" stroke="#c8aa6e" stroke-width="20" 
-                                            stroke-dasharray="565.48" stroke-dashoffset="565.48" 
-                                            transform="rotate(-90 100 100)" stroke-linecap="round"/>
-                                </svg>
-                                <div class="participation-percentage" id="overallParticipation">0%</div>
-                            </div>
-                            <div class="participation-summary">
-                                <h3>Tournament Coverage</h3>
-                                <p id="participationSummary">Loading...</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Round Breakdown -->
-                        <div class="rounds-breakdown">
-                            <h3 class="section-title">
-                                <i class="fas fa-layer-group"></i> Round-by-Round Breakdown
-                            </h3>
-                            <div id="roundsBreakdown" class="rounds-list">
-                                <!-- Populated by JS -->
-                            </div>
-                        </div>
-                        
-                    </div>
-                    
-                    <!-- Achievements Tab -->
-                    <div class="tab-panel" id="tab-achievements">
-                        <div id="allAchievements" class="achievements-grid">
-                            <div class="no-content">
-                                <i class="fas fa-trophy"></i>
-                                <p>No achievements unlocked yet</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Top Songs Tab -->
-                    <div class="tab-panel" id="tab-songs">
-                        <div id="allFavoriteSongs" class="favorite-songs-list">
-                            <div class="no-content">
-                                <i class="fas fa-music"></i>
-                                <p>No votes yet</p>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
-            </section>
+            </div>
+            
+            <!-- Favorite Songs -->
+            <div class="overview-section">
+                <h3 class="section-title">
+                    <i class="fas fa-music"></i> Most Supported Songs
+                </h3>
+                <div id="favoriteSongs" class="favorite-songs-list">
+                    <div class="no-content">
+                        <i class="fas fa-music"></i>
+                        <p>No votes yet</p>
+                    </div>
+                </div>
+            </div>
             
         </div>
         
+      <!-- Votes Tab -->
+<div class="tab-panel" id="tab-votes">
+    <div class="tab-header">
+        <h3>Voting History</h3>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-list"></i> All
+            </button>
+            <button class="filter-btn" data-filter="won">
+                <i class="fas fa-check-circle"></i> Won
+            </button>
+            <button class="filter-btn" data-filter="lost">
+                <i class="fas fa-times-circle"></i> Lost
+            </button>
+            <button class="filter-btn" data-filter="live">
+                <i class="fas fa-circle"></i> Live
+            </button>
+        </div>
+    </div>
+    <div id="allVotes" class="votes-feed">
+        <div class="no-content">
+            <i class="fas fa-vote-yea"></i>
+            <p>No votes yet</p>
+        </div>
+    </div>
+</div>
+        
+         <!-- Participation Tab (NEW) -->
+        <div class="tab-panel" id="tab-participation">
+            
+            <!-- Overall Participation -->
+            <div class="participation-overview">
+                <div class="participation-circle">
+                    <svg width="200" height="200" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(200, 170, 110, 0.1)" stroke-width="20"/>
+                        <circle id="participationCircle" cx="100" cy="100" r="90" fill="none" stroke="#c8aa6e" stroke-width="20" 
+                                stroke-dasharray="565.48" stroke-dashoffset="565.48" 
+                                transform="rotate(-90 100 100)" stroke-linecap="round"/>
+                    </svg>
+                    <div class="participation-percentage" id="overallParticipation">0%</div>
+                </div>
+                <div class="participation-summary">
+                    <h3>Tournament Coverage</h3>
+                    <p id="participationSummary">Loading...</p>
+                </div>
+            </div>
+             <!-- Round Breakdown -->
+            <div class="rounds-breakdown">
+                <h3 class="section-title">
+                    <i class="fas fa-layer-group"></i> Round-by-Round Breakdown
+                </h3>
+                <div id="roundsBreakdown" class="rounds-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+        </div>
+        <!-- Achievements Tab -->
+        <div class="tab-panel" id="tab-achievements">
+            <div id="allAchievements" class="achievements-grid">
+                <div class="no-content">
+                    <i class="fas fa-trophy"></i>
+                    <p>No achievements unlocked yet</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Songs Tab (NEW) -->
+        <div class="tab-panel" id="tab-songs">
+            <div id="allFavoriteSongs" class="favorite-songs-list">
+                <div class="no-content">
+                    <i class="fas fa-music"></i>
+                    <p>No votes yet</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+            
+        </div>
     </main>
     
-    <!-- Loading Spinner Overlay -->
+     <!-- ✅ ADD THIS: Loading Spinner Overlay (BEFORE footer) -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
         <div class="spinner-container">
             <div class="tournament-spinner">
@@ -317,12 +320,16 @@
     </div>
 
     <!-- Footer -->
-    <div id="footer-placeholder"></div>
+ <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>    
 
     <!-- Scripts -->
-    <script type="module" src="/js/rank-system.js"></script>
+
+        <script type="module" src="/js/rank-system.js"></script>
+
     <script type="module" src="/js/profile-page.js"></script>
-    <script type="module" src="/js/settings-modal.js"></script>
+
+    <!-- Near the bottom, before </body> -->
+<script type="module" src="/js/settings-modal.js"></script>
 </body>
 </html>
