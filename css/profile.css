@@ -2281,3 +2281,15 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+/* ========================================
+   FILL THE GAP - SLIDE BANNER UP
+   ======================================== */
+
+.profile-header {
+    margin-top: -80px !important;
+}
+
+.profile-banner {
+    padding-top: 80px !important;
+    height: 480px !important;
+}

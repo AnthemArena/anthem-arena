@@ -320,6 +320,7 @@ async function fetchUserProfileDirect(username) {
 function generateFallbackProfile(username) {
     console.log('🔧 Generating fallback profile for:', username);
     
+    // Champion avatar pool
     const champions = [
         { championId: 'Ahri', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ahri.png' },
         { championId: 'Akali', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Akali.png' },
@@ -331,6 +332,7 @@ function generateFallbackProfile(username) {
         { championId: 'KSante', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/KSante.png' }
     ];
     
+    // Use username hash to consistently pick same champion
     const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const champion = champions[hash % champions.length];
     
@@ -342,15 +344,12 @@ function generateFallbackProfile(username) {
             championId: champion.championId,
             imageUrl: champion.imageUrl
         },
-        banner: {  // ✅ ADD THIS
-            type: 'auto'  // Auto-match the avatar
-        },
         bio: 'New to Anthem Arena',
         privacy: {
             isPublic: true
         },
         createdAt: Date.now(),
-        isFallback: true
+        isFallback: true  // Flag to indicate this is a generated profile
     };
 }
 
@@ -2011,7 +2010,6 @@ function showProfileContent() {
     
     const notFound = document.getElementById('notFoundState');
     const guest = document.getElementById('guestState');
-    
     const content = document.getElementById('profileContent');
     
     if (notFound) notFound.style.display = 'none';
