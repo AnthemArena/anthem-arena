@@ -44,6 +44,28 @@ const BULLETIN_THRESHOLDS = {
 };
 
 // ========================================
+// STREAK TRACKING CONFIGURATION
+// ========================================
+
+const STREAK_CONFIG = {
+    MIN_STREAK: 3,        // Minimum matches for streak alert
+    MILESTONE_STREAKS: [3, 5, 10, 20], // Show special alerts at these numbers
+    MAX_TRACKED: 50       // Track up to 50 people (prevent memory bloat)
+};
+
+// ========================================
+// STREAK STORAGE FORMAT
+// ========================================
+// localStorage 'userStreaks' = {
+//   'ally-username123': {
+//     streak: 5,
+//     lastMatchId: 'round-2-match-3',
+//     lastUpdated: timestamp,
+//     matches: ['round-1-match-1', 'round-1-match-5', ...]
+//   },
+//   'rival-username456': { ... }
+// }
+// ========================================
 // STATE MANAGEMENT
 // ========================================
 
@@ -69,7 +91,9 @@ const COOLDOWN_MINUTES = {
     trending: 30,        // ✅ Keep - good for engagement
     votesurge: 30,       // ✅ Keep
     mostviewed: 60,       // 🔽 Reduce from 90 - still low priority but more active
-        'live-activity': 5  // ✅ NEW: Show live votes every 5 minutes max
+        'live-activity': 5,  // ✅ NEW: Show live votes every 5 minutes max
+            streak: 30  // ✅ NEW: Show streak alerts max every 30 minutes
+
 
 };
 
@@ -795,6 +819,15 @@ async function checkRecentVotes() {
             } catch (error) {
                 console.error('Failed to save notification:', error);
             }
+
+            // ✅ NEW: Track streaks
+const streakData = updateStreak(activity.username, activity.userId, activity.matchId, isAlly);
+if (streakData && streakData.isMilestone) {
+    // Show streak notification after a short delay (don't spam)
+    setTimeout(() => {
+        showStreakNotification(streakData);
+    }, 3000); // 3 second delay after ally/rival toast
+}
             
             // ✅ Show as toast ONLY if within toast window (60 minutes)
             if (!toastShown && activity.timestamp >= toastCutoff) {
@@ -964,6 +997,184 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     };
 }
 
+// ========================================
+// STREAK DETECTION & TRACKING
+// ========================================
+
+function updateStreak(username, userId, matchId, isAlly) {
+    if (!username || username === 'Anonymous') return null;
+    
+    try {
+        // Load existing streaks
+        const streaks = JSON.parse(localStorage.getItem('userStreaks') || '{}');
+        const streakKey = `${isAlly ? 'ally' : 'rival'}-${username}`;
+        const oppositeKey = `${isAlly ? 'rival' : 'ally'}-${username}`;
+        
+        // Check if they have an opposite streak that should break
+        if (streaks[oppositeKey]) {
+            const broken = streaks[oppositeKey];
+            console.log(`💔 Streak broken: ${username} was ${isAlly ? 'rival' : 'ally'} for ${broken.streak} matches`);
+            delete streaks[oppositeKey];
+        }
+        
+        // Get or create current streak
+        const current = streaks[streakKey] || {
+            streak: 0,
+            matches: [],
+            lastUpdated: Date.now()
+        };
+        
+        // Check if this is a new match (not duplicate)
+        if (current.lastMatchId === matchId) {
+            return null; // Already counted this match
+        }
+        
+        // Increment streak
+        current.streak += 1;
+        current.lastMatchId = matchId;
+        current.lastUpdated = Date.now();
+        current.matches.push(matchId);
+        
+        // Keep only recent matches (last 20)
+        if (current.matches.length > 20) {
+            current.matches = current.matches.slice(-20);
+        }
+        
+        streaks[streakKey] = current;
+        
+        // Save back to localStorage
+        localStorage.setItem('userStreaks', JSON.stringify(streaks));
+        
+        // Check if this is a milestone streak
+        const isMilestone = STREAK_CONFIG.MILESTONE_STREAKS.includes(current.streak);
+        
+        console.log(`${isAlly ? '🤝' : '⚔️'} Streak updated: ${username} = ${current.streak} ${isAlly ? 'agreements' : 'rivalries'}`);
+        
+        return {
+            username,
+            userId,
+            streak: current.streak,
+            isAlly,
+            isMilestone,
+            matchId
+        };
+        
+    } catch (error) {
+        console.error('Error updating streak:', error);
+        return null;
+    }
+}
+
+// ========================================
+// SHOW STREAK NOTIFICATION
+// ========================================
+
+function showStreakNotification(streakData) {
+    if (!streakData || streakData.streak < STREAK_CONFIG.MIN_STREAK) return;
+    
+    const { username, userId, streak, isAlly, isMilestone } = streakData;
+    
+    // Build message based on type and milestone
+    let message, detail, icon, priority;
+    
+    if (isAlly) {
+        if (streak === 3) {
+            message = `🔥 3-match streak with ${username}!`;
+            detail = `You've both agreed on 3 matches in a row`;
+            icon = '🤝';
+            priority = 5;
+        } else if (streak === 5) {
+            message = `🔥🔥 5-match alliance with ${username}!`;
+            detail = `Your taste in music is perfectly aligned!`;
+            icon = '✨';
+            priority = 4;
+        } else if (streak === 10) {
+            message = `🔥🔥🔥 EPIC 10-match streak with ${username}!`;
+            detail = `You two are music soulmates!`;
+            icon = '💫';
+            priority = 3;
+        } else if (streak >= 20) {
+            message = `👑 LEGENDARY ${streak}-match streak with ${username}!`;
+            detail = `This alliance is unbreakable!`;
+            icon = '👑';
+            priority = 2;
+        } else if (isMilestone) {
+            message = `🔥 ${streak}-match streak with ${username}!`;
+            detail = `Your alliance grows stronger`;
+            icon = '🤝';
+            priority = 5;
+        } else {
+            return; // Don't show non-milestone streaks
+        }
+    } else {
+        // Rival streaks
+        if (streak === 3) {
+            message = `⚔️ 3-match rivalry with ${username}!`;
+            detail = `You've opposed each other 3 times`;
+            icon = '⚔️';
+            priority = 5;
+        } else if (streak === 5) {
+            message = `⚔️⚔️ 5-match rivalry with ${username}!`;
+            detail = `This rivalry is heating up!`;
+            icon = '🔥';
+            priority = 4;
+        } else if (streak === 10) {
+            message = `⚔️⚔️⚔️ EPIC 10-match rivalry with ${username}!`;
+            detail = `An legendary battle of taste!`;
+            icon = '💀';
+            priority = 3;
+        } else if (streak >= 20) {
+            message = `👹 LEGENDARY ${streak}-match rivalry with ${username}!`;
+            detail = `The ultimate clash continues!`;
+            icon = '👹';
+            priority = 2;
+        } else if (isMilestone) {
+            message = `⚔️ ${streak}-match rivalry with ${username}!`;
+            detail = `The battle intensifies`;
+            icon = '⚔️';
+            priority = 5;
+        } else {
+            return; // Don't show non-milestone streaks
+        }
+    }
+    
+    // Show the notification
+    showBulletin({
+        priority: priority,
+        type: 'streak',
+        matchId: 'streak-notification',
+        username: username,
+        triggerUserId: userId,
+        triggerUsername: username,
+        message: message,
+        detail: detail,
+        icon: icon,
+        cta: `View ${username}'s Profile`,
+        ctaAction: 'navigate',
+        targetUrl: `/profile?user=${username}`,
+        relationship: isAlly ? 'ally-streak' : 'rival-streak',
+        streakCount: streak
+    });
+    
+    // Save to Firestore for notification center
+    const currentUserId = localStorage.getItem('tournamentUserId');
+    if (currentUserId && currentUserId !== 'anonymous') {
+        saveNotification(currentUserId, {
+            type: 'streak',
+            priority: priority,
+            message: message,
+            detail: detail,
+            icon: icon,
+            triggerUsername: username,
+            triggerUserId: userId,
+            ctaText: `View ${username}'s Profile`,
+            ctaAction: 'navigate',
+            targetUrl: `/profile?user=${username}`,
+            streakCount: streak,
+            relationship: isAlly ? 'ally-streak' : 'rival-streak'
+        });
+    }
+}
 // ========================================
 // PERSIST PROCESSED IDs ON PAGE UNLOAD
 // ========================================
@@ -2786,4 +2997,23 @@ window.addEventListener('beforeunload', () => {
 window.restartEmoteListener = function() {
     console.log('🔄 Restarting emote listener (user voted)');
     setupRealtimeEmoteListener();
+};
+
+// ========================================
+// DEBUG: Test Streak System
+// ========================================
+
+window.testStreak = function(type = 'ally', count = 3) {
+    console.log(`🧪 Testing ${count}-match ${type} streak`);
+    
+    const streakData = {
+        username: type === 'ally' ? 'TestAlly' : 'TestRival',
+        userId: `test-${type}-123`,
+        streak: count,
+        isAlly: type === 'ally',
+        isMilestone: true,
+        matchId: 'test-match'
+    };
+    
+    showStreakNotification(streakData);
 };
