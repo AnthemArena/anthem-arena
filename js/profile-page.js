@@ -482,8 +482,11 @@ function applyProfileBanner(profile) {
         
     } else {
         // Auto-match avatar (default behavior)
-        if (profile.avatar.type === 'champion' && profile.avatar.championId) {
-            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${profile.avatar.championId}_0.jpg`;
+        if (profile.avatar && profile.avatar.type === 'url' && profile.avatar.name) {
+            // Extract championId from champion name
+            const championId = profile.avatar.name.replace(/['\s]/g, ''); // Remove spaces and apostrophes
+            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+            
             bannerEl.style.backgroundImage = `
                 linear-gradient(to bottom, 
                     rgba(0, 0, 0, 0.4) 0%,
@@ -943,21 +946,27 @@ async function loadProfileStats(userId) {
         const votesCount = votesSnapshot.size;
         
         // ✅ NEW: Check for newly unlocked achievements (only for own profile)
-        if (isViewingOwnProfile && votesCount > 0) {
-            console.log('🏆 Checking for newly unlocked achievements...');
-            
-            // Get full vote data for achievement checking
-            const votes = votesSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            
-            // Import and run achievement checker
-            const { checkAchievements } = await import('./achievement-tracker.js');
-            await checkAchievements(votes);
-            
-            console.log('✅ Achievement check complete');
-        }
+       // ✅ NEW: Check for newly unlocked achievements (only for own profile AND only once per session)
+if (isViewingOwnProfile && votesCount > 0 && !window.achievementsCheckedThisSession) {
+    console.log('🏆 Checking for newly unlocked achievements...');
+    
+    // Mark as checked for this session
+    window.achievementsCheckedThisSession = true;
+    
+    // Get full vote data for achievement checking
+    const votes = votesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+    
+    // Import and run achievement checker
+    const { checkAchievements } = await import('./achievement-tracker.js');
+    await checkAchievements(votes);
+    
+    console.log('✅ Achievement check complete');
+} else if (isViewingOwnProfile && window.achievementsCheckedThisSession) {
+    console.log('⏭️ Achievements already checked this session, skipping...');
+}
         
         // Get achievements count (might have changed after checking)
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
