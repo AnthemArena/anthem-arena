@@ -952,27 +952,7 @@ async function loadProfileStats(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         const votesCount = votesSnapshot.size;
         
-    // ✅ IMPROVED: Check for newly unlocked achievements (only on initial page load)
-if (isViewingOwnProfile && votesCount > 0 && !window.profileStatsLoaded) {
-    console.log('🏆 Checking for newly unlocked achievements (initial load only)...');
-    
-    // Mark stats as loaded
-    window.profileStatsLoaded = true;
-    
-    // Get full vote data for achievement checking
-    const votes = votesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }));
-    
-    // Import and run achievement checker
-    const { checkAchievements } = await import('./achievement-tracker.js');
-    await checkAchievements(votes);
-    
-    console.log('✅ Achievement check complete');
-} else if (isViewingOwnProfile) {
-    console.log('⏭️ Skipping achievement check (already loaded or settings save)');
-}
+
         
         // Get achievements count (might have changed after checking)
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
