@@ -1938,36 +1938,54 @@ function setupTabs() {
     });
 }
 
-// ========================================
-// STATE MANAGEMENT
-// ========================================
-
 function showLoadingState() {
-    document.getElementById('loadingState').style.display = 'flex';
-    document.getElementById('notFoundState').style.display = 'none';
-    document.getElementById('guestState').style.display = 'none';
-    document.getElementById('profileContent').style.display = 'none';
+    // Use the new tournament spinner instead
+    showLoadingSpinner('Loading profile...');
+    
+    // Hide all content states
+    const notFound = document.getElementById('notFoundState');
+    const guest = document.getElementById('guestState');
+    const content = document.getElementById('profileContent');
+    
+    if (notFound) notFound.style.display = 'none';
+    if (guest) guest.style.display = 'none';
+    if (content) content.style.display = 'none';
 }
 
 function showNotFoundState() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('notFoundState').style.display = 'flex';
-    document.getElementById('guestState').style.display = 'none';
-    document.getElementById('profileContent').style.display = 'none';
+    hideLoadingSpinner();
+    
+    const notFound = document.getElementById('notFoundState');
+    const guest = document.getElementById('guestState');
+    const content = document.getElementById('profileContent');
+    
+    if (notFound) notFound.style.display = 'flex';
+    if (guest) guest.style.display = 'none';
+    if (content) content.style.display = 'none';
 }
 
 function showGuestState() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('notFoundState').style.display = 'none';
-    document.getElementById('guestState').style.display = 'flex';
-    document.getElementById('profileContent').style.display = 'none';
+    hideLoadingSpinner();
+    
+    const notFound = document.getElementById('notFoundState');
+    const guest = document.getElementById('guestState');
+    const content = document.getElementById('profileContent');
+    
+    if (notFound) notFound.style.display = 'none';
+    if (guest) guest.style.display = 'flex';
+    if (content) content.style.display = 'none';
 }
 
 function showProfileContent() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('notFoundState').style.display = 'none';
-    document.getElementById('guestState').style.display = 'none';
-    document.getElementById('profileContent').style.display = 'block';
+    hideLoadingSpinner();
+    
+    const notFound = document.getElementById('notFoundState');
+    const guest = document.getElementById('guestState');
+    const content = document.getElementById('profileContent');
+    
+    if (notFound) notFound.style.display = 'none';
+    if (guest) guest.style.display = 'none';
+    if (content) content.style.display = 'block';
 }
 
 // ========================================
