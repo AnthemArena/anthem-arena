@@ -29,43 +29,106 @@ async function loadMusicVideos() {
         console.error('❌ Error loading music videos:', error);
     }
 }
-
 // ========================================
 // ✅ @MENTION SYSTEM
 // ========================================
 
-let allUsers = []; // Cache of all users for autocomplete
+// ========================================
+// ✅ @MENTION SYSTEM (WITH LIVE DATA)
+// ========================================
+
+let allUsers = [];
+let lastUserLoad = 0;
+const USER_CACHE_DURATION = 300000; // 5 minutes
 
 async function loadAllUsers() {
     try {
         const { db } = await import('./firebase-config.js');
         const { collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         
+        console.log('📥 Loading users for mention system...');
+        
         const profilesRef = collection(db, 'profiles');
         const q = query(profilesRef, where('username', '!=', null));
         const snapshot = await getDocs(q);
         
         allUsers = [];
-        snapshot.forEach(doc => {
-            const profile = doc.data();
-            if (profile.username && profile.username !== 'Anonymous') {
-                allUsers.push({
-                    userId: doc.id,
-                    username: profile.username,
-                    avatar: profile.avatar,
-                    level: profile.level || 1,
-                    rank: profile.rank || 'New Voter',
-                    totalVotes: profile.totalVotes || 0
-                });
-            }
-        });
+        
+        // ✅ Load all users with vote counts
+        for (const docSnap of snapshot.docs) {
+            const profile = docSnap.data();
+            const userId = docSnap.id;
+            
+            if (!profile.username || profile.username === 'Anonymous') continue;
+            
+            // ✅ Count votes from votes collection (real-time)
+            const votesRef = collection(db, 'votes');
+            const votesQuery = query(votesRef, where('userId', '==', userId));
+            const votesSnapshot = await getDocs(votesQuery);
+            const totalVotes = votesSnapshot.size;
+            
+            // ✅ Calculate level from votes
+            const level = calculateLevelFromVotes(totalVotes);
+            const rank = getRankFromLevel(level);
+            
+            allUsers.push({
+                userId: userId,
+                username: profile.username,
+                avatar: profile.avatar,
+                level: level,
+                rank: rank,
+                totalVotes: totalVotes
+            });
+        }
         
         console.log('✅ Loaded users for mentions:', allUsers.length);
+        
+        // ✅ DEBUG: Show your own data
+        const currentUserId = localStorage.getItem('tournamentUserId');
+        const currentUser = allUsers.find(u => u.userId === currentUserId);
+        if (currentUser) {
+            console.log('👤 Your mention data:', currentUser);
+        }
         
     } catch (error) {
         console.error('❌ Error loading users:', error);
     }
 }
+
+// ========================================
+// HELPER: Calculate level from vote count
+// ========================================
+
+function calculateLevelFromVotes(voteCount) {
+    if (voteCount >= 100) return 10;
+    if (voteCount >= 75) return 9;
+    if (voteCount >= 50) return 8;
+    if (voteCount >= 30) return 7;
+    if (voteCount >= 20) return 6;
+    if (voteCount >= 15) return 5;
+    if (voteCount >= 10) return 4;
+    if (voteCount >= 5) return 3;
+    if (voteCount >= 2) return 2;
+    return 1;
+}
+
+function getRankFromLevel(level) {
+    const ranks = {
+        1: 'New Voter',
+        2: 'Casual Fan',
+        3: 'Regular Voter',
+        4: 'Dedicated Fan',
+        5: 'Active Voter',
+        6: 'Engaged Voter',
+        7: 'Tournament Regular',
+        8: 'Music Enthusiast',
+        9: 'Elite Voter',
+        10: 'Tournament Legend'
+    };
+    return ranks[level] || 'New Voter';
+}
+
+
 
 // Parse @mentions in text (for display)
 function parseMentions(text) {
@@ -790,6 +853,10 @@ function setupSongTooltips() {
 // ✅ PROFILE TOOLTIP ON @MENTION HOVER
 // ========================================
 
+// ========================================
+// ✅ PROFILE TOOLTIP ON @MENTION HOVER
+// ========================================
+
 function setupMentionTooltips() {
     document.querySelectorAll('.user-mention').forEach(mention => {
         mention.addEventListener('mouseenter', () => {
@@ -827,9 +894,6 @@ function setupMentionTooltips() {
                         <div class="tooltip-profile-stat-label">Votes</div>
                     </div>
                 </div>
-                <a href="/profile.html?user=${userId}" class="tooltip-profile-link" onclick="event.stopPropagation()">
-                    View Profile →
-                </a>
             `;
             
             mention.style.position = 'relative';
