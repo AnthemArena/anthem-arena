@@ -2347,6 +2347,10 @@ function renderParticipationTab() {
 // RENDER SOCIAL LINKS
 // ========================================
 
+// ========================================
+// RENDER SOCIAL LINKS
+// ========================================
+
 function renderSocialLinks(profile) {
     const socialLinks = profile.socialLinks || {};
     
@@ -2417,16 +2421,19 @@ function renderSocialLinks(profile) {
         `);
     }
     
-    // ✅ NEW: Add social icons as a meta item instead of separate container
-    const profileMeta = document.querySelector('.profile-meta');
-    if (profileMeta && socialIcons.length > 0) {
-        const socialMetaItem = document.createElement('span');
-        socialMetaItem.className = 'profile-meta-item profile-social-inline';
-        socialMetaItem.innerHTML = socialIcons.join('');
-        profileMeta.appendChild(socialMetaItem);
+    // ✅ NEW: Insert after bio, before meta
+    const bioEl = document.getElementById('profileBio');
+    if (bioEl && socialIcons.length > 0) {
+        // Create social container
+        const socialContainer = document.createElement('div');
+        socialContainer.className = 'profile-social-row';
+        socialContainer.innerHTML = socialIcons.join('');
+        
+        // Insert after bio
+        bioEl.parentNode.insertBefore(socialContainer, bioEl.nextSibling);
     }
     
-    console.log('✅ Social links rendered inline');
+    console.log('✅ Social links rendered below bio');
 }
 
 // ========================================
