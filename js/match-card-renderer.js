@@ -125,16 +125,7 @@ export function createMatchCard(match) {
     const artist1 = match.competitor1.source.split('•')[0]?.trim() || 'Artist';
     const artist2 = match.competitor2.source.split('•')[0]?.trim() || 'Artist';
 
-   // ✅ CALCULATE XP REWARD (only for unvoted live matches)
-let xpBadgeHTML = '';
-if (!match.hasVoted && match.status === 'live') {
-    xpBadgeHTML = `
-        <div class="xp-reward-badge">
-            <span class="xp-icon"><i class="fa-solid fa-star"></i></span>
-            <span class="xp-value">+10 XP</span>
-        </div>
-    `;
-}
+
 
 const cardHTML = `
     <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
@@ -145,9 +136,7 @@ const cardHTML = `
          data-date="${match.date || ''}"
          data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
          style="cursor: pointer;">
-    
-    ${xpBadgeHTML}
-    
+        
     <div class="match-header">
         <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
         <span class="match-round">${formatRoundName(match.round)}</span>
