@@ -1760,3 +1760,310 @@ body {
         width: 280px;
     }
 }
+/* ========================================
+   COMMENT THREADING (1 LEVEL)
+   ======================================== */
+
+.comment {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.comment:hover {
+    background: rgba(200, 170, 110, 0.05);
+}
+
+.comment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    color: rgba(200, 170, 110, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.reply-btn:hover {
+    background: rgba(200, 170, 110, 0.1);
+    color: #c8aa6e;
+}
+
+.reply-btn i {
+    font-size: 0.8rem;
+}
+
+/* Replies Container */
+.replies-container {
+    margin-top: 0.75rem;
+    margin-left: 2.5rem;
+    border-left: 2px solid rgba(200, 170, 110, 0.2);
+    padding-left: 0.75rem;
+}
+
+.reply-comment {
+    margin-bottom: 0.5rem;
+}
+
+.reply-comment:last-child {
+    margin-bottom: 0;
+}
+
+.reply-comment .comment-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+/* Reply Input Box */
+.reply-input-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(26, 26, 46, 0.3);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.reply-input-box .comment-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.reply-input-box input {
+    flex: 1;
+    background: rgba(10, 10, 10, 0.5);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: #f0e6d2;
+    font-size: 0.9rem;
+    font-family: 'Lora', serif;
+}
+
+.reply-input-box input:focus {
+    outline: none;
+    border-color: rgba(200, 170, 110, 0.6);
+}
+
+.reply-input-box input::placeholder {
+    color: rgba(240, 230, 210, 0.4);
+}
+
+.reply-input-box button {
+    background: linear-gradient(135deg, #c8aa6e 0%, #a08550 100%);
+    border: none;
+    color: #0a0a0a;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reply-input-box button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(200, 170, 110, 0.5);
+}
+
+.reply-input-box button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cancel-reply-btn {
+    background: none !important;
+    color: rgba(200, 170, 110, 0.7) !important;
+    width: auto !important;
+    padding: 0.5rem !important;
+    border-radius: 4px !important;
+}
+
+.cancel-reply-btn:hover {
+    background: rgba(200, 170, 110, 0.1) !important;
+    transform: none !important;
+}
+/* ========================================
+   @MENTIONS STYLING
+   ======================================== */
+
+.user-mention {
+    color: #3b82f6;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.user-mention:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+/* Mention Autocomplete Dropdown */
+.mention-dropdown {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    border-radius: 8px;
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(200, 170, 110, 0.15);
+    max-width: 300px;
+    z-index: 10000;
+    overflow: hidden;
+}
+
+.mention-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.mention-option:hover {
+    background: rgba(200, 170, 110, 0.15);
+}
+
+.mention-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+}
+
+.mention-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mention-username {
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.mention-rank {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+}
+
+/* Mention Profile Tooltip */
+.mention-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 240px;
+    max-width: 300px;
+    box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.7),
+        0 0 24px rgba(59, 130, 246, 0.25);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-mention:hover .mention-tooltip {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.mention-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(59, 130, 246, 0.5);
+}
+
+.tooltip-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.tooltip-profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(59, 130, 246, 0.5);
+}
+
+.tooltip-profile-info {
+    flex: 1;
+}
+
+.tooltip-profile-username {
+    color: #3b82f6;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.tooltip-profile-rank {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.tooltip-profile-stats {
+    display: flex;
+    gap: 1rem;
+    padding-top: 8px;
+    border-top: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 0.85rem;
+}
+
+.tooltip-profile-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tooltip-profile-stat-value {
+    color: #3b82f6;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.tooltip-profile-stat-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+}
+
+.tooltip-profile-link {
+    display: block;
+    text-align: center;
+    margin-top: 8px;
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.tooltip-profile-link:hover {
+    color: #60a5fa;
+}

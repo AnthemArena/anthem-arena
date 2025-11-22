@@ -31,6 +31,94 @@ async function loadMusicVideos() {
 }
 
 // ========================================
+// ✅ @MENTION SYSTEM
+// ========================================
+
+let allUsers = []; // Cache of all users for autocomplete
+
+async function loadAllUsers() {
+    try {
+        const { db } = await import('./firebase-config.js');
+        const { collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        const profilesRef = collection(db, 'profiles');
+        const q = query(profilesRef, where('username', '!=', null));
+        const snapshot = await getDocs(q);
+        
+        allUsers = [];
+        snapshot.forEach(doc => {
+            const profile = doc.data();
+            if (profile.username && profile.username !== 'Anonymous') {
+                allUsers.push({
+                    userId: doc.id,
+                    username: profile.username,
+                    avatar: profile.avatar,
+                    level: profile.level || 1,
+                    rank: profile.rank || 'New Voter',
+                    totalVotes: profile.totalVotes || 0
+                });
+            }
+        });
+        
+        console.log('✅ Loaded users for mentions:', allUsers.length);
+        
+    } catch (error) {
+        console.error('❌ Error loading users:', error);
+    }
+}
+
+// Parse @mentions in text (for display)
+function parseMentions(text) {
+    if (!text) return '';
+    
+    let parsedText = escapeHtml(text);
+    
+    // Find all @mentions (word characters only)
+    const mentionRegex = /@(\w+)/g;
+    
+    parsedText = parsedText.replace(mentionRegex, (match, username) => {
+        // Check if user exists
+        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+        
+        if (user) {
+            return `<span class="user-mention" 
+                data-user-id="${user.userId}" 
+                data-username="${user.username}"
+                data-level="${user.level}"
+                data-rank="${escapeHtml(user.rank)}"
+                data-votes="${user.totalVotes}">@${username}</span>`;
+        }
+        
+        return match; // Not a valid user, leave as plain text
+    });
+    
+    return parsedText;
+}
+
+// Extract mentioned user IDs from text (for notifications)
+function extractMentionedUsers(text) {
+    if (!text) return [];
+    
+    const mentionRegex = /@(\w+)/g;
+    const mentions = [];
+    let match;
+    
+    while ((match = mentionRegex.exec(text)) !== null) {
+        const username = match[1];
+        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+        
+        if (user) {
+            mentions.push({
+                userId: user.userId,
+                username: user.username
+            });
+        }
+    }
+    
+    return mentions;
+}
+
+// ========================================
 // HELPER FUNCTIONS
 // ========================================
 
@@ -84,6 +172,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     showLoadingSpinner('Loading feed...');
 
     try {
+
+         // ✅ Load users for mentions
+    await loadAllUsers();
 
           // ✅ Load music videos data
     await loadMusicVideos();
@@ -529,6 +620,8 @@ function renderPosts(startIndex, count) {
 
         // ✅ Setup tooltips after rendering
     setupSongTooltips();
+        setupMentionTooltips(); // ✅ NEW!
+
     
     // Show/hide load more button
     if (lastLoadedIndex < currentPosts.length) {
@@ -549,7 +642,7 @@ function renderPostContent(post) {
         
         return `
             <p class="post-text vote-text">
-                <i class="fa-solid fa-check-circle"></i> ${parseSongMentions(smartText)}
+                <i class="fa-solid fa-check-circle"></i> ${parseMentions(parseSongMentions(smartText))}
             </p>
             
             <div class="match-embed" data-match-id="${post.matchId}">
@@ -566,8 +659,8 @@ function renderPostContent(post) {
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        // ✅ Parse song mentions in user posts
-        return `<p class="post-text">${parseSongMentions(post.content)}</p>`;
+        // ✅ Parse BOTH song mentions AND user mentions
+        return `<p class="post-text">${parseMentions(parseSongMentions(post.content))}</p>`;
     }
     
     return '';
@@ -623,6 +716,73 @@ function setupSongTooltips() {
             if (tooltip) {
                 setTimeout(() => tooltip.remove(), 200);
             }
+        });
+    });
+}
+
+
+// ========================================
+// ✅ PROFILE TOOLTIP ON @MENTION HOVER
+// ========================================
+
+function setupMentionTooltips() {
+    document.querySelectorAll('.user-mention').forEach(mention => {
+        mention.addEventListener('mouseenter', () => {
+            // Check if tooltip already exists
+            if (mention.querySelector('.mention-tooltip')) return;
+            
+            const userId = mention.dataset.userId;
+            const username = mention.dataset.username;
+            const level = mention.dataset.level || '1';
+            const rank = mention.dataset.rank || 'New Voter';
+            const votes = mention.dataset.votes || '0';
+            
+            // Get user from allUsers array
+            const user = allUsers.find(u => u.userId === userId);
+            const avatarUrl = user ? getAvatarUrl(user.avatar) : createEmojiAvatar('👤');
+            
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'mention-tooltip';
+            tooltip.innerHTML = `
+                <div class="tooltip-profile-header">
+                    <img src="${avatarUrl}" alt="${username}" class="tooltip-profile-avatar">
+                    <div class="tooltip-profile-info">
+                        <div class="tooltip-profile-username">@${username}</div>
+                        <div class="tooltip-profile-rank">${rank}</div>
+                    </div>
+                </div>
+                <div class="tooltip-profile-stats">
+                    <div class="tooltip-profile-stat">
+                        <div class="tooltip-profile-stat-value">${level}</div>
+                        <div class="tooltip-profile-stat-label">Level</div>
+                    </div>
+                    <div class="tooltip-profile-stat">
+                        <div class="tooltip-profile-stat-value">${votes}</div>
+                        <div class="tooltip-profile-stat-label">Votes</div>
+                    </div>
+                </div>
+                <a href="/profile.html?user=${userId}" class="tooltip-profile-link" onclick="event.stopPropagation()">
+                    View Profile →
+                </a>
+            `;
+            
+            mention.style.position = 'relative';
+            mention.appendChild(tooltip);
+        });
+        
+        mention.addEventListener('mouseleave', () => {
+            const tooltip = mention.querySelector('.mention-tooltip');
+            if (tooltip) {
+                setTimeout(() => tooltip.remove(), 200);
+            }
+        });
+        
+        // Click to go to profile
+        mention.addEventListener('click', (e) => {
+            e.preventDefault();
+            const userId = mention.dataset.userId;
+            window.location.href = `/profile.html?user=${userId}`;
         });
     });
 }
@@ -769,6 +929,10 @@ async function setupPostInteractions(postElement, post) {
     // ✅ NEW: Send comment button
     const sendCommentBtn = postElement.querySelector('.send-comment-btn');
     const commentInput = postElement.querySelector('.comment-input');
+
+    // ✅ Setup mention autocomplete for comments
+setupMentionAutocomplete(commentInput);
+
     
     sendCommentBtn.addEventListener('click', async () => {
         await postComment(post.postId, commentInput);
@@ -816,10 +980,40 @@ async function loadComments(postId) {
         
         commentsList.innerHTML = '';
         
+        // Separate top-level comments and replies
+        const topLevelComments = [];
+        const repliesMap = {}; // parentId -> [replies]
+        
         snapshot.forEach(doc => {
             const comment = doc.data();
-            const commentElement = createCommentElement(comment);
+            
+            if (!comment.parentId) {
+                // Top-level comment
+                topLevelComments.push(comment);
+            } else {
+                // Reply
+                if (!repliesMap[comment.parentId]) {
+                    repliesMap[comment.parentId] = [];
+                }
+                repliesMap[comment.parentId].push(comment);
+            }
+        });
+        
+        // Render top-level comments with their replies
+        topLevelComments.forEach(comment => {
+            const commentElement = createCommentElement(comment, false);
             commentsList.appendChild(commentElement);
+            
+            // Load replies for this comment
+            const replies = repliesMap[comment.commentId] || [];
+            const repliesContainer = commentElement.querySelector(`#replies-${comment.commentId}`);
+            
+            if (repliesContainer && replies.length > 0) {
+                replies.forEach(reply => {
+                    const replyElement = createCommentElement(reply, true);
+                    repliesContainer.appendChild(replyElement);
+                });
+            }
         });
         
     } catch (error) {
@@ -828,9 +1022,9 @@ async function loadComments(postId) {
     }
 }
 
-function createCommentElement(comment) {
+function createCommentElement(comment, isReply = false) {
     const div = document.createElement('div');
-    div.className = 'comment';
+    div.className = isReply ? 'comment reply-comment' : 'comment';
     div.dataset.commentId = comment.commentId;
     
     const avatarUrl = getAvatarUrl(comment.avatar);
@@ -839,20 +1033,34 @@ function createCommentElement(comment) {
     const isOwnComment = comment.userId === currentUserId;
     
     div.innerHTML = `
-        <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
-        <div class="comment-content">
-            <div class="comment-header">
-                <span class="comment-username" data-user-id="${comment.userId}">${comment.username}</span>
-                <span class="comment-time">${timeAgo}</span>
-                ${isOwnComment ? `
-                    <button class="comment-delete-btn" data-comment-id="${comment.commentId}" data-post-id="${comment.postId}">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                ` : ''}
-            </div>
-            <p class="comment-text">${escapeHtml(comment.content)}</p>
+    <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
+    <div class="comment-content">
+        <div class="comment-header">
+            <span class="comment-username" data-user-id="${comment.userId}">${comment.username}</span>
+            <span class="comment-time">${timeAgo}</span>
+            ${isOwnComment ? `
+                <button class="comment-delete-btn" data-comment-id="${comment.commentId}" data-post-id="${comment.postId}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            ` : ''}
         </div>
-    `;
+        <p class="comment-text">${parseMentions(escapeHtml(comment.content))}</p>
+        
+        ${!isReply ? `
+            <div class="comment-actions">
+                <button class="reply-btn" data-comment-id="${comment.commentId}" data-username="${comment.username}">
+                    <i class="fa-solid fa-reply"></i> Reply
+                </button>
+            </div>
+        ` : ''}
+        
+        ${!isReply ? `
+            <div class="replies-container" id="replies-${comment.commentId}">
+                <!-- Replies load here -->
+            </div>
+        ` : ''}
+    </div>
+`;
     
     // Make username/avatar clickable
     const username = div.querySelector('.comment-username');
@@ -871,7 +1079,7 @@ function createCommentElement(comment) {
     avatar.style.cursor = 'pointer';
     avatar.addEventListener('click', goToProfile);
     
-    // ✅ Add delete handler
+    // Delete handler
     const deleteBtn = div.querySelector('.comment-delete-btn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', async () => {
@@ -879,7 +1087,388 @@ function createCommentElement(comment) {
         });
     }
     
+    // ✅ Reply button handler
+    if (!isReply) {
+        const replyBtn = div.querySelector('.reply-btn');
+        if (replyBtn) {
+            replyBtn.addEventListener('click', () => {
+                showReplyInput(comment.commentId, comment.postId, comment.username);
+            });
+        }
+    }
+    
     return div;
+}
+
+// ========================================
+// ✅ AUTO-COMPLETE FOR @MENTIONS
+// ========================================
+
+let currentMentionInput = null;
+let mentionDropdown = null;
+
+function setupMentionAutocomplete(inputElement) {
+    // Create dropdown if doesn't exist
+    if (!mentionDropdown) {
+        mentionDropdown = document.createElement('div');
+        mentionDropdown.className = 'mention-dropdown';
+        mentionDropdown.style.display = 'none';
+        document.body.appendChild(mentionDropdown);
+    }
+    
+    inputElement.addEventListener('input', (e) => {
+        const text = e.target.value;
+        const cursorPos = e.target.selectionStart;
+        
+        // Find @ before cursor
+        const textBeforeCursor = text.substring(0, cursorPos);
+        const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+        
+        if (lastAtIndex === -1) {
+            mentionDropdown.style.display = 'none';
+            return;
+        }
+        
+        // Get text after @
+        const searchTerm = textBeforeCursor.substring(lastAtIndex + 1);
+        
+        // Check if still typing username (no spaces)
+        if (searchTerm.includes(' ')) {
+            mentionDropdown.style.display = 'none';
+            return;
+        }
+        
+        // Filter users
+        const matches = allUsers.filter(user => 
+            user.username.toLowerCase().startsWith(searchTerm.toLowerCase())
+        ).slice(0, 5);
+        
+        if (matches.length === 0 || searchTerm.length === 0) {
+            mentionDropdown.style.display = 'none';
+            return;
+        }
+        
+        // Show dropdown
+        currentMentionInput = {
+            element: e.target,
+            atIndex: lastAtIndex,
+            searchTerm: searchTerm
+        };
+        
+        showMentionDropdown(matches, e.target);
+    });
+    
+    // Hide on blur (with delay for click)
+    inputElement.addEventListener('blur', () => {
+        setTimeout(() => {
+            mentionDropdown.style.display = 'none';
+        }, 200);
+    });
+}
+
+function showMentionDropdown(users, inputElement) {
+    const rect = inputElement.getBoundingClientRect();
+    
+    mentionDropdown.innerHTML = users.map(user => {
+        const avatarUrl = getAvatarUrl(user.avatar);
+        return `
+            <div class="mention-option" data-username="${user.username}" data-user-id="${user.userId}">
+                <img src="${avatarUrl}" alt="${user.username}" class="mention-avatar">
+                <div class="mention-info">
+                    <div class="mention-username">@${user.username}</div>
+                    <div class="mention-rank">${user.rank} • ${user.totalVotes} votes</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    mentionDropdown.style.display = 'block';
+    mentionDropdown.style.position = 'fixed';
+    mentionDropdown.style.left = rect.left + 'px';
+    mentionDropdown.style.top = (rect.top - mentionDropdown.offsetHeight - 8) + 'px';
+    
+    // Add click handlers
+    mentionDropdown.querySelectorAll('.mention-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const username = option.dataset.username;
+            insertMention(username);
+        });
+    });
+}
+
+function insertMention(username) {
+    if (!currentMentionInput) return;
+    
+    const input = currentMentionInput.element;
+    const text = input.value;
+    const atIndex = currentMentionInput.atIndex;
+    const searchTerm = currentMentionInput.searchTerm;
+    
+    // Replace @searchTerm with @username
+    const before = text.substring(0, atIndex);
+    const after = text.substring(atIndex + searchTerm.length + 1);
+    
+    input.value = before + '@' + username + ' ' + after;
+    
+    // Set cursor after mention
+    const newCursorPos = (before + '@' + username + ' ').length;
+    input.setSelectionRange(newCursorPos, newCursorPos);
+    
+    // Hide dropdown
+    mentionDropdown.style.display = 'none';
+    input.focus();
+}
+
+// ========================================
+// ✅ SHOW REPLY INPUT BOX
+// ========================================
+
+function showReplyInput(parentCommentId, postId, parentUsername) {
+    const repliesContainer = document.getElementById(`replies-${parentCommentId}`);
+    if (!repliesContainer) return;
+    
+    // Check if reply input already exists
+    if (repliesContainer.querySelector('.reply-input-box')) {
+        return; // Already showing
+    }
+    
+    const currentAvatar = JSON.parse(localStorage.getItem('avatar') || '{}');
+    const avatarUrl = getAvatarUrl(currentAvatar);
+    
+    const replyInputBox = document.createElement('div');
+    replyInputBox.className = 'reply-input-box';
+    replyInputBox.innerHTML = `
+        <img src="${avatarUrl}" alt="You" class="comment-avatar">
+        <input 
+            type="text" 
+            class="reply-input" 
+            placeholder="Reply to ${parentUsername}..." 
+            maxlength="280"
+            data-parent-id="${parentCommentId}"
+            data-post-id="${postId}"
+        >
+        <button class="send-reply-btn" disabled>
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+        <button class="cancel-reply-btn">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    `;
+    
+    repliesContainer.insertBefore(replyInputBox, repliesContainer.firstChild);
+    
+    const input = replyInputBox.querySelector('.reply-input');
+
+    // ✅ Setup mention autocomplete
+setupMentionAutocomplete(input);
+
+    const sendBtn = replyInputBox.querySelector('.send-reply-btn');
+    const cancelBtn = replyInputBox.querySelector('.cancel-reply-btn');
+    
+    // Focus input
+    input.focus();
+    
+    // Enable/disable send button
+    input.addEventListener('input', () => {
+        sendBtn.disabled = input.value.trim().length === 0;
+    });
+    
+    // Send reply
+    sendBtn.addEventListener('click', async () => {
+        await postReply(postId, parentCommentId, input);
+        replyInputBox.remove();
+    });
+    
+    // Enter to send
+    input.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!sendBtn.disabled) {
+                await postReply(postId, parentCommentId, input);
+                replyInputBox.remove();
+            }
+        }
+    });
+    
+    // Cancel
+    cancelBtn.addEventListener('click', () => {
+        replyInputBox.remove();
+    });
+}
+
+// ========================================
+// ✅ POST REPLY
+// ========================================
+
+async function postReply(postId, parentCommentId, inputElement) {
+    const content = inputElement.value.trim();
+    if (!content) return;
+    
+    const username = localStorage.getItem('username');
+    if (!username || username === 'Anonymous') {
+        if (window.showNotification) {
+            window.showNotification('Please set a username to reply', 'error');
+        }
+        return;
+    }
+    
+    try {
+        const userId = localStorage.getItem('tournamentUserId');
+        const avatarJson = localStorage.getItem('avatar');
+        
+        let avatar;
+        try {
+            avatar = JSON.parse(avatarJson);
+        } catch {
+            avatar = { type: 'emoji', value: '🎵' };
+        }
+        
+        const commentId = `reply_${userId}_${Date.now()}`;
+        const comment = {
+            commentId: commentId,
+            postId: postId,
+            parentId: parentCommentId,
+            userId: userId,
+            username: username,
+            avatar: avatar,
+            content: content,
+            timestamp: Date.now()
+        };
+        
+        // Save to Firestore
+        const { db } = await import('./firebase-config.js');
+        const { doc, setDoc, updateDoc, increment, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        comment.createdAt = Timestamp.now();
+        await setDoc(doc(db, 'comments', commentId), comment);
+        
+        // Update post comment count
+        const postRef = doc(db, 'posts', postId);
+        await updateDoc(postRef, {
+            commentCount: increment(1)
+        });
+        
+        console.log('✅ Reply posted');
+        
+        // ========================================
+        // ✅ SEND NOTIFICATIONS
+        // ========================================
+        
+        // 1. Notify parent comment author
+        const parentComment = await getComment(parentCommentId);
+        if (parentComment && parentComment.userId !== userId) {
+            await sendReplyNotification(parentComment.userId, postId, content, parentComment.username);
+        }
+        
+        // 2. Notify mentioned users
+        const mentionedUsers = extractMentionedUsers(content);
+        
+        if (mentionedUsers.length > 0) {
+            console.log(`📢 Found ${mentionedUsers.length} mentions in reply:`, mentionedUsers);
+            
+            for (const mention of mentionedUsers) {
+                // Don't notify yourself or the parent commenter (they already got notified)
+                if (mention.userId === userId || mention.userId === parentComment?.userId) continue;
+                
+                try {
+                    await saveNotification(mention.userId, {
+                        type: 'mention',
+                        priority: 7,
+                        message: `📢 ${username} mentioned you in a reply`,
+                        detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
+                        icon: '📢',
+                        triggerUsername: username,
+                        triggerUserId: userId,
+                        ctaText: 'View Reply',
+                        ctaAction: 'navigate',
+                        targetUrl: `/feed.html#post-${postId}`
+                    });
+                    
+                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                }
+            }
+        }
+        
+        // Clear input
+        inputElement.value = '';
+        
+        // Add reply to UI
+        const repliesContainer = document.getElementById(`replies-${parentCommentId}`);
+        if (repliesContainer) {
+            const replyElement = createCommentElement(comment, true);
+            repliesContainer.appendChild(replyElement);
+        }
+        
+        // Update comment count in UI
+        const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+        if (commentCountSpan) {
+            commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error posting reply:', error);
+        if (window.showNotification) {
+            window.showNotification('Failed to post reply', 'error');
+        }
+    }
+}
+
+// ========================================
+// ✅ GET COMMENT (HELPER)
+// ========================================
+
+async function getComment(commentId) {
+    try {
+        const { db } = await import('./firebase-config.js');
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        const commentDoc = await getDoc(doc(db, 'comments', commentId));
+        return commentDoc.exists() ? commentDoc.data() : null;
+    } catch (error) {
+        console.error('❌ Error getting comment:', error);
+        return null;
+    }
+}
+
+// ========================================
+// ✅ SEND REPLY NOTIFICATION
+// ========================================
+
+async function sendReplyNotification(recipientUserId, postId, replyContent, parentUsername) {
+    try {
+        const currentUserId = localStorage.getItem('tournamentUserId');
+        const currentUsername = localStorage.getItem('username');
+        
+        if (!currentUsername || currentUsername === 'Anonymous') return;
+        if (recipientUserId === currentUserId) return;
+        
+        const { saveNotification } = await import('./notification-storage.js');
+        
+        const preview = replyContent.length > 50 
+            ? replyContent.substring(0, 50) + '...' 
+            : replyContent;
+        
+        await saveNotification(recipientUserId, {
+            type: 'reply',
+            priority: 8,
+            message: `💬 ${currentUsername} replied to your comment`,
+            detail: `"${preview}"`,
+            icon: '💬',
+            triggerUsername: currentUsername,
+            triggerUserId: currentUserId,
+            ctaText: 'View Reply',
+            ctaAction: 'navigate',
+            targetUrl: `/feed.html#post-${postId}`
+        });
+        
+        console.log(`✅ Reply notification sent to ${recipientUserId}`);
+        
+    } catch (error) {
+        console.error('❌ Error sending reply notification:', error);
+    }
 }
 
 async function postComment(postId, inputElement) {
@@ -931,6 +1520,52 @@ async function postComment(postId, inputElement) {
         
         console.log('✅ Comment posted');
         
+        // ========================================
+        // ✅ SEND NOTIFICATIONS
+        // ========================================
+        
+        // 1. Notify post author
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (postElement) {
+            const post = currentPosts.find(p => p.postId === postId);
+            if (post && post.userId !== userId) {
+                await sendCommentNotification(post.userId, post, content);
+            }
+        }
+        
+        // 2. Notify mentioned users
+        const mentionedUsers = extractMentionedUsers(content);
+        
+        if (mentionedUsers.length > 0) {
+            console.log(`📢 Found ${mentionedUsers.length} mentions in comment:`, mentionedUsers);
+            
+            for (const mention of mentionedUsers) {
+                // Don't notify yourself or the post author (they already got notified)
+                const post = currentPosts.find(p => p.postId === postId);
+                if (mention.userId === userId || mention.userId === post?.userId) continue;
+                
+                try {
+                    await saveNotification(mention.userId, {
+                        type: 'mention',
+                        priority: 7,
+                        message: `📢 ${username} mentioned you in a comment`,
+                        detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
+                        icon: '📢',
+                        triggerUsername: username,
+                        triggerUserId: userId,
+                        ctaText: 'View Comment',
+                        ctaAction: 'navigate',
+                        targetUrl: `/feed.html#post-${postId}`
+                    });
+                    
+                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                }
+            }
+        }
+        
         // Clear input
         inputElement.value = '';
         
@@ -941,16 +1576,6 @@ async function postComment(postId, inputElement) {
         const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
         if (commentCountSpan) {
             commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
-        }
-        
-        // ✅ NEW: Send notification to post author
-        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-        if (postElement) {
-            // Get post from currentPosts array
-            const post = currentPosts.find(p => p.postId === postId);
-            if (post && post.userId !== userId) {
-                await sendCommentNotification(post.userId, post, content);
-            }
         }
         
     } catch (error) {
@@ -1601,6 +2226,9 @@ function setupCreatePost() {
     const charCount = document.getElementById('charCount');
     
     if (!postInput || !submitBtn) return;
+
+    // ✅ Setup mention autocomplete
+    setupMentionAutocomplete(postInput);
     
     // Character counter
     postInput.addEventListener('input', () => {
@@ -1684,6 +2312,41 @@ async function createUserPost() {
         
         console.log('✅ User post created');
         
+        // ========================================
+        // ✅ NEW: SEND MENTION NOTIFICATIONS
+        // ========================================
+        
+        const mentionedUsers = extractMentionedUsers(content);
+        
+        if (mentionedUsers.length > 0) {
+            console.log(`📢 Found ${mentionedUsers.length} mentions:`, mentionedUsers);
+            
+            for (const mention of mentionedUsers) {
+                // Don't notify yourself
+                if (mention.userId === userId) continue;
+                
+                try {
+                    await saveNotification(mention.userId, {
+                        type: 'mention',
+                        priority: 7,
+                        message: `📢 ${username} mentioned you in a post`,
+                        detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
+                        icon: '📢',
+                        triggerUsername: username,
+                        triggerUserId: userId,
+                        ctaText: 'View Post',
+                        ctaAction: 'navigate',
+                        targetUrl: `/feed.html#post-${postId}`
+                    });
+                    
+                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                }
+            }
+        }
+        
         // Clear input
         postInput.value = '';
         document.getElementById('charCount').textContent = '280';
@@ -1700,6 +2363,10 @@ async function createUserPost() {
         
         // Add to current posts array
         currentPosts.unshift(post);
+        
+        // ✅ Setup tooltips for new post
+        setupSongTooltips();
+        setupMentionTooltips();
         
     } catch (error) {
         console.error('❌ Error creating post:', error);
