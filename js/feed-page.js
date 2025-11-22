@@ -577,18 +577,26 @@ function renderPostContent(post) {
 // ✅ SONG TOOLTIP SYSTEM
 // ========================================
 
+// ========================================
+// ✅ SONG TOOLTIP SYSTEM (FIXED)
+// ========================================
+
 function setupSongTooltips() {
-    document.querySelectorAll('.song-mention').forEach(mention => {
+    const mentions = document.querySelectorAll('.song-mention');
+    
+    if (mentions.length === 0) return;
+    
+    mentions.forEach((mention) => {
         mention.addEventListener('mouseenter', (e) => {
             // Check if tooltip already exists
             if (mention.querySelector('.song-tooltip')) return;
             
             const songName = mention.dataset.songName;
-            const youtubeId = mention.dataset.youtubeId;
+            const videoId = mention.dataset.videoId; // ✅ Changed from youtubeId
             const artist = mention.dataset.artist;
             const year = mention.dataset.year;
             
-            if (!youtubeId) return;
+            if (!videoId) return;
             
             // Create tooltip
             const tooltip = document.createElement('div');
@@ -601,21 +609,23 @@ function setupSongTooltips() {
                 
                 <div class="tooltip-thumbnail">
                     <img 
-                        src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" 
+                        src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" 
                         alt="${songName}"
                     >
-                    <a href="https://www.youtube.com/watch?v=${youtubeId}" 
+                    <a href="https://www.youtube.com/watch?v=${videoId}" 
                        target="_blank" 
-                       class="play-overlay">
+                       class="play-overlay"
+                       onclick="event.stopPropagation()">
                         <i class="fas fa-play-circle"></i>
                     </a>
                 </div>
                 
                 ${artist ? `<div class="tooltip-artists">${artist}</div>` : ''}
                 
-                <a href="https://www.youtube.com/watch?v=${youtubeId}" 
+                <a href="https://www.youtube.com/watch?v=${videoId}" 
                    target="_blank" 
-                   class="tooltip-link">
+                   class="tooltip-link"
+                   onclick="event.stopPropagation()">
                     <i class="fab fa-youtube"></i>
                     Watch on YouTube
                 </a>
@@ -623,11 +633,6 @@ function setupSongTooltips() {
             
             mention.style.position = 'relative';
             mention.appendChild(tooltip);
-            
-            // Prevent click from triggering link
-            tooltip.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
         });
         
         mention.addEventListener('mouseleave', (e) => {
@@ -1410,11 +1415,16 @@ async function deletePost(postId, postElement) {
 // ✅ PARSE SONG MENTIONS FOR TOOLTIPS
 // ========================================
 
+// ========================================
+// ✅ PARSE SONG MENTIONS FOR TOOLTIPS (FIXED)
+// ========================================
+
 function parseSongMentions(text) {
-    if (!text || musicVideos.length === 0) return escapeHtml(text);
+    if (!text) return '';
+    if (musicVideos.length === 0) return escapeHtml(text);
     
-    // Get all song names
-    const songNames = musicVideos.map(video => video.name);
+    // ✅ Use shortTitle from your JSON
+    const songNames = musicVideos.map(video => video.shortTitle);
     
     // Sort by length (longest first) to avoid partial matches
     songNames.sort((a, b) => b.length - a.length);
@@ -1423,19 +1433,29 @@ function parseSongMentions(text) {
     
     songNames.forEach(songName => {
         // Case-insensitive match with word boundaries
-        const regex = new RegExp(`\\b(${songName})\\b`, 'gi');
+        const regex = new RegExp(`\\b(${escapeRegex(songName)})\\b`, 'gi');
         
         parsedText = parsedText.replace(regex, (match) => {
-            const video = musicVideos.find(v => v.name.toLowerCase() === match.toLowerCase());
+            const video = musicVideos.find(v => v.shortTitle.toLowerCase() === match.toLowerCase());
             
-            if (video && video.youtubeId) {
-                return `<span class="song-mention" data-song-name="${escapeHtml(video.name)}" data-youtube-id="${video.youtubeId}" data-artist="${escapeHtml(video.artist)}" data-year="${video.year}">${match}</span>`;
+            // ✅ Use videoId instead of youtubeId
+            if (video && video.videoId) {
+                return `<span class="song-mention" 
+                    data-song-name="${escapeHtml(video.shortTitle)}" 
+                    data-video-id="${video.videoId}" 
+                    data-artist="${escapeHtml(video.artist || '')}" 
+                    data-year="${video.year || ''}">${match}</span>`;
             }
             return match;
         });
     });
     
     return parsedText;
+}
+
+// Helper to escape regex special characters
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // ========================================
