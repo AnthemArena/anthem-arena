@@ -811,6 +811,38 @@ async function loadFeed() {
 }
 
 // ========================================
+// RENDER POSTS
+// ========================================
+
+function renderPosts(startIndex, count) {
+    const feedContainer = document.getElementById('feedPosts');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    
+    // Get posts to render
+    const postsToRender = currentPosts.slice(startIndex, startIndex + count);
+    
+    // Render each post
+    postsToRender.forEach(post => {
+        const postElement = createPostElement(post);
+        feedContainer.appendChild(postElement);
+    });
+    
+    // Update last loaded index
+    lastLoadedIndex = startIndex + count;
+
+    // ✅ Setup tooltips after rendering
+    setupSongTooltips();
+    setupMentionTooltips();
+
+    // Show/hide load more button
+    if (lastLoadedIndex < currentPosts.length) {
+        loadMoreContainer.style.display = 'block';
+    } else {
+        loadMoreContainer.style.display = 'none';
+    }
+}
+
+// ========================================
 function renderPostContent(post) {
     if (post.type === 'vote') {
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
