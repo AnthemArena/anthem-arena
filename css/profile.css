@@ -26,9 +26,9 @@
 }
 
 .profile-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem 4rem;
+    max-width: 100%;  /* ✅ Full width */
+    margin: 0;
+    padding: 0;  /* ✅ No padding */
     position: relative;
     z-index: 1;
 }
@@ -92,13 +92,15 @@
    PROFILE HEADER - PREMIUM BANNER
    ======================================== */
 
+/* Full-width header */
 .profile-header {
     position: relative;
-    margin-bottom: 3rem;
-    border-radius: 16px;
+    margin: 0;  /* ✅ No margins */
+    border-radius: 0;  /* ✅ Sharp edges */
     overflow: hidden;
     background: #000;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 100%;
 }
 
 .profile-banner {
@@ -184,6 +186,16 @@
     opacity: 0.6;
     animation: rotate-border 4s linear infinite;
 }
+
+/* Add padding back to content below header */
+.profile-stats-grid,
+.profile-tabs {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 2rem;  /* ✅ Side padding for content */
+}
+
 
 @keyframes rotate-border {
     to { transform: rotate(360deg); }
