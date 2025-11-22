@@ -95,6 +95,65 @@ function parseMentions(text) {
     return parsedText;
 }
 
+// ========================================
+// ✅ NEW: Parse @mentions in HTML (for already-processed text)
+// ========================================
+
+function parseMentionsHTML(html) {
+    if (!html) return '';
+    
+    // Don't escape HTML - work with existing HTML string
+    // Find all @mentions that are NOT already inside tags
+    const mentionRegex = /@(\w+)/g;
+    
+    let result = html;
+    let match;
+    const mentions = [];
+    
+    // Find all @mentions and their positions
+    while ((match = mentionRegex.exec(html)) !== null) {
+        const username = match[1];
+        const startIndex = match.index;
+        
+        // Check if this @ is inside a tag (skip if so)
+        const beforeMatch = html.substring(0, startIndex);
+        const lastTagOpen = beforeMatch.lastIndexOf('<');
+        const lastTagClose = beforeMatch.lastIndexOf('>');
+        
+        // If last < is after last >, we're inside a tag - skip
+        if (lastTagOpen > lastTagClose) continue;
+        
+        // Check if user exists
+        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+        
+        if (user) {
+            mentions.push({
+                match: match[0],
+                username: username,
+                index: startIndex,
+                user: user
+            });
+        }
+    }
+    
+    // Replace mentions in reverse order (to preserve indices)
+    mentions.reverse().forEach(mention => {
+        const before = result.substring(0, mention.index);
+        const after = result.substring(mention.index + mention.match.length);
+        
+        const replacement = `<span class="user-mention" 
+            data-user-id="${mention.user.userId}" 
+            data-username="${mention.user.username}"
+            data-level="${mention.user.level}"
+            data-rank="${escapeHtml(mention.user.rank)}"
+            data-votes="${mention.user.totalVotes}">@${mention.username}</span>`;
+        
+        result = before + replacement + after;
+    });
+    
+    return result;
+}
+
 // Extract mentioned user IDs from text (for notifications)
 function extractMentionedUsers(text) {
     if (!text) return [];
@@ -640,9 +699,13 @@ function renderPostContent(post) {
     if (post.type === 'vote') {
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
         
+        // ✅ FIX: Parse songs first, THEN mentions (both return HTML)
+        const withSongs = parseSongMentions(smartText);
+        const withMentions = parseMentionsHTML(withSongs); // New function!
+        
         return `
             <p class="post-text vote-text">
-                <i class="fa-solid fa-check-circle"></i> ${parseMentions(parseSongMentions(smartText))}
+                <i class="fa-solid fa-check-circle"></i> ${withMentions}
             </p>
             
             <div class="match-embed" data-match-id="${post.matchId}">
@@ -659,8 +722,10 @@ function renderPostContent(post) {
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        // ✅ Parse BOTH song mentions AND user mentions
-        return `<p class="post-text">${parseMentions(parseSongMentions(post.content))}</p>`;
+        // ✅ FIX: Parse songs first, THEN mentions
+        const withSongs = parseSongMentions(post.content);
+        const withMentions = parseMentionsHTML(withSongs);
+        return `<p class="post-text">${withMentions}</p>`;
     }
     
     return '';
@@ -1032,7 +1097,7 @@ function createCommentElement(comment, isReply = false) {
     const currentUserId = localStorage.getItem('tournamentUserId');
     const isOwnComment = comment.userId === currentUserId;
     
-    div.innerHTML = `
+  div.innerHTML = `
     <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
     <div class="comment-content">
         <div class="comment-header">
@@ -1044,7 +1109,7 @@ function createCommentElement(comment, isReply = false) {
                 </button>
             ` : ''}
         </div>
-        <p class="comment-text">${parseMentions(escapeHtml(comment.content))}</p>
+        <p class="comment-text">${parseMentionsHTML(escapeHtml(comment.content))}</p>
         
         ${!isReply ? `
             <div class="comment-actions">
