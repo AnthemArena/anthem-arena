@@ -18,9 +18,10 @@ import {
     query, 
     where, 
     getDocs,
-    limit
+    limit,
+      orderBy,      // ✅ ADD THIS
+    onSnapshot    // ✅ ADD THIS (for real-time listener)
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 
 
