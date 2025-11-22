@@ -4,9 +4,13 @@
 
 import { db } from './firebase-config.js';
 import { createMatchCard } from './match-card-renderer.js';
-import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-// ✅ ADD THIS IMPORT
+import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
+
+// ✅ NEW IMPORTS for personal widgets
+import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
+import { ACHIEVEMENTS } from './achievements.js';
 
 // ========================================
 // INITIALIZE ALL WIDGETS
@@ -17,6 +21,12 @@ export async function initializeFeedWidgets() {
     
     await Promise.all([
         loadUserProfile(),
+        // ✅ NEW: Personal widgets
+        loadPersonalRankCard(),
+        loadRoundProgress(),
+        loadFeaturedAchievement(),
+        loadTopSong(),
+        // Existing widgets
         loadLiveMatches(),
         loadRecentActivity(),
         loadTournamentStats()
@@ -61,7 +71,6 @@ async function loadUserProfile() {
         }
         
         // ✅ Load user's actual profile data from Firebase
-        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         const profileRef = doc(db, 'profiles', userId);
         const profileDoc = await getDoc(profileRef);
         
@@ -75,7 +84,7 @@ async function loadUserProfile() {
             }
         }
         
-        // ✅ FIXED: Use follow-system.js to get real counts from follows collection
+        // ✅ Use follow-system.js to get real counts from follows collection
         const [followingCount, followerCount] = await Promise.all([
             getFollowingCount(userId),
             getFollowerCount(userId)
@@ -105,6 +114,498 @@ async function loadUserProfile() {
     }
 }
 
+// ========================================
+// ✅ NEW: PERSONAL RANK CARD WIDGET
+// ========================================
+
+async function loadPersonalRankCard() {
+    const container = document.getElementById('personalRankWidget');
+    if (!container) return; // Widget not in HTML yet
+    
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        const username = localStorage.getItem('username');
+        
+        if (!username || username === 'Anonymous') {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Get XP and rank
+        const xp = getUserXPFromStorage();
+        const rank = getUserRank(xp);
+        
+        // Get avatar
+        const avatarJson = localStorage.getItem('avatar');
+        let avatar;
+        try {
+            avatar = JSON.parse(avatarJson);
+        } catch {
+            avatar = { type: 'emoji', value: '🎵' };
+        }
+        const avatarUrl = getAvatarUrl(avatar);
+        
+        // Get vote count
+        const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
+        const votesSnapshot = await getDocs(votesQuery);
+        const voteCount = votesSnapshot.size;
+        
+        // Get achievement count
+        const unlockedIds = await getUnlockedAchievementsFromFirebase(userId);
+        const achievementCount = unlockedIds.length;
+        
+        // Progress percentage
+        const progressPercent = Math.round(rank.progressPercent);
+        
+        // Clean rank title (remove emojis)
+        const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+        
+        container.innerHTML = `
+            <div class="personal-rank-card" onclick="window.location.href='/profile.html'">
+                <div class="rank-header">
+                    <img src="${avatarUrl}" alt="${username}" class="rank-avatar">
+                    <div class="rank-info">
+                        <div class="rank-username">${username}</div>
+                        <div class="rank-level">
+                            <span class="level-badge">Lv. ${rank.currentLevel.level}</span>
+                            <span class="rank-title">${cleanTitle}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rank-progress-section">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <div class="progress-text">
+                        ${rank.currentXP.toLocaleString()} / ${rank.nextLevel.xpNeeded.toLocaleString()} XP
+                    </div>
+                </div>
+                
+                <div class="rank-stats-row">
+                    <div class="rank-stat">
+                        <i class="fa-solid fa-trophy"></i>
+                        <span>${voteCount}</span>
+                    </div>
+                    <div class="rank-stat">
+                        <i class="fa-solid fa-award"></i>
+                        <span>${achievementCount}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('✅ Personal rank card loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading rank card:', error);
+        container.style.display = 'none';
+    }
+}
+
+// ========================================
+// ✅ NEW: ROUND PROGRESS WIDGET (replaces streak)
+// ========================================
+
+async function loadRoundProgress() {
+    const container = document.getElementById('roundProgressWidget');
+    if (!container) return;
+    
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        
+        if (!userId) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Get participation data
+        const participation = await calculateTournamentParticipation(userId);
+        
+        if (participation.totalVotes === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Find current incomplete round
+        const currentRound = participation.byRound.find(r => r.percentage > 0 && r.percentage < 100);
+        
+        container.innerHTML = `
+            <div class="round-progress-card">
+                <div class="progress-header">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Tournament Progress</span>
+                </div>
+                
+                <div class="overall-progress">
+                    <div class="progress-circle-mini">
+                        <svg width="60" height="60">
+                            <circle cx="30" cy="30" r="25" 
+                                stroke="rgba(200, 170, 110, 0.2)" 
+                                stroke-width="4" 
+                                fill="none"/>
+                            <circle cx="30" cy="30" r="25" 
+                                stroke="#C8AA6E" 
+                                stroke-width="4" 
+                                fill="none"
+                                stroke-dasharray="157"
+                                stroke-dashoffset="${157 - (157 * participation.overallPercentage / 100)}"
+                                transform="rotate(-90 30 30)"
+                                style="transition: stroke-dashoffset 0.5s ease;"/>
+                        </svg>
+                        <div class="progress-value">${participation.overallPercentage}%</div>
+                    </div>
+                    <div class="progress-label">
+                        ${participation.totalVotes} / ${participation.totalPossible} matches
+                    </div>
+                </div>
+                
+                <div class="rounds-breakdown-mini">
+                    ${participation.byRound.map(round => `
+                        <div class="round-row-mini ${round.percentage === 100 ? 'complete' : ''}">
+                            <span class="round-name">${getRoundShortName(round.round)}</span>
+                            <div class="round-bar-mini">
+                                <div class="round-bar-fill" style="width: ${round.percentage}%"></div>
+                            </div>
+                            <span class="round-votes">${round.voted}/${round.total}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                ${currentRound ? `
+                    <div class="progress-cta">
+                        🎯 ${currentRound.total - currentRound.voted} left in ${currentRound.roundName}!
+                    </div>
+                ` : participation.overallPercentage === 100 ? `
+                    <div class="progress-cta complete">
+                        🏆 100% Complete! 🎉
+                    </div>
+                ` : `
+                    <div class="progress-cta">
+                        <a href="/matches.html">View Matches →</a>
+                    </div>
+                `}
+            </div>
+        `;
+        
+        console.log('✅ Round progress loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading round progress:', error);
+        container.style.display = 'none';
+    }
+}
+
+// Helper: Calculate tournament participation (from profile.js)
+async function calculateTournamentParticipation(userId) {
+    try {
+        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
+        
+        const TOTAL_MATCHES_BY_ROUND = {
+            1: 29,
+            2: 16,
+            3: 8,
+            4: 4,
+            5: 2,
+            6: 1
+        };
+        
+        // Get ALL matches to filter by tournament
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
+        
+        // Get user's votes
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId)
+        );
+        
+        const snapshot = await getDocs(votesQuery);
+        
+        if (snapshot.empty) {
+            return {
+                overallPercentage: 0,
+                byRound: Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => ({
+                    round: parseInt(round),
+                    roundName: getRoundName(parseInt(round)),
+                    voted: 0,
+                    total,
+                    percentage: 0
+                })),
+                totalVotes: 0,
+                totalPossible: 60
+            };
+        }
+        
+        // Filter votes to only include current tournament matches
+        const tournamentVotes = snapshot.docs
+            .map(doc => doc.data())
+            .filter(vote => {
+                const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
+                return match !== undefined;
+            });
+        
+        // Count votes by round
+        const votesByRound = {};
+        tournamentVotes.forEach(vote => {
+            const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
+            if (match) {
+                const round = match.round || vote.round || 1;
+                votesByRound[round] = (votesByRound[round] || 0) + 1;
+            }
+        });
+        
+        // Calculate participation by round
+        const byRound = Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => {
+            const voted = votesByRound[round] || 0;
+            const percentage = total > 0 ? Math.round((voted / total) * 100) : 0;
+            
+            return {
+                round: parseInt(round),
+                roundName: getRoundName(parseInt(round)),
+                voted,
+                total,
+                percentage
+            };
+        });
+        
+        // Calculate overall
+        const totalPossible = Object.values(TOTAL_MATCHES_BY_ROUND).reduce((a, b) => a + b, 0);
+        const totalVotes = tournamentVotes.length;
+        const overallPercentage = Math.round((totalVotes / totalPossible) * 100);
+        
+        return {
+            overallPercentage,
+            byRound,
+            totalVotes,
+            totalPossible
+        };
+        
+    } catch (error) {
+        console.error('❌ Error calculating participation:', error);
+        return {
+            overallPercentage: 0,
+            byRound: [],
+            totalVotes: 0,
+            totalPossible: 60
+        };
+    }
+}
+
+// Helper: Get round name
+function getRoundName(roundNumber) {
+    const roundNames = {
+        1: 'Round 1',
+        2: 'Round 2',
+        3: 'Sweet 16',
+        4: 'Quarterfinals',
+        5: 'Semifinals',
+        6: 'Finals'
+    };
+    return roundNames[roundNumber] || `Round ${roundNumber}`;
+}
+
+// Helper: Get short round name
+function getRoundShortName(roundNumber) {
+    const roundNames = {
+        1: 'R1',
+        2: 'R2',
+        3: 'R3',
+        4: 'QF',
+        5: 'SF',
+        6: 'F'
+    };
+    return roundNames[roundNumber] || `R${roundNumber}`;
+}
+
+// ========================================
+// ✅ NEW: FEATURED ACHIEVEMENT WIDGET
+// ========================================
+
+async function loadFeaturedAchievement() {
+    const container = document.getElementById('featuredAchievementWidget');
+    if (!container) return;
+    
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        
+        if (!userId) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        const unlockedIds = await getUnlockedAchievementsFromFirebase(userId);
+        
+        if (unlockedIds.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Get highest rarity achievement
+        const unlockedAchievements = unlockedIds
+            .map(id => ({ ...ACHIEVEMENTS[id], id }))
+            .filter(Boolean)
+            .sort((a, b) => {
+                const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
+                const rarityA = rarityOrder[a.rarity] || 0;
+                const rarityB = rarityOrder[b.rarity] || 0;
+                if (rarityB !== rarityA) return rarityB - rarityA;
+                return (b.xp || 0) - (a.xp || 0);
+            });
+        
+        const featured = unlockedAchievements[0];
+        
+        container.innerHTML = `
+            <div class="featured-achievement-card" onclick="window.location.href='/profile.html#tab-achievements'">
+                <div class="achievement-widget-header">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Top Achievement</span>
+                </div>
+                <div class="achievement-content">
+                    <div class="achievement-badge-lg">
+                        ${featured.icon}
+                    </div>
+                    <div class="achievement-details">
+                        <div class="achievement-name">${featured.name}</div>
+                        <span class="achievement-rarity ${featured.rarity}">${featured.rarity}</span>
+                    </div>
+                    <div class="achievement-description">${featured.description}</div>
+                    <div class="achievement-xp-badge">+${featured.xp} XP</div>
+                </div>
+                
+                ${unlockedAchievements.length > 1 ? `
+                    <div class="achievement-count">
+                        ${unlockedAchievements.length} achievements unlocked
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        console.log('✅ Featured achievement loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading featured achievement:', error);
+        container.style.display = 'none';
+    }
+}
+
+// ========================================
+// ✅ NEW: TOP SONG WIDGET
+// ========================================
+
+async function loadTopSong() {
+    const container = document.getElementById('topSongWidget');
+    if (!container) return;
+    
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        
+        if (!userId) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Get all user votes
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId)
+        );
+        
+        const snapshot = await getDocs(votesQuery);
+        
+        if (snapshot.empty) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Load music data for thumbnails
+        let musicVideos = [];
+        try {
+            const response = await fetch('/data/music-videos.json');
+            musicVideos = await response.json();
+        } catch (error) {
+            console.warn('⚠️ Could not load music videos:', error);
+        }
+        
+        // Get matches for song data
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+        
+        // Count song votes
+        const songCounts = {};
+        
+        snapshot.docs.forEach(docSnap => {
+            const vote = docSnap.data();
+            const match = matchMap.get(vote.matchId);
+            
+            if (!match) return;
+            
+            const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
+            if (!votedSong) return;
+            
+            const songId = votedSong.id;
+            
+            if (!songCounts[songId]) {
+                const songData = musicVideos.find(v => v.id === songId || v.videoId === votedSong.videoId);
+                
+                songCounts[songId] = {
+                    id: songId,
+                    name: votedSong.shortTitle || votedSong.title,
+                    artist: votedSong.artist,
+                    videoId: votedSong.videoId,
+                    thumbnail: songData?.videoId 
+                        ? `https://img.youtube.com/vi/${songData.videoId}/mqdefault.jpg`
+                        : null,
+                    count: 0
+                };
+            }
+            
+            songCounts[songId].count++;
+        });
+        
+        // Get top song
+        const topSong = Object.values(songCounts)
+            .sort((a, b) => b.count - a.count)[0];
+        
+        if (!topSong) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="top-song-card" onclick="window.open('https://youtube.com/watch?v=${topSong.videoId}', '_blank')">
+                <div class="song-widget-header">
+                    <i class="fa-solid fa-music"></i>
+                    <span>Your Top Song</span>
+                </div>
+                ${topSong.thumbnail ? `
+                    <div class="song-thumbnail-container">
+                        <img src="${topSong.thumbnail}" alt="${topSong.name}" class="song-thumbnail">
+                        <div class="play-overlay">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+                ` : ''}
+                <div class="song-info">
+                    <div class="song-medal">🥇</div>
+                    <div class="song-details">
+                        <div class="song-title">${topSong.name}</div>
+                        <div class="song-artist">${topSong.artist}</div>
+                        <div class="song-votes">${topSong.count} ${topSong.count === 1 ? 'vote' : 'votes'}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('✅ Top song loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading top song:', error);
+        container.style.display = 'none';
+    }
+}
 
 // ========================================
 // RIGHT SIDEBAR - Live Matches Widget
@@ -216,7 +717,7 @@ async function loadRecentActivity() {
             return;
         }
         
-        // ✅ Load music videos data for thumbnails
+        // Load music videos data for thumbnails
         let musicVideos = [];
         try {
             const response = await fetch('/data/music-videos.json');
@@ -231,7 +732,7 @@ async function loadRecentActivity() {
             const timeAgo = getTimeAgo(activity.timestamp);
             const action = `voted for`;
             
-            // ✅ Find thumbnail for the song
+            // Find thumbnail for the song
             const songVideo = musicVideos.find(v => v.id === activity.songId);
             const thumbnailUrl = songVideo?.videoId 
                 ? `https://img.youtube.com/vi/${songVideo.videoId}/mqdefault.jpg`
@@ -298,7 +799,7 @@ async function loadTournamentStats() {
 export function setupSidebarInteractions() {
     console.log('🔧 Setting up sidebar interactions...');
     
-    // ✅ NEW: Make entire profile card clickable
+    // Make entire profile card clickable
     const profileCard = document.querySelector('.sidebar-profile-card');
     if (profileCard) {
         profileCard.style.cursor = 'pointer';
@@ -327,7 +828,7 @@ export function setupSidebarInteractions() {
     // Wait for notification center to be ready
     setTimeout(() => {
         // Notifications button
-        const notifBtn = document.getElementById('sidebarNotifications');
+const notifBtn = document.getElementById('sidebarNotifications');
         if (notifBtn) {
             notifBtn.addEventListener('click', (e) => {
                 e.preventDefault();

@@ -28,47 +28,65 @@
     <!-- 3-COLUMN LAYOUT -->
     <main class="feed-page-layout">
         
-        <!-- LEFT SIDEBAR -->
-        <aside class="feed-sidebar-left">
-            <!-- User Profile Card -->
-            <div class="sidebar-profile-card">
-                <div class="profile-header-bg"></div>
-                <div class="profile-content">
-                    <img id="sidebarAvatar" src="" alt="Avatar" class="sidebar-avatar">
-                    <h3 id="sidebarUsername" class="sidebar-username">Loading...</h3>
-                    <p id="sidebarBio" class="sidebar-bio">Music Tournament Enthusiast</p>
-                    
-                    <div class="profile-stats">
-                        <a href="/profile" class="stat-item">
-                            <span class="stat-value" id="sidebarVotes">0</span>
-                            <span class="stat-label">Votes</span>
-                        </a>
-                        <a href="/profile?tab=following" class="stat-item">
-                            <span class="stat-value" id="sidebarFollowing">0</span>
-                            <span class="stat-label">Following</span>
-                        </a>
-                        <a href="/profile?tab=followers" class="stat-item">
-                            <span class="stat-value" id="sidebarFollowers">0</span>
-                            <span class="stat-label">Followers</span>
-                        </a>
-                    </div>
-                </div>
+       <!-- LEFT SIDEBAR -->
+<aside class="feed-sidebar-left">
+    
+    <!-- User Profile Card -->
+    <div class="sidebar-profile-card">
+        <div class="profile-header-bg"></div>
+        <div class="profile-content">
+            <img id="sidebarAvatar" src="" alt="Avatar" class="sidebar-avatar">
+            <h3 id="sidebarUsername" class="sidebar-username">Loading...</h3>
+            <p id="sidebarBio" class="sidebar-bio">Music Tournament Enthusiast</p>
+            
+            <div class="profile-stats">
+                <a href="/profile.html" class="stat-item">
+                    <span class="stat-value" id="sidebarVotes">0</span>
+                    <span class="stat-label">Votes</span>
+                </a>
+                <a href="/profile.html#tab-following" class="stat-item">
+                    <span class="stat-value" id="sidebarFollowing">0</span>
+                    <span class="stat-label">Following</span>
+                </a>
+                <a href="/profile.html#tab-followers" class="stat-item">
+                    <span class="stat-value" id="sidebarFollowers">0</span>
+                    <span class="stat-label">Followers</span>
+                </a>
             </div>
+        </div>
+    </div>
 
-            <!-- Quick Nav -->
-            <nav class="sidebar-nav">
-                <a href="/profile" class="nav-item">
-                    <i class="fa-solid fa-user"></i>
-                    <span>My Profile</span>
-                </a>
-              
-                <a href="/activity" class="nav-item">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Activity</span>
-                </a>
-                
-            </nav>
-        </aside>
+    <!-- ✅ NEW: Personal Rank Card Widget -->
+    <div id="personalRankWidget" class="sidebar-widget"></div>
+    
+    <!-- ✅ NEW: Round Progress Widget -->
+    <div id="roundProgressWidget" class="sidebar-widget"></div>
+    
+    <!-- ✅ NEW: Featured Achievement Widget -->
+    <div id="featuredAchievementWidget" class="sidebar-widget"></div>
+    
+    <!-- ✅ NEW: Top Song Widget -->
+    <div id="topSongWidget" class="sidebar-widget"></div>
+
+    <!-- Quick Nav -->
+    <nav class="sidebar-nav">
+        <a href="/profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>My Profile</span>
+        </a>
+        
+        <a href="/matches.html" class="nav-item">
+            <i class="fa-solid fa-trophy"></i>
+            <span>Matches</span>
+        </a>
+        
+        <a href="/activity.html" class="nav-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Activity</span>
+        </a>
+    </nav>
+    
+</aside>
 
         <!-- CENTER FEED -->
         <section class="feed-center">
