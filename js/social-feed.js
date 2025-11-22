@@ -172,32 +172,35 @@ export async function createVotePost(voteData) {
         // Generate post ID
         const postId = `vote_${voteData.matchId}_${userId}_${Date.now()}`;
         
-        // Create post object
-        const post = {
-            postId: postId,
-            userId: userId,
-            username: username,
-            avatar: avatar,
-            type: 'vote',
-            text: postText, // ✅ SMART CONTEXT-AWARE TEXT
-            matchId: voteData.matchId,
-            matchTitle: voteData.matchTitle,
-            votedSongName: voteData.votedSongName || voteData.songTitle,
-            opponentSongName: voteData.opponentSongName,
-            votedSongId: voteData.songId,
-            votedThumbnail: voteData.votedThumbnail,
-            opponentThumbnail: voteData.opponentThumbnail,
-            choice: voteData.choice, // 'song1' or 'song2'
-            tournamentId: voteData.tournamentId || '2025-worlds-anthems',
-            round: voteData.round || 1,
-            // ✅ ADD MATCH STATE TO POST
-            matchState: matchState,
-            timestamp: Date.now(),
-            privacy: 'public',
-            likeCount: 0,
-            commentCount: 0,
-            createdAt: Timestamp.now()
-        };
+       // Create post object
+const post = {
+    postId: postId,
+    userId: userId,
+    username: username,
+    avatar: avatar,
+    type: 'vote',
+    text: postText,
+    matchId: voteData.matchId,
+    matchTitle: voteData.matchTitle,
+    votedSongName: voteData.votedSongName || voteData.songTitle,
+    opponentSongName: voteData.opponentSongName,
+    votedSongId: voteData.songId,
+    // ✅ FIX: Generate thumbnail from songId, use null if missing
+    votedThumbnail: voteData.songId 
+        ? `https://img.youtube.com/vi/${voteData.songId}/mqdefault.jpg` 
+        : null,
+    // ✅ FIX: Remove opponentThumbnail or set to null (we don't have opponent videoId)
+    opponentThumbnail: null,
+    choice: voteData.choice,
+    tournamentId: voteData.tournamentId || '2025-worlds-anthems',
+    round: voteData.round || 1,
+    matchState: matchState,
+    timestamp: Date.now(),
+    privacy: 'public',
+    likeCount: 0,
+    commentCount: 0,
+    createdAt: Timestamp.now()
+};
         
         // Save to Firestore
         await setDoc(doc(db, 'posts', postId), post);
