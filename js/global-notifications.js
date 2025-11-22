@@ -1433,8 +1433,8 @@ function showBulletin(notification) {
 
 :root {
     --bulletin-bg: rgba(0, 0, 0, 0.95);
-    --bulletin-bg-size: auto;
-    --bulletin-bg-position: center;
+    --bulletin-bg-size: cover;
+    --bulletin-bg-position: center 30%;
     --bulletin-border: rgba(200, 170, 110, 0.3);
     --bulletin-glow: 0 0 20px rgba(200, 170, 110, 0.15);
     --bulletin-title: #C8AA6E;
@@ -1447,8 +1447,8 @@ function showBulletin(notification) {
 
 /* ========================================
    TOAST-STYLE BULLETIN - BOTTOM RIGHT
-   Matches Nav Theme + TikTok/Instagram Style
 ======================================== */
+
 .bulletin-banner {
     position: fixed;
     bottom: 24px;
@@ -1457,7 +1457,7 @@ function showBulletin(notification) {
     width: 380px;
     max-width: calc(100vw - 48px);
     
-    /* Use CSS variables for theming */
+    /* Full champion splash background */
     background: var(--bulletin-bg);
     background-size: var(--bulletin-bg-size);
     background-position: var(--bulletin-bg-position);
@@ -1465,6 +1465,7 @@ function showBulletin(notification) {
     border: 1px solid var(--bulletin-border);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--bulletin-glow);
+    overflow: hidden;
 
     /* Slide in from bottom-right */
     transform: translateX(120%) translateY(20px);
@@ -1477,56 +1478,36 @@ function showBulletin(notification) {
     opacity: 1;
 }
 
-/* Champion banner strip at top */
-.bulletin-banner::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: var(--bulletin-champion-strip, none);
-    background-size: cover;
-    background-position: center 25%;
-    border-radius: 12px 12px 0 0;
-    z-index: 0;
-    opacity: 0.9;
-}
-
-/* Darken bottom of strip for smooth transition */
+/* Dark gradient overlay on bottom half for text readability */
 .bulletin-banner::after {
     content: '';
     position: absolute;
-    top: 50px;
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 30px;
-    background: linear-gradient(to bottom, transparent, rgba(26, 26, 46, 1));
+    height: 65%;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(0, 0, 0, 0.4) 20%,
+        rgba(0, 0, 0, 0.75) 50%,
+        rgba(0, 0, 0, 0.9) 80%,
+        rgba(0, 0, 0, 0.95) 100%
+    );
     z-index: 1;
     pointer-events: none;
 }
 
-/* Make content appear above the strip */
-.bulletin-toast-content {
-    position: relative;
-    z-index: 2;
-    margin-top: 60px; /* Push content below strip */
-}
-
-.bulletin-toast-cta {
-    position: relative;
-    z-index: 2;
-}
 /* ========================================
    TOAST CONTENT LAYOUT
 ======================================== */
 
 .bulletin-toast-content {
+    position: relative;
+    z-index: 2;
     padding: 1rem;
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    position: relative;
 }
 
 /* ========================================
@@ -1624,6 +1605,7 @@ function showBulletin(notification) {
     align-items: center;
     justify-content: center;
     padding: 0;
+    z-index: 3;
 }
 
 .bulletin-close:hover {
@@ -1636,6 +1618,8 @@ function showBulletin(notification) {
 ======================================== */
 
 .bulletin-toast-cta {
+    position: relative;
+    z-index: 2;
     width: 100%;
     background: var(--bulletin-btn-bg);
     color: var(--bulletin-btn-text);
@@ -1663,6 +1647,8 @@ function showBulletin(notification) {
 }
 
 .bulletin-toast-cta-secondary {
+    position: relative;
+    z-index: 2;
     width: 100%;
     background: rgba(200, 170, 110, 0.15);
     color: #C8AA6E;
@@ -1676,7 +1662,7 @@ function showBulletin(notification) {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-top: -1px; /* Overlap border with primary CTA */
+    margin-top: -1px;
 }
 
 .bulletin-toast-cta-secondary:hover {
