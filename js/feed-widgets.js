@@ -207,6 +207,10 @@ async function loadPersonalRankCard() {
 // ✅ NEW: ROUND PROGRESS WIDGET (replaces streak)
 // ========================================
 
+// ========================================
+// ✅ FIXED: ROUND PROGRESS WIDGET
+// ========================================
+
 async function loadRoundProgress() {
     const container = document.getElementById('roundProgressWidget');
     if (!container) return;
@@ -227,8 +231,50 @@ async function loadRoundProgress() {
             return;
         }
         
-        // Find current incomplete round
-        const currentRound = participation.byRound.find(r => r.percentage > 0 && r.percentage < 100);
+        // ✅ FIX: Find CURRENT ACTIVE round (not just incomplete)
+        // Get all matches to see which rounds are actually open
+        const { getAllMatches } = await import('./api-client.js');
+        const allMatches = await getAllMatches();
+        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
+        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
+        
+        // Find which rounds have live/active matches
+        const activeRounds = new Set();
+        tournamentMatches.forEach(match => {
+            if (match.status === 'live' || match.status === 'active') {
+                activeRounds.add(match.round);
+            }
+        });
+        
+        // Get current active round (lowest round number that's active)
+        const currentActiveRound = activeRounds.size > 0 
+            ? Math.min(...Array.from(activeRounds))
+            : null;
+        
+        // Find the round to show CTA for
+        let ctaRound = null;
+        let ctaMessage = '';
+        
+        if (currentActiveRound) {
+            // Show CTA for current active round if incomplete
+            const roundData = participation.byRound.find(r => r.round === currentActiveRound);
+            if (roundData && roundData.percentage < 100) {
+                ctaRound = roundData;
+                ctaMessage = `🎯 ${roundData.total - roundData.voted} left in ${roundData.roundName}!`;
+            } else if (roundData && roundData.percentage === 100) {
+                ctaMessage = `✅ ${roundData.roundName} complete! Waiting for next round...`;
+            }
+        } else {
+            // No active rounds - check if user has any incomplete rounds
+            const incompleteRound = participation.byRound.find(r => r.percentage > 0 && r.percentage < 100);
+            if (incompleteRound) {
+                ctaRound = incompleteRound;
+                ctaMessage = `⏳ ${incompleteRound.roundName} closed - ${incompleteRound.total - incompleteRound.voted} missed`;
+            }
+        }
+        
+        // Check if 100% complete
+        const isComplete = participation.overallPercentage === 100;
         
         container.innerHTML = `
             <div class="round-progress-card">
@@ -261,24 +307,27 @@ async function loadRoundProgress() {
                 </div>
                 
                 <div class="rounds-breakdown-mini">
-                    ${participation.byRound.map(round => `
-                        <div class="round-row-mini ${round.percentage === 100 ? 'complete' : ''}">
-                            <span class="round-name">${getRoundShortName(round.round)}</span>
-                            <div class="round-bar-mini">
-                                <div class="round-bar-fill" style="width: ${round.percentage}%"></div>
+                    ${participation.byRound.map(round => {
+                        const isActiveRound = activeRounds.has(round.round);
+                        return `
+                            <div class="round-row-mini ${round.percentage === 100 ? 'complete' : ''} ${isActiveRound ? 'active-round' : ''}">
+                                <span class="round-name">${getRoundShortName(round.round)}</span>
+                                <div class="round-bar-mini">
+                                    <div class="round-bar-fill" style="width: ${round.percentage}%"></div>
+                                </div>
+                                <span class="round-votes">${round.voted}/${round.total}</span>
                             </div>
-                            <span class="round-votes">${round.voted}/${round.total}</span>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
                 
-                ${currentRound ? `
-                    <div class="progress-cta">
-                        🎯 ${currentRound.total - currentRound.voted} left in ${currentRound.roundName}!
-                    </div>
-                ` : participation.overallPercentage === 100 ? `
+                ${isComplete ? `
                     <div class="progress-cta complete">
                         🏆 100% Complete! 🎉
+                    </div>
+                ` : ctaMessage ? `
+                    <div class="progress-cta ${ctaMessage.includes('complete') ? 'complete' : ''}">
+                        ${ctaMessage}
                     </div>
                 ` : `
                     <div class="progress-cta">
@@ -288,7 +337,11 @@ async function loadRoundProgress() {
             </div>
         `;
         
-        console.log('✅ Round progress loaded');
+        console.log('✅ Round progress loaded:', {
+            activeRounds: Array.from(activeRounds),
+            currentActiveRound,
+            ctaMessage
+        });
         
     } catch (error) {
         console.error('❌ Error loading round progress:', error);
