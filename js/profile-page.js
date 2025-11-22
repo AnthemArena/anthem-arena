@@ -944,13 +944,11 @@ window.openNotificationPanel = async function() {
 async function loadProfileStats(userId) {
     try {
         console.log('📊 Loading stats for user:', userId);
-         // ✅ FIX: Get current user ID with fallback
+        
         const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
         const isViewingOwnProfile = (userId === currentUserId);
         
         console.log('🔍 Is viewing own profile?', isViewingOwnProfile);
-        console.log('🔍 Current user ID:', currentUserId);
-        console.log('🔍 Profile user ID:', userId);
         
         // Get votes count
         const votesQuery = query(
@@ -960,29 +958,26 @@ async function loadProfileStats(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         const votesCount = votesSnapshot.size;
         
-
+        // ✅ FIXED: Just READ achievements count - NO checking/unlocking
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        const unlockedAchievements = profileDoc.exists() 
+            ? (profileDoc.data().unlockedAchievements || [])
+            : [];
+        const achievementsCount = unlockedAchievements.length;
         
-     // Get achievements count from profile document array
-const profileDoc = await getDoc(doc(db, 'profiles', userId));
-const achievementsCount = profileDoc.exists() 
-    ? (profileDoc.data().unlockedAchievements || []).length 
-    : 0;
-
-console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
+        console.log(`🏆 Found ${achievementsCount} unlocked achievements (display only)`);
         
-        // ✅ GET RANK - Different logic for own profile vs others
+        // ✅ GET RANK
         const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
         
         let currentXP;
         let rank;
         
         if (isViewingOwnProfile) {
-            // ✅ For your own profile: Use stored XP (faster, includes bonuses)
             currentXP = getUserXPFromStorage();
             rank = getUserRank(currentXP);
             console.log('✅ Using stored XP for own profile:', currentXP);
         } else {
-            // ✅ For other profiles: Calculate XP from their votes
             const allVotes = votesSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
@@ -991,7 +986,7 @@ console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
             const xpData = calculateUserXP(allVotes);
             currentXP = xpData.totalXP;
             rank = getUserRank(currentXP);
-            console.log('✅ Calculated XP for other user:', currentXP, xpData);
+            console.log('✅ Calculated XP for other user:', currentXP);
         }
         
         // Update stats display
@@ -1001,10 +996,8 @@ console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
         // ✅ UPDATE ACTIVITY LEVEL WITH RANK
         const activityLevelEl = document.getElementById('statActivityLevel');
         if (activityLevelEl) {
-            // Remove emoji from rank title
             const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
             
-            // Two-line display: Level number + Title
             activityLevelEl.innerHTML = `
                 <span style="font-size: 1.5rem; font-weight: 700; color: #c8aa6e; display: block;">Lv. ${rank.currentLevel.level}</span>
                 <span style="font-size: 1rem; font-weight: 600; color: rgba(240, 230, 210, 0.8); display: block; margin-top: 4px;">${cleanTitle}</span>
@@ -1012,13 +1005,10 @@ console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
         }
         
         console.log('✅ Stats loaded:', {
-            userId,
-            isOwnProfile: isViewingOwnProfile,
             votes: votesCount,
             achievements: achievementsCount,
             xp: currentXP,
-            level: rank.currentLevel.level,
-            title: rank.currentLevel.title
+            level: rank.currentLevel.level
         });
         
     } catch (error) {
