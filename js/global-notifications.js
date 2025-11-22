@@ -838,11 +838,20 @@ async function checkRecentVotes() {
 // HELPER: BUILD SOCIAL NOTIFICATION DATA
 // ========================================
 
+// ========================================
+// HELPER: BUILD SOCIAL NOTIFICATION DATA
+// ========================================
+
 function buildSocialNotification(activity, isAlly, currentUserId) {
     // Get thumbnail from song
     const thumbnailUrl = activity.songId 
         ? `https://img.youtube.com/vi/${activity.songId}/mqdefault.jpg`
         : null;
+    
+    // ✅ NEW: Get user's vote data to show THEIR song choice
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    const userVoteData = userVotes[activity.matchId];
+    const userSongTitle = userVoteData?.songTitle || 'your pick';
     
     let message, detail, cta, icon, ctaAction, ctaData;
     
@@ -851,18 +860,18 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         // ALLY - They voted for YOUR song!
         // ========================================
         const allyMessages = [
-            `Reinforcements! ${activity.username} just backed "${activity.songTitle}"!`,
-            `${activity.username} joined your side! Voted for "${activity.songTitle}"`,
-            `Your choice is gaining momentum! ${activity.username} voted "${activity.songTitle}"`,
-            `Alliance formed! ${activity.username} also picked "${activity.songTitle}"`,
-            `${activity.username} stands with you! Backed "${activity.songTitle}"`
+            `🤝 ${activity.username} also voted for "${activity.songTitle}"!`,
+            `Reinforcements! ${activity.username} backs "${activity.songTitle}" too`,
+            `Alliance formed! You both chose "${activity.songTitle}"`,
+            `${activity.username} agrees with you on "${activity.songTitle}"`,
+            `Team ${activity.songTitle} grows stronger!`
         ];
         
         const allyDetails = [
-            `${activity.matchTitle}`,
             `Standing with you in ${activity.matchTitle}`,
             `Fighting for the same side!`,
-            `Building momentum together`
+            `Building momentum together`,
+            `Your choice gains support`
         ];
         
         const allyButtons = [
@@ -892,25 +901,27 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         // ========================================
         // OPPONENT - They voted AGAINST your song!
         // ========================================
+        
+        // ✅ IMPROVED: Show both sides of the rivalry
         const opponentMessages = [
-            `${activity.username} just voted against you!`,
-            `${activity.username} challenged your pick with "${activity.songTitle}"`,
-            `Rival spotted! ${activity.username} backed "${activity.songTitle}"`,
-            `${activity.username} picked the other side in "${activity.songTitle}"`,
-            `Competition heats up! ${activity.username} opposes you`
+            `⚔️ ${activity.username} picked "${activity.songTitle}" vs your "${userSongTitle}"`,
+            `Rival spotted! ${activity.username} backs "${activity.songTitle}" against you`,
+            `Battle lines: You (${userSongTitle}) vs ${activity.username} (${activity.songTitle})`,
+            `${activity.username} opposes "${userSongTitle}" with "${activity.songTitle}"`,
+            `Challenge accepted: ${activity.username} chose "${activity.songTitle}"`
         ];
         
         const opponentDetails = [
-            `In ${activity.matchTitle}`,
             `The battle continues in ${activity.matchTitle}`,
-            `${activity.matchTitle} - rivalry grows`,
-            `Different sides in this showdown`
+            `Your rivalry grows stronger`,
+            `Different sides in this showdown`,
+            `May the best song win!`
         ];
         
         const opponentButtons = [
-            'View Match 👀',
-            'Check the Battle ⚡',
-            'See the Score 📊',
+            'View Battle 👀',
+            'Check Score ⚡',
+            'See Match 📊',
             'Go to Match 🎯'
         ];
         
@@ -931,6 +942,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         triggerUserId: activity.userId,
         triggerUsername: activity.username,
         song: activity.songTitle,
+        userSong: userSongTitle, // ✅ NEW: Include user's song for context
         thumbnailUrl: thumbnailUrl,
         message: message,
         detail: detail,
@@ -943,7 +955,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         relationship: isAlly ? 'ally' : 'opponent',
         shownAsToast: false,
         
-        // ✅ NEW: Add secondary action to view profile
+        // ✅ Secondary action to view profile
         secondaryCta: {
             text: `View ${activity.username}'s Profile`,
             action: 'navigate',
@@ -1702,19 +1714,63 @@ function showBulletin(notification) {
     }
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 else {
-    // ✅ Determine what to show: song thumbnail, user avatar, or icon
+    // ========================================
+    // BUILD THUMBNAIL/AVATAR IMAGE
+    // ========================================
     let thumbnailHtml = '';
     
-    if (notification.thumbnailUrl) {
-        // Song thumbnail
+    // ✅ SOCIAL ALERTS: Song + User (NO icon badge)
+    if (notification.type === 'live-activity' && notification.thumbnailUrl && (notification.username || notification.triggerUsername)) {
+        const username = notification.username || notification.triggerUsername;
+        const initial = username.charAt(0).toUpperCase();
+        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+        const colorIndex = username.charCodeAt(0) % colors.length;
+        const bgColor = colors[colorIndex];
+        
+        thumbnailHtml = `
+            <div class="bulletin-thumbnail" style="position: relative; width: 64px; height: 64px;">
+                <!-- Song thumbnail (background) -->
+                <img src="${notification.thumbnailUrl}" 
+                     alt="${notification.song || 'Match'}"
+                     class="thumbnail-img" 
+                     style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover; border: 2px solid rgba(200, 170, 110, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
+                
+                <!-- User avatar (overlapping bottom-right) -->
+                <div style="
+                    position: absolute;
+                    bottom: -6px;
+                    right: -6px;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    background: ${bgColor};
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: white;
+                    border: 3px solid #1a1a2e;
+                    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+                ">
+                    ${initial}
+                </div>
+            </div>
+        `;
+    }
+    // MATCH ALERTS: Song + Icon badge
+    else if (notification.thumbnailUrl) {
         thumbnailHtml = `
             <div class="bulletin-thumbnail">
-                <img src="${notification.thumbnailUrl}" alt="${notification.song || 'Match'}" class="thumbnail-img">
+                <img src="${notification.thumbnailUrl}" 
+                     alt="${notification.song || 'Match'}" 
+                     class="thumbnail-img">
                 <div class="thumbnail-overlay">${icon}</div>
             </div>
         `;
-    } else if (notification.username || notification.triggerUsername) {
-        // User avatar
+    }
+    // USER ONLY: Avatar + Icon badge
+    else if (notification.username || notification.triggerUsername) {
         const username = notification.username || notification.triggerUsername;
         const initial = username.charAt(0).toUpperCase();
         const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
@@ -1729,8 +1785,9 @@ else {
                 <div class="thumbnail-overlay">${icon}</div>
             </div>
         `;
-    } else {
-        // Generic music icon
+    }
+    // GENERIC: Just music icon
+    else {
         thumbnailHtml = `
             <div class="bulletin-thumbnail">
                 <div class="thumbnail-img" style="background: linear-gradient(135deg, #C8AA6E, #B89A5E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎵</div>
@@ -1755,7 +1812,8 @@ else {
     setTimeout(() => banner.classList.add('show'), 10);
 }
     
-    console.log(`📢 Bulletin shown: ${notification.type}`);
+console.log(`📢 Bulletin shown: ${notification.type}`);
+
 }
 // ========================================
 // BULLETIN ACTIONS
@@ -2230,6 +2288,58 @@ window.testBulletin = function(type = 'winning') {
             message: '🎉 Your pick "GODS" completed comeback!',
             detail: 'Was losing, now leading 55% to 45%!',
             cta: 'View Match!'
+        },
+
+         // ✅ UPDATED RIVAL TEST
+        'rival': {
+            priority: 7,
+            type: 'live-activity',
+            matchId: 'round-1-match-1',
+            matchTitle: 'GODS vs RISE',
+            username: 'TestRival',
+            triggerUserId: 'test-rival-123',
+            triggerUsername: 'TestRival',
+            song: 'RISE',
+            userSong: 'GODS', // ✅ NEW: Show what YOU voted for
+            thumbnailUrl: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
+            message: '⚔️ TestRival picked "RISE" vs your "GODS"',
+            detail: 'The battle continues in GODS vs RISE',
+            icon: '⚔️',
+            cta: 'View Battle 👀',
+            ctaAction: 'navigate',
+            targetUrl: '/vote.html?match=round-1-match-1',
+            relationship: 'opponent'
+        },
+        
+        // ✅ UPDATED ALLY TEST
+        'ally': {
+            priority: 7,
+            type: 'live-activity',
+            matchId: 'round-1-match-1',
+            matchTitle: 'GODS vs RISE',
+            username: 'TestAlly',
+            triggerUserId: 'test-ally-123',
+            triggerUsername: 'TestAlly',
+            song: 'GODS',
+            userSong: 'GODS', // ✅ NEW: Both voted for same song
+            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+            message: '🤝 TestAlly also voted for "GODS"!',
+            detail: 'Standing with you in GODS vs RISE',
+            icon: '🤝',
+            cta: 'Send Thanks! 🤝',
+            ctaAction: 'send-emote',
+            ctaData: {
+                targetUsername: 'TestAlly',
+                targetUserId: 'test-ally-123',
+                emoteType: 'thanks',
+                matchData: {
+                    matchId: 'round-1-match-1',
+                    matchTitle: 'GODS vs RISE',
+                    songTitle: 'GODS'
+                }
+            },
+            targetUrl: '/vote.html?match=round-1-match-1',
+            relationship: 'ally'
         },
         welcome: {
             priority: 5,
