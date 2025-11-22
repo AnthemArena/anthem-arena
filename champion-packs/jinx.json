@@ -1,0 +1,488 @@
+{
+  "id": "jinx",
+  "name": "Jinx",
+  "displayName": "Chaotic & Explosive 💥",
+  "emoji": "💥",
+  "description": "Wild, unpredictable, and always ready to blow something up! Get ready for mayhem!",
+  "buttonPrefix": "💣",
+  "color": "#ff69b4",
+ "theme": {
+    "background": "linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(138, 43, 226, 0.85)), url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg')",
+    "backgroundSize": "cover",
+    "backgroundPosition": "center 30%",
+    "borderColor": "rgba(255, 105, 180, 0.8)",
+    "borderGlow": "0 0 20px rgba(255, 105, 180, 0.5)",
+    "titleColor": "#ffffff",
+    "detailColor": "rgba(255, 255, 255, 0.95)",
+    "buttonBackground": "linear-gradient(135deg, #ff69b4, #ff1493)",
+    "buttonHover": "linear-gradient(135deg, #ff1493, #c71585)",
+    "buttonText": "#ffffff",
+    "textShadow": "0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 105, 180, 0.3)"
+},
+  "alerts": {
+    "danger": {
+      "messages": [
+        "💥 Uh oh! \"{songTitle}\" is getting WRECKED!",
+        "🎪 Yikes! \"{songTitle}\" is getting smashed to BITS!",
+        "💣 This is BAD! \"{songTitle}\" is EXPLODING (in a bad way)!",
+        "😈 Hehe... wait, NO! \"{songTitle}\" is in BIG trouble!",
+        "🎯 Oof! \"{songTitle}\" is taking HEAVY damage!",
+        "💥 KABOOM! Oh wait, that's just \"{songTitle}\" getting destroyed!",
+        "🎪 Code red! \"{songTitle}\" needs backup RIGHT NOW!",
+        "😱 YIKES! \"{songTitle}\" is getting absolutely PUMMELED!"
+      ],
+      "details": [
+        "Down {voteDiff} votes! Time to blow stuff up and turn this around!",
+        "Behind {userPct}% to {opponentPct}% - this is NOT the fun kind of chaos!",
+        "Losing by {voteDiff}! Light the fuse and rally the troops!",
+        "They're crushing us {opponentPct}% to {userPct}% - UNACCEPTABLE!",
+        "Down {voteDiff} votes - time for EMERGENCY MAYHEM!",
+        "Behind by {voteDiff} - we need MORE EXPLOSIONS!",
+        "Trailing {userPct}% to {opponentPct}% - things are looking GRIM!",
+        "Getting hammered by {voteDiff} votes - time to fight back!"
+      ],
+      "buttons": [
+        "Light the Fuse! 💣",
+        "Blow It Up! 💥",
+        "Get Jinxed! 🎪",
+        "Time for Mayhem!",
+        "Cause Chaos! 💥",
+        "Rally Time! 🔥",
+        "Fight Back! ⚡"
+      ]
+    },
+    
+    "nailbiter": {
+      "messages": [
+        "🔥 WHOA! \"{songTitle}\" is TOO CLOSE for comfort!",
+        "😱 \"{songTitle}\" is a TOTAL coinflip!",
+        "🎪 This is INSANE! \"{songTitle}\" could go EITHER way!",
+        "💥 \"{songTitle}\" is on a KNIFE'S EDGE!",
+        "🎯 ONE VOTE could decide \"{songTitle}\"! ONE!",
+        "😬 \"{songTitle}\" is making my trigger finger TWITCHY!",
+        "🔥 SO CLOSE! \"{songTitle}\" is ANYBODY'S game!",
+        "💣 THIS IS CRAZY! \"{songTitle}\" is SUPER tight!"
+      ],
+      "details": [
+        "Just {voteDiff} vote{voteDiffPlural} apart - MY HEART CAN'T TAKE IT!",
+        "{userPct}% to {opponentPct}% - I'M GONNA EXPLODE from the tension!",
+        "Separated by only {voteDiff}! SO INTENSE!",
+        "This is CRAZY close - like, REALLY crazy!",
+        "Only {voteDiff} vote{voteDiffPlural} between victory and BOOM!",
+        "Down to {voteDiff} vote{voteDiffPlural} - can you FEEL the chaos?!",
+        "It's {userPct}% to {opponentPct}% - EDGE OF YOUR SEAT time!",
+        "Just {voteDiff} apart - this is PEAK excitement!"
+      ],
+      "buttons": [
+        "Watch the Chaos! 🎪",
+        "See the Action! 💥",
+        "Check It Out! 👀",
+        "View the Mayhem!",
+        "See the Battle! ⚔️",
+        "Watch NOW! 🔥"
+      ]
+    },
+    
+    "winning": {
+      "messages": [
+        "💥 BOOM! \"{songTitle}\" is CRUSHING IT!",
+        "🎪 Haha! \"{songTitle}\" is DOMINATING!",
+        "😈 \"{songTitle}\" is blowing them AWAY!",
+        "💣 Ka-POW! \"{songTitle}\" is UNSTOPPABLE!",
+        "🔥 \"{songTitle}\" is on FIRE! (the good kind!)",
+        "🎉 YESSS! \"{songTitle}\" is DESTROYING the competition!",
+        "💥 Boom, baby! \"{songTitle}\" is WINNING BIG!",
+        "🎪 THIS is what I'm talking about! \"{songTitle}\" RULES!"
+      ],
+      "details": [
+        "Leading {userPct}% to {opponentPct}% - EXPLOSIONS OF JOY!",
+        "Up by {voteDiff} votes - time to CELEBRATE with MAYHEM!",
+        "Crushing it {userPct}% to {opponentPct}% - TOTAL domination!",
+        "Ahead by {voteDiff} - they don't stand a CHANCE!",
+        "Winning {userPct}% to {opponentPct}% - this is BEAUTIFUL chaos!",
+        "Up {voteDiff} votes - the carnage is GLORIOUS!",
+        "Leading by {voteDiff} - BOOM BOOM BOOM!",
+        "Dominating {userPct}% to {opponentPct}% - perfection!"
+      ],
+      "buttons": [
+        "Celebrate! 🎉",
+        "Watch 'Em Burn! 🔥",
+        "See the Carnage! 💥",
+        "View Victory! 🏆",
+        "Enjoy the Show! 🎪",
+        "Bask in Glory! ✨"
+      ]
+    },
+    
+    "comeback": {
+      "messages": [
+        "🎉 YESSS! \"{songTitle}\" pulled off a COMEBACK!",
+        "💥 BOOM! \"{songTitle}\" just FLIPPED the script!",
+        "🎪 WOW! \"{songTitle}\" came back from the DEAD!",
+        "😈 HA! \"{songTitle}\" turned it around! I LOVE IT!",
+        "🔥 THAT'S what I'm talking about! \"{songTitle}\" is BACK!",
+        "💣 PLOT TWIST! \"{songTitle}\" just pulled a SNEAKY!",
+        "🎉 FROM ZERO TO HERO! \"{songTitle}\" made a COMEBACK!",
+        "💥 NEVER counted out! \"{songTitle}\" just WON IT BACK!"
+      ],
+      "details": [
+        "Was losing, now winning {userPct}% to {opponentPct}% - CHAOS WORKS!",
+        "Total turnaround! Now at {userPct}% - BOOM!",
+        "From behind to AHEAD - this is the BEST kind of mayhem!",
+        "Plot twist achieved! Leading now!",
+        "They thought it was over - SURPRISE!",
+        "Flipped from losing to WINNING! Classic!",
+        "Was down, now UP {userPct}% to {opponentPct}%!",
+        "Comeback complete - never give up!"
+      ],
+      "buttons": [
+        "Celebrate! 🎉",
+        "Light Fireworks! 💥",
+        "Party Time! 🎪",
+        "View the Win! 🏆",
+        "See the Flip! 🔄",
+        "Enjoy Victory! ✨"
+      ]
+    },
+    
+    "ally": {
+      "messages": [
+        "🤝 YO! {username} also picked \"{songTitle}\"!",
+        "💥 BOOM! {username} is on YOUR team - \"{songTitle}\"!",
+        "🎪 {username} agrees! \"{songTitle}\" all the way!",
+        "😈 Hehe, {username} backs \"{songTitle}\" too!",
+        "🔥 {username} joined the party for \"{songTitle}\"!",
+        "💣 NICE! {username} also chose \"{songTitle}\"!",
+        "🎉 Squad up! {username} voted \"{songTitle}\" like you!",
+        "✨ {username} has GOOD taste - picked \"{songTitle}\"!"
+      ],
+      "details": [
+        "You're not alone in this chaos!",
+        "Team \"{songTitle}\" grows stronger!",
+        "Building an army of good taste!",
+        "More mayhem together!",
+        "Your alliance strengthens!",
+        "Partners in musical crime!",
+        "The squad is assembling!",
+        "Great minds think explosively!"
+      ],
+      "buttons": [
+        "High Five! 🙌",
+        "Send Thanks! 💥",
+        "Fist Bump! 👊",
+        "Celebrate! 🎉",
+        "Give Props! ✨",
+        "Show Love! 💝"
+      ]
+    },
+    
+    "rival": {
+      "messages": [
+        "⚔️ Uh oh! {username} picked \"{theirSong}\" against your \"{yourSong}\"!",
+        "😈 {username} challenged you with \"{theirSong}\"!",
+        "💥 RIVAL ALERT! {username} chose \"{theirSong}\" over \"{yourSong}\"!",
+        "🎪 {username} picked the OTHER side - \"{theirSong}\"!",
+        "⚡ Battle time! {username} vs you: \"{theirSong}\" vs \"{yourSong}\"!",
+        "😠 OH NO THEY DIDN'T! {username} voted \"{theirSong}\" against you!",
+        "💣 {username} just declared WAR with \"{theirSong}\"!",
+        "🔥 Enemy spotted! {username} backed \"{theirSong}\" instead!"
+      ],
+      "details": [
+        "Time to show 'em who's boss!",
+        "The battle is ON!",
+        "Let's blow them away!",
+        "Rivalry detected - prepare for chaos!",
+        "It's war now!",
+        "The clash begins!",
+        "Different sides, same battlefield!",
+        "May the best song win!"
+      ],
+      "buttons": [
+        "View Battle! ⚔️",
+        "Check the War! 💥",
+        "See the Fight! 🔥",
+        "Go to Match! 🎯",
+        "Face Enemy! 😈",
+        "Enter Arena! 🎪"
+      ]
+    },
+    
+    "streak-ally-3": {
+      "messages": [
+        "🔥 3-MATCH STREAK with {username}!",
+        "💥 You and {username} agreed 3 TIMES in a row!",
+        "🎪 {username} is your PARTNER IN CRIME - 3 matches!"
+      ],
+      "details": [
+        "You're vibing together!",
+        "Team spirit is STRONG!",
+        "Partners in chaos!",
+        "The duo is forming!"
+      ],
+      "buttons": [
+        "View Profile! 👀",
+        "Send Props! 👊",
+        "High Five! 🙌"
+      ]
+    },
+    
+    "streak-ally-5": {
+      "messages": [
+        "🔥🔥 5-MATCH STREAK with {username}!",
+        "💥💥 FIVE TIMES you agreed with {username}!",
+        "🎉 {username} is your TWIN - 5 matches in a row!"
+      ],
+      "details": [
+        "You two are UNSTOPPABLE together!",
+        "Music taste twins!",
+        "Epic alliance achieved!",
+        "This partnership is PERFECT!"
+      ],
+      "buttons": [
+        "Celebrate! 🎉",
+        "View Profile! 👀",
+        "Send Love! 💝"
+      ]
+    },
+    
+    "streak-ally-10": {
+      "messages": [
+        "🔥🔥🔥 EPIC 10-MATCH STREAK with {username}!",
+        "💥💥💥 TEN MATCHES! You and {username} are LEGENDS!",
+        "🎪🎪🎪 {username} is your MUSIC SOULMATE - 10 straight!"
+      ],
+      "details": [
+        "This is LEGENDARY status!",
+        "You two are PERFECTLY in sync!",
+        "The ultimate music partnership!",
+        "Ten matches of pure agreement!"
+      ],
+      "buttons": [
+        "Celebrate BIG! 🎉",
+        "View Legend! 👀",
+        "Party Time! 🎪"
+      ]
+    },
+    
+    "streak-ally-20": {
+      "messages": [
+        "👑 LEGENDARY {streakCount}-MATCH STREAK with {username}!",
+        "💎 {streakCount} MATCHES! You and {username} are IMMORTAL!",
+        "🏆 {username} is your ETERNAL ALLY - {streakCount} straight!"
+      ],
+      "details": [
+        "This alliance is UNBREAKABLE!",
+        "You're writing HISTORY together!",
+        "The stuff of LEGENDS!",
+        "Nobody's EVER done this!"
+      ],
+      "buttons": [
+        "BOW DOWN! 👑",
+        "View Royalty! 💎",
+        "Celebrate! 🎉"
+      ]
+    },
+    
+    "streak-rival-3": {
+      "messages": [
+        "⚔️ 3-MATCH RIVALRY with {username}!",
+        "😈 You and {username} clashed 3 TIMES!",
+        "💥 {username} is your NEMESIS - 3 matches of WAR!"
+      ],
+      "details": [
+        "The battle continues!",
+        "Rivalry is heating up!",
+        "Clash of tastes!",
+        "Three rounds of combat!"
+      ],
+      "buttons": [
+        "View Enemy! 👀",
+        "Check Battle! ⚔️",
+        "See Rival! 😈"
+      ]
+    },
+    
+    "streak-rival-5": {
+      "messages": [
+        "⚔️⚔️ 5-MATCH RIVALRY with {username}!",
+        "🔥🔥 Five times you OPPOSED {username}!",
+        "😈😈 {username} is your ARCH-ENEMY - 5 battles!"
+      ],
+      "details": [
+        "This rivalry is INTENSE!",
+        "The war escalates!",
+        "Five rounds of opposition!",
+        "You two are ENEMIES!"
+      ],
+      "buttons": [
+        "Face Foe! ⚔️",
+        "View Rival! 👀",
+        "Battle On! 🔥"
+      ]
+    },
+    
+    "streak-rival-10": {
+      "messages": [
+        "⚔️⚔️⚔️ EPIC 10-MATCH RIVALRY with {username}!",
+        "💀💀💀 TEN BATTLES with {username}!",
+        "🔥🔥🔥 {username} is your ULTIMATE NEMESIS - 10 wars!"
+      ],
+      "details": [
+        "This is a LEGENDARY rivalry!",
+        "The ultimate clash of taste!",
+        "Ten matches of pure opposition!",
+        "The feud is EPIC!"
+      ],
+      "buttons": [
+        "View Nemesis! 💀",
+        "See War! ⚔️",
+        "Battle! 🔥"
+      ]
+    },
+    
+    "streak-rival-20": {
+      "messages": [
+        "👹 LEGENDARY {streakCount}-MATCH RIVALRY with {username}!",
+        "💀 {streakCount} WARS! You and {username} are ETERNAL ENEMIES!",
+        "⚔️ {username} is your ARCH-NEMESIS - {streakCount} battles!"
+      ],
+      "details": [
+        "This feud is LEGENDARY!",
+        "The ultimate rivalry!",
+        "History's greatest clash!",
+        "You're DESTINED to oppose each other!"
+      ],
+      "buttons": [
+        "Face Arch-Foe! 👹",
+        "View Enemy! 💀",
+        "Continue War! ⚔️"
+      ]
+    },
+    
+    "novotes": {
+      "messages": [
+        "🆘 EMERGENCY! This match has ZERO votes!",
+        "😱 NOBODY voted yet! This is a CRISIS!",
+        "💣 Uh oh! This match is COMPLETELY empty!",
+        "🎪 YIKES! Zero votes! Someone needs to start this party!"
+      ],
+      "details": [
+        "\"{song1}\" vs \"{song2}\" • Closes in {hoursLeft}h - BE THE FIRST!",
+        "Empty match closing in {hoursLeft}h - light the fuse!",
+        "No votes yet and only {hoursLeft}h left!",
+        "\"{song1}\" vs \"{song2}\" needs YOU!"
+      ],
+      "buttons": [
+        "Cast First Vote! 💥",
+        "Start the Chaos! 🎪",
+        "Light the Fuse! 💣",
+        "Begin! ⚡"
+      ]
+    },
+    
+    "lowvotes": {
+      "messages": [
+        "⚠️ This match needs MORE votes!",
+        "😬 Only {totalVotes} vote{votesPlural}?! That's not enough chaos!",
+        "💥 This match is DYING - it needs help!",
+        "🎪 Too quiet! This match needs MORE ACTION!"
+      ],
+      "details": [
+        "Only {totalVotes} vote{votesPlural} • Closes in {hoursLeft}h",
+        "\"{song1}\" vs \"{song2}\" • {totalVotes} vote{votesPlural}, {hoursLeft}h left",
+        "Barely any votes and closing in {hoursLeft}h!",
+        "This needs MORE participation!"
+      ],
+      "buttons": [
+        "Help Out! 💥",
+        "Vote Now! 🎯",
+        "Join In! 🎪",
+        "Add Chaos! 💣"
+      ]
+    },
+    
+    "welcome": {
+      "messages": [
+        "🎪 Welcome to the CHAOS!",
+        "💥 Hey! Ready for some MAYHEM?!",
+        "😈 Hehe, you're gonna LOVE this!",
+        "🔥 Time to make things INTERESTING!"
+      ],
+      "details": [
+        "{liveCount} matches live - let's blow stuff up!",
+        "{liveCount} battles waiting - pick your favorites!",
+        "Ready to cause some musical mayhem?",
+        "Time to vote and watch the explosions!"
+      ],
+      "buttons": [
+        "Start Voting! 💥",
+        "Let's Go! 🎪",
+        "Cause Chaos! 💣",
+        "Get Jinxed! 😈"
+      ]
+    },
+    
+    "encouragement": {
+      "messages": [
+        "👀 Still deciding? Pick something already!",
+        "🎪 Come on! The party's waiting!",
+        "💥 Don't just WATCH - VOTE!",
+        "😈 Hehe, scared to pick? Just DO IT!"
+      ],
+      "details": [
+        "Matches closing soon - make your voice heard!",
+        "Don't miss out on the chaos!",
+        "Your votes matter - join the mayhem!",
+        "Pick your favorites before it's too late!"
+      ],
+      "buttons": [
+        "Browse Matches! 🎯",
+        "Start Voting! 💥",
+        "Join In! 🎪",
+        "Let's Go! 🔥"
+      ]
+    }
+  },
+  
+  "uniqueAlerts": {
+    "getJinxedVoted": {
+      "triggerCondition": "songTitle === 'Get Jinxed'",
+      "priority": 3,
+      "type": "unique-jinx-song",
+      "message": "🎪 YESSS! Someone voted for MY SONG!",
+      "detail": "\"Get Jinxed\" is in the fight - time to BLOW IT UP!",
+      "cta": "Join the Party! 💥",
+      "cooldown": 60
+    },
+    
+    "explosiveTurnout": {
+      "triggerCondition": "totalVotes >= 100",
+      "priority": 5,
+      "type": "unique-jinx-votes",
+      "message": "💣 WHOA! This match is EXPLODING!",
+      "detail": "Over 100 votes - this is PEAK CHAOS!",
+      "cta": "Watch the Mayhem! 🎪",
+      "cooldown": 120
+    },
+    
+    "perfectChaos": {
+      "triggerCondition": "Math.abs(song1Pct - 50) < 2 && totalVotes >= 50",
+      "priority": 4,
+      "type": "unique-jinx-chaos",
+      "message": "🎪 PERFECT CHAOS! It's 50/50!",
+      "detail": "\"{song1}\" vs \"{song2}\" - EXACTLY split!",
+      "cta": "Tip the Balance! 💥",
+      "cooldown": 90
+    },
+    
+    "randomMayhem": {
+      "triggerCondition": "Math.random() < 0.05",
+      "priority": 8,
+      "type": "unique-jinx-random",
+      "message": "💥 Random CHAOS alert!",
+      "detail": "Just felt like popping in! Keep voting!",
+      "cta": "Thanks, Jinx! 🎪",
+      "cooldown": 240
+    }
+  }
+}

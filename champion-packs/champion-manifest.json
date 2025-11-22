@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-01",
+  "packs": [
+    {
+      "id": "default",
+      "name": "Standard",
+      "displayName": "Standard Notifications 📢",
+      "emoji": "📢",
+      "description": "Professional, straightforward notifications",
+      "enabled": true
+    },
+    {
+      "id": "jinx",
+      "name": "Jinx",
+      "displayName": "Chaotic & Explosive 💥",
+      "emoji": "💥",
+      "description": "Wild, unpredictable, and always ready to blow something up!",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "id": "default",
+  "name": "Standard",
+  "displayName": "Standard Notifications",
+  "emoji": "📢",
+  "description": "Professional, straightforward tournament notifications",
+  "color": "#C8AA6E",
+  "theme": "standard",
+  
+  "alerts": {
+    "danger": {
+      "messages": [
+        "🚨 Your pick \"{songTitle}\" is in danger!",
+        "⚠️ \"{songTitle}\" is falling behind!",
+        "🆘 \"{songTitle}\" needs support!"
+      ],
+      "details": [
+        "Behind by {voteDiff} votes ({userPct}% vs {opponentPct}%)",
+        "Currently losing {userPct}% to {opponentPct}%",
+        "Down {voteDiff} votes"
+      ],
+      "buttons": [
+        "View Match Now!",
+        "Check Status",
+        "See Match"
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        "🔥 \"{songTitle}\" is too close!",
+        "😰 \"{songTitle}\" is neck and neck!",
+        "🎯 \"{songTitle}\" is a tight race!"
+      ],
+      "details": [
+        "Separated by just {voteDiff} vote{voteDiffPlural}!",
+        "Only {voteDiff} vote{voteDiffPlural} apart",
+        "{userPct}% to {opponentPct}% - very close!"
+      ],
+      "buttons": [
+        "View Match!",
+        "Check Score",
+        "See Battle"
+      ]
+    },
+    "winning": {
+      "messages": [
+        "🎯 Your pick \"{songTitle}\" is dominating!",
+        "✨ \"{songTitle}\" is leading!",
+        "🏆 \"{songTitle}\" is winning big!"
+      ],
+      "details": [
+        "Leading {userPct}% to {opponentPct}%",
+        "Ahead by {voteDiff} votes",
+        "Dominating with {userPct}%"
+      ],
+      "buttons": [
+        "View Match!",
+        "See Victory",
+        "Check Status"
+      ]
+    },
+    "comeback": {
+      "messages": [
+        "🎉 \"{songTitle}\" completed comeback!",
+        "✨ \"{songTitle}\" turned it around!",
+        "🏆 \"{songTitle}\" recovered!"
+      ],
+      "details": [
+        "Was losing, now winning {userPct}% to {opponentPct}%!",
+        "From behind to ahead!",
+        "Now leading {userPct}% to {opponentPct}%"
+      ],
+      "buttons": [
+        "View Match!",
+        "See Comeback",
+        "Check Score"
+      ]
+    },
+    "ally": {
+      "messages": [
+        "🤝 {username} also voted for \"{songTitle}\"!",
+        "✨ {username} agrees with you!",
+        "👥 {username} backs your choice!"
+      ],
+      "details": [
+        "Standing with you",
+        "Your alliance grows",
+        "Great minds think alike"
+      ],
+      "buttons": [
+        "Send Thanks!",
+        "View Profile",
+        "Show Support"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "⚔️ {username} picked \"{theirSong}\" vs your \"{yourSong}\"",
+        "🎯 {username} opposes you!",
+        "⚡ {username} voted differently!"
+      ],
+      "details": [
+        "The battle continues",
+        "Different sides",
+        "May the best song win"
+      ],
+      "buttons": [
+        "View Match",
+        "Check Battle",
+        "See Score"
+      ]
+    },
+    "streak-ally-3": {
+      "messages": ["🔥 3-match streak with {username}!"],
+      "details": ["You've agreed 3 times in a row"],
+      "buttons": ["View Profile"]
+    },
+    "streak-ally-5": {
+      "messages": ["🔥🔥 5-match alliance with {username}!"],
+      "details": ["Your taste aligns perfectly!"],
+      "buttons": ["View Profile"]
+    },
+    "streak-ally-10": {
+      "messages": ["🔥🔥🔥 Epic 10-match streak with {username}!"],
+      "details": ["You're music soulmates!"],
+      "buttons": ["View Profile"]
+    },
+    "streak-ally-20": {
+      "messages": ["👑 Legendary {streakCount}-match streak with {username}!"],
+      "details": ["This alliance is unbreakable!"],
+      "buttons": ["View Profile"]
+    },
+    "streak-rival-3": {
+      "messages": ["⚔️ 3-match rivalry with {username}!"],
+      "details": ["You've opposed each other 3 times"],
+      "buttons": ["View Profile"]
+    },
+    "streak-rival-5": {
+      "messages": ["⚔️⚔️ 5-match rivalry with {username}!"],
+      "details": ["The rivalry heats up!"],
+      "buttons": ["View Profile"]
+    },
+    "streak-rival-10": {
+      "messages": ["⚔️⚔️⚔️ Epic 10-match rivalry with {username}!"],
+      "details": ["A legendary battle of taste!"],
+      "buttons": ["View Profile"]
+    },
+    "streak-rival-20": {
+      "messages": ["👹 Legendary {streakCount}-match rivalry with {username}!"],
+      "details": ["The ultimate clash!"],
+      "buttons": ["View Profile"]
+    },
+    "novotes": {
+      "messages": ["🆘 This match has zero votes!"],
+      "details": ["\"{song1}\" vs \"{song2}\" • Closes in {hoursLeft}h"],
+      "buttons": ["Cast First Vote!"]
+    },
+    "lowvotes": {
+      "messages": ["⚠️ This match needs more votes!"],
+      "details": ["Only {totalVotes} vote{votesPlural} • {hoursLeft}h left"],
+      "buttons": ["Vote Now!"]
+    },
+    "welcome": {
+      "messages": ["🎵 Welcome to the League Music Tournament!"],
+      "details": ["{liveCount} matches live - cast your first vote!"],
+      "buttons": ["Start Voting"]
+    },
+    "encouragement": {
+      "messages": ["👀 Still deciding?"],
+      "details": ["Pick your favorites and see the results!"],
+      "buttons": ["Browse Matches"]
+    }
+  }
+}

@@ -1,5 +1,8 @@
 console.log('🔔 global-notifications.js loaded');
 
+// ✅ ADD THIS LINE:
+import './champion-loader.js';
+
 import { getActivityFeed } from './api-client.js';
 import { sendEmoteReaction, checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -418,29 +421,42 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
     // ✅ Use escalating cooldown: first time = 5min, subsequent = 15min
     const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
     
+    // ✅ Get message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('danger', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        voteDiff: voteDiff,
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
     notifications.push({
         priority: 1,
         type: notificationType,
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),  // ✅ FIXED: Pass song object
+        thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
         opponentPct,
         voteDiff,
-        message: alertCount === 0 
-            ? `🚨 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is in danger!`
-            : `🚨 Still losing: "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}"`,
-        detail: `Behind by ${voteDiff} votes (${userPct}% vs ${opponentPct}%)`,
-        cta: 'View Match Now!'
+        message: championMessage.message,     // ✅ FROM PACK
+        detail: championMessage.detail,       // ✅ FROM PACK
+        cta: championMessage.cta              // ✅ FROM PACK
     });
     
     // ✅ Increment alert count for this match
     localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
 }
             // COMEBACK: Was losing, now winning
-         // COMEBACK: Was losing, now winning
+      // COMEBACK: Was losing, now winning
 else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
+    // ✅ Get message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('comeback', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
     notifications.push({
         priority: 2,
         type: 'comeback',
@@ -450,13 +466,22 @@ else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COME
         thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
         opponentPct,
-        message: `🎉 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" completed comeback!`,
-        detail: `Was losing, now leading ${userPct}% to ${opponentPct}%!`,
-        cta: 'View Match!'
+        message: championMessage.message,     // ✅ FROM PACK
+        detail: championMessage.detail,       // ✅ FROM PACK
+        cta: championMessage.cta              // ✅ FROM PACK
     });
 }
-            // NAILBITER: Very close match
+      // NAILBITER: Very close match
 else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
+    // ✅ Get message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('nailbiter', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        voteDiff: voteDiff,
+        voteDiffPlural: voteDiff === 1 ? '' : 's',
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
     notifications.push({
         priority: 3,
         type: 'nailbiter',
@@ -467,14 +492,22 @@ else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
         voteDiff,
         userPct,
         opponentPct,
-        message: `🔥 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is TOO CLOSE!`,
-        detail: `Separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}!`,
-        cta: 'View Match!'
+        message: championMessage.message,     // ✅ FROM PACK
+        detail: championMessage.detail,       // ✅ FROM PACK
+        cta: championMessage.cta              // ✅ FROM PACK
     });
 }
             // WINNING: User's pick is dominating
-           // WINNING: User's pick is dominating
+    // WINNING: User's pick is dominating
 else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
+    // ✅ Get message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('winning', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        userPct: userPct,
+        opponentPct: opponentPct,
+        voteDiff: voteDiff
+    });
+    
     notifications.push({
         priority: 4,
         type: 'winning',
@@ -484,9 +517,9 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
         thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
         opponentPct,
-        message: `🎯 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is dominating!`,
-        detail: `Leading ${userPct}% to ${opponentPct}%`,
-        cta: 'View Match!'
+        message: championMessage.message,     // ✅ FROM PACK
+        detail: championMessage.detail,       // ✅ FROM PACK
+        cta: championMessage.cta              // ✅ FROM PACK
     });
 }
         }
@@ -888,83 +921,82 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     
     let message, detail, cta, icon, ctaAction, ctaData;
     
-    if (isAlly) {
-        // ========================================
-        // ALLY - They voted for YOUR song!
-        // ========================================
-        const allyMessages = [
-            `🤝 ${activity.username} also voted for "${activity.songTitle}"!`,
-            `Reinforcements! ${activity.username} backs "${activity.songTitle}" too`,
-            `Alliance formed! You both chose "${activity.songTitle}"`,
-            `${activity.username} agrees with you on "${activity.songTitle}"`,
-            `Team ${activity.songTitle} grows stronger!`
-        ];
-        
-        const allyDetails = [
-            `Standing with you in ${activity.matchTitle}`,
-            `Fighting for the same side!`,
-            `Building momentum together`,
-            `Your choice gains support`
-        ];
-        
-        const allyButtons = [
-            'Send Thanks! 🤝',
-            'Give Props 👊',
-            'Show Support ✨',
-            'High Five! 🙌'
-        ];
-        
-        message = allyMessages[Math.floor(Math.random() * allyMessages.length)];
-        detail = allyDetails[Math.floor(Math.random() * allyDetails.length)];
-        cta = allyButtons[Math.floor(Math.random() * allyButtons.length)];
-        icon = '🤝';
-        ctaAction = 'send-emote';
-        ctaData = {
-            targetUsername: activity.username,
-            targetUserId: activity.userId,
-            emoteType: 'thanks',
-            matchData: {
-                matchId: activity.matchId,
-                matchTitle: activity.matchTitle,
-                songTitle: activity.songTitle
-            }
-        };
-        
-    } else {
-        // ========================================
-        // OPPONENT - They voted AGAINST your song!
-        // ========================================
-        
-        // ✅ IMPROVED: Show both sides of the rivalry
-        const opponentMessages = [
-            `⚔️ ${activity.username} picked "${activity.songTitle}" vs your "${userSongTitle}"`,
-            `Rival spotted! ${activity.username} backs "${activity.songTitle}" against you`,
-            `Battle lines: You (${userSongTitle}) vs ${activity.username} (${activity.songTitle})`,
-            `${activity.username} opposes "${userSongTitle}" with "${activity.songTitle}"`,
-            `Challenge accepted: ${activity.username} chose "${activity.songTitle}"`
-        ];
-        
-        const opponentDetails = [
-            `The battle continues in ${activity.matchTitle}`,
-            `Your rivalry grows stronger`,
-            `Different sides in this showdown`,
-            `May the best song win!`
-        ];
-        
-        const opponentButtons = [
-            'View Battle 👀',
-            'Check Score ⚡',
-            'See Match 📊',
-            'Go to Match 🎯'
-        ];
-        
-        message = opponentMessages[Math.floor(Math.random() * opponentMessages.length)];
-        detail = opponentDetails[Math.floor(Math.random() * opponentDetails.length)];
-        cta = opponentButtons[Math.floor(Math.random() * opponentButtons.length)];
-        icon = '⚔️';
-        ctaAction = 'navigate';
-        ctaData = {};
+   if (isAlly) {
+    // ========================================
+    // ALLY - They voted for YOUR song!
+    // ========================================
+    
+    // ✅ Get ally message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('ally', {
+        username: activity.username,
+        songTitle: activity.songTitle
+    });
+    
+    message = championMessage.message;
+    detail = championMessage.detail;
+    cta = championMessage.cta;
+    icon = '🤝';
+    ctaAction = 'send-emote';
+    ctaData = {
+        targetUsername: activity.username,
+        targetUserId: activity.userId,
+        emoteType: 'thanks',
+        matchData: {
+            matchId: activity.matchId,
+            matchTitle: activity.matchTitle,
+            songTitle: activity.songTitle
+        }
+    };
+    
+} else {
+    // ========================================
+    // OPPONENT - They voted AGAINST your song!
+    // ========================================
+    
+    // ✅ Get rival message from champion pack
+    const championMessage = window.championLoader.getChampionMessage('rival', {
+        username: activity.username,
+        theirSong: activity.songTitle,
+        yourSong: userSongTitle
+    });
+    
+    message = championMessage.message;
+    detail = championMessage.detail;
+    cta = championMessage.cta;
+    icon = '⚔️';
+    ctaAction = 'navigate';
+    ctaData = {};
+}
+
+return {
+    priority: 7,
+    type: 'live-activity',
+    matchId: activity.matchId,
+    matchTitle: activity.matchTitle,
+    username: activity.username,
+    triggerUserId: activity.userId,
+    triggerUsername: activity.username,
+    song: activity.songTitle,
+    userSong: userSongTitle,
+    thumbnailUrl: thumbnailUrl,
+    message: message,
+    detail: detail,
+    icon: icon,
+    cta: cta,
+    ctaText: cta,
+    ctaAction: ctaAction,
+    ctaData: ctaData,
+    targetUrl: `/vote.html?match=${activity.matchId}`,
+    relationship: isAlly ? 'ally' : 'opponent',
+    shownAsToast: false,
+    
+    // ✅ Secondary action to view profile
+    secondaryCta: {
+        text: `View ${activity.username}'s Profile`,
+        action: 'navigate',
+        url: `/profile?user=${activity.username}`
     }
+};
     
     return {
         priority: 7,
@@ -1396,10 +1428,27 @@ function showBulletin(notification) {
             style.id = 'bulletin-styles';
             style.textContent = `
 /* ========================================
+   CSS VARIABLES FOR CHAMPION THEMES
+======================================== */
+
+:root {
+    --bulletin-bg: rgba(0, 0, 0, 0.95);
+    --bulletin-bg-size: auto;
+    --bulletin-bg-position: center;
+    --bulletin-border: rgba(200, 170, 110, 0.3);
+    --bulletin-glow: 0 0 20px rgba(200, 170, 110, 0.15);
+    --bulletin-title: #C8AA6E;
+    --bulletin-detail: rgba(255, 255, 255, 0.7);
+    --bulletin-btn-bg: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    --bulletin-btn-hover: linear-gradient(135deg, #D4B876, #C8AA6E);
+    --bulletin-btn-text: #0a0a0a;
+    --bulletin-text-shadow: none;
+}
+
+/* ========================================
    TOAST-STYLE BULLETIN - BOTTOM RIGHT
    Matches Nav Theme + TikTok/Instagram Style
 ======================================== */
-
 .bulletin-banner {
     position: fixed;
     bottom: 24px;
@@ -1408,14 +1457,15 @@ function showBulletin(notification) {
     width: 380px;
     max-width: calc(100vw - 48px);
     
-    /* Match nav styling */
-    background: rgba(0, 0, 0, 0.95);
+    /* Use CSS variables for theming */
+    background: var(--bulletin-bg);
+    background-size: var(--bulletin-bg-size);
+    background-position: var(--bulletin-bg-position);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(200, 170, 110, 0.3);
+    border: 1px solid var(--bulletin-border);
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 
-                0 0 20px rgba(200, 170, 110, 0.15);
-    
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--bulletin-glow);
+
     /* Slide in from bottom-right */
     transform: translateX(120%) translateY(20px);
     opacity: 0;
@@ -1499,15 +1549,16 @@ function showBulletin(notification) {
     font-family: 'Cinzel', serif;
     font-size: 0.95rem;
     font-weight: 700;
-    color: #C8AA6E;
+    color: var(--bulletin-title);
     margin-bottom: 0.35rem;
     letter-spacing: 0.03em;
     line-height: 1.3;
+    text-shadow: var(--bulletin-text-shadow);
 }
 
 .bulletin-detail {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--bulletin-detail);
     font-weight: 400;
     line-height: 1.4;
 }
@@ -1546,8 +1597,8 @@ function showBulletin(notification) {
 
 .bulletin-toast-cta {
     width: 100%;
-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
-    color: #0a0a0a;
+    background: var(--bulletin-btn-bg);
+    color: var(--bulletin-btn-text);
     border: none;
     border-top: 1px solid rgba(200, 170, 110, 0.2);
     padding: 0.875rem;
@@ -1563,7 +1614,7 @@ function showBulletin(notification) {
 }
 
 .bulletin-toast-cta:hover {
-    background: linear-gradient(135deg, #D4B876, #C8AA6E);
+    background: var(--bulletin-btn-hover);
     box-shadow: 0 -2px 12px rgba(200, 170, 110, 0.3);
 }
 
@@ -1832,6 +1883,28 @@ function showBulletin(notification) {
     
     // Update content
     currentBulletin = notification;
+
+// ✅ Apply champion pack theme
+const championPack = window.championLoader?.getCurrentPack();
+if (championPack && championPack.theme) {
+    const theme = championPack.theme;
+    const root = document.documentElement;
+    
+    root.style.setProperty('--bulletin-bg', theme.background || 'rgba(0, 0, 0, 0.95)');
+    root.style.setProperty('--bulletin-bg-size', theme.backgroundSize || 'auto');
+    root.style.setProperty('--bulletin-bg-position', theme.backgroundPosition || 'center');
+    root.style.setProperty('--bulletin-border', theme.borderColor || 'rgba(200, 170, 110, 0.3)');
+    root.style.setProperty('--bulletin-glow', theme.borderGlow || '0 0 20px rgba(200, 170, 110, 0.15)');
+    root.style.setProperty('--bulletin-title', theme.titleColor || '#C8AA6E');
+    root.style.setProperty('--bulletin-detail', theme.detailColor || 'rgba(255, 255, 255, 0.7)');
+    root.style.setProperty('--bulletin-btn-bg', theme.buttonBackground || 'linear-gradient(135deg, #C8AA6E, #B89A5E)');
+    root.style.setProperty('--bulletin-btn-hover', theme.buttonHover || 'linear-gradient(135deg, #D4B876, #C8AA6E)');
+    root.style.setProperty('--bulletin-btn-text', theme.buttonText || '#0a0a0a');
+    root.style.setProperty('--bulletin-text-shadow', theme.textShadow || 'none');
+    
+    console.log(`🎨 Applied ${championPack.name} theme to bulletin`);
+}
+
     
     const icons = {
         danger: '🚨',
@@ -2020,6 +2093,8 @@ else {
     `;
     
     banner.className = `bulletin-banner ${notification.type}`;
+
+
     setTimeout(() => banner.classList.add('show'), 10);
 }
     
@@ -2195,14 +2270,22 @@ function initBulletinSystem() {
 async function initializeNotificationSystem() {
     console.log('🎯 Initializing complete notification system...');
     
-    // Initialize notification center with tabs first
+    // ✅ NEW: Initialize champion pack first
+    try {
+        await window.championLoader.initializeChampionPack();
+        const pack = window.championLoader.getCurrentPack();
+        console.log(`✅ Champion pack loaded: ${pack.name}`);
+    } catch (error) {
+        console.error('⚠️ Could not load champion pack:', error);
+    }
+    
+    // Initialize notification center with tabs
     try {
         const { initNotificationCenterWithTabs } = await import('./notification-center.js');
         await initNotificationCenterWithTabs();
         console.log('✅ Notification center with tabs ready');
     } catch (error) {
         console.warn('⚠️ Could not load notification center:', error);
-        // Continue anyway - toasts will still work
     }
     
     // Initialize bulletin system (toasts)
