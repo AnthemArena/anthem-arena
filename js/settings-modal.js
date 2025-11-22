@@ -184,6 +184,71 @@ function createModalHTML() {
                             </div>
                         </div>
 
+                        <!-- Social Media Links -->
+<div class="setting-group">
+    <label>
+        <i class="fas fa-share-nodes"></i> Social Media
+    </label>
+    <small class="setting-hint">Add your social media profiles (optional)</small>
+    
+    <div class="social-inputs">
+        <div class="social-input-row">
+            <i class="fab fa-x-twitter"></i>
+            <input 
+                type="text" 
+                id="socialTwitter" 
+                class="setting-input" 
+                placeholder="@username"
+                maxlength="50"
+            >
+        </div>
+        
+        <div class="social-input-row">
+            <i class="fab fa-instagram"></i>
+            <input 
+                type="text" 
+                id="socialInstagram" 
+                class="setting-input" 
+                placeholder="@username"
+                maxlength="50"
+            >
+        </div>
+        
+        <div class="social-input-row">
+            <i class="fab fa-twitch"></i>
+            <input 
+                type="text" 
+                id="socialTwitch" 
+                class="setting-input" 
+                placeholder="username"
+                maxlength="50"
+            >
+        </div>
+        
+        <div class="social-input-row">
+            <i class="fab fa-youtube"></i>
+            <input 
+                type="text" 
+                id="socialYoutube" 
+                class="setting-input" 
+                placeholder="@channelname"
+                maxlength="50"
+            >
+        </div>
+        
+        <div class="social-input-row">
+            <i class="fab fa-discord"></i>
+            <input 
+                type="text" 
+                id="socialDiscord" 
+                class="setting-input" 
+                placeholder="username#0000"
+                maxlength="50"
+            >
+        </div>
+    </div>
+</div>
+
 <div class="setting-group">
     <label for="bannerSelect">
         <i class="fas fa-image"></i> Profile Banner
@@ -359,6 +424,24 @@ const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Ch
         bioInput.value = bio;
         updateBioCharCount(); // Update character count
     }
+
+    // ✅ NEW: Load social links
+const socialLinksJson = localStorage.getItem('socialLinks');
+if (socialLinksJson) {
+    try {
+        const socialLinks = JSON.parse(socialLinksJson);
+        
+        if (socialLinks.twitter) document.getElementById('socialTwitter').value = socialLinks.twitter;
+        if (socialLinks.instagram) document.getElementById('socialInstagram').value = socialLinks.instagram;
+        if (socialLinks.twitch) document.getElementById('socialTwitch').value = socialLinks.twitch;
+        if (socialLinks.youtube) document.getElementById('socialYoutube').value = socialLinks.youtube;
+        if (socialLinks.discord) document.getElementById('socialDiscord').value = socialLinks.discord;
+        
+        console.log('✅ Social links loaded');
+    } catch (e) {
+        console.warn('Could not load social links:', e);
+    }
+}
     
   // ✅ Set all privacy toggles
 document.getElementById('publicToggle').checked = isPublic;
@@ -684,6 +767,21 @@ async function handleSaveSettings(e) {
         showOnlineStatus: document.getElementById('showOnlineStatusToggle')?.checked ?? true,
         emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
     };
+
+    // ✅ NEW: Get social media links
+const socialLinks = {
+    twitter: document.getElementById('socialTwitter')?.value.trim() || '',
+    instagram: document.getElementById('socialInstagram')?.value.trim() || '',
+    twitch: document.getElementById('socialTwitch')?.value.trim() || '',
+    youtube: document.getElementById('socialYoutube')?.value.trim() || '',
+    discord: document.getElementById('socialDiscord')?.value.trim() || ''
+};
+
+// Clean up handles (remove @ if user added it)
+if (socialLinks.twitter) socialLinks.twitter = socialLinks.twitter.replace(/^@/, '');
+if (socialLinks.instagram) socialLinks.instagram = socialLinks.instagram.replace(/^@/, '');
+if (socialLinks.youtube) socialLinks.youtube = socialLinks.youtube.replace(/^@/, '');
+
     
     // ✅ FIXED: Get banner selection with proper default
 const bannerSelect = document.getElementById('bannerSelect');
@@ -751,6 +849,8 @@ if (bannerValue === 'default') {
         localStorage.setItem('avatar', JSON.stringify(avatar));
         localStorage.setItem('bio', bio);
         localStorage.setItem('banner', JSON.stringify(banner)); // ✅ NEW: Save banner
+        // ✅ NEW: Save social links to localStorage
+localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
         
         // Save all privacy settings
         Object.keys(privacySettings).forEach(key => {
@@ -770,6 +870,8 @@ if (bannerValue === 'default') {
                 avatar: avatar,
                 banner: banner,  // ✅ NEW: Save banner to Firebase
                 bio: bio,
+                    socialLinks: socialLinks,  // ✅ NEW: Add this line
+
                 privacy: privacySettings,
                 updatedAt: Date.now()
             });

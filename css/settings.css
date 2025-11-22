@@ -775,3 +775,55 @@
     font-size: 0.8rem;
     font-style: italic;
 }
+/* ========================================
+   SOCIAL MEDIA INPUTS
+   ======================================== */
+
+.social-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.social-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.social-input-row:focus-within {
+    border-color: #c8aa6e;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.social-input-row i {
+    color: #c8aa6e;
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.social-input-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #f0e6d2;
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+}
+
+.social-input-row input:focus {
+    outline: none;
+}
+
+.social-input-row input::placeholder {
+    color: rgba(240, 230, 210, 0.4);
+}

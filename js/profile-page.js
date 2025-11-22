@@ -451,6 +451,10 @@ async function renderProfile(profile) {
         <i class="fas fa-trophy"></i> ${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}
     `;
     
+
+    // ✅ NEW: Render social links
+    renderSocialLinks(profile);
+    
     // Render action buttons
 renderProfileActions(isViewingOwnProfile);
 }
@@ -2334,6 +2338,99 @@ function renderParticipationTab() {
         </div>
     `).join('');
 }
+
+// ========================================
+// RENDER SOCIAL LINKS
+// ========================================
+
+function renderSocialLinks(profile) {
+    const socialContainer = document.getElementById('profileSocial');
+    if (!socialContainer) return;
+    
+    const socialLinks = profile.socialLinks || {};
+    
+    // Check if user has any social links
+    const hasSocial = Object.values(socialLinks).some(link => link && link.trim() !== '');
+    
+    if (!hasSocial) {
+        socialContainer.style.display = 'none';
+        return;
+    }
+    
+    const socialIcons = [];
+    
+    if (socialLinks.twitter) {
+        socialIcons.push(`
+            <a href="https://twitter.com/${socialLinks.twitter}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-icon twitter"
+               title="X (Twitter)">
+                <i class="fab fa-x-twitter"></i>
+            </a>
+        `);
+    }
+    
+    if (socialLinks.instagram) {
+        socialIcons.push(`
+            <a href="https://instagram.com/${socialLinks.instagram}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-icon instagram"
+               title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+        `);
+    }
+    
+    if (socialLinks.twitch) {
+        socialIcons.push(`
+            <a href="https://twitch.tv/${socialLinks.twitch}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-icon twitch"
+               title="Twitch">
+                <i class="fab fa-twitch"></i>
+            </a>
+        `);
+    }
+    
+    if (socialLinks.youtube) {
+        socialIcons.push(`
+            <a href="https://youtube.com/@${socialLinks.youtube}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-icon youtube"
+               title="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+        `);
+    }
+    
+    if (socialLinks.discord) {
+        socialIcons.push(`
+            <span class="social-icon discord" 
+                  title="Discord: ${socialLinks.discord}"
+                  onclick="copyDiscordHandle('${socialLinks.discord}')">
+                <i class="fab fa-discord"></i>
+            </span>
+        `);
+    }
+    
+    socialContainer.innerHTML = socialIcons.join('');
+    socialContainer.style.display = 'flex';
+    
+    console.log('✅ Social links rendered');
+}
+
+// Helper: Copy Discord handle to clipboard
+window.copyDiscordHandle = function(handle) {
+    navigator.clipboard.writeText(handle).then(() => {
+        if (window.showQuickToast) {
+            window.showQuickToast(`📋 Copied: ${handle}`, 2000);
+        }
+    });
+};
 
 // ========================================
 // GLOBAL FUNCTIONS (TODO: Implement)
