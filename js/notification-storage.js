@@ -133,7 +133,11 @@ export async function getUnreadNotifications(userId) {
 // GET RECENT UNSHOWN NOTIFICATIONS (for toasts)
 // ========================================
 
-export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 60) {
+// ========================================
+// GET RECENT UNSHOWN NOTIFICATIONS (for toasts)
+// ========================================
+
+export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 4320) { // ✅ Default to 72 hours (4320 minutes)
     if (!userId || userId === 'anonymous') return [];
     
     const cutoffTime = Date.now() - (maxAgeMinutes * 60 * 1000);
@@ -147,7 +151,7 @@ export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 60) 
             where('expiresAt', '>', Date.now()),
             orderBy('timestamp', 'desc'),
             orderBy('expiresAt', 'desc'),
-            limit(5) // Max 5 toasts on page load
+            limit(20) // ✅ Increased from 5 to 20
         );
         
         const snapshot = await getDocs(q);
@@ -160,7 +164,7 @@ export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 60) 
             });
         });
         
-        console.log(`🔔 Found ${notifications.length} recent unshown notifications`);
+        console.log(`🔔 Found ${notifications.length} recent unshown notifications (last ${Math.floor(maxAgeMinutes / 60)}h)`);
         return notifications;
         
     } catch (error) {

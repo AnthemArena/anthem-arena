@@ -20,6 +20,8 @@ import {
     getDocs,
     limit
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
 
 
 // ========================================
@@ -703,12 +705,16 @@ try {
 }
 
 // ========================================
-// REAL-TIME VOTE NOTIFICATIONS
+// REAL-TIME VOTE NOTIFICATIONS - COMPLETE REWRITE
 // ========================================
 
 let lastActivityCheck = 0;
-let lastSeenActivityId = null;
+let lastSeenActivityIds = new Set(); // ✅ Track processed activities to avoid duplicates
 const ACTIVITY_CHECK_INTERVAL = 30000; // Check every 30 seconds
+
+// ✅ NEW: Configurable time windows
+const TOAST_WINDOW_MINUTES = 60;  // Show toasts for votes in last 60 minutes
+const SAVE_WINDOW_HOURS = 72;     // Save notifications for votes in last 72 hours
 
 async function checkRecentVotes() {
     try {
@@ -717,76 +723,145 @@ async function checkRecentVotes() {
         if (now - lastActivityCheck < ACTIVITY_CHECK_INTERVAL) return;
         lastActivityCheck = now;
         
-        // Get recent activity (limit to 10 most recent)
-        const activities = await getActivityFeed(10);
+        // Get recent activity (increased from 10 to 50)
+        const activities = await getActivityFeed(50);
         
         if (!activities || activities.length === 0) return;
         
-        // Get the most recent activity
-        const latestActivity = activities[0];
-        
-        // Skip if we've already shown this one
-        if (lastSeenActivityId === latestActivity.activityId) return;
-        
-        // Filter out own votes
+        // Get current user
         const userId = localStorage.getItem('tournamentUserId');
-        if (latestActivity.userId === userId) return;
+        if (!userId || userId === 'anonymous') return;
         
-        // Skip anonymous votes
-        if (latestActivity.username === 'Anonymous') return;
+        // ✅ Load user's votes from localStorage (fast, no Firestore reads)
+        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         
-        // Check if vote is recent (last 2 minutes)
-        const twoMinutesAgo = now - 120000;
-        if (latestActivity.timestamp < twoMinutesAgo) return;
+        // Calculate time windows
+        const toastWindowMs = TOAST_WINDOW_MINUTES * 60 * 1000;
+        const saveWindowMs = SAVE_WINDOW_HOURS * 60 * 60 * 1000;
+        const toastCutoff = now - toastWindowMs;
+        const saveCutoff = now - saveWindowMs;
         
-        // Check if we've already shown this specific vote
-        const voteKey = `vote-toast-${latestActivity.activityId}`;
-        if (recentlyShownBulletins.has(voteKey)) return;
+        let toastShown = false; // Only show one toast per check
+        let savedCount = 0;
+        let skippedCount = 0;
         
-        // Get thumbnail URL from songId
-        const thumbnailUrl = latestActivity.songId 
-            ? `https://img.youtube.com/vi/${latestActivity.songId}/mqdefault.jpg`
-            : null;
+        // ✅ Process ALL recent activities
+        for (const activity of activities) {
+            // Skip if already processed this activity
+            if (lastSeenActivityIds.has(activity.activityId)) {
+                skippedCount++;
+                continue;
+            }
+            
+            // Skip own votes
+            if (activity.userId === userId) {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+            
+            // Skip anonymous votes
+            if (activity.username === 'Anonymous') {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+            
+            // Skip if too old (outside 72-hour save window)
+            if (activity.timestamp < saveCutoff) {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+            
+            // ✅ Check if current user voted in this match
+            const userVoteData = userVotes[activity.matchId];
+            
+            if (!userVoteData) {
+                // User hasn't voted in this match - not relevant for ally/rival
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+            
+            // ✅ Determine relationship: ally or opponent
+            const isAlly = userVoteData.songId === activity.songId;
+            
+            // ✅ Build notification data
+            const notificationData = buildSocialNotification(activity, isAlly, userId);
+            
+            // ✅ ALWAYS save to Firestore (within 72-hour window)
+            try {
+                await saveNotification(userId, notificationData);
+                savedCount++;
+                console.log(`💾 Saved ${isAlly ? '🤝 ally' : '⚔️ rival'} notification: ${activity.username} in ${activity.matchTitle}`);
+            } catch (error) {
+                console.error('Failed to save notification:', error);
+            }
+            
+            // ✅ Show as toast ONLY if within toast window (60 minutes)
+            if (!toastShown && activity.timestamp >= toastCutoff) {
+                // Check cooldown to avoid spamming same match
+                const bulletinKey = `live-activity-${activity.matchId}`;
+                const lastShown = recentlyShownBulletins.get(bulletinKey);
+                const cooldownMs = 5 * 60000; // 5 minutes between toasts per match
+                
+                if (!lastShown || (now - lastShown) >= cooldownMs) {
+                    showBulletin(notificationData);
+                    recentlyShownBulletins.set(bulletinKey, now);
+                    toastShown = true;
+                    
+                    const minutesAgo = Math.floor((now - activity.timestamp) / 60000);
+                    console.log(`🔔 Toast shown: ${activity.username} (${isAlly ? 'ally' : 'rival'}) - ${minutesAgo}m ago`);
+                }
+            }
+            
+            // ✅ Mark as processed
+            lastSeenActivityIds.add(activity.activityId);
+        }
         
+        // ✅ Log summary
+        if (savedCount > 0 || toastShown) {
+            console.log(`📊 Activity check: ${savedCount} saved, ${toastShown ? '1' : '0'} shown as toast, ${skippedCount} already processed`);
+        }
+        
+        // ✅ Cleanup old activity IDs (prevent memory leak)
+        if (lastSeenActivityIds.size > 200) {
+            const idsArray = Array.from(lastSeenActivityIds);
+            lastSeenActivityIds = new Set(idsArray.slice(-100)); // Keep last 100
+            console.log('🧹 Cleaned up activity ID cache');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error checking recent votes:', error);
+    }
+}
+
 // ========================================
-// CHECK USER'S VOTE STATUS IN THIS MATCH
+// HELPER: BUILD SOCIAL NOTIFICATION DATA
 // ========================================
 
-// Check if current user has voted in this match
-const userVoteKey = `vote-${latestActivity.matchId}`;
-const userVotedSongId = localStorage.getItem(userVoteKey);
-const hasVoted = !!userVotedSongId;
-
-let message, detail, cta, icon;
-
-if (!hasVoted) {
-    // ========================================
-    // USER HASN'T VOTED YET - INVITE THEM IN
-    // ========================================
-    message = `${latestActivity.username} just voted!`;
-    detail = `New vote in ${latestActivity.matchTitle}`;
-    cta = 'Cast Your Vote!';
-    icon = '🗳️';
+function buildSocialNotification(activity, isAlly, currentUserId) {
+    // Get thumbnail from song
+    const thumbnailUrl = activity.songId 
+        ? `https://img.youtube.com/vi/${activity.songId}/mqdefault.jpg`
+        : null;
     
-} else {
-    // User HAS voted - check if they're allies or opponents
-    const isAlly = userVotedSongId === latestActivity.songId;
+    let message, detail, cta, icon, ctaAction, ctaData;
     
     if (isAlly) {
         // ========================================
         // ALLY - They voted for YOUR song!
         // ========================================
         const allyMessages = [
-            `Reinforcements! ${latestActivity.username} just backed "${latestActivity.songTitle}"!`,
-            `${latestActivity.username} joined your side! Voted for "${latestActivity.songTitle}"`,
-            `Your choice is gaining momentum! ${latestActivity.username} voted "${latestActivity.songTitle}"`,
-            `Alliance formed! ${latestActivity.username} also picked "${latestActivity.songTitle}"`
+            `Reinforcements! ${activity.username} just backed "${activity.songTitle}"!`,
+            `${activity.username} joined your side! Voted for "${activity.songTitle}"`,
+            `Your choice is gaining momentum! ${activity.username} voted "${activity.songTitle}"`,
+            `Alliance formed! ${activity.username} also picked "${activity.songTitle}"`,
+            `${activity.username} stands with you! Backed "${activity.songTitle}"`
         ];
         
         const allyDetails = [
-            `${latestActivity.matchTitle}`,
-            `Standing with you in ${latestActivity.matchTitle}`,
-            `Fighting for the same side!`
+            `${activity.matchTitle}`,
+            `Standing with you in ${activity.matchTitle}`,
+            `Fighting for the same side!`,
+            `Building momentum together`
         ];
         
         const allyButtons = [
@@ -800,22 +875,35 @@ if (!hasVoted) {
         detail = allyDetails[Math.floor(Math.random() * allyDetails.length)];
         cta = allyButtons[Math.floor(Math.random() * allyButtons.length)];
         icon = '🤝';
+        ctaAction = 'send-emote';
+        ctaData = {
+            targetUsername: activity.username,
+            targetUserId: activity.userId,
+            emoteType: 'thanks',
+            matchData: {
+                matchId: activity.matchId,
+                matchTitle: activity.matchTitle,
+                songTitle: activity.songTitle
+            }
+        };
         
     } else {
         // ========================================
         // OPPONENT - They voted AGAINST your song!
         // ========================================
         const opponentMessages = [
-            `${latestActivity.username} just voted against you!`,
-            `${latestActivity.username} challenged your pick with "${latestActivity.songTitle}"`,
-            `Rival spotted! ${latestActivity.username} backed "${latestActivity.songTitle}"`,
-            `${latestActivity.username} picked the other side in "${latestActivity.songTitle}"`
+            `${activity.username} just voted against you!`,
+            `${activity.username} challenged your pick with "${activity.songTitle}"`,
+            `Rival spotted! ${activity.username} backed "${activity.songTitle}"`,
+            `${activity.username} picked the other side in "${activity.songTitle}"`,
+            `Competition heats up! ${activity.username} opposes you`
         ];
         
         const opponentDetails = [
-            `In ${latestActivity.matchTitle}`,
-            `The battle continues in ${latestActivity.matchTitle}`,
-            `${latestActivity.matchTitle} - rivalry grows`
+            `In ${activity.matchTitle}`,
+            `The battle continues in ${activity.matchTitle}`,
+            `${activity.matchTitle} - rivalry grows`,
+            `Different sides in this showdown`
         ];
         
         const opponentButtons = [
@@ -829,91 +917,68 @@ if (!hasVoted) {
         detail = opponentDetails[Math.floor(Math.random() * opponentDetails.length)];
         cta = opponentButtons[Math.floor(Math.random() * opponentButtons.length)];
         icon = '⚔️';
+        ctaAction = 'navigate';
+        ctaData = {};
     }
-}
-
-// ✅ NOW message, detail, cta, and icon are ALL defined before use
-// Build notification data
-const isAlly = hasVoted && userVotedSongId === latestActivity.songId;
-const notificationData = {
-    priority: 7,
-    type: 'live-activity',
-    matchId: latestActivity.matchId,
-    matchTitle: latestActivity.matchTitle,
-    username: latestActivity.username,
-    triggerUserId: latestActivity.userId,
-    triggerUsername: latestActivity.username,
-    song: latestActivity.songTitle,
-    thumbnailUrl: thumbnailUrl,
-    message: message,
-    detail: detail,
-    icon: icon,
-    cta: cta,  // ✅ NOW DEFINED!
-    ctaText: cta,  // ✅ ADD THIS TOO - some parts of code use ctaText
-    ctaAction: hasVoted ? (isAlly ? 'send-emote' : 'navigate') : 'navigate',
-    ctaData: hasVoted && isAlly ? {
-        targetUsername: latestActivity.username,
-        targetUserId: latestActivity.userId,
-        emoteType: 'thanks',
-        matchData: {
-            matchId: latestActivity.matchId,
-            matchTitle: latestActivity.matchTitle,
-            songTitle: latestActivity.songTitle
-        }
-    } : {},
-    targetUrl: `/vote.html?match=${latestActivity.matchId}`,
-    relationship: hasVoted ? (isAlly ? 'ally' : 'opponent') : null,
-    shownAsToast: true,
     
-    // ✅ NEW: Add secondary action to view profile
-    secondaryCta: {
-        text: `View ${latestActivity.username}'s Profile`,
-        action: 'navigate',
-        url: `/profile?user=${latestActivity.username}`
-    }
-};
-
-// Save to Firestore for notification center
-if (userId && userId !== 'anonymous') {
-    await saveNotification(userId, notificationData);
-
-    // Also add a "Send Message" quick action
-if (latestActivity.userId !== userId) {
-    // Don't send message option to yourself
-    notificationData.secondaryCta = {
-        text: 'Send Message',
-        action: 'open-message',
-        data: {
-            fromUsername: latestActivity.username,
-            fromUserId: latestActivity.userId
+    return {
+        priority: 7,
+        type: 'live-activity',
+        matchId: activity.matchId,
+        matchTitle: activity.matchTitle,
+        username: activity.username,
+        triggerUserId: activity.userId,
+        triggerUsername: activity.username,
+        song: activity.songTitle,
+        thumbnailUrl: thumbnailUrl,
+        message: message,
+        detail: detail,
+        icon: icon,
+        cta: cta,
+        ctaText: cta,
+        ctaAction: ctaAction,
+        ctaData: ctaData,
+        targetUrl: `/vote.html?match=${activity.matchId}`,
+        relationship: isAlly ? 'ally' : 'opponent',
+        shownAsToast: false,
+        
+        // ✅ NEW: Add secondary action to view profile
+        secondaryCta: {
+            text: `View ${activity.username}'s Profile`,
+            action: 'navigate',
+            url: `/profile?user=${activity.username}`
         }
     };
 }
-}
 
-// Show as toast immediately
-showBulletin(notificationData);  // ✅ Correct - use the function to display toast
-        
-// Track to avoid duplicates
-recentlyShownBulletins.set(voteKey, now);
-lastSeenActivityId = latestActivity.activityId;
+// ========================================
+// PERSIST PROCESSED IDs ON PAGE UNLOAD
+// ========================================
 
-console.log(`🎯 Live vote activity: ${latestActivity.username} → ${latestActivity.songTitle} (${hasVoted ? (userVotedSongId === latestActivity.songId ? 'ALLY' : 'OPPONENT') : 'NOT VOTED'})`);
-        
-    } catch (error) {
-        console.error('Error checking recent votes:', error);
-    }
-}
-
-// Add to polling - check every 30 seconds
-setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL);
-
-// Also check on page visibility change (when user returns to tab)
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        checkRecentVotes();
+window.addEventListener('beforeunload', () => {
+    try {
+        // Save processed activity IDs to sessionStorage
+        const idsArray = Array.from(lastSeenActivityIds);
+        sessionStorage.setItem('processedActivityIds', JSON.stringify(idsArray.slice(-100)));
+    } catch (e) {
+        console.warn('Could not persist activity IDs:', e);
     }
 });
+
+// ========================================
+// RESTORE PROCESSED IDs ON PAGE LOAD
+// ========================================
+
+try {
+    const stored = sessionStorage.getItem('processedActivityIds');
+    if (stored) {
+        const idsArray = JSON.parse(stored);
+        lastSeenActivityIds = new Set(idsArray);
+        console.log(`✅ Restored ${lastSeenActivityIds.size} processed activity IDs`);
+    }
+} catch (e) {
+    console.warn('Could not restore activity IDs:', e);
+}
 
 
 // ========================================
@@ -2289,6 +2354,9 @@ window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType
         ctaButton.style.opacity = '0.6';
     }
     
+    // ✅ Import sendEmoteReaction from your emote-system.js
+    const { sendEmoteReaction } = await import('./emote-system.js');
+    
     const success = await sendEmoteReaction(targetUsername, targetUserId, emoteType, matchData);
     
     if (success) {
@@ -2300,8 +2368,7 @@ window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType
             ctaButton.style.opacity = '1';
         }
         
-        // Show toast
-        showQuickToast(`✅ Sent to ${targetUsername}!`, 2000);
+        showQuickToast(`✅ Sent ${emoteType} to ${targetUsername}!`, 2000);
         
         // Hide bulletin after 1 second
         setTimeout(() => {
@@ -2322,7 +2389,7 @@ window.handleEmoteClick = async function(targetUsername, targetUserId, emoteType
         // Reset button after 2 seconds
         setTimeout(() => {
             if (ctaButton) {
-                ctaButton.textContent = originalText;  // ✅ NOW DEFINED
+                ctaButton.textContent = originalText;
                 ctaButton.style.background = '';
                 ctaButton.disabled = false;
             }
@@ -2394,7 +2461,7 @@ async function checkIncomingReactions() {
     
 }
 
-/// ========================================
+// ========================================
 // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
 // ========================================
 
@@ -2404,41 +2471,208 @@ async function checkMissedNotifications() {
     
     console.log('🔍 Checking for missed notifications...');
     
-    const missedNotifications = await getRecentUnshownNotifications(userId, 60);
+    // ✅ Match the 72-hour window from checkRecentVotes
+    const hoursToCheck = 72; // Same as SAVE_WINDOW_HOURS
+    const missedNotifications = await getRecentUnshownNotifications(userId, hoursToCheck * 60);
     
     if (missedNotifications.length === 0) {
         console.log('✅ No missed notifications');
         return;
     }
     
-    console.log(`📬 Found ${missedNotifications.length} missed notifications`);
+    console.log(`📬 Found ${missedNotifications.length} missed notifications from last ${hoursToCheck}h`);
     
-    // Show each missed notification as a toast
-    missedNotifications.forEach(notification => {
-        showBulletin({
-            priority: notification.priority,
-            type: notification.type,
-            matchId: notification.matchId,
-            matchTitle: notification.matchTitle,
-            username: notification.triggerUsername,
-            userId: notification.triggerUserId,
-            message: `While you were away: ${notification.message}`,
-            detail: notification.detail,
-            icon: notification.icon,
-            cta: notification.ctaText,
-            action: notification.ctaAction,
-            targetUrl: notification.targetUrl,
-            emoteData: notification.ctaAction === 'send-emote' ? notification.ctaData : null,
-            onShow: () => markNotificationShown(notification.id)
-        });
+    // ✅ Prioritize notifications (show most important first)
+    const prioritized = missedNotifications.sort((a, b) => {
+        // Sort by priority first (lower number = higher priority)
+        if (a.priority !== b.priority) return a.priority - b.priority;
+        // Then by recency (newer first)
+        return b.timestamp - a.timestamp;
     });
+    
+    // ✅ Only show the top 3 most important as toasts
+    const toShow = prioritized.slice(0, 3);
+    const remaining = missedNotifications.length - toShow.length;
+    
+    // Show each as a toast with slight delay between them
+    toShow.forEach((notification, index) => {
+        setTimeout(() => {
+            const hoursAgo = Math.floor((Date.now() - notification.timestamp) / (1000 * 60 * 60));
+            const timeAgo = hoursAgo < 1 
+                ? 'Just before you left' 
+                : hoursAgo < 24 
+                    ? `${hoursAgo}h ago` 
+                    : `${Math.floor(hoursAgo / 24)}d ago`;
+            
+            showBulletin({
+                priority: notification.priority,
+                type: notification.type,
+                matchId: notification.matchId,
+                matchTitle: notification.matchTitle,
+                username: notification.triggerUsername,
+                triggerUserId: notification.triggerUserId,
+                thumbnailUrl: notification.thumbnailUrl,
+                message: notification.message, // ✅ Don't prefix "While you were away"
+                detail: `${timeAgo} • ${notification.detail}`,
+                icon: notification.icon,
+                cta: notification.ctaText,
+                ctaText: notification.ctaText,
+                ctaAction: notification.ctaAction,
+                ctaData: notification.ctaData,
+                targetUrl: notification.targetUrl,
+                relationship: notification.relationship,
+                secondaryCta: notification.secondaryCta
+            });
+            
+            // Mark as shown
+            markNotificationShown(notification.id);
+            
+        }, index * 3000); // 3-second delay between toasts
+    });
+    
+    // ✅ Show summary if there are more notifications
+    if (remaining > 0) {
+        setTimeout(() => {
+            showBulletin({
+                priority: 10,
+                type: 'notification-summary',
+                matchId: 'summary',
+                message: `📬 ${remaining} more notification${remaining === 1 ? '' : 's'}`,
+                detail: 'Check your notification center to see everything',
+                icon: '🔔',
+                cta: 'Open Notifications',
+                ctaAction: 'open-panel',
+                targetUrl: '#'
+            });
+        }, toShow.length * 3000 + 1000);
+    }
 }
 
-// Run on page load
+// ✅ Run on page load with longer delay (let page settle first)
 setTimeout(() => {
     checkMissedNotifications();
-}, 2000);
+}, 3000); // 3 seconds instead of 2
 
-// Check on page load and every 2 minutes
-checkIncomingReactions();
-setInterval(checkIncomingReactions, 120000);
+// ✅ Also check when user returns to tab (was idle)
+let wasHidden = false;
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && wasHidden) {
+        // User just came back to tab
+        console.log('👀 User returned to tab - checking for new notifications');
+        setTimeout(() => {
+            checkMissedNotifications();
+        }, 1000);
+    }
+    wasHidden = document.hidden;
+});
+
+// ========================================
+// REAL-TIME EMOTE LISTENER (ZERO POLLING)
+// ========================================
+
+let emoteListener = null;
+
+async function setupRealtimeEmoteListener() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') {
+        console.log('⏸️ Emote listener disabled - anonymous user');
+        return;
+    }
+    
+    // Check if user has any votes (can't receive emotes without voting)
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    if (Object.keys(userVotes).length === 0) {
+        console.log('⏸️ Emote listener disabled - no votes yet (vote to enable)');
+        return;
+    }
+    
+    // Clean up existing listener
+    if (emoteListener) {
+        emoteListener();
+    }
+    
+    console.log('👂 Setting up real-time emote listener...');
+    
+    try {
+        // ✅ Listen for NEW unseen reactions in real-time
+        const q = query(
+            collection(db, 'user-reactions'), // ✅ Matches your emote-system.js
+            where('toUserId', '==', userId),
+            where('seen', '==', false),
+            orderBy('timestamp', 'desc'),
+            limit(10)
+        );
+        
+        emoteListener = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const reaction = { id: change.doc.id, ...change.doc.data() };
+                    
+                    // ✅ Show toast notification
+                    const emoteIcons = {
+                        'thanks': '🤝',
+                        'props': '👊',
+                        'rivalry': '⚔️',
+                        'hype': '🔥'
+                    };
+                    
+                    const icon = emoteIcons[reaction.type] || '✨';
+                    
+                    showBulletin({
+                        priority: 8,
+                        type: 'emote-received',
+                        reactionId: reaction.id,
+                        matchId: reaction.matchId,
+                        matchTitle: reaction.matchTitle,
+                        fromUsername: reaction.fromUsername,
+                        triggerUserId: reaction.fromUserId,
+                        triggerUsername: reaction.fromUsername,
+                        emoteType: reaction.type,
+                        icon: icon,
+                        message: `${icon} ${reaction.fromUsername} sent you ${reaction.type}!`,
+                        detail: `"${reaction.message}" • ${reaction.matchTitle}`,
+                        cta: 'View Match',
+                        ctaAction: 'navigate',
+                        targetUrl: `/vote.html?match=${reaction.matchId}`,
+                        secondaryCta: {
+                            text: `View ${reaction.fromUsername}'s Profile`,
+                            action: 'navigate',
+                            url: `/profile?user=${reaction.fromUsername}`
+                        }
+                    });
+                    
+                    // ✅ Mark as seen
+                    markReactionSeen(reaction.id);
+                    
+                    console.log(`✨ NEW EMOTE RECEIVED: ${reaction.type} from ${reaction.fromUsername}`);
+                }
+            });
+        }, (error) => {
+            console.error('❌ Emote listener error:', error);
+        });
+        
+        console.log('✅ Real-time emote listener active (instant notifications)');
+        
+    } catch (error) {
+        console.error('❌ Failed to setup emote listener:', error);
+    }
+}
+
+// ✅ Start listener on page load
+setTimeout(() => {
+    setupRealtimeEmoteListener();
+}, 3000);
+
+// ✅ Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (emoteListener) {
+        emoteListener();
+        console.log('🔌 Emote listener disconnected');
+    }
+});
+
+// ✅ Expose function to restart listener after vote
+window.restartEmoteListener = function() {
+    console.log('🔄 Restarting emote listener (user voted)');
+    setupRealtimeEmoteListener();
+};
