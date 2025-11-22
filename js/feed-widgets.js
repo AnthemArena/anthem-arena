@@ -3,9 +3,10 @@
 // ========================================
 
 import { db } from './firebase-config.js';
-// At the top of feed-widgets.js
 import { createMatchCard } from './match-card-renderer.js';
 import { collection, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+// ✅ ADD THIS IMPORT
+import { getFollowerCount, getFollowingCount } from './follow-system.js';
 
 // ========================================
 // INITIALIZE ALL WIDGETS
@@ -72,14 +73,16 @@ async function loadUserProfile() {
             if (bioEl && profileData.bio) {
                 bioEl.textContent = profileData.bio;
             }
-            
-            // ✅ Set following/followers from profile
-            const following = profileData.following || [];
-            const followers = profileData.followers || [];
-            
-            document.getElementById('sidebarFollowing').textContent = following.length;
-            document.getElementById('sidebarFollowers').textContent = followers.length;
         }
+        
+        // ✅ FIXED: Use follow-system.js to get real counts from follows collection
+        const [followingCount, followerCount] = await Promise.all([
+            getFollowingCount(userId),
+            getFollowerCount(userId)
+        ]);
+        
+        document.getElementById('sidebarFollowing').textContent = followingCount;
+        document.getElementById('sidebarFollowers').textContent = followerCount;
         
         // Load vote count
         const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
@@ -193,10 +196,6 @@ function transformToMatchCardFormat(apiMatch) {
 // RIGHT SIDEBAR - Recent Activity Widget
 // ========================================
 
-// ========================================
-// RIGHT SIDEBAR - Recent Activity Widget
-// ========================================
-
 async function loadRecentActivity() {
     const container = document.getElementById('recentActivityWidget');
     
@@ -296,12 +295,34 @@ async function loadTournamentStats() {
 // SETUP SIDEBAR INTERACTIONS
 // ========================================
 
-// ========================================
-// SETUP SIDEBAR INTERACTIONS
-// ========================================
-
 export function setupSidebarInteractions() {
     console.log('🔧 Setting up sidebar interactions...');
+    
+    // ✅ NEW: Make entire profile card clickable
+    const profileCard = document.querySelector('.sidebar-profile-card');
+    if (profileCard) {
+        profileCard.style.cursor = 'pointer';
+        profileCard.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+        
+        profileCard.addEventListener('click', (e) => {
+            // Don't trigger if clicking on a button or link inside
+            if (e.target.closest('button, a, .sidebar-actions')) return;
+            
+            window.location.href = '/profile.html';
+        });
+        
+        profileCard.addEventListener('mouseenter', () => {
+            profileCard.style.transform = 'translateY(-2px)';
+            profileCard.style.boxShadow = '0 6px 16px rgba(200, 170, 110, 0.15)';
+        });
+        
+        profileCard.addEventListener('mouseleave', () => {
+            profileCard.style.transform = 'translateY(0)';
+            profileCard.style.boxShadow = '';
+        });
+        
+        console.log('✅ Profile card now clickable');
+    }
     
     // Wait for notification center to be ready
     setTimeout(() => {
@@ -310,6 +331,7 @@ export function setupSidebarInteractions() {
         if (notifBtn) {
             notifBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation(); // Prevent card click
                 console.log('🔔 Notifications clicked');
                 
                 if (window.openNotificationPanel) {
@@ -326,6 +348,7 @@ export function setupSidebarInteractions() {
         if (msgBtn) {
             msgBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation(); // Prevent card click
                 console.log('💬 Messages clicked');
                 
                 if (window.openNotificationPanel) {

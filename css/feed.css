@@ -1340,3 +1340,24 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(200, 170, 110, 0.2);
 }
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state i {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    line-height: 1.6;
+}

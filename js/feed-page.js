@@ -2,7 +2,7 @@
 // FEED PAGE - UI CONTROLLER
 // League Music Tournament
 // ========================================
-import { initializeFeedWidgets } from './feed-widgets.js';
+import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
 import { 
     getFeed, 
@@ -74,6 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Initialize widgets FIRST
         await initializeFeedWidgets();
+
+         // ✅ Setup sidebar interactions (makes profile card clickable)
+        setupSidebarInteractions();
         
         // ✅ NEW: Make profile widget fully clickable
         makeProfileWidgetClickable();
@@ -170,6 +173,7 @@ function checkLoginStatus() {
 // FILTERS
 // ========================================
 
+
 function setupFilters() {
     const filterBtns = document.querySelectorAll('.filter-btn');
     
@@ -206,25 +210,111 @@ async function loadFeed() {
     feedContainer.appendChild(emptyState);
     
     try {
-        // Fetch posts based on filter
-        let feedType = currentFilter === 'following' ? 'following' : 'all';
-        currentPosts = await getFeed(feedType, 100);
+        const currentUserId = localStorage.getItem('tournamentUserId');
         
-        // Apply additional filtering
-        if (currentFilter === 'trending') {
-            // Sort by likes + comments (engagement)
+        // ========================================
+        // FETCH POSTS BASED ON FILTER
+        // ========================================
+        
+        if (currentFilter === 'my-posts') {
+            // ✅ MY POSTS: Show only current user's posts
+            if (!currentUserId || currentUserId === 'anonymous') {
+                loadingState.style.display = 'none';
+                emptyState.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-slash" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>Not Logged In</h3>
+                        <p>You need to be logged in to see your posts</p>
+                    </div>
+                `;
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            currentPosts = await getFeed('all', 100);
+            currentPosts = currentPosts.filter(post => post.userId === currentUserId);
+            
+        } else if (currentFilter === 'following') {
+            // ✅ FOLLOWING: Show posts from people you follow
+            if (!currentUserId || currentUserId === 'anonymous') {
+                loadingState.style.display = 'none';
+                emptyState.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-friends" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>Not Logged In</h3>
+                        <p>Log in to see posts from people you follow</p>
+                    </div>
+                `;
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            currentPosts = await getFeed('following', 100);
+            
+        } else if (currentFilter === 'trending') {
+            // ✅ TRENDING: Most engagement (likes + comments * 2)
+            currentPosts = await getFeed('all', 100);
             currentPosts.sort((a, b) => {
                 const engagementA = (a.likeCount || 0) + (a.commentCount || 0) * 2;
                 const engagementB = (b.likeCount || 0) + (b.commentCount || 0) * 2;
                 return engagementB - engagementA;
             });
+            
+            // Only show posts with at least 1 engagement
+            currentPosts = currentPosts.filter(post => 
+                (post.likeCount || 0) + (post.commentCount || 0) > 0
+            );
+            
+        } else {
+            // ✅ ALL: Show all public posts (default)
+            currentPosts = await getFeed('all', 100);
         }
         
         // Hide loading
         loadingState.style.display = 'none';
         
-        // Show posts or empty state
+        // ========================================
+        // SHOW POSTS OR EMPTY STATE
+        // ========================================
+        
         if (currentPosts.length === 0) {
+            let emptyMessage = '';
+            
+            if (currentFilter === 'my-posts') {
+                emptyMessage = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-pen" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>No Posts Yet</h3>
+                        <p>You haven't created any posts. Share something with the community!</p>
+                    </div>
+                `;
+            } else if (currentFilter === 'following') {
+                emptyMessage = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-plus" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>No Posts from Following</h3>
+                        <p>Follow other users to see their posts here</p>
+                    </div>
+                `;
+            } else if (currentFilter === 'trending') {
+                emptyMessage = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-fire" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>No Trending Posts</h3>
+                        <p>Be the first to create popular content!</p>
+                    </div>
+                `;
+            } else {
+                emptyMessage = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>No Posts Yet</h3>
+                        <p>Be the first to share something!</p>
+                    </div>
+                `;
+            }
+            
+            emptyState.innerHTML = emptyMessage;
             emptyState.style.display = 'block';
         } else {
             renderPosts(0, POSTS_PER_PAGE);
