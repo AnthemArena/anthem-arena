@@ -38,12 +38,21 @@ async function loadMusicVideos() {
 // ========================================
 
 // ========================================
-// ✅ @MENTION SYSTEM (OPTIMIZED)
+// ✅ @MENTION SYSTEM (OPTIMIZED - READS FROM SYNCED PROFILES)
 // ========================================
 
 let allUsers = [];
+let lastUserLoad = 0;
+const USER_CACHE_DURATION = 300000; // 5 minutes
 
-async function loadAllUsers() {
+async function loadAllUsers(forceRefresh = false) {
+    // Use cache if recent
+    const now = Date.now();
+    if (!forceRefresh && allUsers.length > 0 && (now - lastUserLoad) < USER_CACHE_DURATION) {
+        console.log('✅ Using cached user data (no Firebase reads)');
+        return;
+    }
+    
     try {
         const { db } = await import('./firebase-config.js');
         const { collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -54,7 +63,7 @@ async function loadAllUsers() {
         const q = query(profilesRef, where('username', '!=', null));
         const snapshot = await getDocs(q);
         
-        const currentUserId = localStorage.getItem('tournamentUserId');
+        const currentUserId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
         
         allUsers = [];
         
@@ -64,7 +73,7 @@ async function loadAllUsers() {
             
             if (!profile.username || profile.username === 'Anonymous') return;
             
-            // ✅ For current user, use localStorage stats
+            // ✅ For current user, prefer localStorage (most up-to-date)
             if (userId === currentUserId) {
                 const statsJson = localStorage.getItem('stats');
                 let stats = { level: 1, votes: 0 };
@@ -72,65 +81,65 @@ async function loadAllUsers() {
                 try {
                     stats = JSON.parse(statsJson) || stats;
                 } catch (e) {
-                    console.warn('Failed to parse stats from localStorage');
+                    // Fallback to synced profile data
+                    stats = {
+                        level: profile.level || 1,
+                        votes: profile.totalVotes || 0
+                    };
                 }
-                
-                const level = stats.level || 1;
-                const totalVotes = stats.votes || 0;
-                const rank = getRankFromLevel(level);
                 
                 allUsers.push({
                     userId: userId,
                     username: profile.username,
                     avatar: profile.avatar,
-                    level: level,
-                    rank: rank,
-                    totalVotes: totalVotes
+                    level: stats.level,
+                    rank: profile.rank || getRankTitle(stats.level),
+                    totalVotes: stats.votes
                 });
                 
                 console.log('👤 Your mention data (from localStorage):', {
-                    username: profile.username,
-                    level,
-                    totalVotes,
-                    rank
+                    level: stats.level,
+                    totalVotes: stats.votes
                 });
                 
             } else {
-                // ✅ For other users, use stored profile data (fallback to defaults)
-                const level = profile.level || 1;
-                const totalVotes = profile.totalVotes || profile.voteCount || 0;
-                const rank = profile.rank || getRankFromLevel(level);
-                
+                // ✅ For other users, use synced profile stats (fast!)
                 allUsers.push({
                     userId: userId,
                     username: profile.username,
                     avatar: profile.avatar,
-                    level: level,
-                    rank: rank,
-                    totalVotes: totalVotes
+                    level: profile.level || 1,
+                    rank: profile.rank || getRankTitle(profile.level || 1),
+                    totalVotes: profile.totalVotes || 0
                 });
             }
         });
         
-        console.log('✅ Loaded users for mentions:', allUsers.length);
+        lastUserLoad = now;
+        
+        console.log(`✅ Loaded ${allUsers.length} users (${snapshot.size} Firebase reads)`);
         
     } catch (error) {
         console.error('❌ Error loading users:', error);
     }
 }
 
-function getRankFromLevel(level) {
+// ========================================
+// HELPER: Get rank title from level (fallback)
+// ========================================
+
+function getRankTitle(level) {
     const ranks = {
         1: 'New Voter',
-        2: 'Casual Fan',
-        3: 'Regular Voter',
+        2: 'Music Fan',
+        3: 'Enthusiast',
         4: 'Dedicated Fan',
-        5: 'Active Voter',
-        6: 'Engaged Voter',
-        7: 'Tournament Regular',
-        8: 'Music Enthusiast',
-        9: 'Elite Voter',
-        10: 'Tournament Legend'
+        5: 'Tournament Regular',
+        6: 'Power Voter',
+        7: 'Super Fan',
+        8: 'Elite Voter',
+        9: 'Legend',
+        10: 'Arena Champion'
     };
     return ranks[level] || 'New Voter';
 }
@@ -152,21 +161,7 @@ function calculateLevelFromVotes(voteCount) {
     return 1;
 }
 
-function getRankFromLevel(level) {
-    const ranks = {
-        1: 'New Voter',
-        2: 'Casual Fan',
-        3: 'Regular Voter',
-        4: 'Dedicated Fan',
-        5: 'Active Voter',
-        6: 'Engaged Voter',
-        7: 'Tournament Regular',
-        8: 'Music Enthusiast',
-        9: 'Elite Voter',
-        10: 'Tournament Legend'
-    };
-    return ranks[level] || 'New Voter';
-}
+
 
 
 
