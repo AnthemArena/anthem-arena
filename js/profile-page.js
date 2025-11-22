@@ -2686,6 +2686,14 @@ async function pinPost(postId) {
     }
     
     try {
+        // ✅ Find the button and show loading state
+        const menuBtn = document.querySelector(`[data-post-id="${postId}"].pin-post-btn`);
+        
+        if (menuBtn) {
+            menuBtn.disabled = true;
+            menuBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Pinning...';
+        }
+        
         // Get current pinned posts
         const profileRef = doc(db, 'profiles', userId);
         const profileDoc = await getDoc(profileRef);
@@ -2697,6 +2705,13 @@ async function pinPost(postId) {
         
         // Check limit (max 3 pinned posts)
         if (pinnedPosts.length >= 3) {
+            if (menuBtn) {
+                menuBtn.innerHTML = '<i class="fa-solid fa-exclamation"></i> Max 3 Posts';
+                setTimeout(() => {
+                    menuBtn.disabled = false;
+                    menuBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i> Pin to Profile';
+                }, 2000);
+            }
             alert('You can only pin up to 3 posts. Unpin one first.');
             return;
         }
@@ -2716,19 +2731,42 @@ async function pinPost(postId) {
         
         console.log('✅ Post pinned');
         
+        // ✅ Show success feedback
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fa-solid fa-check"></i> Pinned!';
+        }
+        
         if (window.showNotification) {
             window.showNotification('Post pinned to your profile!', 'success');
         }
         
-        // Reload posts
-        await loadAllUserPosts(userId);
-        await loadFeaturedPosts(userId);
+        // ✅ Wait a moment to show success, then reload
+        setTimeout(async () => {
+            // Reload posts to show updated pin status
+            await loadAllUserPosts(userId);
+            await loadFeaturedPosts(userId);
+        }, 800);
         
     } catch (error) {
         console.error('❌ Error pinning post:', error);
+        
+        // ✅ Show error state
+        const menuBtn = document.querySelector(`[data-post-id="${postId}"].pin-post-btn`);
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fa-solid fa-times"></i> Failed';
+            setTimeout(() => {
+                menuBtn.disabled = false;
+                menuBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i> Pin to Profile';
+            }, 2000);
+        }
+        
         alert('Failed to pin post. Please try again.');
     }
 }
+
+// ========================================
+// UNPIN POST FROM PROFILE
+// ========================================
 
 // ========================================
 // UNPIN POST FROM PROFILE
@@ -2740,6 +2778,15 @@ async function unpinPost(postId) {
     if (!userId) return;
     
     try {
+        // ✅ Find the button and show loading state
+        const menuBtn = document.querySelector(`[data-post-id="${postId}"].unpin-post-btn`);
+        const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+        
+        if (menuBtn) {
+            menuBtn.disabled = true;
+            menuBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Unpinning...';
+        }
+        
         // Get current pinned posts
         const profileRef = doc(db, 'profiles', userId);
         const profileDoc = await getDoc(profileRef);
@@ -2761,16 +2808,58 @@ async function unpinPost(postId) {
         
         console.log('✅ Post unpinned');
         
+        // ✅ Show success feedback
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fa-solid fa-check"></i> Unpinned!';
+        }
+        
         if (window.showNotification) {
             window.showNotification('Post unpinned', 'success');
         }
         
-        // Reload posts
-        await loadAllUserPosts(userId);
-        await loadFeaturedPosts(userId);
+        // ✅ Animate post card removal if in featured section
+        if (postCard && postCard.closest('#featuredPostsList, #featuredPostsOverviewGrid')) {
+            postCard.style.transition = 'all 0.3s ease';
+            postCard.style.opacity = '0';
+            postCard.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                postCard.remove();
+                
+                // Check if featured section is now empty
+                const featuredSection = document.getElementById('featuredPostsSection');
+                const featuredOverview = document.getElementById('featuredPostsOverview');
+                const featuredList = document.getElementById('featuredPostsList');
+                const featuredOverviewGrid = document.getElementById('featuredPostsOverviewGrid');
+                
+                if (featuredList && featuredList.children.length === 0) {
+                    if (featuredSection) featuredSection.style.display = 'none';
+                }
+                
+                if (featuredOverviewGrid && featuredOverviewGrid.children.length === 0) {
+                    if (featuredOverview) featuredOverview.style.display = 'none';
+                }
+            }, 300);
+        }
+        
+        // ✅ Update the post card in "All Posts" section
+        setTimeout(async () => {
+            await loadAllUserPosts(userId);
+        }, 350);
         
     } catch (error) {
         console.error('❌ Error unpinning post:', error);
+        
+        // ✅ Show error state
+        const menuBtn = document.querySelector(`[data-post-id="${postId}"].unpin-post-btn`);
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fa-solid fa-times"></i> Failed';
+            setTimeout(() => {
+                menuBtn.disabled = false;
+                menuBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i> Unpin Post';
+            }, 2000);
+        }
+        
         alert('Failed to unpin post. Please try again.');
     }
 }
