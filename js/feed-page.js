@@ -854,8 +854,10 @@ function renderPosts(startIndex, count) {
 
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        // ✅ FIXED: Don't parse song mentions in the text - show it clean
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
+        
+        // Determine which song was picked
+        const isPicked1 = post.choice === 'song1';
         
         return `
             <p class="post-text vote-text">
@@ -863,39 +865,31 @@ function renderPostContent(post) {
             </p>
             
             <div class="match-embed" data-match-id="${post.matchId}">
-                <div class="match-thumbnail">
-                    <img src="${post.votedThumbnail || `https://img.youtube.com/vi/${post.votedSongId}/mqdefault.jpg`}" 
-                         alt="${escapeHtml(post.votedSongName)}" 
-                         loading="lazy">
-                </div>
+                <h4 class="match-title">${escapeHtml(post.matchTitle || 'Match')}</h4>
                 
-                <div class="match-info-card">
-                    <h4 class="match-title">${escapeHtml(post.matchTitle || 'Match')}</h4>
-                    
-                    <div class="match-songs">
-                        <div class="song-option ${post.choice === 'song1' ? 'picked' : ''}">
-                            <span class="song-name">${escapeHtml(post.votedSongName || post.songTitle)}</span>
-                            ${post.matchState ? `<span class="song-pct">${post.matchState.userPct}%</span>` : ''}
-                        </div>
-                        
-                        <div class="vs-badge">VS</div>
-                        
-                        <div class="song-option ${post.choice === 'song2' ? 'picked' : ''}">
-                            <span class="song-name">${escapeHtml(post.opponentSongName || 'Opponent')}</span>
-                            ${post.matchState ? `<span class="song-pct">${100 - post.matchState.userPct}%</span>` : ''}
-                        </div>
+                <div class="match-songs">
+                    <div class="song-option ${isPicked1 ? 'picked' : ''}">
+                        <span class="song-name">${escapeHtml(post.votedSongName || 'Song 1')}</span>
+                        ${post.matchState ? `<span class="song-pct">${post.matchState.userPct}%</span>` : ''}
                     </div>
                     
-                    ${post.matchState ? `
-                        <div class="match-progress-bar">
-                            <div class="progress-fill ${post.matchState.isWinning ? 'winning' : 'losing'}" 
-                                 style="width: ${post.matchState.userPct}%"></div>
-                        </div>
-                        <div class="match-status">
-                            ${post.matchState.isWinning ? '🏆 Leading' : '⚔️ Behind'} 
-                            by ${post.matchState.voteDiff} vote${post.matchState.voteDiff !== 1 ? 's' : ''}
-                        </div>
-                    ` : ''}
+                    <span class="vs-badge">VS</span>
+                    
+                    <div class="song-option ${!isPicked1 ? 'picked' : ''}">
+                        <span class="song-name">${escapeHtml(post.opponentSongName || 'Song 2')}</span>
+                        ${post.matchState ? `<span class="song-pct">${100 - post.matchState.userPct}%</span>` : ''}
+                    </div>
+                </div>
+                
+                ${post.matchState ? `
+                    <div class="match-progress-bar">
+                        <div class="progress-fill ${post.matchState.isWinning ? 'winning' : 'losing'}" 
+                             style="width: ${post.matchState.userPct}%"></div>
+                    </div>
+                ` : ''}
+                
+                <div class="match-cta">
+                    <span>View Match →</span>
                 </div>
             </div>
         `;

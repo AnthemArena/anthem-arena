@@ -133,28 +133,33 @@ export async function createVotePost(voteData) {
             const allMatches = await matchResponse.json();
             const match = allMatches.find(m => (m.matchId || m.id) === voteData.matchId);
             
-            if (match) {
-                const votedSong = voteData.choice === 'song1' ? match.song1 : match.song2;
-                const opponentSong = voteData.choice === 'song1' ? match.song2 : match.song1;
-                
-                const votedVotes = votedSong?.votes || 0;
-                const opponentVotes = opponentSong?.votes || 0;
-                const totalVotes = votedVotes + opponentVotes;
-                
-                matchState.voteDiff = Math.abs(votedVotes - opponentVotes);
-                matchState.userPct = totalVotes > 0 ? Math.round((votedVotes / totalVotes) * 100) : 50;
-                matchState.wasClose = matchState.voteDiff <= 5;
-                matchState.isWinning = votedVotes >= opponentVotes;
-                matchState.isDominating = matchState.userPct >= 65;
-                
-                // Tipped the scale = was losing/tied, now winning OR was close and vote made it 1-vote lead
-                matchState.tippedScale = (
-                    (matchState.voteDiff === 1 && matchState.isWinning) || // Made it 1-vote lead
-                    (matchState.wasClose && matchState.voteDiff <= 2) // Very close and just voted
-                );
-                
-                console.log('📊 Match context:', matchState);
-            }
+           if (match) {
+    const votedSong = voteData.choice === 'song1' ? match.song1 : match.song2;
+    const opponentSong = voteData.choice === 'song1' ? match.song2 : match.song1;
+    
+    // ✅ FIX: Add 1 to voted song (our vote isn't reflected in cache yet)
+    const votedVotes = (votedSong?.votes || 0) + 1;  // ← ADD +1 HERE
+    const opponentVotes = opponentSong?.votes || 0;
+    const totalVotes = votedVotes + opponentVotes;
+    
+    matchState.voteDiff = Math.abs(votedVotes - opponentVotes);
+    matchState.userPct = totalVotes > 0 ? Math.round((votedVotes / totalVotes) * 100) : 50;
+    matchState.wasClose = matchState.voteDiff <= 5;
+    matchState.isWinning = votedVotes >= opponentVotes;
+    matchState.isDominating = matchState.userPct >= 65;
+    
+    // Tipped the scale = was tied/losing, now winning
+    const previousVotedVotes = votedVotes - 1; // Before our vote
+    const wasPreviouslyLosing = previousVotedVotes < opponentVotes;
+    const wasPreviouslyTied = previousVotedVotes === opponentVotes;
+    
+    matchState.tippedScale = (
+        (wasPreviouslyLosing && matchState.isWinning) ||  // Was losing, now winning
+        (wasPreviouslyTied && matchState.voteDiff === 1)   // Was tied, now leading by 1
+    );
+    
+    console.log('📊 Match context (with our vote):', matchState);
+}
         } catch (error) {
             console.warn('⚠️ Could not fetch match state for context:', error);
         }

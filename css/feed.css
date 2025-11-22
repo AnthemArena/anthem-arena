@@ -2858,3 +2858,113 @@ body {
         margin: 4px 0;
     }
 }
+/* ========================================
+   VOTE POST - COMPACT MATCH CARD
+   ======================================== */
+
+.match-embed {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.match-embed:hover {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: rgba(200, 170, 110, 0.5);
+}
+
+.match-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: #C8AA6E;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.match-songs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.song-option {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid transparent;
+    min-width: 0; /* Allow text truncation */
+}
+
+.song-option.picked {
+    background: rgba(200, 170, 110, 0.15);
+    border-color: rgba(200, 170, 110, 0.5);
+}
+
+.song-name {
+    font-size: 0.8rem;
+    color: #f0e6d2;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.song-pct {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+
+.vs-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(200, 170, 110, 0.6);
+    padding: 4px 6px;
+    flex-shrink: 0;
+}
+
+.match-progress-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.progress-fill.winning {
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+}
+
+.progress-fill.losing {
+    background: linear-gradient(90deg, #f44336, #ff7043);
+}
+
+.match-status {
+    font-size: 0.7rem;
+    color: rgba(240, 230, 210, 0.6);
+    text-align: center;
+}
+
+/* Remove the thumbnail for cleaner look */
+.match-thumbnail {
+    display: none;
+}
