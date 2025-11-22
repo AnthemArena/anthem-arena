@@ -6,12 +6,12 @@
   "description": "Wild, unpredictable, and always ready to blow something up! Get ready for mayhem!",
   "buttonPrefix": "💣",
   "color": "#ff69b4",
- "theme": {
-    "background": "linear-gradient(to right, rgba(26, 26, 46, 0.98) 0%, rgba(26, 26, 46, 0.85) 60%, rgba(26, 26, 46, 0.6) 100%), url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg')",
-    "backgroundSize": "cover",
-    "backgroundPosition": "right center",
-    "borderColor": "rgba(255, 105, 180, 0.5)",
-    "borderGlow": "0 0 20px rgba(255, 105, 180, 0.3)",
+"theme": {
+    "background": "rgba(26, 26, 46, 0.98)",
+    "championStrip": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg')",
+    "championStripPosition": "center 25%",
+    "borderColor": "rgba(255, 105, 180, 0.6)",
+    "borderGlow": "0 0 20px rgba(255, 105, 180, 0.4)",
     "titleColor": "#ff69b4",
     "detailColor": "rgba(255, 255, 255, 0.85)",
     "buttonBackground": "linear-gradient(135deg, #C8AA6E, #B89A5E)",

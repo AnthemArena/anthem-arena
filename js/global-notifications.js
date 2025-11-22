@@ -1477,6 +1477,46 @@ function showBulletin(notification) {
     opacity: 1;
 }
 
+/* Champion banner strip at top */
+.bulletin-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--bulletin-champion-strip, none);
+    background-size: cover;
+    background-position: center 25%;
+    border-radius: 12px 12px 0 0;
+    z-index: 0;
+    opacity: 0.9;
+}
+
+/* Darken bottom of strip for smooth transition */
+.bulletin-banner::after {
+    content: '';
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, rgba(26, 26, 46, 1));
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Make content appear above the strip */
+.bulletin-toast-content {
+    position: relative;
+    z-index: 2;
+    margin-top: 60px; /* Push content below strip */
+}
+
+.bulletin-toast-cta {
+    position: relative;
+    z-index: 2;
+}
 /* ========================================
    TOAST CONTENT LAYOUT
 ======================================== */
@@ -1893,6 +1933,7 @@ if (championPack && championPack.theme) {
     root.style.setProperty('--bulletin-bg', theme.background || 'rgba(0, 0, 0, 0.95)');
     root.style.setProperty('--bulletin-bg-size', theme.backgroundSize || 'auto');
     root.style.setProperty('--bulletin-bg-position', theme.backgroundPosition || 'center');
+    root.style.setProperty('--bulletin-champion-strip', theme.championStrip || 'none'); // ✅ NEW
     root.style.setProperty('--bulletin-border', theme.borderColor || 'rgba(200, 170, 110, 0.3)');
     root.style.setProperty('--bulletin-glow', theme.borderGlow || '0 0 20px rgba(200, 170, 110, 0.15)');
     root.style.setProperty('--bulletin-title', theme.titleColor || '#C8AA6E');
