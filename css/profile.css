@@ -2302,3 +2302,28 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* ========================================
+   EMERGENCY FIX: Remove gaps around header
+   ======================================== */
+
+.profile-content {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.profile-header {
+    margin-left: -2rem !important;   /* Extend beyond container */
+    margin-right: -2rem !important;
+    margin-top: -2rem !important;    /* Pull up to top */
+    width: calc(100% + 4rem) !important;  /* Full width */
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        margin-left: -1rem !important;
+        margin-right: -1rem !important;
+        margin-top: -1rem !important;
+        width: calc(100% + 2rem) !important;
+    }
+}
