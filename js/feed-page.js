@@ -811,47 +811,6 @@ async function loadFeed() {
 }
 
 // ========================================
-// RENDER POSTS
-// ========================================
-
-function renderPosts(startIndex, count) {
-    const feedContainer = document.getElementById('feedPosts');
-    const loadMoreContainer = document.getElementById('loadMoreContainer');
-    
-    // Get posts to render
-    const postsToRender = currentPosts.slice(startIndex, startIndex + count);
-    
-    // Render each post
-    postsToRender.forEach(post => {
-        const postElement = createPostElement(post);
-        feedContainer.appendChild(postElement);
-    });
-    
-    // Update last loaded index
-    lastLoadedIndex = startIndex + count;
-
-        // ✅ Setup tooltips after rendering
-    setupSongTooltips();
-        setupMentionTooltips(); // ✅ NEW!
-
-    
-    // Show/hide load more button
-    if (lastLoadedIndex < currentPosts.length) {
-        loadMoreContainer.style.display = 'block';
-    } else {
-        loadMoreContainer.style.display = 'none';
-    }
-}
-
-
-// ========================================
-// RENDER POST CONTENT
-// ========================================
-
-// ========================================
-// RENDER POST CONTENT
-// ========================================
-
 function renderPostContent(post) {
     if (post.type === 'vote') {
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
@@ -864,9 +823,8 @@ function renderPostContent(post) {
         const votedThumbnail = post.votedThumbnail || 
             (post.votedSongId ? `https://img.youtube.com/vi/${post.votedSongId}/mqdefault.jpg` : '');
         
-        // We need opponent thumbnail - try to get from matchState or generate placeholder
         const opponentThumbnail = post.opponentThumbnail || 
-            'https://img.youtube.com/vi/default/mqdefault.jpg';
+            (post.opponentSongId ? `https://img.youtube.com/vi/${post.opponentSongId}/mqdefault.jpg` : '');
         
         return `
             <p class="post-text vote-text">
@@ -910,16 +868,30 @@ function renderPostContent(post) {
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        const withSongs = parseSongMentions(post.content);
+        let displayContent = post.content;
+        
+        // ✅ Remove YouTube URL from text if we're showing an embed
+        if (post.youtubeVideoId) {
+            displayContent = displayContent
+                .replace(/https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)[^\s]+/gi, '')
+                .trim();
+        }
+        
+        const withSongs = parseSongMentions(displayContent);
         const withMentions = parseMentionsHTML(withSongs);
         
+        // Only show text paragraph if there's content left after removing URL
+        const textHtml = withMentions.trim() 
+            ? `<p class="post-text">${withMentions}</p>` 
+            : '';
+        
         return `
-            <p class="post-text">${withMentions}</p>
+            ${textHtml}
             ${post.youtubeVideoId ? renderYouTubeEmbed(post) : ''}
         `;
     }
     
-    return '';
+    return '';  // ✅ Fallback for other post types
 }
 
 // ========================================
