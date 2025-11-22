@@ -2293,3 +2293,79 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* ========================================
+   PROFILE HEADER - FULL WIDTH, NO GAPS
+   ======================================== */
+
+.profile-page {
+    min-height: 100vh;
+    padding-top: 80px;  /* Nav clearance only */
+    background: #0a0a0a;
+    position: relative;
+}
+
+/* Remove any wrapper padding */
+.profile-page > * {
+    margin-top: 0 !important;
+}
+
+.profile-header {
+    position: relative;
+    margin: 0 !important;
+    margin-bottom: 3rem !important;  /* Space below for content */
+    padding: 0;
+    border-radius: 0;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 100%;
+}
+
+.profile-banner {
+    height: 400px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(200, 170, 110, 0.9) 0%, 
+            rgba(26, 26, 46, 0.95) 50%,
+            rgba(10, 10, 10, 0.98) 100%
+        ),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 250"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23c8aa6e;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23000;stop-opacity:0"/></linearGradient></defs><rect fill="url(%23g)" width="1200" height="250"/></svg>');
+    background-size: cover;
+    background-position: center 30%;
+    position: relative;
+    border-bottom: 3px solid #c8aa6e;
+}
+
+/* Gold shimmer effect on banner */
+.profile-banner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(200, 170, 110, 0.2),
+        transparent
+    );
+    animation: shimmer 8s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+
+.profile-info-container {
+    padding: 0 3rem 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, #0a0a0a 100%);
+    position: relative;
+    margin-top: -120px;  /* Avatar overlap */
+}
