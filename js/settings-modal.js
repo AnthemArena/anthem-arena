@@ -790,34 +790,43 @@ if (bannerValue === 'default') {
         
         hasChanges = false;
         
-        console.log('✅ Settings saved:', { username, avatar, banner, privacy: privacySettings });
-        
-        // Update navigation
-        if (window.updateNavProfile) {
-            window.updateNavProfile();
-        }
-        
-        // Show success state
-        if (saveBtn) {
-            saveBtn.innerHTML = '✅ Saved!';
-            saveBtn.style.background = '#4caf50';
-        }
-        
-        // Show success notification
-        showNotification('✅ Profile updated successfully!', 'success');
-        
-        // Reload preview
-        loadCurrentProfile();
-        
-        // Close modal after short delay
-        setTimeout(() => {
-            closeSettingsModal();
-            if (saveBtn) {
-                saveBtn.innerHTML = originalBtnText;
-                saveBtn.style.background = '';
-                saveBtn.disabled = false;
-            }
-        }, 1500);
+       console.log('✅ Settings saved:', { username, avatar, banner, privacy: privacySettings });
+
+// ✅ Invalidate profile cache
+if (window.invalidateProfileCache) {
+    window.invalidateProfileCache(username);
+    console.log('🗑️ Profile cache invalidated');
+}
+
+// Update navigation
+if (window.updateNavProfile) {
+    window.updateNavProfile();
+}
+
+// Show success state
+if (saveBtn) {
+    saveBtn.innerHTML = '✅ Saved!';
+    saveBtn.style.background = '#4caf50';
+}
+
+// Show success notification
+showNotification('✅ Profile updated successfully!', 'success');
+
+// Close modal after short delay
+setTimeout(() => {
+    closeSettingsModal();
+    if (saveBtn) {
+        saveBtn.innerHTML = originalBtnText;
+        saveBtn.style.background = '';
+        saveBtn.disabled = false;
+    }
+    
+    // ✅ Hard reload if on profile page (force fresh data)
+    if (window.location.pathname.includes('profile')) {
+        console.log('🔄 Reloading profile page with fresh data...');
+        window.location.reload(true);
+    }
+}, 1500);
         
         return true;
         
