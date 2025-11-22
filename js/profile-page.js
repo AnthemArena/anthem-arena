@@ -208,14 +208,17 @@ async function preloadTabCounts(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         document.getElementById('votesCount').textContent = votesSnapshot.size;
         
-        // Get achievements count
-        const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        const achievementsCount = profileDoc.exists() 
-            ? (profileDoc.data().unlockedAchievements || []).length 
-            : 0;
+        // ✅ FIXED: Get achievements count from subcollection
+        const achievementsRef = collection(db, 'profiles', userId, 'achievements');
+        const achievementsSnapshot = await getDocs(achievementsRef);
+        const achievementsCount = achievementsSnapshot.size;
+        
         document.getElementById('achievementsCount').textContent = achievementsCount;
         
-        console.log('✅ Tab counts preloaded');
+        console.log('✅ Tab counts preloaded:', {
+            votes: votesSnapshot.size,
+            achievements: achievementsCount
+        });
         
     } catch (error) {
         console.error('❌ Error preloading counts:', error);
@@ -958,12 +961,12 @@ async function loadProfileStats(userId) {
         
 
         
-        // Get achievements count (might have changed after checking)
-        const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        const unlockedAchievements = profileDoc.exists() 
-            ? (profileDoc.data().unlockedAchievements || [])
-            : [];
-        const achievementsCount = unlockedAchievements.length;
+      // ✅ NEW - Query achievements subcollection
+const achievementsRef = collection(db, 'profiles', userId, 'achievements');
+const achievementsSnapshot = await getDocs(achievementsRef);
+const achievementsCount = achievementsSnapshot.size;
+
+console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
         
         // ✅ GET RANK - Different logic for own profile vs others
         const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
