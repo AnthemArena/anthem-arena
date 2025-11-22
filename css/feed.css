@@ -1584,3 +1584,248 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
 }
+/* ========================================
+   COMMENT DELETE BUTTON
+   ======================================== */
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+.comment-delete-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 107, 107, 0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    opacity: 0;
+}
+
+.comment:hover .comment-delete-btn {
+    opacity: 1;
+}
+
+.comment-delete-btn:hover {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+.comment-delete-btn:active {
+    transform: scale(0.95);
+}
+/* ========================================
+   FEED SEARCH BAR
+   ======================================== */
+
+.feed-search-container {
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(10, 10, 10, 0.8) 100%);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    border-color: rgba(200, 170, 110, 0.6);
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.2);
+}
+
+.search-box i.fa-search {
+    color: rgba(200, 170, 110, 0.6);
+    margin-right: 0.75rem;
+    font-size: 1rem;
+}
+
+.feed-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #f0e6d2;
+    font-size: 0.95rem;
+    font-family: 'Lora', serif;
+    outline: none;
+}
+
+.feed-search-input::placeholder {
+    color: rgba(240, 230, 210, 0.4);
+}
+
+.clear-search-btn {
+    background: none;
+    border: none;
+    color: rgba(200, 170, 110, 0.6);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    margin-left: 0.5rem;
+}
+
+.clear-search-btn:hover {
+    background: rgba(200, 170, 110, 0.15);
+    color: #c8aa6e;
+}
+
+/* Search Results Info */
+.search-results-info {
+    text-align: center;
+    padding: 1rem;
+    color: rgba(240, 230, 210, 0.6);
+    font-size: 0.9rem;
+}
+
+.search-results-info strong {
+    color: #c8aa6e;
+}
+/* ========================================
+   SONG MENTIONS & TOOLTIPS
+   ======================================== */
+
+.song-mention {
+    color: #c8aa6e;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    border-bottom: 1px dotted rgba(200, 170, 110, 0.5);
+    transition: all 0.2s ease;
+}
+
+.song-mention:hover {
+    color: #f0e6d2;
+    border-bottom-color: #c8aa6e;
+}
+
+/* Tooltip */
+.song-tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+    border: 1px solid rgba(200, 170, 110, 0.6);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 300px;
+    max-width: 350px;
+    box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.7),
+        0 0 24px rgba(200, 170, 110, 0.25);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.song-mention:hover .song-tooltip {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Arrow */
+.song-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(200, 170, 110, 0.6);
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+    color: #f0e6d2;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.tooltip-header i {
+    color: #c8aa6e;
+}
+
+.tooltip-thumbnail {
+    position: relative;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tooltip-thumbnail img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    text-decoration: none;
+}
+
+.play-overlay:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.play-overlay i {
+    font-size: 3rem;
+    color: #fff;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+.play-overlay:hover i {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.tooltip-artists {
+    font-size: 0.85rem;
+    color: rgba(240, 230, 210, 0.7);
+    margin-bottom: 0.75rem;
+}
+
+.tooltip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #c8aa6e;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.tooltip-link:hover {
+    color: #f0e6d2;
+}
+
+@media (max-width: 768px) {
+    .song-tooltip {
+        min-width: 280px;
+        max-width: 90vw;
+    }
+}

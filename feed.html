@@ -74,6 +74,23 @@
         <section class="feed-center">
             <div class="feed-header">
                 <h1 class="feed-title"><i class="fa-solid fa-users"></i> Community Feed</h1>
+
+                <!-- Search Bar -->
+<div class="feed-search-container">
+    <div class="search-box">
+        <i class="fa-solid fa-search"></i>
+        <input 
+            type="text" 
+            id="feedSearchInput" 
+            class="feed-search-input" 
+            placeholder="Search posts, users, songs..."
+            autocomplete="off"
+        >
+        <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    </div>
+</div>
                 
                 <!-- Filter Tabs -->
                 <div class="feed-filters">

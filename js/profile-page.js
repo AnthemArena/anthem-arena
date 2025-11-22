@@ -2527,25 +2527,34 @@ async function loadFeaturedPosts(userId) {
 // ========================================
 
 function renderProfilePostCard(post, isFeatured = false) {
-    const avatarUrl = getAvatarUrl(post.avatar);
-    const timeAgo = formatTimeAgo(post.timestamp);
     const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
     const isOwnPost = post.userId === currentUserId;
     
-    // Check if post is editable (within 15 minutes)
+    let avatarUrl, displayUsername;
+    
+    if (isOwnPost && window.location.pathname.includes('profile.html')) {
+        const currentAvatar = JSON.parse(localStorage.getItem('avatar') || '{}');
+        const currentUsername = localStorage.getItem('username');
+        
+        avatarUrl = getAvatarUrl(currentAvatar);
+        displayUsername = currentUsername || post.username;
+    } else {
+        avatarUrl = getAvatarUrl(post.avatar);
+        displayUsername = post.username;
+    }
+    
+    const timeAgo = formatTimeAgo(post.timestamp);
     const postAge = Date.now() - post.timestamp;
     const isEditable = isOwnPost && postAge < (15 * 60 * 1000);
     const editedIndicator = post.editedAt ? '<span class="edited-indicator">• Edited</span>' : '';
-    
-    // Pin indicator
     const pinBadge = isFeatured ? '<span class="pin-badge"><i class="fas fa-thumbtack"></i> Pinned</span>' : '';
     
     return `
         <div class="profile-post-card" data-post-id="${post.id}">
             <div class="post-header">
-                <img src="${avatarUrl}" alt="${post.username}" class="post-avatar">
+                <img src="${avatarUrl}" alt="${displayUsername}" class="post-avatar">
                 <div class="post-meta">
-                    <div class="post-username">${post.username}</div>
+                    <div class="post-username">${displayUsername}</div>
                     <div class="post-timestamp">${timeAgo}${editedIndicator}</div>
                 </div>
                 ${pinBadge}
@@ -2585,10 +2594,6 @@ function renderProfilePostCard(post, isFeatured = false) {
                 <span><i class="fa-solid fa-heart"></i> ${post.likeCount || 0}</span>
                 <span><i class="fa-solid fa-comment"></i> ${post.commentCount || 0}</span>
             </div>
-            
-            <a href="/feed.html#post-${post.id}" class="view-post-link">
-                View Full Post →
-            </a>
         </div>
     `;
 }

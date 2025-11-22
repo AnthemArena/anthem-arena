@@ -15,6 +15,22 @@ import {
 } from './social-feed.js';
 
 // ========================================
+// SONG DATA
+// ========================================
+
+let musicVideos = [];
+
+async function loadMusicVideos() {
+    try {
+        const response = await fetch('/data/music-videos.json');
+        musicVideos = await response.json();
+        console.log('✅ Loaded music videos:', musicVideos.length);
+    } catch (error) {
+        console.error('❌ Error loading music videos:', error);
+    }
+}
+
+// ========================================
 // HELPER FUNCTIONS
 // ========================================
 
@@ -69,6 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
 
+          // ✅ Load music videos data
+    await loadMusicVideos();
+
         // ✅ NEW: Update header banner first
         await updateFeedHeaderBanner();
         
@@ -86,6 +105,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Setup filter buttons
         setupFilters();
+
+        // ✅ NEW: Setup search
+setupSearch();
         
         // Setup create post box
         setupCreatePost();
@@ -191,6 +213,165 @@ function setupFilters() {
             await loadFeed();
         });
     });
+}
+
+// ========================================
+// ✅ NEW: SEARCH FUNCTIONALITY
+// ========================================
+
+let searchQuery = '';
+let isSearching = false;
+
+function setupSearch() {
+    const searchInput = document.getElementById('feedSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    
+    if (!searchInput || !clearBtn) return;
+    
+    // Debounced search (wait 300ms after typing stops)
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        
+        // Show/hide clear button
+        clearBtn.style.display = query ? 'block' : 'none';
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Wait 300ms before searching
+        searchTimeout = setTimeout(async () => {
+            searchQuery = query;
+            
+            if (query) {
+                isSearching = true;
+                await performSearch(query);
+            } else {
+                isSearching = false;
+                await loadFeed(); // Reload normal feed
+            }
+        }, 300);
+    });
+    
+    // Clear search
+    clearBtn.addEventListener('click', async () => {
+        searchInput.value = '';
+        searchQuery = '';
+        isSearching = false;
+        clearBtn.style.display = 'none';
+        await loadFeed();
+        searchInput.focus();
+    });
+    
+    // Enter key submits search immediately
+    searchInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            const query = searchInput.value.trim();
+            searchQuery = query;
+            
+            if (query) {
+                isSearching = true;
+                await performSearch(query);
+            }
+        }
+    });
+}
+
+async function performSearch(query) {
+    const feedContainer = document.getElementById('feedPosts');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Show loading
+    loadingState.style.display = 'block';
+    emptyState.style.display = 'none';
+    feedContainer.innerHTML = '';
+    feedContainer.appendChild(loadingState);
+    feedContainer.appendChild(emptyState);
+    
+    try {
+        // Get all posts
+        const allPosts = await getFeed('all', 200);
+        
+        const lowerQuery = query.toLowerCase();
+        
+        // Filter posts by:
+        // - Username
+        // - Post content
+        // - Song names
+        // - Match titles
+        const filteredPosts = allPosts.filter(post => {
+            // Search username
+            if (post.username && post.username.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            // Search post content
+            if (post.content && post.content.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            // Search post text (for vote posts)
+            if (post.text && post.text.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            // Search song names
+            if (post.votedSongName && post.votedSongName.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            if (post.songTitle && post.songTitle.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            if (post.opponentSongName && post.opponentSongName.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            // Search match title
+            if (post.matchTitle && post.matchTitle.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            
+            return false;
+        });
+        
+        // Hide loading
+        loadingState.style.display = 'none';
+        
+        // Show results
+        if (filteredPosts.length === 0) {
+            emptyState.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-search" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <h3>No Results Found</h3>
+                    <p>No posts match "${escapeHtml(query)}"</p>
+                    <p style="font-size: 0.85rem; opacity: 0.7;">Try different keywords or check spelling</p>
+                </div>
+            `;
+            emptyState.style.display = 'block';
+        } else {
+            // Add search info
+            const searchInfo = document.createElement('div');
+            searchInfo.className = 'search-results-info';
+            searchInfo.innerHTML = `
+                Found <strong>${filteredPosts.length}</strong> result${filteredPosts.length !== 1 ? 's' : ''} for "${escapeHtml(query)}"
+            `;
+            feedContainer.appendChild(searchInfo);
+            
+            // Render filtered posts
+            currentPosts = filteredPosts;
+            lastLoadedIndex = 0;
+            renderPosts(0, POSTS_PER_PAGE);
+        }
+        
+    } catch (error) {
+        console.error('❌ Search error:', error);
+        loadingState.innerHTML = '<p style="color: var(--danger);">Search failed. Please try again.</p>';
+    }
 }
 
 // ========================================
@@ -345,6 +526,9 @@ function renderPosts(startIndex, count) {
     
     // Update last loaded index
     lastLoadedIndex = startIndex + count;
+
+        // ✅ Setup tooltips after rendering
+    setupSongTooltips();
     
     // Show/hide load more button
     if (lastLoadedIndex < currentPosts.length) {
@@ -361,32 +545,98 @@ function renderPosts(startIndex, count) {
 
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        // NEW: Show the smart context-aware text!
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
         
         return `
             <p class="post-text vote-text">
-                <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
+                <i class="fa-solid fa-check-circle"></i> ${parseSongMentions(smartText)}
             </p>
             
             <div class="match-embed" data-match-id="${post.matchId}">
                 <h4 class="match-title">${escapeHtml(post.matchTitle)}</h4>
                 <div class="match-songs">
                     <div class="song-info ${post.choice === 'song1' ? 'picked' : ''}">
-                        <div class="song-title">${escapeHtml(post.votedSongName || post.songTitle)}</div>
+                        <div class="song-title">${parseSongMentions(post.votedSongName || post.songTitle)}</div>
                     </div>
                     <div class="vs-divider">VS</div>
                     <div class="song-info ${post.choice === 'song2' ? 'picked' : ''}">
-                        <div class="song-title">${escapeHtml(post.opponentSongName || 'Other Song')}</div>
+                        <div class="song-title">${parseSongMentions(post.opponentSongName || 'Other Song')}</div>
                     </div>
                 </div>
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        return `<p class="post-text">${escapeHtml(post.content)}</p>`;
+        // ✅ Parse song mentions in user posts
+        return `<p class="post-text">${parseSongMentions(post.content)}</p>`;
     }
     
     return '';
+}
+
+// ========================================
+// ✅ SONG TOOLTIP SYSTEM
+// ========================================
+
+function setupSongTooltips() {
+    document.querySelectorAll('.song-mention').forEach(mention => {
+        mention.addEventListener('mouseenter', (e) => {
+            // Check if tooltip already exists
+            if (mention.querySelector('.song-tooltip')) return;
+            
+            const songName = mention.dataset.songName;
+            const youtubeId = mention.dataset.youtubeId;
+            const artist = mention.dataset.artist;
+            const year = mention.dataset.year;
+            
+            if (!youtubeId) return;
+            
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'song-tooltip';
+            tooltip.innerHTML = `
+                <div class="tooltip-header">
+                    <i class="fas fa-music"></i>
+                    ${songName} ${year ? `(${year})` : ''}
+                </div>
+                
+                <div class="tooltip-thumbnail">
+                    <img 
+                        src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" 
+                        alt="${songName}"
+                    >
+                    <a href="https://www.youtube.com/watch?v=${youtubeId}" 
+                       target="_blank" 
+                       class="play-overlay">
+                        <i class="fas fa-play-circle"></i>
+                    </a>
+                </div>
+                
+                ${artist ? `<div class="tooltip-artists">${artist}</div>` : ''}
+                
+                <a href="https://www.youtube.com/watch?v=${youtubeId}" 
+                   target="_blank" 
+                   class="tooltip-link">
+                    <i class="fab fa-youtube"></i>
+                    Watch on YouTube
+                </a>
+            `;
+            
+            mention.style.position = 'relative';
+            mention.appendChild(tooltip);
+            
+            // Prevent click from triggering link
+            tooltip.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+        
+        mention.addEventListener('mouseleave', (e) => {
+            const tooltip = mention.querySelector('.song-tooltip');
+            if (tooltip) {
+                setTimeout(() => tooltip.remove(), 200);
+            }
+        });
+    });
 }
 
 // ========================================
@@ -593,10 +843,12 @@ async function loadComments(postId) {
 function createCommentElement(comment) {
     const div = document.createElement('div');
     div.className = 'comment';
+    div.dataset.commentId = comment.commentId;
     
     const avatarUrl = getAvatarUrl(comment.avatar);
     const timeAgo = getTimeAgo(comment.timestamp);
     const currentUserId = localStorage.getItem('tournamentUserId');
+    const isOwnComment = comment.userId === currentUserId;
     
     div.innerHTML = `
         <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
@@ -604,6 +856,11 @@ function createCommentElement(comment) {
             <div class="comment-header">
                 <span class="comment-username" data-user-id="${comment.userId}">${comment.username}</span>
                 <span class="comment-time">${timeAgo}</span>
+                ${isOwnComment ? `
+                    <button class="comment-delete-btn" data-comment-id="${comment.commentId}" data-post-id="${comment.postId}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                ` : ''}
             </div>
             <p class="comment-text">${escapeHtml(comment.content)}</p>
         </div>
@@ -625,6 +882,14 @@ function createCommentElement(comment) {
     username.addEventListener('click', goToProfile);
     avatar.style.cursor = 'pointer';
     avatar.addEventListener('click', goToProfile);
+    
+    // ✅ Add delete handler
+    const deleteBtn = div.querySelector('.comment-delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+            await deleteComment(comment.commentId, comment.postId, div);
+        });
+    }
     
     return div;
 }
@@ -704,6 +969,63 @@ async function postComment(postId, inputElement) {
         console.error('❌ Error posting comment:', error);
         if (window.showNotification) {
             window.showNotification('Failed to post comment', 'error');
+        }
+    }
+}
+
+// ========================================
+// ✅ NEW: DELETE COMMENT
+// ========================================
+
+async function deleteComment(commentId, postId, commentElement) {
+    if (!confirm('Delete this comment? This cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete from Firestore
+        const { doc, deleteDoc, updateDoc, increment } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        await deleteDoc(doc(db, 'comments', commentId));
+        
+        // Decrement post comment count
+        const postRef = doc(db, 'posts', postId);
+        await updateDoc(postRef, {
+            commentCount: increment(-1)
+        });
+        
+        console.log('✅ Comment deleted');
+        
+        // Animate removal
+        commentElement.style.transition = 'all 0.3s ease';
+        commentElement.style.opacity = '0';
+        commentElement.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            commentElement.remove();
+            
+            // Update comment count in UI
+            const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+            if (commentCountSpan) {
+                const currentCount = parseInt(commentCountSpan.textContent);
+                commentCountSpan.textContent = Math.max(0, currentCount - 1);
+            }
+            
+            // Check if comments section is now empty
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+            if (commentsList && commentsList.children.length === 0) {
+                commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first!</p>';
+            }
+        }, 300);
+        
+        if (window.showNotification) {
+            window.showNotification('Comment deleted', 'success');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error deleting comment:', error);
+        if (window.showNotification) {
+            window.showNotification('Failed to delete comment', 'error');
         }
     }
 }
@@ -1082,6 +1404,38 @@ async function deletePost(postId, postElement) {
             window.showNotification('Failed to delete post', 'error');
         }
     }
+}
+
+// ========================================
+// ✅ PARSE SONG MENTIONS FOR TOOLTIPS
+// ========================================
+
+function parseSongMentions(text) {
+    if (!text || musicVideos.length === 0) return escapeHtml(text);
+    
+    // Get all song names
+    const songNames = musicVideos.map(video => video.name);
+    
+    // Sort by length (longest first) to avoid partial matches
+    songNames.sort((a, b) => b.length - a.length);
+    
+    let parsedText = escapeHtml(text);
+    
+    songNames.forEach(songName => {
+        // Case-insensitive match with word boundaries
+        const regex = new RegExp(`\\b(${songName})\\b`, 'gi');
+        
+        parsedText = parsedText.replace(regex, (match) => {
+            const video = musicVideos.find(v => v.name.toLowerCase() === match.toLowerCase());
+            
+            if (video && video.youtubeId) {
+                return `<span class="song-mention" data-song-name="${escapeHtml(video.name)}" data-youtube-id="${video.youtubeId}" data-artist="${escapeHtml(video.artist)}" data-year="${video.year}">${match}</span>`;
+            }
+            return match;
+        });
+    });
+    
+    return parsedText;
 }
 
 // ========================================
