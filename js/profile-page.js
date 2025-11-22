@@ -59,6 +59,13 @@ let currentUserId = null;
 let currentUsername = null;
 
 // ========================================
+// PREVENT DUPLICATE ACHIEVEMENT CHECKS
+// ========================================
+
+let profileStatsLoaded = false;
+window.profileStatsLoaded = false;
+
+// ========================================
 // MUSIC DATA CACHE (for thumbnails)
 // ========================================
 
@@ -945,13 +952,12 @@ async function loadProfileStats(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         const votesCount = votesSnapshot.size;
         
-        // ✅ NEW: Check for newly unlocked achievements (only for own profile)
-       // ✅ NEW: Check for newly unlocked achievements (only for own profile AND only once per session)
-if (isViewingOwnProfile && votesCount > 0 && !window.achievementsCheckedThisSession) {
-    console.log('🏆 Checking for newly unlocked achievements...');
+    // ✅ IMPROVED: Check for newly unlocked achievements (only on initial page load)
+if (isViewingOwnProfile && votesCount > 0 && !window.profileStatsLoaded) {
+    console.log('🏆 Checking for newly unlocked achievements (initial load only)...');
     
-    // Mark as checked for this session
-    window.achievementsCheckedThisSession = true;
+    // Mark stats as loaded
+    window.profileStatsLoaded = true;
     
     // Get full vote data for achievement checking
     const votes = votesSnapshot.docs.map(doc => ({
@@ -964,8 +970,8 @@ if (isViewingOwnProfile && votesCount > 0 && !window.achievementsCheckedThisSess
     await checkAchievements(votes);
     
     console.log('✅ Achievement check complete');
-} else if (isViewingOwnProfile && window.achievementsCheckedThisSession) {
-    console.log('⏭️ Achievements already checked this session, skipping...');
+} else if (isViewingOwnProfile) {
+    console.log('⏭️ Skipping achievement check (already loaded or settings save)');
 }
         
         // Get achievements count (might have changed after checking)
