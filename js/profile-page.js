@@ -320,7 +320,6 @@ async function fetchUserProfileDirect(username) {
 function generateFallbackProfile(username) {
     console.log('🔧 Generating fallback profile for:', username);
     
-    // Champion avatar pool
     const champions = [
         { championId: 'Ahri', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ahri.png' },
         { championId: 'Akali', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Akali.png' },
@@ -332,7 +331,6 @@ function generateFallbackProfile(username) {
         { championId: 'KSante', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/KSante.png' }
     ];
     
-    // Use username hash to consistently pick same champion
     const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const champion = champions[hash % champions.length];
     
@@ -344,12 +342,15 @@ function generateFallbackProfile(username) {
             championId: champion.championId,
             imageUrl: champion.imageUrl
         },
+        banner: {  // ✅ ADD THIS
+            type: 'auto'  // Auto-match the avatar
+        },
         bio: 'New to Anthem Arena',
         privacy: {
             isPublic: true
         },
         createdAt: Date.now(),
-        isFallback: true  // Flag to indicate this is a generated profile
+        isFallback: true
     };
 }
 
@@ -358,6 +359,10 @@ function generateFallbackProfile(username) {
 // ========================================
 
 async function renderProfile(profile) {
+
+      // ✅ ADD THIS: Apply banner FIRST (before avatar)
+    applyProfileBanner(profile);
+
     // Avatar
     const avatarEl = document.getElementById('profileAvatar');
     if (profile.avatar.type === 'url') {
@@ -444,6 +449,64 @@ async function renderProfile(profile) {
 renderProfileActions(isViewingOwnProfile);
 }
 
+
+// ✅ ADD THIS: New function to apply banner
+function applyProfileBanner(profile) {
+    const bannerEl = document.querySelector('.profile-banner');
+    if (!bannerEl) return;
+    
+    const banner = profile.banner || { type: 'auto' };
+    
+    if (banner.type === 'default') {
+        // Default gold gradient
+        bannerEl.style.background = `
+            linear-gradient(135deg, 
+                rgba(200, 170, 110, 0.9) 0%, 
+                rgba(26, 26, 46, 0.95) 50%,
+                rgba(10, 10, 10, 0.98) 100%
+            )
+        `;
+        bannerEl.style.backgroundImage = '';
+        
+    } else if (banner.type === 'champion') {
+        // Specific champion splash
+        const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${banner.championId}_${banner.skinNumber || 0}.jpg`;
+        bannerEl.style.backgroundImage = `
+            linear-gradient(to bottom, 
+                rgba(0, 0, 0, 0.4) 0%,
+                rgba(10, 10, 10, 0.85) 100%
+            ),
+            url('${splashUrl}')
+        `;
+        bannerEl.style.backgroundSize = 'cover';
+        bannerEl.style.backgroundPosition = 'center 25%';
+        
+    } else {
+        // Auto-match avatar (default behavior)
+        if (profile.avatar.type === 'champion' && profile.avatar.championId) {
+            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${profile.avatar.championId}_0.jpg`;
+            bannerEl.style.backgroundImage = `
+                linear-gradient(to bottom, 
+                    rgba(0, 0, 0, 0.4) 0%,
+                    rgba(10, 10, 10, 0.85) 100%
+                ),
+                url('${splashUrl}')
+            `;
+            bannerEl.style.backgroundSize = 'cover';
+            bannerEl.style.backgroundPosition = 'center 25%';
+        } else {
+            // Fallback to gold gradient for emoji avatars
+            bannerEl.style.background = `
+                linear-gradient(135deg, 
+                    rgba(200, 170, 110, 0.9) 0%, 
+                    rgba(26, 26, 46, 0.95) 50%,
+                    rgba(10, 10, 10, 0.98) 100%
+                )
+            `;
+            bannerEl.style.backgroundImage = '';
+        }
+    }
+}
 // ========================================
 // RENDER PROFILE BADGES
 // ========================================
@@ -481,21 +544,14 @@ async function renderProfileActions(isOwnProfile) {
     if (!actionsEl) return;
     
     if (isOwnProfile) {
-        // ========================================
-        // OWN PROFILE - Show Notifications + Settings
-        // ========================================
-        actionsEl.innerHTML = `
-            <button class="profile-action-btn secondary" id="profileNotificationBtn" onclick="window.openNotificationPanel()">
-                <i class="fas fa-bell"></i> Notifications
-                <span class="notification-badge" id="profileNotificationBadge" style="display: none;">0</span>
-            </button>
-            <button class="profile-action-btn primary" onclick="window.openSettingsModal()">
-                <i class="fas fa-cog"></i> Settings
-            </button>
-        `;
-        
-        // Update notification badge count
-        updateProfileNotificationBadge();
+    // ========================================
+    // OWN PROFILE - Show Edit Profile Button
+    // ========================================
+    actionsEl.innerHTML = `
+        <button class="profile-action-btn primary" onclick="window.openSettingsModal()">
+            <i class="fas fa-edit"></i> Edit Profile
+        </button>
+    `;
         
     } else {
         // ========================================
@@ -595,32 +651,6 @@ async function renderProfileActions(isOwnProfile) {
     }
 }
 
-// ========================================
-// UPDATE PROFILE NOTIFICATION BADGE
-// ========================================
-
-async function updateProfileNotificationBadge() {
-    try {
-        const { getUnreadCount } = await import('./notification-storage.js');
-        const userId = localStorage.getItem('tournamentUserId');
-        
-        if (!userId || userId === 'anonymous') return;
-        
-        const count = await getUnreadCount(userId);
-        const badge = document.getElementById('profileNotificationBadge');
-        
-        if (badge) {
-            if (count > 0) {
-                badge.textContent = count > 99 ? '99+' : count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-    } catch (error) {
-        console.warn('Could not update notification badge:', error);
-    }
-}
 
 // ========================================
 // HANDLE FOLLOW BUTTON CLICK

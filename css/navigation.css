@@ -1761,3 +1761,44 @@
         display: none;
     }
 }
+/* ========================================
+   FIX: Prevent profile page styles from affecting nav
+   ======================================== */
+
+/* Make navigation username always small */
+.nav-profile-card .profile-username,
+.profile-info .profile-username,
+.nav-profile-link .profile-username {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #f0e6d2 !important;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+/* Hover state */
+.nav-profile-link:hover .profile-username {
+    color: #c8aa6e !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .nav-profile-card .profile-username,
+    .profile-info .profile-username,
+    .nav-profile-link .profile-username {
+        font-size: 0.85rem !important;
+        max-width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-profile-card .profile-username,
+    .profile-info .profile-username,
+    .nav-profile-link .profile-username {
+        font-size: 0.8rem !important;
+        max-width: 80px;
+    }
+}

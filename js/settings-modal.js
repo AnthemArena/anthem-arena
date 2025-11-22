@@ -56,6 +56,9 @@ export function openSettingsModal() {
     // Setup event listeners
     setupEventListeners();
     
+    // ✅ NEW: Setup banner preview
+    setupBannerPreview();
+    
     // Show modal with animation
     setTimeout(() => {
         modalElement.classList.add('active');
@@ -180,6 +183,54 @@ function createModalHTML() {
                                 </div>
                             </div>
                         </div>
+
+                        // ========================================
+// ADD THIS: Banner Selection Field
+// ========================================
+
+<div class="setting-group">
+    <label for="bannerSelect">
+        <i class="fas fa-image"></i> Profile Banner
+    </label>
+    <select id="bannerSelect" class="setting-input">
+        <option value="auto">Auto (Match Avatar)</option>
+        <option value="default">Default (Gold Gradient)</option>
+        <optgroup label="Champions">
+            <option value="Ahri">Ahri</option>
+            <option value="Akali">Akali</option>
+            <option value="Akshan">Akshan</option>
+            <option value="Ashe">Ashe</option>
+            <option value="Ekko">Ekko</option>
+            <option value="Ezreal">Ezreal</option>
+            <option value="Jhin">Jhin</option>
+            <option value="Jinx">Jinx</option>
+            <option value="Kaisa">Kai'Sa</option>
+            <option value="KSante">K'Sante</option>
+            <option value="Katarina">Katarina</option>
+            <option value="LeeSin">Lee Sin</option>
+            <option value="Lux">Lux</option>
+            <option value="MissFortune">Miss Fortune</option>
+            <option value="Pyke">Pyke</option>
+            <option value="Seraphine">Seraphine</option>
+            <option value="Sett">Sett</option>
+            <option value="Sona">Sona</option>
+            <option value="Thresh">Thresh</option>
+            <option value="Yasuo">Yasuo</option>
+            <option value="Yone">Yone</option>
+            <option value="Zed">Zed</option>
+        </optgroup>
+    </select>
+    <small class="setting-hint">Choose a champion splash art for your profile banner</small>
+</div>
+
+<!-- ✅ OPTIONAL: Banner Preview -->
+<div class="setting-group">
+    <div id="bannerPreview" class="banner-preview">
+        <div class="banner-preview-overlay">
+            <span>Banner Preview</span>
+        </div>
+    </div>
+</div>
 
                         <!-- Privacy & Social Settings -->
 <div class="settings-section">
@@ -613,7 +664,6 @@ function validateUsername(username) {
     
     return { valid: true };
 }
-
 // ========================================
 // HANDLE SAVE SETTINGS
 // ========================================
@@ -638,6 +688,23 @@ async function handleSaveSettings(e) {
         showOnlineStatus: document.getElementById('showOnlineStatusToggle')?.checked ?? true,
         emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
     };
+    
+    // ✅ NEW: Get banner selection
+    const bannerSelect = document.getElementById('bannerSelect')?.value || 'auto';
+    let banner;
+    
+    if (bannerSelect === 'auto') {
+        banner = { type: 'auto' };
+    } else if (bannerSelect === 'default') {
+        banner = { type: 'default' };
+    } else {
+        // Specific champion splash
+        banner = {
+            type: 'champion',
+            championId: bannerSelect,
+            skinNumber: 0
+        };
+    }
     
     // Validate username
     const validation = validateUsername(username);
@@ -685,6 +752,7 @@ async function handleSaveSettings(e) {
         localStorage.setItem('username', username);
         localStorage.setItem('avatar', JSON.stringify(avatar));
         localStorage.setItem('bio', bio);
+        localStorage.setItem('banner', JSON.stringify(banner)); // ✅ NEW: Save banner
         
         // Save all privacy settings
         Object.keys(privacySettings).forEach(key => {
@@ -702,11 +770,12 @@ async function handleSaveSettings(e) {
             await setDoc(doc(db, 'profiles', userId), {
                 username: username,
                 avatar: avatar,
+                banner: banner,  // ✅ NEW: Save banner to Firebase
                 bio: bio,
                 privacy: privacySettings,
                 updatedAt: Date.now()
             });
-            console.log('✅ Profile saved to Firebase with privacy settings');
+            console.log('✅ Profile saved to Firebase with banner and privacy settings');
             
             // Show updating history state
             if (saveBtn) {
@@ -723,7 +792,7 @@ async function handleSaveSettings(e) {
         
         hasChanges = false;
         
-        console.log('✅ Settings saved:', { username, avatar, privacy: privacySettings });
+        console.log('✅ Settings saved:', { username, avatar, banner, privacy: privacySettings });
         
         // Update navigation
         if (window.updateNavProfile) {
@@ -777,6 +846,93 @@ async function handleSaveSettings(e) {
         return false;
     }
 }
+
+// ========================================
+// BANNER PREVIEW
+// ========================================
+
+function setupBannerPreview() {
+    const bannerSelect = document.getElementById('bannerSelect');
+    const bannerPreview = document.getElementById('bannerPreview');
+    
+    if (!bannerSelect || !bannerPreview) return;
+    
+    // Update preview when selection changes
+    bannerSelect.addEventListener('change', () => {
+        updateBannerPreview(bannerSelect.value);
+    });
+    
+    // Initial preview
+    updateBannerPreview(bannerSelect.value);
+}
+
+function updateBannerPreview(selection) {
+    const bannerPreview = document.getElementById('bannerPreview');
+    if (!bannerPreview) return;
+    
+    if (selection === 'default') {
+        // Gold gradient
+        bannerPreview.style.background = `
+            linear-gradient(135deg, 
+                rgba(200, 170, 110, 0.9) 0%, 
+                rgba(26, 26, 46, 0.95) 50%,
+                rgba(10, 10, 10, 0.98) 100%
+            )
+        `;
+        bannerPreview.style.backgroundImage = '';
+        
+    } else if (selection === 'auto') {
+        // Show current avatar's champion (if champion avatar)
+        const currentAvatar = getCurrentAvatarSelection();
+        
+        if (currentAvatar.type === 'champion') {
+            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${currentAvatar.championId}_0.jpg`;
+            bannerPreview.style.backgroundImage = `
+                linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
+                url('${splashUrl}')
+            `;
+        } else {
+            // Fallback to gradient if avatar is emoji
+            bannerPreview.style.background = `
+                linear-gradient(135deg, 
+                    rgba(200, 170, 110, 0.9) 0%, 
+                    rgba(26, 26, 46, 0.95) 50%,
+                    rgba(10, 10, 10, 0.98) 100%
+                )
+            `;
+            bannerPreview.style.backgroundImage = '';
+        }
+        
+    } else {
+        // Specific champion
+        const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${selection}_0.jpg`;
+        bannerPreview.style.backgroundImage = `
+            linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
+            url('${splashUrl}')
+        `;
+    }
+    
+    bannerPreview.style.backgroundSize = 'cover';
+    bannerPreview.style.backgroundPosition = 'center 30%';
+}
+
+function getCurrentAvatarSelection() {
+    const avatarType = document.querySelector('input[name="avatarType"]:checked')?.value;
+    
+    if (avatarType === 'champion') {
+        const selectedChampion = document.querySelector('.avatar-option.selected[data-type="champion"]');
+        return {
+            type: 'champion',
+            championId: selectedChampion?.dataset.champion
+        };
+    }
+    
+    return { type: 'emoji' };
+}
+
+// ✅ Call this when settings modal opens
+// Add to your existing openSettingsModal() or init function:
+// setupBannerPreview();
 
 // ========================================
 // NOTIFICATION SYSTEM
