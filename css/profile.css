@@ -2612,3 +2612,66 @@
         font-size: 1rem;
     }
 }
+/* ========================================
+   PROFILE SOCIAL LINKS - INLINE WITH META
+   ======================================== */
+
+.profile-social-inline {
+    display: flex !important;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.social-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 50%;
+    color: #c8aa6e;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.social-icon:hover {
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #c8aa6e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(200, 170, 110, 0.3);
+}
+
+/* Platform-specific colors */
+.social-icon.twitter:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: #fff;
+    color: #fff;
+}
+
+.social-icon.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-color: transparent;
+    color: #fff;
+}
+
+.social-icon.twitch:hover {
+    background: #9146ff;
+    border-color: #9146ff;
+    color: #fff;
+}
+
+.social-icon.youtube:hover {
+    background: #ff0000;
+    border-color: #ff0000;
+    color: #fff;
+}
+
+.social-icon.discord:hover {
+    background: #5865f2;
+    border-color: #5865f2;
+    color: #fff;
+}

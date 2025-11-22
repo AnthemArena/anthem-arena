@@ -454,7 +454,7 @@ async function renderProfile(profile) {
 
     // ✅ NEW: Render social links
     renderSocialLinks(profile);
-        
+
     // Render action buttons
 renderProfileActions(isViewingOwnProfile);
 }
@@ -2343,18 +2343,18 @@ function renderParticipationTab() {
 // RENDER SOCIAL LINKS
 // ========================================
 
+// ========================================
+// RENDER SOCIAL LINKS
+// ========================================
+
 function renderSocialLinks(profile) {
-    const socialContainer = document.getElementById('profileSocial');
-    if (!socialContainer) return;
-    
     const socialLinks = profile.socialLinks || {};
     
     // Check if user has any social links
     const hasSocial = Object.values(socialLinks).some(link => link && link.trim() !== '');
     
     if (!hasSocial) {
-        socialContainer.style.display = 'none';
-        return;
+        return; // Don't render anything if no social links
     }
     
     const socialIcons = [];
@@ -2417,20 +2417,17 @@ function renderSocialLinks(profile) {
         `);
     }
     
-    socialContainer.innerHTML = socialIcons.join('');
-    socialContainer.style.display = 'flex';
+    // ✅ NEW: Add social icons as a meta item instead of separate container
+    const profileMeta = document.querySelector('.profile-meta');
+    if (profileMeta && socialIcons.length > 0) {
+        const socialMetaItem = document.createElement('span');
+        socialMetaItem.className = 'profile-meta-item profile-social-inline';
+        socialMetaItem.innerHTML = socialIcons.join('');
+        profileMeta.appendChild(socialMetaItem);
+    }
     
-    console.log('✅ Social links rendered');
+    console.log('✅ Social links rendered inline');
 }
-
-// Helper: Copy Discord handle to clipboard
-window.copyDiscordHandle = function(handle) {
-    navigator.clipboard.writeText(handle).then(() => {
-        if (window.showQuickToast) {
-            window.showQuickToast(`📋 Copied: ${handle}`, 2000);
-        }
-    });
-};
 
 // ========================================
 // GLOBAL FUNCTIONS (TODO: Implement)
