@@ -1761,6 +1761,16 @@ try {
         // ✅ Track voting streak
         updateVotingStreak();
 
+        // ✅ NEW: Sync profile stats to Firestore after voting
+try {
+    const { syncProfileStatsToFirestore } = await import('./rank-system.js');
+    await syncProfileStatsToFirestore();
+    console.log('✅ Profile synced to Firestore after vote');
+} catch (syncError) {
+    console.warn('⚠️ Profile sync failed (non-critical):', syncError);
+    // Don't block vote submission if sync fails
+}
+
         // ✅ NEW: Check for achievement unlocks
         await checkForAchievementUnlocks();
 

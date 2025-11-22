@@ -221,3 +221,86 @@ export function addXP(xpToAdd, source = 'vote') {
     
     return newXP;
 }
+// ========================================
+// ✅ SYNC PROFILE STATS TO FIRESTORE
+// ========================================
+
+export async function syncProfileStatsToFirestore() {
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        if (!userId) {
+            console.warn('⚠️ No userId - cannot sync profile');
+            return;
+        }
+        
+        // Get current XP from storage
+        const totalXP = getUserXPFromStorage();
+        const rank = getUserRank(totalXP);
+        
+        // Get vote count from stats
+        const statsJson = localStorage.getItem('stats');
+        let voteCount = 0;
+        
+        try {
+            const stats = JSON.parse(statsJson);
+            voteCount = stats.votes || 0;
+        } catch {
+            console.warn('⚠️ No stats found in localStorage');
+        }
+        
+        const { db } = await import('./firebase-config.js');
+        const { doc, updateDoc, setDoc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        const profileRef = doc(db, 'profiles', userId);
+        
+        // Get rank title (remove emoji for storage)
+        const rankTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+        
+        // Check if profile exists
+        const profileDoc = await getDoc(profileRef);
+        
+        if (profileDoc.exists()) {
+            // Update existing profile
+            await updateDoc(profileRef, {
+                level: rank.currentLevel.level,
+                totalVotes: voteCount,
+                rank: rankTitle,
+                xp: totalXP,
+                lastSynced: Date.now()
+            });
+            
+            console.log('✅ Profile synced:', {
+                level: rank.currentLevel.level,
+                votes: voteCount,
+                rank: rankTitle,
+                xp: totalXP
+            });
+        } else {
+            // Create profile if doesn't exist
+            const username = localStorage.getItem('username') || localStorage.getItem('tournamentUsername') || 'Anonymous';
+            const avatarJson = localStorage.getItem('avatar');
+            let avatar = { type: 'emoji', value: '🎵' };
+            
+            try {
+                avatar = JSON.parse(avatarJson) || avatar;
+            } catch {}
+            
+            await setDoc(profileRef, {
+                username: username,
+                avatar: avatar,
+                level: rank.currentLevel.level,
+                totalVotes: voteCount,
+                rank: rankTitle,
+                xp: totalXP,
+                createdAt: Date.now(),
+                lastSynced: Date.now()
+            });
+            
+            console.log('✅ Profile created and synced');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error syncing profile stats:', error);
+        // Non-blocking - don't fail the calling function
+    }
+}

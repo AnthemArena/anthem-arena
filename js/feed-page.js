@@ -37,9 +37,11 @@ async function loadMusicVideos() {
 // ✅ @MENTION SYSTEM (WITH LIVE DATA)
 // ========================================
 
+// ========================================
+// ✅ @MENTION SYSTEM (OPTIMIZED)
+// ========================================
+
 let allUsers = [];
-let lastUserLoad = 0;
-const USER_CACHE_DURATION = 300000; // 5 minutes
 
 async function loadAllUsers() {
     try {
@@ -52,47 +54,85 @@ async function loadAllUsers() {
         const q = query(profilesRef, where('username', '!=', null));
         const snapshot = await getDocs(q);
         
+        const currentUserId = localStorage.getItem('tournamentUserId');
+        
         allUsers = [];
         
-        // ✅ Load all users with vote counts
-        for (const docSnap of snapshot.docs) {
+        snapshot.forEach(docSnap => {
             const profile = docSnap.data();
             const userId = docSnap.id;
             
-            if (!profile.username || profile.username === 'Anonymous') continue;
+            if (!profile.username || profile.username === 'Anonymous') return;
             
-            // ✅ Count votes from votes collection (real-time)
-            const votesRef = collection(db, 'votes');
-            const votesQuery = query(votesRef, where('userId', '==', userId));
-            const votesSnapshot = await getDocs(votesQuery);
-            const totalVotes = votesSnapshot.size;
-            
-            // ✅ Calculate level from votes
-            const level = calculateLevelFromVotes(totalVotes);
-            const rank = getRankFromLevel(level);
-            
-            allUsers.push({
-                userId: userId,
-                username: profile.username,
-                avatar: profile.avatar,
-                level: level,
-                rank: rank,
-                totalVotes: totalVotes
-            });
-        }
+            // ✅ For current user, use localStorage stats
+            if (userId === currentUserId) {
+                const statsJson = localStorage.getItem('stats');
+                let stats = { level: 1, votes: 0 };
+                
+                try {
+                    stats = JSON.parse(statsJson) || stats;
+                } catch (e) {
+                    console.warn('Failed to parse stats from localStorage');
+                }
+                
+                const level = stats.level || 1;
+                const totalVotes = stats.votes || 0;
+                const rank = getRankFromLevel(level);
+                
+                allUsers.push({
+                    userId: userId,
+                    username: profile.username,
+                    avatar: profile.avatar,
+                    level: level,
+                    rank: rank,
+                    totalVotes: totalVotes
+                });
+                
+                console.log('👤 Your mention data (from localStorage):', {
+                    username: profile.username,
+                    level,
+                    totalVotes,
+                    rank
+                });
+                
+            } else {
+                // ✅ For other users, use stored profile data (fallback to defaults)
+                const level = profile.level || 1;
+                const totalVotes = profile.totalVotes || profile.voteCount || 0;
+                const rank = profile.rank || getRankFromLevel(level);
+                
+                allUsers.push({
+                    userId: userId,
+                    username: profile.username,
+                    avatar: profile.avatar,
+                    level: level,
+                    rank: rank,
+                    totalVotes: totalVotes
+                });
+            }
+        });
         
         console.log('✅ Loaded users for mentions:', allUsers.length);
-        
-        // ✅ DEBUG: Show your own data
-        const currentUserId = localStorage.getItem('tournamentUserId');
-        const currentUser = allUsers.find(u => u.userId === currentUserId);
-        if (currentUser) {
-            console.log('👤 Your mention data:', currentUser);
-        }
         
     } catch (error) {
         console.error('❌ Error loading users:', error);
     }
+}
+
+function getRankFromLevel(level) {
+    const ranks = {
+        1: 'New Voter',
+        2: 'Casual Fan',
+        3: 'Regular Voter',
+        4: 'Dedicated Fan',
+        5: 'Active Voter',
+        6: 'Engaged Voter',
+        7: 'Tournament Regular',
+        8: 'Music Enthusiast',
+        9: 'Elite Voter',
+        10: 'Tournament Legend'
+    };
+    return ranks[level] || 'New Voter';
 }
 
 // ========================================
