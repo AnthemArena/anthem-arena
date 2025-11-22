@@ -29,6 +29,61 @@ async function loadMusicVideos() {
         console.error('❌ Error loading music videos:', error);
     }
 }
+
+// ========================================
+// ✅ YOUTUBE AUTO-EMBED SYSTEM
+// ========================================
+
+/**
+ * Extract YouTube video ID from text
+ * Supports: youtube.com/watch, youtu.be, youtube.com/embed, youtube.com/shorts
+ */
+function extractYouTubeVideoId(text) {
+    if (!text) return null;
+    
+    const patterns = [
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+        /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/,
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+    ];
+    
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match && match[1]) {
+            return match[1];
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Get YouTube video metadata
+ * First tries your music-videos.json, then falls back to thumbnail
+ */
+async function getYouTubeMetadata(videoId) {
+    // Try to find in your music videos JSON
+    if (musicVideos.length > 0) {
+        const video = musicVideos.find(v => v.videoId === videoId);
+        
+        if (video) {
+            return {
+                title: video.title,
+                artist: video.artist,
+                thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+            };
+        }
+    }
+    
+    // Fallback: just use thumbnail
+    return {
+        title: null,
+        artist: null,
+        thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+    };
+}
 // ========================================
 // ✅ @MENTION SYSTEM
 // ========================================
@@ -793,13 +848,16 @@ function renderPosts(startIndex, count) {
 // RENDER POST CONTENT
 // ========================================
 
+// ========================================
+// RENDER POST CONTENT
+// ========================================
+
 function renderPostContent(post) {
     if (post.type === 'vote') {
         const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
         
-        // ✅ FIX: Parse songs first, THEN mentions (both return HTML)
         const withSongs = parseSongMentions(smartText);
-        const withMentions = parseMentionsHTML(withSongs); // New function!
+        const withMentions = parseMentionsHTML(withSongs);
         
         return `
             <p class="post-text vote-text">
@@ -820,14 +878,67 @@ function renderPostContent(post) {
             </div>
         `;
     } else if (post.type === 'user_post' && post.content) {
-        // ✅ FIX: Parse songs first, THEN mentions
         const withSongs = parseSongMentions(post.content);
         const withMentions = parseMentionsHTML(withSongs);
-        return `<p class="post-text">${withMentions}</p>`;
+        
+        return `
+            <p class="post-text">${withMentions}</p>
+            
+            ${post.youtubeVideoId ? renderYouTubeEmbed(post) : ''}
+        `;
     }
     
     return '';
 }
+
+// ========================================
+// ✅ NEW: RENDER YOUTUBE EMBED
+// ========================================
+
+function renderYouTubeEmbed(post) {
+    const videoId = post.youtubeVideoId;
+    
+    // Option A: Thumbnail Preview (Fast, Recommended)
+    return `
+        <div class="youtube-embed-preview" data-video-id="${videoId}">
+            <img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" 
+                 alt="YouTube video" 
+                 class="youtube-thumbnail"
+                 loading="lazy">
+            <button class="youtube-play-button" onclick="loadYouTubePlayer(this)">
+                <i class="fa-solid fa-play"></i>
+            </button>
+            ${post.youtubeTitle ? `
+                <div class="youtube-info">
+                    <div class="youtube-title">${escapeHtml(post.youtubeTitle)}</div>
+                    ${post.youtubeArtist ? `
+                        <div class="youtube-artist">${escapeHtml(post.youtubeArtist)}</div>
+                    ` : ''}
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+// ✅ Load YouTube player when user clicks play
+window.loadYouTubePlayer = function(button) {
+    const previewDiv = button.closest('.youtube-embed-preview');
+    const videoId = previewDiv.dataset.videoId;
+    
+    // Replace preview with actual player
+    previewDiv.innerHTML = `
+        <div class="youtube-embed-full">
+            <iframe 
+                width="100%" 
+                height="315" 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    `;
+};
 
 // ========================================
 // ✅ SONG TOOLTIP SYSTEM
@@ -2451,7 +2562,22 @@ async function createUserPost() {
             avatar = { type: 'emoji', value: '🎵' };
         }
         
-        // Create post object
+        // ========================================
+        // ✅ NEW: AUTO-DETECT YOUTUBE LINK
+        // ========================================
+        
+        const youtubeVideoId = extractYouTubeVideoId(content);
+        let youtubeMetadata = null;
+        
+        if (youtubeVideoId) {
+            youtubeMetadata = await getYouTubeMetadata(youtubeVideoId);
+            console.log('✅ YouTube video detected:', youtubeVideoId, youtubeMetadata);
+        }
+        
+        // ========================================
+        // CREATE POST OBJECT
+        // ========================================
+        
         const postId = `user_${userId}_${Date.now()}`;
         const post = {
             postId: postId,
@@ -2464,10 +2590,21 @@ async function createUserPost() {
             privacy: 'public',
             likeCount: 0,
             commentCount: 0,
-            createdAt: new Date()
+            createdAt: new Date(),
+            
+            // ✅ NEW: Add YouTube data if video detected
+            ...(youtubeVideoId && {
+                youtubeVideoId: youtubeVideoId,
+                youtubeThumbnail: youtubeMetadata?.thumbnail,
+                youtubeTitle: youtubeMetadata?.title,
+                youtubeArtist: youtubeMetadata?.artist
+            })
         };
         
-        // Save to Firestore
+        // ========================================
+        // SAVE TO FIRESTORE
+        // ========================================
+        
         const { db } = await import('./firebase-config.js');
         const { doc, setDoc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         
@@ -2477,7 +2614,7 @@ async function createUserPost() {
         console.log('✅ User post created');
         
         // ========================================
-        // ✅ NEW: SEND MENTION NOTIFICATIONS
+        // ✅ SEND MENTION NOTIFICATIONS
         // ========================================
         
         const mentionedUsers = extractMentionedUsers(content);
@@ -2510,6 +2647,10 @@ async function createUserPost() {
                 }
             }
         }
+        
+        // ========================================
+        // UPDATE UI
+        // ========================================
         
         // Clear input
         postInput.value = '';

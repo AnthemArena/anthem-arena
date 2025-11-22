@@ -120,15 +120,44 @@ function adjustPollingRate() {
 // UTILITY FUNCTIONS
 // ========================================
 
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
 function extractYouTubeId(url) {
     if (!url) return '';
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&\n?#]+)/);
     return match ? match[1] : '';
 }
 
-function getThumbnailUrl(youtubeUrl) {
-    const videoId = extractYouTubeId(youtubeUrl);
-    return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+// ✅ FIXED: Handle both song objects and URLs
+function getThumbnailUrl(input) {
+    // Handle null/undefined
+    if (!input) return '';
+    
+    // Handle if passed a song object (from match data)
+    if (typeof input === 'object') {
+        // Priority 1: Use videoId directly (your data structure)
+        if (input.videoId) {
+            return `https://img.youtube.com/vi/${input.videoId}/mqdefault.jpg`;
+        }
+        
+        // Priority 2: Extract from youtubeUrl (fallback)
+        if (input.youtubeUrl) {
+            const videoId = extractYouTubeId(input.youtubeUrl);
+            if (videoId) {
+                return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+            }
+        }
+    }
+    
+    // Handle if passed a string (legacy - full YouTube URL)
+    if (typeof input === 'string') {
+        const videoId = extractYouTubeId(input);
+        return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+    }
+    
+    return '';
 }
 
 // ========================================
@@ -368,7 +397,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        thumbnailUrl: getThumbnailUrl(userSong),  // ✅ FIXED: Pass song object
         userPct,
         opponentPct,
         voteDiff,
@@ -391,7 +420,7 @@ else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COME
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
         opponentPct,
         message: `🎉 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" completed comeback!`,
@@ -407,7 +436,7 @@ else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        thumbnailUrl: getThumbnailUrl(userSong),
         voteDiff,
         userPct,
         opponentPct,
@@ -425,7 +454,7 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
         matchId: match.id,
         song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong?.youtubeUrl),
+        thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
         opponentPct,
         message: `🎯 Your pick "${userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song'}" is dominating!`,

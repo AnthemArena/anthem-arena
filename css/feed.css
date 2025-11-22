@@ -2611,3 +2611,104 @@ body {
         display: none;
     }
 }
+
+/* ========================================
+   YOUTUBE EMBED STYLES
+   ======================================== */
+
+.youtube-embed-preview {
+    position: relative;
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.youtube-embed-preview:hover {
+    transform: scale(1.02);
+}
+
+.youtube-thumbnail {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.youtube-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px;
+    height: 48px;
+    background: rgba(200, 170, 110, 0.95);
+    border: none;
+    border-radius: 12px;
+    color: #0a0a0a;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.youtube-play-button:hover {
+    background: #C8AA6E;
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(200, 170, 110, 0.5);
+}
+
+.youtube-info {
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.youtube-title {
+    font-family: 'Cinzel', serif;
+    color: #f0e6d2;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.youtube-artist {
+    color: rgba(200, 170, 110, 0.8);
+    font-size: 0.85rem;
+}
+
+/* Full Player (after clicking play) */
+.youtube-embed-full {
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.youtube-embed-full iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: none;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .youtube-play-button {
+        width: 56px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .youtube-title {
+        font-size: 0.875rem;
+    }
+    
+    .youtube-artist {
+        font-size: 0.8rem;
+    }
+}
