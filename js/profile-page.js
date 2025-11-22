@@ -948,8 +948,6 @@ async function loadProfileStats(userId) {
         const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
         const isViewingOwnProfile = (userId === currentUserId);
         
-        console.log('🔍 Is viewing own profile?', isViewingOwnProfile);
-        
         // Get votes count
         const votesQuery = query(
             collection(db, 'votes'),
@@ -958,14 +956,44 @@ async function loadProfileStats(userId) {
         const votesSnapshot = await getDocs(votesQuery);
         const votesCount = votesSnapshot.size;
         
-        // ✅ FIXED: Just READ achievements count - NO checking/unlocking
+        // ✅ ONE-TIME achievement check for own profile (max once per hour)
+        if (isViewingOwnProfile && votesCount > 0) {
+            const lastCheckKey = 'lastProfileAchievementCheck';
+            const lastCheck = parseInt(localStorage.getItem(lastCheckKey) || '0');
+            const now = Date.now();
+            const ONE_HOUR = 60 * 60 * 1000;
+            
+            if (now - lastCheck > ONE_HOUR) {
+                console.log('🏆 Running hourly achievement check...');
+                localStorage.setItem(lastCheckKey, now.toString());
+                
+                // Get full vote data for achievement checking
+                const votes = votesSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                // Import and run achievement checker
+                const { checkAchievements } = await import('./achievement-tracker.js');
+                await checkAchievements(votes);
+                
+                console.log('✅ Achievement check complete');
+            } else {
+                const minutesAgo = Math.floor((now - lastCheck) / 1000 / 60);
+                console.log(`⏭️ Skipping achievement check (ran ${minutesAgo} minutes ago)`);
+            }
+        }
+        
+        // ✅ Read achievements count (always fresh from Firebase)
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
         const unlockedAchievements = profileDoc.exists() 
             ? (profileDoc.data().unlockedAchievements || [])
             : [];
         const achievementsCount = unlockedAchievements.length;
         
-        console.log(`🏆 Found ${achievementsCount} unlocked achievements (display only)`);
+        console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
+        
+        // ... rest of the function (rank calculation, UI updates, etc.)
         
         // ✅ GET RANK
         const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
