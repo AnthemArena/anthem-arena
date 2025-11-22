@@ -454,7 +454,7 @@ async function renderProfile(profile) {
 
     // ✅ NEW: Render social links
     renderSocialLinks(profile);
-    
+        
     // Render action buttons
 renderProfileActions(isViewingOwnProfile);
 }
