@@ -68,6 +68,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     showLoadingSpinner('Loading feed...');
 
     try {
+
+        // ✅ NEW: Update header banner first
+        await updateFeedHeaderBanner();
+        
         // Initialize widgets FIRST
         await initializeFeedWidgets();
         
@@ -341,6 +345,94 @@ function renderPostContent(post) {
 // ========================================
 // SETUP POST INTERACTIONS
 // ========================================
+
+// ========================================
+// UPDATE FEED HEADER BANNER
+// ========================================
+
+async function updateFeedHeaderBanner() {
+    const headerBg = document.querySelector('.profile-header-bg');
+    if (!headerBg) return;
+    
+    try {
+        // Get current user's banner from localStorage
+        const bannerJson = localStorage.getItem('banner');
+        const avatarJson = localStorage.getItem('avatar');
+        
+        let banner;
+        try {
+            banner = bannerJson ? JSON.parse(bannerJson) : { type: 'auto' };
+        } catch {
+            banner = { type: 'auto' };
+        }
+        
+        let avatar;
+        try {
+            avatar = avatarJson ? JSON.parse(avatarJson) : null;
+        } catch {
+            avatar = null;
+        }
+        
+        // Apply banner based on type
+        if (banner.type === 'default') {
+            // Gold gradient
+            headerBg.style.background = `
+                linear-gradient(135deg, 
+                    rgba(200, 170, 110, 0.9) 0%, 
+                    rgba(26, 26, 46, 0.95) 50%,
+                    rgba(10, 10, 10, 0.98) 100%
+                )
+            `;
+            headerBg.style.backgroundImage = '';
+            
+        } else if (banner.type === 'champion') {
+            // Specific champion splash
+            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${banner.championId}_0.jpg`;
+            headerBg.style.backgroundImage = `
+                linear-gradient(to bottom, 
+                    rgba(0, 0, 0, 0.4) 0%,
+                    rgba(10, 10, 10, 0.85) 100%
+                ),
+                url('${splashUrl}')
+            `;
+            headerBg.style.backgroundSize = 'cover';
+            headerBg.style.backgroundPosition = 'center 30%';
+            
+        } else {
+            // Auto-match avatar
+            if (avatar && avatar.type === 'url' && avatar.name) {
+                const championId = avatar.name.replace(/['\s]/g, '');
+                const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+                
+                headerBg.style.backgroundImage = `
+                    linear-gradient(to bottom, 
+                        rgba(0, 0, 0, 0.4) 0%,
+                        rgba(10, 10, 10, 0.85) 100%
+                    ),
+                    url('${splashUrl}')
+                `;
+                headerBg.style.backgroundSize = 'cover';
+                headerBg.style.backgroundPosition = 'center 30%';
+            } else {
+                // Fallback to gradient for emoji avatars
+                headerBg.style.background = `
+                    linear-gradient(135deg, 
+                        rgba(200, 170, 110, 0.9) 0%, 
+                        rgba(26, 26, 46, 0.95) 50%,
+                        rgba(10, 10, 10, 0.98) 100%
+                    )
+                `;
+                headerBg.style.backgroundImage = '';
+            }
+        }
+        
+        console.log('✅ Feed header banner updated');
+        
+    } catch (error) {
+        console.error('❌ Error updating feed header banner:', error);
+    }
+}
+
 
 async function setupPostInteractions(postElement, post) {
     // Like button
