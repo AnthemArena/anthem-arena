@@ -184,6 +184,17 @@ function createModalHTML() {
                             </div>
                         </div>
 
+
+<!-- ✅ NEW: Champion Pack Section -->
+<div class="settings-section">
+    <h3><i class="fas fa-bullhorn"></i> Champion Announcer</h3>
+    <p class="section-description">Choose which champion voices your match notifications</p>
+    
+    <div id="championPackSelector" class="champion-pack-grid">
+        <!-- Will be populated by JS -->
+    </div>
+</div>
+
                         <!-- Social Media Links -->
 <div class="setting-group">
     <label>
@@ -458,6 +469,9 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
         };
         showSelectedAvatar();
     }
+    
+     // ✅ NEW: Load champion pack selector
+    loadChampionPackSelector();
     
     console.log('✅ Profile loaded with privacy settings');
 }
@@ -1247,6 +1261,99 @@ function invalidateProfileCache(username) {
         console.warn('Could not invalidate cache:', e);
     }
 }
+
+// ========================================
+// CHAMPION PACK SELECTOR
+// ========================================
+
+async function loadChampionPackSelector() {
+    const container = document.getElementById('championPackSelector');
+    if (!container) return;
+    
+    try {
+        // Get available packs from manifest
+        const manifest = await window.championLoader.getManifest();
+        const currentPack = window.championLoader.getCurrentPack();
+        
+        container.innerHTML = manifest.packs.map(pack => {
+            const isActive = pack.id === currentPack.id;
+            const isDisabled = !pack.enabled || pack.comingSoon;
+            
+            return `
+                <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}" 
+                     data-pack-id="${pack.id}"
+                     ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
+                    ${pack.comingSoon ? '<span class="coming-soon-badge">🔒</span>' : ''}
+                    <div class="champion-pack-icon">${pack.emoji}</div>
+                    <div class="champion-pack-name">${pack.name}</div>
+                    <div class="champion-pack-description">${pack.description}</div>
+                    ${!isDisabled ? `
+                        <button class="champion-preview-btn" 
+                                onclick="event.stopPropagation(); previewChampionPack('${pack.id}')">
+                            Preview 👀
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        console.log('✅ Champion pack selector loaded');
+        
+    } catch (error) {
+        console.error('❌ Failed to load champion packs:', error);
+        container.innerHTML = '<p style="color: rgba(255,255,255,0.6); text-align: center;">Failed to load champion packs</p>';
+    }
+}
+
+async function selectChampionPack(packId) {
+    console.log(`🎭 User selected: ${packId}`);
+    
+    // Update UI immediately
+    document.querySelectorAll('.champion-pack-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    const selectedCard = document.querySelector(`[data-pack-id="${packId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('active');
+    }
+    
+    // Save to champion loader
+    await window.championLoader.setUserChampionPack(packId);
+    
+    // Show confirmation
+    const pack = await window.championLoader.loadChampionPack(packId);
+    showNotification(`${pack.emoji} ${pack.name} announcer activated!`, 'success');
+    
+    // Mark as changed
+    hasChanges = true;
+    
+    console.log(`✅ Champion pack set to: ${packId}`);
+}
+
+async function previewChampionPack(packId) {
+    console.log(`👀 Previewing: ${packId}`);
+    
+    // Temporarily load the pack
+    const originalPack = window.championLoader.getCurrentPack().id;
+    await window.championLoader.loadChampionPack(packId);
+    
+    // Show a test notification
+    if (window.testBulletin) {
+        window.testBulletin('danger');
+    }
+    
+    showNotification('Preview notification sent! Check bottom-right corner', 'info');
+    
+    // Wait 5 seconds, then restore original pack
+    setTimeout(async () => {
+        await window.championLoader.loadChampionPack(originalPack);
+        console.log(`✅ Restored to: ${originalPack}`);
+    }, 5000);
+}
+
+// Make functions global so onclick can access them
+window.selectChampionPack = selectChampionPack;
+window.previewChampionPack = previewChampionPack;
 
 // ========================================
 // EXPORT AND GLOBAL ACCESS

@@ -827,3 +827,122 @@
 .social-input-row input::placeholder {
     color: rgba(240, 230, 210, 0.4);
 }
+/* ========================================
+   CHAMPION PACK SELECTOR
+   ======================================== */
+
+.champion-pack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.champion-pack-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+}
+
+.champion-pack-card:hover {
+    border-color: #C8AA6E;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(200, 170, 110, 0.3);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.champion-pack-card.active {
+    border-color: #C8AA6E;
+    border-width: 3px;
+    background: rgba(200, 170, 110, 0.15);
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.4);
+}
+
+.champion-pack-card.active::before {
+    content: '✓';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 24px;
+    height: 24px;
+    background: #C8AA6E;
+    color: #0a0a0a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+}
+
+.champion-pack-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.champion-pack-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.champion-pack-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #C8AA6E;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.champion-pack-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+}
+
+.champion-preview-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background: rgba(200, 170, 110, 0.2);
+    border: 1px solid rgba(200, 170, 110, 0.4);
+    border-radius: 6px;
+    color: #C8AA6E;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.champion-preview-btn:hover {
+    background: rgba(200, 170, 110, 0.3);
+    border-color: #C8AA6E;
+}
+
+.coming-soon-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.5rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .champion-pack-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .champion-pack-icon {
+        font-size: 2.5rem;
+    }
+}
