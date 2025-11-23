@@ -1507,19 +1507,20 @@ function showBulletin(notification) {
 }
 
 /* Dark overlay only on bottom portion */
+/* Dark gradient overlay on bottom half for text readability */
 .bulletin-banner::after {
     content: '';
     position: absolute;
-    bottom: 0;  /* ✅ Start from bottom */
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 200px;  /* ✅ Only cover the text/button area */
+    height: 200px;  /* Only cover the text/button area */
     background: linear-gradient(to bottom, 
         transparent 0%, 
-        rgba(0, 0, 0, 0.3) 20%,
-        rgba(0, 0, 0, 0.7) 50%,
-        rgba(0, 0, 0, 0.9) 80%,
-        rgba(0, 0, 0, 0.95) 100%
+        rgba(0, 0, 0, 0.5) 20%,
+        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 0.93) 80%,
+        rgba(0, 0, 0, 0.98) 100%
     );
     z-index: 1;
     pointer-events: none;
