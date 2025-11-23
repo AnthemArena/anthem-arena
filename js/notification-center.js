@@ -54,6 +54,8 @@ export async function initNotificationCenter() {
 // ========================================
 
 let currentTab = 'all';
+let isPanelOpen = false; // ✅ Track state explicitly
+
 
 export async function initNotificationCenterWithTabs() {
     const bell = document.getElementById('notificationBell');
@@ -72,11 +74,12 @@ export async function initNotificationCenterWithTabs() {
     
     await updateBadgeCount();
     
+    // ✅ FIXED: Bell click handler
     bell.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const isOpen = panel.style.display === 'block';
+        console.log('🔔 Bell clicked, current state:', isPanelOpen);
         
-        if (isOpen) {
+        if (isPanelOpen) {
             closePanel();
         } else {
             await openPanel();
@@ -92,13 +95,14 @@ export async function initNotificationCenterWithTabs() {
         }
     });
     
-    setInterval(updateBadgeCount, 120000);
+  // Periodic badge update
+    setInterval(updateBadgeCount, 120000); // Every 2 minutes
     
-    // Make globally accessible
+    // ✅ Make functions globally accessible
     window.openNotificationPanel = openPanel;
     window.closeNotificationPanel = closePanel;
     
-    console.log('✅ Notification center with tabs initialized');
+    console.log('✅ Notification center initialized');
 }
 
 function addTabsToPanel(panel) {

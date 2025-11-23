@@ -1215,8 +1215,8 @@ if (timeRemaining) {
         if (comp1Seed) comp1Seed.textContent = `#${currentMatch.competitor1.seed} Seed`;
         if (comp1Name) comp1Name.textContent = currentMatch.competitor1.name;
         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
-        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
-        if (comp1Votes) comp1Votes.textContent = `${currentMatch.competitor1.votes.toLocaleString()} votes`;
+       if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
+if (comp1Votes) comp1Votes.style.display = 'none'; // ✅ Hide vote count
 if (comp1Video) {
     const song1Name = currentMatch.competitor1.name;
     const artist1 = currentMatch.competitor1.source.split('•')[0]?.trim();
@@ -1238,8 +1238,8 @@ if (comp1Video) {
         const comp2Seed = document.getElementById('competitor2-seed');
         const comp2Name = document.getElementById('competitor2-name');
         const comp2Source = document.getElementById('competitor2-source');
-        const comp2Percentage = document.getElementById('competitor2-percentage');
-        const comp2Votes = document.getElementById('competitor2-votes');
+       if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
+if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
         const comp2Video = document.getElementById('competitor2-video');
         
         if (comp2Seed) comp2Seed.textContent = `#${currentMatch.competitor2.seed} Seed`;
@@ -2324,26 +2324,19 @@ function updateVoteCountsUI() {
         console.error('Element not found: competitor1-percentage');
     }
 
+  // ✅ HIDE vote count, only show percentage
     if (comp1VotesEl) {
-        comp1VotesEl.textContent = `${comp1Votes.toLocaleString()} vote${comp1Votes === 1 ? '' : 's'}`;
-        console.log('Set comp1 votes to:', comp1Votes);
-    } else {
-        console.error('Element not found: competitor1-votes');
+        comp1VotesEl.style.display = 'none';
     }
 
-    // Update Competitor 2
+     // Update Competitor 2
     if (comp2Percentage) {
         comp2Percentage.textContent = comp2Percent;
-        console.log('Set comp2 percentage to:', comp2Percent);
-    } else {
-        console.error('Element not found: competitor2-percentage');
     }
 
+    // ✅ HIDE vote count, only show percentage
     if (comp2VotesEl) {
-        comp2VotesEl.textContent = `${comp2Votes.toLocaleString()} vote${comp2Votes === 1 ? '' : 's'}`;
-        console.log('Set comp2 votes to:', comp2Votes);
-    } else {
-        console.error('Element not found: competitor2-votes');
+        comp2VotesEl.style.display = 'none';
     }
 
     // Update total

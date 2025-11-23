@@ -2369,7 +2369,34 @@ function showNotificationToast(message, type = 'info') {
 function initBulletinSystem() {
     console.log('🎯 Initializing bulletin system...');
 
-        // ✅ NEW: Restore recent bulletins from sessionStorage
+    // ✅ WHITELIST: Only enable on specific pages
+    const allowedPages = [
+        'vote.html',
+        'my-votes.html',      // ✅ ADDED (you probably want alerts here)
+        'matches.html',
+        'feed.html',
+        'activity.html',
+        'brackets.html',
+        'profile.html',
+        // ❌ REMOVED 'index.html' - this is your landing page that was showing unwanted alerts
+    ];
+
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const isAllowedPage = allowedPages.some(page => currentPage.includes(page));
+    
+    if (!isAllowedPage) {
+        console.log(`📴 Bulletins disabled on ${currentPage} (only enabled on: ${allowedPages.join(', ')})`);
+        
+        // Still check for social activity (ally/rival)
+        checkRecentVotes();
+        setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL);
+        
+        return;
+    }
+    
+    console.log(`✅ Bulletins enabled on ${currentPage}`);
+
+    // ✅ NEW: Restore recent bulletins from sessionStorage
     try {
         const persisted = JSON.parse(sessionStorage.getItem('recentBulletins') || '{}');
         Object.entries(persisted).forEach(([key, timestamp]) => {
@@ -2419,7 +2446,7 @@ function initBulletinSystem() {
     checkAndShowBulletin();
     adjustPollingRate();
     
- // ✅ ADD THIS: START SOCIAL ACTIVITY CHECKING (ally/rival notifications)
+    // ✅ START SOCIAL ACTIVITY CHECKING (ally/rival notifications)
     checkRecentVotes(); // Run once immediately
     setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL); // Then every 30 seconds
     
