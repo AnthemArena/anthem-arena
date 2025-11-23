@@ -446,7 +446,7 @@ async function checkAndShowBulletin() {
                 }
                 
                 // ✅ Check cooldown for this specific severity
-                const lastShown = recentBulletins.get(bulletinKey);
+const lastShown = recentlyShownBulletins.get(bulletinKey);
                 if (lastShown && (Date.now() - lastShown) < BULLETIN_COOLDOWNS.DANGER) {
                     continue;
                 }

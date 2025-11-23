@@ -1063,6 +1063,10 @@ async function loadProfileStats(userId) {
 // LOAD FEATURED ACHIEVEMENTS
 // ========================================
 
+// ========================================
+// LOAD FEATURED ACHIEVEMENTS
+// ========================================
+
 async function loadFeaturedAchievements(userId) {
     try {
         console.log('🏆 Loading featured achievements for:', userId);
@@ -1114,19 +1118,33 @@ async function loadFeaturedAchievements(userId) {
             return; // Keep no-content state
         }
         
-        container.innerHTML = unlockedAchievements.map(ach => `
-            <div class="achievement-card">
-                <div class="achievement-header">
-                    <div class="achievement-icon">${ach.icon}</div>
-                    <div class="achievement-info">
-                        <div class="achievement-name">${ach.name}</div>
-                        <span class="achievement-rarity ${ach.rarity}">${ach.rarity}</span>
+        // ✅ FIX: Check if icon is URL and render as image
+        container.innerHTML = unlockedAchievements.map(ach => {
+            const isUrl = ach.icon && typeof ach.icon === 'string' && ach.icon.startsWith('http');
+            
+            return `
+                <div class="achievement-card">
+                    <div class="achievement-header">
+                        <div class="achievement-icon">
+                            ${isUrl 
+                                ? `<img src="${ach.icon}" 
+                                        alt="${ach.name}" 
+                                        class="achievement-icon-img"
+                                        style="width: 100%; height: 100%; object-fit: contain;"
+                                        onerror="this.style.display='none'; this.parentElement.textContent='🏆';">`
+                                : ach.icon
+                            }
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${ach.name}</div>
+                            <span class="achievement-rarity ${ach.rarity}">${ach.rarity}</span>
+                        </div>
                     </div>
+                    <div class="achievement-description">${ach.description}</div>
+                    <div class="achievement-xp">+${ach.xp} XP</div>
                 </div>
-                <div class="achievement-description">${ach.description}</div>
-                <div class="achievement-xp">+${ach.xp} XP</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         console.log('✅ Featured achievements rendered');
         
@@ -1418,19 +1436,33 @@ async function loadAllAchievements(userId) {
             });
         
         const container = document.getElementById('allAchievements');
-        container.innerHTML = achievements.map(ach => `
-            <div class="achievement-card">
-                <div class="achievement-header">
-                    <div class="achievement-icon">${ach.icon}</div>
-                    <div class="achievement-info">
-                        <div class="achievement-name">${ach.name}</div>
-                        <span class="achievement-rarity ${ach.rarity}">${ach.rarity}</span>
+        // ✅ FIX: Check if icon is URL and render as image
+        container.innerHTML = achievements.map(ach => {
+            const isUrl = ach.icon && typeof ach.icon === 'string' && ach.icon.startsWith('http');
+            
+            return `
+                <div class="achievement-card">
+                    <div class="achievement-header">
+                        <div class="achievement-icon">
+                            ${isUrl 
+                                ? `<img src="${ach.icon}" 
+                                        alt="${ach.name}" 
+                                        class="achievement-icon-img"
+                                        style="width: 100%; height: 100%; object-fit: contain;"
+                                        onerror="this.style.display='none'; this.parentElement.textContent='🏆';">`
+                                : ach.icon
+                            }
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${ach.name}</div>
+                            <span class="achievement-rarity ${ach.rarity}">${ach.rarity}</span>
+                        </div>
                     </div>
+                    <div class="achievement-description">${ach.description}</div>
+                    <div class="achievement-xp">+${ach.xp} XP</div>
                 </div>
-                <div class="achievement-description">${ach.description}</div>
-                <div class="achievement-xp">+${ach.xp} XP</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
     } catch (error) {
         console.error('❌ Error loading all achievements:', error);
