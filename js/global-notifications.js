@@ -1621,25 +1621,31 @@ function showBulletin(notification) {
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
-    background: transparent;
-    border: none;
-    color: rgba(200, 170, 110, 0.6);
-    width: 24px;
-    height: 24px;
-    font-size: 1.25rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9));
+    border: 2px solid var(--bulletin-title);  /* Pink for Jinx, gold for default */
+    color: var(--bulletin-title);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: 900;
     line-height: 1;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     z-index: 3;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .bulletin-close:hover {
-    color: #C8AA6E;
-    transform: rotate(90deg);
+    background: var(--bulletin-title);  /* ✅ Fill with champion color on hover */
+    color: #000;  /* ✅ Black X on colored background */
+    transform: rotate(90deg) scale(1.15);
+    box-shadow: 0 0 20px var(--bulletin-title);  /* ✅ Champion-colored glow */
+    border-color: var(--bulletin-title);
 }
 
 /* ========================================
