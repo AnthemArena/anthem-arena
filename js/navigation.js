@@ -158,7 +158,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function updateNavProfile() {
     const navProfileContainer = document.getElementById('navProfileContainer');
     const navProfileCard = document.getElementById('navProfileCard');
-    const notificationBell = document.getElementById('notificationBell');
     
     console.log('Updating nav profile display...');
     
@@ -242,7 +241,7 @@ async function updateNavProfile() {
         const hasVoted = hasVotedLocal || hasVotedFirebase;
         
         // ========================================
-        // STATE 1: NOT VOTED YET - Show Locked Profile
+        // STATE 1: NOT VOTED YET - Show Locked Profile (No Bell)
         // ========================================
         
         if (!hasVoted) {
@@ -269,16 +268,11 @@ async function updateNavProfile() {
             
             navProfileContainer.style.display = 'flex';
             
-            // ✅ Hide notification bell for non-voters
-            if (notificationBell) {
-                notificationBell.style.display = 'none';
-            }
-            
             return;
         }
         
         // ========================================
-        // STATE 2: VOTED BUT NO USERNAME - Show Claim Profile
+        // STATE 2: VOTED BUT NO USERNAME - Show Claim Profile (With Bell)
         // ========================================
         
         if (!username) {
@@ -293,6 +287,12 @@ async function updateNavProfile() {
                     </div>
                     <div class="claim-arrow">→</div>
                 </div>
+                
+                <!-- ✅ Notification Bell for voters without username -->
+                <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: block;">
+                    <span style="font-size: 20px;">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                </div>
             `;
             
             navProfileCard.title = 'Click to set your username and claim your profile!';
@@ -304,16 +304,11 @@ async function updateNavProfile() {
             
             navProfileContainer.style.display = 'flex';
             
-            // ✅ Show notification bell for voters (even without username)
-            if (notificationBell) {
-                notificationBell.style.display = 'block';
-            }
-            
             return;
         }
         
         // ========================================
-        // STATE 3: FULL PROFILE - Show Normal Profile
+        // STATE 3: FULL PROFILE - Show Normal Profile (With Bell)
         // ========================================
 
         console.log('Showing full profile for:', username);
@@ -341,6 +336,12 @@ async function updateNavProfile() {
                 </div>
             </a>
             
+            <!-- ✅ Notification Bell -->
+            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: block;">
+                <span style="font-size: 20px;">🔔</span>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+            </div>
+            
             <!-- Settings Button -->
             <button class="nav-settings-btn" onclick="window.openSettingsModal()" title="Profile Settings">
                 <i class="fas fa-cog"></i>
@@ -349,11 +350,6 @@ async function updateNavProfile() {
 
         // Remove any old onclick handlers
         navProfileCard.onclick = null;
-
-        // ✅ Show notification bell
-        if (notificationBell) {
-            notificationBell.style.display = 'block';
-        }
 
         // Update rank display
         const currentXP = getUserXPFromStorage();
@@ -385,9 +381,6 @@ async function updateNavProfile() {
 
         navProfileContainer.style.display = 'flex';
         console.log('✅ Profile display updated successfully');
-        
-        // ✅ Re-initialize notification center after profile update
-      
 
     } catch (err) {
         console.error('Unexpected error in updateNavProfile:', err);
