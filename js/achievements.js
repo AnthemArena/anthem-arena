@@ -827,6 +827,22 @@ icon: '<i class="fa-solid fa-fire"></i>',
   }
 },
 
+'match-tied': {
+  id: 'match-tied',
+  name: 'Split Decision',
+  description: 'Your match ended in a perfect tie!',
+  icon: '<i class="fa-solid fa-equals"></i>',
+  xp: 100,
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'uncommon',
+  condition: (stats) => {
+    const tiedMatches = parseInt(localStorage.getItem('matchesTied') || '0');
+    return tiedMatches >= 1;
+  }
+},
+
 
   // ========================================
   // SOCIAL ACHIEVEMENTS

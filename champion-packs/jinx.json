@@ -421,6 +421,45 @@
         "Get Jinxed! 😈"
       ]
     },
+    "round-opening": {
+  "messages": [
+    "🎪 ROUND {round} IS LIVE!",
+    "💥 NEW ROUND! Time to blow stuff up!",
+    "🔥 ROUND {round} BEGINS NOW!",
+    "😈 Fresh chaos! Round {round} is HERE!"
+  ],
+  "details": [
+    "{matchCount} new matches just dropped! Let's cause mayhem!",
+    "Time to vote! {matchCount} fresh battles!",
+    "Get in there! {matchCount} matches waiting!",
+    "{matchCount} new targets locked and loaded!"
+  ],
+  "buttons": [
+    "Start Voting! 💥",
+    "View Matches! 🎪",
+    "Let's GO! 🔥"
+  ]
+},
+
+"new-matches": {
+  "messages": [
+    "💥 NEW MATCHES just dropped!",
+    "🎪 MORE CHAOS incoming!",
+    "🔥 Fresh battles are LIVE!",
+    "😈 Hehe~ More targets!"
+  ],
+  "details": [
+    "{matchCount} new matches in Round {round}!",
+    "{matchCount} more songs to judge!",
+    "Round {round} just got bigger!",
+    "More mayhem! {matchCount} new matchups!"
+  ],
+  "buttons": [
+    "Check 'Em Out! 💥",
+    "Vote Now! 🎪",
+    "Let's Go! 🔥"
+  ]
+},
     
     "encouragement": {
       "messages": [
@@ -441,7 +480,27 @@
         "Join! 🎪",
         "Go! 🔥"
       ]
-    }
+    },
+    "match-tied": {
+  "messages": [
+    "😬 TIE GAME! \"{songTitle}\" split 50/50!",
+    "🎪 NOBODY wins! It's a PERFECT tie!",
+    "💥 STALEMATE! Both songs dead even!",
+    "🤷 Hehe~ Tied! Nobody wins, nobody loses!"
+  ],
+  "details": [
+    "Your vote couldn't break the tie!",
+    "Perfectly balanced - as all things should be!",
+    "50/50 split - pure chaos!",
+    "Couldn't decide? Neither could they!"
+  ],
+  "buttons": [
+    "View Results! 📊",
+    "See Bracket! 🏆",
+    "Next Match! 🔥",
+    "Oh Well! 🤷"
+  ]
+}
 },
   
   "achievements": {
@@ -800,6 +859,25 @@
   ]
 },
 
+"match-tied": {
+  "messages": [
+    "🤷 SPLIT DECISION! Perfect tie!",
+    "😬 Hehe~ Nobody wins, nobody loses!",
+    "🎪 TIE GAME! Chaos perfected!",
+    "💥 50/50! The ultimate stalemate!"
+  ],
+  "details": [
+    "Your match ended in a perfect tie! +{xp} XP",
+    "Perfectly balanced chaos! +{xp} XP",
+    "Nobody could decide! +{xp} XP"
+  ],
+  "buttons": [
+    "Oh Well! 🤷",
+    "Next Match! 🔥",
+    "View Results! 📊"
+  ]
+},
+
     "first-blood": {
       "messages": [
         "FIRST BLOOD! You just drew first blood, baby!",
@@ -818,6 +896,7 @@
         "I’m Just Getting Started!"
       ]
     },
+    
 
     "daily-comeback": {
       "messages": [

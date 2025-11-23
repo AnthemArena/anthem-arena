@@ -270,124 +270,136 @@ async function getMatchData(matchId) {
 // BULLETIN DETECTION LOGIC
 // ========================================
 
+// ========================================
+// BULLETIN DETECTION LOGIC
+// ========================================
+
 async function checkAndShowBulletin() {
     try {
+        // ========================================
+        // PRIORITY 0: CHECK FOR NEW ROUNDS/BATCHES
+        // ========================================
+        
+        try {
+            const { checkRoundOpenings, showRoundOpeningNotification } = await import('./round-alerts.js');
+            const roundAlert = await checkRoundOpenings();
+            
+            if (roundAlert) {
+                console.log(`🎪 Round alert detected: ${roundAlert.type} - Round ${roundAlert.round}`);
+                showRoundOpeningNotification(roundAlert);
+                return; // Exit early - showed round alert (highest priority)
+            }
+        } catch (error) {
+            console.error('⚠️ Error checking round openings:', error);
+        }
+        
+        // ========================================
+        // CONTINUE WITH USER ID CHECK
+        // ========================================
+        
         // ✅ Get user ID properly
-const userId = localStorage.getItem('tournamentUserId');  // ✅ Match navigation.js
+        const userId = localStorage.getItem('tournamentUserId');
         
         if (!userId) {
             console.warn('⚠️ No user ID found - skipping vote checks');
             // Still check for zero-vote/low-vote alerts below
         }
         
-        // ✅ Fetch user votes from Firebase
+        // ✅ Fetch user votes from localStorage
         let userVotes = {};
         let hasVoted = false;
         
-       // ✅ NEW: Read from localStorage (FREE, instant)
-if (userId) {
-    try {
-        // Get votes from localStorage (already set by vote.js)
-        const storedVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        if (userId) {
+            try {
+                // Get votes from localStorage (already set by vote.js)
+                const storedVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+                
+                // Convert to the format this function expects
+                Object.entries(storedVotes).forEach(([matchId, voteData]) => {
+                    userVotes[matchId] = {
+                        matchId: matchId,
+                        choice: voteData.songId,
+                        songTitle: voteData.songTitle,
+                        opponentTitle: voteData.opponentTitle,
+                        timestamp: voteData.timestamp
+                    };
+                });
+                
+                hasVoted = Object.keys(userVotes).length > 0;
+                console.log(`📊 User has ${Object.keys(userVotes).length} votes (from localStorage)`);
+                
+            } catch (error) {
+                console.error('❌ Error reading votes from localStorage:', error);
+            }
+        }
+            
+        // ========================================
+        // NON-VOTER ENGAGEMENT SYSTEM
+        // ========================================
         
-        // Convert to the format this function expects
-        Object.entries(storedVotes).forEach(([matchId, voteData]) => {
-            userVotes[matchId] = {
-                matchId: matchId,
-                choice: voteData.songId,
-                songTitle: voteData.songTitle,
-                opponentTitle: voteData.opponentTitle,
-                timestamp: voteData.timestamp
-            };
-        });
-        
-        hasVoted = Object.keys(userVotes).length > 0;
-        console.log(`📊 User has ${Object.keys(userVotes).length} votes (from localStorage)`);
-        
-    } catch (error) {
-        console.error('❌ Error reading votes from localStorage:', error);
-    }
-}
-
-     
-        
-       // ========================================
-// NON-VOTER ENGAGEMENT SYSTEM
-// ========================================
-
-if (!hasVoted) {
-    console.log('👤 First-time visitor - checking engagement prompts');
-    
-    const lastEncouragement = parseInt(localStorage.getItem('lastEncouragementToast') || '0');
-    const timeSinceLastPrompt = Date.now() - lastEncouragement;
-    const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
-    const timeOnSite = Date.now() - pageLoadTime;
-    
-    // Store page load time if not set
-    if (!sessionStorage.getItem('pageLoadTime')) {
-        sessionStorage.setItem('pageLoadTime', Date.now().toString());
-    }
-    
-    // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
-    const shouldWelcome = await shouldShowWelcome(timeOnSite);
-    if (shouldWelcome) {
-        await showWelcomeToast();
-        return;
-    }
-    
-    // 👀 GENTLE REMINDER: After 2 minutes of browsing
-    const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
-    if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
-        await showEncouragementToast('gentle');
-        return;
-    }
-    
-    // ⏰ URGENCY: After 5 minutes + matches closing soon
-    if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
-        const hasUrgentMatches = await checkForClosingMatches();
-        if (hasUrgentMatches) {
-            await showEncouragementToast('urgent');
+        if (!hasVoted) {
+            console.log('👤 First-time visitor - checking engagement prompts');
+            
+            const lastEncouragement = parseInt(localStorage.getItem('lastEncouragementToast') || '0');
+            const timeSinceLastPrompt = Date.now() - lastEncouragement;
+            const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
+            const timeOnSite = Date.now() - pageLoadTime;
+            
+            // Store page load time if not set
+            if (!sessionStorage.getItem('pageLoadTime')) {
+                sessionStorage.setItem('pageLoadTime', Date.now().toString());
+            }
+            
+            // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
+            const shouldWelcome = await shouldShowWelcome(timeOnSite);
+            if (shouldWelcome) {
+                await showWelcomeToast();
+                return;
+            }
+            
+            // 👀 GENTLE REMINDER: After 2 minutes of browsing
+            const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
+            if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
+                await showEncouragementToast('gentle');
+                return;
+            }
+            
+            // ⏰ URGENCY: After 5 minutes + matches closing soon
+            if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
+                const hasUrgentMatches = await checkForClosingMatches();
+                if (hasUrgentMatches) {
+                    await showEncouragementToast('urgent');
+                    return;
+                }
+            }
+            
+            // Don't check voted-match alerts for non-voters
             return;
         }
-    }
-    
-    // Don't check voted-match alerts for non-voters
-    return;
-}
         
         const notifications = [];
         
-       // PRIORITY 1: Check user's picks for danger/nailbiter/comeback/winning
-for (const [matchId, vote] of Object.entries(userVotes)) {
-    const match = await getMatchData(matchId);
-    
-    if (!match || match.status !== 'live') continue;
-
-    if (!match.id && !match.matchId) {
-        console.warn('⚠️ Match missing ID:', match);
-        continue;
-    }
-    
-    // ✅ ADD DEBUG LOGGING:
-    console.log(`\n🔍 Checking ${matchId}:`);
-    console.log('  Vote data:', vote);
-    console.log('  vote.choice:', vote.choice);
-    
-    const userChoice = vote.choice;
-    const userSong = userChoice === 'song1' ? match.song1 : match.song2;
-    const opponent = userChoice === 'song1' ? match.song2 : match.song1;
-    
-    console.log('  User picked:', userChoice);
-    console.log('  User song:', userSong?.shortTitle, '→', userSong?.votes || 0, 'votes');
-    console.log('  Opponent:', opponent?.shortTitle, '→', opponent?.votes || 0, 'votes');
+        // ========================================
+        // PRIORITY 1: Check user's picks for danger/nailbiter/comeback/winning
+        // ========================================
+        
+        for (const [matchId, vote] of Object.entries(userVotes)) {
+            const match = await getMatchData(matchId);
             
-            if (!userSong || !opponent) continue;
-
-                // ✅ ADD THIS HERE (before the "if (!userSong || !opponent)" check):
-    if (!userSong || !opponent) {
-        console.log('  ❌ Missing song data, skipping...');
-        continue;
-    }
+            if (!match || match.status !== 'live') continue;
+            
+            if (!match.id && !match.matchId) {
+                console.warn('⚠️ Match missing ID:', match);
+                continue;
+            }
+            
+            const userChoice = vote.choice;
+            const userSong = userChoice === 'song1' ? match.song1 : match.song2;
+            const opponent = userChoice === 'song1' ? match.song2 : match.song1;
+            
+            if (!userSong || !opponent) {
+                continue;
+            }
             
             const totalVotes = match.totalVotes || 0;
             const userSongVotes = userSong.votes || 0;
@@ -396,11 +408,6 @@ for (const [matchId, vote] of Object.entries(userVotes)) {
             
             const userPct = totalVotes > 0 ? Math.round((userSongVotes / totalVotes) * 100) : 50;
             const opponentPct = totalVotes > 0 ? 100 - userPct : 50;
-
-             // ✅ ADD DEBUG FOR DANGER CHECK:
-    console.log('  User %:', userPct + '%');
-    console.log('  Danger threshold: < 40% AND losing');
-    console.log('  Danger check:', userPct < 40 && userSongVotes < opponentVotes ? '🚨 YES' : '✅ NO');
             
             // Track state for comeback detection
             const previousState = matchStates[matchId];
@@ -412,147 +419,146 @@ for (const [matchId, vote] of Object.entries(userVotes)) {
                 lastCheck: Date.now()
             };
             
-// DANGER: User's pick is losing badly
-if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-    // ✅ Check if we've alerted about this match before
-    const dangerAlertKey = `danger-alert-count-${match.id}`;
-    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
-    
-    // ✅ Use escalating cooldown: first time = 5min, subsequent = 15min
-    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
-    
-    // ✅ Get message from champion pack
-    const championMessage = window.championLoader?.getChampionMessage('danger', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        voteDiff: voteDiff,
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 1,
-        type: notificationType,
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        voteDiff,
-        message: championMessage?.message || `🚨 Your pick is in danger!`,     // ✅ ADD ?.
-        detail: championMessage?.detail || `Behind by ${voteDiff} votes`,       // ✅ ADD ?.
-        cta: championMessage?.cta || 'View Match Now!'                          // ✅ ADD ?.
-    });
-    
-    // ✅ Increment alert count for this match
-    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-}
-
-// COMEBACK: Was losing, now winning
-else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
-    // ✅ Get message from champion pack
-    const championMessage = window.championLoader?.getChampionMessage('comeback', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 2,
-        type: 'comeback',
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        message: championMessage?.message || `🎉 Comeback complete!`,     // ✅ ADD ?.
-        detail: championMessage?.detail || `Now leading!`,                // ✅ ADD ?.
-        cta: championMessage?.cta || 'View Match!'                        // ✅ ADD ?.
-    });
-
-    
-    // ✅ Increment alert count for this match
-    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-}
+            // DANGER: User's pick is losing badly
+            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+                const dangerAlertKey = `danger-alert-count-${match.id}`;
+                const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+                const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+                
+                const championMessage = window.championLoader?.getChampionMessage('danger', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    voteDiff: voteDiff,
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
+                
+                notifications.push({
+                    priority: 1,
+                    type: notificationType,
+                    matchId: match.id,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    userPct,
+                    opponentPct,
+                    voteDiff,
+                    message: championMessage?.message || `🚨 Your pick is in danger!`,
+                    detail: championMessage?.detail || `Behind by ${voteDiff} votes`,
+                    cta: championMessage?.cta || 'View Match Now!'
+                });
+                
+                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+            }
             // COMEBACK: Was losing, now winning
-      // COMEBACK: Was losing, now winning
-else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
-    // ✅ Get message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('comeback', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 2,
-        type: 'comeback',
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        message: championMessage.message,     // ✅ FROM PACK
-        detail: championMessage.detail,       // ✅ FROM PACK
-        cta: championMessage.cta              // ✅ FROM PACK
-    });
-}
-      // NAILBITER: Very close match
-else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
-    // ✅ Get message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('nailbiter', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        voteDiff: voteDiff,
-        voteDiffPlural: voteDiff === 1 ? '' : 's',
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 3,
-        type: 'nailbiter',
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        voteDiff,
-        userPct,
-        opponentPct,
-        message: championMessage.message,     // ✅ FROM PACK
-        detail: championMessage.detail,       // ✅ FROM PACK
-        cta: championMessage.cta              // ✅ FROM PACK
-    });
-}
+            else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
+                const championMessage = window.championLoader?.getChampionMessage('comeback', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
+                
+                notifications.push({
+                    priority: 2,
+                    type: 'comeback',
+                    matchId: match.id,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    userPct,
+                    opponentPct,
+                    message: championMessage?.message || `🎉 Comeback complete!`,
+                    detail: championMessage?.detail || `Now leading!`,
+                    cta: championMessage?.cta || 'View Match!'
+                });
+            }
+            // NAILBITER: Very close match
+            else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
+                const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    voteDiff: voteDiff,
+                    voteDiffPlural: voteDiff === 1 ? '' : 's',
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
+                
+                notifications.push({
+                    priority: 3,
+                    type: 'nailbiter',
+                    matchId: match.id,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    voteDiff,
+                    userPct,
+                    opponentPct,
+                    message: championMessage?.message || `🔥 Too close!`,
+                    detail: championMessage?.detail || `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`,
+                    cta: championMessage?.cta || 'View Match!'
+                });
+            }
             // WINNING: User's pick is dominating
-    // WINNING: User's pick is dominating
-else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
-    // ✅ Get message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('winning', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        userPct: userPct,
-        opponentPct: opponentPct,
-        voteDiff: voteDiff
-    });
-    
-    notifications.push({
-        priority: 4,
-        type: 'winning',
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        message: championMessage.message,     // ✅ FROM PACK
-        detail: championMessage.detail,       // ✅ FROM PACK
-        cta: championMessage.cta              // ✅ FROM PACK
-    });
-}
+            else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
+                const championMessage = window.championLoader?.getChampionMessage('winning', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    userPct: userPct,
+                    opponentPct: opponentPct,
+                    voteDiff: voteDiff
+                });
+                
+                notifications.push({
+                    priority: 4,
+                    type: 'winning',
+                    matchId: match.id,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    userPct,
+                    opponentPct,
+                    message: championMessage?.message || `🎯 Dominating!`,
+                    detail: championMessage?.detail || `Leading ${userPct}% to ${opponentPct}%`,
+                    cta: championMessage?.cta || 'View Match!'
+                });
+            }
         }
         
-      // PRIORITY 2: CHECK ALL LIVE MATCHES FOR VOTE ISSUES
+        // ========================================
+        // PRIORITY 2: CHECK MATCH OUTCOMES
+        // ========================================
+        
+        try {
+            const { checkMatchOutcomes, showMatchOutcomeNotification } = await import('./match-outcomes.js');
+            const outcomes = await checkMatchOutcomes();
+            
+            if (outcomes.length > 0) {
+                console.log(`🏆 Found ${outcomes.length} new match outcome(s)`);
+                
+                // Show the first outcome as a notification
+                const outcome = outcomes[0];
+                showMatchOutcomeNotification(outcome);
+                
+                // Also trigger achievement check
+                const { checkAchievements } = await import('./achievement-tracker.js');
+                
+                // Fetch user votes from API for achievement checking
+                try {
+                    const votesResponse = await fetch(`/api/user-votes?userId=${userId}`);
+                    if (votesResponse.ok) {
+                        const allVotes = await votesResponse.json();
+                        await checkAchievements(allVotes);
+                    }
+                } catch (voteError) {
+                    console.warn('Could not check achievements:', voteError);
+                }
+                
+                return; // Exit early - showed outcome notification
+            }
+            
+        } catch (error) {
+            console.error('⚠️ Error checking match outcomes:', error);
+        }
+        
+        // ========================================
+        // PRIORITY 3: CHECK ALL LIVE MATCHES FOR VOTE ISSUES
         // ========================================
         
         let zeroVoteCount = 0;
@@ -575,20 +581,15 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             if (totalVotes === 0 && hoursLeft <= 6) {
                 zeroVoteCount++;
                 
-                // ✅ NEW: Check if user already dismissed this match
                 const dismissKey = `novotes-${matchId}`;
                 if (dismissedBulletins.has(dismissKey)) {
-                    continue; // Skip - user doesn't want to see this again
+                    continue;
                 }
                 
-                // Check cooldown (only alert every 2 hours)
                 const alertKey = `lastAlert-novotes-${matchId}`;
                 const lastAlerted = localStorage.getItem(alertKey);
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
-                // Only show if:
-                // 1. Haven't shown this match alert in 2+ hours
-                // 2. No other zero-vote alert is pending
                 if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
                     notifications.push({
                         priority: 1,
@@ -605,10 +606,7 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                         targetUrl: `/vote.html?match=${matchId}`
                     });
                     
-                    // Mark this match as alerted (timestamp)
                     localStorage.setItem(alertKey, Date.now().toString());
-                    
-                    // ✅ BREAK after adding ONE notification
                     break;
                 }
             }
@@ -616,18 +614,15 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             else if (totalVotes > 0 && totalVotes < 5 && hoursLeft <= 3) {
                 lowVoteCount++;
                 
-                // ✅ NEW: Check if user dismissed this match
                 const dismissKey = `lowvotes-${matchId}`;
                 if (dismissedBulletins.has(dismissKey)) {
-                    continue; // Skip - user doesn't want to see this
+                    continue;
                 }
                 
-                // Check cooldown
                 const alertKey = `lastAlert-lowvotes-${matchId}`;
                 const lastAlerted = localStorage.getItem(alertKey);
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
-                // Only show if no zero-vote alerts AND haven't shown recently
                 if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
                     notifications.push({
                         priority: 6,
@@ -651,29 +646,17 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
             }
         }
         
-        // Log summary
-        if (zeroVoteCount > 0) {
-            console.log(`⚠️ ${zeroVoteCount} matches have zero votes (${notifications.filter(n => n.type === 'novotes').length} will be shown)`);
-        }
-        if (lowVoteCount > 0) {
-            console.log(`⚠️ ${lowVoteCount} matches have low votes (${notifications.filter(n => n.type === 'lowvotes').length} will be shown)`);
-        }
-
         // ========================================
-        // PRIORITY 3: CHECK FOR TRENDING/ENGAGING MATCHES
+        // PRIORITY 4: CHECK FOR TRENDING/ENGAGING MATCHES
         // ========================================
         
         if (hasVoted && Object.keys(userVotes).length >= 2) {
-            // Only show engagement toasts to users who have voted in 2+ matches
-            
             for (const match of liveMatches) {
                 const matchId = match.matchId || match.id;
                 
-                // Skip if user already voted in this match
                 if (userVotes[matchId]) continue;
                 
                 try {
-                    // Fetch view stats for this match
                     const viewResponse = await fetch(`/api/view-stats?matchId=${matchId}`);
                     
                     if (!viewResponse.ok) continue;
@@ -681,10 +664,8 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                     const viewStats = await viewResponse.json();
                     const totalViews = viewStats.totalViews || 0;
                     const recentViews = viewStats.recentViews || 0;
-                    
                     const totalVotes = match.totalVotes || 0;
                     
-                 // 🔥 TRENDING: High recent views
                     if (recentViews >= 10 && totalVotes >= 5) {
                         notifications.push({
                             priority: 3,
@@ -701,8 +682,6 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                             targetUrl: `/vote.html?match=${matchId}`
                         });
                     }
-                    
-                    // 👀 MOST VIEWED: Popular but few votes
                     else if (totalViews >= 30 && totalVotes < 15) {
                         notifications.push({
                             priority: 4,
@@ -719,69 +698,62 @@ else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
                             targetUrl: `/vote.html?match=${matchId}`
                         });
                     }
-                    
                 } catch (error) {
                     console.error(`Error checking engagement for ${matchId}:`, error);
                 }
             }
         }
-                
-// Show highest priority notification that hasn't been dismissed
+        
+        // ========================================
+        // SHOW HIGHEST PRIORITY NOTIFICATION
+        // ========================================
+        
         notifications.sort((a, b) => a.priority - b.priority);
         
         for (const notification of notifications) {
             const bulletinKey = `${notification.type}-${notification.matchId}`;
             
-            // ✅ Check if dismissed (24h block)
             if (dismissedBulletins.has(bulletinKey)) continue;
             
-            // ✅ NEW: Check if recently shown (type-specific cooldown)
             const lastShown = recentlyShownBulletins.get(bulletinKey);
             if (lastShown) {
                 const cooldownMs = (COOLDOWN_MINUTES[notification.type] || 10) * 60000;
                 const timeSinceShown = Date.now() - lastShown;
                 
                 if (timeSinceShown < cooldownMs) {
-                    const minutesRemaining = Math.ceil((cooldownMs - timeSinceShown) / 60000);
-                    console.log(`⏳ Toast "${notification.type}" on cooldown (${minutesRemaining}m remaining)`);
                     continue;
                 }
             }
             
-            // ✅ Show the toast and track it
             showBulletin(notification);
             recentlyShownBulletins.set(bulletinKey, Date.now());
-
-            // ✅ SAVE TO FIRESTORE for notification center
-const userId = localStorage.getItem('tournamentUserId');
-if (userId && userId !== 'anonymous' && notification.matchId) {
-    await saveNotification(userId, {
-        type: notification.type,
-        priority: notification.priority,
-        message: notification.message,
-        detail: notification.detail,
-        icon: notification.icon || icons[notification.type],
-        matchId: notification.matchId,
-        matchTitle: notification.song && notification.opponent ? 
-                   `${notification.song} vs ${notification.opponent}` : '',
-        thumbnailUrl: notification.thumbnailUrl,  // ✅ Include thumbnail
-        ctaText: notification.cta,
-        ctaAction: notification.action || 'navigate',
-        targetUrl: notification.targetUrl || `/vote.html?match=${notification.matchId}`,
-        shownAsToast: true
-    });
-}
-
-            // ✅ NEW: Persist to sessionStorage (survives page refresh, expires on tab close)
-try {
-    const persistedData = Object.fromEntries(recentlyShownBulletins);
-    sessionStorage.setItem('recentBulletins', JSON.stringify(persistedData));
-} catch (e) {
-    console.warn('Could not persist bulletin cooldowns:', e);
-}
-
-
-            console.log(`📢 Toast shown and tracked: ${bulletinKey} (cooldown: ${COOLDOWN_MINUTES[notification.type] || 10}m)`);
+            
+            // Save to Firestore for notification center
+            if (userId && userId !== 'anonymous' && notification.matchId) {
+                await saveNotification(userId, {
+                    type: notification.type,
+                    priority: notification.priority,
+                    message: notification.message,
+                    detail: notification.detail,
+                    matchId: notification.matchId,
+                    matchTitle: notification.song && notification.opponent ? 
+                               `${notification.song} vs ${notification.opponent}` : '',
+                    thumbnailUrl: notification.thumbnailUrl,
+                    ctaText: notification.cta,
+                    ctaAction: notification.action || 'navigate',
+                    targetUrl: notification.targetUrl || `/vote.html?match=${notification.matchId}`,
+                    shownAsToast: true
+                });
+            }
+            
+            try {
+                const persistedData = Object.fromEntries(recentlyShownBulletins);
+                sessionStorage.setItem('recentBulletins', JSON.stringify(persistedData));
+            } catch (e) {
+                console.warn('Could not persist bulletin cooldowns:', e);
+            }
+            
+            console.log(`📢 Toast shown: ${bulletinKey}`);
             break;
         }
         
@@ -801,6 +773,8 @@ const ACTIVITY_CHECK_INTERVAL = 30000; // Check every 30 seconds
 // ✅ NEW: Configurable time windows
 const TOAST_WINDOW_MINUTES = 60;  // Show toasts for votes in last 60 minutes
 const SAVE_WINDOW_HOURS = 72;     // Save notifications for votes in last 72 hours
+
+
 
 async function checkRecentVotes() {
     try {
@@ -890,22 +864,26 @@ if (streakData && streakData.isMilestone) {
     }, 3000); // 3 second delay after ally/rival toast
 }
             
-            // ✅ Show as toast ONLY if within toast window (60 minutes)
-            if (!toastShown && activity.timestamp >= toastCutoff) {
-                // Check cooldown to avoid spamming same match
-                const bulletinKey = `live-activity-${activity.matchId}`;
-                const lastShown = recentlyShownBulletins.get(bulletinKey);
-                const cooldownMs = 5 * 60000; // 5 minutes between toasts per match
-                
-                if (!lastShown || (now - lastShown) >= cooldownMs) {
-                    showBulletin(notificationData);
-                    recentlyShownBulletins.set(bulletinKey, now);
-                    toastShown = true;
-                    
-                    const minutesAgo = Math.floor((now - activity.timestamp) / 60000);
-                    console.log(`🔔 Toast shown: ${activity.username} (${isAlly ? 'ally' : 'rival'}) - ${minutesAgo}m ago`);
-                }
-            }
+      // ✅ Show as toast ONLY if within toast window (60 minutes)
+if (!toastShown && activity.timestamp >= toastCutoff) {
+    // Check cooldown to avoid spamming same match
+    const bulletinKey = `live-activity-${activity.matchId}`;
+    const lastShown = recentlyShownBulletins.get(bulletinKey);
+    const cooldownMs = 5 * 60000; // 5 minutes between toasts per match
+    
+    if (!lastShown || (now - lastShown) >= cooldownMs) {
+        showBulletin({
+            ...notificationData, // Spread existing data
+            action: 'navigate',  // ✅ ADD: Navigate action
+            targetUrl: `/profile.html?user=${activity.userId}` // ✅ ADD: User profile URL
+        });
+        recentlyShownBulletins.set(bulletinKey, now);
+        toastShown = true;
+        
+        const minutesAgo = Math.floor((now - activity.timestamp) / 60000);
+        console.log(`🔔 Toast shown: ${activity.username} (${isAlly ? 'ally' : 'rival'}) - ${minutesAgo}m ago`);
+    }
+}
             
             // ✅ Mark as processed
             lastSeenActivityIds.add(activity.activityId);
@@ -937,10 +915,14 @@ if (streakData && streakData.isMilestone) {
 // ========================================
 
 function buildSocialNotification(activity, isAlly, currentUserId) {
-    // Get thumbnail from song
-    const thumbnailUrl = activity.songId 
+    // ✅ PRIMARY: User's avatar (large background)
+    const avatarUrl = activity.avatarUrl || activity.avatar || null;
+    
+    // ✅ SECONDARY: Song thumbnail (small overlay)
+    const songThumbnailUrl = activity.songId 
         ? `https://img.youtube.com/vi/${activity.songId}/mqdefault.jpg`
         : null;
+
     
     // ✅ NEW: Get user's vote data to show THEIR song choice
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
@@ -1006,7 +988,9 @@ return {
     triggerUsername: activity.username,
     song: activity.songTitle,
     userSong: userSongTitle,
-    thumbnailUrl: thumbnailUrl,
+        thumbnailUrl: avatarUrl, // ✅ PRIMARY: User avatar (large)
+                secondaryThumbnail: songThumbnailUrl, // ✅ SECONDARY: Song thumbnail (small badge)
+
     message: message,
     detail: detail,
     icon: icon,
@@ -1024,7 +1008,7 @@ return {
         action: 'navigate',
         url: `/profile?user=${activity.username}`
     }
-};
+}
     
     return {
         priority: 7,
@@ -2181,50 +2165,92 @@ if (championPack && championPack.theme) {
         
     }
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
+// ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 else {
     // ========================================
     // BUILD THUMBNAIL/AVATAR IMAGE
     // ========================================
     let thumbnailHtml = '';
     
-    // ✅ SOCIAL ALERTS: Song + User (NO icon badge)
-    if (notification.type === 'live-activity' && notification.thumbnailUrl && (notification.username || notification.triggerUsername)) {
+    // ✅ SOCIAL ALERTS: User Avatar + Song Badge
+    if (notification.type === 'live-activity' && (notification.username || notification.triggerUsername)) {
         const username = notification.username || notification.triggerUsername;
-        const initial = username.charAt(0).toUpperCase();
-        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
-        const colorIndex = username.charCodeAt(0) % colors.length;
-        const bgColor = colors[colorIndex];
         
-        thumbnailHtml = `
-            <div class="bulletin-thumbnail" style="position: relative; width: 64px; height: 64px;">
-                <!-- Song thumbnail (background) -->
-                <img src="${notification.thumbnailUrl}" 
-                     alt="${notification.song || 'Match'}"
-                     class="thumbnail-img" 
-                     style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover; border: 2px solid rgba(200, 170, 110, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
-                
-                <!-- User avatar (overlapping bottom-right) -->
-                <div style="
-                    position: absolute;
-                    bottom: -6px;
-                    right: -6px;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    background: ${bgColor};
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1rem;
-                    font-weight: 700;
-                    color: white;
-                    border: 3px solid #1a1a2e;
-                    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-                ">
-                    ${initial}
+        // ✅ CASE 1: User has avatar - show avatar with song badge
+        if (notification.thumbnailUrl) {
+            thumbnailHtml = `
+                <div class="bulletin-thumbnail" style="position: relative; width: 64px; height: 64px;">
+                    <!-- User avatar (large background) -->
+                    <img src="${notification.thumbnailUrl}" 
+                         alt="${username}"
+                         class="thumbnail-img" 
+                         style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover; border: 2px solid rgba(200, 170, 110, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
+                    
+                    <!-- Song thumbnail (small overlay bottom-right) -->
+                    ${notification.secondaryThumbnail ? `
+                        <img src="${notification.secondaryThumbnail}"
+                             alt="${notification.song || 'Song'}"
+                             style="
+                                 position: absolute;
+                                 bottom: -6px;
+                                 right: -6px;
+                                 width: 36px;
+                                 height: 36px;
+                                 border-radius: 8px;
+                                 object-fit: cover;
+                                 border: 3px solid #1a1a2e;
+                                 box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+                             ">
+                    ` : ''}
                 </div>
-            </div>
-        `;
+            `;
+        }
+        // ✅ CASE 2: No avatar - show initial with song badge
+        else {
+            const initial = username.charAt(0).toUpperCase();
+            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+            const colorIndex = username.charCodeAt(0) % colors.length;
+            const bgColor = colors[colorIndex];
+            
+            thumbnailHtml = `
+                <div class="bulletin-thumbnail" style="position: relative; width: 64px; height: 64px;">
+                    <!-- User initial (background) -->
+                    <div style="
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 12px;
+                        background: ${bgColor};
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.8rem;
+                        font-weight: 700;
+                        color: white;
+                        border: 2px solid rgba(200, 170, 110, 0.3);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                    ">
+                        ${initial}
+                    </div>
+                    
+                    <!-- Song thumbnail (small overlay bottom-right) -->
+                    ${notification.secondaryThumbnail ? `
+                        <img src="${notification.secondaryThumbnail}"
+                             alt="${notification.song || 'Song'}"
+                             style="
+                                 position: absolute;
+                                 bottom: -6px;
+                                 right: -6px;
+                                 width: 36px;
+                                 height: 36px;
+                                 border-radius: 8px;
+                                 object-fit: cover;
+                                 border: 3px solid #1a1a2e;
+                                 box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+                             ">
+                    ` : ''}
+                </div>
+            `;
+        }
     }
     // MATCH ALERTS: Song + Icon badge
     else if (notification.thumbnailUrl) {
@@ -2277,14 +2303,14 @@ else {
     `;
     
     banner.className = `bulletin-banner ${notification.type}`;
-
-
-    setTimeout(() => banner.classList.add('show'), 10);
 }
-    
+
+setTimeout(() => banner.classList.add('show'), 10);
+
 console.log(`📢 Bulletin shown: ${notification.type}`);
-
 }
+
+
 // ========================================
 // BULLETIN ACTIONS
 // ========================================
@@ -2442,7 +2468,9 @@ function initBulletinSystem() {
     checkAndShowBulletin();
     adjustPollingRate();
     
-
+ // ✅ ADD THIS: START SOCIAL ACTIVITY CHECKING (ally/rival notifications)
+    checkRecentVotes(); // Run once immediately
+    setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL); // Then every 30 seconds
     
     console.log('✅ Bulletin system initialized with live activity');
 }
