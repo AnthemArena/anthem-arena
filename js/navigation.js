@@ -3,52 +3,47 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
-import { initNotificationCenter } from './notification-center.js';  // STEP 6A: Added
+import { initNotificationCenter } from './notification-center.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Navigation DOMContentLoaded fired');
     
-   const navHTML = `
+    const navHTML = `
     <nav class="main-nav">
         <div class="nav-container">
             <a href="/index.html" class="logo-link">
                 <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
             </a>
-          <ul class="nav-links">
-    <li><a href="/">Home</a></li>
-    <li><a href="/feed.html">
-        <i class="fa-solid fa-users"></i>
-        Feed
-    </a></li>
-    <li><a href="/matches">Matches</a></li>
-    
-    <li class="nav-separator"></li>
-    
-    <li><a href="/brackets">Brackets</a></li>
-    <li><a href="/music-gallery">Gallery</a></li>
-    
-    <li class="nav-separator"></li>
-    
-    <li><a href="/stats">Stats</a></li>
-    <li><a href="/activity.html">
-        <i class="fa-solid fa-bolt"></i>
-        Live
-    </a></li>
-</ul>
             
-            <!-- PROFILE + RANK DISPLAY WITH SETTINGS ICON -->
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/feed.html">
+                    <i class="fa-solid fa-users"></i>
+                    Feed
+                </a></li>
+                <li><a href="/matches">Matches</a></li>
+                
+                <li class="nav-separator"></li>
+                
+                <li><a href="/brackets">Brackets</a></li>
+                <li><a href="/music-gallery">Gallery</a></li>
+                
+                <li class="nav-separator"></li>
+                
+                <li><a href="/stats">Stats</a></li>
+                <li><a href="/activity.html">
+                    <i class="fa-solid fa-bolt"></i>
+                    Live
+                </a></li>
+            </ul>
+            
+            <!-- PROFILE + RANK DISPLAY -->
             <div class="nav-profile-container" id="navProfileContainer" style="display: none;">
                 <a href="#" class="nav-profile-card" id="navProfileCard" title="Profile Settings" onclick="window.openSettingsModal(); return false;">
                     <div class="profile-avatar" id="navProfileAvatar">
-                        Music Note
-                    </div>
-                    
-                    <!-- Notification Bell -->
-                    <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 16px;">
-                        <span style="font-size: 20px;">🔔</span>
-                        <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                        🎵
                     </div>
                     
                     <div class="profile-info">
@@ -60,6 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
                         </div>
                     </div>
+                    
+                    <!-- ✅ Notification Bell (ONLY HERE) -->
+                    <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 16px;">
+                        <span style="font-size: 20px;">🔔</span>
+                        <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                    </div>
+                    
                     <i class="fas fa-cog profile-settings-icon"></i>
                 </a>
             </div>
@@ -68,28 +70,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="hamburger"></span>
             </button>
         </div>
-
-        <!-- Notification Panel -->
-        <div id="notificationPanel" class="notification-panel" style="display: none;">
-            <div class="notification-panel-header">
-                <h3>Notifications</h3>
-                <button id="closeNotificationPanel" class="close-btn">X</button>
-            </div>
-            
-            <div class="notification-panel-content" id="notificationPanelContent">
-                <div class="notification-empty">
-                    <span style="font-size: 48px; opacity: 0.3;">🔔</span>
-                    <p>No new notifications</p>
-                </div>
+    </nav>
+    
+    <!-- ✅ Notification Panel (OUTSIDE nav, appended to body) -->
+    <div id="notificationOverlay" class="notification-overlay" style="display: none;"></div>
+    
+    <div id="notificationPanel" class="notification-panel" style="display: none;">
+        <div class="notification-panel-header">
+            <h3>Notifications</h3>
+            <button id="closeNotificationPanel" class="close-btn">×</button>
+        </div>
+        
+        <div class="notification-panel-content" id="notificationPanelContent">
+            <div class="notification-empty">
+                <span style="font-size: 48px; opacity: 0.3;">🔔</span>
+                <p>No new notifications</p>
             </div>
         </div>
-
-        <div id="notificationOverlay" class="notification-overlay" style="display: none;"></div>
-    </nav>
+    </div>
     `;
     
     document.getElementById('nav-placeholder').innerHTML = navHTML;
-    console.log('Navigation HTML injected');
+    console.log('✅ Navigation HTML injected');
     
     // Auto-highlight current page
     const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
@@ -138,8 +140,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Calling updateNavProfile...');
     updateNavProfile();
 
-    // STEP 6B: Initialize notification center after nav is ready
-    initNotificationCenter();
+    // ✅ Initialize notification center AFTER nav is fully rendered
+    setTimeout(() => {
+        initNotificationCenter();
+        console.log('✅ Notification center initialized');
+    }, 100);
 });
 
 // ========================================
@@ -197,11 +202,11 @@ async function updateNavProfile() {
             try {
                 avatar = JSON.parse(avatarJson);
             } catch {
-                avatar = { type: 'emoji', value: 'Music Note' };
+                avatar = { type: 'emoji', value: '🎵' };
             }
         }
         
-        // Check if user has voted (check BOTH localStorage AND Firebase)
+        // Check if user has voted
         const userVotesLocal = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const hasVotedLocal = Object.keys(userVotesLocal).length > 0;
         
@@ -231,16 +236,13 @@ async function updateNavProfile() {
         
         const hasVoted = hasVotedLocal || hasVotedFirebase;
         
-        // ========================================
-        // STATE 1: NOT VOTED YET - Show Locked Profile
-        // ========================================
-        
+        // STATE 1: NOT VOTED YET
         if (!hasVoted) {
             console.log("User hasn't voted yet - showing locked state");
             
             navProfileCard.innerHTML = `
                 <div class="profile-locked-state">
-                    <div class="locked-icon">Locked</div>
+                    <div class="locked-icon">🔒</div>
                     <div class="locked-info">
                         <div class="locked-title">Profile Locked</div>
                         <div class="locked-subtitle">Vote to unlock!</div>
@@ -261,21 +263,18 @@ async function updateNavProfile() {
             return;
         }
         
-        // ========================================
-        // STATE 2: VOTED BUT NO USERNAME - Show Claim Profile
-        // ========================================
-        
+        // STATE 2: VOTED BUT NO USERNAME
         if (!username) {
             console.log('User has voted but no username - showing claim prompt');
             
             navProfileCard.innerHTML = `
                 <div class="profile-claim-state">
-                    <div class="claim-icon">Sparkles</div>
+                    <div class="claim-icon">✨</div>
                     <div class="claim-info">
                         <div class="claim-title">Claim Your Profile!</div>
                         <div class="claim-subtitle">Set username & avatar</div>
                     </div>
-                    <div class="claim-arrow">Right Arrow</div>
+                    <div class="claim-arrow">→</div>
                 </div>
             `;
             
@@ -290,21 +289,17 @@ async function updateNavProfile() {
             return;
         }
         
-        // ========================================
-        // STATE 3: FULL PROFILE - Show Normal Profile
-        // ========================================
-
+        // STATE 3: FULL PROFILE
         console.log('Showing full profile for:', username);
 
-        // Restore original profile card HTML
         navProfileCard.innerHTML = `
             <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
                 <div class="profile-avatar" id="navProfileAvatar">
                     ${avatar && avatar.type === 'url' 
                         ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                           <span class="nav-avatar-fallback" style="display: none;">Music Note</span>`
-                        : `<span class="nav-avatar-emoji">${avatar?.value || 'Music Note'}</span>`
+                           <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
+                        : `<span class="nav-avatar-emoji">${avatar?.value || '🎵'}</span>`
                     }
                 </div>
                 
@@ -319,8 +314,8 @@ async function updateNavProfile() {
                 </div>
             </a>
             
-            <!-- Notification Bell -->
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer;">
+            <!-- ✅ Notification Bell (recreated after profile update) -->
+            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 16px;">
                 <span style="font-size: 20px;">🔔</span>
                 <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
             </div>
@@ -331,7 +326,13 @@ async function updateNavProfile() {
             </button>
         `;
 
-        // Remove old onclick handler
+        // ✅ Re-initialize notification center after bell is recreated
+        setTimeout(() => {
+            if (window.initNotificationCenter) {
+                initNotificationCenter();
+            }
+        }, 50);
+
         navProfileCard.onclick = null;
 
         // Update rank display
@@ -363,13 +364,12 @@ async function updateNavProfile() {
         }
 
         navProfileContainer.style.display = 'flex';
-        console.log('Profile display updated successfully');
+        console.log('✅ Profile display updated successfully');
 
     } catch (err) {
         console.error('Unexpected error in updateNavProfile:', err);
     }
-} // ← This closes the async function
-  // ← This was missing in your original code!
+}
 
 // ========================================
 // EXPORT FOR USE IN OTHER FILES
@@ -378,5 +378,4 @@ async function updateNavProfile() {
 export { updateNavProfile };
 
 window.updateNavProfile = updateNavProfile;
-
 window.updateNavRank = updateNavProfile;
