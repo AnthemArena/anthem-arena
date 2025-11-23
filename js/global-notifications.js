@@ -422,7 +422,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
     const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
     
     // ✅ Get message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('danger', {
+    const championMessage = window.championLoader?.getChampionMessage('danger', {
         songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         voteDiff: voteDiff,
         userPct: userPct,
@@ -439,10 +439,38 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
         userPct,
         opponentPct,
         voteDiff,
-        message: championMessage.message,     // ✅ FROM PACK
-        detail: championMessage.detail,       // ✅ FROM PACK
-        cta: championMessage.cta              // ✅ FROM PACK
+        message: championMessage?.message || `🚨 Your pick is in danger!`,     // ✅ ADD ?.
+        detail: championMessage?.detail || `Behind by ${voteDiff} votes`,       // ✅ ADD ?.
+        cta: championMessage?.cta || 'View Match Now!'                          // ✅ ADD ?.
     });
+    
+    // ✅ Increment alert count for this match
+    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+}
+
+// COMEBACK: Was losing, now winning
+else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
+    // ✅ Get message from champion pack
+    const championMessage = window.championLoader?.getChampionMessage('comeback', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
+    notifications.push({
+        priority: 2,
+        type: 'comeback',
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong),
+        userPct,
+        opponentPct,
+        message: championMessage?.message || `🎉 Comeback complete!`,     // ✅ ADD ?.
+        detail: championMessage?.detail || `Now leading!`,                // ✅ ADD ?.
+        cta: championMessage?.cta || 'View Match!'                        // ✅ ADD ?.
+    });
+
     
     // ✅ Increment alert count for this match
     localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
