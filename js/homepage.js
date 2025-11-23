@@ -1,592 +1,798 @@
 // ========================================
 // IMPORTS
 // ========================================
+import { getBookForSong } from './bookMappings.js';
 import { getAllMatches } from './api-client.js';
+import './youtube-playlist.js';
+
+import { db } from './firebase-config.js';
+import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { createMatchCard } from './match-card-renderer.js';
+
+const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
 // ========================================
-// GLOBAL STATE
+// STATE
 // ========================================
-let musicVideos = {};
+let currentMatch = null;
+let voteState = {
+    leftVotes: 0,
+    rightVotes: 0,
+    totalVotes: 0,
+    userVote: null
+};
+let musicVideos = [];
 let countdownInterval = null;
 
 // ========================================
-// LOAD MUSIC VIDEO DATA
+// INITIALIZE ON PAGE LOAD
+// ========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.time('⏱️ Total Homepage Load');
+    console.log('🎵 League Music Tournament loaded');
+    
+    try {
+        showHomepageLoading();
+        
+        console.time('⏱️ Music Videos');
+        await loadMusicVideos();
+        console.timeEnd('⏱️ Music Videos');
+        
+        console.time('⏱️ Fetch All Matches');
+        const allMatches = await getAllMatches();
+        console.timeEnd('⏱️ Fetch All Matches');
+        
+        console.time('⏱️ Tournament Info');
+        await loadTournamentInfo(allMatches);
+        console.timeEnd('⏱️ Tournament Info');
+        
+        console.time('⏱️ Featured Match');
+        await loadFeaturedMatch(allMatches);
+        console.timeEnd('⏱️ Featured Match');
+        
+        // ✅ ADD THIS:
+        console.time('⏱️ Your Active Votes');
+        await loadYourActiveVotes(allMatches);
+        console.timeEnd('⏱️ Your Active Votes');
+        
+        console.time('⏱️ Live Matches');
+        await loadLiveMatches(allMatches);
+        console.timeEnd('⏱️ Live Matches');
+        
+        console.time('⏱️ Recent Results');
+        await loadRecentResults(allMatches);
+        console.timeEnd('⏱️ Recent Results');
+        
+        console.time('⏱️ Next Match Countdown');
+        await loadNextMatchCountdown(allMatches);
+        console.timeEnd('⏱️ Next Match Countdown');
+        
+        console.time('⏱️ Hero Stats');
+        await updateHeroStats(allMatches);
+        console.timeEnd('⏱️ Hero Stats');
+        
+        hideChampionsSection();
+        hideHomepageLoading();
+        showHomepageSections();
+        
+        console.timeEnd('⏱️ Total Homepage Load');
+        
+    } catch (error) {
+        console.error('❌ Error loading homepage:', error);
+        hideHomepageLoading();
+        showHomepageError(error);
+    }
+});
+
+// ========================================
+// VOTE TRACKING HELPERS
+// ========================================
+function hasUserVoted(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return !!userVotes[matchId];
+}
+
+function getUserVotedSongId(matchId) {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+    return userVotes[matchId]?.songId || null;
+}
+
+// ========================================
+// LOAD MUSIC VIDEOS DATA
 // ========================================
 async function loadMusicVideos() {
     try {
         const response = await fetch('/data/music-videos.json');
-        if (!response.ok) {
-            console.warn('⚠️ musicVideos.json not found, using fallback');
-            musicVideos = {};
-            return;
-        }
         musicVideos = await response.json();
-        console.log('✅ Music videos loaded:', Object.keys(musicVideos).length);
+        console.log('✅ Music videos loaded:', musicVideos.length);
     } catch (error) {
         console.error('❌ Error loading music videos:', error);
-        musicVideos = {};
     }
 }
 
 // ========================================
-// GET SONG INFO
+// UPDATE HERO STATS
 // ========================================
-function getSongInfo(songTitle) {
-    // ✅ FIXED: Handle object input (from Firebase nested structure)
-    if (!songTitle) {
-        return null;
+async function updateHeroStats(allMatches) {
+    try {
+        const totalVideosEl = document.getElementById('totalVideos');
+        if (totalVideosEl) {
+            totalVideosEl.textContent = musicVideos.length;
+        }
+        
+        let totalVotes = 0;
+        let activeMatches = 0;
+        
+        allMatches.forEach(match => {
+            totalVotes += (match.totalVotes || 0);
+            if (match.status === 'live') activeMatches++;
+        });
+        
+        const totalVotesEl = document.getElementById('totalVotes');
+        const matchesLeftEl = document.getElementById('matchesLeft');
+        
+        if (totalVotesEl) {
+            totalVotesEl.textContent = totalVotes.toLocaleString();
+        }
+        
+        if (matchesLeftEl) {
+            matchesLeftEl.textContent = activeMatches;
+        }
+        
+        console.log('✅ Hero stats updated:', { totalVotes, activeMatches });
+        
+    } catch (error) {
+        console.error('❌ Error updating hero stats:', error);
     }
-    
-    // If songTitle is an object (e.g., {title: "Warriors", name: "Warriors"}), extract the title
-    let titleString = songTitle;
-    if (typeof songTitle === 'object' && songTitle.title) {
-        titleString = songTitle.title;
-    } else if (typeof songTitle === 'object' && songTitle.name) {
-        titleString = songTitle.name;
-    } else if (typeof songTitle !== 'string') {
-        console.warn('⚠️ getSongInfo received invalid songTitle:', songTitle);
-        return null;
-    }
-    
-    // Direct match
-    if (musicVideos[titleString]) {
-        return { title: titleString, ...musicVideos[titleString] };
-    }
-    
-    // Case-insensitive match
-    const normalizedTitle = titleString.toLowerCase().trim();
-    const matchedKey = Object.keys(musicVideos).find(
-        key => key.toLowerCase().trim() === normalizedTitle
-    );
-    
-    if (matchedKey) {
-        return { title: matchedKey, ...musicVideos[matchedKey] };
-    }
-    
-    return null;
 }
 
 // ========================================
-// GET SONG TITLE STRING
-// ========================================
-function getSongTitle(song) {
-    if (!song) return 'Unknown Song';
-    if (typeof song === 'string') return song;
-    if (typeof song === 'object' && song.title) return song.title;
-    if (typeof song === 'object' && song.name) return song.name;
-    return 'Unknown Song';
-}
-
-// ========================================
-// LOAD TOURNAMENT INFO
+// LOAD TOURNAMENT INFO (BADGE)
 // ========================================
 async function loadTournamentInfo(allMatches) {
     try {
-        // Get tournament metadata from first match
-        if (allMatches.length > 0) {
-            const firstMatch = allMatches[0];
-            const tournamentName = firstMatch.tournament || 'Anthem Arena Championship S1';
-            const tournamentDescription = 'The ultimate showdown of League music begins! Vote for your favorites.';
+        const liveMatches = allMatches.filter(m => m.status === 'live');
+        const upcomingMatches = allMatches.filter(m => m.status === 'upcoming');
+        
+        const tournamentNameEl = document.getElementById('tournamentName');
+        const tournamentStatusEl = document.getElementById('tournamentStatus');
+        const badgeIcon = document.querySelector('.tournament-badge .badge-icon');
+        
+        if (!tournamentNameEl || !tournamentStatusEl) return;
+        
+        // SCENARIO 1: Live matches exist
+        if (liveMatches.length > 0) {
+            const actualLiveMatches = liveMatches.filter(match => {
+                const isTBD = !match.song1?.id || !match.song2?.id ||
+                             String(match.song1.id).includes('TBD') ||
+                             String(match.song2.id).includes('TBD');
+                return !isTBD;
+            });
             
-            // Determine current round
-            const liveMatches = allMatches.filter(m => m.status === 'live');
-            const currentRound = liveMatches.length > 0 ? liveMatches[0].round : 'Finals';
-            
-            // Update DOM
-            const nameEl = document.getElementById('tournamentName');
-            const descEl = document.getElementById('tournamentDescription');
-            const roundEl = document.getElementById('tournamentRound');
-            
-            if (nameEl) nameEl.textContent = tournamentName;
-            if (descEl) descEl.textContent = tournamentDescription;
-            if (roundEl) roundEl.textContent = currentRound;
-            
-            // Update status indicator
-            const statusEl = document.getElementById('tournamentStatus');
-            if (statusEl) {
-                if (liveMatches.length > 0) {
-                    statusEl.innerHTML = '<span class="status-dot"></span>LIVE';
-                    statusEl.className = 'status-indicator live';
-                } else {
-                    statusEl.innerHTML = 'COMPLETED';
-                    statusEl.className = 'status-indicator completed';
-                }
+            if (actualLiveMatches.length === 1) {
+                const liveMatch = actualLiveMatches[0];
+                const song1 = liveMatch.song1.shortTitle || liveMatch.song1.title;
+                const song2 = liveMatch.song2.shortTitle || liveMatch.song2.title;
+                
+                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
+                tournamentNameEl.textContent = 'Live Now';
+                tournamentStatusEl.textContent = `${song1} vs ${song2}`;
+                tournamentStatusEl.style.maxWidth = '400px';
+                tournamentStatusEl.style.overflow = 'hidden';
+                tournamentStatusEl.style.textOverflow = 'ellipsis';
+                tournamentStatusEl.style.whiteSpace = 'nowrap';
+                
+                console.log(`✅ Tournament badge: ${song1} vs ${song2}`);
+                return;
+            } else if (actualLiveMatches.length > 1) {
+                const currentRound = actualLiveMatches[0].round || 1;
+                
+                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
+                tournamentNameEl.textContent = 'Live Now';
+                tournamentStatusEl.textContent = `${actualLiveMatches.length} matches • ${getRoundDisplayName(currentRound)}`;
+                
+                console.log(`✅ Tournament badge: ${actualLiveMatches.length} live matches`);
+                return;
             }
-            
-            console.log('✅ Tournament info loaded:', tournamentName);
         }
+        
+        // SCENARIO 2: No live matches - show next upcoming match
+        if (upcomingMatches.length > 0) {
+            const validUpcomingMatches = upcomingMatches.filter(match => {
+                const isTBD = !match.song1?.id || !match.song2?.id ||
+                             String(match.song1.id).includes('TBD') ||
+                             String(match.song2.id).includes('TBD');
+                return !isTBD && match.date;
+            });
+            
+            if (validUpcomingMatches.length > 0) {
+                validUpcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                const nextMatch = validUpcomingMatches[0];
+                const song1 = nextMatch.song1.shortTitle || nextMatch.song1.title;
+                const song2 = nextMatch.song2.shortTitle || nextMatch.song2.title;
+                const roundName = getRoundDisplayName(nextMatch.round);
+                const timeUntil = getTimeUntilMatch(nextMatch.date);
+                
+                badgeIcon.innerHTML = '<i class="fa-solid fa-clock"></i>'; // ✅ Changed
+                tournamentNameEl.textContent = `${song1} vs ${song2}`;
+                tournamentStatusEl.textContent = `${roundName} • Starts ${timeUntil}`;
+                tournamentStatusEl.style.maxWidth = '500px';
+                tournamentStatusEl.style.overflow = 'hidden';
+                tournamentStatusEl.style.textOverflow = 'ellipsis';
+                tournamentStatusEl.style.whiteSpace = 'nowrap';
+                
+                console.log(`✅ Tournament badge: Next match - ${song1} vs ${song2}`);
+                return;
+            }
+        }
+        
+        // SCENARIO 3: Fallback
+        badgeIcon.innerHTML = '<i class="fa-solid fa-music"></i>'; // ✅ Changed
+        tournamentNameEl.textContent = 'Music Tournament';
+        tournamentStatusEl.textContent = 'Season 1';
+        
+        console.log('✅ Tournament badge: Fallback');
+        
     } catch (error) {
         console.error('❌ Error loading tournament info:', error);
+        const tournamentNameEl = document.getElementById('tournamentName');
+        const tournamentStatusEl = document.getElementById('tournamentStatus');
+        if (tournamentNameEl) tournamentNameEl.textContent = 'Music Tournament';
+        if (tournamentStatusEl) tournamentStatusEl.textContent = 'Season 1';
     }
 }
 
+function getRoundDisplayName(roundNumber) {
+    const roundNames = {
+        1: 'Round 1',
+        2: 'Round 2',
+        3: 'Sweet 16',
+        4: 'Quarterfinals',
+        5: 'Semifinals',
+        6: 'Finals'
+    };
+    return roundNames[roundNumber] || `Round ${roundNumber}`;
+}
+
+function getTimeUntilMatch(dateString) {
+    if (!dateString) return 'soon';
+    
+    const matchDate = new Date(dateString);
+    const now = new Date();
+    const diff = matchDate - now;
+    
+    if (diff < 0) return 'soon';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) return `in ${days}d ${hours}h`;
+    if (hours > 0) return `in ${hours}h ${minutes}m`;
+    if (minutes > 0) return `in ${minutes}m`;
+    return 'soon';
+}
+
 // ========================================
-// LOAD FEATURED MATCH
+// LOAD FEATURED MATCH (DAILY ROTATION)
 // ========================================
 async function loadFeaturedMatch(allMatches) {
     try {
-        const container = document.getElementById('featuredMatchContainer');
-        if (!container) return;
+        console.log('🔍 Searching for live matches...');
         
-        // Get live matches
-        const liveMatches = allMatches.filter(m => m.status === 'live');
+        let liveMatches = allMatches.filter(m => {
+            if (m.status !== 'live') return false;
+            const isTBD = !m.song1?.id || !m.song2?.id ||
+                         String(m.song1.id).includes('TBD') ||
+                         String(m.song2.id).includes('TBD');
+            return !isTBD;
+        });
         
         if (liveMatches.length === 0) {
-            container.innerHTML = `
-                <div class="no-matches">
-                    <i class="fa-solid fa-calendar-xmark"></i>
-                    <p>No live matches at the moment. Check back soon!</p>
-                    <a href="/brackets.html" class="btn-secondary">View Bracket</a>
-                </div>
-            `;
+            console.log('❌ No live matches found');
+            hideFeaturedSection();
             return;
         }
         
-        // Pick featured match (highest vote count)
-        const featuredMatch = liveMatches.sort((a, b) => 
-            (b.totalVotes || 0) - (a.totalVotes || 0)
-        )[0];
+        currentMatch = selectDailyFeaturedMatch(liveMatches);
         
-        // Render match card
-        container.innerHTML = renderMatchCard(featuredMatch, true);
+        console.log(`✅ Featured match of the day: ${currentMatch.matchId}`);
+        console.log(`   ${liveMatches.length} total live matches rotating daily`);
         
-        console.log('✅ Featured match loaded:', featuredMatch.id);
+        await displayFeaturedMatch();
         
     } catch (error) {
         console.error('❌ Error loading featured match:', error);
+        hideFeaturedSection();
+    }
+}
+
+function selectDailyFeaturedMatch(liveMatches) {
+    if (liveMatches.length === 0) return null;
+    if (liveMatches.length === 1) return liveMatches[0];
+    
+    const today = new Date().toISOString().split('T')[0];
+    const dateSeed = hashString(today);
+    const index = dateSeed % liveMatches.length;
+    
+    console.log(`🎲 Daily featured rotation: match ${index + 1} of ${liveMatches.length}`);
+    
+    return liveMatches[index];
+}
+
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash);
+}
+
+function hideFeaturedSection() {
+    const section = document.getElementById('featured-matchup');
+    if (section) section.style.display = 'none';
+}
+
+function displayFeaturedMatch() {
+    if (!currentMatch) return;
+    
+    const featuredSection = document.getElementById('featured-matchup');
+    if (!featuredSection) return;
+    
+    const container = featuredSection.querySelector('.container');
+    if (!container) return;
+    
+    const matchId = currentMatch.matchId || currentMatch.id;
+    const userHasVoted = hasUserVoted(matchId);
+    const userVotedSongId = userHasVoted ? getUserVotedSongId(matchId) : null;
+    
+    const totalVotes = currentMatch.totalVotes || 0;
+    const song1Votes = currentMatch.song1?.votes || 0;
+    const song2Votes = currentMatch.song2?.votes || 0;
+    
+    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+    
+    const timeLeftInfo = getTimeLeftForMatch(currentMatch.endDate);
+    
+    container.innerHTML = `
+        <div class="section-header">
+            <span class="section-label">🔥 Featured Match</span>
+            <h2 class="section-title">Match of the Day</h2>
+            <p class="section-subtitle">
+                ${userHasVoted 
+                    ? `${totalVotes.toLocaleString()} votes • ${timeLeftInfo}` 
+                    : `${timeLeftInfo}`
+                }
+            </p>
+        </div>
+        
+        <div class="featured-match-card" onclick="voteNow('${matchId}')">
+            <div class="featured-match-inner">
+                <div class="featured-thumbnails">
+                    <div class="thumbnail-wrapper ${userVotedSongId === 'song1' ? 'user-voted' : ''}">
+                        <img src="https://img.youtube.com/vi/${currentMatch.song1.videoId}/mqdefault.jpg" 
+                             alt="${currentMatch.song1.shortTitle || currentMatch.song1.title}">
+                        <div class="thumbnail-overlay">
+                            <span class="seed-badge">#${currentMatch.song1.seed}</span>
+                            ${userVotedSongId === 'song1' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+                        </div>
+                        ${userHasVoted ? `
+                            <div class="thumbnail-result">
+                                <span class="result-pct">${song1Pct}%</span>
+                                <span class="result-votes">${song1Votes.toLocaleString()}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="featured-vs">
+                        <span class="vs-badge">VS</span>
+                        ${userHasVoted ? `
+                            <div class="vs-progress-bar">
+                                <div class="bar-fill left" style="height: ${song1Pct}%"></div>
+                                <div class="bar-fill right" style="height: ${song2Pct}%"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="thumbnail-wrapper ${userVotedSongId === 'song2' ? 'user-voted' : ''}">
+                        <img src="https://img.youtube.com/vi/${currentMatch.song2.videoId}/mqdefault.jpg" 
+                             alt="${currentMatch.song2.shortTitle || currentMatch.song2.title}">
+                        <div class="thumbnail-overlay">
+                            <span class="seed-badge">#${currentMatch.song2.seed}</span>
+                            ${userVotedSongId === 'song2' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+                        </div>
+                        ${userHasVoted ? `
+                            <div class="thumbnail-result">
+                                <span class="result-pct">${song2Pct}%</span>
+                                <span class="result-votes">${song2Votes.toLocaleString()}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="featured-info">
+                    <div class="song-pair">
+                        <div class="song-details">
+                            <h3 class="song-title">${currentMatch.song1.shortTitle || currentMatch.song1.title}</h3>
+                            <p class="song-meta">${currentMatch.song1.artist} • ${currentMatch.song1.year}</p>
+                        </div>
+                        
+                        <div class="song-details">
+                            <h3 class="song-title">${currentMatch.song2.shortTitle || currentMatch.song2.title}</h3>
+                            <p class="song-meta">${currentMatch.song2.artist} • ${currentMatch.song2.year}</p>
+                        </div>
+                    </div>
+                    
+                    ${userHasVoted ? `
+                        <button class="featured-cta voted" onclick="voteNow('${matchId}'); event.stopPropagation();">
+                            <span class="cta-icon">📊</span>
+                            <span class="cta-text">View Full Results</span>
+                            <span class="cta-arrow">→</span>
+                        </button>
+                    ` : `
+                        <button class="featured-cta" onclick="voteNow('${matchId}'); event.stopPropagation();">
+                            <span class="cta-icon">🎵</span>
+                            <span class="cta-text">Vote Now</span>
+                            <span class="cta-arrow">→</span>
+                        </button>
+                    `}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    featuredSection.style.display = 'block';
+    console.log('✅ Featured match rendered:', matchId);
+}
+
+function getTimeLeftForMatch(endDate) {
+    if (!endDate) return '<i class="fa-solid fa-circle"></i> Live Now'; // ✅ Changed
+    
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end - now;
+    
+    if (diff <= 0) return '⏱️ Voting Closed';
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 24) {
+        const days = Math.floor(hours / 24);
+        return `<i class="fa-solid fa-clock"></i> ${days}d ${hours % 24}h left`; // ✅ Changed
+    } else if (hours > 0) {
+        return `<i class="fa-solid fa-clock"></i> ${hours}h ${minutes}m left`; // ✅ Changed
+    } else if (minutes > 5) {
+        return `<i class="fa-solid fa-clock"></i> ${minutes}m left`; // ✅ Changed
+    } else {
+        return `<i class="fa-solid fa-triangle-exclamation"></i> ${minutes}m left - Vote now!`; // ✅ Changed
     }
 }
 
 // ========================================
-// LOAD YOUR ACTIVE VOTES
+// NEW: LOAD YOUR ACTIVE VOTES
 // ========================================
 async function loadYourActiveVotes(allMatches) {
     try {
-        const section = document.getElementById('yourVotesSection');
-        const container = document.getElementById('yourVotesGrid');
-        
-        if (!section || !container) return;
-        
-        // Get user votes from localStorage
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        const votedMatchIds = Object.keys(userVotes);
         
-        // Filter to only live matches where user has voted
-        const yourActiveVotes = allMatches.filter(match => 
-            match.status === 'live' && userVotes[match.id]
-        );
-        
-        if (yourActiveVotes.length === 0) {
-            section.style.display = 'none';
+        if (votedMatchIds.length === 0) {
+            hideYourVotesSection();
             return;
         }
         
-        // Show section
-        section.style.display = 'block';
+        const activeVotedMatches = allMatches.filter(m => 
+            m.status === 'live' && votedMatchIds.includes(m.matchId)
+        ).slice(0, 4);
         
-        // Render vote cards
-        container.innerHTML = yourActiveVotes
-            .slice(0, 6) // Limit to 6
-            .map(match => renderMatchCard(match, false))
-            .join('');
+        if (activeVotedMatches.length === 0) {
+            hideYourVotesSection();
+            return;
+        }
         
-        console.log('✅ Your active votes loaded:', yourActiveVotes.length);
+        console.log(`✅ Found ${activeVotedMatches.length} active votes for user`);
+        displayYourActiveVotes(activeVotedMatches);
         
     } catch (error) {
         console.error('❌ Error loading your active votes:', error);
+        hideYourVotesSection();
     }
 }
 
-// ========================================
-// LOAD COMMUNITY PULSE (NEW!)
-// ========================================
-async function loadCommunityPulse() {
-    try {
-        console.log('🔄 Loading community pulse...');
-        
-        // Load recent activity
-        await loadRecentActivity();
-        
-        // Load live stats
-        await loadLiveStats();
-        
-        // Load feed preview
-        await loadFeedPreview();
-        
-        console.log('✅ Community pulse loaded');
-        
-    } catch (error) {
-        console.error('❌ Error loading community pulse:', error);
-    }
+function hideYourVotesSection() {
+    const section = document.getElementById('yourVotesSection');
+    if (section) section.style.display = 'none';
 }
 
-// ========================================
-// LOAD RECENT ACTIVITY
-// ========================================
-async function loadRecentActivity() {
-    try {
-        const container = document.getElementById('recentActivityPreview');
-        if (!container) return;
+function displayYourActiveVotes(matches) {
+    const section = document.getElementById('yourVotesSection');
+    const grid = document.getElementById('yourVotesGrid');
+    
+    if (!section || !grid) return;
+    
+    grid.innerHTML = '';
+    
+    matches.forEach(match => {
+        const userVotedSongId = getUserVotedSongId(match.matchId);
+        const totalVotes = match.totalVotes || 0;
         
-        // Import getActivityFeed
-        const { getActivityFeed } = await import('./api-client.js');
-        const recentActivity = await getActivityFeed(5);
+        let userSong, opponentSong, userVotes, opponentVotes;
         
-        if (!recentActivity || recentActivity.length === 0) {
-            container.innerHTML = '<p class="no-activity">No recent activity</p>';
-            return;
+        if (userVotedSongId === 'song1') {
+            userSong = match.song1;
+            opponentSong = match.song2;
+            userVotes = match.song1.votes || 0;
+            opponentVotes = match.song2.votes || 0;
+        } else {
+            userSong = match.song2;
+            opponentSong = match.song1;
+            userVotes = match.song2.votes || 0;
+            opponentVotes = match.song1.votes || 0;
         }
         
-        container.innerHTML = recentActivity.map(activity => {
-            const avatar = getAvatarUrl(activity.avatar);
-            const timeAgo = getTimeAgo(activity.timestamp);
-            
-            return `
-                <div class="activity-item">
-                    <img src="${avatar}" alt="${escapeHtml(activity.username)}" class="activity-avatar">
-                    <div class="activity-details">
-                        <span class="activity-user">${escapeHtml(activity.username)}</span>
-                        <span class="activity-action">voted for</span>
-                        <span class="activity-song">${escapeHtml(activity.songTitle || 'Unknown Song')}</span>
+        const userPct = totalVotes > 0 ? Math.round((userVotes / totalVotes) * 100) : 50;
+        const isWinning = userVotes > opponentVotes;
+        
+        const card = document.createElement('div');
+        card.className = `your-vote-card ${isWinning ? 'winning' : 'losing'}`;
+        card.onclick = () => voteNow(match.matchId);
+        
+        card.innerHTML = `
+            <div class="your-pick-badge"><i class="fa-solid fa-check"></i> Your Pick</div>
+            <div class="vote-matchup">
+                <div class="vote-song">
+                    <img src="https://img.youtube.com/vi/${userSong.videoId}/mqdefault.jpg" 
+                         alt="${userSong.shortTitle || userSong.title}">
+                    <div class="vote-song-info">
+                        <h4>${userSong.shortTitle || userSong.title}</h4>
+                        <p>${userSong.artist}</p>
                     </div>
-                    <span class="activity-time">${timeAgo}</span>
                 </div>
-            `;
-        }).join('');
-        
-        console.log('✅ Recent activity loaded:', recentActivity.length);
-        
-    } catch (error) {
-        console.error('❌ Error loading recent activity:', error);
-        const container = document.getElementById('recentActivityPreview');
-        if (container) {
-            container.innerHTML = '<p class="no-activity">Unable to load activity</p>';
-        }
-    }
-}
-
-// ========================================
-// LOAD LIVE STATS
-// ========================================
-async function loadLiveStats() {
-    try {
-        // Get all matches
-        const allMatches = await getAllMatches();
-        
-        // Calculate active voters (unique users in last hour)
-        const oneHourAgo = Date.now() - (60 * 60 * 1000);
-        const { getActivityFeed } = await import('./api-client.js');
-        const recentActivity = await getActivityFeed(100);
-        
-        const uniqueVoters = new Set(
-            recentActivity
-                .filter(a => a.timestamp > oneHourAgo)
-                .map(a => a.userId)
-        ).size;
-        
-        // Calculate today's votes
-        const todayStart = new Date().setHours(0, 0, 0, 0);
-        const todayVotes = recentActivity
-            .filter(a => a.timestamp > todayStart)
-            .length;
-        
-        // Find hottest match
-        const liveMatches = allMatches.filter(m => m.status === 'live');
-        const hottestMatch = liveMatches.sort((a, b) => 
-            (b.totalVotes || 0) - (a.totalVotes || 0)
-        )[0];
-        
-        // Update UI
-        const votersEl = document.getElementById('liveVotersCount');
-        const todayEl = document.getElementById('todayVotesCount');
-        const hottestEl = document.getElementById('hottestMatchVotes');
-        
-        if (votersEl) votersEl.textContent = uniqueVoters || '0';
-        if (todayEl) todayEl.textContent = todayVotes.toLocaleString() || '0';
-        if (hottestEl) hottestEl.textContent = hottestMatch ? (hottestMatch.totalVotes || 0) : '0';
-        
-        console.log('✅ Live stats updated:', { 
-            uniqueVoters, 
-            todayVotes, 
-            hottestMatch: hottestMatch?.totalVotes 
-        });
-        
-    } catch (error) {
-        console.error('❌ Error loading live stats:', error);
-        // Set fallback values
-        const votersEl = document.getElementById('liveVotersCount');
-        const todayEl = document.getElementById('todayVotesCount');
-        const hottestEl = document.getElementById('hottestMatchVotes');
-        
-        if (votersEl) votersEl.textContent = '—';
-        if (todayEl) todayEl.textContent = '—';
-        if (hottestEl) hottestEl.textContent = '—';
-    }
-}
-
-// ========================================
-// LOAD FEED PREVIEW
-// ========================================
-async function loadFeedPreview() {
-    try {
-        const container = document.getElementById('feedPostsPreview');
-        if (!container) return;
-        
-        // ✅ FIXED: Import Firebase properly
-        const { db } = await import('./firebase-config.js');
-        const { collection, getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
-        
-        // Query Firestore for recent posts
-        const postsRef = collection(db, 'posts');
-        const q = query(postsRef, orderBy('timestamp', 'desc'), limit(3));
-        const snapshot = await getDocs(q);
-        
-        if (snapshot.empty) {
-            container.innerHTML = '<p class="no-posts">No posts yet. Be the first!</p>';
-            return;
-        }
-        
-        const posts = [];
-        snapshot.forEach(doc => {
-            posts.push({ id: doc.id, ...doc.data() });
-        });
-        
-        container.innerHTML = posts.map(post => {
-            const avatar = getAvatarUrl(post.avatar);
-            const timeAgo = getTimeAgo(post.timestamp);
-            const content = post.content || post.text || '';
-            const truncated = truncateText(content, 80);
-            
-            return `
-                <div class="feed-post-preview">
-                    <img src="${avatar}" alt="${escapeHtml(post.username)}" class="post-avatar">
-                    <div class="post-content">
-                        <span class="post-user">${escapeHtml(post.username || 'Anonymous')}</span>
-                        <p class="post-text">${escapeHtml(truncated)}</p>
+                <div class="vote-vs">VS</div>
+                <div class="vote-song opponent">
+                    <img src="https://img.youtube.com/vi/${opponentSong.videoId}/mqdefault.jpg" 
+                         alt="${opponentSong.shortTitle || opponentSong.title}">
+                    <div class="vote-song-info">
+                        <h4>${opponentSong.shortTitle || opponentSong.title}</h4>
+                        <p>${opponentSong.artist}</p>
                     </div>
-                    <span class="post-time">${timeAgo}</span>
                 </div>
-            `;
-        }).join('');
+            </div>
+            <div class="vote-status ${isWinning ? 'winning' : 'losing'}">
+<span class="status-icon">${isWinning ? '<i class="fa-solid fa-fire"></i>' : '<i class="fa-solid fa-arrow-down"></i>'}</span>
+                <span class="status-text">
+                    ${isWinning ? 'Leading' : 'Trailing'} at ${userPct}%
+                </span>
+                <span class="status-votes">${userVotes.toLocaleString()} votes</span>
+            </div>
+        `;
         
-        console.log('✅ Feed preview loaded:', posts.length);
-        
-    } catch (error) {
-        console.error('❌ Error loading feed preview:', error);
-        const container = document.getElementById('feedPostsPreview');
-        if (container) {
-            container.innerHTML = '<p class="no-posts">Unable to load feed</p>';
-        }
-    }
+        grid.appendChild(card);
+    });
+    
+    section.style.display = 'block';
+    console.log('✅ Your active votes displayed');
 }
 
 // ========================================
-// LOAD PROFILE WIDGET (NEW!)
-// ========================================
-async function loadProfileWidget() {
-    try {
-        const username = localStorage.getItem('username') || 'Guest';
-        const avatarJson = localStorage.getItem('avatar');
-        
-        let avatar;
-        try {
-            avatar = JSON.parse(avatarJson);
-        } catch {
-            avatar = { type: 'emoji', value: '🎵' };
-        }
-        
-        // Get XP and rank
-        const { getUserXPFromStorage, getUserRank } = await import('./rank-system.js');
-        const xp = getUserXPFromStorage();
-        const rank = getUserRank(xp);
-        
-        // Get vote count
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const voteCount = Object.keys(userVotes).length;
-        
-        // Get achievements
-        const achievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
-        
-        // Update widget
-        const usernameEl = document.getElementById('profileWidgetUsername');
-        const rankEl = document.getElementById('profileWidgetRank');
-        const votesEl = document.getElementById('profileWidgetVotes');
-        const xpEl = document.getElementById('profileWidgetXP');
-        const achievementsEl = document.getElementById('profileWidgetAchievements');
-        const avatarEl = document.getElementById('profileWidgetAvatar');
-        const packEl = document.getElementById('championPackName');
-        
-        if (usernameEl) usernameEl.textContent = username;
-        
-        if (rankEl) {
-            const rankTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
-            rankEl.textContent = `Level ${rank.currentLevel.level} - ${rankTitle}`;
-        }
-        
-        if (votesEl) votesEl.textContent = voteCount;
-        if (xpEl) xpEl.textContent = xp.toLocaleString();
-        if (achievementsEl) achievementsEl.textContent = achievements.length;
-        
-        // Set avatar
-        if (avatarEl) {
-            if (avatar.type === 'url') {
-                avatarEl.src = avatar.value;
-            } else {
-                avatarEl.src = createEmojiAvatar(avatar.value);
-            }
-        }
-        
-        // Champion pack name
-        if (packEl) {
-            const championPack = window.championLoader?.getCurrentPack();
-            if (championPack) {
-                packEl.textContent = `${championPack.emoji || '📢'} ${championPack.name}`;
-            } else {
-                packEl.textContent = '📢 Default Announcer';
-            }
-        }
-        
-        console.log('✅ Profile widget loaded:', { username, voteCount, xp, achievements: achievements.length });
-        
-    } catch (error) {
-        console.error('❌ Error loading profile widget:', error);
-    }
-}
-
-// ========================================
-// LOAD LIVE MATCHES
+// LOAD LIVE MATCHES (LIMITED TO 3)
 // ========================================
 async function loadLiveMatches(allMatches) {
     try {
-        const container = document.getElementById('liveMatchesGrid');
-        if (!container) return;
-        
-        // Get live matches
-        const liveMatches = allMatches.filter(m => m.status === 'live');
+        let liveMatches = allMatches.filter(m => {
+            if (m.status !== 'live') return false;
+            if (m.matchId === currentMatch?.matchId) return false;
+            const isTBD = !m.song1?.id || !m.song2?.id ||
+                         String(m.song1.id).includes('TBD') ||
+                         String(m.song2.id).includes('TBD');
+            return !isTBD;
+        });
         
         if (liveMatches.length === 0) {
-            container.innerHTML = `
-                <div class="no-matches">
-                    <i class="fa-solid fa-calendar-xmark"></i>
-                    <p>No live matches at the moment</p>
-                </div>
-            `;
+            hideLiveMatchesSection();
             return;
         }
         
-        // Sort by total votes (most active first)
-        const sortedMatches = liveMatches
+        const topLiveMatches = liveMatches
             .sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0))
-            .slice(0, 4); // Show top 4
+            .slice(0, 4);
         
-        container.innerHTML = sortedMatches
-            .map(match => renderMatchCard(match, false))
-            .join('');
+        console.log(`✅ Showing top ${topLiveMatches.length} live matches`);
+        displayLiveMatchesGrid(topLiveMatches);
         
-        console.log('✅ Live matches loaded:', sortedMatches.length);
+        if (liveMatches.length > 3) {
+            addViewAllLiveLink(liveMatches.length);
+        }
         
     } catch (error) {
         console.error('❌ Error loading live matches:', error);
     }
 }
 
+function displayLiveMatchesGrid(matches) {
+    const grid = document.getElementById('liveMatchesGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    matches.forEach(m => {
+        const hasVoted = hasUserVoted(m.matchId);
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+        const card = createMatchCard(matchData);
+        grid.appendChild(card);
+    });
+}
+
+function hideLiveMatchesSection() {
+    const section = document.querySelector('.live-matches-section');
+    if (section) section.style.display = 'none';
+}
+
+function addViewAllLiveLink(totalCount) {
+    const section = document.querySelector('.live-matches-section .section-header');
+    if (section) {
+        const subtitle = section.querySelector('.section-subtitle');
+        if (subtitle) {
+            subtitle.innerHTML = `
+                Showing 4 of ${totalCount} live matches
+                <a href="matches.html?status=live" class="view-all-inline">View All →</a>
+            `;
+        }
+    }
+}
+
 // ========================================
-// LOAD RECENT RESULTS
+// LOAD RECENT RESULTS (LIMITED TO 6)
 // ========================================
 async function loadRecentResults(allMatches) {
     try {
-        const container = document.getElementById('recentResultsGrid');
-        if (!container) return;
+        let results = allMatches.filter(m => m.status === 'completed');
         
-        // Get completed matches
-        const completedMatches = allMatches.filter(m => m.status === 'completed');
-        
-        if (completedMatches.length === 0) {
-            container.innerHTML = `
-                <div class="no-matches">
-                    <i class="fa-solid fa-hourglass-half"></i>
-                    <p>No results yet. Be patient!</p>
-                </div>
-            `;
+        if (results.length === 0) {
+            showNoResultsMessage();
             return;
         }
         
-        // Sort by close time (most recent first)
-        const sortedResults = completedMatches
-            .sort((a, b) => (b.closeTime || 0) - (a.closeTime || 0))
-            .slice(0, 6); // Show 6 most recent
+        results.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
         
-        container.innerHTML = sortedResults
-            .map(match => renderResultCard(match))
-            .join('');
+        const recentResults = results.slice(0, 6);
         
-        console.log('✅ Recent results loaded:', sortedResults.length);
+        console.log(`✅ Showing ${recentResults.length} recent results`);
+        displayRecentResultsGrid(recentResults);
+        
+        if (results.length > 6) {
+            addViewAllResultsLink(results.length);
+        }
         
     } catch (error) {
         console.error('❌ Error loading recent results:', error);
     }
 }
 
-// ========================================
-// LOAD NEXT MATCH COUNTDOWN
-// ========================================
-async function loadNextMatchCountdown(allMatches) {
-    try {
-        const section = document.getElementById('countdownSection');
-        if (!section) return;
-        
-        // Find upcoming matches
-        const upcomingMatches = allMatches.filter(m => 
-            m.status === 'upcoming' && m.openTime
-        );
-        
-        if (upcomingMatches.length === 0) {
-            section.style.display = 'none';
-            return;
+
+
+function displayRecentResultsGrid(matches) {
+    const grid = document.getElementById('recentResultsGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    matches.forEach(m => {
+        const hasVoted = hasUserVoted(m.matchId);
+        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+        const card = createMatchCard(matchData);
+        grid.appendChild(card);
+    });
+}
+
+function showNoResultsMessage() {
+    const grid = document.getElementById('recentResultsGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = `
+        <div class="no-results">
+            <div class="no-results-icon">⏳</div>
+            <h3 class="no-results-title">No Results Yet</h3>
+            <p class="no-results-text">
+                The tournament hasn't started or matches are still in progress.<br>
+                Results will appear here as winners are decided. Check back soon! 🏆
+            </p>
+        </div>
+    `;
+}
+
+function addViewAllResultsLink(totalCount) {
+    const section = document.querySelector('.recent-results-section .section-header');
+    if (section) {
+        const subtitle = section.querySelector('.section-subtitle');
+        if (subtitle) {
+            subtitle.innerHTML = `
+                Showing 6 of ${totalCount} completed matches
+                <a href="matches.html?status=completed" class="view-all-inline">View All →</a>
+            `;
         }
-        
-        // Get soonest upcoming match
-        const nextMatch = upcomingMatches.sort((a, b) => 
-            a.openTime - b.openTime
-        )[0];
-        
-        // Show section
-        section.style.display = 'block';
-        
-        // Update description
-        const descEl = document.getElementById('countdownDescription');
-        if (descEl) {
-            const song1Title = getSongTitle(nextMatch.song1);
-            const song2Title = getSongTitle(nextMatch.song2);
-            descEl.textContent = `${song1Title} vs ${song2Title} opens soon!`;
-        }
-        
-        // Start countdown
-        startCountdown(nextMatch.openTime);
-        
-        console.log('✅ Countdown started for:', nextMatch.id);
-        
-    } catch (error) {
-        console.error('❌ Error loading countdown:', error);
     }
 }
 
 // ========================================
-// START COUNTDOWN
+// NEW: LOAD NEXT MATCH COUNTDOWN
 // ========================================
-function startCountdown(targetTime) {
-    // Clear existing interval
+async function loadNextMatchCountdown(allMatches) {
+    try {
+        const upcomingMatches = allMatches.filter(m => {
+            if (m.status !== 'upcoming') return false;
+            const isTBD = !m.song1?.id || !m.song2?.id ||
+                         String(m.song1.id).includes('TBD') ||
+                         String(m.song2.id).includes('TBD');
+            return !isTBD && m.date;
+        });
+        
+        if (upcomingMatches.length === 0) {
+            hideNextMatchCountdown();
+            return;
+        }
+        
+        upcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        const nextMatch = upcomingMatches[0];
+        
+        console.log('✅ Next match countdown:', nextMatch.matchId);
+        displayNextMatchCountdown(nextMatch);
+        startCountdown(nextMatch.date);
+        
+    } catch (error) {
+        console.error('❌ Error loading next match countdown:', error);
+        hideNextMatchCountdown();
+    }
+}
+
+function hideNextMatchCountdown() {
+    const section = document.getElementById('nextMatchCountdown');
+    if (section) section.style.display = 'none';
+}
+
+function displayNextMatchCountdown(match) {
+    const section = document.getElementById('nextMatchCountdown');
+    const titleEl = document.getElementById('nextMatchTitle');
+    
+    if (!section || !titleEl) return;
+    
+    const song1 = match.song1.shortTitle || match.song1.title;
+    const song2 = match.song2.shortTitle || match.song2.title;
+    
+    titleEl.textContent = `${song1} vs ${song2}`;
+    section.style.display = 'block';
+}
+
+function startCountdown(targetDate) {
     if (countdownInterval) {
         clearInterval(countdownInterval);
     }
     
-    function updateCountdown() {
-        const now = Date.now();
-        const diff = targetTime - now;
+    const target = new Date(targetDate).getTime();
+    
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const diff = target - now;
         
         if (diff <= 0) {
             clearInterval(countdownInterval);
-            const section = document.getElementById('countdownSection');
-            if (section) section.style.display = 'none';
+            
+            document.getElementById('countdownDays').textContent = '00';
+            document.getElementById('countdownHours').textContent = '00';
+            document.getElementById('countdownMinutes').textContent = '00';
+            document.getElementById('countdownSeconds').textContent = '00';
+            
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
             return;
         }
         
@@ -595,352 +801,277 @@ function startCountdown(targetTime) {
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         
-        const daysEl = document.getElementById('countdownDays');
-        const hoursEl = document.getElementById('countdownHours');
-        const minutesEl = document.getElementById('countdownMinutes');
-        const secondsEl = document.getElementById('countdownSeconds');
-        
-        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
-    }
+        document.getElementById('countdownDays').textContent = String(days).padStart(2, '0');
+        document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+    };
     
     updateCountdown();
     countdownInterval = setInterval(updateCountdown, 1000);
 }
 
 // ========================================
-// UPDATE HERO STATS
+// CONVERT FIREBASE MATCH TO DISPLAY FORMAT
 // ========================================
-async function updateHeroStats(allMatches) {
-    try {
-        // Total songs
-        const uniqueSongs = new Set();
-        allMatches.forEach(match => {
-            const song1Title = getSongTitle(match.song1);
-            const song2Title = getSongTitle(match.song2);
-            if (song1Title) uniqueSongs.add(song1Title);
-            if (song2Title) uniqueSongs.add(song2Title);
-        });
-        
-        const songsEl = document.getElementById('heroTotalSongs');
-        if (songsEl) songsEl.textContent = uniqueSongs.size;
-        
-        // Total votes
-        const totalVotes = allMatches.reduce((sum, match) => 
-            sum + (match.totalVotes || 0), 0
-        );
-        const votesEl = document.getElementById('heroTotalVotes');
-        if (votesEl) votesEl.textContent = totalVotes.toLocaleString();
-        
-        // Active matches
-        const liveMatches = allMatches.filter(m => m.status === 'live');
-        const matchesEl = document.getElementById('heroActiveMatches');
-        if (matchesEl) matchesEl.textContent = liveMatches.length;
-        
-        console.log('✅ Hero stats updated:', { 
-            songs: uniqueSongs.size, 
-            votes: totalVotes, 
-            liveMatches: liveMatches.length 
-        });
-        
-    } catch (error) {
-        console.error('❌ Error updating hero stats:', error);
-    }
-}
-
-// ========================================
-// RENDER MATCH CARD
-// ========================================
-function renderMatchCard(match, isFeatured = false) {
-    // ✅ Validate match data
-    if (!match || !match.song1 || !match.song2) {
-        console.warn('⚠️ Invalid match data:', match);
-        return '<div class="match-card-error">Invalid match data</div>';
+function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, userVotedSongId = null) {
+    const totalVotes = firebaseMatch.totalVotes || 0;
+    const song1Votes = firebaseMatch.song1?.votes || 0;
+    const song2Votes = firebaseMatch.song2?.votes || 0;
+    
+    const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+    const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+    
+    if (!userVotedSongId && hasVoted) {
+        userVotedSongId = getUserVotedSongId(firebaseMatch.matchId);
     }
     
-    // ✅ Extract song titles properly
-    const song1Title = getSongTitle(match.song1);
-    const song2Title = getSongTitle(match.song2);
-    
-    const song1Info = getSongInfo(song1Title);
-    const song2Info = getSongInfo(song2Title);
-    
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    const userVote = userVotes[match.id];
-    
-    // ✅ Handle nested vote structure from Firebase
-    const totalVotes = match.totalVotes || 0;
-    const song1Votes = match.song1?.votes || 0;
-    const song2Votes = match.song2?.votes || 0;
-    
-    const song1Pct = match.song1?.percentage || (totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50);
-    const song2Pct = match.song2?.percentage || (totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50);
-    
-    const cardClass = isFeatured ? 'match-card featured' : 'match-card';
-    
-    // ✅ Fallback thumbnail
-    const song1Thumbnail = song1Info?.videoId 
-        ? `https://img.youtube.com/vi/${song1Info.videoId}/mqdefault.jpg`
-        : '/assets/default-thumbnail.jpg';
-    
-    const song2Thumbnail = song2Info?.videoId 
-        ? `https://img.youtube.com/vi/${song2Info.videoId}/mqdefault.jpg`
-        : '/assets/default-thumbnail.jpg';
-    
-    return `
-        <div class="${cardClass}" data-match-id="${match.id}">
-            <div class="match-header">
-                <span class="match-round">${escapeHtml(match.round || 'Round 1')}</span>
-                ${userVote ? '<span class="voted-badge">✓ Voted</span>' : ''}
-            </div>
-            
-            <div class="match-songs">
-                <div class="song-option ${userVote === song1Title ? 'voted' : ''}" 
-                     onclick="window.location.href='/vote.html?match=${match.id}'">
-                    <div class="song-thumbnail">
-                        <img src="${song1Thumbnail}" 
-                             alt="${escapeHtml(song1Title)}"
-                             onerror="this.src='/assets/default-thumbnail.jpg'">
-                    </div>
-                    <div class="song-info">
-                        <h3 class="song-title">${escapeHtml(song1Title)}</h3>
-                        <div class="song-votes">
-                            <div class="vote-bar">
-                                <div class="vote-fill" style="width: ${song1Pct}%"></div>
-                            </div>
-                            <span class="vote-count">${song1Votes} votes (${song1Pct}%)</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="vs-divider">
-                    <span>VS</span>
-                </div>
-                
-                <div class="song-option ${userVote === song2Title ? 'voted' : ''}"
-                     onclick="window.location.href='/vote.html?match=${match.id}'">
-                    <div class="song-thumbnail">
-                        <img src="${song2Thumbnail}" 
-                             alt="${escapeHtml(song2Title)}"
-                             onerror="this.src='/assets/default-thumbnail.jpg'">
-                    </div>
-                    <div class="song-info">
-                        <h3 class="song-title">${escapeHtml(song2Title)}</h3>
-                        <div class="song-votes">
-                            <div class="vote-bar">
-                                <div class="vote-fill" style="width: ${song2Pct}%"></div>
-                            </div>
-                            <span class="vote-count">${song2Votes} votes (${song2Pct}%)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="match-footer">
-                <span class="match-total-votes">${totalVotes} total votes</span>
-                <a href="/vote.html?match=${match.id}" class="btn-vote">
-                    ${userVote ? 'View Match' : 'Vote Now'} →
-                </a>
-            </div>
-        </div>
-    `;
+    return {
+        id: firebaseMatch.matchId || firebaseMatch.id,
+        tournament: 'Anthems Arena Championship',
+        round: getRoundName(firebaseMatch.round),
+        status: firebaseMatch.status || 'upcoming',
+        date: firebaseMatch.date || '2025-11-01',
+        endDate: firebaseMatch.endDate || null,
+        totalVotes: totalVotes,
+        timeLeft: firebaseMatch.status === 'live' ? 'Voting Open' : 'Not Started',
+        hasVoted: hasVoted,
+        competitor1: {
+            seed: firebaseMatch.song1.seed,
+            name: firebaseMatch.song1.shortTitle || firebaseMatch.song1.title,
+            source: `${firebaseMatch.song1.artist} • ${firebaseMatch.song1.year || '2025'}`,
+            videoId: firebaseMatch.song1.videoId,
+            votes: song1Votes,
+            percentage: song1Percentage,
+            winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
+            leading: userVotedSongId === 'song1',
+            userVoted: userVotedSongId === 'song1'
+        },
+        competitor2: {
+            seed: firebaseMatch.song2.seed,
+            name: firebaseMatch.song2.shortTitle || firebaseMatch.song2.title,
+            source: `${firebaseMatch.song2.artist} • ${firebaseMatch.song2.year || '2025'}`,
+            videoId: firebaseMatch.song2.videoId,
+            votes: song2Votes,
+            percentage: song2Percentage,
+            winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
+            leading: userVotedSongId === 'song2',
+            userVoted: userVotedSongId === 'song2'
+        }
+    };
+}
+
+function getRoundName(roundNumber) {
+    const roundNames = {
+        1: 'round-1',
+        2: 'round-2',
+        3: 'round-3',
+        4: 'quarterfinals',
+        5: 'semifinals',
+        6: 'finals'
+    };
+    return roundNames[roundNumber] || `round-${roundNumber}`;
 }
 
 // ========================================
-// RENDER RESULT CARD
+// VOTE NOW NAVIGATION
 // ========================================
-function renderResultCard(match) {
-    // ✅ Validate match data
-    if (!match || !match.song1 || !match.song2) {
-        console.warn('⚠️ Invalid match data:', match);
-        return '<div class="result-card-error">Invalid match data</div>';
+window.voteNow = function(matchId) {
+    if (!matchId) {
+        console.error('❌ voteNow: No match ID provided');
+        showNotification('Unable to load match. Please try again.', 'error');
+        return;
     }
     
-    // ✅ Extract song titles properly
-    const song1Title = getSongTitle(match.song1);
-    const song2Title = getSongTitle(match.song2);
-    
-    const song1Info = getSongInfo(song1Title);
-    const song2Info = getSongInfo(song2Title);
-    
-    // ✅ Handle nested vote structure
-    const totalVotes = match.totalVotes || 0;
-    const song1Votes = match.song1?.votes || 0;
-    const song2Votes = match.song2?.votes || 0;
-    
-    const winner = song1Votes > song2Votes ? song1Title : song2Title;
-    const winnerInfo = song1Votes > song2Votes ? song1Info : song2Info;
-    const loser = song1Votes > song2Votes ? song2Title : song1Title;
-    const loserInfo = song1Votes > song2Votes ? song2Info : song1Info;
-    const winnerVotes = Math.max(song1Votes, song2Votes);
-    const loserVotes = Math.min(song1Votes, song2Votes);
-    
-    // ✅ Fallback thumbnails
-    const winnerThumbnail = winnerInfo?.videoId 
-        ? `https://img.youtube.com/vi/${winnerInfo.videoId}/mqdefault.jpg`
-        : '/assets/default-thumbnail.jpg';
-    
-    const loserThumbnail = loserInfo?.videoId 
-        ? `https://img.youtube.com/vi/${loserInfo.videoId}/mqdefault.jpg`
-        : '/assets/default-thumbnail.jpg';
-    
-    return `
-        <div class="result-card">
-            <div class="result-header">
-<span class="result-round">${escapeHtml(match.round || 'Round 1')}</span>
-                <span class="result-status">✓ Completed</span>
-            </div>
-            
-            <div class="result-winner">
-                <div class="winner-thumbnail">
-                    <img src="${winnerThumbnail}" 
-                         alt="${escapeHtml(winner)}"
-                         onerror="this.src='/assets/default-thumbnail.jpg'">
-                    <div class="winner-badge">🏆 WINNER</div>
-                </div>
-                <h3 class="winner-title">${escapeHtml(winner)}</h3>
-                <span class="winner-votes">${winnerVotes} votes</span>
-            </div>
-            
-            <div class="result-divider">defeated</div>
-            
-            <div class="result-loser">
-                <div class="loser-thumbnail">
-                    <img src="${loserThumbnail}" 
-                         alt="${escapeHtml(loser)}"
-                         onerror="this.src='/assets/default-thumbnail.jpg'">
-                </div>
-                <h4 class="loser-title">${escapeHtml(loser)}</h4>
-                <span class="loser-votes">${loserVotes} votes</span>
-            </div>
-            
-            <a href="/vote.html?match=${match.id}" class="btn-view-result">
-                View Details →
-            </a>
-        </div>
-    `;
-}
+    console.log(`✅ Navigating to vote page for match: ${matchId}`);
+    window.location.href = `vote?match=${matchId}`;
+};
 
 // ========================================
-// HELPER FUNCTIONS
-// ========================================
-function getAvatarUrl(avatar) {
-    if (!avatar) return createEmojiAvatar('🎵');
-    if (avatar.type === 'url') return avatar.value;
-    if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
-    return createEmojiAvatar('🎵');
-}
-
-function createEmojiAvatar(emoji) {
-    return `data:image/svg+xml,${encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
-            <rect width="50" height="50" fill="#C8AA6E"/>
-            <text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text>
-        </svg>
-    `)}`;
-}
-
-function truncateText(text, maxLength) {
-    if (!text) return '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-}
-
-function getTimeAgo(timestamp) {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ========================================
-// LOADING STATES
+// LOADING STATE HELPERS
 // ========================================
 function showHomepageLoading() {
-    const loading = document.getElementById('homepageLoading');
-    if (loading) loading.style.display = 'flex';
+    const loadingState = document.getElementById('homepageLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'block';
+    }
+    hideHomepageSections();
+    console.log('⏳ Showing homepage loading state');
 }
 
 function hideHomepageLoading() {
-    const loading = document.getElementById('homepageLoading');
-    if (loading) loading.style.display = 'none';
+    const loadingState = document.getElementById('homepageLoadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    console.log('✅ Hiding homepage loading state');
 }
 
 function showHomepageSections() {
-    const content = document.getElementById('homepageContent');
-    if (content) content.style.display = 'block';
+    const sections = [
+        { id: 'heroSection', stagger: 1 },
+        { id: 'featured-matchup', stagger: 2 },
+        { id: 'yourVotesSection', stagger: 3 },
+        { id: 'liveMatchesSection', stagger: 4 },
+        { id: 'recentResultsSection', stagger: 5 },
+        { id: 'nextMatchCountdown', stagger: 6 }
+    ];
+    
+    sections.forEach(({ id, stagger }) => {
+        const section = document.getElementById(id);
+        if (section && section.style.display !== 'none') {
+            section.style.display = 'block';
+            section.classList.add('homepage-fade-in', `stagger-${stagger}`);
+        }
+    });
+    
+    console.log('✅ Homepage sections visible with stagger animation');
+}
+
+function hideHomepageSections() {
+    const sectionIds = [
+        'heroSection',
+        'featured-matchup',
+        'yourVotesSection',
+        'liveMatchesSection',
+        'recentResultsSection',
+        'nextMatchCountdown'
+    ];
+    
+    sectionIds.forEach(id => {
+        const section = document.getElementById(id);
+        if (section) {
+            section.style.display = 'none';
+            section.classList.remove('homepage-fade-in');
+        }
+    });
 }
 
 function showHomepageError(error) {
-    const content = document.getElementById('homepageContent');
-    if (content) {
-        content.innerHTML = `
-            <div class="error-state" style="text-align: center; padding: 4rem 2rem;">
-                <i class="fa-solid fa-exclamation-triangle" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 1rem;"></i>
-                <h2 style="color: #fff; margin-bottom: 1rem;">Unable to Load Tournament</h2>
-                <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">${error.message}</p>
-                <button class="btn-primary" onclick="location.reload()">
-                    <i class="fa-solid fa-refresh"></i> Retry
-                </button>
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+        heroSection.style.display = 'block';
+        heroSection.innerHTML = `
+            <div class="container">
+                <div style="text-align: center; padding: 5rem 2rem;">
+                    <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.5;">⚠️</div>
+                    <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: #C8AA6E; margin-bottom: 1rem;">
+                        Error Loading Tournament
+                    </h2>
+                    <p style="font-family: 'Lora', serif; font-size: 1.1rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 2rem;">
+                        Could not load tournament data. Please try refreshing the page.
+                    </p>
+                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">
+                        Error: ${error.message}
+                    </p>
+                    <button onclick="location.reload()" style="margin-top: 2rem; padding: 1rem 2rem; background: linear-gradient(135deg, #C8AA6E, #b49a5e); border: none; color: #1a1a2e; font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer;">
+                        Retry
+                    </button>
+                </div>
             </div>
         `;
-        content.style.display = 'block';
     }
 }
 
 // ========================================
-// INITIALIZE
+// HIDE CHAMPIONS SECTION
 // ========================================
-document.addEventListener('DOMContentLoaded', async () => {
-    console.time('⏱️ Total Homepage Load');
-    console.log('🎵 League Music Tournament Homepage Loaded');
-    
-    try {
-        showHomepageLoading();
-        
-        // Load music video data first
-        await loadMusicVideos();
-        
-        // Get all matches
-        const allMatches = await getAllMatches();
-        console.log('📊 Total matches loaded:', allMatches.length);
-        
-        // Load all sections
-        await loadTournamentInfo(allMatches);
-        await loadFeaturedMatch(allMatches);
-        await loadYourActiveVotes(allMatches);
-        
-        // 🆕 NEW SECTIONS
-        await loadCommunityPulse();
-        await loadProfileWidget();
-        
-        await loadLiveMatches(allMatches);
-        await loadRecentResults(allMatches);
-        await loadNextMatchCountdown(allMatches);
-        await updateHeroStats(allMatches);
-        
-        // Show content
-        hideHomepageLoading();
-        showHomepageSections();
-        
-        console.timeEnd('⏱️ Total Homepage Load');
-        console.log('✅ Homepage fully loaded');
-        
-    } catch (error) {
-        console.error('❌ Critical error loading homepage:', error);
-        hideHomepageLoading();
-        showHomepageError(error);
+function hideChampionsSection() {
+    const championsSection = document.querySelector('.champions');
+    if (championsSection) {
+        championsSection.style.display = 'none';
+        console.log('✅ Hall of Champions hidden (no champions yet)');
     }
-});
+}
+
+// ========================================
+// VIDEO PLAYER
+// ========================================
+function playVideo(momentId) {
+    const videoWrapper = event.currentTarget.closest('.video-wrapper');
+    const thumbnail = videoWrapper.querySelector('.video-thumbnail');
+    const playButton = videoWrapper.querySelector('.play-button');
+    
+    const thumbnailSrc = thumbnail.src;
+    const videoIdMatch = thumbnailSrc.match(/vi\/([^\/]+)\//);
+    
+    if (!videoIdMatch) {
+        console.error('Could not extract video ID');
+        return;
+    }
+    
+    const videoId = videoIdMatch[1];
+    
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    iframe.frameBorder = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;';
+    
+    thumbnail.style.display = 'none';
+    playButton.style.display = 'none';
+    videoWrapper.appendChild(iframe);
+}
+
+window.playVideo = playVideo;
+
+// ========================================
+// BOOK LINK TRACKING
+// ========================================
+window.trackBookClick = function(songSlug, location) {
+    console.log(`📊 Book clicked: ${songSlug} from ${location}`);
+    
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'book_click', {
+            song: songSlug,
+            location: location
+        });
+    }
+};
+
+// ========================================
+// NOTIFICATION HELPER
+// ========================================
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    const bgColor = {
+        'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+        'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
+        'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+    }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
+    
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
 
 // ========================================
 // CLEANUP ON PAGE UNLOAD
@@ -952,46 +1083,10 @@ window.addEventListener('beforeunload', () => {
 });
 
 // ========================================
-// EXPOSE GLOBAL FUNCTIONS
+// CONSOLE BRANDING
 // ========================================
-window.reloadHomepage = async () => {
-    console.log('🔄 Reloading homepage...');
-    showHomepageLoading();
-    
-    try {
-        const allMatches = await getAllMatches();
-        await loadTournamentInfo(allMatches);
-        await loadFeaturedMatch(allMatches);
-        await loadYourActiveVotes(allMatches);
-        await loadCommunityPulse();
-        await loadProfileWidget();
-        await loadLiveMatches(allMatches);
-        await loadRecentResults(allMatches);
-        await loadNextMatchCountdown(allMatches);
-        await updateHeroStats(allMatches);
-        
-        hideHomepageLoading();
-        console.log('✅ Homepage reloaded');
-    } catch (error) {
-        console.error('❌ Error reloading homepage:', error);
-        hideHomepageLoading();
-    }
-};
-
-// Export for testing
-export { 
-    loadMusicVideos, 
-    getSongInfo, 
-    getSongTitle,
-    loadTournamentInfo,
-    loadFeaturedMatch,
-    loadYourActiveVotes,
-    loadCommunityPulse,
-    loadProfileWidget,
-    loadLiveMatches,
-    loadRecentResults,
-    loadNextMatchCountdown,
-    updateHeroStats,
-    renderMatchCard,
-    renderResultCard
-};
+console.log(
+    '%c🎵 League Music Tournament %c- Powered by the Lore',
+    'color: #C8AA6E; font-size: 20px; font-weight: bold; font-family: Cinzel, serif;',
+    'color: #888; font-size: 14px; font-family: Lora, serif;'
+);
