@@ -16,29 +16,25 @@ document.addEventListener('DOMContentLoaded', function() {
             <a href="/index.html" class="logo-link">
                 <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
             </a>
-           <ul class="nav-links">
+          <ul class="nav-links">
     <li><a href="/">Home</a></li>
-    <li><a href="/brackets">Brackets</a></li>
+    <li><a href="/feed.html">
+        <i class="fa-solid fa-users"></i>
+        Feed
+    </a></li>
     <li><a href="/matches">Matches</a></li>
-    <li><a href="/music-gallery">Music Gallery</a></li>
+    
+    <li class="nav-separator"></li>
+    
+    <li><a href="/brackets">Brackets</a></li>
+    <li><a href="/music-gallery">Gallery</a></li>
     
     <li class="nav-separator"></li>
     
     <li><a href="/stats">Stats</a></li>
-    <li><a href="/activity.html" class="nav-link">
-        <i class="fa-solid fa-chart-line"></i>
-        Activity
-    </a></li>
-    
-    <li class="nav-separator"></li>
-    
-    <li><a href="/feed.html" class="nav-link">
-        <i class="fa-solid fa-users"></i>
-        Feed
-    </a></li>
-    <li><a href="/profile" class="nav-link">
-        <i class="fa-solid fa-user"></i>
-        My Profile
+    <li><a href="/activity.html">
+        <i class="fa-solid fa-bolt"></i>
+        Live
     </a></li>
 </ul>
             
