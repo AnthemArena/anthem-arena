@@ -26,7 +26,14 @@ import {
     onSnapshot    // ✅ ADD THIS (for real-time listener)
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+// ========================================
+// HELPER: NORMALIZE MATCH ID
+// ========================================
 
+function getMatchId(match) {
+    // Ensure consistent match ID format
+    return match.matchId || match.id;
+}
 
 // ========================================
 // CONFIGURATION
@@ -421,6 +428,15 @@ async function checkAndShowBulletin() {
             
          // DANGER: User's pick is losing badly
 if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+        const matchId = getMatchId(match); // ✅ Normalize ID
+         // ✅ Check if EITHER danger OR danger-repeat is dismissed
+    const dangerKey = `danger-${matchId}`;
+    const dangerRepeatKey = `danger-repeat-${matchId}`;
+    
+    if (dismissedBulletins.has(dangerKey) || dismissedBulletins.has(dangerRepeatKey)) {
+        continue; // ✅ Skip if dismissed in any form
+    }
+
     const dangerAlertKey = `danger-alert-count-${match.id}`;
     const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
     const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
@@ -437,8 +453,8 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
     notifications.push({
         priority: 1,
         type: notificationType,
-        matchId: match.id,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        matchId: getMatchId(match),   
+             song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
         opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
         thumbnailUrl: getThumbnailUrl(userSong),
         userPct,
@@ -465,8 +481,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 notifications.push({
                     priority: 2,
                     type: 'comeback',
-                    matchId: match.id,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
@@ -490,8 +505,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 notifications.push({
                     priority: 3,
                     type: 'nailbiter',
-                    matchId: match.id,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     voteDiff,
@@ -514,8 +528,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 notifications.push({
                     priority: 4,
                     type: 'winning',
-                    matchId: match.id,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
@@ -2368,33 +2381,39 @@ function hideBulletin() {
 }
 
 window.dismissBulletin = function() {
-    if (currentBulletin) {
-        const bulletinKey = `${currentBulletin.type}-${currentBulletin.matchId}`;
-        
-        // ✅ NEW: Store with timestamp for expiry tracking
-        const dismissalData = {
-            key: bulletinKey,
-            timestamp: Date.now()
-        };
-        
-        dismissedBulletins.add(bulletinKey);
-        
-        // Store in localStorage with timestamps
-        const dismissed = Array.from(dismissedBulletins).map(key => {
-            // Check if this is the newly dismissed one
-            if (key === bulletinKey) {
-                return dismissalData;
-            }
-            // Try to find existing data
-            const existing = JSON.parse(localStorage.getItem('dismissedBulletins') || '[]');
-            const found = existing.find(d => d.key === key);
-            return found || { key: key, timestamp: Date.now() };
-        });
-        
-        localStorage.setItem('dismissedBulletins', JSON.stringify(dismissed));
-        
-        console.log(`🚫 Bulletin dismissed: ${bulletinKey} (expires in 24h)`);
+    if (!currentBulletin) return;
+    
+    const matchId = currentBulletin.matchId;
+    const type = currentBulletin.type;
+    
+    // ✅ Dismiss ALL variations of this match alert
+    const dismissalKeys = [];
+    
+    if (type === 'danger' || type === 'danger-repeat') {
+        // Dismiss both danger types for this match
+        dismissalKeys.push(`danger-${matchId}`);
+        dismissalKeys.push(`danger-repeat-${matchId}`);
+    } else {
+        // Normal dismissal
+        dismissalKeys.push(`${type}-${matchId}`);
     }
+    
+    // ✅ Add all variations to dismissedBulletins
+    dismissalKeys.forEach(key => {
+        dismissedBulletins.add(key);
+    });
+    
+    // ✅ Save to localStorage with timestamps
+    const now = Date.now();
+    const dismissed = Array.from(dismissedBulletins).map(key => ({
+        key: key,
+        timestamp: now
+    }));
+    
+    localStorage.setItem('dismissedBulletins', JSON.stringify(dismissed));
+    
+    console.log(`🚫 Dismissed: ${dismissalKeys.join(', ')} (expires in 24h)`);
+    
     hideBulletin();
     currentBulletin = null;
 };
