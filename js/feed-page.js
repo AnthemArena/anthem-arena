@@ -2564,6 +2564,51 @@ function setupCreatePost() {
 
     // ✅ Setup mention autocomplete
     setupMentionAutocomplete(postInput);
+
+      
+    // ✅ NEW: Auto-expand textarea as user types
+    postInput.addEventListener('input', function() {
+        const length = this.value.length;
+        
+        // Reset height to auto to get proper scrollHeight
+        this.style.height = 'auto';
+        
+        // Set height to scrollHeight (content height)
+        this.style.height = Math.min(this.scrollHeight, 300) + 'px';
+        
+        // Clear previous classes
+        charCount.classList.remove('danger', 'warning');
+        
+        // Character count warnings
+        if (length > 5000) {
+            charCount.classList.add('danger');
+            charCount.textContent = `${length}/5000 (too long!)`;
+            submitBtn.disabled = true;
+        } else if (length > 1000) {
+            charCount.classList.add('warning');
+            charCount.textContent = `${length} characters`;
+            submitBtn.disabled = false;
+        } else if (length > 280) {
+            charCount.textContent = `${length} characters`;
+            submitBtn.disabled = false;
+        } else {
+            charCount.textContent = `${280 - length} characters left`;
+            submitBtn.disabled = length === 0;
+        }
+        
+        // Final check
+        if (length === 0 || length > 5000) {
+            submitBtn.disabled = true;
+        }
+    });
+
+      // Submit post
+    submitBtn.addEventListener('click', async () => {
+        await createUserPost();
+        
+        // ✅ Reset textarea height after posting
+        postInput.style.height = 'auto';
+    });
     
     postInput.addEventListener('input', () => {
         const length = postInput.value.length;

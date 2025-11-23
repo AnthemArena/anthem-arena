@@ -128,24 +128,29 @@ body {
 
 .post-input {
     flex: 1;
-    background: var(--grey-dark);
-    border: 2px solid var(--grey-light);
-    border-radius: 25px;
-    padding: 12px 20px;
-    color: var(--text-primary);
-    font-size: 1rem;
-    font-family: 'Roboto', sans-serif;
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 170, 110, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;  /* ✅ Allow manual resize */
+    min-height: 60px;  /* ✅ Minimum 3 rows */
+    max-height: 300px; /* ✅ Max height before scroll */
+    overflow-y: auto;  /* ✅ Scroll if exceeds max */
+    line-height: 1.5;
+    transition: border-color 0.2s ease;
 }
 
 .post-input:focus {
     outline: none;
-    border-color: var(--gold);
-    box-shadow: 0 0 15px rgba(200, 170, 110, 0.3);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(200, 170, 110, 0.1);
 }
 
 .post-input::placeholder {
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .post-actions {
