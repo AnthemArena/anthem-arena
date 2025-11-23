@@ -899,52 +899,24 @@ function renderPostContent(post) {
                 </a>
             </div>
         `;
-    } else if (post.type === 'user_post' && post.content) {
+     } else if (post.type === 'user_post' && post.content) {
         let displayContent = post.content;
         
-        // ✅ Remove YouTube URL from text if we're showing an embed
+        // Remove YouTube URL from text if showing embed
         if (post.youtubeVideoId) {
             displayContent = displayContent
-                .replace(/https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)[^\s]+/gi, '')
+                .replace(/https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu.be\/|youtube\.com\/shorts\/)[^\s]+/gi, '')
                 .trim();
         }
         
+        // Parse mentions and songs
         const withSongs = parseSongMentions(displayContent);
         const withMentions = parseMentionsHTML(withSongs);
-
-         // ✅ NEW: Collapse long content
-        const PREVIEW_LENGTH = 280;
-        const needsCollapse = displayContent.length > PREVIEW_LENGTH;
         
-         
-        let textHtml = '';
-        
-        if (needsCollapse) {
-    const previewText = displayContent.substring(0, PREVIEW_LENGTH);
-    
-    const previewWithSongs = parseSongMentions(previewText);
-    const previewWithMentions = parseMentionsHTML(previewWithSongs);
-    
-    // ✅ Create a unique ID for this post's content
-    const contentId = `post-content-${post.postId}`;
-    
-    textHtml = `
-        <div class="post-text-container" data-full-text="${escapeHtml(displayContent)}">
-            <p class="post-text post-text-preview" id="${contentId}">
-                ${previewWithMentions}...
-            </p>
-            <button class="show-more-btn" onclick="togglePostText(this)">
-                Show more
-            </button>
-        </div>
-    `;
-
-        } else {
-            // Short post - show normally
-            textHtml = withMentions.trim() 
-                ? `<p class="post-text">${withMentions}</p>` 
-                : '';
-        }
+        // Simple text display (no collapse needed - all posts ≤ 280 chars)
+        const textHtml = withMentions.trim() 
+            ? `<p class="post-text">${withMentions}</p>` 
+            : '';
         
         return `
             ${textHtml}
@@ -2569,40 +2541,32 @@ function setupCreatePost() {
 
       
     // ✅ NEW: Auto-expand textarea as user types
-    postInput.addEventListener('input', function() {
-        const length = this.value.length;
-        
-        // Reset height to auto to get proper scrollHeight
-        this.style.height = 'auto';
-        
-        // Set height to scrollHeight (content height)
-        this.style.height = Math.min(this.scrollHeight, 300) + 'px';
-        
-        // Clear previous classes
-        charCount.classList.remove('danger', 'warning');
-        
-        // Character count warnings
-        if (length > 5000) {
-            charCount.classList.add('danger');
-            charCount.textContent = `${length}/5000 (too long!)`;
-            submitBtn.disabled = true;
-        } else if (length > 1000) {
-            charCount.classList.add('warning');
-            charCount.textContent = `${length} characters`;
-            submitBtn.disabled = false;
-        } else if (length > 280) {
-            charCount.textContent = `${length} characters`;
-            submitBtn.disabled = false;
-        } else {
-            charCount.textContent = `${280 - length} characters left`;
-            submitBtn.disabled = length === 0;
-        }
-        
-        // Final check
-        if (length === 0 || length > 5000) {
-            submitBtn.disabled = true;
-        }
-    });
+  postInput.addEventListener('input', function() {
+    const length = this.value.length;
+    
+    // Reset height to auto to get proper scrollHeight
+    this.style.height = 'auto';
+    
+    // Set height to scrollHeight (content height)
+    this.style.height = Math.min(this.scrollHeight, 300) + 'px';
+    
+    // Character count
+    const remaining = 280 - length;
+    charCount.textContent = remaining;
+    
+    if (remaining < 20) {
+        charCount.classList.add('danger');
+        charCount.classList.remove('warning');
+    } else if (remaining < 50) {
+        charCount.classList.add('warning');
+        charCount.classList.remove('danger');
+    } else {
+        charCount.classList.remove('warning', 'danger');
+    }
+    
+    // Enable/disable submit
+    submitBtn.disabled = length === 0 || remaining < 0;
+});
 
       // Submit post
     submitBtn.addEventListener('click', async () => {
@@ -2915,48 +2879,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ========================================
-// ✅ TOGGLE SHOW MORE/LESS
-// ========================================
 
-// ========================================
-// ✅ TOGGLE SHOW MORE/LESS
-// ========================================
-
-window.togglePostText = function(button) {
-    const container = button.closest('.post-text-container');
-    const textElement = container.querySelector('.post-text-preview');
-    const fullText = container.dataset.fullText; // ✅ Get from container
-    
-    const isExpanded = button.textContent.trim() === 'Show less';
-    
-    if (isExpanded) {
-        // Collapse - show preview only
-        const previewText = fullText.substring(0, 280);
-        
-        // ✅ Re-parse with mentions and songs
-        const withSongs = parseSongMentions(previewText);
-        const withMentions = parseMentionsHTML(withSongs);
-        
-        textElement.innerHTML = withMentions + '...';
-        button.textContent = 'Show more';
-        
-        // ✅ Re-setup tooltips after updating DOM
-        setupSongTooltips();
-        setupMentionTooltips();
-        
-    } else {
-        // Expand - show full text
-        const withSongs = parseSongMentions(fullText);
-        const withMentions = parseMentionsHTML(withSongs);
-        
-        textElement.innerHTML = withMentions;
-        button.textContent = 'Show less';
-        
-        // ✅ Re-setup tooltips after updating DOM
-        setupSongTooltips();
-        setupMentionTooltips();
-    }
-};
 
 console.log('✅ Feed page module loaded');
