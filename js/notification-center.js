@@ -1,7 +1,6 @@
 console.log('🔔 notification-center.js loaded');
 
 import { 
-    
     getUnreadNotifications, 
     getUnreadCount, 
     markNotificationRead, 
@@ -9,10 +8,18 @@ import {
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
 
-// At the top of notification-center.js
-let isPanelInitialized = false;
+// ✅ GUARD: Prevent duplicate initialization
+let isInitialized = false;
+let isPanelOpen = false;
+let currentTab = 'all';
 
 export async function initNotificationCenter() {
+    // ✅ Exit if already initialized
+    if (isInitialized) {
+        console.log('⏭️ Notification center already initialized, skipping');
+        return;
+    }
+    
     const bell = document.getElementById('notificationBell');
     const badge = document.getElementById('notificationBadge');
     const panel = document.getElementById('notificationPanel');
@@ -23,26 +30,31 @@ export async function initNotificationCenter() {
         console.error('❌ Notification center elements not found!');
         console.log('   Bell:', bell);
         console.log('   Panel:', panel);
-        console.log('   Trying again in 1 second...');
         
-        // ✅ Retry once after 1 second
-        setTimeout(() => {
-            initNotificationCenter();
-        }, 1000);
-        return;
-    }
-    
-    if (isPanelInitialized) {
-        console.log('⏭️ Notification center already initialized');
+        // ✅ Only retry once if never initialized
+        if (!isInitialized) {
+            console.log('   Trying again in 1 second...');
+            setTimeout(() => {
+                initNotificationCenter();
+            }, 1000);
+        }
         return;
     }
     
     console.log('✅ Initializing notification center...');
     
+    // Update badge count
     await updateBadgeCount();
     
-    // ✅ Use async function for bell click
-    bell.addEventListener('click', async (e) => {
+    // ✅ CRITICAL: Remove old listeners by cloning bell
+    const newBell = bell.cloneNode(true);
+    bell.parentNode.replaceChild(newBell, bell);
+    
+    // ✅ Get fresh reference to bell after replacement
+    const freshBell = document.getElementById('notificationBell');
+    
+    // ✅ Attach single click handler
+    freshBell.addEventListener('click', async (e) => {
         e.stopPropagation();
         console.log('🔔 Bell clicked, current state:', isPanelOpen);
         
@@ -53,22 +65,28 @@ export async function initNotificationCenter() {
         }
     });
     
+    // Attach other listeners
     closeBtn?.addEventListener('click', closePanel);
     overlay?.addEventListener('click', closePanel);
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && panel.style.display === 'block') {
+        if (e.key === 'Escape' && isPanelOpen) {
             closePanel();
         }
     });
     
+    // Add tabs to panel
+    addTabsToPanel(panel);
+    
+    // Update badge count every 2 minutes
     setInterval(updateBadgeCount, 120000);
     
-    // ✅ Expose functions globally
+    // Expose functions globally
     window.openNotificationPanel = openPanel;
     window.closeNotificationPanel = closePanel;
     
-    isPanelInitialized = true;
+    // ✅ Mark as initialized
+    isInitialized = true;
     
     console.log('✅ Notification center initialized');
 }
@@ -77,66 +95,18 @@ export async function initNotificationCenter() {
 // TAB SYSTEM FOR NOTIFICATION CENTER
 // ========================================
 
-let currentTab = 'all';
-let isPanelOpen = false; // ✅ Track state explicitly
-
-
-export async function initNotificationCenterWithTabs() {
-    const bell = document.getElementById('notificationBell');
-    const badge = document.getElementById('notificationBadge');
-    const panel = document.getElementById('notificationPanel');
-    const overlay = document.getElementById('notificationOverlay');
-    const closeBtn = document.getElementById('closeNotificationPanel');
-    
-    if (!bell || !panel) {
-        console.log('⚠️ Notification center elements not found');
+function addTabsToPanel(panel) {
+    // Check if tabs already exist
+    if (panel.querySelector('.notification-tabs')) {
+        console.log('⏭️ Tabs already added');
         return;
     }
     
-    // Add tabs to panel header
-    addTabsToPanel(panel);
-    
-    await updateBadgeCount();
-    
-    // ✅ FIXED: Bell click handler
-    bell.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        console.log('🔔 Bell clicked, current state:', isPanelOpen);
-        
-        if (isPanelOpen) {
-            closePanel();
-        } else {
-            await openPanel();
-        }
-    });
-    
-    closeBtn?.addEventListener('click', closePanel);
-    overlay?.addEventListener('click', closePanel);
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && panel.style.display === 'block') {
-            closePanel();
-        }
-    });
-    
-  // Periodic badge update
-    setInterval(updateBadgeCount, 120000); // Every 2 minutes
-    
-    // ✅ Make functions globally accessible
-    window.openNotificationPanel = openPanel;
-    window.closeNotificationPanel = closePanel;
-    
-    console.log('✅ Notification center initialized');
-}
-
-function addTabsToPanel(panel) {
-    // Find the panel header
     const header = panel.querySelector('.notification-panel-header');
     if (!header) return;
     
-    // Add tabs container
-   const tabsHTML = `
-    <div class="notification-tabs" style="...">
+    const tabsHTML = `
+    <div class="notification-tabs" style="display: flex; gap: 4px; padding: 8px 0; border-bottom: 1px solid rgba(200, 170, 110, 0.2);">
         <button class="notif-tab active" data-tab="all">
             <i class="fa-solid fa-bell"></i> All
         </button>
@@ -154,64 +124,64 @@ function addTabsToPanel(panel) {
             <span class="tab-badge" id="messageTabBadge" style="display: none;"></span>
         </button>
     </div>
-`;
+    `;
     
     header.insertAdjacentHTML('beforeend', tabsHTML);
     
-    // Add tab styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .notif-tab {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border-bottom: 2px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            position: relative;
-        }
-        
-        .notif-tab:hover {
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(200, 170, 110, 0.1);
-        }
-        
-        .notif-tab.active {
-            color: #C8AA6E;
-            border-bottom-color: #C8AA6E;
-        }
-        
-        .tab-badge {
-            background: #e74c3c;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
-        }
-    `;
-    document.head.appendChild(style);
+    // Add tab styles (only once)
+    if (!document.getElementById('notificationTabStyles')) {
+        const style = document.createElement('style');
+        style.id = 'notificationTabStyles';
+        style.textContent = `
+            .notif-tab {
+                background: transparent;
+                border: none;
+                color: rgba(255, 255, 255, 0.6);
+                padding: 8px 16px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                font-weight: 600;
+                transition: all 0.2s ease;
+                border-bottom: 2px solid transparent;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                position: relative;
+            }
+            
+            .notif-tab:hover {
+                color: rgba(255, 255, 255, 0.9);
+                background: rgba(200, 170, 110, 0.1);
+            }
+            
+            .notif-tab.active {
+                color: #C8AA6E;
+                border-bottom-color: #C8AA6E;
+            }
+            
+            .tab-badge {
+                background: #e74c3c;
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 700;
+                padding: 2px 6px;
+                border-radius: 10px;
+                min-width: 18px;
+                text-align: center;
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
-    // Add tab click handlers
     setupTabListeners();
 }
 
 function setupTabListeners() {
     document.querySelectorAll('.notif-tab').forEach(tab => {
         tab.addEventListener('click', async () => {
-            // Update active state
             document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             
-            // Load content for this tab
             currentTab = tab.dataset.tab;
             await loadNotificationsByTab(currentTab);
         });
@@ -309,7 +279,6 @@ async function loadMessagesTab(content, userId) {
 async function loadNotificationsTab(content, userId, tab) {
     const notifications = await getUnreadNotifications(userId);
     
-    // Filter by tab
     let filtered = notifications;
     if (tab === 'votes') {
         filtered = notifications.filter(n => 
@@ -317,7 +286,7 @@ async function loadNotificationsTab(content, userId, tab) {
         );
     } else if (tab === 'achievements') {
         filtered = notifications.filter(n => n.type === 'achievement');
-    } else if (tab === 'social') {  // ✅ NEW TAB
+    } else if (tab === 'social') {
         filtered = notifications.filter(n => 
             n.type === 'like' || n.type === 'comment' || n.type === 'follow'
         );
@@ -341,7 +310,6 @@ async function loadNotificationsTab(content, userId, tab) {
     await updateCtaButtonsWithPrivacy();
 }
 
-// Global function for opening conversations
 window.openConversationModal = function(userId, username) {
     showMessageComposer(userId, username, {});
 };
@@ -364,61 +332,77 @@ async function updateBadgeCount() {
 }
 
 async function openPanel() {
-        console.log('📂 Opening notification panel...');
-
-
+    console.log('📂 Opening notification panel...');
+    
     const panel = document.getElementById('notificationPanel');
     const overlay = document.getElementById('notificationOverlay');
-
+    
     if (!panel) {
         console.error('❌ Panel element not found');
         return;
     }
     
-    // ✅ NEW: Apply champion pack theme to panel
+    // Apply champion pack theme
     const championPack = window.championLoader?.getCurrentPack();
-    if (championPack) {
-        panel.setAttribute('data-champion-pack', championPack.id);
+    if (championPack?.theme) {
+        const theme = championPack.theme;
+        const root = document.documentElement;
         
-        // Apply CSS variables from theme
-        if (championPack.theme) {
-            const theme = championPack.theme;
-            const root = document.documentElement;
-            
-            root.style.setProperty('--champion-border-color', theme.borderColor);
-            root.style.setProperty('--champion-border-glow', theme.borderGlow);
-            root.style.setProperty('--champion-title-color', theme.titleColor);
-            root.style.setProperty('--champion-detail-color', theme.detailColor);
-            root.style.setProperty('--champion-button-bg', theme.buttonBackground);
-            root.style.setProperty('--champion-button-hover', theme.buttonHover);
-            root.style.setProperty('--champion-button-text', theme.buttonText);
-            root.style.setProperty('--champion-text-shadow', theme.textShadow);
-            root.style.setProperty('--champion-accent', `${theme.borderColor.replace('0.8', '0.15')}`);
-            root.style.setProperty('--champion-splash', theme.background);
-            
-            console.log(`🎨 Applied ${championPack.name} theme to notification panel`);
-        }
+        root.style.setProperty('--champion-border-color', theme.borderColor);
+        root.style.setProperty('--champion-border-glow', theme.borderGlow);
+        root.style.setProperty('--champion-title-color', theme.titleColor);
+        root.style.setProperty('--champion-detail-color', theme.detailColor);
+        root.style.setProperty('--champion-button-bg', theme.buttonBackground);
+        root.style.setProperty('--champion-button-hover', theme.buttonHover);
+        root.style.setProperty('--champion-button-text', theme.buttonText);
+        root.style.setProperty('--champion-text-shadow', theme.textShadow);
+        
+        console.log(`🎨 Applied ${championPack.name} theme to notification panel`);
     }
-    // Show panel and overlay
-    panel.style.display = 'block';
+    
+    // ✅ Show overlay first
     if (overlay) {
         overlay.style.display = 'block';
+        overlay.offsetHeight; // Force reflow
+        overlay.classList.add('show');
     }
+    
+    // ✅ Show panel
+    panel.style.display = 'flex';
+    panel.offsetHeight; // Force reflow
+    panel.classList.add('open');
     
     isPanelOpen = true;
     
-    // Load notifications for current tab
+    // Load notifications
     await loadNotificationsByTab(currentTab);
     
     console.log('✅ Panel opened');
 }
 
 function closePanel() {
+    console.log('📭 Closing panel...');
+    
     const panel = document.getElementById('notificationPanel');
     const overlay = document.getElementById('notificationOverlay');
     
-    panel.style.display = 'none';
-    overlay.style.display = 'none';
+    if (panel) {
+        panel.classList.remove('open');
+        setTimeout(() => {
+            panel.style.display = 'none';
+        }, 300);
+    }
+    
+    if (overlay) {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 200);
+    }
+    
+    isPanelOpen = false;
+    
+    console.log('✅ Panel closed');
 }
 
 async function loadNotifications() {

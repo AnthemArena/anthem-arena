@@ -9,83 +9,83 @@ const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Navigation DOMContentLoaded fired');
     
-    const navHTML = `
-    <nav class="main-nav">
-        <div class="nav-container">
-            <a href="/index.html" class="logo-link">
-                <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
-            </a>
+   const navHTML = `
+<nav class="main-nav">
+    <div class="nav-container">
+        <a href="/index.html" class="logo-link">
+            <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/feed.html">
+                <i class="fa-solid fa-users"></i>
+                Feed
+            </a></li>
+            <li><a href="/matches">Matches</a></li>
             
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/feed.html">
-                    <i class="fa-solid fa-users"></i>
-                    Feed
-                </a></li>
-                <li><a href="/matches">Matches</a></li>
-                
-                <li class="nav-separator"></li>
-                
-                <li><a href="/brackets">Brackets</a></li>
-                <li><a href="/music-gallery">Gallery</a></li>
-                
-                <li class="nav-separator"></li>
-                
-                <li><a href="/stats">Stats</a></li>
-                <li><a href="/activity.html">
-                    <i class="fa-solid fa-bolt"></i>
-                    Live
-                </a></li>
-            </ul>
+            <li class="nav-separator"></li>
             
-            <!-- ✅ PERSISTENT Notification Bell (outside profile container) -->
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 12px; display: none;">
-                <span style="font-size: 20px;">🔔</span>
-                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
-            </div>
+            <li><a href="/brackets">Brackets</a></li>
+            <li><a href="/music-gallery">Gallery</a></li>
             
-            <!-- PROFILE CONTAINER -->
-            <div class="nav-profile-container" id="navProfileContainer" style="display: none;">
-                <div class="nav-profile-card" id="navProfileCard" title="Profile Settings">
-                    <div class="profile-avatar" id="navProfileAvatar">🎵</div>
-                    
-                    <div class="profile-info">
-                        <div class="profile-username" id="navProfileUsername">Guest</div>
-                        <div class="profile-rank-mini">
-                            <div class="rank-progress-bar">
-                                <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
-                            </div>
-                            <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
+            <li class="nav-separator"></li>
+            
+            <li><a href="/stats">Stats</a></li>
+            <li><a href="/activity.html">
+                <i class="fa-solid fa-bolt"></i>
+                Live
+            </a></li>
+        </ul>
+        
+        <!-- PROFILE CONTAINER (with bell inside) -->
+        <div class="nav-profile-container" id="navProfileContainer" style="display: none;">
+            <div class="nav-profile-card" id="navProfileCard" title="Profile Settings">
+                <div class="profile-avatar" id="navProfileAvatar">🎵</div>
+                
+                <div class="profile-info">
+                    <div class="profile-username" id="navProfileUsername">Guest</div>
+                    <div class="profile-rank-mini">
+                        <div class="rank-progress-bar">
+                            <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
                         </div>
+                        <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
                     </div>
-                    
-                    <i class="fas fa-cog profile-settings-icon" onclick="window.openSettingsModal()" title="Settings"></i>
                 </div>
+                
+                <!-- ✅ Notification Bell INSIDE profile card -->
+                <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: none;">
+                    <span style="font-size: 20px;">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                </div>
+                
+                <i class="fas fa-cog profile-settings-icon" onclick="window.openSettingsModal()" title="Settings"></i>
             </div>
-            
-            <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                <span class="hamburger"></span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- ✅ Notification System (OUTSIDE nav, appended to body) -->
-    <div id="notificationOverlay" class="notification-overlay" style="display: none;"></div>
-    
-    <div id="notificationPanel" class="notification-panel" style="display: none;">
-        <div class="notification-panel-header">
-            <h3>Notifications</h3>
-            <button id="closeNotificationPanel" class="close-btn">×</button>
         </div>
         
-        <div class="notification-panel-content" id="notificationPanelContent">
-            <div class="notification-empty">
-                <span style="font-size: 48px; opacity: 0.3;">🔔</span>
-                <p>No new notifications</p>
-            </div>
+        <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span class="hamburger"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ✅ Notification System (OUTSIDE nav, appended to body) -->
+<div id="notificationOverlay" class="notification-overlay" style="display: none;"></div>
+
+<div id="notificationPanel" class="notification-panel" style="display: none;">
+    <div class="notification-panel-header">
+        <h3>Notifications</h3>
+        <button id="closeNotificationPanel" class="close-btn">×</button>
+    </div>
+    
+    <div class="notification-panel-content" id="notificationPanelContent">
+        <div class="notification-empty">
+            <span style="font-size: 48px; opacity: 0.3;">🔔</span>
+            <p>No new notifications</p>
         </div>
     </div>
-    `;
+</div>
+`;
     
     document.getElementById('nav-placeholder').innerHTML = navHTML;
     console.log('✅ Navigation HTML injected');
@@ -387,15 +387,7 @@ async function updateNavProfile() {
         console.log('✅ Profile display updated successfully');
         
         // ✅ Re-initialize notification center after profile update
-        setTimeout(async () => {
-            try {
-                const { initNotificationCenter } = await import('./notification-center.js');
-                await initNotificationCenter();
-                console.log('🔔 Notification center re-initialized after profile update');
-            } catch (error) {
-                console.warn('⚠️ Could not re-initialize notification center:', error);
-            }
-        }, 100);
+      
 
     } catch (err) {
         console.error('Unexpected error in updateNavProfile:', err);
