@@ -3199,3 +3199,25 @@ body {
     margin: 0 !important;
     padding: 0;
 }
+/* ========================================
+   POST CONTENT AREA
+   ======================================== */
+
+.post-content {
+    margin-top: 0.75rem;
+}
+
+.post-content > p:first-child,
+.post-content > .post-text-container:first-child {
+    margin-top: 0 !important;  /* ✅ Remove top margin from first element */
+}
+
+.post-text-container {
+    margin: 0;
+    padding: 0;
+}
+
+.post-text-container p {
+    margin: 0 !important;  /* ✅ Remove all paragraph margins inside container */
+    padding: 0;
+}

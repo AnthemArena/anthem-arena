@@ -2789,31 +2789,51 @@ async function createUserPost() {
             window.showNotification('Post shared!', 'success');
         }
         
-        // Prepend new post to feed
-        const feedContainer = document.getElementById('feedPosts');
-        const postElement = createPostElement(post);
-        feedContainer.insertBefore(postElement, feedContainer.firstChild);
-        
-        // Add to current posts array
+        // ✅ Add to current posts array FIRST
         currentPosts.unshift(post);
         
-        // ✅ Setup tooltips for new post
-        setupSongTooltips();
-        setupMentionTooltips();
+        // ✅ Prepend new post to feed
+        const feedContainer = document.getElementById('feedPosts');
+        
+        // Hide empty/loading states
+        const loadingState = feedContainer.querySelector('#loadingState');
+        const emptyState = feedContainer.querySelector('#emptyState');
+        if (loadingState) loadingState.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+        
+        // Check if post already exists
+        const existingPost = feedContainer.querySelector(`[data-post-id="${post.postId}"]`);
+        if (!existingPost) {
+            const postElement = createPostElement(post);
+            
+            // Insert at the beginning
+            const firstPost = feedContainer.querySelector('.feed-post');
+            if (firstPost) {
+                feedContainer.insertBefore(postElement, firstPost);
+            } else {
+                feedContainer.appendChild(postElement);
+            }
+            
+            // Setup tooltips
+            setTimeout(() => {
+                setupSongTooltips();
+                setupMentionTooltips();
+            }, 100);
+        }
         
     } catch (error) {
         console.error('❌ Error creating post:', error);
         if (window.showNotification) {
             window.showNotification('Failed to post. Try again.', 'error');
         }
-     } finally {
+    } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post';
         
-        // ✅ Reset textarea height to default
+        // Reset textarea height
         if (postInput) {
             postInput.style.height = 'auto';
-            postInput.style.height = '60px'; // Match min-height from CSS
+            postInput.style.height = '60px';
         }
     }
 }
