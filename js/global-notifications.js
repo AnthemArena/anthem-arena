@@ -915,103 +915,53 @@ if (!toastShown && activity.timestamp >= toastCutoff) {
 // ========================================
 
 function buildSocialNotification(activity, isAlly, currentUserId) {
-    // ✅ PRIMARY: User's avatar (large background)
     const avatarUrl = activity.avatarUrl || activity.avatar || null;
-    
-    // ✅ SECONDARY: Song thumbnail (small overlay)
     const songThumbnailUrl = activity.songId 
         ? `https://img.youtube.com/vi/${activity.songId}/mqdefault.jpg`
         : null;
 
-    
-    // ✅ NEW: Get user's vote data to show THEIR song choice
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
     const userVoteData = userVotes[activity.matchId];
     const userSongTitle = userVoteData?.songTitle || 'your pick';
-    
+
     let message, detail, cta, icon, ctaAction, ctaData;
-    
-   if (isAlly) {
-    // ========================================
-    // ALLY - They voted for YOUR song!
-    // ========================================
-    
-    // ✅ Get ally message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('ally', {
-        username: activity.username,
-        songTitle: activity.songTitle
-    });
-    
-    message = championMessage.message;
-    detail = championMessage.detail;
-    cta = championMessage.cta;
-    icon = '🤝';
-    ctaAction = 'send-emote';
-    ctaData = {
-        targetUsername: activity.username,
-        targetUserId: activity.userId,
-        emoteType: 'thanks',
-        matchData: {
-            matchId: activity.matchId,
-            matchTitle: activity.matchTitle,
+
+    if (isAlly) {
+        const championMessage = window.championLoader.getChampionMessage('ally', {
+            username: activity.username,
             songTitle: activity.songTitle
-        }
-    };
-    
-} else {
-    // ========================================
-    // OPPONENT - They voted AGAINST your song!
-    // ========================================
-    
-    // ✅ Get rival message from champion pack
-    const championMessage = window.championLoader.getChampionMessage('rival', {
-        username: activity.username,
-        theirSong: activity.songTitle,
-        yourSong: userSongTitle,
-                matchTitle: activity.matchTitle  // ← Make sure this is here
-
-    });
-    
-    message = championMessage.message;
-    detail = championMessage.detail;
-    cta = championMessage.cta;
-    icon = '⚔️';
-    ctaAction = 'navigate';
-    ctaData = {};
-}
-
-return {
-    priority: 7,
-    type: 'live-activity',
-    matchId: activity.matchId,
-    matchTitle: activity.matchTitle,
-    username: activity.username,
-    triggerUserId: activity.userId,
-    triggerUsername: activity.username,
-    song: activity.songTitle,
-    userSong: userSongTitle,
-        thumbnailUrl: avatarUrl, // ✅ PRIMARY: User avatar (large)
-                secondaryThumbnail: songThumbnailUrl, // ✅ SECONDARY: Song thumbnail (small badge)
-
-    message: message,
-    detail: detail,
-    icon: icon,
-    cta: cta,
-    ctaText: cta,
-    ctaAction: ctaAction,
-    ctaData: ctaData,
-    targetUrl: `/vote.html?match=${activity.matchId}`,
-    relationship: isAlly ? 'ally' : 'opponent',
-    shownAsToast: false,
-    
-    // ✅ Secondary action to view profile
-    secondaryCta: {
-        text: `View ${activity.username}'s Profile`,
-        action: 'navigate',
-        url: `/profile?user=${activity.username}`
+        });
+        message = championMessage.message;
+        detail = championMessage.detail;
+        cta = championMessage.cta;
+        icon = 'Handshake';
+        ctaAction = 'send-emote';
+        ctaData = {
+            targetUsername: activity.username,
+            targetUserId: activity.userId,
+            emoteType: 'thanks',
+            matchData: {
+                matchId: activity.matchId,
+                matchTitle: activity.matchTitle,
+                songTitle: activity.songTitle
+            }
+        };
+    } else {
+        const championMessage = window.championLoader.getChampionMessage('rival', {
+            username: activity.username,
+            theirSong: activity.songTitle,
+            yourSong: userSongTitle,
+            matchTitle: activity.matchTitle
+        });
+        message = championMessage.message;
+        detail = championMessage.detail;
+        cta = championMessage.cta;
+        icon = 'Crossed Swords';
+        ctaAction = 'navigate';
+        ctaData = {};
     }
-}
-    
+
+    // SINGLE, CORRECT RETURN
     return {
         priority: 7,
         type: 'live-activity',
@@ -1021,20 +971,19 @@ return {
         triggerUserId: activity.userId,
         triggerUsername: activity.username,
         song: activity.songTitle,
-        userSong: userSongTitle, // ✅ NEW: Include user's song for context
-        thumbnailUrl: thumbnailUrl,
-        message: message,
-        detail: detail,
-        icon: icon,
-        cta: cta,
+        userSong: userSongTitle,
+        thumbnailUrl: avatarUrl,                    // Main: user's avatar
+        secondaryThumbnail: songThumbnailUrl,       // Badge: song thumbnail
+        message,
+        detail,
+        icon,
+        cta,
         ctaText: cta,
-        ctaAction: ctaAction,
-        ctaData: ctaData,
+        ctaAction,
+        ctaData,
         targetUrl: `/vote.html?match=${activity.matchId}`,
         relationship: isAlly ? 'ally' : 'opponent',
         shownAsToast: false,
-        
-        // ✅ Secondary action to view profile
         secondaryCta: {
             text: `View ${activity.username}'s Profile`,
             action: 'navigate',

@@ -394,22 +394,35 @@ function displayRoundCountdown() {
 function updateCountdown() {
     const countdownEl = document.getElementById('countdownTimer');
     if (!countdownEl) return;
-    
+
+    // Set the target time to exactly 7 days from NOW
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 7);
+    targetDate.setHours(0, 0, 0, 0); // optional: reset to midnight, remove if you want exact 7×24h
+
     const now = new Date();
-    const diff = ROUND_CONFIG.endDate - now;
-    
+    const diff = targetDate - now;
+
     if (diff <= 0) {
         countdownEl.textContent = '0d 0h 0m';
-        countdownEl.parentElement.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> <strong>${ROUND_CONFIG.roundName} ENDED!</strong> • Check back soon for Round 3!`;
+        countdownEl.parentElement.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> <strong>Round Ended!</strong> • Check back soon for the next one!`;
+        clearInterval(countdownInterval); // optional: stop the timer completely
         return;
     }
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000); // optional: add seconds for more precision
+
+    // Choose one of the formats below:
     countdownEl.textContent = `${days}d ${hours}h ${minutes}m`;
+    // countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`; // with seconds
 }
+
+// Run immediately and then every second
+updateCountdown();
+const countdownInterval = setInterval(updateCountdown, 1000);
 
 // ========================================
 // LOAD LIVE MATCHES
