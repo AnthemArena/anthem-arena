@@ -1686,65 +1686,93 @@ try {
     const votedSongName = votedSong.name || 'Unknown Song';
     const otherSongName = otherSong.name || 'Unknown Song';
     const matchTitle = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
-    
-    console.log('📝 Logging activity:', {
-        matchId: currentMatch.id,
-        username: username,
-        round: currentMatch.round,
-        choice: songId  // ✅ This songId comes from function parameter
-    });
-    
-    // ✅ ALWAYS log to activity collection
-    await setDoc(doc(db, 'activity', activityId), {
-        activityId: activityId,
-        userId: userId,
-        username: username,
-        avatar: avatar,
-        matchId: currentMatch.id,
-        matchTitle: matchTitle,
-        songId: votedVideoId,
-        songTitle: votedSongName,
-        choice: songId,  // ✅ FIX: songId is from submitVote(songId) parameter
-        timestamp: Date.now(),
-        round: currentMatch.round,
-        tournamentId: ACTIVE_TOURNAMENT,
-        isPublic: isPublic
-    });
-    
-    console.log('✅ Activity logged for:', username);
-    
-    // ✅ ALWAYS create social feed post (if public)
-    if (isPublic) {
-        try {
-            const { createVotePost } = await import('./social-feed.js');
-            
-            await createVotePost({
-                matchId: currentMatch.id,
-                matchTitle: matchTitle,
-                songId: votedVideoId,
-                songTitle: votedSongName,
-                votedSongName: votedSongName,
-                opponentSongName: otherSongName,
-                    opponentSongId: otherSong.videoId,  // ✅ ADD THIS LINE
+   // ✅ DEBUG: Log exactly what we're about to write
+console.log('📝 Logging activity:', {
+    matchId: currentMatch.id,
+    username: username,
+    round: currentMatch.round,
+    choice: songId  // ✅ This songId comes from function parameter
+});
 
-                choice: songId,  // ✅ FIX: songId is 'song1' or 'song2' from function parameter
-                round: currentMatch.round,
-                tournamentId: ACTIVE_TOURNAMENT
-            });
-            
-            console.log('✅ Social feed post created for:', username);
-        } catch (postError) {
-            console.error('⚠️ Could not create social feed post:', postError);
-            console.error('Error details:', postError.message);
-            console.error('Stack trace:', postError.stack);
+console.log('🔍 songId parameter value:', songId);
+console.log('🔍 votedVideoId:', votedVideoId);
+console.log('🔍 isPublic:', isPublic);
+
+// Create activity data object
+const activityData = {
+    activityId: activityId,
+    userId: userId,
+    username: username,
+    avatar: avatar,
+    matchId: currentMatch.id,
+    matchTitle: matchTitle,
+    songId: votedVideoId,
+    songTitle: votedSongName,
+    choice: songId,  // ✅ FIX: songId is from submitVote(songId) parameter
+    timestamp: Date.now(),
+    round: currentMatch.round,
+    tournamentId: ACTIVE_TOURNAMENT,
+    isPublic: isPublic
+};
+
+console.log('🔍 COMPLETE ACTIVITY DATA TO WRITE:', JSON.stringify(activityData, null, 2));
+
+// ✅ ALWAYS log to activity collection
+await setDoc(doc(db, 'activity', activityId), activityData);
+
+console.log('✅ Activity logged for:', username);
+console.log('✅ Activity written to Firebase with ID:', activityId);
+
+// ✅ ALWAYS create social feed post (if public)
+if (isPublic) {
+    try {
+        console.log('📝 ATTEMPTING TO CREATE SOCIAL FEED POST...');
+        console.log('   - User is public');
+        console.log('   - matchId:', currentMatch.id);
+        console.log('   - songId:', votedVideoId);
+        console.log('   - choice:', songId);
+        
+        const { createVotePost } = await import('./social-feed.js');
+        
+        console.log('✅ social-feed.js imported successfully');
+        
+        const postData = {
+            matchId: currentMatch.id,
+            matchTitle: matchTitle,
+            songId: votedVideoId,
+            songTitle: votedSongName,
+            votedSongName: votedSongName,
+            opponentSongName: otherSongName,
+            opponentSongId: otherSong.videoId,
+            choice: songId,  // ✅ FIX: songId is 'song1' or 'song2' from function parameter
+            round: currentMatch.round,
+            tournamentId: ACTIVE_TOURNAMENT
+        };
+        
+        console.log('🔍 SOCIAL POST DATA:', JSON.stringify(postData, null, 2));
+        
+        await createVotePost(postData);
+        
+        console.log('✅ Social feed post created for:', username);
+    } catch (postError) {
+        console.error('❌ SOCIAL FEED POST FAILED!');
+        console.error('Error type:', postError.constructor.name);
+        console.error('Error message:', postError.message);
+        console.error('Full stack:', postError.stack);
+        
+        // ✅ NEW: Show a notification so you know it failed
+        if (window.showNotification) {
+            showNotification('Vote saved but social post failed', 'warning');
         }
-    } else {
-        console.log('ℹ️ User is private, skipping social post');
     }
-    
+} else {
+    console.log('ℹ️ User is private, skipping social post (isPublic:', isPublic, ')');
+}
+
 } catch (activityError) {
     console.error('❌ Could not log activity:', activityError);
-    console.error('Error details:', activityError.message);
+    console.error('Error type:', activityError.constructor.name);
+    console.error('Error message:', activityError.message);
     console.error('Stack trace:', activityError.stack);
 }
         
@@ -1884,7 +1912,7 @@ async function checkForAchievementUnlocks() {
             sessionStorage.setItem('sessionStart', Date.now().toString());
             console.log('📍 New voting session started');
         }
-        
+
         
         // Get user's complete vote history from localStorage
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
