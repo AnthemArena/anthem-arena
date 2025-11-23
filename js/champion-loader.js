@@ -174,6 +174,44 @@ function getChampionMessage(alertType, data) {
     };
 }
 
+
+/**
+ * Get champion-voiced achievement message
+ */
+function getAchievementMessage(achievementId, data) {
+    if (!currentChampionPack) {
+        console.error('❌ No champion pack loaded!');
+        return null;
+    }
+    
+    const achievements = currentChampionPack.achievements;
+    
+    if (!achievements) {
+        console.warn(`⚠️ No achievements in pack "${currentChampionPack.id}"`);
+        return null;
+    }
+    
+    // Try specific achievement first, then fall back to default
+    const achievement = achievements[achievementId] || achievements['default'];
+    
+    if (!achievement) {
+        console.warn(`⚠️ Achievement "${achievementId}" not found in pack`);
+        return null;
+    }
+    
+    // Pick random variations
+    const message = achievement.messages[Math.floor(Math.random() * achievement.messages.length)];
+    const detail = achievement.details[Math.floor(Math.random() * achievement.details.length)];
+    const button = achievement.buttons[Math.floor(Math.random() * achievement.buttons.length)];
+    
+    // Replace placeholders
+    return {
+        message: replacePlaceholders(message, data),
+        detail: replacePlaceholders(detail, data),
+        cta: button,
+        emoji: currentChampionPack.emoji
+    };
+}
 // ========================================
 // REPLACE PLACEHOLDERS
 // ========================================
@@ -387,6 +425,8 @@ async function initializeChampionPack() {
 window.championLoader = {
     loadChampionPack,
     getChampionMessage,
+        getAchievementMessage,  // ✅ ADD THIS
+
     checkUniqueAlerts,
     getAvailableChampionPacks,
     setUserChampionPack,

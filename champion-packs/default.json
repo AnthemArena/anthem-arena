@@ -5,7 +5,6 @@
   "emoji": "📢",
   "description": "Professional, straightforward tournament notifications",
   "color": "#C8AA6E",
-  "theme": "standard",
   
   "alerts": {
     "danger": {
@@ -25,6 +24,7 @@
         "See Match"
       ]
     },
+    
     "nailbiter": {
       "messages": [
         "🔥 \"{songTitle}\" is too close!",
@@ -42,6 +42,7 @@
         "See Battle"
       ]
     },
+    
     "winning": {
       "messages": [
         "🎯 Your pick \"{songTitle}\" is dominating!",
@@ -59,6 +60,7 @@
         "Check Status"
       ]
     },
+    
     "comeback": {
       "messages": [
         "🎉 \"{songTitle}\" completed comeback!",
@@ -76,6 +78,7 @@
         "Check Score"
       ]
     },
+    
     "ally": {
       "messages": [
         "🤝 {username} also voted for \"{songTitle}\"!",
@@ -93,6 +96,7 @@
         "Show Support"
       ]
     },
+    
     "rival": {
       "messages": [
         "⚔️ {username} picked \"{theirSong}\" vs your \"{yourSong}\"",
@@ -110,65 +114,175 @@
         "See Score"
       ]
     },
+    
     "streak-ally-3": {
       "messages": ["🔥 3-match streak with {username}!"],
       "details": ["You've agreed 3 times in a row"],
       "buttons": ["View Profile"]
     },
+    
     "streak-ally-5": {
       "messages": ["🔥🔥 5-match alliance with {username}!"],
       "details": ["Your taste aligns perfectly!"],
       "buttons": ["View Profile"]
     },
+    
     "streak-ally-10": {
       "messages": ["🔥🔥🔥 Epic 10-match streak with {username}!"],
       "details": ["You're music soulmates!"],
       "buttons": ["View Profile"]
     },
+    
     "streak-ally-20": {
       "messages": ["👑 Legendary {streakCount}-match streak with {username}!"],
       "details": ["This alliance is unbreakable!"],
       "buttons": ["View Profile"]
     },
+    
     "streak-rival-3": {
       "messages": ["⚔️ 3-match rivalry with {username}!"],
       "details": ["You've opposed each other 3 times"],
       "buttons": ["View Profile"]
     },
+    
     "streak-rival-5": {
       "messages": ["⚔️⚔️ 5-match rivalry with {username}!"],
       "details": ["The rivalry heats up!"],
       "buttons": ["View Profile"]
     },
+    
     "streak-rival-10": {
       "messages": ["⚔️⚔️⚔️ Epic 10-match rivalry with {username}!"],
       "details": ["A legendary battle of taste!"],
       "buttons": ["View Profile"]
     },
+    
     "streak-rival-20": {
       "messages": ["👹 Legendary {streakCount}-match rivalry with {username}!"],
       "details": ["The ultimate clash!"],
       "buttons": ["View Profile"]
     },
+    
     "novotes": {
       "messages": ["🆘 This match has zero votes!"],
       "details": ["\"{song1}\" vs \"{song2}\" • Closes in {hoursLeft}h"],
       "buttons": ["Cast First Vote!"]
     },
+    
     "lowvotes": {
       "messages": ["⚠️ This match needs more votes!"],
       "details": ["Only {totalVotes} vote{votesPlural} • {hoursLeft}h left"],
       "buttons": ["Vote Now!"]
     },
+    
     "welcome": {
       "messages": ["🎵 Welcome to the League Music Tournament!"],
       "details": ["{liveCount} matches live - cast your first vote!"],
       "buttons": ["Start Voting"]
     },
+    
     "encouragement": {
       "messages": ["👀 Still deciding?"],
       "details": ["Pick your favorites and see the results!"],
       "buttons": ["Browse Matches"]
+    }
+  },
+  
+  "achievements": {
+    "opening-act": {
+      "messages": ["🏆 Achievement Unlocked: Opening Act"],
+      "details": ["Cast your first vote • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "encore": {
+      "messages": ["🏆 Achievement Unlocked: Encore"],
+      "details": ["Cast 5 votes • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "world-tour": {
+      "messages": ["🏆 Achievement Unlocked: World Tour"],
+      "details": ["Cast 10 votes • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "headliner": {
+      "messages": ["🏆 Achievement Unlocked: Headliner"],
+      "details": ["Cast 25 votes • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "pentakill": {
+      "messages": ["🎸 Achievement Unlocked: Pentakill"],
+      "details": ["Cast 50 votes - Rock on! • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "chart-topper": {
+      "messages": ["🏆 Achievement Unlocked: Chart Topper"],
+      "details": ["Cast 100 votes • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "hall-of-fame": {
+      "messages": ["👑 Achievement Unlocked: Hall of Fame"],
+      "details": ["Cast 250 votes - You are a legend! • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "on-fire": {
+      "messages": ["🔥 Achievement Unlocked: On Fire"],
+      "details": ["Vote 3 days in a row • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "hot-streak": {
+      "messages": ["🔥 Achievement Unlocked: Hot Streak"],
+      "details": ["Vote 7 days in a row • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "unstoppable": {
+      "messages": ["⚡ Achievement Unlocked: Unstoppable"],
+      "details": ["Vote 14 days in a row • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "legendary-streak": {
+      "messages": ["👑 Achievement Unlocked: Legendary"],
+      "details": ["Vote 30 days in a row - Unstoppable dedication! • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "underdog-champion": {
+      "messages": ["🎯 Achievement Unlocked: Underdog Champion"],
+      "details": ["Vote for 5 underdogs • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "dark-horse": {
+      "messages": ["🐴 Achievement Unlocked: Dark Horse"],
+      "details": ["Vote for 15 underdogs • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "rebel-heart": {
+      "messages": ["💔 Achievement Unlocked: Rebel Heart"],
+      "details": ["Vote for 30 underdogs • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "founding-member": {
+      "messages": ["👑 Achievement Unlocked: Founding Member"],
+      "details": ["Voted before 1,000 total votes • +{xp} XP"],
+      "buttons": ["View Achievements"]
+    },
+    
+    "default": {
+      "messages": ["🏆 Achievement Unlocked: {name}"],
+      "details": ["{description} • +{xp} XP"],
+      "buttons": ["View Achievements"]
     }
   }
 }

@@ -1878,6 +1878,13 @@ if (!hasUsername && !tipShown) {
 async function checkForAchievementUnlocks() {
     try {
         console.log('🏆 Checking for achievement unlocks...');
+
+        // ✅ NEW: Initialize session tracking
+        if (!sessionStorage.getItem('sessionStart')) {
+            sessionStorage.setItem('sessionStart', Date.now().toString());
+            console.log('📍 New voting session started');
+        }
+        
         
         // Get user's complete vote history from localStorage
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');

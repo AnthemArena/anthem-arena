@@ -442,6 +442,386 @@
         "Go! 🔥"
       ]
     }
-}
+},
+  
+  "achievements": {
+    "opening-act": {
+      "messages": [
+        "🎪 YESSS! Your FIRST vote!",
+        "💥 BOOM! Look at you GO!",
+        "😈 Hehe! First one down!",
+        "🎉 Your first vote! This is EXCITING!"
+      ],
+      "details": [
+        "Now the REAL fun begins! +{xp} XP",
+        "Time to blow stuff up! +{xp} XP earned",
+        "You're gonna love this! +{xp} XP",
+        "Let the chaos commence! +{xp} XP"
+      ],
+      "buttons": [
+        "More Chaos! 🎪",
+        "Keep Going! 💥",
+        "Blow It Up! 💣",
+        "Let's Go! 🔥"
+      ]
+    },
+    
+    "encore": {
+      "messages": [
+        "💥 FIVE votes! You're on a roll!",
+        "🎪 Hehe! Five down already!",
+        "😈 Look at you racking them up!",
+        "🔥 FIVE! I'm impressed!"
+      ],
+      "details": [
+        "Keep the mayhem going! +{xp} XP",
+        "This is getting FUN! +{xp} XP earned",
+        "More votes = MORE chaos! +{xp} XP",
+        "Don't stop now! +{xp} XP"
+      ],
+      "buttons": [
+        "More! 💥",
+        "Keep Voting! 🎪",
+        "Continue! 🔥",
+        "Go Again! 💣"
+      ]
+    },
+    
+    "pentakill": {
+      "messages": [
+        "🎸 PENTAKILL! 50 votes!",
+        "💥 FIFTY VOTES! You're UNSTOPPABLE!",
+        "🎪 Like the band! 50 votes!",
+        "😈 PENTAKILL achieved! Rock on!"
+      ],
+      "details": [
+        "You're a LEGEND! +{xp} XP",
+        "This is EPIC! +{xp} XP earned",
+        "50 votes of pure chaos! +{xp} XP",
+        "Can't stop won't stop! +{xp} XP"
+      ],
+      "buttons": [
+        "Rock On! 🎸",
+        "Celebrate! 🎉",
+        "More Mayhem! 💥",
+        "Keep Going! 🔥"
+      ]
+    },
+    
+    "underdog-champion": {
+      "messages": [
+        "💥 You love the UNDERDOGS!",
+        "🎪 5 underdog votes! I like your style!",
+        "😈 Betting on the losers? BOLD!",
+        "🔥 Underdog Champion! Chaos lover!"
+      ],
+      "details": [
+        "Supporting the unexpected! +{xp} XP",
+        "Rules? What rules?! +{xp} XP",
+        "You're unpredictable! +{xp} XP earned",
+        "This is MY kind of thinking! +{xp} XP"
+      ],
+      "buttons": [
+        "View Progress! 👀",
+        "See Achievements! 🏆",
+        "More Chaos! 💥",
+        "Keep It Up! 🎪"
+      ]
+    },
+    
+    "hot-streak": {
+      "messages": [
+        "🔥 SEVEN DAYS IN A ROW!",
+        "💥 HOT STREAK! You're ON FIRE!",
+        "🎪 Week-long streak! DEDICATION!",
+        "😈 Seven days! Can't stop you!"
+      ],
+      "details": [
+        "This is COMMITMENT! +{xp} XP",
+        "You're addicted! I LOVE IT! +{xp} XP",
+        "Keep the streak alive! +{xp} XP earned",
+        "Don't break it now! +{xp} XP"
+      ],
+      "buttons": [
+        "Continue Streak! 🔥",
+        "View Stats! 📊",
+        "More Votes! 💥",
+        "Keep Going! 🎪"
+      ]
+    },
+    "world-tour": {
+  "messages": [
+    "🌍 TEN votes! You're going GLOBAL!",
+    "💥 World Tour unlocked!",
+    "🎪 TEN down! The world is YOURS!"
+  ],
+  "details": [
+    "Spreading chaos worldwide! +{xp} XP",
+    "Ten votes! BOOM! +{xp} XP",
+    "Keep the tour going! +{xp} XP earned"
+  ],
+  "buttons": [
+    "More Chaos! 💥",
+    "Keep Going! 🎪",
+    "Continue! 🔥"
+  ]
+},
+
+"headliner": {
+  "messages": [
+    "⭐ HEADLINER! 25 votes!",
+    "💥 You're the MAIN EVENT!",
+    "🎪 25 votes! TOP BILLING!"
+  ],
+  "details": [
+    "You're the star now! +{xp} XP",
+    "This is YOUR show! +{xp} XP earned",
+    "Headliner status! +{xp} XP"
+  ],
+  "buttons": [
+    "Rock On! 🎸",
+    "More! 💥",
+    "Continue! 🎪"
+  ]
+},
+
+"chart-topper": {
+  "messages": [
+    "📈 CHART TOPPER! 100 votes!",
+    "💥 A HUNDRED! You're INSANE!",
+    "🎪 100 votes of pure MAYHEM!"
+  ],
+  "details": [
+    "You're at the TOP! +{xp} XP",
+    "This is LEGENDARY! +{xp} XP earned",
+    "Can't stop won't stop! +{xp} XP"
+  ],
+  "buttons": [
+    "Celebrate! 🎉",
+    "Keep Going! 💥",
+    "More! 🔥"
+  ]
+},
+
+"hall-of-fame": {
+  "messages": [
+    "👑 HALL OF FAME! 250 votes!",
+    "💎 TWO HUNDRED FIFTY! You're a LEGEND!",
+    "🏆 You made HISTORY!"
+  ],
+  "details": [
+    "You're IMMORTAL now! +{xp} XP",
+    "This is LEGENDARY status! +{xp} XP",
+    "Nobody's EVER done this! +{xp} XP earned"
+  ],
+  "buttons": [
+    "BOW DOWN! 👑",
+    "View Stats! 📊",
+    "Celebrate! 🎉"
+  ]
+},
+
+"on-fire": {
+  "messages": [
+    "🔥 ON FIRE! 3 days straight!",
+    "💥 Three days! You're heating UP!",
+    "🎪 Streak starting! THREE days!"
+  ],
+  "details": [
+    "Keep the fire burning! +{xp} XP",
+    "Three in a row! +{xp} XP earned",
+    "Don't stop now! +{xp} XP"
+  ],
+  "buttons": [
+    "Continue! 🔥",
+    "More Votes! 💥",
+    "Keep Going! 🎪"
+  ]
+},
+
+"unstoppable": {
+  "messages": [
+    "⚡ UNSTOPPABLE! 14 days!",
+    "💥 TWO WEEKS! You're CRAZY!",
+    "🎪 14-day streak! Can't STOP you!"
+  ],
+  "details": [
+    "This is DEDICATION! +{xp} XP",
+    "Truly unstoppable! +{xp} XP earned",
+    "The streak continues! +{xp} XP"
+  ],
+  "buttons": [
+    "Keep Going! ⚡",
+    "View Streak! 📊",
+    "Continue! 🔥"
+  ]
+},
+
+"legendary-streak": {
+  "messages": [
+    "👑 LEGENDARY! 30 DAYS STRAIGHT!",
+    "💎 THIRTY DAYS! You're IMMORTAL!",
+    "🏆 A MONTH! This is HISTORIC!"
+  ],
+  "details": [
+    "You're a LIVING LEGEND! +{xp} XP",
+    "30 days of CHAOS! +{xp} XP earned",
+    "I'm actually IMPRESSED! +{xp} XP"
+  ],
+  "buttons": [
+    "BOW DOWN! 👑",
+    "View Stats! 📊",
+    "PARTY! 🎉"
+  ]
+},
+
+"dark-horse": {
+  "messages": [
+    "🐴 DARK HORSE! 15 underdogs!",
+    "💥 You LOVE the longshots!",
+    "🎪 15 underdog picks! BOLD!"
+  ],
+  "details": [
+    "Supporting the chaos! +{xp} XP",
+    "Unpredictable! +{xp} XP earned",
+    "This is MY style! +{xp} XP"
+  ],
+  "buttons": [
+    "More Chaos! 💥",
+    "View Progress! 👀",
+    "Keep Going! 🎪"
+  ]
+},
+
+"rebel-heart": {
+  "messages": [
+    "💔 REBEL HEART! 30 underdogs!",
+    "💥 You're a TRUE rebel!",
+    "🎪 30 underdog votes! RESPECT!"
+  ],
+  "details": [
+    "Rules? WHAT RULES?! +{xp} XP",
+    "Pure rebellion! +{xp} XP earned",
+    "This is PERFECT! +{xp} XP"
+  ],
+  "buttons": [
+    "Rebel On! 💥",
+    "View All! 🏆",
+    "More Chaos! 🎪"
+  ]
+},
+"triple-threat": {
+  "messages": [
+    "⚡ THREE in one go! You're on a ROLL!",
+    "💥 TRIPLE THREAT! Keep going!",
+    "🎪 Three votes! This is FUN!"
+  ],
+  "details": [
+    "You're getting the hang of this! +{xp} XP",
+    "Three down! MORE! +{xp} XP earned",
+    "The chaos BUILDS! +{xp} XP"
+  ],
+  "buttons": [
+    "More! 💥",
+    "Keep Going! 🎪",
+    "Continue! 🔥"
+  ]
+},
+
+"vote-spree": {
+  "messages": [
+    "🔥 FIVE IN A ROW! You're UNSTOPPABLE!",
+    "💥 VOTE SPREE! I LOVE IT!",
+    "🎪 Five votes! You can't STOP!"
+  ],
+  "details": [
+    "This is getting EXCITING! +{xp} XP",
+    "You're on FIRE! +{xp} XP earned",
+    "Keep the spree alive! +{xp} XP"
+  ],
+  "buttons": [
+    "MORE CHAOS! 💥",
+    "Keep Voting! 🔥",
+    "Don't Stop! 🎪"
+  ]
+},
+
+"power-voter": {
+  "messages": [
+    "🚀 TEN VOTES! You're a MACHINE!",
+    "💥 POWER VOTER! This is INSANE!",
+    "🎪 TEN in one session! WOW!"
+  ],
+  "details": [
+    "You're UNSTOPPABLE! +{xp} XP",
+    "This is PEAK chaos! +{xp} XP earned",
+    "Can't stop won't stop! +{xp} XP"
+  ],
+  "buttons": [
+    "KEEP GOING! 💥",
+    "More Mayhem! 🔥",
+    "Continue! 🎪"
+  ]
+},
+
+"voting-marathon": {
+  "messages": [
+    "🏆 TWENTY VOTES! You're a LEGEND!",
+    "💎 VOTING MARATHON! This is HISTORIC!",
+    "👑 TWENTY in one go! I'm IMPRESSED!"
+  ],
+  "details": [
+    "This is LEGENDARY! +{xp} XP",
+    "You're IMMORTAL now! +{xp} XP earned",
+    "Nobody does this! +{xp} XP"
+  ],
+  "buttons": [
+    "BOW DOWN! 👑",
+    "View Stats! 📊",
+    "CELEBRATE! 🎉"
+  ]
+},
+
+"founding-member": {
+  "messages": [
+    "👑 FOUNDING MEMBER!",
+    "💎 You were HERE from the START!",
+    "🎪 OG voter! You're LEGENDARY!"
+  ],
+  "details": [
+    "You're part of HISTORY! +{xp} XP",
+    "Original chaos-causer! +{xp} XP earned",
+    "This is SPECIAL! +{xp} XP"
+  ],
+  "buttons": [
+    "View Badge! 👑",
+    "See Stats! 📊",
+    "Celebrate! 🎉"
+  ]
+},
+    
+    "default": {
+      "messages": [
+        "🏆 Achievement unlocked: {name}!",
+        "💥 You got {name}!",
+        "🎪 Congrats! {name} unlocked!",
+        "✨ {name} achieved!"
+      ],
+      "details": [
+        "{description} • +{xp} XP",
+        "Nice work! +{xp} XP earned",
+        "{description} • +{xp} XP",
+        "Achievement complete! +{xp} XP"
+      ],
+      "buttons": [
+        "View All! 🏆",
+        "See Progress! 👀",
+        "Check It Out! ✨",
+        "View Achievements!"
+      ]
+    }
+  }
+
+
 }
   

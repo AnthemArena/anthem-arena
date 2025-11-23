@@ -610,6 +610,64 @@ icon: '<i class="fa-solid fa-fire"></i>',
     condition: (stats) => stats.comebackVotes >= 5,
     progress: (stats) => ({ current: stats.comebackVotes, target: 5 })
   },
+  // ========================================
+// BATCH VOTING ACHIEVEMENTS
+// ========================================
+'triple-threat': {
+  id: 'triple-threat',
+  name: 'Triple Threat',
+  description: 'Vote in 3 matches in one session',
+  icon: '<i class="fa-solid fa-bolt-lightning"></i>',
+  xp: 75,
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'uncommon',
+  condition: (stats) => stats.votesInSession >= 3,
+  progress: (stats) => ({ current: stats.votesInSession, target: 3 })
+},
+
+'vote-spree': {
+  id: 'vote-spree',
+  name: 'Vote Spree',
+  description: 'Vote in 5 matches in one session',
+  icon: '<i class="fa-solid fa-fire"></i>',
+  xp: 150,
+  category: 'special',
+  hidden: true,
+  tier: 'silver',
+  rarity: 'rare',
+  condition: (stats) => stats.votesInSession >= 5,
+  progress: (stats) => ({ current: stats.votesInSession, target: 5 })
+},
+
+'power-voter': {
+  id: 'power-voter',
+  name: 'Power Voter',
+  description: 'Vote in 10 matches in one session',
+  icon: '<i class="fa-solid fa-rocket"></i>',
+  xp: 300,
+  category: 'special',
+  hidden: true,
+  tier: 'gold',
+  rarity: 'epic',
+  condition: (stats) => stats.votesInSession >= 10,
+  progress: (stats) => ({ current: stats.votesInSession, target: 10 })
+},
+
+'voting-marathon': {
+  id: 'voting-marathon',
+  name: 'Voting Marathon',
+  description: 'Vote in 20 matches in one session - Unstoppable!',
+  icon: '<i class="fa-solid fa-trophy"></i>',
+  xp: 500,
+  category: 'special',
+  hidden: true,
+  tier: 'legendary',
+  rarity: 'legendary',
+  condition: (stats) => stats.votesInSession >= 20,
+  progress: (stats) => ({ current: stats.votesInSession, target: 20 })
+},
 
   // ========================================
   // SOCIAL ACHIEVEMENTS

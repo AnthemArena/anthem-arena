@@ -172,6 +172,11 @@ export async function checkFoundingMemberStatus() {
  * @returns {Object} - Stats object
  */
 export async function calculateAchievementStats(allVotes) {
+
+    // ✅ NEW: Track votes in current session
+  const sessionStart = parseInt(sessionStorage.getItem('sessionStart') || Date.now());
+  const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
+
   // Check founding member status from Firebase
   const isFoundingMember = await checkFoundingMemberStatus();
   
@@ -192,7 +197,9 @@ export async function calculateAchievementStats(allVotes) {
     uniqueArtists: 0,
     uniqueYears: 0,
     comebackVotes: 0,
-    isFoundingMember: isFoundingMember // ✅ From Firebase now
+    isFoundingMember: isFoundingMember, // ✅ From Firebase now
+        votesInSession: votesThisSession.length  // ✅ NEW
+
   };
   
   // Calculate early votes (match had <10 votes when user voted)
@@ -336,23 +343,32 @@ if (newlyUnlocked.length > 0) {
 /**
  * Show achievement unlock notification using existing toast system
  */
+/**
+ * Show achievement unlock notification using champion pack
+ */
 export function showAchievementUnlock(achievement) {
-  // Use your existing global-notifications.js system
-  if (window.showBulletin) {
-    window.showBulletin({
-      priority: 2,
-      type: 'achievement',
-      matchId: `achievement-${achievement.id}`,
-      thumbnailUrl: null,
-      message: `🏆 Achievement Unlocked: ${achievement.name}`,
-      detail: `${achievement.description} • +${achievement.xp} XP`,
-      cta: 'View Achievements',
-      action: 'navigate',
-      targetUrl: '/my-votes.html#achievements'
+    // ✅ Get champion-voiced message
+    const championMessage = window.championLoader?.getAchievementMessage(achievement.id, {
+        name: achievement.name,
+        description: achievement.description,
+        xp: achievement.xp
     });
-  }
-  
-  console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP)`);
+    
+    if (window.showBulletin) {
+        window.showBulletin({
+            priority: 2,
+            type: 'achievement',
+            matchId: `achievement-${achievement.id}`,
+            thumbnailUrl: null,
+            message: championMessage?.message || `🏆 Achievement Unlocked: ${achievement.name}`,
+            detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP`,
+            cta: championMessage?.cta || 'View Achievements',
+            action: 'navigate',
+            targetUrl: '/my-votes.html#achievements'
+        });
+    }
+    
+    console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP)`);
 }
 
 /**
