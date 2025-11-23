@@ -187,16 +187,16 @@
         "💣 {username} just declared WAR!",
         "🔥 {username} backed \"{theirSong}\" - let's BLOW 'EM UP!"
       ],
-      "details": [
-        "They chose \"{theirSong}\" vs your \"{yourSong}\" - wanna settle this?",
-        "Time to show 'em what happens when they pick wrong!",
-        "The battle is ON! Rules? What rules?!",
-        "Different sides - may the best song EXPLODE!",
-        "It's you vs them now!",
-        "Let's get dangerous!",
-        "\"{theirSong}\" vs \"{yourSong}\" - BOOM TIME!",
-        "They wanna fight? Let's FIGHT!"
-      ],
+  "details": [
+  "They chose \"{theirSong}\" vs your \"{yourSong}\" - wanna settle this?",
+  "Time to show 'em what happens when they pick wrong!",
+  "The battle is ON! Rules? What rules?!",
+  "Different sides on \"{matchTitle}\" - may the best song EXPLODE!",  
+  "It's you vs them now on \"{matchTitle}\"!",  
+  "Let's get dangerous!",
+  "\"{theirSong}\" vs \"{yourSong}\" - BOOM TIME!",
+  "They wanna fight? Let's FIGHT!"
+],
       "buttons": [
         "View Battle! ⚔️",
         "Show 'Em! 💥",

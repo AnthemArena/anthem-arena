@@ -967,7 +967,9 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     const championMessage = window.championLoader.getChampionMessage('rival', {
         username: activity.username,
         theirSong: activity.songTitle,
-        yourSong: userSongTitle
+        yourSong: userSongTitle,
+                matchTitle: activity.matchTitle  // ← Make sure this is here
+
     });
     
     message = championMessage.message;
@@ -3154,11 +3156,11 @@ async function checkMissedNotifications() {
     toShow.forEach((notification, index) => {
         setTimeout(() => {
             const hoursAgo = Math.floor((Date.now() - notification.timestamp) / (1000 * 60 * 60));
-            const timeAgo = hoursAgo < 1 
-                ? 'Just before you left' 
-                : hoursAgo < 24 
-                    ? `${hoursAgo}h ago` 
-                    : `${Math.floor(hoursAgo / 24)}d ago`;
+           const timeAgo = hoursAgo < 1 
+    ? 'Less than 1 hour ago'  // ← Better than "just before you left"
+    : hoursAgo < 24 
+        ? `${hoursAgo}h ago` 
+        : `${Math.floor(hoursAgo / 24)}d ago`;
             
             showBulletin({
                 priority: notification.priority,
@@ -3169,7 +3171,7 @@ async function checkMissedNotifications() {
                 triggerUserId: notification.triggerUserId,
                 thumbnailUrl: notification.thumbnailUrl,
                 message: notification.message, // ✅ Don't prefix "While you were away"
-                detail: `${timeAgo} • ${notification.detail}`,
+    detail: `${notification.detail} • ${timeAgo}`,  // ← Time at end
                 icon: notification.icon,
                 cta: notification.ctaText,
                 ctaText: notification.ctaText,
