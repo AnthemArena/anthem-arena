@@ -855,6 +855,8 @@ const lastShown = recentlyShownBulletins.get(bulletinKey);
                     ctaText: notification.cta,
                     ctaAction: notification.action || 'navigate',
                     targetUrl: notification.targetUrl || `/vote.html?match=${notification.matchId}`,
+                                severityTier: notification.severityTier, // ✅ ADD THIS!
+
                     shownAsToast: true
                 });
             }
@@ -2479,16 +2481,32 @@ window.dismissBulletin = function() {
     
     const matchId = currentBulletin.matchId;
     const type = currentBulletin.type;
+    const severityTier = currentBulletin.severityTier; // ✅ Get severity tier
     
-    // ✅ Dismiss ALL variations of this match alert
+    // ✅ Build dismissal keys with severity tier
     const dismissalKeys = [];
     
     if (type === 'danger' || type === 'danger-repeat') {
-        // Dismiss both danger types for this match
-        dismissalKeys.push(`danger-${matchId}`);
-        dismissalKeys.push(`danger-repeat-${matchId}`);
-    } else {
-        // Normal dismissal
+        // ✅ Dismiss both danger types for this match AND severity tier
+        if (severityTier) {
+            dismissalKeys.push(`danger-${matchId}-${severityTier}`);
+            dismissalKeys.push(`danger-repeat-${matchId}-${severityTier}`);
+        } else {
+            // Fallback if no severity tier (shouldn't happen for new alerts)
+            dismissalKeys.push(`danger-${matchId}`);
+            dismissalKeys.push(`danger-repeat-${matchId}`);
+        }
+    } 
+    else if (type === 'comeback' || type === 'nailbiter' || type === 'winning') {
+        // ✅ Include severity tier for other match alerts too
+        if (severityTier) {
+            dismissalKeys.push(`${type}-${matchId}-${severityTier}`);
+        } else {
+            dismissalKeys.push(`${type}-${matchId}`);
+        }
+    }
+    else {
+        // Normal dismissal for non-match alerts
         dismissalKeys.push(`${type}-${matchId}`);
     }
     
@@ -3375,6 +3393,8 @@ async function checkMissedNotifications() {
                 type: notification.type,
                 matchId: notification.matchId,
                 matchTitle: notification.matchTitle,
+                            severityTier: notification.severityTier, // ✅ ADD THIS!
+
                 username: notification.triggerUsername,
                 triggerUserId: notification.triggerUserId,
                 thumbnailUrl: notification.thumbnailUrl,
