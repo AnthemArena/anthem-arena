@@ -12,6 +12,8 @@ import { sendMessage } from './message-system.js';
 let isInitialized = false;
 let isPanelOpen = false;
 let currentTab = 'all';
+let isAnimating = false; // ✅ ADD THIS
+
 
 export async function initNotificationCenter() {
     // ✅ Exit if already initialized
@@ -57,14 +59,32 @@ export async function initNotificationCenter() {
     
     // ✅ Attach single click handler
     freshBell.addEventListener('click', async (e) => {
-        e.stopPropagation();
+        e.preventDefault();           // ✅ Prevent default
+                e.stopPropagation();          // ✅ Stop bubbling
+                        e.stopImmediatePropagation(); // ✅ Stop duplicate listeners
+
+                          // ✅ Ignore rapid clicks
+        if (isAnimating) {
+            console.log('⏭️ Click ignored - animation in progress');
+            return;
+        }
+
+
         console.log('🔔 Bell clicked, current state:', isPanelOpen);
+
+                isAnimating = true;
+
+
         
         if (isPanelOpen) {
             closePanel();
         } else {
             await openPanel();
         }
+       // ✅ Reset after animation completes
+        setTimeout(() => {
+            isAnimating = false;
+        }, 400); // Slightly longer than CSS transition
     });
     
     // Attach other listeners

@@ -278,22 +278,27 @@ async function updateNavProfile() {
         if (!username) {
             console.log('User has voted but no username - showing claim prompt');
             
-            navProfileCard.innerHTML = `
-                <div class="profile-claim-state">
-                    <div class="claim-icon">✨</div>
-                    <div class="claim-info">
-                        <div class="claim-title">Claim Your Profile!</div>
-                        <div class="claim-subtitle">Set username & avatar</div>
-                    </div>
-                    <div class="claim-arrow">→</div>
-                </div>
-                
-                <!-- ✅ Notification Bell for voters without username -->
-                <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: block;">
-                    <span style="font-size: 20px;">🔔</span>
-                    <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
-                </div>
-            `;
+           navProfileCard.innerHTML = `
+    <div class="profile-claim-state">
+        <div class="claim-icon">✨</div>
+        <div class="claim-info">
+            <div class="claim-title">Claim Your Profile!</div>
+            <div class="claim-subtitle">Set username & avatar</div>
+        </div>
+        <div class="claim-arrow">→</div>
+    </div>
+    
+    <!-- ✅ Wrap bell in non-clickable container -->
+    <div onclick="event.stopPropagation(); event.preventDefault();" 
+         style="position: relative; margin: 0 12px; display: block;">
+        <div class="notification-bell" id="notificationBell" 
+             style="position: relative; cursor: pointer; display: block;">
+            <span style="font-size: 20px;">🔔</span>
+            <span class="notification-badge" id="notificationBadge" 
+                  style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+        </div>
+    </div>
+`;
             
             navProfileCard.title = 'Click to set your username and claim your profile!';
             navProfileCard.style.cursor = 'pointer';
@@ -313,40 +318,46 @@ async function updateNavProfile() {
 
         console.log('Showing full profile for:', username);
 
-        // Update profile card HTML
-        navProfileCard.innerHTML = `
-            <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
-                <div class="profile-avatar" id="navProfileAvatar">
-                    ${avatar && avatar.type === 'url' 
-                        ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
-                               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                           <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
-                        : `<span class="nav-avatar-emoji">${avatar?.value || '🎵'}</span>`
-                    }
+     navProfileCard.innerHTML = `
+    <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
+        <div class="profile-avatar" id="navProfileAvatar">
+            ${avatar && avatar.type === 'url' 
+                ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                   <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
+                : `<span class="nav-avatar-emoji">${avatar?.value || '🎵'}</span>`
+            }
+        </div>
+        
+        <div class="profile-info">
+            <div class="profile-username" id="navProfileUsername">${username}</div>
+            <div class="profile-rank-mini">
+                <div class="rank-progress-bar">
+                    <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
                 </div>
-                
-                <div class="profile-info">
-                    <div class="profile-username" id="navProfileUsername">${username}</div>
-                    <div class="profile-rank-mini">
-                        <div class="rank-progress-bar">
-                            <div class="rank-progress-fill" id="navRankProgress" style="width: 0%"></div>
-                        </div>
-                        <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
-                    </div>
-                </div>
-            </a>
-            
-            <!-- ✅ Notification Bell -->
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: block;">
-                <span style="font-size: 20px;">🔔</span>
-                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                <span class="rank-level-text" id="navRankLevel">Lv. 1</span>
             </div>
-            
-            <!-- Settings Button -->
-            <button class="nav-settings-btn" onclick="window.openSettingsModal()" title="Profile Settings">
-                <i class="fas fa-cog"></i>
-            </button>
-        `;
+        </div>
+    </a>
+    
+    <!-- ✅ Wrap bell with click isolation -->
+    <div onclick="event.stopPropagation(); event.preventDefault();" 
+         style="position: relative; margin: 0 12px; display: block;">
+        <div class="notification-bell" id="notificationBell" 
+             style="position: relative; cursor: pointer; display: block;">
+            <span style="font-size: 20px;">🔔</span>
+            <span class="notification-badge" id="notificationBadge" 
+                  style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+        </div>
+    </div>
+    
+    <!-- ✅ Settings button with click isolation -->
+    <button class="nav-settings-btn" 
+            onclick="event.stopPropagation(); event.preventDefault(); window.openSettingsModal();" 
+            title="Profile Settings">
+        <i class="fas fa-cog"></i>
+    </button>
+`;
 
         // Remove any old onclick handlers
         navProfileCard.onclick = null;
