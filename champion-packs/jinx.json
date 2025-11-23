@@ -6,7 +6,7 @@
   "description": "Wild, unpredictable, and always ready to blow something up! Get ready for mayhem!",
   "buttonPrefix": "💣",
   "color": "#ff69b4",
-"theme": {
+  "theme": {
     "background": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg')",
     "backgroundSize": "cover",
     "backgroundPosition": "center 25%",
@@ -18,8 +18,8 @@
     "buttonHover": "linear-gradient(135deg, #ff1493, #c71585)",
     "buttonText": "#ffffff",
     "textShadow": "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 105, 180, 0.4)"
-},
- "alerts": {
+  },
+  "alerts": {
     "danger": {
       "messages": [
         "💥 Uh-oh! \"{songTitle}\" is getting blown to BITS!",
@@ -32,12 +32,12 @@
         "😈 Wait wait wait! \"{songTitle}\" is in DANGER!"
       ],
       "details": [
-        "Down {voteDiff} votes! Rules are made to be broken - let's flip this!",
+        "Down {voteDiff} votes in \"{matchTitle}\"! Rules are made to be broken!",
         "Behind {userPct}% to {opponentPct}% - time for EMERGENCY mayhem!",
-        "Losing by {voteDiff}! I'm getting antsy just watching!",
+        "Losing by {voteDiff} on \"{matchTitle}\"! I'm getting antsy!",
         "They're crushing us {opponentPct}% to {userPct}% - can't have that!",
         "Down {voteDiff} votes - my trigger finger's getting ITCHY!",
-        "Behind by {voteDiff} - time to blow stuff up!",
+        "Behind by {voteDiff} in \"{matchTitle}\" - time to blow stuff up!",
         "Trailing {userPct}% to {opponentPct}% - this is making me crazy!",
         "Getting hammered by {voteDiff} votes - any last words? Kidding!"
       ],
@@ -64,12 +64,12 @@
         "⚡ Can't... stop... WATCHING! \"{songTitle}\" is SO close!"
       ],
       "details": [
-        "Just {voteDiff} vote{voteDiffPlural} apart - I'm gonna EXPLODE from tension!",
+        "Just {voteDiff} vote{voteDiffPlural} apart on \"{matchTitle}\" - I'm gonna EXPLODE!",
         "{userPct}% to {opponentPct}% - somebody DO something!",
-        "Separated by only {voteDiff}! This is PEAK chaos!",
+        "Separated by only {voteDiff} in \"{matchTitle}\"! This is PEAK chaos!",
         "This is CRAZY close - like, really REALLY crazy!",
         "Only {voteDiff} vote{voteDiffPlural} between you and them!",
-        "Down to {voteDiff} vote{voteDiffPlural} - can you FEEL it?!",
+        "Down to {voteDiff} vote{voteDiffPlural} on \"{matchTitle}\" - can you FEEL it?!",
         "It's {userPct}% to {opponentPct}% - I can't TAKE this!",
         "Just {voteDiff} apart - my kind of mayhem!"
       ],
@@ -95,12 +95,12 @@
         "🎪 THIS is what I'm TALKING about! \"{songTitle}\" for the WIN!"
       ],
       "details": [
-        "Leading {userPct}% to {opponentPct}% - wanna celebrate with EXPLOSIONS?!",
+        "Leading {userPct}% to {opponentPct}% on \"{matchTitle}\" - FIREWORKS time!",
         "Up by {voteDiff} votes - time for FIREWORKS!",
         "Crushing it {userPct}% to {opponentPct}% - I'm so proud right now!",
-        "Ahead by {voteDiff} - rules were made to be broken, RIGHT?!",
+        "Ahead by {voteDiff} in \"{matchTitle}\" - rules were made to be broken!",
         "Winning {userPct}% to {opponentPct}% - this is BEAUTIFUL chaos!",
-        "Up {voteDiff} votes - BOOM BOOM BOOM!",
+        "Up {voteDiff} votes on \"{matchTitle}\" - BOOM BOOM BOOM!",
         "Leading by {voteDiff} - perfection looks like THIS!",
         "Dominating {userPct}% to {opponentPct}% - they never saw it coming!"
       ],
@@ -126,14 +126,14 @@
         "💥 Never counted out! \"{songTitle}\" just WON it back!"
       ],
       "details": [
-        "Was losing, now winning {userPct}% to {opponentPct}% - BOOM!",
+        "Was losing on \"{matchTitle}\", now winning {userPct}% to {opponentPct}% - BOOM!",
         "Total turnaround! Now at {userPct}% - chaos works!",
-        "From behind to AHEAD - rules? What rules?!",
+        "From behind to AHEAD on \"{matchTitle}\" - rules? What rules?!",
         "Plot twist achieved! I'm so proud of us right now!",
-        "They thought it was over - SURPRISE!",
+        "They thought it was over on \"{matchTitle}\" - SURPRISE!",
         "Flipped from losing to WINNING! Classic move!",
         "Was down, now UP {userPct}% to {opponentPct}%!",
-        "Comeback complete - that's how we do it!"
+        "Comeback complete on \"{matchTitle}\" - that's how we do it!"
       ],
       "buttons": [
         "Party Time! 🎉",
@@ -161,10 +161,11 @@
         "Team \"{songTitle}\" is getting STRONGER!",
         "You're not alone in this chaos!",
         "More friends means MORE mayhem!",
-        "Partners in crime!",
-        "Building an army!",
+        "Partners in crime on \"{matchTitle}\"!",
+        "Building an army for \"{matchTitle}\"!",
         "The squad is forming!",
-        "Two's better than one for causing chaos!"
+        "Two's better than one for causing chaos!",
+        "Both backing \"{songTitle}\" on \"{matchTitle}\"!"
       ],
       "buttons": [
         "High Five! 🙌",
@@ -187,16 +188,16 @@
         "💣 {username} just declared WAR!",
         "🔥 {username} backed \"{theirSong}\" - let's BLOW 'EM UP!"
       ],
-  "details": [
-  "They chose \"{theirSong}\" vs your \"{yourSong}\" - wanna settle this?",
-  "Time to show 'em what happens when they pick wrong!",
-  "The battle is ON! Rules? What rules?!",
-  "Different sides on \"{matchTitle}\" - may the best song EXPLODE!",  
-  "It's you vs them now on \"{matchTitle}\"!",  
-  "Let's get dangerous!",
-  "\"{theirSong}\" vs \"{yourSong}\" - BOOM TIME!",
-  "They wanna fight? Let's FIGHT!"
-],
+      "details": [
+        "They chose \"{theirSong}\" vs your \"{yourSong}\" - wanna settle this?",
+        "Time to show 'em what happens when they pick wrong!",
+        "The battle is ON! Rules? What rules?!",
+        "Different sides on \"{matchTitle}\" - may the best song EXPLODE!",
+        "It's you vs them now on \"{matchTitle}\"!",
+        "Let's get dangerous!",
+        "\"{theirSong}\" vs \"{yourSong}\" on \"{matchTitle}\" - BOOM TIME!",
+        "They wanna fight? Let's FIGHT!"
+      ],
       "buttons": [
         "View Battle! ⚔️",
         "Show 'Em! 💥",
@@ -361,9 +362,9 @@
     
     "novotes": {
       "messages": [
-        "🆘 EMERGENCY! ZERO votes!",
+        "🆘 EMERGENCY! ZERO votes on \"{matchTitle}\"!",
         "😱 NOBODY voted yet! This is SAD!",
-        "💣 Uh-oh! This match is EMPTY!",
+        "💣 Uh-oh! \"{matchTitle}\" is EMPTY!",
         "🎪 Yikes! Someone needs to START this party!"
       ],
       "details": [
@@ -382,9 +383,9 @@
     
     "lowvotes": {
       "messages": [
-        "⚠️ This match needs MORE!",
+        "⚠️ \"{matchTitle}\" needs MORE!",
         "😬 Only {totalVotes} vote{votesPlural}?! Boooring!",
-        "💥 This match is DYING!",
+        "💥 \"{matchTitle}\" is DYING!",
         "🎪 Too quiet! Needs MORE ACTION!"
       ],
       "details": [
@@ -421,45 +422,46 @@
         "Get Jinxed! 😈"
       ]
     },
+    
     "round-opening": {
-  "messages": [
-    "🎪 ROUND {round} IS LIVE!",
-    "💥 NEW ROUND! Time to blow stuff up!",
-    "🔥 ROUND {round} BEGINS NOW!",
-    "😈 Fresh chaos! Round {round} is HERE!"
-  ],
-  "details": [
-    "{matchCount} new matches just dropped! Let's cause mayhem!",
-    "Time to vote! {matchCount} fresh battles!",
-    "Get in there! {matchCount} matches waiting!",
-    "{matchCount} new targets locked and loaded!"
-  ],
-  "buttons": [
-    "Start Voting! 💥",
-    "View Matches! 🎪",
-    "Let's GO! 🔥"
-  ]
-},
+      "messages": [
+        "🎪 ROUND {round} IS LIVE!",
+        "💥 NEW ROUND! Time to blow stuff up!",
+        "🔥 ROUND {round} BEGINS NOW!",
+        "😈 Fresh chaos! Round {round} is HERE!"
+      ],
+      "details": [
+        "{matchCount} new matches just dropped! Let's cause mayhem!",
+        "Time to vote! {matchCount} fresh battles!",
+        "Get in there! {matchCount} matches waiting!",
+        "{matchCount} new targets locked and loaded!"
+      ],
+      "buttons": [
+        "Start Voting! 💥",
+        "View Matches! 🎪",
+        "Let's GO! 🔥"
+      ]
+    },
 
-"new-matches": {
-  "messages": [
-    "💥 NEW MATCHES just dropped!",
-    "🎪 MORE CHAOS incoming!",
-    "🔥 Fresh battles are LIVE!",
-    "😈 Hehe~ More targets!"
-  ],
-  "details": [
-    "{matchCount} new matches in Round {round}!",
-    "{matchCount} more songs to judge!",
-    "Round {round} just got bigger!",
-    "More mayhem! {matchCount} new matchups!"
-  ],
-  "buttons": [
-    "Check 'Em Out! 💥",
-    "Vote Now! 🎪",
-    "Let's Go! 🔥"
-  ]
-},
+    "new-matches": {
+      "messages": [
+        "💥 NEW MATCHES just dropped!",
+        "🎪 MORE CHAOS incoming!",
+        "🔥 Fresh battles are LIVE!",
+        "😈 Hehe~ More targets!"
+      ],
+      "details": [
+        "{matchCount} new matches in Round {round}!",
+        "{matchCount} more songs to judge!",
+        "Round {round} just got bigger!",
+        "More mayhem! {matchCount} new matchups!"
+      ],
+      "buttons": [
+        "Check 'Em Out! 💥",
+        "Vote Now! 🎪",
+        "Let's Go! 🔥"
+      ]
+    },
     
     "encouragement": {
       "messages": [
@@ -481,27 +483,28 @@
         "Go! 🔥"
       ]
     },
+    
     "match-tied": {
-  "messages": [
-    "😬 TIE GAME! \"{songTitle}\" split 50/50!",
-    "🎪 NOBODY wins! It's a PERFECT tie!",
-    "💥 STALEMATE! Both songs dead even!",
-    "🤷 Hehe~ Tied! Nobody wins, nobody loses!"
-  ],
-  "details": [
-    "Your vote couldn't break the tie!",
-    "Perfectly balanced - as all things should be!",
-    "50/50 split - pure chaos!",
-    "Couldn't decide? Neither could they!"
-  ],
-  "buttons": [
-    "View Results! 📊",
-    "See Bracket! 🏆",
-    "Next Match! 🔥",
-    "Oh Well! 🤷"
-  ]
-}
-},
+      "messages": [
+        "😬 TIE GAME! \"{songTitle}\" split 50/50!",
+        "🎪 NOBODY wins! It's a PERFECT tie!",
+        "💥 STALEMATE! Both songs dead even!",
+        "🤷 Hehe~ Tied! Nobody wins, nobody loses!"
+      ],
+      "details": [
+        "Your vote couldn't break the tie on \"{matchTitle}\"!",
+        "Perfectly balanced on \"{matchTitle}\" - as all things should be!",
+        "50/50 split - pure chaos!",
+        "Couldn't decide? Neither could they!"
+      ],
+      "buttons": [
+        "View Results! 📊",
+        "See Bracket! 🏆",
+        "Next Match! 🔥",
+        "Oh Well! 🤷"
+      ]
+    }
+  },
   
   "achievements": {
     "opening-act": {
@@ -608,537 +611,224 @@
         "Keep Going! 🎪"
       ]
     },
+    
     "world-tour": {
-  "messages": [
-    "🌍 TEN votes! You're going GLOBAL!",
-    "💥 World Tour unlocked!",
-    "🎪 TEN down! The world is YOURS!"
-  ],
-  "details": [
-    "Spreading chaos worldwide! +{xp} XP",
-    "Ten votes! BOOM! +{xp} XP",
-    "Keep the tour going! +{xp} XP earned"
-  ],
-  "buttons": [
-    "More Chaos! 💥",
-    "Keep Going! 🎪",
-    "Continue! 🔥"
-  ]
-},
-
-"headliner": {
-  "messages": [
-    "⭐ HEADLINER! 25 votes!",
-    "💥 You're the MAIN EVENT!",
-    "🎪 25 votes! TOP BILLING!"
-  ],
-  "details": [
-    "You're the star now! +{xp} XP",
-    "This is YOUR show! +{xp} XP earned",
-    "Headliner status! +{xp} XP"
-  ],
-  "buttons": [
-    "Rock On! 🎸",
-    "More! 💥",
-    "Continue! 🎪"
-  ]
-},
-
-"chart-topper": {
-  "messages": [
-    "📈 CHART TOPPER! 100 votes!",
-    "💥 A HUNDRED! You're INSANE!",
-    "🎪 100 votes of pure MAYHEM!"
-  ],
-  "details": [
-    "You're at the TOP! +{xp} XP",
-    "This is LEGENDARY! +{xp} XP earned",
-    "Can't stop won't stop! +{xp} XP"
-  ],
-  "buttons": [
-    "Celebrate! 🎉",
-    "Keep Going! 💥",
-    "More! 🔥"
-  ]
-},
-
-"hall-of-fame": {
-  "messages": [
-    "👑 HALL OF FAME! 250 votes!",
-    "💎 TWO HUNDRED FIFTY! You're a LEGEND!",
-    "🏆 You made HISTORY!"
-  ],
-  "details": [
-    "You're IMMORTAL now! +{xp} XP",
-    "This is LEGENDARY status! +{xp} XP",
-    "Nobody's EVER done this! +{xp} XP earned"
-  ],
-  "buttons": [
-    "BOW DOWN! 👑",
-    "View Stats! 📊",
-    "Celebrate! 🎉"
-  ]
-},
-
-"on-fire": {
-  "messages": [
-    "🔥 ON FIRE! 3 days straight!",
-    "💥 Three days! You're heating UP!",
-    "🎪 Streak starting! THREE days!"
-  ],
-  "details": [
-    "Keep the fire burning! +{xp} XP",
-    "Three in a row! +{xp} XP earned",
-    "Don't stop now! +{xp} XP"
-  ],
-  "buttons": [
-    "Continue! 🔥",
-    "More Votes! 💥",
-    "Keep Going! 🎪"
-  ]
-},
-
-"unstoppable": {
-  "messages": [
-    "⚡ UNSTOPPABLE! 14 days!",
-    "💥 TWO WEEKS! You're CRAZY!",
-    "🎪 14-day streak! Can't STOP you!"
-  ],
-  "details": [
-    "This is DEDICATION! +{xp} XP",
-    "Truly unstoppable! +{xp} XP earned",
-    "The streak continues! +{xp} XP"
-  ],
-  "buttons": [
-    "Keep Going! ⚡",
-    "View Streak! 📊",
-    "Continue! 🔥"
-  ]
-},
-
-"legendary-streak": {
-  "messages": [
-    "👑 LEGENDARY! 30 DAYS STRAIGHT!",
-    "💎 THIRTY DAYS! You're IMMORTAL!",
-    "🏆 A MONTH! This is HISTORIC!"
-  ],
-  "details": [
-    "You're a LIVING LEGEND! +{xp} XP",
-    "30 days of CHAOS! +{xp} XP earned",
-    "I'm actually IMPRESSED! +{xp} XP"
-  ],
-  "buttons": [
-    "BOW DOWN! 👑",
-    "View Stats! 📊",
-    "PARTY! 🎉"
-  ]
-},
-
-"dark-horse": {
-  "messages": [
-    "🐴 DARK HORSE! 15 underdogs!",
-    "💥 You LOVE the longshots!",
-    "🎪 15 underdog picks! BOLD!"
-  ],
-  "details": [
-    "Supporting the chaos! +{xp} XP",
-    "Unpredictable! +{xp} XP earned",
-    "This is MY style! +{xp} XP"
-  ],
-  "buttons": [
-    "More Chaos! 💥",
-    "View Progress! 👀",
-    "Keep Going! 🎪"
-  ]
-},
-
-"rebel-heart": {
-  "messages": [
-    "💔 REBEL HEART! 30 underdogs!",
-    "💥 You're a TRUE rebel!",
-    "🎪 30 underdog votes! RESPECT!"
-  ],
-  "details": [
-    "Rules? WHAT RULES?! +{xp} XP",
-    "Pure rebellion! +{xp} XP earned",
-    "This is PERFECT! +{xp} XP"
-  ],
-  "buttons": [
-    "Rebel On! 💥",
-    "View All! 🏆",
-    "More Chaos! 🎪"
-  ]
-},
-"triple-threat": {
-  "messages": [
-    "⚡ THREE in one go! You're on a ROLL!",
-    "💥 TRIPLE THREAT! Keep going!",
-    "🎪 Three votes! This is FUN!"
-  ],
-  "details": [
-    "You're getting the hang of this! +{xp} XP",
-    "Three down! MORE! +{xp} XP earned",
-    "The chaos BUILDS! +{xp} XP"
-  ],
-  "buttons": [
-    "More! 💥",
-    "Keep Going! 🎪",
-    "Continue! 🔥"
-  ]
-},
-
-"vote-spree": {
-  "messages": [
-    "🔥 FIVE IN A ROW! You're UNSTOPPABLE!",
-    "💥 VOTE SPREE! I LOVE IT!",
-    "🎪 Five votes! You can't STOP!"
-  ],
-  "details": [
-    "This is getting EXCITING! +{xp} XP",
-    "You're on FIRE! +{xp} XP earned",
-    "Keep the spree alive! +{xp} XP"
-  ],
-  "buttons": [
-    "MORE CHAOS! 💥",
-    "Keep Voting! 🔥",
-    "Don't Stop! 🎪"
-  ]
-},
-
-"power-voter": {
-  "messages": [
-    "🚀 TEN VOTES! You're a MACHINE!",
-    "💥 POWER VOTER! This is INSANE!",
-    "🎪 TEN in one session! WOW!"
-  ],
-  "details": [
-    "You're UNSTOPPABLE! +{xp} XP",
-    "This is PEAK chaos! +{xp} XP earned",
-    "Can't stop won't stop! +{xp} XP"
-  ],
-  "buttons": [
-    "KEEP GOING! 💥",
-    "More Mayhem! 🔥",
-    "Continue! 🎪"
-  ]
-},
-
-"voting-marathon": {
-  "messages": [
-    "🏆 TWENTY VOTES! You're a LEGEND!",
-    "💎 VOTING MARATHON! This is HISTORIC!",
-    "👑 TWENTY in one go! I'm IMPRESSED!"
-  ],
-  "details": [
-    "This is LEGENDARY! +{xp} XP",
-    "You're IMMORTAL now! +{xp} XP earned",
-    "Nobody does this! +{xp} XP"
-  ],
-  "buttons": [
-    "BOW DOWN! 👑",
-    "View Stats! 📊",
-    "CELEBRATE! 🎉"
-  ]
-},
-
-"founding-member": {
-  "messages": [
-    "👑 FOUNDING MEMBER!",
-    "💎 You were HERE from the START!",
-    "🎪 OG voter! You're LEGENDARY!"
-  ],
-  "details": [
-    "You're part of HISTORY! +{xp} XP",
-    "Original chaos-causer! +{xp} XP earned",
-    "This is SPECIAL! +{xp} XP"
-  ],
-  "buttons": [
-    "View Badge! 👑",
-    "See Stats! 📊",
-    "Celebrate! 🎉"
-  ]
-},
-
-"match-tied": {
-  "messages": [
-    "🤷 SPLIT DECISION! Perfect tie!",
-    "😬 Hehe~ Nobody wins, nobody loses!",
-    "🎪 TIE GAME! Chaos perfected!",
-    "💥 50/50! The ultimate stalemate!"
-  ],
-  "details": [
-    "Your match ended in a perfect tie! +{xp} XP",
-    "Perfectly balanced chaos! +{xp} XP",
-    "Nobody could decide! +{xp} XP"
-  ],
-  "buttons": [
-    "Oh Well! 🤷",
-    "Next Match! 🔥",
-    "View Results! 📊"
-  ]
-},
-
-    "first-blood": {
       "messages": [
-        "FIRST BLOOD! You just drew first blood, baby!",
-        "Hehe~ Someone’s gotta start the explosion!",
-        "BOOM! The very first vote EVER! You’re MY kind of crazy!",
-        "Welcome to the chaos. You just lit the fuse!"
+        "🌍 TEN votes! You're going GLOBAL!",
+        "💥 World Tour unlocked!",
+        "🎪 TEN down! The world is YOURS!"
       ],
       "details": [
-        "You’re the first one to pull the trigger! +500 XP",
-        "History made. Explosions incoming. +500 XP",
-        "The very first vote on the site… and it was YOU! +500 XP"
+        "Spreading chaos worldwide! +{xp} XP",
+        "Ten votes! BOOM! +{xp} XP",
+        "Keep the tour going! +{xp} XP earned"
       ],
       "buttons": [
-        "Light It Up!",
-        "More Chaos!",
-        "I’m Just Getting Started!"
+        "More Chaos! 💥",
+        "Keep Going! 🎪",
+        "Continue! 🔥"
       ]
     },
-    
 
-    "daily-comeback": {
+    "headliner": {
       "messages": [
-        "WELCOME BACK, PSYCHO!",
-        "Thought you could escape the chaos? WRONG!",
-        "Missed me? I missed YOU! Let’s blow something up!",
-        "Took you long enough! Now VOTE!"
+        "⭐ HEADLINER! 25 votes!",
+        "💥 You're the MAIN EVENT!",
+        "🎪 25 votes! TOP BILLING!"
       ],
       "details": [
-        "Absent for {days} days — now you’re back for mayhem! +300 XP",
-        "You can’t quit me that easy! +300 XP"
+        "You're the star now! +{xp} XP",
+        "This is YOUR show! +{xp} XP earned",
+        "Headliner status! +{xp} XP"
       ],
       "buttons": [
-        "Cause Chaos!",
-        "I’m Back Baby!",
-        "Vote NOW!"
+        "Rock On! 🎸",
+        "More! 💥",
+        "Continue! 🎪"
+      ]
+    },
+
+    "chart-topper": {
+      "messages": [
+        "📈 CHART TOPPER! 100 votes!",
+        "💥 A HUNDRED! You're INSANE!",
+        "🎪 100 votes of pure MAYHEM!"
+      ],
+      "details": [
+        "You're at the TOP! +{xp} XP",
+        "This is LEGENDARY! +{xp} XP earned",
+        "Can't stop won't stop! +{xp} XP"
+      ],
+      "buttons": [
+        "Celebrate! 🎉",
+        "Keep Going! 💥",
+        "More! 🔥"
+      ]
+    },
+
+    "hall-of-fame": {
+      "messages": [
+        "👑 HALL OF FAME! 250 votes!",
+        "💎 TWO HUNDRED FIFTY! You're a LEGEND!",
+        "🏆 You made HISTORY!"
+      ],
+      "details": [
+        "You're IMMORTAL now! +{xp} XP",
+        "This is LEGENDARY status! +{xp} XP",
+        "Nobody's EVER done this! +{xp} XP earned"
+      ],
+      "buttons": [
+        "BOW DOWN! 👑",
+        "View Stats! 📊",
+        "Celebrate! 🎉"
+      ]
+    },
+
+    "on-fire": {
+      "messages": [
+        "🔥 ON FIRE! 3 days straight!",
+        "💥 Three days! You're heating UP!",
+        "🎪 Streak starting! THREE days!"
+      ],
+      "details": [
+        "Keep the fire burning! +{xp} XP",
+        "Three in a row! +{xp} XP earned",
+        "Don't stop now! +{xp} XP"
+      ],
+      "buttons": [
+        "Continue! 🔥",
+        "More Votes! 💥",
+        "Keep Going! 🎪"
+      ]
+    },
+
+    "unstoppable": {
+      "messages": [
+        "⚡ UNSTOPPABLE! 14 days!",
+        "💥 TWO WEEKS! You're CRAZY!",
+        "🎪 14-day streak! Can't STOP you!"
+      ],
+      "details": [
+        "This is DEDICATION! +{xp} XP",
+        "Truly unstoppable! +{xp} XP earned",
+        "The streak continues! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep Going! ⚡",
+        "View Streak! 📊",
+        "Continue! 🔥"
+      ]
+    },
+
+  
+
+    "legendary-streak": {
+      "messages": [
+        "👑 LEGENDARY STREAK! 30 DAYS!",
+        "💎 THIRTY DAYS! You're IMMORTAL!",
+        "🏆 A MONTH! This is UNBREAKABLE!"
+      ],
+      "details": [
+        "This is HISTORY! +{xp} XP",
+        "You're a LEGEND! +{xp} XP earned",
+        "Nobody's EVER done this! +{xp} XP"
+      ],
+      "buttons": [
+        "LEGENDARY! 👑",
+        "View Glory! 💎",
+        "Celebrate! 🎉"
       ]
     },
 
     "match-won": {
       "messages": [
-        "KABOOM! \"{songTitle}\" JUST WON!",
-        "We did it! We actually did it! EXPLOSIONS EVERYWHERE!",
-        "Told you we’d blow them away!",
-        "Your vote helped burn the place down — PERFECT!"
+        "🎉 \"{songTitle}\" WON!",
+        "💥 YES! \"{songTitle}\" DESTROYED them!",
+        "😈 Hehe! \"{songTitle}\" made it through!",
+        "🔥 \"{songTitle}\" is ADVANCING!",
+        "🎪 Your pick WON! \"{songTitle}\" rules!",
+        "💣 BOOM! \"{songTitle}\" blew them away!"
       ],
       "details": [
-        "Your vote helped destroy the competition! +200 XP",
-        "Victory tastes like gunpowder and candy! +200 XP"
+        "Your pick advanced to the next round on \"{matchTitle}\"! +{xp} XP",
+        "\"{songTitle}\" moves on • Chaos successful! +{xp} XP",
+        "Victory on \"{matchTitle}\"! Your song survives! +{xp} XP",
+        "Match won! \"{songTitle}\" crushed it! +{xp} XP earned",
+        "Advancing from \"{matchTitle}\"! Rules? What rules?! +{xp} XP"
       ],
       "buttons": [
-        "Celebrate Victory!",
-        "Next Target!",
-        "Watch It Burn!"
+        "See Results! 🏆",
+        "View Bracket! 📊",
+        "Celebrate! 🎉",
+        "More Chaos! 💥"
       ]
     },
-
+    
     "match-lost": {
       "messages": [
-        "…Well that sucked.",
-        "They got lucky. NEXT TIME WE BURN EVERYTHING.",
-        "Don’t be sad! Be DANGEROUS!",
-        "Okay okay… new plan: bigger bombs."
+        "💔 \"{songTitle}\" didn't make it...",
+        "😈 They got lucky. \"{songTitle}\" deserved better!",
+        "…Well that sucked. RIP \"{songTitle}\"",
+        "Don't be sad about \"{songTitle}\" — be DANGEROUS!",
+        "💥 Oof! \"{songTitle}\" got eliminated!",
+        "🎪 Aww~ \"{songTitle}\" is out. Next time!"
       ],
       "details": [
-        "Better luck next explosion! +50 XP anyway",
-        "We’ll get ’em next time. Promise."
+        "Your pick got eliminated from \"{matchTitle}\" • Better luck next explosion! +{xp} XP",
+        "\"{songTitle}\" is out of the tournament, but we'll get 'em next time! +{xp} XP",
+        "Eliminated from \"{matchTitle}\" • +{xp} XP for trying!",
+        "Match closed on \"{matchTitle}\" • Time to cause NEW chaos! +{xp} XP",
+        "\"{songTitle}\" didn't survive \"{matchTitle}\" • +{xp} XP anyway!"
       ],
       "buttons": [
-        "Revenge Vote!",
-        "Start New Chaos!",
-        "Plot Revenge!"
+        "See Results! 📊",
+        "View Bracket! 🏆",
+        "Vote on New Match! 🔥",
+        "Find New Target! 🎯",
+        "Oh Well! 🤷"
       ]
     },
 
-    "level-up": {
+    "prediction-correct": {
       "messages": [
-        "LEVEL {level}! You’re getting DANGEROUS!",
-        "Ding ding ding! Level {level} unlocked — respect!",
-        "Look who’s climbing the chaos ladder!",
-        "Level {level}? Oh we’re just getting started~"
+        "🎯 YOU CALLED IT! \"{songTitle}\" won like you said!",
+        "💥 NAILED IT! Your prediction was RIGHT!",
+        "😈 Hehe! You KNEW \"{songTitle}\" would win!",
+        "🎪 BOOM! Prediction perfect!"
       ],
       "details": [
-        "Level {level} achieved • +{xp} XP",
-        "More power = more things to blow up!"
+        "You predicted \"{songTitle}\" would win on \"{matchTitle}\" - and it DID! +{xp} XP",
+        "Called it on \"{matchTitle}\"! +{xp} XP earned",
+        "Your prediction came true! +{xp} XP",
+        "Fortune teller! +{xp} XP for being right!"
       ],
       "buttons": [
-        "Show Off!",
-        "View Profile!",
-        "Next Level NOW!"
+        "Celebrate! 🎉",
+        "See Results! 📊",
+        "Make More! 🎯",
+        "View Stats! 👀"
       ]
     },
 
-    "last-second-hero": {
+    "prediction-wrong": {
       "messages": [
-        "YOU TIED/IT FLIPPED AT THE LAST SECOND!",
-        "CLUTCH! You absolute MANIAC!",
-        "I can’t believe you just did that!",
-        "ONE VOTE. ONE MOMENT. TOTAL CHAOS!"
+        "😬 Oops! You picked \"{songTitle}\" but they LOST!",
+        "💥 Plot twist! \"{songTitle}\" didn't make it!",
+        "🎪 Aww~ Your prediction missed!",
+        "🤷 Can't win 'em all! \"{songTitle}\" lost!"
       ],
       "details": [
-        "Single-handedly saved the match! +1000 XP",
-        "You’re the reason rules exist to be broken!"
+        "Your prediction was wrong on \"{matchTitle}\" • +{xp} XP for trying!",
+        "\"{songTitle}\" didn't win like you thought • +{xp} XP anyway",
+        "Better luck next time! +{xp} XP earned",
+        "Prediction missed on \"{matchTitle}\" • +{xp} XP"
       ],
       "buttons": [
-        "I’m a Legend!",
-        "Watch Replay!",
-        "Do It Again!"
-      ]
-    },
-        "tournament-first-blood": {
-      "messages": [
-        "FIRST BLOOD OF THE TOURNAMENT!",
-        "You just fired the opening shot of the entire tournament!",
-        "BOOM! Tournament’s officially started — because of YOU!",
-        "The very first vote this tournament? That’s MINE now!"
-      ],
-      "details": [
-        "You started the whole explosion chain! +750 XP",
-        "Tournament ignition complete. Chaos level: maximum. +750 XP"
-      ],
-      "buttons": [
-        "Start the Fireworks!",
-        "Claim Your Glory!",
-        "Keep Blowing It Up!"
-      ]
-    },
-
-    "round-first-blood": {
-      "messages": [
-        "FIRST BLOOD THIS ROUND!",
-        "Round {round} just started with a BANG — your vote!",
-        "New round, same chaos. You’re first again!",
-        "Hehe~ Round {round} belongs to us now!"
-      ],
-      "details": [
-        "First vote of Round {round} — you own this one! +400 XP",
-        "Round {round} ignited! Let’s burn it down! +400 XP"
-      ],
-      "buttons": [
-        "Dominate This Round!",
-        "More Explosions!",
-        "Lead the Chaos!"
-      ]
-    },
-
-    "daily-session-kickoff": {
-      "messages": [
-        "TODAY’S FIRST VOTE — LET’S MAKE IT COUNT!",
-        "Morning, psycho! Time to blow up the leaderboard!",
-        "First vote of the day? That’s the spirit!",
-        "Daily chaos quota: ACTIVATED!"
-      ],
-      "details": [
-        "Your first vote today — the mayhem begins anew! +150 XP",
-        "Day started right: with explosions. +150 XP"
-      ],
-      "buttons": [
-        "Start the Rampage!",
-        "Keep the Streak!",
-        "More Votes NOW!"
-      ]
-    },
-
-    "default": {
-      "messages": [
-        "Achievement unlocked: {name}!",
-        "You got {name}!",
-        "Congrats! {name} unlocked!",
-        "{name} achieved!"
-      ],
-      "details": [
-        "{description} • +{xp} XP",
-        "Nice work! +{xp} XP earned",
-        "{description} • +{xp} XP",
-        "Achievement complete! +{xp} XP"
-      ],
-      "buttons": [
-        "View All!",
-        "See Progress!",
-        "Check It Out!",
-        "View Achievements!"
-      ]
-    }
-  },
-  "welcomeDialogs": {
-    "welcome-first-time": {
-      "messages": [
-        "Welcome to the chaos, fresh meat!",
-        "First time? Don't worry, explosions are easy!",
-        "NEW PSYCHO ALERT! Let's blow something up!",
-        "Hehe~ Someone new to corrupt! This'll be FUN!"
-      ],
-      "details": [
-        "Your first visit - let's make it EXPLOSIVE!",
-        "Time to learn what real chaos looks like!",
-        "Fresh meat for the grinder! 💥"
-      ],
-      "buttons": [
-        "Start Voting!",
-        "Show Me Around!",
-        "Let's Go!"
-      ]
-    },
-    
-    "welcome-streak": {
-      "messages": [
-        "Back AGAIN?! You're MY kind of crazy!",
-        "Two days in a row! Now we're talking!",
-        "Daily streak maintained! Keep the chaos going!",
-        "Hehe~ You can't stay away, can you?"
-      ],
-      "details": [
-        "Daily streak active - you're on fire! 🔥",
-        "Consistent chaos - I LOVE it!",
-        "Keep this up and you'll be legendary!"
-      ],
-      "buttons": [
-        "Continue Streak!",
-        "More Chaos!",
-        "Let's Vote!"
-      ]
-    },
-    
-    "welcome-comeback": {
-      "messages": [
-        "Took you {days} days to come back?! Thought you could escape? WRONG!",
-        "Where've you BEEN?! The chaos missed you!",
-        "Finally! I was getting BORED without you!",
-        "Welcome back, psycho! Let's make up for lost time!"
-      ],
-      "details": [
-        "Absent for {days} days - time to catch up on the mayhem!",
-        "The chaos kept going without you - but it's better WITH you!",
-        "Ready to rejoin the explosion party?"
-      ],
-      "buttons": [
-        "Rejoin the Chaos!",
-        "I'm Back!",
-        "Catch Me Up!"
-      ]
-    },
-    
-    "welcome-back": {
-      "messages": [
-        "You're back! Ready for more explosions?",
-        "Hey hey! Missed the chaos, didn't you?",
-        "Welcome back! Let's blow something up!",
-        "Another day, another explosion! Let's GO!"
-      ],
-      "details": [
-        "Good to see you again - let's make today explosive!",
-        "The voting arena awaits!",
-        "Time to cause some musical mayhem!"
-      ],
-      "buttons": [
-        "Start Voting!",
-        "Let's Go!",
-        "Show Me What's New!"
+        "See Results! 📊",
+        "Try Again! 🎯",
+        "Oh Well! 🤷",
+        "Next Match! 🔥"
       ]
     }
   }
-
 }
-  
