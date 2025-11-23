@@ -10,18 +10,21 @@
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="League of Legends Music Tournament | Anthem Arena">
     <meta property="og:description" content="Vote for your favorite League of Legends songs! Worlds anthems vs champion themes in epic matchups.">
-    <meta property="og:image" content="https://your-domain.com/assets/og-image.jpg">
-    <meta property="og:url" content="https://your-domain.com">
+    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+    <meta property="og:url" content="https://anthemarena.com">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="League of Legends Music Tournament">
     <meta name="twitter:description" content="Vote for your favorite LoL songs in epic bracket-style matchups!">
-    <meta name="twitter:image" content="https://your-domain.com/assets/twitter-card.jpg">
+    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,124 +32,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="homepage.css">
-    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/homepage.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/settings.css">
     
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "League Music Tournament",
-        "url": "https://your-domain.com",
+        "name": "Anthem Arena",
+        "url": "https://anthemarena.com",
         "description": "Vote for your favorite League of Legends songs in tournament-style matchups"
     }
     </script>
+
+    <!-- ✅ CRITICAL: Load notification system in HEAD -->
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
 <body>
 
     <!-- NAVIGATION -->
-    <nav class="main-nav" id="mainNav">
-        <div class="nav-container">
-            <div class="nav-left">
-                <a href="index.html" class="nav-logo">
-                    <i class="fa-solid fa-trophy"></i>
-                    <span>ANTHEM ARENA</span>
-                </a>
-            </div>
-            
-            <div class="nav-center">
-                <a href="index.html" class="nav-link active">
-                    <i class="fa-solid fa-home"></i>
-                    <span>Home</span>
-                </a>
-                <a href="bracket.html" class="nav-link">
-                    <i class="fa-solid fa-sitemap"></i>
-                    <span>Bracket</span>
-                </a>
-                <a href="matches.html" class="nav-link">
-                    <i class="fa-solid fa-fire"></i>
-                    <span>Matches</span>
-                </a>
-                <a href="songs.html" class="nav-link">
-                    <i class="fa-solid fa-music"></i>
-                    <span>Songs</span>
-                </a>
-                <a href="feed.html" class="nav-link">
-                    <i class="fa-solid fa-comments"></i>
-                    <span>Feed</span>
-                </a>
-                <a href="activity.html" class="nav-link">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>Activity</span>
-                </a>
-                <a href="leaderboard.html" class="nav-link">
-                    <i class="fa-solid fa-ranking-star"></i>
-                    <span>Leaderboard</span>
-                </a>
-            </div>
-            
-            <div class="nav-right">
-                <!-- Notification Bell -->
-                <button class="nav-icon-btn" id="notificationBell" title="Notifications">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-                </button>
-                
-                <!-- User Profile -->
-                <div class="nav-user" id="navUser">
-                    <img src="" alt="Avatar" id="navAvatar" class="nav-avatar">
-                    <span id="navUsername">Guest</span>
-                    <i class="fa-solid fa-chevron-down"></i>
-                </div>
-                
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="index.html" class="mobile-menu-link active">
-                <i class="fa-solid fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="bracket.html" class="mobile-menu-link">
-                <i class="fa-solid fa-sitemap"></i>
-                <span>Bracket</span>
-            </a>
-            <a href="matches.html" class="mobile-menu-link">
-                <i class="fa-solid fa-fire"></i>
-                <span>Matches</span>
-            </a>
-            <a href="songs.html" class="mobile-menu-link">
-                <i class="fa-solid fa-music"></i>
-                <span>Songs</span>
-            </a>
-            <a href="feed.html" class="mobile-menu-link">
-                <i class="fa-solid fa-comments"></i>
-                <span>Feed</span>
-            </a>
-            <a href="activity.html" class="mobile-menu-link">
-                <i class="fa-solid fa-bolt"></i>
-                <span>Activity</span>
-            </a>
-            <a href="leaderboard.html" class="mobile-menu-link">
-                <i class="fa-solid fa-ranking-star"></i>
-                <span>Leaderboard</span>
-            </a>
-        </div>
-    </nav>
+    <div id="nav-placeholder"></div>
+    <script type="module" src="/js/navigation.js"></script>
 
-    <!-- User Dropdown Menu -->
+    <!-- User Dropdown Menu (if not included in navigation.js) -->
     <div class="user-dropdown" id="userDropdown">
-        <a href="profile.html" class="dropdown-item">
+        <a href="/profile.html" class="dropdown-item">
             <i class="fa-solid fa-user"></i>
             <span>My Profile</span>
         </a>
@@ -175,7 +95,7 @@
             </p>
             <div class="hero-stats">
                 <div class="hero-stat">
-                    <span class="hero-stat-value" id="heroTotalSongs">128</span>
+                    <span class="hero-stat-value" id="heroTotalSongs">64</span>
                     <span class="hero-stat-label">Songs</span>
                 </div>
                 <div class="hero-stat">
@@ -188,11 +108,11 @@
                 </div>
             </div>
             <div class="hero-cta">
-                <a href="matches.html" class="btn-primary btn-large">
+                <a href="/matches.html" class="btn-primary btn-large">
                     <i class="fa-solid fa-fire"></i>
                     Vote Now
                 </a>
-                <a href="bracket.html" class="btn-secondary btn-large">
+                <a href="/brackets.html" class="btn-secondary btn-large">
                     <i class="fa-solid fa-sitemap"></i>
                     View Bracket
                 </a>
@@ -209,7 +129,7 @@
                 </div>
                 <div class="badge-content">
                     <span class="badge-label">Current Tournament</span>
-                    <h3 class="badge-title" id="tournamentName">2025 Worlds Anthems Championship</h3>
+                    <h3 class="badge-title" id="tournamentName">Anthem Arena Championship S1</h3>
                     <p class="badge-description" id="tournamentDescription">
                         The ultimate showdown of League music begins! Vote for your favorites.
                     </p>
@@ -257,7 +177,7 @@
                     <h2 class="section-title">Your Active Votes</h2>
                     <p class="section-subtitle">
                         Track your picks in live matches
-                        <a href="profile.html?tab=votes" class="view-all-inline">View All →</a>
+                        <a href="/profile.html?tab=votes" class="view-all-inline">View All →</a>
                     </p>
                 </div>
                 
@@ -291,7 +211,7 @@
                                 <p>Loading activity...</p>
                             </div>
                         </div>
-                        <a href="activity.html" class="card-cta">
+                        <a href="/activity.html" class="card-cta">
                             See All Activity →
                         </a>
                     </div>
@@ -316,7 +236,7 @@
                                 <span class="stat-label">Hottest Match</span>
                             </div>
                         </div>
-                        <a href="leaderboard.html" class="card-cta">
+                        <a href="/stats.html" class="card-cta">
                             View Full Stats →
                         </a>
                     </div>
@@ -333,7 +253,7 @@
                                 <p>Loading posts...</p>
                             </div>
                         </div>
-                        <a href="feed.html" class="card-cta">
+                        <a href="/feed.html" class="card-cta">
                             Join the Discussion →
                         </a>
                     </div>
@@ -349,7 +269,7 @@
                     <h2 class="section-title">Live Matches</h2>
                     <p class="section-subtitle">
                         Active battles you can vote on right now
-                        <a href="matches.html" class="view-all-inline">View All →</a>
+                        <a href="/matches.html" class="view-all-inline">View All →</a>
                     </p>
                 </div>
                 
@@ -387,7 +307,7 @@
                     </div>
                     
                     <div class="profile-actions">
-                        <a href="profile.html" class="btn-profile-view">
+                        <a href="/profile.html" class="btn-profile-view">
                             <i class="fa-solid fa-user"></i>
                             View Profile
                         </a>
@@ -413,7 +333,7 @@
                     <h2 class="section-title">Recent Results</h2>
                     <p class="section-subtitle">
                         See which songs advanced to the next round
-                        <a href="bracket.html" class="view-all-inline">View Bracket →</a>
+                        <a href="/brackets.html" class="view-all-inline">View Bracket →</a>
                     </p>
                 </div>
                 
@@ -497,7 +417,7 @@
                 </div>
                 
                 <div class="how-it-works-cta">
-                    <a href="matches.html" class="btn-primary btn-large">
+                    <a href="/matches.html" class="btn-primary btn-large">
                         Start Voting Now
                     </a>
                 </div>
@@ -507,54 +427,12 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Anthem Arena</h3>
-                    <p>The ultimate League of Legends music tournament. Vote for your favorite songs and crown the champion!</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="bracket.html">Bracket</a></li>
-                        <li><a href="matches.html">Matches</a></li>
-                        <li><a href="songs.html">Songs</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Community</h4>
-                    <ul>
-                        <li><a href="feed.html">Feed</a></li>
-                        <li><a href="activity.html">Activity</a></li>
-                        <li><a href="leaderboard.html">Leaderboard</a></li>
-                        <li><a href="profile.html">Profile</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="terms.html">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Anthem Arena. Not affiliated with Riot Games. League of Legends and all related properties are trademarks of Riot Games, Inc.</p>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
 
     <!-- Scripts -->
-    <script type="module" src="homepage.js"></script>
-    <script type="module" src="nav.js"></script>
-    <script type="module" src="global-notifications.js"></script>
-    <script type="module" src="notification-center.js"></script>
+    <script type="module" src="/js/homepage.js"></script>
+    <script type="module" src="/js/settings-modal.js"></script>
 
 </body>
 </html>
