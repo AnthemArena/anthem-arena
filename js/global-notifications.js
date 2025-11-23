@@ -2572,6 +2572,28 @@ function initBulletinSystem() {
 
 async function initializeNotificationSystem() {
     console.log('🎯 Initializing complete notification system...');
+
+      // Wait for navigation to be ready
+    await new Promise((resolve) => {
+        const checkNav = setInterval(() => {
+            const bell = document.getElementById('notificationBell');
+            const panel = document.getElementById('notificationPanel');
+            
+            if (bell && panel) {
+                clearInterval(checkNav);
+                console.log('✅ Navigation detected');
+                resolve();
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(checkNav);
+            console.warn('⚠️ Navigation took too long, proceeding anyway');
+            resolve();
+        }, 5000);
+    });
+    
     
     // ✅ NEW: Initialize champion pack first
     try {

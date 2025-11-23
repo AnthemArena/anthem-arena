@@ -9,6 +9,8 @@ import {
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
 
+// At the top of notification-center.js
+let isPanelInitialized = false;
 
 export async function initNotificationCenter() {
     const bell = document.getElementById('notificationBell');
@@ -18,17 +20,33 @@ export async function initNotificationCenter() {
     const closeBtn = document.getElementById('closeNotificationPanel');
     
     if (!bell || !panel) {
-        console.log('⚠️ Notification center elements not found');
+        console.error('❌ Notification center elements not found!');
+        console.log('   Bell:', bell);
+        console.log('   Panel:', panel);
+        console.log('   Trying again in 1 second...');
+        
+        // ✅ Retry once after 1 second
+        setTimeout(() => {
+            initNotificationCenter();
+        }, 1000);
         return;
     }
     
+    if (isPanelInitialized) {
+        console.log('⏭️ Notification center already initialized');
+        return;
+    }
+    
+    console.log('✅ Initializing notification center...');
+    
     await updateBadgeCount();
     
+    // ✅ Use async function for bell click
     bell.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const isOpen = panel.style.display === 'block';
+        console.log('🔔 Bell clicked, current state:', isPanelOpen);
         
-        if (isOpen) {
+        if (isPanelOpen) {
             closePanel();
         } else {
             await openPanel();
@@ -45,6 +63,12 @@ export async function initNotificationCenter() {
     });
     
     setInterval(updateBadgeCount, 120000);
+    
+    // ✅ Expose functions globally
+    window.openNotificationPanel = openPanel;
+    window.closeNotificationPanel = closePanel;
+    
+    isPanelInitialized = true;
     
     console.log('✅ Notification center initialized');
 }

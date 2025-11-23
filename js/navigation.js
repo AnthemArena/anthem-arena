@@ -3,11 +3,10 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
-import { initNotificationCenter } from './notification-center.js';
 
 const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Navigation DOMContentLoaded fired');
     
     const navHTML = `
@@ -39,12 +38,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a></li>
             </ul>
             
-            <!-- PROFILE + RANK DISPLAY -->
+            <!-- ✅ PERSISTENT Notification Bell (outside profile container) -->
+            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-right: 12px; display: none;">
+                <span style="font-size: 20px;">🔔</span>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+            </div>
+            
+            <!-- PROFILE CONTAINER -->
             <div class="nav-profile-container" id="navProfileContainer" style="display: none;">
-                <a href="#" class="nav-profile-card" id="navProfileCard" title="Profile Settings" onclick="window.openSettingsModal(); return false;">
-                    <div class="profile-avatar" id="navProfileAvatar">
-                        🎵
-                    </div>
+                <div class="nav-profile-card" id="navProfileCard" title="Profile Settings">
+                    <div class="profile-avatar" id="navProfileAvatar">🎵</div>
                     
                     <div class="profile-info">
                         <div class="profile-username" id="navProfileUsername">Guest</div>
@@ -56,14 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     
-                    <!-- ✅ Notification Bell (ONLY HERE) -->
-                    <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 16px;">
-                        <span style="font-size: 20px;">🔔</span>
-                        <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
-                    </div>
-                    
-                    <i class="fas fa-cog profile-settings-icon"></i>
-                </a>
+                    <i class="fas fa-cog profile-settings-icon" onclick="window.openSettingsModal()" title="Settings"></i>
+                </div>
             </div>
             
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -72,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </nav>
     
-    <!-- ✅ Notification Panel (OUTSIDE nav, appended to body) -->
+    <!-- ✅ Notification System (OUTSIDE nav, appended to body) -->
     <div id="notificationOverlay" class="notification-overlay" style="display: none;"></div>
     
     <div id="notificationPanel" class="notification-panel" style="display: none;">
@@ -138,13 +135,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // LOAD PROFILE + RANK DISPLAY
     console.log('Calling updateNavProfile...');
-    updateNavProfile();
+    await updateNavProfile();
 
-    // ✅ Initialize notification center AFTER nav is fully rendered
-    setTimeout(() => {
-        initNotificationCenter();
-        console.log('✅ Notification center initialized');
-    }, 100);
+    // ✅ Initialize notification center AFTER navigation is fully rendered
+    console.log('🔔 Initializing notification center...');
+    
+    setTimeout(async () => {
+        try {
+            const { initNotificationCenter } = await import('./notification-center.js');
+            await initNotificationCenter();
+            console.log('✅ Notification center initialized from navigation');
+        } catch (error) {
+            console.error('❌ Failed to initialize notification center:', error);
+        }
+    }, 200);
 });
 
 // ========================================
@@ -154,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function updateNavProfile() {
     const navProfileContainer = document.getElementById('navProfileContainer');
     const navProfileCard = document.getElementById('navProfileCard');
+    const notificationBell = document.getElementById('notificationBell');
     
     console.log('Updating nav profile display...');
     
@@ -206,7 +211,7 @@ async function updateNavProfile() {
             }
         }
         
-        // Check if user has voted
+        // Check if user has voted (check BOTH localStorage AND Firebase)
         const userVotesLocal = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const hasVotedLocal = Object.keys(userVotesLocal).length > 0;
         
@@ -236,7 +241,10 @@ async function updateNavProfile() {
         
         const hasVoted = hasVotedLocal || hasVotedFirebase;
         
-        // STATE 1: NOT VOTED YET
+        // ========================================
+        // STATE 1: NOT VOTED YET - Show Locked Profile
+        // ========================================
+        
         if (!hasVoted) {
             console.log("User hasn't voted yet - showing locked state");
             
@@ -260,10 +268,19 @@ async function updateNavProfile() {
             };
             
             navProfileContainer.style.display = 'flex';
+            
+            // ✅ Hide notification bell for non-voters
+            if (notificationBell) {
+                notificationBell.style.display = 'none';
+            }
+            
             return;
         }
         
-        // STATE 2: VOTED BUT NO USERNAME
+        // ========================================
+        // STATE 2: VOTED BUT NO USERNAME - Show Claim Profile
+        // ========================================
+        
         if (!username) {
             console.log('User has voted but no username - showing claim prompt');
             
@@ -286,12 +303,22 @@ async function updateNavProfile() {
             };
             
             navProfileContainer.style.display = 'flex';
+            
+            // ✅ Show notification bell for voters (even without username)
+            if (notificationBell) {
+                notificationBell.style.display = 'block';
+            }
+            
             return;
         }
         
-        // STATE 3: FULL PROFILE
+        // ========================================
+        // STATE 3: FULL PROFILE - Show Normal Profile
+        // ========================================
+
         console.log('Showing full profile for:', username);
 
+        // Update profile card HTML
         navProfileCard.innerHTML = `
             <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
                 <div class="profile-avatar" id="navProfileAvatar">
@@ -314,26 +341,19 @@ async function updateNavProfile() {
                 </div>
             </a>
             
-            <!-- ✅ Notification Bell (recreated after profile update) -->
-            <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin-left: 16px;">
-                <span style="font-size: 20px;">🔔</span>
-                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
-            </div>
-            
             <!-- Settings Button -->
             <button class="nav-settings-btn" onclick="window.openSettingsModal()" title="Profile Settings">
                 <i class="fas fa-cog"></i>
             </button>
         `;
 
-        // ✅ Re-initialize notification center after bell is recreated
-        setTimeout(() => {
-            if (window.initNotificationCenter) {
-                initNotificationCenter();
-            }
-        }, 50);
-
+        // Remove any old onclick handlers
         navProfileCard.onclick = null;
+
+        // ✅ Show notification bell
+        if (notificationBell) {
+            notificationBell.style.display = 'block';
+        }
 
         // Update rank display
         const currentXP = getUserXPFromStorage();
@@ -365,6 +385,17 @@ async function updateNavProfile() {
 
         navProfileContainer.style.display = 'flex';
         console.log('✅ Profile display updated successfully');
+        
+        // ✅ Re-initialize notification center after profile update
+        setTimeout(async () => {
+            try {
+                const { initNotificationCenter } = await import('./notification-center.js');
+                await initNotificationCenter();
+                console.log('🔔 Notification center re-initialized after profile update');
+            } catch (error) {
+                console.warn('⚠️ Could not re-initialize notification center:', error);
+            }
+        }, 100);
 
     } catch (err) {
         console.error('Unexpected error in updateNavProfile:', err);
