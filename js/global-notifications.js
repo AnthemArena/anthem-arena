@@ -2637,7 +2637,7 @@ window.testBulletin = function(type = 'winning') {
             matchId: 'test-match',
             song: 'GODS',
             opponent: 'RISE',
-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             userPct: 35,
             opponentPct: 65,
             voteDiff: 15,
@@ -2651,7 +2651,7 @@ window.testBulletin = function(type = 'winning') {
             matchId: 'test-match',
             song: 'GODS',
             opponent: 'RISE',
-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             voteDiff: 2,
             userPct: 49,
             opponentPct: 51,
@@ -2665,7 +2665,7 @@ window.testBulletin = function(type = 'winning') {
             matchId: 'test-match',
             song: 'GODS',
             opponent: 'RISE',
-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             userPct: 72,
             opponentPct: 28,
             message: winningMsg?.message || '🎯 Your pick "GODS" is dominating!',
@@ -2678,7 +2678,7 @@ window.testBulletin = function(type = 'winning') {
             matchId: 'test-match',
             song: 'GODS',
             opponent: 'RISE',
-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             userPct: 55,
             opponentPct: 45,
             message: comebackMsg?.message || '🎉 Your pick "GODS" completed comeback!',
@@ -2696,7 +2696,7 @@ window.testBulletin = function(type = 'winning') {
             triggerUsername: 'TestRival',
             song: 'RISE',
             userSong: 'GODS',
-            thumbnailUrl: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             message: rivalMsg?.message || '⚔️ TestRival picked "RISE" vs your "GODS"',
             detail: rivalMsg?.detail || 'The battle continues in GODS vs RISE',
             icon: '⚔️',
@@ -2716,7 +2716,7 @@ window.testBulletin = function(type = 'winning') {
             triggerUsername: 'TestAlly',
             song: 'GODS',
             userSong: 'GODS',
-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+    thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',  // ✅ GODS thumbnail
             message: allyMsg?.message || '🤝 TestAlly also voted for "GODS"!',
             detail: allyMsg?.detail || 'Standing with you in GODS vs RISE',
             icon: '🤝',
