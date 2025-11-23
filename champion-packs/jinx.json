@@ -799,13 +799,175 @@
     "Celebrate! 🎉"
   ]
 },
-    
+
+    "first-blood": {
+      "messages": [
+        "FIRST BLOOD! You just drew first blood, baby!",
+        "Hehe~ Someone’s gotta start the explosion!",
+        "BOOM! The very first vote EVER! You’re MY kind of crazy!",
+        "Welcome to the chaos. You just lit the fuse!"
+      ],
+      "details": [
+        "You’re the first one to pull the trigger! +500 XP",
+        "History made. Explosions incoming. +500 XP",
+        "The very first vote on the site… and it was YOU! +500 XP"
+      ],
+      "buttons": [
+        "Light It Up!",
+        "More Chaos!",
+        "I’m Just Getting Started!"
+      ]
+    },
+
+    "daily-comeback": {
+      "messages": [
+        "WELCOME BACK, PSYCHO!",
+        "Thought you could escape the chaos? WRONG!",
+        "Missed me? I missed YOU! Let’s blow something up!",
+        "Took you long enough! Now VOTE!"
+      ],
+      "details": [
+        "Absent for {days} days — now you’re back for mayhem! +300 XP",
+        "You can’t quit me that easy! +300 XP"
+      ],
+      "buttons": [
+        "Cause Chaos!",
+        "I’m Back Baby!",
+        "Vote NOW!"
+      ]
+    },
+
+    "match-won": {
+      "messages": [
+        "KABOOM! \"{songTitle}\" JUST WON!",
+        "We did it! We actually did it! EXPLOSIONS EVERYWHERE!",
+        "Told you we’d blow them away!",
+        "Your vote helped burn the place down — PERFECT!"
+      ],
+      "details": [
+        "Your vote helped destroy the competition! +200 XP",
+        "Victory tastes like gunpowder and candy! +200 XP"
+      ],
+      "buttons": [
+        "Celebrate Victory!",
+        "Next Target!",
+        "Watch It Burn!"
+      ]
+    },
+
+    "match-lost": {
+      "messages": [
+        "…Well that sucked.",
+        "They got lucky. NEXT TIME WE BURN EVERYTHING.",
+        "Don’t be sad! Be DANGEROUS!",
+        "Okay okay… new plan: bigger bombs."
+      ],
+      "details": [
+        "Better luck next explosion! +50 XP anyway",
+        "We’ll get ’em next time. Promise."
+      ],
+      "buttons": [
+        "Revenge Vote!",
+        "Start New Chaos!",
+        "Plot Revenge!"
+      ]
+    },
+
+    "level-up": {
+      "messages": [
+        "LEVEL {level}! You’re getting DANGEROUS!",
+        "Ding ding ding! Level {level} unlocked — respect!",
+        "Look who’s climbing the chaos ladder!",
+        "Level {level}? Oh we’re just getting started~"
+      ],
+      "details": [
+        "Level {level} achieved • +{xp} XP",
+        "More power = more things to blow up!"
+      ],
+      "buttons": [
+        "Show Off!",
+        "View Profile!",
+        "Next Level NOW!"
+      ]
+    },
+
+    "last-second-hero": {
+      "messages": [
+        "YOU TIED/IT FLIPPED AT THE LAST SECOND!",
+        "CLUTCH! You absolute MANIAC!",
+        "I can’t believe you just did that!",
+        "ONE VOTE. ONE MOMENT. TOTAL CHAOS!"
+      ],
+      "details": [
+        "Single-handedly saved the match! +1000 XP",
+        "You’re the reason rules exist to be broken!"
+      ],
+      "buttons": [
+        "I’m a Legend!",
+        "Watch Replay!",
+        "Do It Again!"
+      ]
+    },
+        "tournament-first-blood": {
+      "messages": [
+        "FIRST BLOOD OF THE TOURNAMENT!",
+        "You just fired the opening shot of the entire tournament!",
+        "BOOM! Tournament’s officially started — because of YOU!",
+        "The very first vote this tournament? That’s MINE now!"
+      ],
+      "details": [
+        "You started the whole explosion chain! +750 XP",
+        "Tournament ignition complete. Chaos level: maximum. +750 XP"
+      ],
+      "buttons": [
+        "Start the Fireworks!",
+        "Claim Your Glory!",
+        "Keep Blowing It Up!"
+      ]
+    },
+
+    "round-first-blood": {
+      "messages": [
+        "FIRST BLOOD THIS ROUND!",
+        "Round {round} just started with a BANG — your vote!",
+        "New round, same chaos. You’re first again!",
+        "Hehe~ Round {round} belongs to us now!"
+      ],
+      "details": [
+        "First vote of Round {round} — you own this one! +400 XP",
+        "Round {round} ignited! Let’s burn it down! +400 XP"
+      ],
+      "buttons": [
+        "Dominate This Round!",
+        "More Explosions!",
+        "Lead the Chaos!"
+      ]
+    },
+
+    "daily-session-kickoff": {
+      "messages": [
+        "TODAY’S FIRST VOTE — LET’S MAKE IT COUNT!",
+        "Morning, psycho! Time to blow up the leaderboard!",
+        "First vote of the day? That’s the spirit!",
+        "Daily chaos quota: ACTIVATED!"
+      ],
+      "details": [
+        "Your first vote today — the mayhem begins anew! +150 XP",
+        "Day started right: with explosions. +150 XP"
+      ],
+      "buttons": [
+        "Start the Rampage!",
+        "Keep the Streak!",
+        "More Votes NOW!"
+      ]
+    },
+
     "default": {
       "messages": [
-        "🏆 Achievement unlocked: {name}!",
-        "💥 You got {name}!",
-        "🎪 Congrats! {name} unlocked!",
-        "✨ {name} achieved!"
+        "Achievement unlocked: {name}!",
+        "You got {name}!",
+        "Congrats! {name} unlocked!",
+        "{name} achieved!"
       ],
       "details": [
         "{description} • +{xp} XP",
@@ -814,14 +976,90 @@
         "Achievement complete! +{xp} XP"
       ],
       "buttons": [
-        "View All! 🏆",
-        "See Progress! 👀",
-        "Check It Out! ✨",
+        "View All!",
+        "See Progress!",
+        "Check It Out!",
         "View Achievements!"
       ]
     }
+  },
+  "welcomeDialogs": {
+    "welcome-first-time": {
+      "messages": [
+        "Welcome to the chaos, fresh meat!",
+        "First time? Don't worry, explosions are easy!",
+        "NEW PSYCHO ALERT! Let's blow something up!",
+        "Hehe~ Someone new to corrupt! This'll be FUN!"
+      ],
+      "details": [
+        "Your first visit - let's make it EXPLOSIVE!",
+        "Time to learn what real chaos looks like!",
+        "Fresh meat for the grinder! 💥"
+      ],
+      "buttons": [
+        "Start Voting!",
+        "Show Me Around!",
+        "Let's Go!"
+      ]
+    },
+    
+    "welcome-streak": {
+      "messages": [
+        "Back AGAIN?! You're MY kind of crazy!",
+        "Two days in a row! Now we're talking!",
+        "Daily streak maintained! Keep the chaos going!",
+        "Hehe~ You can't stay away, can you?"
+      ],
+      "details": [
+        "Daily streak active - you're on fire! 🔥",
+        "Consistent chaos - I LOVE it!",
+        "Keep this up and you'll be legendary!"
+      ],
+      "buttons": [
+        "Continue Streak!",
+        "More Chaos!",
+        "Let's Vote!"
+      ]
+    },
+    
+    "welcome-comeback": {
+      "messages": [
+        "Took you {days} days to come back?! Thought you could escape? WRONG!",
+        "Where've you BEEN?! The chaos missed you!",
+        "Finally! I was getting BORED without you!",
+        "Welcome back, psycho! Let's make up for lost time!"
+      ],
+      "details": [
+        "Absent for {days} days - time to catch up on the mayhem!",
+        "The chaos kept going without you - but it's better WITH you!",
+        "Ready to rejoin the explosion party?"
+      ],
+      "buttons": [
+        "Rejoin the Chaos!",
+        "I'm Back!",
+        "Catch Me Up!"
+      ]
+    },
+    
+    "welcome-back": {
+      "messages": [
+        "You're back! Ready for more explosions?",
+        "Hey hey! Missed the chaos, didn't you?",
+        "Welcome back! Let's blow something up!",
+        "Another day, another explosion! Let's GO!"
+      ],
+      "details": [
+        "Good to see you again - let's make today explosive!",
+        "The voting arena awaits!",
+        "Time to cause some musical mayhem!"
+      ],
+      "buttons": [
+        "Start Voting!",
+        "Let's Go!",
+        "Show Me What's New!"
+      ]
+    }
   }
-
 
 }
   

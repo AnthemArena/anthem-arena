@@ -284,5 +284,32 @@
       "details": ["{description} • +{xp} XP"],
       "buttons": ["View Achievements"]
     }
+  },
+
+  "welcomeDialogs": {
+    "welcome-first-time": {
+      "messages": ["Welcome to the tournament!"],
+      "details": ["Your first visit - let's get started!"],
+      "buttons": ["Start Voting!"]
+    },
+    
+    "welcome-streak": {
+      "messages": ["Welcome back! Daily streak maintained!"],
+      "details": ["Keep up the momentum!"],
+      "buttons": ["Continue Voting!"]
+    },
+    
+    "welcome-comeback": {
+      "messages": ["Welcome back after {days} days!"],
+      "details": ["Good to see you again!"],
+      "buttons": ["Rejoin!"]
+    },
+    
+    "welcome-back": {
+      "messages": ["Welcome back!"],
+      "details": ["Ready to vote?"],
+      "buttons": ["Start Voting!"]
+    }
   }
+
 }

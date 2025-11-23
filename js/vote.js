@@ -1879,6 +1879,22 @@ try {
         // ✅ NEW: Check for achievement unlocks
         await checkForAchievementUnlocks();
 
+        // ========================================
+// ✅ CHECK DAILY SESSION KICKOFF
+// ========================================
+try {
+    const { markDailySessionStarted } = await import('./daily-welcome.js');
+    const isFirstVoteToday = markDailySessionStarted();
+    
+    if (isFirstVoteToday) {
+        console.log('🌅 First vote of the day!');
+        // Achievement will be checked in next checkAchievements() call
+    }
+} catch (error) {
+    console.error('⚠️ Could not mark daily session:', error);
+}
+
+
         console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
 
         // ✅ Update nav display immediately (with safety check)

@@ -1301,45 +1301,133 @@ async function shouldShowWelcome(timeOnSite) {
     // Show if first time OR been 12+ hours since last welcome
     return !lastWelcome || hoursSinceWelcome >= 12;
 }
-// ========================================
-// WELCOME TOAST FOR FIRST-TIME VISITORS
-// ========================================
-
 async function showWelcomeToast() {
+    const today = new Date().toDateString();
+    const lastVisitDate = localStorage.getItem('lastVisitDate');
+    const lastVisitTime = localStorage.getItem('lastVisitTime');
+    
+    // Calculate days since last visit
+    const daysSince = lastVisitTime 
+        ? Math.floor((Date.now() - parseInt(lastVisitTime)) / (1000 * 60 * 60 * 24))
+        : 0;
+    
+    // Save today's visit
+    localStorage.setItem('lastVisitDate', today);
+    localStorage.setItem('lastVisitTime', Date.now().toString());
+    
+    // Determine welcome type
+    let welcomeType;
+    if (daysSince === 0) {
+        welcomeType = 'first-time';
+    } else if (daysSince === 1) {
+        welcomeType = 'streak';
+    } else if (daysSince >= 3) {
+        welcomeType = 'comeback';
+        localStorage.setItem('daysSinceLastVisit', daysSince.toString());
+    } else {
+        welcomeType = 'back';
+    }
+    
+    // ✅ Get champion-voiced welcome message
+    const championLoader = window.championLoader;
+    if (!championLoader) {
+        console.warn('⚠️ Champion loader not available');
+        return;
+    }
+    
+    const welcomeData = championLoader.getCustomMessage(`welcome-${welcomeType}`);
+    
+    if (!welcomeData) {
+        console.warn(`⚠️ No welcome message for type: ${welcomeType}`);
+        return;
+    }
+    
+    // Replace {days} placeholder for comeback messages
+    if (welcomeType === 'comeback' && daysSince > 0) {
+        welcomeData.message = welcomeData.message.replace('{days}', daysSince);
+        welcomeData.detail = welcomeData.detail.replace('{days}', daysSince);
+    }
+    
     try {
         // Count live matches
         const response = await fetch('/api/matches');
         const allMatches = await response.json();
         const liveMatches = allMatches.filter(m => m.status === 'live');
-        const liveCount = liveMatches.length;
         
-        // Get a random live match for thumbnail
+        // Get random match thumbnail
         const randomMatch = liveMatches[Math.floor(Math.random() * liveMatches.length)];
         const thumbnailUrl = randomMatch 
             ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
             : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
         
+        const isOnVotePage = window.location.pathname.includes('vote.html');
+        
         showBulletin({
-            priority: 5,
+            priority: 1,
             type: 'welcome',
             matchId: 'welcome',
             thumbnailUrl: thumbnailUrl,
-            message: '🎵 Welcome to the League Music Tournament!',
-            detail: `${liveCount} live matches • Cast your first vote and join the action!`,
-            cta: 'Start Voting',
-            action: 'navigate',
-            targetUrl: '/matches.html'
+            message: welcomeData.message,
+            detail: welcomeData.detail,
+            cta: welcomeData.cta,
+            action: isOnVotePage ? 'dismiss' : 'navigate',
+            targetUrl: '/vote.html',
+            duration: 5000
         });
         
-   // Mark as shown
-sessionStorage.setItem('welcomeToastShown', 'true'); // This session
-localStorage.setItem('lastWelcomeToast', Date.now().toString()); // Timestamp for 12hr cooldown
-sessionStorage.setItem('pageLoadTime', Date.now().toString());
+        // Mark as shown
+        sessionStorage.setItem('welcomeToastShown', 'true');
+        localStorage.setItem('lastWelcomeToast', Date.now().toString());
+        sessionStorage.setItem('pageLoadTime', Date.now().toString());
         
-        console.log('👋 Welcome toast shown');
+        // Award comeback achievement if eligible
+        if (welcomeType === 'comeback' && daysSince >= 3) {
+            setTimeout(async () => {
+                await checkComebackAchievementGlobal();
+            }, 6000); // After welcome toast finishes
+        }
+        
+        console.log(`👋 Daily welcome shown: ${welcomeType}`);
         
     } catch (error) {
         console.error('Error showing welcome toast:', error);
+    }
+}
+
+/**
+ * Check and award comeback achievement (global version)
+ */
+async function checkComebackAchievementGlobal() {
+    try {
+        const { unlockAchievementInFirebase } = await import('./achievement-tracker.js');
+        const { ACHIEVEMENTS } = await import('./achievements.js');
+        
+        const comebackAchievement = ACHIEVEMENTS['daily-comeback'];
+        if (!comebackAchievement) return;
+        
+        // Check if already unlocked
+        const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+        if (unlockedAchievements.includes('daily-comeback')) {
+            console.log('ℹ️ Comeback achievement already unlocked');
+            return;
+        }
+        
+        // Unlock it
+        const wasUnlocked = await unlockAchievementInFirebase('daily-comeback', comebackAchievement.xp);
+        
+        if (wasUnlocked && window.showAchievementUnlock) {
+            // Import and award XP
+            const { addXP } = await import('./rank-system.js');
+            addXP(comebackAchievement.xp);
+            
+            // Show achievement unlock
+            setTimeout(() => {
+                window.showAchievementUnlock(comebackAchievement);
+            }, 1000);
+        }
+        
+    } catch (error) {
+        console.error('⚠️ Error checking comeback achievement:', error);
     }
 }
 

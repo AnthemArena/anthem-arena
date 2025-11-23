@@ -669,6 +669,165 @@ icon: '<i class="fa-solid fa-fire"></i>',
   progress: (stats) => ({ current: stats.votesInSession, target: 20 })
 },
 
+// ========================================
+// SPECIAL EVENT ACHIEVEMENTS
+// ========================================
+
+'first-blood': {
+  id: 'first-blood',
+  name: 'First Blood',
+  description: 'You drew first blood - the very first vote ever on the site!',
+  icon: '<i class="fa-solid fa-bolt"></i>',
+  xp: 500,
+  category: 'special',
+  hidden: true,
+  tier: 'legendary',
+  rarity: 'legendary',
+  condition: (stats) => {
+    // Check if user has the global first vote (tracked separately)
+    return localStorage.getItem('globalFirstVote') === 'true';
+  }
+},
+
+'tournament-first-blood': {
+  id: 'tournament-first-blood',
+  name: 'Tournament First Blood',
+  description: 'The first vote of the entire tournament!',
+  icon: '<i class="fa-solid fa-star"></i>',
+  xp: 750,
+  category: 'special',
+  hidden: true,
+  tier: 'legendary',
+  rarity: 'legendary',
+  condition: (stats) => {
+    return localStorage.getItem('tournamentFirstVote') === 'true';
+  }
+},
+
+'round-first-blood': {
+  id: 'round-first-blood',
+  name: 'Round First Blood',
+  description: 'First vote in a new round!',
+  icon: '<i class="fa-solid fa-fire"></i>',
+  xp: 400,
+  category: 'special',
+  hidden: true,
+  tier: 'gold',
+  rarity: 'epic',
+  condition: (stats) => {
+    // Check if user was first in any round
+    const firstInRounds = JSON.parse(localStorage.getItem('firstInRounds') || '[]');
+    return firstInRounds.length > 0;
+  }
+},
+
+'daily-session-kickoff': {
+  id: 'daily-session-kickoff',
+  name: 'Daily Session Kickoff',
+  description: 'Your first vote of the day!',
+  icon: '<i class="fa-solid fa-sun"></i>',
+  xp: 150,
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'uncommon',
+  condition: (stats) => {
+    // Check if this is first vote today
+    const lastVoteDate = localStorage.getItem('lastVoteDate');
+    const today = new Date().toDateString();
+    return lastVoteDate !== today && stats.totalVotes >= 1;
+  }
+},
+
+'daily-comeback': {
+  id: 'daily-comeback',
+  name: 'Welcome Back',
+  description: 'Returned after being away for days!',
+  icon: '<i class="fa-solid fa-door-open"></i>',
+  xp: 300,
+  category: 'special',
+  hidden: true,
+  tier: 'silver',
+  rarity: 'rare',
+  condition: (stats) => {
+    const lastVisit = localStorage.getItem('lastVisitDate');
+    if (!lastVisit) return false;
+    
+    const daysSince = Math.floor((Date.now() - new Date(lastVisit)) / (1000 * 60 * 60 * 24));
+    return daysSince >= 3;
+  }
+},
+
+// ========================================
+// MATCH OUTCOME ACHIEVEMENTS
+// ========================================
+
+
+'match-won': {
+  id: 'match-won',
+  name: 'Victory!',
+  description: 'Your voted song won the match!',
+  icon: '<i class="fa-solid fa-trophy"></i>',
+  xp: 200,
+  category: 'special',
+  hidden: true,
+  tier: 'silver',
+  rarity: 'uncommon',
+  condition: (stats) => {
+    // This needs to be checked after match closes
+    const wonMatches = parseInt(localStorage.getItem('matchesWon') || '0');
+    return wonMatches >= 1;
+  }
+},
+
+'match-lost': {
+  id: 'match-lost',
+  name: 'Better Luck Next Time',
+  description: 'Your song lost, but you fought well!',
+  icon: '<i class="fa-solid fa-shield-heart"></i>',
+  xp: 50,
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'common',
+  condition: (stats) => {
+    const lostMatches = parseInt(localStorage.getItem('matchesLost') || '0');
+    return lostMatches >= 1;
+  }
+},
+
+'last-second-hero': {
+  id: 'last-second-hero',
+  name: 'Clutch Hero',
+  description: 'Your vote tied or flipped a match at the last second!',
+  icon: '<i class="fa-solid fa-clock"></i>',
+  xp: 1000,
+  category: 'special',
+  hidden: true,
+  tier: 'legendary',
+  rarity: 'legendary',
+  condition: (stats) => {
+    return localStorage.getItem('lastSecondHero') === 'true';
+  }
+},
+
+'level-up': {
+  id: 'level-up',
+  name: 'Level Up!',
+  description: 'Reached a new level!',
+  icon: '<i class="fa-solid fa-arrow-up"></i>',
+  xp: 0, // XP already awarded by leveling system
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'common',
+  condition: (stats) => {
+    // This is awarded dynamically when level increases
+    return false; // Never shows as unlocked, triggered manually
+  }
+},
+
+
   // ========================================
   // SOCIAL ACHIEVEMENTS
   // ========================================

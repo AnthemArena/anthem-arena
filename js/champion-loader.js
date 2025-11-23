@@ -211,6 +211,40 @@ function getAchievementMessage(achievementId, data) {
         cta: button,
         emoji: currentChampionPack.emoji
     };
+
+}
+
+/**
+ * Get custom welcome message from loaded champion pack
+ */
+function getCustomMessage(messageType) {
+    if (!currentChampionPack) {
+        console.error('❌ No champion pack loaded!');
+        return null;
+    }
+    
+    // Check if pack has welcomeDialogs
+    const welcomeDialogs = currentChampionPack.welcomeDialogs;
+    
+    if (!welcomeDialogs) {
+        console.warn(`⚠️ No welcome dialogs in pack "${currentChampionPack.id}"`);
+        return null;
+    }
+    
+    // Get the specific dialog type
+    const dialog = welcomeDialogs[messageType];
+    
+    if (!dialog) {
+        console.warn(`⚠️ Welcome message type "${messageType}" not found in pack "${currentChampionPack.id}"`);
+        return null;
+    }
+    
+    // Pick random variations
+    const message = dialog.messages[Math.floor(Math.random() * dialog.messages.length)];
+    const detail = dialog.details[Math.floor(Math.random() * dialog.details.length)];
+    const cta = dialog.buttons[Math.floor(Math.random() * dialog.buttons.length)];
+    
+    return { message, detail, cta };
 }
 // ========================================
 // REPLACE PLACEHOLDERS
@@ -426,6 +460,7 @@ window.championLoader = {
     loadChampionPack,
     getChampionMessage,
         getAchievementMessage,  // ✅ ADD THIS
+    getCustomMessage,  // ✅ ADD THIS LINE
 
     checkUniqueAlerts,
     getAvailableChampionPacks,
