@@ -2583,6 +2583,46 @@ window.debugMatchVotes = async function() {
 window.testBulletin = function(type = 'winning') {
     console.log('🧪 Force showing bulletin:', type);
     
+    // ✅ Get messages from champion pack
+    const dangerMsg = window.championLoader?.getChampionMessage('danger', {
+        songTitle: 'GODS',
+        voteDiff: 15,
+        userPct: 35,
+        opponentPct: 65
+    });
+    
+    const comebackMsg = window.championLoader?.getChampionMessage('comeback', {
+        songTitle: 'GODS',
+        userPct: 55,
+        opponentPct: 45
+    });
+    
+    const nailbiterMsg = window.championLoader?.getChampionMessage('nailbiter', {
+        songTitle: 'GODS',
+        voteDiff: 2,
+        voteDiffPlural: 's',
+        userPct: 49,
+        opponentPct: 51
+    });
+    
+    const winningMsg = window.championLoader?.getChampionMessage('winning', {
+        songTitle: 'GODS',
+        userPct: 72,
+        opponentPct: 28,
+        voteDiff: 44
+    });
+    
+    const allyMsg = window.championLoader?.getChampionMessage('ally', {
+        username: 'TestAlly',
+        songTitle: 'GODS'
+    });
+    
+    const rivalMsg = window.championLoader?.getChampionMessage('rival', {
+        username: 'TestRival',
+        theirSong: 'RISE',
+        yourSong: 'GODS'
+    });
+    
     const testNotifications = {
         danger: {
             priority: 1,
@@ -2594,9 +2634,9 @@ window.testBulletin = function(type = 'winning') {
             userPct: 35,
             opponentPct: 65,
             voteDiff: 15,
-            message: '🚨 Your pick "GODS" is in danger!',
-            detail: 'Behind by 15 votes (35% vs 65%)',
-            cta: 'View Match Now!'
+            message: dangerMsg?.message || '🚨 Your pick "GODS" is in danger!',
+            detail: dangerMsg?.detail || 'Behind by 15 votes (35% vs 65%)',
+            cta: dangerMsg?.cta || 'View Match Now!'
         },
         nailbiter: {
             priority: 2,
@@ -2608,9 +2648,9 @@ window.testBulletin = function(type = 'winning') {
             voteDiff: 2,
             userPct: 49,
             opponentPct: 51,
-            message: '🔥 Your pick "GODS" is TOO CLOSE!',
-            detail: 'Separated by just 2 votes!',
-            cta: 'View Match!'
+            message: nailbiterMsg?.message || '🔥 Your pick "GODS" is TOO CLOSE!',
+            detail: nailbiterMsg?.detail || 'Separated by just 2 votes!',
+            cta: nailbiterMsg?.cta || 'View Match!'
         },
         winning: {
             priority: 4,
@@ -2621,9 +2661,9 @@ window.testBulletin = function(type = 'winning') {
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
             userPct: 72,
             opponentPct: 28,
-            message: '🎯 Your pick "GODS" is dominating!',
-            detail: 'Leading 72% to 28%',
-            cta: 'View Match!'
+            message: winningMsg?.message || '🎯 Your pick "GODS" is dominating!',
+            detail: winningMsg?.detail || 'Leading 72% to 28%',
+            cta: winningMsg?.cta || 'View Match!'
         },
         comeback: {
             priority: 3,
@@ -2634,12 +2674,11 @@ window.testBulletin = function(type = 'winning') {
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
             userPct: 55,
             opponentPct: 45,
-            message: '🎉 Your pick "GODS" completed comeback!',
-            detail: 'Was losing, now leading 55% to 45%!',
-            cta: 'View Match!'
+            message: comebackMsg?.message || '🎉 Your pick "GODS" completed comeback!',
+            detail: comebackMsg?.detail || 'Was losing, now leading 55% to 45%!',
+            cta: comebackMsg?.cta || 'View Match!'
         },
 
-         // ✅ UPDATED RIVAL TEST
         'rival': {
             priority: 7,
             type: 'live-activity',
@@ -2649,18 +2688,17 @@ window.testBulletin = function(type = 'winning') {
             triggerUserId: 'test-rival-123',
             triggerUsername: 'TestRival',
             song: 'RISE',
-            userSong: 'GODS', // ✅ NEW: Show what YOU voted for
+            userSong: 'GODS',
             thumbnailUrl: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
-            message: '⚔️ TestRival picked "RISE" vs your "GODS"',
-            detail: 'The battle continues in GODS vs RISE',
+            message: rivalMsg?.message || '⚔️ TestRival picked "RISE" vs your "GODS"',
+            detail: rivalMsg?.detail || 'The battle continues in GODS vs RISE',
             icon: '⚔️',
-            cta: 'View Battle 👀',
+            cta: rivalMsg?.cta || 'View Battle 👀',
             ctaAction: 'navigate',
             targetUrl: '/vote.html?match=round-1-match-1',
             relationship: 'opponent'
         },
         
-        // ✅ UPDATED ALLY TEST
         'ally': {
             priority: 7,
             type: 'live-activity',
@@ -2670,12 +2708,12 @@ window.testBulletin = function(type = 'winning') {
             triggerUserId: 'test-ally-123',
             triggerUsername: 'TestAlly',
             song: 'GODS',
-            userSong: 'GODS', // ✅ NEW: Both voted for same song
+            userSong: 'GODS',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-            message: '🤝 TestAlly also voted for "GODS"!',
-            detail: 'Standing with you in GODS vs RISE',
+            message: allyMsg?.message || '🤝 TestAlly also voted for "GODS"!',
+            detail: allyMsg?.detail || 'Standing with you in GODS vs RISE',
             icon: '🤝',
-            cta: 'Send Thanks! 🤝',
+            cta: allyMsg?.cta || 'Send Thanks! 🤝',
             ctaAction: 'send-emote',
             ctaData: {
                 targetUsername: 'TestAlly',
@@ -2690,6 +2728,7 @@ window.testBulletin = function(type = 'winning') {
             targetUrl: '/vote.html?match=round-1-match-1',
             relationship: 'ally'
         },
+        
         welcome: {
             priority: 5,
             type: 'welcome',
