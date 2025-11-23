@@ -95,6 +95,8 @@ const response = await fetch(`../champion-packs/${championId}.json`);
     }
 }
 
+
+
 // ========================================
 // EMERGENCY FALLBACK PACK
 // ========================================
@@ -377,6 +379,7 @@ async function initializeChampionPack() {
     return currentChampionPack;
 }
 
+
 // ========================================
 // EXPORT FUNCTIONS
 // ========================================
@@ -389,7 +392,8 @@ window.championLoader = {
     setUserChampionPack,
     getUserChampionPack,
     initializeChampionPack,
-    getCurrentPack: () => currentChampionPack
+    getCurrentPack: () => currentChampionPack,
+    getManifest: loadChampionManifest  // ✅ Use existing function
 };
 
 console.log('✅ Champion loader ready');
