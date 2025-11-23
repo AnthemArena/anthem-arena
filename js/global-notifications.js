@@ -304,12 +304,10 @@ async function checkAndShowBulletin() {
         // CONTINUE WITH USER ID CHECK
         // ========================================
         
-        // ✅ Get user ID properly
         const userId = localStorage.getItem('tournamentUserId');
         
         if (!userId) {
             console.warn('⚠️ No user ID found - skipping vote checks');
-            // Still check for zero-vote/low-vote alerts below
         }
         
         // ✅ Fetch user votes from localStorage
@@ -318,10 +316,8 @@ async function checkAndShowBulletin() {
         
         if (userId) {
             try {
-                // Get votes from localStorage (already set by vote.js)
                 const storedVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
                 
-                // Convert to the format this function expects
                 Object.entries(storedVotes).forEach(([matchId, voteData]) => {
                     userVotes[matchId] = {
                         matchId: matchId,
@@ -352,26 +348,22 @@ async function checkAndShowBulletin() {
             const pageLoadTime = parseInt(sessionStorage.getItem('pageLoadTime') || Date.now().toString());
             const timeOnSite = Date.now() - pageLoadTime;
             
-            // Store page load time if not set
             if (!sessionStorage.getItem('pageLoadTime')) {
                 sessionStorage.setItem('pageLoadTime', Date.now().toString());
             }
             
-            // 🎵 WELCOME: Smart timing (5s delay + 12hr cooldown)
             const shouldWelcome = await shouldShowWelcome(timeOnSite);
             if (shouldWelcome) {
                 await showWelcomeToast();
                 return;
             }
             
-            // 👀 GENTLE REMINDER: After 2 minutes of browsing
             const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
             if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
                 await showEncouragementToast('gentle');
                 return;
             }
             
-            // ⏰ URGENCY: After 5 minutes + matches closing soon
             if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
                 const hasUrgentMatches = await checkForClosingMatches();
                 if (hasUrgentMatches) {
@@ -380,7 +372,6 @@ async function checkAndShowBulletin() {
                 }
             }
             
-            // Don't check voted-match alerts for non-voters
             return;
         }
         
@@ -416,7 +407,6 @@ async function checkAndShowBulletin() {
             const userPct = totalVotes > 0 ? Math.round((userSongVotes / totalVotes) * 100) : 50;
             const opponentPct = totalVotes > 0 ? 100 - userPct : 50;
             
-            // Track state for comeback detection
             const previousState = matchStates[matchId];
             const isCurrentlyLosing = userSongVotes < opponentVotes;
             const wasLosing = previousState?.wasLosing || false;
@@ -426,98 +416,199 @@ async function checkAndShowBulletin() {
                 lastCheck: Date.now()
             };
             
-         // DANGER: User's pick is losing badly
-if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-        const matchId = getMatchId(match); // ✅ Normalize ID
-         // ✅ Check if EITHER danger OR danger-repeat is dismissed
-    const dangerKey = `danger-${matchId}`;
-    const dangerRepeatKey = `danger-repeat-${matchId}`;
-    
-    if (dismissedBulletins.has(dangerKey) || dismissedBulletins.has(dangerRepeatKey)) {
-        continue; // ✅ Skip if dismissed in any form
-    }
-
-    const dangerAlertKey = `danger-alert-count-${match.id}`;
-    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
-    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
-    
-    const championMessage = window.championLoader?.getChampionMessage('danger', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent', // ✅ ADD THIS
-        matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`, // ✅ ADD THIS
-        voteDiff: voteDiff,
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 1,
-        type: notificationType,
-        matchId: getMatchId(match),   
-             song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        voteDiff,
-        message: championMessage?.message || `🚨 Your pick is in danger!`,
-        detail: championMessage?.detail || `Behind by ${voteDiff} votes`,
-        cta: championMessage?.cta || 'View Match Now!'
-    });
-    
-    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-}
-            // COMEBACK: Was losing, now winning
-            else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
-             const championMessage = window.championLoader?.getChampionMessage('comeback', {
-    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
-    voteDiff: voteDiff,
-    userPct: userPct,
-    opponentPct: opponentPct
-});
+            // ========================================
+            // DANGER: User's pick is losing badly
+            // ========================================
+            
+            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+                const normalizedMatchId = getMatchId(match);
+                
+                // ✅ Determine severity tier for dismissal tracking
+                let severityTier;
+                if (voteDiff === 1) {
+                    severityTier = 'trailing-1';
+                } else if (voteDiff <= 3) {
+                    severityTier = 'trailing-2-3';
+                } else if (voteDiff <= 5) {
+                    severityTier = 'trailing-4-5';
+                } else if (voteDiff <= 10) {
+                    severityTier = 'trailing-6-10';
+                } else {
+                    severityTier = 'trailing-11plus';
+                }
+                
+                const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
+                
+                // ✅ Check if THIS specific severity tier was dismissed
+                if (dismissedBulletins.has(bulletinKey)) {
+                    console.log(`⏭️ Skipping danger alert (${severityTier} dismissed for 24h): ${bulletinKey}`);
+                    continue;
+                }
+                
+                // ✅ Check cooldown for this specific severity
+                const lastShown = recentBulletins.get(bulletinKey);
+                if (lastShown && (Date.now() - lastShown) < BULLETIN_COOLDOWNS.DANGER) {
+                    continue;
+                }
+                
+                // Track alert count for escalation messaging
+                const dangerAlertKey = `danger-alert-count-${normalizedMatchId}`;
+                const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+                const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+                
+                const championMessage = window.championLoader?.getChampionMessage('danger', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+                    voteDiff: voteDiff,
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
                 
                 notifications.push({
-                    priority: 2,
-                    type: 'comeback',
-                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    priority: 1,
+                    type: notificationType,
+                    matchId: normalizedMatchId,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
                     opponentPct,
+                    voteDiff,
+                    severityTier, // ✅ Store for dismissal key
+                    message: championMessage?.message || `🚨 Your pick is in danger!`,
+                    detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
+                    cta: championMessage?.cta || 'View Match Now!'
+                });
+                
+                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+            }
+            
+            // ========================================
+            // COMEBACK: Was losing, now winning
+            // ========================================
+            
+            else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
+                const normalizedMatchId = getMatchId(match);
+                
+                // ✅ Severity tier: how much are they winning by now?
+                let comebackTier;
+                if (voteDiff <= 2) {
+                    comebackTier = 'comeback-small';
+                } else if (voteDiff <= 5) {
+                    comebackTier = 'comeback-medium';
+                } else {
+                    comebackTier = 'comeback-large';
+                }
+                
+                const bulletinKey = `comeback-${normalizedMatchId}-${comebackTier}`;
+                
+                if (dismissedBulletins.has(bulletinKey)) {
+                    console.log(`⏭️ Skipping comeback alert (${comebackTier} dismissed): ${bulletinKey}`);
+                    continue;
+                }
+                
+                const championMessage = window.championLoader?.getChampionMessage('comeback', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+                    voteDiff: voteDiff,
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
+                
+                notifications.push({
+                    priority: 2,
+                    type: 'comeback',
+                    matchId: normalizedMatchId,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    userPct,
+                    opponentPct,
+                    severityTier: comebackTier, // ✅ Store for dismissal key
                     message: championMessage?.message || `🎉 Comeback complete!`,
-                    detail: championMessage?.detail || `Now leading!`,
+                    detail: championMessage?.detail || `Now leading by ${voteDiff}!`,
                     cta: championMessage?.cta || 'View Match!'
                 });
             }
+            
+            // ========================================
             // NAILBITER: Very close match
+            // ========================================
+            
             else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
-              const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
-    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
-    voteDiff: voteDiff,
-    userPct: userPct,
-    opponentPct: opponentPct
-});
+                const normalizedMatchId = getMatchId(match);
+                
+                // ✅ Severity tier: how close is it?
+                let nailbiterTier;
+                if (voteDiff === 0) {
+                    nailbiterTier = 'tied';
+                } else if (voteDiff === 1) {
+                    nailbiterTier = 'diff-1';
+                } else {
+                    nailbiterTier = `diff-${voteDiff}`;
+                }
+                
+                const bulletinKey = `nailbiter-${normalizedMatchId}-${nailbiterTier}`;
+                
+                if (dismissedBulletins.has(bulletinKey)) {
+                    console.log(`⏭️ Skipping nailbiter alert (${nailbiterTier} dismissed): ${bulletinKey}`);
+                    continue;
+                }
+                
+                const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+                    voteDiff: voteDiff,
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
                 
                 notifications.push({
                     priority: 3,
                     type: 'nailbiter',
-                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    matchId: normalizedMatchId,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     voteDiff,
                     userPct,
                     opponentPct,
+                    severityTier: nailbiterTier, // ✅ Store for dismissal key
                     message: championMessage?.message || `🔥 Too close!`,
-                    detail: championMessage?.detail || `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`,
+                    detail: championMessage?.detail || `${voteDiff === 0 ? 'Perfectly tied!' : `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`}`,
                     cta: championMessage?.cta || 'View Match!'
                 });
             }
+            
+            // ========================================
             // WINNING: User's pick is dominating
+            // ========================================
+            
             else if (userPct >= BULLETIN_THRESHOLDS.WINNING && totalVotes > 20) {
+                const normalizedMatchId = getMatchId(match);
+                
+                // ✅ Severity tier: how much are they winning by?
+                let winTier;
+                if (voteDiff <= 3) {
+                    winTier = 'winning-small';
+                } else if (voteDiff <= 10) {
+                    winTier = 'winning-medium';
+                } else if (voteDiff <= 20) {
+                    winTier = 'winning-large';
+                } else {
+                    winTier = 'winning-dominating';
+                }
+                
+                const bulletinKey = `winning-${normalizedMatchId}-${winTier}`;
+                
+                if (dismissedBulletins.has(bulletinKey)) {
+                    console.log(`⏭️ Skipping winning alert (${winTier} dismissed): ${bulletinKey}`);
+                    continue;
+                }
+                
                 const championMessage = window.championLoader?.getChampionMessage('winning', {
                     songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     userPct: userPct,
@@ -528,11 +619,13 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 notifications.push({
                     priority: 4,
                     type: 'winning',
-                    matchId: getMatchId(match),                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    matchId: normalizedMatchId,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
                     opponentPct,
+                    severityTier: winTier, // ✅ Store for dismissal key
                     message: championMessage?.message || `🎯 Dominating!`,
                     detail: championMessage?.detail || `Leading ${userPct}% to ${opponentPct}%`,
                     cta: championMessage?.cta || 'View Match!'
@@ -551,14 +644,11 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
             if (outcomes.length > 0) {
                 console.log(`🏆 Found ${outcomes.length} new match outcome(s)`);
                 
-                // Show the first outcome as a notification
                 const outcome = outcomes[0];
                 showMatchOutcomeNotification(outcome);
                 
-                // Also trigger achievement check
                 const { checkAchievements } = await import('./achievement-tracker.js');
                 
-                // Fetch user votes from API for achievement checking
                 try {
                     const votesResponse = await fetch(`/api/user-votes?userId=${userId}`);
                     if (votesResponse.ok) {
@@ -569,7 +659,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                     console.warn('Could not check achievements:', voteError);
                 }
                 
-                return; // Exit early - showed outcome notification
+                return;
             }
             
         } catch (error) {
@@ -583,7 +673,6 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
         let zeroVoteCount = 0;
         let lowVoteCount = 0;
         
-        // Fetch all live matches once
         const allLiveResponse = await fetch('/api/matches');
         const allMatches = await allLiveResponse.json();
         const liveMatches = allMatches.filter(m => m.status === 'live');
@@ -593,10 +682,8 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
             const totalVotes = (match.song1?.votes || 0) + (match.song2?.votes || 0);
             const hoursLeft = getHoursUntilClose(match);
             
-            // Skip if no end time or already closed
             if (!hoursLeft || hoursLeft <= 0) continue;
             
-            // 🚨 CRITICAL: Zero votes
             if (totalVotes === 0 && hoursLeft <= 6) {
                 zeroVoteCount++;
                 
@@ -610,26 +697,25 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
-          notifications.push({
-    priority: 1,
-    type: 'novotes',
-    matchId: matchId,
-    song: match.song1?.title,
-    opponent: match.song2?.title,
-    thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
-    hoursLeft: hoursLeft,
-    message: `🚨 URGENT: Match has ZERO votes!`,
-    detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
-    cta: 'Cast First Vote!',
-    action: 'navigate',
-    targetUrl: `/vote.html?match=${matchId}`
-});
+                    notifications.push({
+                        priority: 1,
+                        type: 'novotes',
+                        matchId: matchId,
+                        song: match.song1?.title,
+                        opponent: match.song2?.title,
+                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                        hoursLeft: hoursLeft,
+                        message: `🚨 URGENT: Match has ZERO votes!`,
+                        detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
+                        cta: 'Cast First Vote!',
+                        action: 'navigate',
+                        targetUrl: `/vote.html?match=${matchId}`
+                    });
                     
                     localStorage.setItem(alertKey, Date.now().toString());
                     break;
                 }
             }
-            // ⚠️ WARNING: Low votes
             else if (totalVotes > 0 && totalVotes < 5 && hoursLeft <= 3) {
                 lowVoteCount++;
                 
@@ -643,21 +729,21 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
-notifications.push({
-    priority: 6,
-    type: 'lowvotes',
-    matchId: matchId,
-    song: match.song1?.title,
-    opponent: match.song2?.title,
-    thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
-    totalVotes: totalVotes,
-    hoursLeft: hoursLeft,
-    message: `⚠️ Match needs more votes!`,
-    detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
-    cta: 'Vote Now!',
-    action: 'navigate',
-    targetUrl: `/vote.html?match=${matchId}`
-});
+                    notifications.push({
+                        priority: 6,
+                        type: 'lowvotes',
+                        matchId: matchId,
+                        song: match.song1?.title,
+                        opponent: match.song2?.title,
+                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                        totalVotes: totalVotes,
+                        hoursLeft: hoursLeft,
+                        message: `⚠️ Match needs more votes!`,
+                        detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
+                        cta: 'Vote Now!',
+                        action: 'navigate',
+                        targetUrl: `/vote.html?match=${matchId}`
+                    });
                     
                     localStorage.setItem(alertKey, Date.now().toString());
                     break;
@@ -730,10 +816,18 @@ notifications.push({
         notifications.sort((a, b) => a.priority - b.priority);
         
         for (const notification of notifications) {
-            const bulletinKey = `${notification.type}-${notification.matchId}`;
+            // ✅ Build bulletin key with severity tier if available
+            const bulletinKey = notification.severityTier 
+                ? `${notification.type}-${notification.matchId}-${notification.severityTier}`
+                : `${notification.type}-${notification.matchId}`;
             
-            if (dismissedBulletins.has(bulletinKey)) continue;
+            // ✅ Check if THIS specific situation was dismissed
+            if (dismissedBulletins.has(bulletinKey)) {
+                console.log(`⏭️ Skipping ${notification.type} (dismissed): ${bulletinKey}`);
+                continue;
+            }
             
+            // ✅ Check cooldown
             const lastShown = recentlyShownBulletins.get(bulletinKey);
             if (lastShown) {
                 const cooldownMs = (COOLDOWN_MINUTES[notification.type] || 10) * 60000;
@@ -747,7 +841,7 @@ notifications.push({
             showBulletin(notification);
             recentlyShownBulletins.set(bulletinKey, Date.now());
             
-            // Save to Firestore for notification center
+            // Save to Firestore
             if (userId && userId !== 'anonymous' && notification.matchId) {
                 await saveNotification(userId, {
                     type: notification.type,
@@ -2491,6 +2585,8 @@ function initBulletinSystem() {
         'activity.html',
         'brackets.html',
         'profile.html',
+            'profile',        // ✅ Add this for /profile URLs without .html
+
         // ❌ REMOVED 'index.html' - this is your landing page that was showing unwanted alerts
     ];
 
@@ -2593,7 +2689,7 @@ async function initializeNotificationSystem() {
             resolve();
         }, 5000);
     });
-    
+
     
     // ✅ NEW: Initialize champion pack first
     try {

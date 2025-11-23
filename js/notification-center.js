@@ -46,9 +46,11 @@ export async function initNotificationCenter() {
     // Update badge count
     await updateBadgeCount();
     
-    // ✅ CRITICAL: Remove old listeners by cloning bell
-    const newBell = bell.cloneNode(true);
-    bell.parentNode.replaceChild(newBell, bell);
+    // ✅ CRITICAL: Only clone if bell has a parent (not already removed)
+    if (bell.parentNode) {
+        const newBell = bell.cloneNode(true);
+        bell.parentNode.replaceChild(newBell, bell);
+    }
     
     // ✅ Get fresh reference to bell after replacement
     const freshBell = document.getElementById('notificationBell');
