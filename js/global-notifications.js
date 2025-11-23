@@ -1456,7 +1456,6 @@ function showBulletin(notification) {
     z-index: 999;
     width: 380px;
     max-width: calc(100vw - 48px);
-    min-height: 280px;  /* ✅ Even taller (was 240px) */
     
     /* Full champion splash background */
     background: var(--bulletin-bg);
@@ -1479,20 +1478,18 @@ function showBulletin(notification) {
     opacity: 1;
 }
 
-/* Dark gradient overlay - starts halfway down */
+/* Dark overlay only on bottom portion */
 .bulletin-banner::after {
     content: '';
     position: absolute;
-    top: 0;
+    bottom: 0;  /* ✅ Start from bottom */
     left: 0;
     right: 0;
-    bottom: 0;
+    height: 200px;  /* ✅ Only cover the text/button area */
     background: linear-gradient(to bottom, 
         transparent 0%, 
-        transparent 45%,           /* ✅ Clear until almost halfway */
-        rgba(0, 0, 0, 0.2) 40%,
-        rgba(0, 0, 0, 0.5) 50%,
-        rgba(0, 0, 0, 0.75) 65%,
+        rgba(0, 0, 0, 0.3) 20%,
+        rgba(0, 0, 0, 0.7) 50%,
         rgba(0, 0, 0, 0.9) 80%,
         rgba(0, 0, 0, 0.95) 100%
     );
@@ -1507,12 +1504,10 @@ function showBulletin(notification) {
 .bulletin-toast-content {
     position: relative;
     z-index: 2;
-    padding: 1rem;  /* ✅ Normal padding, not pushed up */
+    padding: 120px 1rem 1rem 1rem;  /* ✅ Add 120px space at top for clear banner */
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    margin-top: auto;  /* ✅ Push content to bottom */
-
 }
 
 /* ========================================
