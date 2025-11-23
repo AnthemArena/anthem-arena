@@ -3,6 +3,7 @@
   "name": "Standard",
   "displayName": "Standard Notifications",
   "emoji": "📢",
+    "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
   "description": "Professional, straightforward tournament notifications",
   "color": "#C8AA6E",
   

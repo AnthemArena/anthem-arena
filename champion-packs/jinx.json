@@ -3,6 +3,7 @@
   "name": "Jinx",
   "displayName": "Chaotic & Explosive 💥",
   "emoji": "💥",
+    "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png",
   "description": "Wild, unpredictable, and always ready to blow something up! Get ready for mayhem!",
   "buttonPrefix": "💣",
   "color": "#ff69b4",

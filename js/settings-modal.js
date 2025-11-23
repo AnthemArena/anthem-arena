@@ -472,7 +472,7 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
     
      // ✅ NEW: Load champion pack selector
     loadChampionPackSelector();
-    
+
     console.log('✅ Profile loaded with privacy settings');
 }
 
@@ -1284,7 +1284,19 @@ async function loadChampionPackSelector() {
                      data-pack-id="${pack.id}"
                      ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
                     ${pack.comingSoon ? '<span class="coming-soon-badge">🔒</span>' : ''}
-                    <div class="champion-pack-icon">${pack.emoji}</div>
+                    
+                    <!-- ✅ UPDATED: Use champion icon with emoji fallback -->
+                    <div class="champion-pack-icon">
+                        ${pack.icon 
+                            ? `<img src="${pack.icon}" 
+                                    alt="${pack.name}" 
+                                    class="champion-icon-img"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                               <span class="champion-emoji-fallback" style="display: none;">${pack.emoji}</span>`
+                            : pack.emoji
+                        }
+                    </div>
+                    
                     <div class="champion-pack-name">${pack.name}</div>
                     <div class="champion-pack-description">${pack.description}</div>
                     ${!isDisabled ? `
@@ -1354,7 +1366,6 @@ async function previewChampionPack(packId) {
 // Make functions global so onclick can access them
 window.selectChampionPack = selectChampionPack;
 window.previewChampionPack = previewChampionPack;
-
 // ========================================
 // EXPORT AND GLOBAL ACCESS
 // ========================================

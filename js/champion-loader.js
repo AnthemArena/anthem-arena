@@ -508,6 +508,14 @@ function getUserChampionPack() {
 
 async function initializeChampionPack() {
     const userChoice = getUserChampionPack();
+
+     // ✅ NEW: Set Jinx as default for new users
+    if (!userChoice) {
+        userChoice = 'jinx';
+        localStorage.setItem('championPack', 'jinx');
+        console.log('🎪 First visit - setting Jinx as default!');
+    }
+    
     console.log(`🎭 Initializing champion pack: ${userChoice}`);
     
     await loadChampionPack(userChoice);

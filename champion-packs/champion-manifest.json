@@ -1,22 +1,33 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-01-01",
   "packs": [
-    {
-      "id": "default",
-      "name": "Standard",
-      "displayName": "Standard Notifications 📢",
-      "emoji": "📢",
-      "description": "Professional, straightforward notifications",
-      "enabled": true
-    },
     {
       "id": "jinx",
       "name": "Jinx",
       "displayName": "Chaotic & Explosive 💥",
       "emoji": "💥",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png",
       "description": "Wild, unpredictable, and always ready to blow something up!",
       "enabled": true
+    },
+    {
+      "id": "default",
+      "name": "Standard",
+      "displayName": "Standard Notifications",
+      "emoji": "📢",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
+      "description": "Professional, straightforward notifications",
+      "enabled": true
+    },
+    {
+      "id": "lux",
+      "name": "Lux",
+      "displayName": "Bright & Optimistic ✨",
+      "emoji": "✨",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Lux.png",
+      "description": "Positive energy and magical encouragement!",
+      "enabled": false,
+      "comingSoon": true
     }
   ]
 }
