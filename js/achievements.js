@@ -943,6 +943,50 @@ export const ACHIEVEMENT_CATEGORIES = {
 };
 
 // ========================================
+// RARITY SYSTEM  ← ADD THIS NEW SECTION HERE
+// ========================================
+
+export const RARITY_INFO = {
+  common: {
+    color: '#A0A0A0',
+    name: 'Common',
+    glow: '0 0 10px rgba(160, 160, 160, 0.3)',
+    gradient: 'linear-gradient(135deg, #808080, #A0A0A0)'
+  },
+  uncommon: {
+    color: '#1EFF0C',
+    name: 'Uncommon',
+    glow: '0 0 15px rgba(30, 255, 12, 0.4)',
+    gradient: 'linear-gradient(135deg, #0FC800, #1EFF0C)'
+  },
+  rare: {
+    color: '#0070DD',
+    name: 'Rare',
+    glow: '0 0 20px rgba(0, 112, 221, 0.5)',
+    gradient: 'linear-gradient(135deg, #0058B0, #0070DD)'
+  },
+  epic: {
+    color: '#A335EE',
+    name: 'Epic',
+    glow: '0 0 25px rgba(163, 53, 238, 0.6)',
+    gradient: 'linear-gradient(135deg, #8B2DB8, #A335EE)'
+  },
+  legendary: {
+    color: '#FF8000',
+    name: 'Legendary',
+    glow: '0 0 30px rgba(255, 128, 0, 0.7)',
+    gradient: 'linear-gradient(135deg, #E67300, #FF8000)'
+  },
+  mythic: {
+    color: '#E74C3C',
+    name: 'Mythic',
+    glow: '0 0 35px rgba(231, 76, 60, 0.8)',
+    gradient: 'linear-gradient(135deg, #C0392B, #E74C3C)'
+  }
+};
+
+
+// ========================================
 // HELPER FUNCTIONS (UPDATED)
 // ========================================
 
