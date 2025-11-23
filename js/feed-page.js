@@ -920,23 +920,25 @@ function renderPostContent(post) {
         let textHtml = '';
         
         if (needsCollapse) {
-            // Show preview + "Show more" button
-            const previewText = displayContent.substring(0, PREVIEW_LENGTH);
-            const fullText = displayContent;
-            
-            const previewWithSongs = parseSongMentions(previewText);
-            const previewWithMentions = parseMentionsHTML(previewWithSongs);
-            
-            textHtml = `
-                <div class="post-text-container">
-                    <p class="post-text post-text-preview" data-full-text="${escapeHtml(fullText)}">
-                        ${previewWithMentions}...
-                    </p>
-                    <button class="show-more-btn" onclick="togglePostText(this)">
-                        Show more
-                    </button>
-                </div>
-            `;
+    const previewText = displayContent.substring(0, PREVIEW_LENGTH);
+    
+    const previewWithSongs = parseSongMentions(previewText);
+    const previewWithMentions = parseMentionsHTML(previewWithSongs);
+    
+    // ✅ Create a unique ID for this post's content
+    const contentId = `post-content-${post.postId}`;
+    
+    textHtml = `
+        <div class="post-text-container" data-full-text="${escapeHtml(displayContent)}">
+            <p class="post-text post-text-preview" id="${contentId}">
+                ${previewWithMentions}...
+            </p>
+            <button class="show-more-btn" onclick="togglePostText(this)">
+                Show more
+            </button>
+        </div>
+    `;
+
         } else {
             // Short post - show normally
             textHtml = withMentions.trim() 
@@ -2904,7 +2906,7 @@ function escapeHtml(text) {
 window.togglePostText = function(button) {
     const container = button.closest('.post-text-container');
     const textElement = container.querySelector('.post-text-preview');
-    const fullText = textElement.dataset.fullText;
+    const fullText = container.dataset.fullText; // ✅ Get from container
     
     const isExpanded = button.textContent.trim() === 'Show less';
     

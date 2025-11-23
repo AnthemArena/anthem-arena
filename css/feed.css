@@ -3174,3 +3174,28 @@ body {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+/* ========================================
+   POST TEXT CONTAINER FIX
+   ======================================== */
+
+.post-text-container {
+    position: relative;
+}
+
+.post-text {
+    margin: 0 !important;  /* ✅ Remove default paragraph margin */
+    padding: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
+.post-text:first-child {
+    margin-top: 0 !important;  /* ✅ Ensure no top margin on first element */
+}
+
+.post-text-preview {
+    display: block;
+    margin: 0 !important;
+    padding: 0;
+}
