@@ -14,7 +14,7 @@ let countdownInterval = null;
 // ========================================
 async function loadMusicVideos() {
     try {
-        const response = await fetch('/data/musicVideos.json');
+        const response = await fetch('/data/music-videos.json');
         if (!response.ok) {
             console.warn('⚠️ musicVideos.json not found, using fallback');
             musicVideos = {};
