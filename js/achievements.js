@@ -799,7 +799,7 @@ export const ACHIEVEMENTS = {
   id: 'last-second-hero',
   name: 'Clutch Hero',
   description: 'Your vote tied or flipped a match at the last second!',
-  icon: '<i class="fa-solid fa-clock"></i>',
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/6676.png', // ✅ The Collector (already in your code earlier)
   xp: 1000,
   category: 'special',
   hidden: true,
@@ -814,7 +814,7 @@ export const ACHIEVEMENTS = {
   id: 'level-up',
   name: 'Level Up!',
   description: 'Reached a new level!',
-  icon: '<i class="fa-solid fa-arrow-up"></i>',
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3124.png', // ✅ Guinsoo's Rageblade (progression item)
   xp: 0, // XP already awarded by leveling system
   category: 'special',
   hidden: true,
@@ -830,7 +830,7 @@ export const ACHIEVEMENTS = {
   id: 'match-tied',
   name: 'Split Decision',
   description: 'Your match ended in a perfect tie!',
-  icon: '<i class="fa-solid fa-equals"></i>',
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png', // ✅ Guardian Angel (balance/resurrection theme)
   xp: 100,
   category: 'special',
   hidden: true,
