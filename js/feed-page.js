@@ -2645,14 +2645,18 @@ function setupCreatePost() {
     });
     
     // Enter to submit (Shift+Enter for new line)
-    postInput.addEventListener('keypress', async (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (!submitBtn.disabled) {
-                await createUserPost();
-            }
+postInput.addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!submitBtn.disabled) {
+            await createUserPost();
+            
+            // ✅ Reset textarea height after posting
+            postInput.style.height = 'auto';
+            postInput.style.height = '60px'; // Match min-height
         }
-    });
+    }
+});
 }
 
 async function createUserPost() {
@@ -2665,6 +2669,12 @@ async function createUserPost() {
     // Disable submit while posting
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+
+       // ✅ ADD THESE LINES:
+        // Reset textarea height to default
+        postInput.style.height = 'auto';
+        postInput.style.height = '60px'; // Match min-height from CSS
+    
     
     try {
         const userId = localStorage.getItem('tournamentUserId');
@@ -2794,9 +2804,15 @@ async function createUserPost() {
         if (window.showNotification) {
             window.showNotification('Failed to post. Try again.', 'error');
         }
-    } finally {
+     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post';
+        
+        // ✅ Reset textarea height to default
+        if (postInput) {
+            postInput.style.height = 'auto';
+            postInput.style.height = '60px'; // Match min-height from CSS
+        }
     }
 }
 
@@ -2881,6 +2897,10 @@ function escapeHtml(text) {
 // ✅ TOGGLE SHOW MORE/LESS
 // ========================================
 
+// ========================================
+// ✅ TOGGLE SHOW MORE/LESS
+// ========================================
+
 window.togglePostText = function(button) {
     const container = button.closest('.post-text-container');
     const textElement = container.querySelector('.post-text-preview');
@@ -2889,21 +2909,31 @@ window.togglePostText = function(button) {
     const isExpanded = button.textContent.trim() === 'Show less';
     
     if (isExpanded) {
-        // Collapse
+        // Collapse - show preview only
         const previewText = fullText.substring(0, 280);
+        
+        // ✅ Re-parse with mentions and songs
         const withSongs = parseSongMentions(previewText);
         const withMentions = parseMentionsHTML(withSongs);
         
         textElement.innerHTML = withMentions + '...';
-        button.innerHTML = 'Show more';
+        button.textContent = 'Show more';
+        
+        // ✅ Re-setup tooltips after updating DOM
+        setupSongTooltips();
+        setupMentionTooltips();
         
     } else {
-        // Expand
+        // Expand - show full text
         const withSongs = parseSongMentions(fullText);
         const withMentions = parseMentionsHTML(withSongs);
         
         textElement.innerHTML = withMentions;
-        button.innerHTML = 'Show less';
+        button.textContent = 'Show less';
+        
+        // ✅ Re-setup tooltips after updating DOM
+        setupSongTooltips();
+        setupMentionTooltips();
     }
 };
 
