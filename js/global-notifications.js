@@ -419,43 +419,48 @@ async function checkAndShowBulletin() {
                 lastCheck: Date.now()
             };
             
-            // DANGER: User's pick is losing badly
-            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-                const dangerAlertKey = `danger-alert-count-${match.id}`;
-                const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
-                const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
-                
-                const championMessage = window.championLoader?.getChampionMessage('danger', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    voteDiff: voteDiff,
-                    userPct: userPct,
-                    opponentPct: opponentPct
-                });
-                
-                notifications.push({
-                    priority: 1,
-                    type: notificationType,
-                    matchId: match.id,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-                    thumbnailUrl: getThumbnailUrl(userSong),
-                    userPct,
-                    opponentPct,
-                    voteDiff,
-                    message: championMessage?.message || `🚨 Your pick is in danger!`,
-                    detail: championMessage?.detail || `Behind by ${voteDiff} votes`,
-                    cta: championMessage?.cta || 'View Match Now!'
-                });
-                
-                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-            }
+         // DANGER: User's pick is losing badly
+if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+    const dangerAlertKey = `danger-alert-count-${match.id}`;
+    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+    
+    const championMessage = window.championLoader?.getChampionMessage('danger', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent', // ✅ ADD THIS
+        matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`, // ✅ ADD THIS
+        voteDiff: voteDiff,
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
+    notifications.push({
+        priority: 1,
+        type: notificationType,
+        matchId: match.id,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong),
+        userPct,
+        opponentPct,
+        voteDiff,
+        message: championMessage?.message || `🚨 Your pick is in danger!`,
+        detail: championMessage?.detail || `Behind by ${voteDiff} votes`,
+        cta: championMessage?.cta || 'View Match Now!'
+    });
+    
+    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+}
             // COMEBACK: Was losing, now winning
             else if (wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN) {
-                const championMessage = window.championLoader?.getChampionMessage('comeback', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    userPct: userPct,
-                    opponentPct: opponentPct
-                });
+             const championMessage = window.championLoader?.getChampionMessage('comeback', {
+    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+    voteDiff: voteDiff,
+    userPct: userPct,
+    opponentPct: opponentPct
+});
                 
                 notifications.push({
                     priority: 2,
@@ -473,13 +478,14 @@ async function checkAndShowBulletin() {
             }
             // NAILBITER: Very close match
             else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
-                const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    voteDiff: voteDiff,
-                    voteDiffPlural: voteDiff === 1 ? '' : 's',
-                    userPct: userPct,
-                    opponentPct: opponentPct
-                });
+              const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
+    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+    voteDiff: voteDiff,
+    userPct: userPct,
+    opponentPct: opponentPct
+});
                 
                 notifications.push({
                     priority: 3,
@@ -591,20 +597,20 @@ async function checkAndShowBulletin() {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
-                    notifications.push({
-                        priority: 1,
-                        type: 'novotes',
-                        matchId: matchId,
-                        song: match.song1?.title,
-                        opponent: match.song2?.title,
-                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
-                        hoursLeft: hoursLeft,
-                        message: `🚨 URGENT: Match has ZERO votes!`,
-                        detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
-                        cta: 'Cast First Vote!',
-                        action: 'navigate',
-                        targetUrl: `/vote.html?match=${matchId}`
-                    });
+          notifications.push({
+    priority: 1,
+    type: 'novotes',
+    matchId: matchId,
+    song: match.song1?.title,
+    opponent: match.song2?.title,
+    thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+    hoursLeft: hoursLeft,
+    message: `🚨 URGENT: Match has ZERO votes!`,
+    detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
+    cta: 'Cast First Vote!',
+    action: 'navigate',
+    targetUrl: `/vote.html?match=${matchId}`
+});
                     
                     localStorage.setItem(alertKey, Date.now().toString());
                     break;
@@ -624,21 +630,21 @@ async function checkAndShowBulletin() {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
-                    notifications.push({
-                        priority: 6,
-                        type: 'lowvotes',
-                        matchId: matchId,
-                        song: match.song1?.title,
-                        opponent: match.song2?.title,
-                        thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
-                        totalVotes: totalVotes,
-                        hoursLeft: hoursLeft,
-                        message: `⚠️ Match needs more votes!`,
-                        detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
-                        cta: 'Vote Now!',
-                        action: 'navigate',
-                        targetUrl: `/vote.html?match=${matchId}`
-                    });
+notifications.push({
+    priority: 6,
+    type: 'lowvotes',
+    matchId: matchId,
+    song: match.song1?.title,
+    opponent: match.song2?.title,
+    thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+    totalVotes: totalVotes,
+    hoursLeft: hoursLeft,
+    message: `⚠️ Match needs more votes!`,
+    detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
+    cta: 'Vote Now!',
+    action: 'navigate',
+    targetUrl: `/vote.html?match=${matchId}`
+});
                     
                     localStorage.setItem(alertKey, Date.now().toString());
                     break;
@@ -927,13 +933,14 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     let message, detail, cta, icon, ctaAction, ctaData;
 
     if (isAlly) {
-        const championMessage = window.championLoader.getChampionMessage('ally', {
-            username: activity.username,
-            songTitle: activity.songTitle
-        });
-        message = championMessage.message;
-        detail = championMessage.detail;
-        cta = championMessage.cta;
+      const championMessage = window.championLoader.getChampionMessage('ally', {
+        username: activity.username,
+        songTitle: activity.songTitle,
+        matchTitle: activity.matchTitle
+    });
+    message = championMessage.message;
+    detail = championMessage.detail;
+    cta = championMessage.cta;
         icon = 'Handshake';
         ctaAction = 'send-emote';
         ctaData = {
@@ -947,15 +954,15 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
             }
         };
     } else {
-        const championMessage = window.championLoader.getChampionMessage('rival', {
-            username: activity.username,
-            theirSong: activity.songTitle,
-            yourSong: userSongTitle,
-            matchTitle: activity.matchTitle
-        });
-        message = championMessage.message;
-        detail = championMessage.detail;
-        cta = championMessage.cta;
+     const championMessage = window.championLoader.getChampionMessage('rival', {
+        username: activity.username,
+        theirSong: activity.songTitle,
+        yourSong: userSongTitle,
+        matchTitle: activity.matchTitle
+    });
+    message = championMessage.message;
+    detail = championMessage.detail;
+    cta = championMessage.cta;
         icon = 'Crossed Swords';
         ctaAction = 'navigate';
         ctaData = {};
@@ -1070,66 +1077,143 @@ function showStreakNotification(streakData) {
     const { username, userId, streak, isAlly, isMilestone } = streakData;
     
     // Build message based on type and milestone
-    let message, detail, icon, priority;
+    let message, detail, icon, priority, cta;
     
     if (isAlly) {
-        if (streak === 3) {
-            message = `🔥 3-match streak with ${username}!`;
-            detail = `You've both agreed on 3 matches in a row`;
+        // ✅ ALLY STREAKS - Use champion messages for ALL cases
+        let alertType = 'streak-ally-3'; // Default
+        
+        if (streak >= 20) {
+            alertType = 'streak-ally-20';
+        } else if (streak >= 10) {
+            alertType = 'streak-ally-10';
+        } else if (streak >= 5) {
+            alertType = 'streak-ally-5';
+        } else if (streak >= 3) {
+            alertType = 'streak-ally-3';
+        }
+        
+        const championMessage = window.championLoader?.getChampionMessage(alertType, {
+            username: username,
+            streakCount: streak
+        });
+        
+        if (championMessage) {
+            message = championMessage.message;
+            detail = championMessage.detail;
+            cta = championMessage.cta;
             icon = '🤝';
-            priority = 5;
-        } else if (streak === 5) {
-            message = `🔥🔥 5-match alliance with ${username}!`;
-            detail = `Your taste in music is perfectly aligned!`;
-            icon = '✨';
-            priority = 4;
-        } else if (streak === 10) {
-            message = `🔥🔥🔥 EPIC 10-match streak with ${username}!`;
-            detail = `You two are music soulmates!`;
-            icon = '💫';
-            priority = 3;
-        } else if (streak >= 20) {
-            message = `👑 LEGENDARY ${streak}-match streak with ${username}!`;
-            detail = `This alliance is unbreakable!`;
-            icon = '👑';
-            priority = 2;
-        } else if (isMilestone) {
-            message = `🔥 ${streak}-match streak with ${username}!`;
-            detail = `Your alliance grows stronger`;
-            icon = '🤝';
-            priority = 5;
+            
+            // Set priority based on streak size
+            if (streak >= 20) {
+                priority = 2;
+            } else if (streak >= 10) {
+                priority = 3;
+            } else if (streak >= 5) {
+                priority = 4;
+            } else {
+                priority = 5;
+            }
         } else {
-            return; // Don't show non-milestone streaks
+            // ✅ Fallback if champion pack doesn't have this alert
+            if (streak === 3) {
+                message = `🔥 3-match streak with ${username}!`;
+                detail = `You've both agreed on 3 matches in a row`;
+                icon = '🤝';
+                priority = 5;
+            } else if (streak === 5) {
+                message = `🔥🔥 5-match alliance with ${username}!`;
+                detail = `Your taste in music is perfectly aligned!`;
+                icon = '✨';
+                priority = 4;
+            } else if (streak === 10) {
+                message = `🔥🔥🔥 EPIC 10-match streak with ${username}!`;
+                detail = `You two are music soulmates!`;
+                icon = '💫';
+                priority = 3;
+            } else if (streak >= 20) {
+                message = `👑 LEGENDARY ${streak}-match streak with ${username}!`;
+                detail = `This alliance is unbreakable!`;
+                icon = '👑';
+                priority = 2;
+            } else if (isMilestone) {
+                message = `🔥 ${streak}-match streak with ${username}!`;
+                detail = `Your alliance grows stronger`;
+                icon = '🤝';
+                priority = 5;
+            } else {
+                return; // Don't show non-milestone streaks
+            }
+            
+            cta = `View ${username}'s Profile`;
         }
     } else {
-        // Rival streaks
-        if (streak === 3) {
-            message = `⚔️ 3-match rivalry with ${username}!`;
-            detail = `You've opposed each other 3 times`;
+        // ✅ RIVAL STREAKS - Use champion messages for ALL cases
+        let alertType = 'streak-rival-3'; // Default
+        
+        if (streak >= 20) {
+            alertType = 'streak-rival-20';
+        } else if (streak >= 10) {
+            alertType = 'streak-rival-10';
+        } else if (streak >= 5) {
+            alertType = 'streak-rival-5';
+        } else if (streak >= 3) {
+            alertType = 'streak-rival-3';
+        }
+        
+        const championMessage = window.championLoader?.getChampionMessage(alertType, {
+            username: username,
+            streakCount: streak
+        });
+        
+        if (championMessage) {
+            message = championMessage.message;
+            detail = championMessage.detail;
+            cta = championMessage.cta;
             icon = '⚔️';
-            priority = 5;
-        } else if (streak === 5) {
-            message = `⚔️⚔️ 5-match rivalry with ${username}!`;
-            detail = `This rivalry is heating up!`;
-            icon = '🔥';
-            priority = 4;
-        } else if (streak === 10) {
-            message = `⚔️⚔️⚔️ EPIC 10-match rivalry with ${username}!`;
-            detail = `An legendary battle of taste!`;
-            icon = '💀';
-            priority = 3;
-        } else if (streak >= 20) {
-            message = `👹 LEGENDARY ${streak}-match rivalry with ${username}!`;
-            detail = `The ultimate clash continues!`;
-            icon = '👹';
-            priority = 2;
-        } else if (isMilestone) {
-            message = `⚔️ ${streak}-match rivalry with ${username}!`;
-            detail = `The battle intensifies`;
-            icon = '⚔️';
-            priority = 5;
+            
+            // Set priority based on streak size
+            if (streak >= 20) {
+                priority = 2;
+            } else if (streak >= 10) {
+                priority = 3;
+            } else if (streak >= 5) {
+                priority = 4;
+            } else {
+                priority = 5;
+            }
         } else {
-            return; // Don't show non-milestone streaks
+            // ✅ Fallback if champion pack doesn't have this alert
+            if (streak === 3) {
+                message = `⚔️ 3-match rivalry with ${username}!`;
+                detail = `You've opposed each other 3 times`;
+                icon = '⚔️';
+                priority = 5;
+            } else if (streak === 5) {
+                message = `⚔️⚔️ 5-match rivalry with ${username}!`;
+                detail = `This rivalry is heating up!`;
+                icon = '🔥';
+                priority = 4;
+            } else if (streak === 10) {
+                message = `⚔️⚔️⚔️ EPIC 10-match rivalry with ${username}!`;
+                detail = `A legendary battle of taste!`;
+                icon = '💀';
+                priority = 3;
+            } else if (streak >= 20) {
+                message = `👹 LEGENDARY ${streak}-match rivalry with ${username}!`;
+                detail = `The ultimate clash continues!`;
+                icon = '👹';
+                priority = 2;
+            } else if (isMilestone) {
+                message = `⚔️ ${streak}-match rivalry with ${username}!`;
+                detail = `The battle intensifies`;
+                icon = '⚔️';
+                priority = 5;
+            } else {
+                return; // Don't show non-milestone streaks
+            }
+            
+            cta = `View ${username}'s Profile`;
         }
     }
     
@@ -1144,7 +1228,7 @@ function showStreakNotification(streakData) {
         message: message,
         detail: detail,
         icon: icon,
-        cta: `View ${username}'s Profile`,
+        cta: cta,
         ctaAction: 'navigate',
         targetUrl: `/profile?user=${username}`,
         relationship: isAlly ? 'ally-streak' : 'rival-streak',
@@ -1162,7 +1246,7 @@ function showStreakNotification(streakData) {
             icon: icon,
             triggerUsername: username,
             triggerUserId: userId,
-            ctaText: `View ${username}'s Profile`,
+            ctaText: cta,
             ctaAction: 'navigate',
             targetUrl: `/profile?user=${username}`,
             streakCount: streak,
@@ -1170,6 +1254,7 @@ function showStreakNotification(streakData) {
         });
     }
 }
+
 // ========================================
 // PERSIST PROCESSED IDs ON PAGE UNLOAD
 // ========================================
@@ -2085,36 +2170,45 @@ if (championPack && championPack.theme) {
     } 
     // ✅ ACHIEVEMENT SPECIFIC STYLING
     else if (notification.type === 'achievement') {
-        const achievementIcon = notification.message.match(/[🏆✨⚔️🔥💀👑⭐💙🎯]/)?.[0] || '🏆';
-        
-        banner.innerHTML = `
-            <div class="bulletin-toast-content achievement-toast">
-                <div class="achievement-badge-large">
-                    ${achievementIcon}
-                </div>
-                <div class="bulletin-toast-text">
-                    <div class="achievement-label">ACHIEVEMENT UNLOCKED</div>
-                    <div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>
-                    <div class="bulletin-detail">${notification.detail}</div>
-                </div>
-                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+ // ✅ NEW: Support League item icons (can be URL or emoji)
+    const achievementIcon = notification.thumbnailUrl || notification.icon || '🏆';
+    const isLeagueItem = typeof achievementIcon === 'string' && achievementIcon.startsWith('http');
+
+       banner.innerHTML = `
+        <div class="bulletin-toast-content achievement-toast">
+            <div class="achievement-badge-large" style="${isLeagueItem ? 'background: linear-gradient(135deg, rgba(10,10,10,0.95), rgba(20,20,30,0.95)); padding: 8px; border: 2px solid rgba(200, 170, 110, 0.4);' : ''}">
+                ${isLeagueItem ? 
+                    `<img src="${achievementIcon}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(200, 170, 110, 0.7));">` 
+                    : achievementIcon
+                }
             </div>
-            <button class="bulletin-toast-cta achievement-cta" onclick="window.handleBulletinCTA()">
-                ${notification.cta || 'View Achievements'}
-            </button>
-        `;
+            <div class="bulletin-toast-text">
+                <div class="achievement-label">ACHIEVEMENT UNLOCKED</div>
+                <div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>
+                <div class="bulletin-detail">${notification.detail}</div>
+            </div>
+            <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
+        </div>
+        <button class="bulletin-toast-cta achievement-cta" onclick="window.handleBulletinCTA()">
+            ${notification.cta || 'View Achievements'}
+        </button>
+    `;
+    
+    banner.className = 'bulletin-banner achievement show';
         
-        banner.className = 'bulletin-banner achievement show';
-        
-        // Add special animation for achievement badge
-        setTimeout(() => {
-            const badge = banner.querySelector('.achievement-badge-large');
-            if (badge) {
-                badge.style.animation = 'achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-            }
-        }, 100);
-        
+       // ✅ NEW: Add rarity border color
+    if (notification.rarity) {
+        banner.setAttribute('data-rarity', notification.rarity);
     }
+    
+    // Add special animation for achievement badge
+    setTimeout(() => {
+        const badge = banner.querySelector('.achievement-badge-large');
+        if (badge) {
+            badge.style.animation = 'achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        }
+    }, 100);
+}
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 else {
@@ -2471,8 +2565,9 @@ async function initializeNotificationSystem() {
     
     // Initialize notification center with tabs
     try {
-        const { initNotificationCenterWithTabs } = await import('./notification-center.js');
-        await initNotificationCenterWithTabs();
+       // ✅ CORRECT
+const { initNotificationCenter } = await import('./notification-center.js');
+await initNotificationCenter();
         console.log('✅ Notification center with tabs ready');
     } catch (error) {
         console.warn('⚠️ Could not load notification center:', error);

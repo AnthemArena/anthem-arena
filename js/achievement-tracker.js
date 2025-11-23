@@ -2,7 +2,13 @@
 // ACHIEVEMENT TRACKER - Checking & Unlocking
 // ========================================
 
-import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES } from './achievements.js';
+import { 
+    ACHIEVEMENTS, 
+    ACHIEVEMENT_CATEGORIES,
+    getRarityColor,
+    getRarityGlow,
+    getAchievementById  // ✅ Use the exported function
+} from './achievements.js';
 import { addXP } from './rank-system.js';
 
 // ========================================
@@ -49,6 +55,11 @@ export async function unlockAchievementInFirebase(achievementId, xpReward = 0) {
             
             console.log('✅ Achievement unlocked in Firebase:', achievementId);
             
+            // ✅ NEW: Also save timestamp to localStorage for recent tracking
+            const timestamps = JSON.parse(localStorage.getItem('achievementTimestamps') || '{}');
+            timestamps[achievementId] = Date.now();
+            localStorage.setItem('achievementTimestamps', JSON.stringify(timestamps));
+            
             // Also save to localStorage as cache
             const localAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
             if (!localAchievements.includes(achievementId)) {
@@ -72,6 +83,9 @@ export async function unlockAchievementInFirebase(achievementId, xpReward = 0) {
             });
             
             console.log('✅ Profile created with first achievement:', achievementId);
+            
+            // ✅ NEW: Save timestamp
+            localStorage.setItem('achievementTimestamps', JSON.stringify({ [achievementId]: Date.now() }));
             
             // Save to localStorage
             localStorage.setItem('unlockedAchievements', JSON.stringify([achievementId]));
@@ -114,6 +128,17 @@ export async function getUnlockedAchievementsFromFirebase(userId = null) {
             // ✅ Only sync to localStorage if it's the current user
             if (!userId || userId === localStorage.getItem('tournamentUserId')) {
                 localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+                
+                // ✅ NEW: Sync timestamps if available
+                if (profile.achievementDetails) {
+                    const timestamps = {};
+                    Object.entries(profile.achievementDetails).forEach(([id, details]) => {
+                        if (details.unlockedAt) {
+                            timestamps[id] = new Date(details.unlockedAt).getTime();
+                        }
+                    });
+                    localStorage.setItem('achievementTimestamps', JSON.stringify(timestamps));
+                }
             }
             
             return unlockedAchievements;
@@ -173,87 +198,86 @@ export async function checkFoundingMemberStatus() {
  */
 export async function calculateAchievementStats(allVotes) {
 
-    // ✅ NEW: Track votes in current session
-  const sessionStart = parseInt(sessionStorage.getItem('sessionStart') || Date.now());
-  const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
+    // ✅ Track votes in current session
+    const sessionStart = parseInt(sessionStorage.getItem('sessionStart') || Date.now());
+    const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
 
-  // Check founding member status from Firebase
-  const isFoundingMember = await checkFoundingMemberStatus();
+    // Check founding member status from Firebase
+    const isFoundingMember = await checkFoundingMemberStatus();
   
-  const stats = {
-    totalVotes: allVotes.length,
-    underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
-    closeMatchVotes: allVotes.filter(v => v.voteType === 'closeCall').length,
-    earlyVotes: 0,
-    votingStreak: parseInt(localStorage.getItem('votingStreak') || '0'),
-    furthestRound: Math.max(...allVotes.map(v => v.round), 0),
-    roundsParticipated: new Set(allVotes.map(v => v.round)).size,
-    uniqueMatches: new Set(allVotes.map(v => v.matchId)).size,
-    lateNightVotes: 0,
-    instantVotes: 0,
-    prophesied: false,
-    maxSongVotes: 0,
-    sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
-    uniqueArtists: 0,
-    uniqueYears: 0,
-    comebackVotes: 0,
-    isFoundingMember: isFoundingMember, // ✅ From Firebase now
-        votesInSession: votesThisSession.length  // ✅ NEW
-
-  };
+    const stats = {
+        totalVotes: allVotes.length,
+        underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
+        closeMatchVotes: allVotes.filter(v => v.voteType === 'closeCall').length,
+        earlyVotes: 0,
+        votingStreak: parseInt(localStorage.getItem('votingStreak') || '0'),
+        furthestRound: Math.max(...allVotes.map(v => v.round), 0),
+        roundsParticipated: new Set(allVotes.map(v => v.round)).size,
+        uniqueMatches: new Set(allVotes.map(v => v.matchId)).size,
+        lateNightVotes: 0,
+        instantVotes: 0,
+        prophesied: false,
+        maxSongVotes: 0,
+        sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
+        uniqueArtists: 0,
+        uniqueYears: 0,
+        comebackVotes: 0,
+        isFoundingMember: isFoundingMember,
+        votesInSession: votesThisSession.length
+    };
   
-  // Calculate early votes (match had <10 votes when user voted)
-  stats.earlyVotes = allVotes.filter(v => {
-    const match = v.match;
-    if (!match) return false;
-    const totalAtTimeOfVote = (match.song1?.votes || 0) + (match.song2?.votes || 0);
-    return totalAtTimeOfVote <= 10;
-  }).length;
+    // Calculate early votes (match had <10 votes when user voted)
+    stats.earlyVotes = allVotes.filter(v => {
+        const match = v.match;
+        if (!match) return false;
+        const totalAtTimeOfVote = (match.song1?.votes || 0) + (match.song2?.votes || 0);
+        return totalAtTimeOfVote <= 10;
+    }).length;
   
-  // Calculate late night votes (midnight to 5am)
-  stats.lateNightVotes = allVotes.filter(v => {
-    const hour = new Date(v.timestamp).getHours();
-    return hour >= 0 && hour < 5;
-  }).length;
+    // Calculate late night votes (midnight to 5am)
+    stats.lateNightVotes = allVotes.filter(v => {
+        const hour = new Date(v.timestamp).getHours();
+        return hour >= 0 && hour < 5;
+    }).length;
   
-  // Calculate comeback votes (voted for song that was losing <40%)
-  stats.comebackVotes = allVotes.filter(v => {
-    return v.votedSongPercentage < 40;
-  }).length;
+    // Calculate comeback votes (voted for song that was losing <40%)
+    stats.comebackVotes = allVotes.filter(v => {
+        return v.votedSongPercentage < 40;
+    }).length;
   
-  // Calculate max votes for a single song
-  const songVoteCounts = {};
-  allVotes.forEach(v => {
-    const songId = v.votedForSeed || v.votedForName;
-    if (songId) {
-      songVoteCounts[songId] = (songVoteCounts[songId] || 0) + 1;
-    }
-  });
-  stats.maxSongVotes = Math.max(...Object.values(songVoteCounts), 0);
+    // Calculate max votes for a single song
+    const songVoteCounts = {};
+    allVotes.forEach(v => {
+        const songId = v.votedForSeed || v.votedForName;
+        if (songId) {
+            songVoteCounts[songId] = (songVoteCounts[songId] || 0) + 1;
+        }
+    });
+    stats.maxSongVotes = Math.max(...Object.values(songVoteCounts), 0);
   
-  // Calculate unique artists
-  const uniqueArtists = new Set();
-  allVotes.forEach(v => {
-    if (v.votedForArtist) {
-      uniqueArtists.add(v.votedForArtist);
-    }
-  });
-  stats.uniqueArtists = uniqueArtists.size;
+    // Calculate unique artists
+    const uniqueArtists = new Set();
+    allVotes.forEach(v => {
+        if (v.votedForArtist) {
+            uniqueArtists.add(v.votedForArtist);
+        }
+    });
+    stats.uniqueArtists = uniqueArtists.size;
   
-  // Calculate unique years
-  const uniqueYears = new Set();
-  allVotes.forEach(v => {
-    const match = v.match;
-    if (match) {
-      const votedSong = v.choice === 'song1' ? match.song1 : match.song2;
-      if (votedSong && votedSong.year) {
-        uniqueYears.add(votedSong.year);
-      }
-    }
-  });
-  stats.uniqueYears = uniqueYears.size;
+    // Calculate unique years
+    const uniqueYears = new Set();
+    allVotes.forEach(v => {
+        const match = v.match;
+        if (match) {
+            const votedSong = v.choice === 'song1' ? match.song1 : match.song2;
+            if (votedSong && votedSong.year) {
+                uniqueYears.add(votedSong.year);
+            }
+        }
+    });
+    stats.uniqueYears = uniqueYears.size;
   
-  return stats;
+    return stats;
 }
 
 /**
@@ -262,96 +286,98 @@ export async function calculateAchievementStats(allVotes) {
  * @returns {Object} - Achievement status
  */
 export async function checkAchievements(allVotes) {
-  const stats = await calculateAchievementStats(allVotes);
-  const unlocked = [];
-  const locked = [];
-  const newlyUnlocked = [];
+    const stats = await calculateAchievementStats(allVotes);
+    const unlocked = [];
+    const locked = [];
+    const newlyUnlocked = [];
   
-  // ✅ Get previously unlocked achievements from Firebase
-  const previouslyUnlocked = await getUnlockedAchievementsFromFirebase();
+    // ✅ Get previously unlocked achievements from Firebase
+    const previouslyUnlocked = await getUnlockedAchievementsFromFirebase();
   
-  for (const achievement of Object.values(ACHIEVEMENTS)) {
-    // Check condition (may be async)
-    let isUnlocked = false;
-    try {
-      if (typeof achievement.condition === 'function') {
-        isUnlocked = await achievement.condition(stats);
-      } else {
-        isUnlocked = achievement.condition;
-      }
-    } catch (error) {
-      console.error(`Error checking achievement ${achievement.id}:`, error);
-      continue;
-    }
+    for (const achievement of Object.values(ACHIEVEMENTS)) {
+        // Check condition (may be async)
+        let isUnlocked = false;
+        try {
+            if (typeof achievement.condition === 'function') {
+                isUnlocked = await achievement.condition(stats);
+            } else {
+                isUnlocked = achievement.condition;
+            }
+        } catch (error) {
+            console.error(`Error checking achievement ${achievement.id}:`, error);
+            continue;
+        }
     
-    const wasUnlocked = previouslyUnlocked.includes(achievement.id);
+        const wasUnlocked = previouslyUnlocked.includes(achievement.id);
     
-    // Always calculate progress
-    const progress = achievement.progress ? achievement.progress(stats) : null;
+        // Always calculate progress
+        const progress = achievement.progress ? achievement.progress(stats) : null;
     
-    if (isUnlocked) {
-      unlocked.push({
-        ...achievement,
-        progress
-      });
+        if (isUnlocked) {
+            unlocked.push({
+                ...achievement,
+                progress
+            });
       
-      // Track newly unlocked
-      if (!wasUnlocked) {
-        newlyUnlocked.push(achievement);
-      }
-    } else if (!achievement.hidden) {
-      // Only show locked achievements that aren't hidden
-      locked.push({
-        ...achievement,
-        progress
-      });
+            // Track newly unlocked
+            if (!wasUnlocked) {
+                newlyUnlocked.push(achievement);
+            }
+        } else if (!achievement.hidden) {
+            // Only show locked achievements that aren't hidden
+            locked.push({
+                ...achievement,
+                progress
+            });
+        }
     }
-  }
-  // ✅ Save newly unlocked achievements to Firebase
-if (newlyUnlocked.length > 0) {
-  console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
-  
-  for (const achievement of newlyUnlocked) {
-    // ✅ Only proceed if actually newly unlocked (not duplicate)
-    const wasActuallyUnlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
     
-    // ✅ Only award XP if it was NEWLY unlocked (Firebase returns true for new unlocks)
-    if (wasActuallyUnlocked) {
-      // Award XP
-      if (achievement.xp > 0) {
-        addXP(achievement.xp);
-        console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
-      }
-      
-      // Show unlock notification
-      showAchievementUnlock(achievement);
-    } else {
-      console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
-    }
-  }
-}
+    // ✅ Save newly unlocked achievements to Firebase
+    if (newlyUnlocked.length > 0) {
+        console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
   
-  return {
-    unlocked,
-    locked,
-    newlyUnlocked,
-    totalXPFromAchievements: unlocked.reduce((sum, a) => sum + a.xp, 0),
-    completionPercentage: Math.round((unlocked.length / Object.keys(ACHIEVEMENTS).length) * 100)
-  };
+        for (const achievement of newlyUnlocked) {
+            // ✅ Only proceed if actually newly unlocked (not duplicate)
+            const wasActuallyUnlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
+    
+            // ✅ Only award XP if it was NEWLY unlocked (Firebase returns true for new unlocks)
+            if (wasActuallyUnlocked) {
+                // Award XP
+                if (achievement.xp > 0) {
+                    addXP(achievement.xp);
+                    console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
+                }
+      
+                // Show unlock notification
+                showAchievementUnlock(achievement);
+            } else {
+                console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
+            }
+        }
+    }
+  
+    return {
+        unlocked,
+        locked,
+        newlyUnlocked,
+        totalXPFromAchievements: unlocked.reduce((sum, a) => sum + a.xp, 0),
+        completionPercentage: Math.round((unlocked.length / Object.keys(ACHIEVEMENTS).length) * 100)
+    };
 }
 
-/**
- * Show achievement unlock notification using existing toast system
- */
 /**
  * Show achievement unlock notification using champion pack
  */
 export function showAchievementUnlock(achievement) {
+    // ✅ NEW: Use League item icon
+    const achievementIcon = achievement.icon || 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3041.png';
+    
     // ✅ Get champion-voiced message
     const championMessage = window.championLoader?.getAchievementMessage(achievement.id, {
         name: achievement.name,
         description: achievement.description,
-        xp: achievement.xp
+        xp: achievement.xp,
+        rarity: achievement.rarity
     });
     
     if (window.showBulletin) {
@@ -359,26 +385,37 @@ export function showAchievementUnlock(achievement) {
             priority: 2,
             type: 'achievement',
             matchId: `achievement-${achievement.id}`,
-            thumbnailUrl: null,
+            thumbnailUrl: achievementIcon, // ✅ Use League item icon
+            icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
             message: championMessage?.message || `🏆 Achievement Unlocked: ${achievement.name}`,
-            detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP`,
+            detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP • ${achievement.rarity}`,
             cta: championMessage?.cta || 'View Achievements',
             action: 'navigate',
-            targetUrl: '/my-votes.html#achievements'
+            targetUrl: '/my-votes.html#achievements',
+                        rarity: achievement.rarity, // ✅ NEW: Pass rarity for styling
+
+            // ✅ NEW: Add rarity styling
+            customStyle: {
+                borderColor: getRarityColor(achievement.rarity),
+                boxShadow: getRarityGlow(achievement.rarity)
+            }
         });
     }
     
-    console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP)`);
+    console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP) [${achievement.rarity}]`);
 }
 
 /**
  * Get category info
  */
 export function getCategoryInfo(categoryId) {
-  return ACHIEVEMENT_CATEGORIES[categoryId] || {
-    name: 'Other',
-    icon: '🎵',
-    color: '#999',
-    description: 'Miscellaneous achievements'
-  };
+    return ACHIEVEMENT_CATEGORIES[categoryId] || {
+        name: 'Other',
+        icon: '🎵',
+        color: '#999',
+        description: 'Miscellaneous achievements'
+    };
 }
+
+// ✅ NEW: Export for external use
+export { getRarityColor, getRarityGlow } from './achievements.js';

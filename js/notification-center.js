@@ -340,13 +340,53 @@ async function updateBadgeCount() {
 }
 
 async function openPanel() {
+        console.log('📂 Opening notification panel...');
+
+
     const panel = document.getElementById('notificationPanel');
     const overlay = document.getElementById('notificationOverlay');
+
+    if (!panel) {
+        console.error('❌ Panel element not found');
+        return;
+    }
     
+    // ✅ NEW: Apply champion pack theme to panel
+    const championPack = window.championLoader?.getCurrentPack();
+    if (championPack) {
+        panel.setAttribute('data-champion-pack', championPack.id);
+        
+        // Apply CSS variables from theme
+        if (championPack.theme) {
+            const theme = championPack.theme;
+            const root = document.documentElement;
+            
+            root.style.setProperty('--champion-border-color', theme.borderColor);
+            root.style.setProperty('--champion-border-glow', theme.borderGlow);
+            root.style.setProperty('--champion-title-color', theme.titleColor);
+            root.style.setProperty('--champion-detail-color', theme.detailColor);
+            root.style.setProperty('--champion-button-bg', theme.buttonBackground);
+            root.style.setProperty('--champion-button-hover', theme.buttonHover);
+            root.style.setProperty('--champion-button-text', theme.buttonText);
+            root.style.setProperty('--champion-text-shadow', theme.textShadow);
+            root.style.setProperty('--champion-accent', `${theme.borderColor.replace('0.8', '0.15')}`);
+            root.style.setProperty('--champion-splash', theme.background);
+            
+            console.log(`🎨 Applied ${championPack.name} theme to notification panel`);
+        }
+    }
+    // Show panel and overlay
     panel.style.display = 'block';
-    overlay.style.display = 'block';
+    if (overlay) {
+        overlay.style.display = 'block';
+    }
     
-    await loadNotifications();
+    isPanelOpen = true;
+    
+    // Load notifications for current tab
+    await loadNotificationsByTab(currentTab);
+    
+    console.log('✅ Panel opened');
 }
 
 function closePanel() {
@@ -420,6 +460,18 @@ function renderCtaButton(notification) {
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
+    
+    // ✅ NEW: Check if notification is from champion pack
+    const championPack = window.championLoader?.getCurrentPack();
+    const isChampionNotification = notification.type === 'live-activity' || 
+                                   notification.type === 'danger' || 
+                                   notification.type === 'nailbiter' ||
+                                   notification.type === 'comeback' ||
+                                   notification.type === 'winning';
+    
+    const championAttr = isChampionNotification && championPack 
+        ? `data-from-champion="${championPack.id}"` 
+        : '';
 
      // ✅ ADD THESE ICONS:
     const typeIcons = {
@@ -491,7 +543,7 @@ function renderNotificationItem(notification) {
     }
     
     return `
-        <div class="notification-item ${unreadClass}" data-id="${notification.id}">
+        <div class="notification-item ${unreadClass}" data-id="${notification.id}"${championAttr}>
             <div class="notification-item-header" style="display: flex; align-items: center;">
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">

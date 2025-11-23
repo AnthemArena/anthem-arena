@@ -18,7 +18,7 @@ async function loadChampionManifest() {
     if (championManifest) return championManifest;
     
     try {
-const response = await fetch('../champion-packs/champion-manifest.json');
+        const response = await fetch('../champion-packs/champion-manifest.json');
         if (!response.ok) throw new Error('Manifest not found');
         
         championManifest = await response.json();
@@ -58,7 +58,7 @@ async function loadChampionPack(championId = 'default') {
     try {
         console.log(`📦 Loading champion pack: ${championId}`);
         
-const response = await fetch(`../champion-packs/${championId}.json`);
+        const response = await fetch(`../champion-packs/${championId}.json`);
         
         if (!response.ok) {
             throw new Error(`Pack not found: ${championId}`);
@@ -94,8 +94,6 @@ const response = await fetch(`../champion-packs/${championId}.json`);
         return createEmergencyPack();
     }
 }
-
-
 
 // ========================================
 // EMERGENCY FALLBACK PACK
@@ -144,7 +142,7 @@ function createEmergencyPack() {
 }
 
 // ========================================
-// GET RANDOM MESSAGE FROM PACK
+// GET RANDOM MESSAGE FROM PACK (UPDATED)
 // ========================================
 
 function getChampionMessage(alertType, data) {
@@ -160,12 +158,39 @@ function getChampionMessage(alertType, data) {
         return null;
     }
     
-    // Pick random message, detail, and button
-    const message = alert.messages[Math.floor(Math.random() * alert.messages.length)];
-    const detail = alert.details[Math.floor(Math.random() * alert.details.length)];
-    const button = alert.buttons[Math.floor(Math.random() * alert.buttons.length)];
+    // ✅ NEW: Check if messages is an array of conditional objects
+    if (Array.isArray(alert.messages) && alert.messages.length > 0 && typeof alert.messages[0] === 'object' && alert.messages[0].condition) {
+        // Handle conditional messages (danger, nailbiter, winning, comeback)
+        let selectedMessage = null;
+        
+        // Find first message that matches conditions
+        for (const msgObj of alert.messages) {
+            if (msgObj.condition === 'default') continue; // Skip default for now
+            
+            if (matchesCondition(msgObj.condition, data)) {
+                selectedMessage = msgObj;
+                break;
+            }
+        }
+        
+        // If no match, use default
+        if (!selectedMessage) {
+            selectedMessage = alert.messages.find(m => m.condition === 'default') || alert.messages[0];
+        }
+        
+        return {
+            message: replacePlaceholders(selectedMessage.message, data),
+            detail: replacePlaceholders(selectedMessage.detail, data),
+            cta: selectedMessage.cta,
+            emoji: currentChampionPack.emoji
+        };
+    }
     
-    // Replace placeholders
+    // ✅ EXISTING: Handle random arrays (ally, rival, etc.)
+    const message = getRandomItem(alert.messages);
+    const detail = getRandomItem(alert.details);
+    const button = getRandomItem(alert.buttons);
+    
     return {
         message: replacePlaceholders(message, data),
         detail: replacePlaceholders(detail, data),
@@ -174,10 +199,47 @@ function getChampionMessage(alertType, data) {
     };
 }
 
+// ========================================
+// HELPER: CHECK IF CONTEXT MATCHES CONDITION
+// ========================================
 
-/**
- * Get champion-voiced achievement message
- */
+function matchesCondition(condition, context) {
+    if (!condition || typeof condition !== 'object') return false;
+    
+    for (const [key, rule] of Object.entries(condition)) {
+        const value = context[key];
+        
+        if (value === undefined) return false;
+        
+        // Handle comparison operators
+        if (typeof rule === 'object') {
+            if (rule.gte !== undefined && value < rule.gte) return false;
+            if (rule.lte !== undefined && value > rule.lte) return false;
+            if (rule.gt !== undefined && value <= rule.gt) return false;
+            if (rule.lt !== undefined && value >= rule.lt) return false;
+            if (rule.eq !== undefined && value !== rule.eq) return false;
+        } else {
+            // Direct equality check
+            if (value !== rule) return false;
+        }
+    }
+    
+    return true;
+}
+
+// ========================================
+// HELPER: GET RANDOM ITEM FROM ARRAY
+// ========================================
+
+function getRandomItem(array) {
+    if (!array || !Array.isArray(array) || array.length === 0) return '';
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+// ========================================
+// GET CHAMPION-VOICED ACHIEVEMENT MESSAGE
+// ========================================
+
 function getAchievementMessage(achievementId, data) {
     if (!currentChampionPack) {
         console.error('❌ No champion pack loaded!');
@@ -200,23 +262,22 @@ function getAchievementMessage(achievementId, data) {
     }
     
     // Pick random variations
-    const message = achievement.messages[Math.floor(Math.random() * achievement.messages.length)];
-    const detail = achievement.details[Math.floor(Math.random() * achievement.details.length)];
-    const button = achievement.buttons[Math.floor(Math.random() * achievement.buttons.length)];
+    const message = getRandomItem(achievement.messages);
+    const detail = getRandomItem(achievement.details);
+    const button = getRandomItem(achievement.buttons);
     
-    // Replace placeholders
     return {
         message: replacePlaceholders(message, data),
         detail: replacePlaceholders(detail, data),
         cta: button,
         emoji: currentChampionPack.emoji
     };
-
 }
 
-/**
- * Get custom welcome message from loaded champion pack
- */
+// ========================================
+// GET CUSTOM WELCOME MESSAGE
+// ========================================
+
 function getCustomMessage(messageType) {
     if (!currentChampionPack) {
         console.error('❌ No champion pack loaded!');
@@ -240,12 +301,13 @@ function getCustomMessage(messageType) {
     }
     
     // Pick random variations
-    const message = dialog.messages[Math.floor(Math.random() * dialog.messages.length)];
-    const detail = dialog.details[Math.floor(Math.random() * dialog.details.length)];
-    const cta = dialog.buttons[Math.floor(Math.random() * dialog.buttons.length)];
+    const message = getRandomItem(dialog.messages);
+    const detail = getRandomItem(dialog.details);
+    const cta = getRandomItem(dialog.buttons);
     
     return { message, detail, cta };
 }
+
 // ========================================
 // REPLACE PLACEHOLDERS
 // ========================================
@@ -258,6 +320,12 @@ function replacePlaceholders(text, data) {
     // Song titles
     if (data.songTitle) {
         result = result.replace(/\{songTitle\}/g, data.songTitle);
+    }
+    if (data.opponentTitle) {
+        result = result.replace(/\{opponentTitle\}/g, data.opponentTitle);
+    }
+    if (data.matchTitle) {
+        result = result.replace(/\{matchTitle\}/g, data.matchTitle);
     }
     if (data.song) {
         result = result.replace(/\{song\}/g, data.song);
@@ -278,7 +346,6 @@ function replacePlaceholders(text, data) {
     // Vote data
     if (data.voteDiff !== undefined) {
         result = result.replace(/\{voteDiff\}/g, data.voteDiff);
-        // Handle plural
         result = result.replace(/\{voteDiffPlural\}/g, data.voteDiff === 1 ? '' : 's');
     }
     if (data.userPct !== undefined) {
@@ -308,6 +375,14 @@ function replacePlaceholders(text, data) {
         result = result.replace(/\{liveCount\}/g, data.liveCount);
     }
     
+    // Round data
+    if (data.round !== undefined) {
+        result = result.replace(/\{round\}/g, data.round);
+    }
+    if (data.matchCount !== undefined) {
+        result = result.replace(/\{matchCount\}/g, data.matchCount);
+    }
+    
     return result;
 }
 
@@ -334,7 +409,6 @@ function checkUniqueAlerts(data) {
         
         // Evaluate trigger condition
         try {
-            // Create safe evaluation context
             const condition = alert.triggerCondition;
             const shouldTrigger = evaluateCondition(condition, data);
             
@@ -367,11 +441,7 @@ function checkUniqueAlerts(data) {
 // ========================================
 
 function evaluateCondition(condition, data) {
-    // Simple string-based evaluation for safety
-    // Supports basic comparisons
-    
     try {
-        // Extract variables from data
         const {
             songTitle,
             totalVotes,
@@ -382,7 +452,6 @@ function evaluateCondition(condition, data) {
             voteDiff
         } = data;
         
-        // Use Function constructor for safer eval
         const func = new Function(
             'songTitle', 'totalVotes', 'userPct', 'opponentPct', 
             'song1Pct', 'song2Pct', 'voteDiff', 'Math',
@@ -415,14 +484,9 @@ async function getAvailableChampionPacks() {
 
 async function setUserChampionPack(championId) {
     try {
-        // Load the pack
         await loadChampionPack(championId);
-        
-        // Save to localStorage
         localStorage.setItem('championPack', championId);
-        
         console.log(`✅ User champion pack set to: ${championId}`);
-        
         return true;
     } catch (error) {
         console.error('Failed to set champion pack:', error);
@@ -451,7 +515,6 @@ async function initializeChampionPack() {
     return currentChampionPack;
 }
 
-
 // ========================================
 // EXPORT FUNCTIONS
 // ========================================
@@ -459,16 +522,15 @@ async function initializeChampionPack() {
 window.championLoader = {
     loadChampionPack,
     getChampionMessage,
-        getAchievementMessage,  // ✅ ADD THIS
-    getCustomMessage,  // ✅ ADD THIS LINE
-
+    getAchievementMessage,
+    getCustomMessage,
     checkUniqueAlerts,
     getAvailableChampionPacks,
     setUserChampionPack,
     getUserChampionPack,
     initializeChampionPack,
     getCurrentPack: () => currentChampionPack,
-    getManifest: loadChampionManifest  // ✅ Use existing function
+    getManifest: loadChampionManifest
 };
 
 console.log('✅ Champion loader ready');

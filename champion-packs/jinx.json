@@ -19,129 +19,133 @@
     "buttonText": "#ffffff",
     "textShadow": "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 105, 180, 0.4)"
   },
+
   "alerts": {
     "danger": {
       "messages": [
-        "💥 Uh-oh! \"{songTitle}\" is getting blown to BITS!",
-        "😬 Yikes! \"{songTitle}\" is in biiig trouble!",
-        "🎪 Oh no! \"{songTitle}\" needs backup, like, NOW!",
-        "💣 Oopsie! \"{songTitle}\" is getting SMASHED!",
-        "😱 GAH! \"{songTitle}\" is taking a beating!",
-        "🚨 Wanna see a sad thing? \"{songTitle}\" is LOSING!",
-        "💀 Oof! \"{songTitle}\" is getting destroyed! ...Did I do that?",
-        "😈 Wait wait wait! \"{songTitle}\" is in DANGER!"
-      ],
-      "details": [
-        "Down {voteDiff} votes in \"{matchTitle}\"! Rules are made to be broken!",
-        "Behind {userPct}% to {opponentPct}% - time for EMERGENCY mayhem!",
-        "Losing by {voteDiff} on \"{matchTitle}\"! I'm getting antsy!",
-        "They're crushing us {opponentPct}% to {userPct}% - can't have that!",
-        "Down {voteDiff} votes - my trigger finger's getting ITCHY!",
-        "Behind by {voteDiff} in \"{matchTitle}\" - time to blow stuff up!",
-        "Trailing {userPct}% to {opponentPct}% - this is making me crazy!",
-        "Getting hammered by {voteDiff} votes - any last words? Kidding!"
-      ],
-      "buttons": [
-        "Blow It Up! 💥",
-        "Light the Fuse! 💣",
-        "Get Jinxed! 🎪",
-        "Make It Go BOOM!",
-        "Fix This! ⚡",
-        "Rally! 🔥",
-        "Surprise Attack! 😈"
+        {
+          "condition": { "voteDiff": { "gte": 50 } },
+          "message": "💥 WHOA! \"{songTitle}\" is getting DESTROYED!",
+          "detail": "Down by {voteDiff} votes vs \"{opponentTitle}\" - this is BAD BAD!",
+          "cta": "SAVE IT NOW! 🚨"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 30 } },
+          "message": "😱 GAH! \"{songTitle}\" is getting SMASHED!",
+          "detail": "Losing by {voteDiff} against \"{opponentTitle}\" - PANIC MODE!",
+          "cta": "Rally NOW! 💣"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 20 } },
+          "message": "🔥 Uh-oh! \"{songTitle}\" is way behind!",
+          "detail": "Down {voteDiff} votes vs \"{opponentTitle}\" - needs EMERGENCY backup!",
+          "cta": "Turn It Around! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 10 } },
+          "message": "⚠️ Yikes! \"{songTitle}\" is in trouble!",
+          "detail": "Behind by {voteDiff} against \"{opponentTitle}\" - time to blow stuff up!",
+          "cta": "Fix This! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 5 } },
+          "message": "😬 Eek! \"{songTitle}\" is slipping!",
+          "detail": "Down {voteDiff} vs \"{opponentTitle}\" - not looking great!",
+          "cta": "Help Out! 🔥"
+        },
+        {
+          "condition": "default",
+          "message": "🤔 Hmm... \"{songTitle}\" is trailing",
+          "detail": "Behind by {voteDiff} against \"{opponentTitle}\" - just a lil' push needed!",
+          "cta": "Nudge It! ⚡"
+        }
       ]
     },
     
     "nailbiter": {
       "messages": [
-        "😬 Eeeek! \"{songTitle}\" is TOO CLOSE!",
-        "😱 GAH! This is making me CRAZY!",
-        "🎪 Wanna see something scary? \"{songTitle}\" could go EITHER way!",
-        "💥 \"{songTitle}\" is on a knife's edge! ...I like knives!",
-        "🔥 ONE VOTE! Just ONE could change \"{songTitle}\"!",
-        "😬 My trigger finger is TWITCHING watching \"{songTitle}\"!",
-        "💣 This is BONKERS! \"{songTitle}\" is ANYBODY'S game!",
-        "⚡ Can't... stop... WATCHING! \"{songTitle}\" is SO close!"
-      ],
-      "details": [
-        "Just {voteDiff} vote{voteDiffPlural} apart on \"{matchTitle}\" - I'm gonna EXPLODE!",
-        "{userPct}% to {opponentPct}% - somebody DO something!",
-        "Separated by only {voteDiff} in \"{matchTitle}\"! This is PEAK chaos!",
-        "This is CRAZY close - like, really REALLY crazy!",
-        "Only {voteDiff} vote{voteDiffPlural} between you and them!",
-        "Down to {voteDiff} vote{voteDiffPlural} on \"{matchTitle}\" - can you FEEL it?!",
-        "It's {userPct}% to {opponentPct}% - I can't TAKE this!",
-        "Just {voteDiff} apart - my kind of mayhem!"
-      ],
-      "buttons": [
-        "Watch the Show! 🎪",
-        "See the Chaos! 💥",
-        "Check It! 👀",
-        "View Mayhem! 🔥",
-        "See Battle! ⚔️",
-        "Watch NOW! ⚡"
+        {
+          "condition": { "voteDiff": { "eq": 0 } },
+          "message": "🔥🔥🔥 PERFECT TIE! \"{songTitle}\" is DEAD EVEN!",
+          "detail": "50/50 on \"{matchTitle}\" - ONE VOTE changes EVERYTHING!",
+          "cta": "BREAK THE TIE! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "eq": 1 } },
+          "message": "😱 ONE VOTE! Just ONE separates them!",
+          "detail": "\"{songTitle}\" vs \"{opponentTitle}\" - I can't TAKE this!",
+          "cta": "Decide It NOW! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "lte": 3 } },
+          "message": "😬 TOO CLOSE! \"{songTitle}\" hanging by a thread!",
+          "detail": "Only {voteDiff} vote{voteDiffPlural} apart on \"{matchTitle}\"!",
+          "cta": "End This! ⚡"
+        },
+        {
+          "condition": "default",
+          "message": "🔥 Super tight! \"{songTitle}\" neck-and-neck!",
+          "detail": "Just {voteDiff} votes between them on \"{matchTitle}\"!",
+          "cta": "Watch Chaos! 👀"
+        }
       ]
     },
     
     "winning": {
       "messages": [
-        "💥 BOOM BABY! \"{songTitle}\" is CRUSHING it!",
-        "🎪 Hehe! \"{songTitle}\" is blowing them AWAY!",
-        "😈 Haha! \"{songTitle}\" RULES! They don't stand a chance!",
-        "💣 KA-POW! \"{songTitle}\" is UNSTOPPABLE!",
-        "🔥 \"{songTitle}\" is on FIRE! The good kind, not the building kind!",
-        "🎉 YESSSS! \"{songTitle}\" is DESTROYING them!",
-        "💥 I accidentally did that on purpose! \"{songTitle}\" is WINNING!",
-        "🎪 THIS is what I'm TALKING about! \"{songTitle}\" for the WIN!"
-      ],
-      "details": [
-        "Leading {userPct}% to {opponentPct}% on \"{matchTitle}\" - FIREWORKS time!",
-        "Up by {voteDiff} votes - time for FIREWORKS!",
-        "Crushing it {userPct}% to {opponentPct}% - I'm so proud right now!",
-        "Ahead by {voteDiff} in \"{matchTitle}\" - rules were made to be broken!",
-        "Winning {userPct}% to {opponentPct}% - this is BEAUTIFUL chaos!",
-        "Up {voteDiff} votes on \"{matchTitle}\" - BOOM BOOM BOOM!",
-        "Leading by {voteDiff} - perfection looks like THIS!",
-        "Dominating {userPct}% to {opponentPct}% - they never saw it coming!"
-      ],
-      "buttons": [
-        "Celebrate! 🎉",
-        "Watch 'Em Burn! 🔥",
-        "See Glory! 💥",
-        "View Victory! 🏆",
-        "Enjoy Show! 🎪",
-        "More Mayhem! ✨"
+        {
+          "condition": { "userPct": { "gte": 85 } },
+          "message": "👑 TOTAL ANNIHILATION! \"{songTitle}\" is CRUSHING!",
+          "detail": "OBLITERATING at {userPct}% vs {opponentPct}% - absolute MAYHEM!",
+          "cta": "Enjoy the Show! 🎪"
+        },
+        {
+          "condition": { "userPct": { "gte": 75 } },
+          "message": "💥 BOOM BABY! \"{songTitle}\" is DESTROYING them!",
+          "detail": "Leading BIG at {userPct}% to {opponentPct}% - FIREWORKS!",
+          "cta": "Celebrate! 🎉"
+        },
+        {
+          "condition": { "userPct": { "gte": 65 } },
+          "message": "🎯 Hehe! \"{songTitle}\" is DOMINATING!",
+          "detail": "Crushing it {userPct}% to {opponentPct}% on \"{matchTitle}\"!",
+          "cta": "Watch Glory! 💥"
+        },
+        {
+          "condition": "default",
+          "message": "😎 Nice! \"{songTitle}\" in control!",
+          "detail": "Comfortable lead at {userPct}% vs {opponentPct}%!",
+          "cta": "Keep It Going! ✨"
+        }
       ]
     },
     
     "comeback": {
       "messages": [
-        "🎉 SURPRISE! \"{songTitle}\" just came back from the DEAD!",
-        "💥 PLOT TWIST! \"{songTitle}\" flipped the script!",
-        "🎪 WOW! \"{songTitle}\" turned it around! Didn't see THAT coming!",
-        "😈 HA! \"{songTitle}\" just broke ALL the rules!",
-        "🔥 From ZERO to HERO! \"{songTitle}\" is BACK, baby!",
-        "💣 Ooh! \"{songTitle}\" pulled a sneaky! I LOVE IT!",
-        "🎉 \"{songTitle}\" said NOPE and reversed it!",
-        "💥 Never counted out! \"{songTitle}\" just WON it back!"
-      ],
-      "details": [
-        "Was losing on \"{matchTitle}\", now winning {userPct}% to {opponentPct}% - BOOM!",
-        "Total turnaround! Now at {userPct}% - chaos works!",
-        "From behind to AHEAD on \"{matchTitle}\" - rules? What rules?!",
-        "Plot twist achieved! I'm so proud of us right now!",
-        "They thought it was over on \"{matchTitle}\" - SURPRISE!",
-        "Flipped from losing to WINNING! Classic move!",
-        "Was down, now UP {userPct}% to {opponentPct}%!",
-        "Comeback complete on \"{matchTitle}\" - that's how we do it!"
-      ],
-      "buttons": [
-        "Party Time! 🎉",
-        "Light Fireworks! 💥",
-        "Celebrate! 🎪",
-        "See the Win! 🏆",
-        "Watch Flip! 🔄",
-        "Victory Dance! ✨"
+        {
+          "condition": { "voteDiff": { "gte": 30 } },
+          "message": "💥💥💥 EPIC COMEBACK! \"{songTitle}\" from the DEAD!",
+          "detail": "Was down BIG, now CRUSHING on \"{matchTitle}\" - LEGENDARY!",
+          "cta": "Witness It! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 15 } },
+          "message": "🎉 MASSIVE TURNAROUND! \"{songTitle}\" flipped it!",
+          "detail": "Was losing, now DOMINATING at {userPct}% on \"{matchTitle}\"!",
+          "cta": "See the Magic! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 5 } },
+          "message": "🔥 PLOT TWIST! \"{songTitle}\" took the lead!",
+          "detail": "From behind to AHEAD at {userPct}% to {opponentPct}%!",
+          "cta": "Check It! ✨"
+        },
+        {
+          "condition": "default",
+          "message": "😎 Nice! \"{songTitle}\" edged ahead!",
+          "detail": "Barely squeaked into the lead on \"{matchTitle}\"!",
+          "cta": "View It! 👀"
+        }
       ]
     },
     
@@ -162,7 +166,7 @@
         "You're not alone in this chaos!",
         "More friends means MORE mayhem!",
         "Partners in crime on \"{matchTitle}\"!",
-        "Building an army for \"{matchTitle}\"!",
+        "Building an army for \"{songTitle}\"!",
         "The squad is forming!",
         "Two's better than one for causing chaos!",
         "Both backing \"{songTitle}\" on \"{matchTitle}\"!"
@@ -179,23 +183,23 @@
     
     "rival": {
       "messages": [
-        "⚔️ Oooh! {username} picked the OTHER one!",
-        "😈 Hehe! {username} wants a rumble!",
-        "💥 Fight fight FIGHT! {username} chose \"{theirSong}\"!",
-        "🎪 {username} picked \"{theirSong}\" - time to get DANGEROUS!",
-        "⚡ Battle time! You vs {username}!",
+        "⚔️ Oooh! {username} picked \"{theirSong}\" against YOUR \"{yourSong}\"!",
+        "😈 Hehe! {username} wants a rumble on \"{matchTitle}\"!",
+        "💥 Fight fight FIGHT! {username} chose the WRONG side!",
+        "🎪 {username} backed \"{theirSong}\" - time to get DANGEROUS!",
+        "⚡ Battle time! You vs {username} on \"{matchTitle}\"!",
         "😈 OH they did NOT just pick \"{theirSong}\"!",
-        "💣 {username} just declared WAR!",
-        "🔥 {username} backed \"{theirSong}\" - let's BLOW 'EM UP!"
+        "💣 {username} just declared WAR in \"{matchTitle}\"!",
+        "🔥 {username} chose \"{theirSong}\" - let's BLOW 'EM UP!"
       ],
       "details": [
         "They chose \"{theirSong}\" vs your \"{yourSong}\" - wanna settle this?",
         "Time to show 'em what happens when they pick wrong!",
-        "The battle is ON! Rules? What rules?!",
+        "The battle is ON in \"{matchTitle}\"! Rules? What rules?!",
         "Different sides on \"{matchTitle}\" - may the best song EXPLODE!",
-        "It's you vs them now on \"{matchTitle}\"!",
+        "It's you vs them now!",
         "Let's get dangerous!",
-        "\"{theirSong}\" vs \"{yourSong}\" on \"{matchTitle}\" - BOOM TIME!",
+        "\"{theirSong}\" vs \"{yourSong}\" - BOOM TIME!",
         "They wanna fight? Let's FIGHT!"
       ],
       "buttons": [

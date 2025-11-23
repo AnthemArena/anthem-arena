@@ -1165,7 +1165,7 @@
     transform: rotate(90deg);
 }
 /* ========================================
-   NOTIFICATION CENTER STYLES
+   NOTIFICATION CENTER STYLES - BLACK & GOLD THEME
    ======================================== */
 
 .notification-bell {
@@ -1174,21 +1174,47 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
 }
 
 .notification-bell:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(15deg);
+    filter: drop-shadow(0 0 8px rgba(200, 170, 110, 0.6));
 }
 
 .notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid #0a0a0a;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.4);
     animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(255, 68, 68, 0.4);
+    }
+    50% { 
+        transform: scale(1.15);
+        box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+    }
 }
+
+/* ========================================
+   OVERLAY
+   ======================================== */
 
 .notification-overlay {
     position: fixed;
@@ -1196,71 +1222,182 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.75);
     z-index: 9998;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    animation: fadeIn 0.2s ease forwards;
 }
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* ========================================
+   NOTIFICATION PANEL
+   ======================================== */
 
 .notification-panel {
     position: fixed;
-    top: 60px;
+    top: 70px;
     right: 20px;
-    width: 400px;
-    max-height: 600px;
-    background: #1a1a2e;
-    border: 2px solid #c89b3c;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    width: 420px;
+    max-height: 650px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border: 2px solid #C8AA6E;
+    border-radius: 16px;
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(200, 170, 110, 0.2),
+        inset 0 1px 0 rgba(200, 170, 110, 0.1);
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    animation: slideIn 0.3s ease;
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-20px) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
+/* ========================================
+   PANEL HEADER
+   ======================================== */
+
 .notification-panel-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(200, 155, 60, 0.3);
+    flex-direction: column;
+    padding: 20px 20px 16px 20px;
+    border-bottom: 2px solid rgba(200, 170, 110, 0.2);
+    background: linear-gradient(180deg, rgba(200, 170, 110, 0.05) 0%, transparent 100%);
+    position: relative;
+}
+
+.notification-panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C8AA6E, transparent);
+    opacity: 0.3;
 }
 
 .notification-panel-header h3 {
     margin: 0;
-    font-size: 18px;
-    color: #c89b3c;
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #C8AA6E;
+    letter-spacing: 0.05em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .notification-panel-header .close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(200, 170, 110, 0.1);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: #C8AA6E;
+    font-size: 20px;
     cursor: pointer;
     padding: 0;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .notification-panel-header .close-btn:hover {
-    transform: scale(1.2);
-    color: #c89b3c;
+    background: rgba(200, 170, 110, 0.2);
+    border-color: #C8AA6E;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 0 12px rgba(200, 170, 110, 0.4);
 }
+
+/* ========================================
+   TABS (if you have them)
+   ======================================== */
+
+.notification-tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 12px;
+    border-bottom: 1px solid rgba(200, 170, 110, 0.15);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.notification-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.notif-tab {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    position: relative;
+}
+
+.notif-tab:hover {
+    color: rgba(200, 170, 110, 0.8);
+    background: rgba(200, 170, 110, 0.05);
+}
+
+.notif-tab.active {
+    color: #C8AA6E;
+    border-bottom-color: #C8AA6E;
+}
+
+.notif-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #C8AA6E;
+    box-shadow: 0 0 8px rgba(200, 170, 110, 0.6);
+}
+
+.tab-badge {
+    background: #e74c3c;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* ========================================
+   PANEL CONTENT
+   ======================================== */
 
 .notification-panel-content {
     flex: 1;
@@ -1269,134 +1406,322 @@
     max-height: 540px;
 }
 
+/* Custom scrollbar */
+.notification-panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notification-panel-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.notification-panel-content::-webkit-scrollbar-thumb {
+    background: rgba(200, 170, 110, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.notification-panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(200, 170, 110, 0.5);
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
 .notification-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     text-align: center;
     color: #666;
 }
 
-.notification-empty p {
-    margin: 12px 0 0 0;
-    font-size: 14px;
+.notification-empty span {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
 }
 
-.notification-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(200, 155, 60, 0.2);
-    border-radius: 8px;
-    padding: 12px;
+.notification-empty p {
+    margin: 0;
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.6;
+}
+
+.notification-empty p:first-of-type {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 8px;
+}
+
+/* ========================================
+   NOTIFICATION ITEMS
+   ======================================== */
+
+.notification-item {
+    background: rgba(200, 170, 110, 0.03);
+    border: 1px solid rgba(200, 170, 110, 0.15);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.notification-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s ease;
 }
 
 .notification-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(200, 155, 60, 0.4);
-    transform: translateX(-2px);
+    background: rgba(200, 170, 110, 0.08);
+    border-color: rgba(200, 170, 110, 0.3);
+    transform: translateX(4px);
+    box-shadow: -4px 0 12px rgba(200, 170, 110, 0.15);
+}
+
+.notification-item:hover::before {
+    background: linear-gradient(180deg, #C8AA6E, #B89A5E);
+    box-shadow: 0 0 8px rgba(200, 170, 110, 0.4);
 }
 
 .notification-item.unread {
-    background: rgba(200, 155, 60, 0.1);
-    border-color: rgba(200, 155, 60, 0.4);
+    background: rgba(200, 170, 110, 0.1);
+    border-color: rgba(200, 170, 110, 0.3);
 }
+
+.notification-item.unread::before {
+    background: linear-gradient(180deg, #C8AA6E, #B89A5E);
+}
+
+/* ========================================
+   NOTIFICATION CONTENT
+   ======================================== */
 
 .notification-item-header {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .notification-item-icon {
-    font-size: 20px;
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .notification-item-message {
     flex: 1;
+    font-family: 'Lora', serif;
     font-size: 14px;
     font-weight: 600;
     color: #fff;
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 .notification-item-detail {
-    font-size: 12px;
-    color: #aaa;
-    margin-bottom: 8px;
-    line-height: 1.4;
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 8px 0;
+    line-height: 1.5;
 }
+
+/* ========================================
+   NOTIFICATION FOOTER
+   ======================================== */
 
 .notification-item-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 10px;
+    gap: 8px;
 }
 
 .notification-item-time {
     font-size: 11px;
-    color: #666;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
 }
 
+/* ========================================
+   CTA BUTTON
+   ======================================== */
+
 .notification-item-cta {
-    background: linear-gradient(135deg, #c89b3c 0%, #f0e6d2 100%);
-    color: #000;
+    background: linear-gradient(135deg, #C8AA6E 0%, #B89A5E 100%);
+    color: #0a0a0a;
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(200, 170, 110, 0.3);
 }
 
 .notification-item-cta:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(200, 155, 60, 0.4);
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.5);
+    background: linear-gradient(135deg, #D4B876 0%, #C8AA6E 100%);
 }
 
-.notification-item-dismiss {
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 4px;
-    transition: color 0.2s ease;
+.notification-item-cta:active {
+    transform: scale(0.98);
 }
 
-.notification-item-dismiss:hover {
-    color: #e74c3c;
-}
-
-@media (max-width: 768px) {
-    .notification-panel {
-        width: calc(100% - 40px);
-        right: 20px;
-        left: 20px;
-        max-height: 500px;
-    }
-}
-/* Disabled CTA button styling */
+/* Disabled state */
 .notification-item-cta:disabled {
     cursor: not-allowed !important;
-    opacity: 0.5 !important;
+    opacity: 0.4 !important;
     background: rgba(100, 100, 100, 0.3) !important;
+    box-shadow: none !important;
 }
 
 .notification-item-cta:disabled:hover {
     transform: none !important;
-    box-shadow: none !important;
 }
 
 .cta-loading {
-    font-size: 0.85rem;
-    opacity: 0.6;
+    font-size: 11px;
+    opacity: 0.7;
 }
+
+/* ========================================
+   DISMISS BUTTON
+   ======================================== */
+
+.notification-item-dismiss {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.notification-item-dismiss:hover {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    transform: scale(1.2);
+}
+
+/* ========================================
+   MESSAGE ITEMS (if you have them)
+   ======================================== */
+
+.message-item {
+    border-left: 3px solid #667eea;
+}
+
+.message-item:hover::before {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.unread-badge {
+    background: #e74c3c;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .notification-panel {
+        width: calc(100% - 32px);
+        right: 16px;
+        left: 16px;
+        top: 60px;
+        max-height: calc(100vh - 80px);
+    }
+    
+    .notification-panel-header h3 {
+        font-size: 18px;
+    }
+    
+    .notif-tab {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notification-panel {
+        width: calc(100% - 16px);
+        right: 8px;
+        left: 8px;
+        top: 56px;
+        border-radius: 12px;
+    }
+    
+    .notification-panel-header {
+        padding: 16px;
+    }
+    
+    .notification-item {
+        padding: 12px;
+    }
+    
+    .notification-item-cta {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-item {
+    animation: slideDown 0.3s ease;
+}
+
+.notification-item:nth-child(2) { animation-delay: 0.05s; }
+.notification-item:nth-child(3) { animation-delay: 0.1s; }
+.notification-item:nth-child(4) { animation-delay: 0.15s; }
+.notification-item:nth-child(5) { animation-delay: 0.2s; }
+
+
 /* ========================================
    PROFILE LOCKED STATE
    ======================================== */
@@ -1801,4 +2126,207 @@
         font-size: 0.8rem !important;
         max-width: 80px;
     }
+}
+/* ========================================
+   CHAMPION PACK THEMING FOR NOTIFICATION PANEL
+   ======================================== */
+
+/* Apply champion theme to entire panel */
+.notification-panel[data-champion-pack] {
+    border-color: var(--champion-border-color, #C8AA6E);
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.9),
+        var(--champion-border-glow, 0 0 0 1px rgba(200, 170, 110, 0.2));
+}
+
+/* Header with champion theme */
+.notification-panel[data-champion-pack] .notification-panel-header {
+    background: linear-gradient(180deg, var(--champion-accent, rgba(200, 170, 110, 0.15)) 0%, transparent 100%);
+    border-bottom-color: var(--champion-border-color, rgba(200, 170, 110, 0.2));
+}
+
+.notification-panel[data-champion-pack] .notification-panel-header h3 {
+    color: var(--champion-title-color, #C8AA6E);
+    text-shadow: var(--champion-text-shadow, 0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.notification-panel[data-champion-pack] .notification-panel-header::after {
+    background: linear-gradient(90deg, transparent, var(--champion-border-color, #C8AA6E), transparent);
+}
+
+/* Close button with champion colors */
+.notification-panel[data-champion-pack] .close-btn {
+    border-color: var(--champion-border-color, rgba(200, 170, 110, 0.3));
+    color: var(--champion-title-color, #C8AA6E);
+    background: var(--champion-accent, rgba(200, 170, 110, 0.1));
+}
+
+.notification-panel[data-champion-pack] .close-btn:hover {
+    border-color: var(--champion-border-color, #C8AA6E);
+    box-shadow: 0 0 12px var(--champion-border-color, rgba(200, 170, 110, 0.4));
+    background: var(--champion-title-color, #C8AA6E);
+    color: #000;
+}
+
+/* Tabs with champion theme */
+.notification-panel[data-champion-pack] .notif-tab.active {
+    color: var(--champion-title-color, #C8AA6E);
+    border-bottom-color: var(--champion-border-color, #C8AA6E);
+}
+
+.notification-panel[data-champion-pack] .notif-tab.active::after {
+    background: var(--champion-border-color, #C8AA6E);
+    box-shadow: 0 0 8px var(--champion-border-color, rgba(200, 170, 110, 0.6));
+}
+
+.notification-panel[data-champion-pack] .notif-tab:hover {
+    color: var(--champion-title-color, rgba(200, 170, 110, 0.8));
+    background: var(--champion-accent, rgba(200, 170, 110, 0.05));
+}
+
+/* ========================================
+   CHAMPION-THEMED NOTIFICATION ITEMS
+   ======================================== */
+
+/* Items with champion voiceover styling */
+.notification-item[data-from-champion] {
+    background: var(--champion-accent, rgba(200, 170, 110, 0.05));
+    border-color: var(--champion-border-color, rgba(200, 170, 110, 0.2));
+    position: relative;
+    overflow: hidden;
+}
+
+/* Champion splash art background (subtle) */
+.notification-item[data-from-champion]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 100%;
+    background: var(--champion-splash, none);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.08;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.notification-item[data-from-champion]:hover::after {
+    opacity: 0.15;
+}
+
+.notification-item[data-from-champion]::before {
+    background: linear-gradient(180deg, var(--champion-border-color, #C8AA6E), var(--champion-accent, #B89A5E));
+    box-shadow: 0 0 8px var(--champion-border-color, rgba(200, 170, 110, 0.6));
+}
+
+.notification-item[data-from-champion]:hover {
+    border-color: var(--champion-border-color, rgba(200, 170, 110, 0.4));
+    box-shadow: -4px 0 12px var(--champion-border-color, rgba(200, 170, 110, 0.2));
+}
+
+/* Champion icon/emoji in notification */
+.notification-item[data-from-champion] .notification-item-icon {
+    filter: drop-shadow(0 0 4px var(--champion-border-color, rgba(200, 170, 110, 0.6)));
+}
+
+/* Message text with champion styling */
+.notification-item[data-from-champion] .notification-item-message {
+    color: var(--champion-title-color, #fff);
+    text-shadow: var(--champion-text-shadow, 0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.notification-item[data-from-champion] .notification-item-detail {
+    color: var(--champion-detail-color, rgba(255, 255, 255, 0.8));
+}
+
+/* CTA button with champion theme */
+.notification-item[data-from-champion] .notification-item-cta {
+    background: var(--champion-button-bg, linear-gradient(135deg, #C8AA6E 0%, #B89A5E 100%));
+    color: var(--champion-button-text, #0a0a0a);
+    box-shadow: 0 2px 8px var(--champion-border-color, rgba(200, 170, 110, 0.4));
+}
+
+.notification-item[data-from-champion] .notification-item-cta:hover {
+    background: var(--champion-button-hover, linear-gradient(135deg, #D4B876 0%, #C8AA6E 100%));
+    box-shadow: 0 4px 12px var(--champion-border-color, rgba(200, 170, 110, 0.6));
+}
+
+/* ========================================
+   JINX-SPECIFIC OVERRIDES (Pink & Explosive)
+   ======================================== */
+
+.notification-panel[data-champion-pack="jinx"] {
+    border-color: rgba(255, 105, 180, 0.8);
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(255, 105, 180, 0.6),
+        0 0 50px rgba(255, 105, 180, 0.2);
+}
+
+.notification-panel[data-champion-pack="jinx"] .notification-panel-header h3 {
+    color: #ff69b4;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 105, 180, 0.4);
+}
+
+.notification-panel[data-champion-pack="jinx"] .close-btn:hover {
+    background: #ff69b4;
+    border-color: #ff1493;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+}
+
+.notification-item[data-from-champion="jinx"]::after {
+    background: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg');
+    background-size: cover;
+    background-position: center 25%;
+    opacity: 0.1;
+}
+
+.notification-item[data-from-champion="jinx"]:hover::after {
+    opacity: 0.18;
+}
+
+.notification-item[data-from-champion="jinx"]::before {
+    background: linear-gradient(180deg, #ff69b4, #ff1493);
+    box-shadow: 0 0 12px rgba(255, 105, 180, 0.8);
+}
+
+.notification-item[data-from-champion="jinx"] .notification-item-message {
+    color: #ffffff;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 105, 180, 0.4);
+}
+
+.notification-item[data-from-champion="jinx"] .notification-item-cta {
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    color: #ffffff;
+    box-shadow: 0 2px 12px rgba(255, 105, 180, 0.6);
+    font-weight: 700;
+}
+
+.notification-item[data-from-champion="jinx"] .notification-item-cta:hover {
+    background: linear-gradient(135deg, #ff1493, #c71585);
+    box-shadow: 0 4px 16px rgba(255, 105, 180, 0.8);
+    transform: scale(1.08) translateY(-2px);
+}
+
+/* ========================================
+   SCROLLBAR WITH CHAMPION THEME
+   ======================================== */
+
+.notification-panel[data-champion-pack] .notification-panel-content::-webkit-scrollbar-thumb {
+    background: var(--champion-border-color, rgba(200, 170, 110, 0.3));
+}
+
+.notification-panel[data-champion-pack] .notification-panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--champion-border-color, rgba(200, 170, 110, 0.5));
+}
+
+/* Jinx pink scrollbar */
+.notification-panel[data-champion-pack="jinx"] .notification-panel-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 105, 180, 0.4);
+}
+
+.notification-panel[data-champion-pack="jinx"] .notification-panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 105, 180, 0.7);
 }
