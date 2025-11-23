@@ -99,14 +99,15 @@ export async function createVotePost(voteData) {
     try {
         const userId = localStorage.getItem('tournamentUserId');
         const username = localStorage.getItem('username') || 'Anonymous';
-        const isPublic = localStorage.getItem('isPublic') === 'true';
+// ✅ Default to true if not explicitly set to 'false'
+const isPublic = localStorage.getItem('isPublic') !== 'false';
         const avatarJson = localStorage.getItem('avatar');
         
-        // Don't post if user is private or anonymous
-        if (!isPublic || username === 'Anonymous' || !userId) {
-            console.log('⏸️ Skipping post - user is private or anonymous');
-            return null;
-        }
+      // ✅ Only skip if explicitly private OR truly anonymous (no userId)
+if (isPublic === false || !userId) {
+    console.log('⏸️ Skipping post - user is explicitly private or no userId');
+    return null;
+}
         
         let avatar;
         try {

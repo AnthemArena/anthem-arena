@@ -858,6 +858,10 @@ function renderPostContent(post) {
         const opponentThumbnail = post.opponentThumbnail || 
             (post.opponentSongId ? `https://img.youtube.com/vi/${post.opponentSongId}/mqdefault.jpg` : '');
         
+        // ✅ FIX: Determine which card is picked based on videoId match, not position
+        const leftSongIsPicked = post.votedSongId === post.votedSongId; // Always true for left (voted song)
+        const rightSongIsPicked = false; // Right is always opponent
+        
         return `
             <p class="post-text vote-text">
                 <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
@@ -865,7 +869,7 @@ function renderPostContent(post) {
             
             <div class="match-embed-card" data-match-id="${post.matchId}">
                 <div class="match-versus">
-                    <div class="match-song ${post.choice === 'song1' ? 'picked' : ''}">
+                    <div class="match-song ${leftSongIsPicked ? 'picked' : ''}">
                         <div class="song-thumbnail">
                             <img src="${votedThumbnail}" alt="${escapeHtml(post.votedSongName)}" loading="lazy">
                         </div>
@@ -877,7 +881,7 @@ function renderPostContent(post) {
                     
                     <div class="vs-circle">VS</div>
                     
-                    <div class="match-song ${post.choice === 'song2' ? 'picked' : ''}">
+                    <div class="match-song ${rightSongIsPicked ? 'picked' : ''}">
                         <div class="song-thumbnail">
                             <img src="${opponentThumbnail}" alt="${escapeHtml(post.opponentSongName)}" loading="lazy">
                         </div>
