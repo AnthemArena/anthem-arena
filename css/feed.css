@@ -3140,3 +3140,32 @@ body {
     height: 100%;
     object-fit: cover;
 }
+/* ========================================
+   SHOW MORE/LESS BUTTON
+   ======================================== */
+
+.post-text-container {
+    position: relative;
+}
+
+.show-more-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.25rem 0;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s ease;
+}
+
+.show-more-btn:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+.post-text-preview {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

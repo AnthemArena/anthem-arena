@@ -911,11 +911,38 @@ function renderPostContent(post) {
         
         const withSongs = parseSongMentions(displayContent);
         const withMentions = parseMentionsHTML(withSongs);
+
+         // ✅ NEW: Collapse long content
+        const PREVIEW_LENGTH = 280;
+        const needsCollapse = displayContent.length > PREVIEW_LENGTH;
         
-        // Only show text paragraph if there's content left after removing URL
-        const textHtml = withMentions.trim() 
-            ? `<p class="post-text">${withMentions}</p>` 
-            : '';
+         
+        let textHtml = '';
+        
+        if (needsCollapse) {
+            // Show preview + "Show more" button
+            const previewText = displayContent.substring(0, PREVIEW_LENGTH);
+            const fullText = displayContent;
+            
+            const previewWithSongs = parseSongMentions(previewText);
+            const previewWithMentions = parseMentionsHTML(previewWithSongs);
+            
+            textHtml = `
+                <div class="post-text-container">
+                    <p class="post-text post-text-preview" data-full-text="${escapeHtml(fullText)}">
+                        ${previewWithMentions}...
+                    </p>
+                    <button class="show-more-btn" onclick="togglePostText(this)">
+                        Show more
+                    </button>
+                </div>
+            `;
+        } else {
+            // Short post - show normally
+            textHtml = withMentions.trim() 
+                ? `<p class="post-text">${withMentions}</p>` 
+                : '';
+        }
         
         return `
             ${textHtml}
@@ -923,7 +950,7 @@ function renderPostContent(post) {
         `;
     }
     
-    return '';  // ✅ Fallback for other post types
+    return '';
 }
 
 // ========================================
@@ -2381,7 +2408,6 @@ function escapeRegex(string) {
 // ========================================
 
 async function openEditPostModal(post) {
-    // Create modal
     const modal = document.createElement('div');
     modal.className = 'edit-post-modal';
     modal.innerHTML = `
@@ -2396,12 +2422,12 @@ async function openEditPostModal(post) {
             <div class="edit-post-body">
                 <textarea 
                     class="edit-post-input" 
-                    maxlength="280" 
+                    maxlength="5000"  // ✅ Updated limit
                     placeholder="What's on your mind?"
                 >${post.content || post.text || ''}</textarea>
                 <div class="edit-post-footer">
                     <span class="edit-char-count">
-                        <span id="editCharCount">${(post.content || post.text || '').length}</span>/280
+                        <span id="editCharCount">${(post.content || post.text || '').length}</span> characters
                     </span>
                     <button class="btn-save-edit" disabled>
                         <i class="fa-solid fa-check"></i> Save Changes
@@ -2529,7 +2555,6 @@ async function openEditPostModal(post) {
 // ========================================
 // CREATE POST
 // ========================================
-
 function setupCreatePost() {
     const postInput = document.getElementById('postInput');
     const submitBtn = document.getElementById('submitPostBtn');
@@ -2540,22 +2565,33 @@ function setupCreatePost() {
     // ✅ Setup mention autocomplete
     setupMentionAutocomplete(postInput);
     
-    // Character counter
     postInput.addEventListener('input', () => {
-        const remaining = 280 - postInput.value.length;
-        charCount.textContent = remaining;
+        const length = postInput.value.length;
         
-        if (remaining < 20) {
+        // ✅ Clear previous classes
+        charCount.classList.remove('danger', 'warning');
+        
+        // ✅ NEW: Warnings at different levels
+        if (length > 5000) {
             charCount.classList.add('danger');
-            charCount.classList.remove('warning');
-        } else if (remaining < 50) {
+            charCount.textContent = `${length}/5000 (too long!)`;
+            submitBtn.disabled = true;
+        } else if (length > 1000) {
             charCount.classList.add('warning');
-            charCount.classList.remove('danger');
+            charCount.textContent = `${length} characters`;
+            submitBtn.disabled = false;
+        } else if (length > 280) {
+            charCount.textContent = `${length} characters`;
+            submitBtn.disabled = false;
         } else {
-            charCount.classList.remove('warning', 'danger');
+            charCount.textContent = `${280 - length} characters left`;
+            submitBtn.disabled = length === 0;
         }
-// Enable/disable submit
-        submitBtn.disabled = postInput.value.trim().length === 0 || remaining < 0;
+        
+        // Final check
+        if (length === 0 || length > 5000) {
+            submitBtn.disabled = true;
+        }
     });
     
     // Submit post
@@ -2795,5 +2831,35 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// ========================================
+// ✅ TOGGLE SHOW MORE/LESS
+// ========================================
+
+window.togglePostText = function(button) {
+    const container = button.closest('.post-text-container');
+    const textElement = container.querySelector('.post-text-preview');
+    const fullText = textElement.dataset.fullText;
+    
+    const isExpanded = button.textContent.trim() === 'Show less';
+    
+    if (isExpanded) {
+        // Collapse
+        const previewText = fullText.substring(0, 280);
+        const withSongs = parseSongMentions(previewText);
+        const withMentions = parseMentionsHTML(withSongs);
+        
+        textElement.innerHTML = withMentions + '...';
+        button.innerHTML = 'Show more';
+        
+    } else {
+        // Expand
+        const withSongs = parseSongMentions(fullText);
+        const withMentions = parseMentionsHTML(withSongs);
+        
+        textElement.innerHTML = withMentions;
+        button.innerHTML = 'Show less';
+    }
+};
 
 console.log('✅ Feed page module loaded');
