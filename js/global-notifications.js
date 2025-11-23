@@ -1507,11 +1507,11 @@ function showBulletin(notification) {
 .bulletin-toast-content {
     position: relative;
     z-index: 2;
-    padding: 5rem 1rem 1rem 1rem;  /* ✅ More space at top */
+    padding: 1rem;  /* ✅ Normal padding, not pushed up */
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-        min-height: 120px;  /* ✅ Ensure content area has minimum height */
+    margin-top: auto;  /* ✅ Push content to bottom */
 
 }
 
