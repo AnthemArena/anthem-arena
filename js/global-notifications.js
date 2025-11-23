@@ -1975,7 +1975,30 @@ if (championPack && championPack.theme) {
     root.style.setProperty('--bulletin-btn-text', theme.buttonText || '#0a0a0a');
     root.style.setProperty('--bulletin-text-shadow', theme.textShadow || 'none');
     
-    console.log(`🎨 Applied ${championPack.name} theme to bulletin`);
+    } else if (notification.thumbnailUrl) {
+    // ✅ DEFAULT PACK: Use song thumbnail as background
+    const root = document.documentElement;
+    
+    root.style.setProperty('--bulletin-bg', `
+        linear-gradient(to bottom, 
+            rgba(10, 10, 10, 0.3) 0%, 
+            rgba(10, 10, 10, 0.7) 50%,
+            rgba(10, 10, 10, 0.95) 100%
+        ),
+        url('${notification.thumbnailUrl}')
+    `);
+    root.style.setProperty('--bulletin-bg-size', 'cover');
+    root.style.setProperty('--bulletin-bg-position', 'center 30%');
+    root.style.setProperty('--bulletin-border', 'rgba(200, 170, 110, 0.3)');
+    root.style.setProperty('--bulletin-glow', '0 0 20px rgba(200, 170, 110, 0.15)');
+    root.style.setProperty('--bulletin-title', '#C8AA6E');
+    root.style.setProperty('--bulletin-detail', 'rgba(255, 255, 255, 0.7)');
+    root.style.setProperty('--bulletin-btn-bg', 'linear-gradient(135deg, #C8AA6E, #B89A5E)');
+    root.style.setProperty('--bulletin-btn-hover', 'linear-gradient(135deg, #D4B876, #C8AA6E)');
+    root.style.setProperty('--bulletin-btn-text', '#0a0a0a');
+    root.style.setProperty('--bulletin-text-shadow', '0 2px 6px rgba(0, 0, 0, 0.9)');
+    
+    console.log(`🎨 Applied default theme with song thumbnail background`);
 }
 
     
