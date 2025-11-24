@@ -562,7 +562,27 @@ function renderNotificationItem(notification) {
         'message-received': '💬'
     };
     
-    const icon = notification.icon || typeIcons[notification.type] || '📢';
+    // ✅ NEW: Text-to-emoji fallback map
+    const iconTextMap = {
+        'Crossed Swords': '⚔️',
+        'crossed swords': '⚔️',
+        'swords': '⚔️'
+    };
+
+    // ✅ NEW: Relationship-based fallbacks
+    const relationshipIcons = {
+        'rival': '⚔️',
+        'ally': '🤝',
+        'opponent': '⚔️',
+        'teammate': '✨'
+    };
+
+    // ✅ UPDATED: Smart icon selection with fallback chain
+    const icon = iconTextMap[notification.icon] 
+        || notification.icon 
+        || relationshipIcons[notification.relationship] 
+        || typeIcons[notification.type] 
+        || '📢';
     
     // ✅ NEW: Show count badge if multiple matches
     const countBadge = notification.count > 1 
@@ -651,8 +671,6 @@ function renderNotificationItem(notification) {
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
                     <div class="notification-item-message">${displayMessage}</div>
-                    
-            
                 </div>
                 <button class="notification-item-dismiss" 
                         data-id="${notification.ids ? notification.ids.join(',') : notification.id}">
