@@ -1,7 +1,8 @@
 console.log('🔔 notification-storage.js loaded');
 
 import { db } from './firebase-config.js';
-import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, deleteDoc,     writeBatch  // ✅ Add this if missing
+ } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
 // FIRESTORE COLLECTION: user-notifications
@@ -193,32 +194,94 @@ export async function markNotificationShown(notificationId) {
 // MARK NOTIFICATION AS READ
 // ========================================
 
-export async function markNotificationRead(notificationId) {
+// ========================================
+// MARK NOTIFICATION(S) AS READ
+// ========================================
+
+export async function markNotificationRead(idOrIds) {
+    if (!idOrIds) return false;
+    
+    // ✅ Handle both single ID and comma-separated IDs
+    const ids = typeof idOrIds === 'string' ? idOrIds.split(',') : [idOrIds];
+    
+    console.log(`👁️ Marking ${ids.length} notification(s) as read:`, ids);
+    
     try {
-        const notificationRef = doc(db, 'user-notifications', notificationId);
-        await updateDoc(notificationRef, { 
-            read: true 
-        });
-        console.log(`✅ Notification ${notificationId} marked as read`);
+        if (ids.length > 1) {
+            const batch = writeBatch(db);
+            
+            ids.forEach(id => {
+                const notifRef = doc(db, 'user-notifications', id.trim());
+                batch.update(notifRef, { 
+                    read: true,
+                    readAt: Date.now()
+                });
+            });
+            
+            await batch.commit();
+            console.log(`✅ Marked ${ids.length} notifications as read`);
+            return true;
+            
+        } else {
+            const notificationRef = doc(db, 'user-notifications', ids[0].trim());
+            await updateDoc(notificationRef, { 
+                read: true,
+                readAt: Date.now()
+            });
+            console.log(`✅ Marked notification as read: ${ids[0]}`);
+            return true;
+        }
+        
     } catch (error) {
         console.error('❌ Error marking notification as read:', error);
+        return false;
     }
 }
-
 // ========================================
-// DISMISS NOTIFICATION
+// DISMISS NOTIFICATION(S) - SOFT DELETE
 // ========================================
 
-export async function dismissNotification(notificationId) {
+export async function dismissNotification(idOrIds) {
+    if (!idOrIds) return false;
+    
+    // ✅ Handle both single ID and comma-separated IDs
+    const ids = typeof idOrIds === 'string' ? idOrIds.split(',') : [idOrIds];
+    
+    console.log(`🗑️ Dismissing ${ids.length} notification(s):`, ids);
+    
     try {
-        const notificationRef = doc(db, 'user-notifications', notificationId);
-        await updateDoc(notificationRef, { 
-            dismissed: true,
-            read: true
-        });
-        console.log(`✅ Notification ${notificationId} dismissed`);
+        if (ids.length > 1) {
+            // Use batch for multiple notifications
+            const batch = writeBatch(db);
+            
+            ids.forEach(id => {
+                const notifRef = doc(db, 'user-notifications', id.trim());
+                batch.update(notifRef, { 
+                    dismissed: true,
+                    read: true,
+                    dismissedAt: Date.now()
+                });
+            });
+            
+            await batch.commit();
+            console.log(`✅ Dismissed ${ids.length} notifications`);
+            return true;
+            
+        } else {
+            // Single notification
+            const notificationRef = doc(db, 'user-notifications', ids[0].trim());
+            await updateDoc(notificationRef, { 
+                dismissed: true,
+                read: true,
+                dismissedAt: Date.now()
+            });
+            console.log(`✅ Notification ${ids[0]} dismissed`);
+            return true;
+        }
+        
     } catch (error) {
         console.error('❌ Error dismissing notification:', error);
+        return false;
     }
 }
 
