@@ -652,13 +652,7 @@ function renderNotificationItem(notification) {
                 <div style="flex: 1; min-width: 0;">
                     <div class="notification-item-message">${displayMessage}</div>
                     
-                    ${notification.triggerUsername ? `
-                        <a href="/profile?user=${notification.triggerUsername}" 
-                           style="color: #C8AA6E; text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-block; font-size: 0.85rem;"
-                           onclick="event.stopPropagation();">
-                            User ${notification.triggerUsername}
-                        </a>
-                    ` : ''}
+            
                 </div>
                 <button class="notification-item-dismiss" 
                         data-id="${notification.ids ? notification.ids.join(',') : notification.id}">

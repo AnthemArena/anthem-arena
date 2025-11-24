@@ -1093,7 +1093,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     message = championMessage.message;
     detail = championMessage.detail;
     cta = championMessage.cta;
-        icon = 'Handshake';
+        icon = '🤝';
         ctaAction = 'send-emote';
         ctaData = {
             targetUsername: activity.username,
@@ -1115,7 +1115,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     message = championMessage.message;
     detail = championMessage.detail;
     cta = championMessage.cta;
-        icon = 'Crossed Swords';
+        icon = '⚔️';
         ctaAction = 'navigate';
         ctaData = {};
     }
