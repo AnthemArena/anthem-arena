@@ -1231,22 +1231,23 @@ if (comp1Video) {
             showThumbnailForCompetitor(1, currentMatch.competitor1.videoId);
         }
         
-        // ========================================
-        // UPDATE COMPETITOR 2 - BASIC INFO
-        // ========================================
-        
-        const comp2Seed = document.getElementById('competitor2-seed');
-        const comp2Name = document.getElementById('competitor2-name');
-        const comp2Source = document.getElementById('competitor2-source');
-       if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
+  // ========================================
+// UPDATE COMPETITOR 2 - BASIC INFO
+// ========================================
+
+const comp2Seed = document.getElementById('competitor2-seed');
+const comp2Name = document.getElementById('competitor2-name');
+const comp2Source = document.getElementById('competitor2-source');
+const comp2Percentage = document.getElementById('competitor2-percentage');
+const comp2Votes = document.getElementById('competitor2-votes');
+const comp2Video = document.getElementById('competitor2-video');
+
+if (comp2Seed) comp2Seed.textContent = `#${currentMatch.competitor2.seed} Seed`;
+if (comp2Name) comp2Name.textContent = currentMatch.competitor2.name;
+if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
+if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
 if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
-        const comp2Video = document.getElementById('competitor2-video');
-        
-        if (comp2Seed) comp2Seed.textContent = `#${currentMatch.competitor2.seed} Seed`;
-        if (comp2Name) comp2Name.textContent = currentMatch.competitor2.name;
-        if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
-        if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
-        if (comp2Votes) comp2Votes.textContent = `${currentMatch.competitor2.votes.toLocaleString()} votes`;
+
 if (comp2Video) {
     const song2Name = currentMatch.competitor2.name;
     const artist2 = currentMatch.competitor2.source.split('•')[0]?.trim();
@@ -1254,12 +1255,14 @@ if (comp2Video) {
     comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
     comp2Video.title = `${song2Name} by ${artist2} - League of Legends Music Video`;
     comp2Video.loading = 'lazy';
-}        
-        // Check embedAllowed from JSON data
-        if (!isEmbedAllowed(currentMatch.competitor2.videoId)) {
-            console.log('🚫 Competitor 2 cannot be embedded, showing thumbnail');
-            showThumbnailForCompetitor(2, currentMatch.competitor2.videoId);
-        }
+}
+
+// Check embedAllowed from JSON data
+if (!isEmbedAllowed(currentMatch.competitor2.videoId)) {
+    console.log('🚫 Competitor 2 cannot be embedded, showing thumbnail');
+    showThumbnailForCompetitor(2, currentMatch.competitor2.videoId);
+}
+        
 
     
         
