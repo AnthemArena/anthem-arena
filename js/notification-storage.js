@@ -97,18 +97,21 @@ export async function saveNotification(userId, notificationData) {
 // GET UNREAD NOTIFICATIONS
 // ========================================
 
-export async function getUnreadNotifications(userId) {
+export async function getUnreadNotifications(userId, maxAgeHours = 72) {  // ✅ Default 72 hours (3 days)
     if (!userId || userId === 'anonymous') return [];
+    
+    const cutoffTime = Date.now() - (maxAgeHours * 60 * 60 * 1000);
     
     try {
         const q = query(
             collection(db, 'user-notifications'),
             where('userId', '==', userId),
             where('dismissed', '==', false),
+            where('timestamp', '>', cutoffTime),  // ✅ ADD THIS
             where('expiresAt', '>', Date.now()),
+            orderBy('timestamp', 'desc'),  // ✅ ADD THIS (must order by filtered field)
             orderBy('expiresAt', 'desc'),
-            orderBy('timestamp', 'desc'),
-            limit(50) // Max 50 notifications
+            limit(50)
         );
         
         const snapshot = await getDocs(q);
@@ -121,7 +124,7 @@ export async function getUnreadNotifications(userId) {
             });
         });
         
-        console.log(`📬 Found ${notifications.length} notifications for ${userId}`);
+        console.log(`📬 Found ${notifications.length} notifications from last ${maxAgeHours}h for ${userId}`);
         return notifications;
         
     } catch (error) {

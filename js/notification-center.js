@@ -127,6 +127,32 @@ function addTabsToPanel(panel) {
     const header = panel.querySelector('.notification-panel-header');
     if (!header) return;
     
+    // ✅ ADD CLEAR OLD BUTTON TO HEADER (before tabs)
+    const closeBtn = header.querySelector('.close-btn');
+    if (closeBtn && !header.querySelector('.clear-old-btn')) {
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'clear-old-btn';
+        clearBtn.textContent = 'Clear Old';
+        clearBtn.onclick = dismissOldNotifications;
+        clearBtn.style.cssText = `
+            background: rgba(200, 170, 110, 0.15);
+            border: 1px solid rgba(200, 170, 110, 0.3);
+            color: #C8AA6E;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 8px;
+        `;
+        clearBtn.onmouseover = () => clearBtn.style.background = 'rgba(200, 170, 110, 0.25)';
+        clearBtn.onmouseout = () => clearBtn.style.background = 'rgba(200, 170, 110, 0.15)';
+        
+        // Insert before close button
+        closeBtn.parentNode.insertBefore(clearBtn, closeBtn);
+    }
+    
     const tabsHTML = `
     <div class="notification-tabs" style="display: flex; gap: 4px; padding: 8px 0; border-bottom: 1px solid rgba(200, 170, 110, 0.2);">
         <button class="notif-tab active" data-tab="all">
@@ -339,6 +365,77 @@ window.openConversationModal = function(userId, username) {
     showMessageComposer(userId, username, {});
 };
 
+// ========================================
+// DISMISS OLD NOTIFICATIONS (>48 HOURS)
+// ========================================
+
+async function dismissOldNotifications() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId) return;
+    
+    const button = document.querySelector('.clear-old-btn');
+    if (button) {
+        button.textContent = 'Cleaning...';
+        button.disabled = true;
+    }
+    
+    try {
+        // Get all unread notifications
+        const notifications = await getUnreadNotifications(userId);
+        
+        // Filter to only old ones (>48 hours)
+        const twoDaysAgo = Date.now() - (48 * 60 * 60 * 1000);
+        const oldNotifications = notifications.filter(n => n.timestamp < twoDaysAgo);
+        
+        if (oldNotifications.length === 0) {
+            if (button) {
+                button.textContent = 'Nothing to Clear';
+                setTimeout(() => {
+                    button.textContent = 'Clear Old';
+                    button.disabled = false;
+                }, 2000);
+            }
+            return;
+        }
+        
+        console.log(`🧹 Dismissing ${oldNotifications.length} old notifications...`);
+        
+        // Dismiss each old notification
+        let dismissed = 0;
+        for (const notif of oldNotifications) {
+            const success = await dismissNotification(notif.id);
+            if (success) dismissed++;
+        }
+        
+        console.log(`✅ Dismissed ${dismissed} old notifications`);
+        
+        // Reload panel to show updated list
+        const activeTab = document.querySelector('.notif-tab.active')?.dataset.tab || 'all';
+        const content = document.getElementById('notificationPanelContent');
+        await loadNotificationsTab(content, userId, activeTab);
+        
+        if (button) {
+            button.textContent = `✓ Cleared ${dismissed}`;
+            setTimeout(() => {
+                button.textContent = 'Clear Old';
+                button.disabled = false;
+            }, 3000);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error dismissing old notifications:', error);
+        if (button) {
+            button.textContent = 'Error';
+            setTimeout(() => {
+                button.textContent = 'Clear Old';
+                button.disabled = false;
+            }, 2000);
+        }
+    }
+}
+
+// Expose to window for onclick handler
+window.dismissOldNotifications = dismissOldNotifications;
 // ========================================
 // GROUP NOTIFICATIONS BY USER
 // ========================================
