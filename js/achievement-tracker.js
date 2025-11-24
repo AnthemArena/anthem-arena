@@ -283,18 +283,43 @@ export async function calculateAchievementStats(allVotes) {
 /**
  * Check which achievements user has unlocked (Firebase-based)
  * @param {Array} allVotes - User's vote history
+ * @param {Object} context - Context for when this is being called (e.g., { afterVote: true })
  * @returns {Object} - Achievement status
  */
-export async function checkAchievements(allVotes) {
+export async function checkAchievements(allVotes, context = {}) {
     const stats = await calculateAchievementStats(allVotes);
     const unlocked = [];
     const locked = [];
     const newlyUnlocked = [];
   
+    // ✅ NEW: Achievements that should ONLY be checked immediately after voting
+    const voteOnlyAchievements = [
+        'daily-session-kickoff',      // First vote of the day
+        'opening-act',                // First vote ever
+        'first-blood',                // First vote on site
+        'round-first-blood',          // First vote in round
+        'tournament-first-blood',     // First tournament vote
+        'lightning-fast',             // Voted within 1 min
+        'night-owl'                   // Late night vote
+    ];
+    
     // ✅ Get previously unlocked achievements from Firebase
     const previouslyUnlocked = await getUnlockedAchievementsFromFirebase();
   
     for (const achievement of Object.values(ACHIEVEMENTS)) {
+        // ✅ NEW: Skip vote-only achievements if not checking after a vote
+        if (voteOnlyAchievements.includes(achievement.id) && !context.afterVote) {
+            // But still add to unlocked list if already unlocked!
+            if (previouslyUnlocked.includes(achievement.id)) {
+                const progress = achievement.progress ? achievement.progress(stats) : null;
+                unlocked.push({
+                    ...achievement,
+                    progress
+                });
+            }
+            continue;
+        }
+        
         // Check condition (may be async)
         let isUnlocked = false;
         try {
@@ -337,18 +362,14 @@ export async function checkAchievements(allVotes) {
         console.log(`🎉 ${newlyUnlocked.length} new achievements unlocked!`);
   
         for (const achievement of newlyUnlocked) {
-            // ✅ Only proceed if actually newly unlocked (not duplicate)
             const wasActuallyUnlocked = await unlockAchievementInFirebase(achievement.id, achievement.xp);
     
-            // ✅ Only award XP if it was NEWLY unlocked (Firebase returns true for new unlocks)
             if (wasActuallyUnlocked) {
-                // Award XP
                 if (achievement.xp > 0) {
                     addXP(achievement.xp);
                     console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
                 }
       
-                // Show unlock notification
                 showAchievementUnlock(achievement);
             } else {
                 console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);

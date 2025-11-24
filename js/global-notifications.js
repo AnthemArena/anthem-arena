@@ -121,24 +121,20 @@ function adjustPollingRate() {
     const timeSinceActivity = Date.now() - lastActivity;
     const isActive = timeSinceActivity < POLL_CONFIG.INACTIVE_THRESHOLD;
     
-    // ✅ Check if user has any active votes in live matches
     const userId = localStorage.getItem('tournamentUserId');
     const hasActiveVotes = userId && localStorage.getItem('userVotes');
     
     let interval;
     
     if (!hasActiveVotes) {
-        // ✅ No votes yet - very slow polling (5 minutes)
         interval = 300000;
         console.log('🐌 Polling: 5min (no active votes)');
     } else if (isActive) {
-        // Active user with votes - frequent polling
         interval = POLL_CONFIG.ACTIVE_INTERVAL;
-        console.log('⚡ Polling: 30s (active user)');
+        console.log(`⚡ Polling: ${interval/1000}s (active user)`); // ✅ FIXED
     } else {
-        // Inactive user with votes - moderate polling
         interval = POLL_CONFIG.BASE_INTERVAL;
-        console.log('💤 Polling: 2min (inactive user)');
+        console.log(`💤 Polling: ${interval/60000}min (inactive user)`); // ✅ FIXED
     }
     
     if (pollInterval) {

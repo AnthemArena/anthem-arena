@@ -2090,25 +2090,25 @@ async function checkForAchievementUnlocks() {
             };
         });
         
-        // ✅ DEFENSIVE: Import and check achievements safely
-        const { checkAchievements } = await import('./achievement-tracker.js');
-        
-        if (typeof checkAchievements !== 'function') {
-            console.error('❌ checkAchievements is not a function');
-            return;
-        }
-        
-        // ✅ FIX: Pass userId as the second parameter!
-        console.log('🔍 Calling checkAchievements with', allVotes.length, 'votes and userId:', userId);
-        const achievementResult = await checkAchievements(allVotes, userId);
-        
-        // ✅ DEFENSIVE: Handle undefined/null results
-        if (!achievementResult) {
-            console.warn('⚠️ checkAchievements returned undefined');
-            return;
-        }
-        
-        const newlyUnlocked = achievementResult.newlyUnlocked || [];
+      // ✅ DEFENSIVE: Import and check achievements safely
+const { checkAchievements } = await import('./achievement-tracker.js');
+
+if (typeof checkAchievements !== 'function') {
+    console.error('❌ checkAchievements is not a function');
+    return;
+}
+
+// ✅ FIX: Pass context object with afterVote flag (not userId!)
+console.log('🔍 Calling checkAchievements with', allVotes.length, 'votes (afterVote: true)');
+const achievementResult = await checkAchievements(allVotes, { afterVote: true });
+
+// ✅ DEFENSIVE: Handle undefined/null results
+if (!achievementResult) {
+    console.warn('⚠️ checkAchievements returned undefined');
+    return;
+}
+
+const newlyUnlocked = achievementResult.newlyUnlocked || [];
         
         // Show notifications for newly unlocked achievements
         if (newlyUnlocked && newlyUnlocked.length > 0) {
