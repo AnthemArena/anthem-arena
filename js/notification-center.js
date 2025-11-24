@@ -477,65 +477,7 @@ function closePanel() {
     console.log('✅ Panel closed');
 }
 
-async function loadNotifications() {
-    const userId = localStorage.getItem('tournamentUserId');
-    if (!userId || userId === 'anonymous') return;
-    
-    const content = document.getElementById('notificationPanelContent');
-    if (!content) return;
-    
-    content.innerHTML = '<div class="notification-empty"><p>Loading...</p></div>';
-    
-    const notifications = await getUnreadNotifications(userId);
-    
-    if (notifications.length === 0) {
-        content.innerHTML = `
-            <div class="notification-empty">
-                <span style="font-size: 48px; opacity: 0.3;">🔔</span>
-                <p>No new notifications</p>
-            </div>
-        `;
-        return;
-    }
-    
-    content.innerHTML = notifications.map(notification => {
-        return renderNotificationItem(notification);
-    }).join('');
-    
-    attachNotificationListeners();
 
-    // ✅ Check privacy settings for action buttons
-    await updateCtaButtonsWithPrivacy();
-}
-
-// ========================================
-// RENDER CTA BUTTON (WITH PRIVACY CHECK PLACEHOLDER)
-// ========================================
-
-function renderCtaButton(notification) {
-    // ✅ For actions that need privacy check
-    if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
-        return `
-            <button class="notification-item-cta" 
-                    data-id="${notification.id}"
-                    data-action="${notification.ctaAction}"
-                    data-target-user="${notification.triggerUserId || ''}"
-                    data-url="${notification.targetUrl || ''}">
-                <span class="cta-loading" style="opacity: 0.6;">Checking...</span>
-            </button>
-        `;
-    }
-    
-    // ✅ Standard navigation button
-    return `
-        <button class="notification-item-cta" 
-                data-id="${notification.id}"
-                data-action="${notification.ctaAction}"
-                data-url="${notification.targetUrl || ''}">
-            ${notification.ctaText}
-        </button>
-    `;
-}
 
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);

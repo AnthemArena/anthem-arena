@@ -4,14 +4,11 @@ console.log('🔔 global-notifications.js loaded');
 import './champion-loader.js';
 
 import { getActivityFeed } from './api-client.js';
-import { sendEmoteReaction, checkNewReactions, markReactionSeen } from './emote-system.js';
+import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
     saveNotification, 
     getRecentUnshownNotifications, 
     markNotificationShown,
-    getUnreadCount,
-    markNotificationRead,
-    dismissNotification
 } from './notification-storage.js';
 
 // ✅ Import Firestore functions separately
@@ -1016,9 +1013,9 @@ async function checkRecentVotes() {
                 continue;
             }
             
-            // ✅ Determine relationship: ally or opponent
-            const isAlly = userVoteData.songId === activity.songId;
-            
+      // ✅ CORRECT (comparing "song1"/"song2" to "song1"/"song2"):
+const isAlly = userVoteData.songId === activity.choice;
+
             // ✅ Build notification data
             const notificationData = buildSocialNotification(activity, isAlly, userId);
             
@@ -3350,42 +3347,6 @@ function showQuickToast(message, duration = 2000) {
         toast.style.animation = 'slideDown 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, duration);
-}
-
-// Check for incoming reactions on page load
-async function checkIncomingReactions() {
-    const reactions = await checkNewReactions();
-    
-    if (reactions.length === 0) return;
-    
-    // Show notification for each new reaction
-    reactions.forEach(reaction => {
-        const emoteIcons = {
-            'thanks': '🤝',
-            'props': '👊',
-            'rivalry': '⚔️',
-            'hype': '🔥'
-        };
-        
-        notifications.push({
-            priority: 8, // High priority - someone messaged you!
-            type: 'emote-received',
-            reactionId: reaction.id,
-            fromUsername: reaction.fromUsername,
-            emoteType: reaction.type,
-            icon: emoteIcons[reaction.type] || '✨',
-            message: `${emoteIcons[reaction.type]} ${reaction.fromUsername} sent you ${reaction.type}!`,
-            detail: `"${reaction.message}" in ${reaction.matchTitle}`,
-            cta: 'View Match',
-            action: 'navigate',
-            targetUrl: `/vote.html?match=${reaction.matchId}`,
-            onShow: () => markReactionSeen(reaction.id) // Mark as seen when shown
-        });
-    });
-    
-    console.log(`📬 Loaded ${reactions.length} new reactions`);
-
-    
 }
 
 // ========================================
