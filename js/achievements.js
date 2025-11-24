@@ -759,39 +759,35 @@ export const ACHIEVEMENTS = {
   },
 
   // ========================================
-  // MATCH OUTCOME ACHIEVEMENTS
-  // ========================================
-  'match-won': {
-    id: 'match-won',
-    name: 'Victory!',
-    description: 'Your voted song won the match!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3004.png', // Manamune
-    xp: 200,
-    category: 'special',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'uncommon',
-    condition: (stats) => {
-      const wonMatches = parseInt(localStorage.getItem('matchesWon') || '0');
-      return wonMatches >= 1;
-    }
-  },
+// MATCH OUTCOME ACHIEVEMENTS (FIXED)
+// ========================================
+'match-won': {
+  id: 'match-won',
+  name: 'Victory!',
+  description: 'Your voted song won the match!',
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3004.png',
+  xp: 200,
+  category: 'special',
+  hidden: true,
+  tier: 'silver',
+  rarity: 'uncommon',
+  condition: (stats) => stats.wonMatches >= 1,
+  progress: (stats) => ({ current: stats.wonMatches || 0, target: 1 })
+},
 
-  'match-lost': {
-    id: 'match-lost',
-    name: 'Better Luck Next Time',
-    description: 'Your song lost, but you fought well!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1055.png', // Doran's Blade
-    xp: 50,
-    category: 'special',
-    hidden: true,
-    tier: 'bronze',
-    rarity: 'common',
-    condition: (stats) => {
-      const lostMatches = parseInt(localStorage.getItem('matchesLost') || '0');
-      return lostMatches >= 1;
-    }
-  },
+'match-lost': {
+  id: 'match-lost',
+  name: 'Better Luck Next Time',
+  description: 'Your song lost, but you fought well!',
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1055.png',
+  xp: 50,
+  category: 'special',
+  hidden: true,
+  tier: 'bronze',
+  rarity: 'common',
+  condition: (stats) => stats.lostMatches >= 1,
+  progress: (stats) => ({ current: stats.lostMatches || 0, target: 1 })
+},
 
   
 
@@ -830,16 +826,15 @@ export const ACHIEVEMENTS = {
   id: 'match-tied',
   name: 'Split Decision',
   description: 'Your match ended in a perfect tie!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png', // ✅ Guardian Angel (balance/resurrection theme)
+  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png',
   xp: 100,
   category: 'special',
   hidden: true,
   tier: 'bronze',
   rarity: 'uncommon',
-  condition: (stats) => {
-    const tiedMatches = parseInt(localStorage.getItem('matchesTied') || '0');
-    return tiedMatches >= 1;
-  }
+  condition: (stats) => stats.tiedMatches >= 1,
+  progress: (stats) => ({ current: stats.tiedMatches || 0, target: 1 })
+
 },
 
 

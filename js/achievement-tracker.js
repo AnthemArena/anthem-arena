@@ -223,8 +223,18 @@ export async function calculateAchievementStats(allVotes) {
         uniqueYears: 0,
         comebackVotes: 0,
         isFoundingMember: isFoundingMember,
-        votesInSession: votesThisSession.length
+        votesInSession: votesThisSession.length,
+        
     };
+
+        };
+  
+    // ADD THESE 3 LINES HERE
+    stats.wonMatches  = allVotes.filter(v => v.outcome === 'won').length;
+    stats.lostMatches = allVotes.filter(v => v.outcome === 'lost').length;
+    stats.tiedMatches = allVotes.filter(v => v.outcome === 'tied').length;
+  
+
   
     // Calculate early votes (match had <10 votes when user voted)
     stats.earlyVotes = allVotes.filter(v => {
