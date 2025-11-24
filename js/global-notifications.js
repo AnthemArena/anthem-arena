@@ -3379,7 +3379,7 @@ async function checkMissedNotifications() {
     if (!userId || userId === 'anonymous') return;
     
     // ✅ Track shown notifications in this session to prevent spam
-    const sessionShown = JSON.parse(sessionStorage.getItem('shownMissedNotifications') || '[]');
+const sessionShown = JSON.parse(localStorage.getItem('shownMissedNotifications') || '[]');
     
     console.log('🔍 Checking for missed notifications...');
     
@@ -3391,6 +3391,14 @@ async function checkMissedNotifications() {
         console.log('✅ No missed notifications');
         return;
     }
+
+     // ✅ NEW: Clean up old entries (older than 72 hours)
+    const cleanupCutoff = Date.now() - (72 * 60 * 60 * 1000);
+    const validShown = sessionShown.filter(id => {
+        // Keep notification IDs that are still within the 72-hour window
+        const notif = missedNotifications.find(n => n.id === id);
+        return notif && notif.timestamp > cleanupCutoff;
+    });
     
     // ✅ Filter out already shown in this session
     const newMissed = missedNotifications.filter(notif => !sessionShown.includes(notif.id));
@@ -3462,7 +3470,7 @@ async function checkMissedNotifications() {
     
     // ✅ Save shown notification IDs to session storage
     const newShownIds = toShow.map(n => n.id);
-    sessionStorage.setItem('shownMissedNotifications', JSON.stringify([...sessionShown, ...newShownIds]));
+localStorage.setItem('shownMissedNotifications', JSON.stringify([...sessionShown, ...newShownIds]));
     
     // ✅ Show summary if there are more notifications
     if (remaining > 0) {
