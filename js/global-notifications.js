@@ -996,26 +996,6 @@ if (streakData && streakData.isMilestone) {
     }, 3000); // 3 second delay after ally/rival toast
 }
             
-      // ✅ Show as toast ONLY if within toast window (60 minutes)
-if (!toastShown && activity.timestamp >= toastCutoff) {
-    // Check cooldown to avoid spamming same match
-    const bulletinKey = `live-activity-${activity.matchId}`;
-    const lastShown = recentlyShownBulletins.get(bulletinKey);
-    const cooldownMs = 5 * 60000; // 5 minutes between toasts per match
-    
-    if (!lastShown || (now - lastShown) >= cooldownMs) {
-        showBulletin({
-            ...notificationData, // Spread existing data
-            action: 'navigate',  // ✅ ADD: Navigate action
-            targetUrl: `/profile.html?user=${activity.userId}` // ✅ ADD: User profile URL
-        });
-        recentlyShownBulletins.set(bulletinKey, now);
-        toastShown = true;
-        
-        const minutesAgo = Math.floor((now - activity.timestamp) / 60000);
-        console.log(`🔔 Toast shown: ${activity.username} (${isAlly ? 'ally' : 'rival'}) - ${minutesAgo}m ago`);
-    }
-}
             
             // ✅ Mark as processed
             lastSeenActivityIds.add(activity.activityId);
