@@ -137,7 +137,9 @@ export async function getUnreadNotifications(userId) {
 // GET RECENT UNSHOWN NOTIFICATIONS (for toasts)
 // ========================================
 
-export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 4320) { // ✅ Default to 72 hours (4320 minutes)
+export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 15) {
+
+
     if (!userId || userId === 'anonymous') return [];
     
     const cutoffTime = Date.now() - (maxAgeMinutes * 60 * 1000);

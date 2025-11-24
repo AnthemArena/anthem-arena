@@ -309,6 +309,32 @@ async function checkAndShowBulletin() {
         // ✅ Fetch user votes from localStorage
         let userVotes = {};
         let hasVoted = false;
+
+                // ========================================
+        // STATE TRACKING: Only notify on CHANGES
+        // ========================================
+        const LAST_STATES_KEY = 'lastMatchStates_v2';
+        let lastMatchStates = {};
+
+        try {
+            const stored = localStorage.getItem(LAST_STATES_KEY);
+            if (stored) lastMatchStates = JSON.parse(stored);
+        } catch (e) {
+            console.warn('Failed to load lastMatchStates');
+        }
+
+        const saveMatchState = (matchId, state) => {
+            lastMatchStates[matchId] = {
+                ...state,
+                updatedAt: Date.now()
+            };
+            try {
+                localStorage.setItem(LAST_STATES_KEY, JSON.stringify(lastMatchStates));
+            } catch (e) {
+                console.warn('Failed to save lastMatchStates');
+            }
+        };
+
         
         if (userId) {
             try {
@@ -412,74 +438,71 @@ async function checkAndShowBulletin() {
                 lastCheck: Date.now()
             };
             
-          // ========================================
-// DANGER: User's pick is losing badly
-// ========================================
+                   // ========================================
+            // DANGER: User's pick is losing badly → ONLY if severity changed
+            // ========================================
+            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+                const normalizedMatchId = getMatchId(match);
 
-if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-    const normalizedMatchId = getMatchId(match);
-    
-    // ✅ Determine severity tier for dismissal tracking
-    let severityTier;
-    if (voteDiff === 1) {
-        severityTier = 'trailing-1';
-    } else if (voteDiff <= 3) {
-        severityTier = 'trailing-2-3';
-    } else if (voteDiff <= 5) {
-        severityTier = 'trailing-4-5';
-    } else if (voteDiff <= 10) {
-        severityTier = 'trailing-6-10';
-    } else {
-        severityTier = 'trailing-11plus';
-    }
-    
-    const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
-    const repeatKey = `danger-repeat-${normalizedMatchId}-${severityTier}`;
-    
-    // ✅ Check if EITHER the original OR repeat was dismissed
-    if (dismissedBulletins.has(bulletinKey) || dismissedBulletins.has(repeatKey)) {
-        console.log(`⏭️ Skipping danger alert (${severityTier} dismissed for 24h): ${bulletinKey}, ${repeatKey}`);
-        continue;
-    }
-    
-    // ✅ Check cooldown for this specific severity
-    const lastShown = recentlyShownBulletins.get(bulletinKey);
-    if (lastShown && (Date.now() - lastShown) < (COOLDOWN_MINUTES.danger * 60000)) {
-        continue;
-    }
-    
-    // Track alert count for escalation messaging
-    const dangerAlertKey = `danger-alert-count-${normalizedMatchId}`;
-    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
-    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
-    
-    const championMessage = window.championLoader?.getChampionMessage('danger', {
-        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
-        voteDiff: voteDiff,
-        userPct: userPct,
-        opponentPct: opponentPct
-    });
-    
-    notifications.push({
-        priority: 1,
-        type: notificationType,
-        matchId: normalizedMatchId,
-        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-        thumbnailUrl: getThumbnailUrl(userSong),
-        userPct,
-        opponentPct,
-        voteDiff,
-        severityTier, // ✅ Store for dismissal key
-        message: championMessage?.message || `🚨 Your pick is in danger!`,
-        detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
-        cta: championMessage?.cta || 'View Match Now!'
-    });
-    
-    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-}
+                const currentTier = voteDiff === 1 ? 'trailing-1' :
+                                  voteDiff <= 3 ? 'trailing-2-3' :
+                                  voteDiff <= 5 ? 'trailing-4-5' :
+                                  voteDiff <= 10 ? 'trailing-6-10' : 'trailing-11plus';
+
+                const previous = lastMatchStates[normalizedMatchId];
+                if (previous?.dangerTier === currentTier) {
+                    console.log(`No change in danger state for ${normalizedMatchId} (${currentTier})`);
+                    continue;
+                }
+
+                let severityTier = currentTier;
+                const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
+                const repeatKey = `danger-repeat-${normalizedMatchId}-${severityTier}`;
+
+                if (dismissedBulletins.has(bulletinKey) || dismissedBulletins.has(repeatKey)) {
+                    console.log(`Skipping danger alert (${severityTier} dismissed)`);
+                    continue;
+                }
+
+                const lastShown = recentlyShownBulletins.get(bulletinKey);
+                if (lastShown && (Date.now() - lastShown) < (COOLDOWN_MINUTES.danger * 60000)) {
+                    continue;
+                }
+
+                const dangerAlertKey = `danger-alert-count-${normalizedMatchId}`;
+                const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+                const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+
+                const championMessage = window.championLoader?.getChampionMessage('danger', {
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+                    voteDiff: voteDiff,
+                    userPct: userPct,
+                    opponentPct: opponentPct
+                });
+
+                notifications.push({
+                    priority: 1,
+                    type: notificationType,
+                    matchId: normalizedMatchId,
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+                    thumbnailUrl: getThumbnailUrl(userSong),
+                    userPct,
+                    opponentPct,
+                    voteDiff,
+                    severityTier,
+                    message: championMessage?.message || `Your pick is in danger!`,
+                    detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
+                    cta: championMessage?.cta || 'View Match Now!'
+                });
+
+                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+
+                // SAVE NEW STATE
+                saveMatchState(normalizedMatchId, { dangerTier: currentTier });
+            }
             
             // ========================================
             // COMEBACK: Was losing, now winning
@@ -530,30 +553,25 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                 });
             }
             
+                      // ========================================
+            // NAILBITER: Very close match → ONLY if closeness changed
             // ========================================
-            // NAILBITER: Very close match
-            // ========================================
-            
             else if (voteDiff <= BULLETIN_THRESHOLDS.NAILBITER && totalVotes > 10) {
                 const normalizedMatchId = getMatchId(match);
-                
-                // ✅ Severity tier: how close is it?
-                let nailbiterTier;
-                if (voteDiff === 0) {
-                    nailbiterTier = 'tied';
-                } else if (voteDiff === 1) {
-                    nailbiterTier = 'diff-1';
-                } else {
-                    nailbiterTier = `diff-${voteDiff}`;
-                }
-                
-                const bulletinKey = `nailbiter-${normalizedMatchId}-${nailbiterTier}`;
-                
-                if (dismissedBulletins.has(bulletinKey)) {
-                    console.log(`⏭️ Skipping nailbiter alert (${nailbiterTier} dismissed): ${bulletinKey}`);
+                const currentTier = voteDiff === 0 ? 'tied' : `diff-${voteDiff}`;
+
+                const previous = lastMatchStates[normalizedMatchId];
+                if (previous?.nailbiterTier === currentTier) {
                     continue;
                 }
-                
+
+                let nailbiterTier = currentTier;
+                const bulletinKey = `nailbiter-${normalizedMatchId}-${nailbiterTier}`;
+
+                if (dismissedBulletins.has(bulletinKey)) {
+                    continue;
+                }
+
                 const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
                     songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
                     opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
@@ -562,7 +580,7 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                     userPct: userPct,
                     opponentPct: opponentPct
                 });
-                
+
                 notifications.push({
                     priority: 3,
                     type: 'nailbiter',
@@ -573,11 +591,13 @@ if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
                     voteDiff,
                     userPct,
                     opponentPct,
-                    severityTier: nailbiterTier, // ✅ Store for dismissal key
-                    message: championMessage?.message || `🔥 Too close!`,
+                    severityTier: nailbiterTier,
+                    message: championMessage?.message || `Too close!`,
                     detail: championMessage?.detail || `${voteDiff === 0 ? 'Perfectly tied!' : `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`}`,
                     cta: championMessage?.cta || 'View Match!'
                 });
+
+                saveMatchState(normalizedMatchId, { nailbiterTier: currentTier });
             }
             
             // ========================================
@@ -980,8 +1000,10 @@ async function checkRecentVotes() {
             
             // ✅ ALWAYS save to Firestore (within 72-hour window)
             try {
-                await saveNotification(userId, notificationData);
-                savedCount++;
+await saveNotification(userId, {
+    ...notificationData,
+    timestamp: activity.timestamp  // ← THIS IS THE CRUCIAL FIX
+});                savedCount++;
                 console.log(`💾 Saved ${isAlly ? '🤝 ally' : '⚔️ rival'} notification: ${activity.username} in ${activity.matchTitle}`);
             } catch (error) {
                 console.error('Failed to save notification:', error);
@@ -3346,79 +3368,57 @@ async function checkIncomingReactions() {
 // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
 // ========================================
 
+/// ========================================
+// CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD — FIXED FOREVER
 // ========================================
-// CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
-// ========================================
-
 async function checkMissedNotifications() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') return;
-    
-    // ✅ Track shown notifications in this session to prevent spam
-const sessionShown = JSON.parse(localStorage.getItem('shownMissedNotifications') || '[]');
-    
-    console.log('🔍 Checking for missed notifications...');
-    
-    // Match the 72-hour window from checkRecentVotes
-    const hoursToCheck = 72;
-    const missedNotifications = await getRecentUnshownNotifications(userId, hoursToCheck * 60);
-    
-    if (missedNotifications.length === 0) {
-        console.log('✅ No missed notifications');
+
+    // Only show toasts for things that happened while the user was actually away
+    const MAX_MINUTES_TO_CATCH_UP = 30;
+
+    // Prevent spam: only run once per session + cooldown
+    const lastCheckKey = 'lastMissedNotificationCheck';
+    const lastCheck = parseInt(localStorage.getItem(lastCheckKey) || '0');
+    const now = Date.now();
+
+    if (now - lastCheck < 60000) { // less than 1 minute ago
+        console.log('⏭️ Skipping missed notifications — already checked recently');
         return;
     }
 
-     // ✅ NEW: Clean up old entries (older than 72 hours)
-    const cleanupCutoff = Date.now() - (72 * 60 * 60 * 1000);
-    const validShown = sessionShown.filter(id => {
-        // Keep notification IDs that are still within the 72-hour window
-        const notif = missedNotifications.find(n => n.id === id);
-        return notif && notif.timestamp > cleanupCutoff;
-    });
-    
-    // ✅ Filter out already shown in this session
-    const newMissed = missedNotifications.filter(notif => !sessionShown.includes(notif.id));
-    
-    if (newMissed.length === 0) {
-        console.log(`✅ No NEW missed notifications (${missedNotifications.length} total already shown this session)`);
+    console.log(`Checking for missed notifications (last ${MAX_MINUTES_TO_CATCH_UP} mins)...`);
+
+    const missed = await getRecentUnshownNotifications(userId, MAX_MINUTES_TO_CATCH_UP);
+
+    if (missed.length === 0) {
+        localStorage.setItem(lastCheckKey, now.toString());
         return;
     }
-    
-    console.log(`📬 Found ${newMissed.length} NEW missed notifications (${missedNotifications.length} total, ${sessionShown.length} already shown this session)`);
-    
-    // ✅ Prioritize and deduplicate
-    const prioritized = newMissed
-        .sort((a, b) => a.priority - b.priority);
 
-    // ✅ Deduplicate by user + event type (keep only latest per user/event)
+    // Deduplicate: one per user + event type
     const seen = new Map();
-    const deduplicated = [];
+    const unique = [];
 
-    for (const notif of prioritized) {
-        const key = `${notif.triggerUserId}-${notif.eventType || notif.type}`;
-        
+    for (const n of missed.sort((a, b) => (b.priority || 5) - (a.priority || 5))) {
+        const key = `${n.triggerUserId || 'system'}-${n.eventType || n.type}`;
         if (!seen.has(key)) {
             seen.set(key, true);
-            deduplicated.push(notif);
+            unique.push(n);
         }
     }
 
-    // ✅ Only show the top 3 most important as toasts
-    const toShow = deduplicated.slice(0, 3);
-    const remaining = deduplicated.length - toShow.length;
-    
-    // Show each as a toast with slight delay between them
-    toShow.forEach((notification, index) => {
+    const toShow = unique.slice(0, 3); // max 3 toasts
+    const extraCount = unique.length - toShow.length;
+
+    toShow.forEach((notification, i) => {
         setTimeout(() => {
-            const hoursAgo = Math.floor((Date.now() - notification.timestamp) / (1000 * 60 * 60));
-            const timeAgo = hoursAgo < 1 
-                ? 'Less than 1 hour ago'
-                : hoursAgo < 24 
-                    ? `${hoursAgo}h ago` 
-                    : `${Math.floor(hoursAgo / 24)}d ago`;
-            
+            const minsAgo = Math.floor((Date.now() - notification.timestamp) / 60000);
+            const timeAgo = minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo / 60)}h ago`;
+
             showBulletin({
-                priority: notification.priority,
+                priority: notification.priority || 5,
                 type: notification.type,
                 matchId: notification.matchId,
                 matchTitle: notification.matchTitle,
@@ -3427,59 +3427,48 @@ const sessionShown = JSON.parse(localStorage.getItem('shownMissedNotifications')
                 triggerUserId: notification.triggerUserId,
                 thumbnailUrl: notification.thumbnailUrl,
                 message: notification.message,
-                detail: `${notification.detail} • ${timeAgo}`,
-                icon: notification.icon,
-                cta: notification.ctaText,
+                detail: notification.detail ? `${notification.detail} • ${timeAgo}` : timeAgo,
+                icon: notification.icon || '🔔',
                 ctaText: notification.ctaText,
                 ctaAction: notification.ctaAction,
                 ctaData: notification.ctaData,
                 targetUrl: notification.targetUrl,
                 relationship: notification.relationship,
-                secondaryCta: notification.secondaryCta
             });
-            
-            // Mark as shown in Firestore
+
+            // Mark as shown so it NEVER comes back
             markNotificationShown(notification.id);
-            
-        }, index * 3000); // 3-second delay between toasts
+        }, i * 3000);
     });
-    
-    // ✅ Save shown notification IDs to session storage
-    const newShownIds = toShow.map(n => n.id);
-localStorage.setItem('shownMissedNotifications', JSON.stringify([...sessionShown, ...newShownIds]));
-    
-    // ✅ Show summary if there are more notifications
-    if (remaining > 0) {
+
+    // Summary toast if more than 3
+    if (extraCount > 0) {
         setTimeout(() => {
             showBulletin({
+                type: 'summary',
                 priority: 10,
-                type: 'notification-summary',
-                matchId: 'summary',
-                message: `📬 ${remaining} more notification${remaining === 1 ? '' : 's'}`,
-                detail: 'Check your notification center to see everything',
+                message: `+ ${extraCount} more notification${extraCount > 1 ? 's' : ''}`,
+                detail: 'Open notification center to see all',
                 icon: '🔔',
-                cta: 'Open Notifications',
+                ctaText: 'View All',
                 ctaAction: 'open-panel',
-                targetUrl: '#'
             });
         }, toShow.length * 3000 + 1000);
     }
+
+    // Update timestamp so we don’t run again this session
+    localStorage.setItem(lastCheckKey, now.toString());
 }
 
-// ✅ Run on page load with longer delay (let page settle first)
-setTimeout(() => {
-    checkMissedNotifications();
-}, 3000); // 3 seconds instead of 2
+// Run once on load (after page settles)
+setTimeout(checkMissedNotifications, 4000);
 
-// ✅ Also check when user returns to tab (was idle)
-let wasHidden = false;
+// Optional: run again when user returns from background tab
+let wasHidden = document.hidden;
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden && wasHidden) {
-        // User just came back to tab
-        console.log('👀 User returned to tab - checking for new notifications');
-        setTimeout(() => {
-            checkMissedNotifications();
-        }, 1000);
+        console.log('User returned — checking for missed notifications');
+        setTimeout(checkMissedNotifications, 2000);
     }
     wasHidden = document.hidden;
 });
