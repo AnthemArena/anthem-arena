@@ -138,8 +138,6 @@ export async function getUnreadNotifications(userId) {
 // ========================================
 
 export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 15) {
-
-
     if (!userId || userId === 'anonymous') return [];
     
     const cutoffTime = Date.now() - (maxAgeMinutes * 60 * 1000);
@@ -153,7 +151,7 @@ export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 15) 
             where('expiresAt', '>', Date.now()),
             orderBy('timestamp', 'desc'),
             orderBy('expiresAt', 'desc'),
-            limit(20) // ✅ Increased from 5 to 20
+            limit(50) // Get up to 50 to group them
         );
         
         const snapshot = await getDocs(q);
@@ -166,7 +164,7 @@ export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 15) 
             });
         });
         
-        console.log(`🔔 Found ${notifications.length} recent unshown notifications (last ${Math.floor(maxAgeMinutes / 60)}h)`);
+        console.log(`🔔 Found ${notifications.length} unshown notifications from last ${maxAgeMinutes}min`);
         return notifications;
         
     } catch (error) {

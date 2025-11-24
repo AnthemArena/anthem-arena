@@ -27,6 +27,30 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
+// TRACK USER ACTIVITY
+// ========================================
+
+function trackUserActivity() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') return;
+    
+    // Update last visit timestamp
+    localStorage.setItem('lastVisitTimestamp', Date.now().toString());
+}
+
+// Update on any user interaction
+['click', 'scroll', 'keydown', 'mousemove'].forEach(eventType => {
+    let timeout;
+    document.addEventListener(eventType, () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(trackUserActivity, 1000); // Debounce to once per second
+    }, { passive: true });
+});
+
+// Update every 30 seconds while active
+setInterval(trackUserActivity, 30000);
+
+// ========================================
 // HELPER: NORMALIZE MATCH ID
 // ========================================
 
@@ -3375,99 +3399,151 @@ async function checkMissedNotifications() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') return;
 
-    // Only show toasts for things that happened while the user was actually away
-    const MAX_MINUTES_TO_CATCH_UP = 30;
-
-    // Prevent spam: only run once per session + cooldown
-    const lastCheckKey = 'lastMissedNotificationCheck';
-    const lastCheck = parseInt(localStorage.getItem(lastCheckKey) || '0');
+    // ✅ CRITICAL: Only check if user just returned to the site
+    const lastVisit = parseInt(localStorage.getItem('lastVisitTimestamp') || '0');
     const now = Date.now();
-
-    if (now - lastCheck < 60000) { // less than 1 minute ago
-        console.log('⏭️ Skipping missed notifications — already checked recently');
+    
+    // If last visit was less than 2 minutes ago, they're still actively browsing
+    const timeSinceLastVisit = now - lastVisit;
+    if (timeSinceLastVisit < 2 * 60 * 1000) {
+        console.log('⏭️ User still active, skipping missed notifications check');
+        localStorage.setItem('lastVisitTimestamp', now.toString());
+        return;
+    }
+    
+    // ✅ Only check once per session
+    if (sessionStorage.getItem('missedNotificationsChecked')) {
+        console.log('⏭️ Already checked missed notifications this session');
         return;
     }
 
-    console.log(`Checking for missed notifications (last ${MAX_MINUTES_TO_CATCH_UP} mins)...`);
+    console.log(`⏰ User was away for ${Math.floor(timeSinceLastVisit / 60000)} minutes, checking for missed notifications...`);
 
-    const missed = await getRecentUnshownNotifications(userId, MAX_MINUTES_TO_CATCH_UP);
+    // ✅ Only look for notifications from WHILE THEY WERE AWAY (max 2 hours)
+    const maxLookbackMinutes = Math.min(Math.floor(timeSinceLastVisit / 60000), 120); // Max 2 hours
+    
+    if (maxLookbackMinutes < 5) {
+        console.log('⏭️ Away time too short, skipping');
+        localStorage.setItem('lastVisitTimestamp', now.toString());
+        sessionStorage.setItem('missedNotificationsChecked', 'true');
+        return;
+    }
+
+    const missed = await getRecentUnshownNotifications(userId, maxLookbackMinutes);
 
     if (missed.length === 0) {
-        localStorage.setItem(lastCheckKey, now.toString());
+        console.log('✅ No missed notifications');
+        localStorage.setItem('lastVisitTimestamp', now.toString());
+        sessionStorage.setItem('missedNotificationsChecked', 'true');
         return;
     }
 
-    // Deduplicate: one per user + event type
-    const seen = new Map();
-    const unique = [];
-
-    for (const n of missed.sort((a, b) => (b.priority || 5) - (a.priority || 5))) {
-        const key = `${n.triggerUserId || 'system'}-${n.eventType || n.type}`;
-        if (!seen.has(key)) {
-            seen.set(key, true);
-            unique.push(n);
-        }
+    // ✅ CRITICAL: Filter out very old notifications (> 2 hours)
+    const twoHoursAgo = now - (2 * 60 * 60 * 1000);
+    const recentMissed = missed.filter(n => n.timestamp > twoHoursAgo);
+    
+    if (recentMissed.length === 0) {
+        console.log('⏭️ All missed notifications are too old (>2 hours), skipping toasts');
+        // Still mark them as shown so they don't appear next time
+        missed.forEach(n => markNotificationShown(n.id));
+        localStorage.setItem('lastVisitTimestamp', now.toString());
+        sessionStorage.setItem('missedNotificationsChecked', 'true');
+        return;
     }
 
-    const toShow = unique.slice(0, 3); // max 3 toasts
-    const extraCount = unique.length - toShow.length;
+    console.log(`📬 Found ${recentMissed.length} recent missed notifications`);
 
-    toShow.forEach((notification, i) => {
+    // ✅ GROUP BY USER: Only show ONE toast per user
+    const groupedByUser = new Map();
+    
+    recentMissed.forEach(n => {
+        const userKey = n.triggerUserId || 'system';
+        
+        if (!groupedByUser.has(userKey)) {
+            groupedByUser.set(userKey, {
+                ...n,
+                count: 1,
+                matches: [n.matchTitle],
+                ids: [n.id]
+            });
+        } else {
+            const existing = groupedByUser.get(userKey);
+            existing.count++;
+            existing.matches.push(n.matchTitle);
+            existing.ids.push(n.id);
+            // Keep most recent timestamp
+            if (n.timestamp > existing.timestamp) {
+                existing.timestamp = n.timestamp;
+            }
+        }
+    });
+
+    const uniqueNotifications = Array.from(groupedByUser.values())
+        .sort((a, b) => (b.priority || 5) - (a.priority || 5))
+        .slice(0, 3); // Max 3 toasts
+
+    console.log(`🔔 Showing ${uniqueNotifications.length} grouped toast notifications`);
+
+    uniqueNotifications.forEach((notification, i) => {
         setTimeout(() => {
-            const minsAgo = Math.floor((Date.now() - notification.timestamp) / 60000);
+            const minsAgo = Math.floor((now - notification.timestamp) / 60000);
             const timeAgo = minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo / 60)}h ago`;
+
+            // ✅ Update message if multiple matches
+            let message = notification.message;
+            let detail = notification.detail;
+            
+            if (notification.count > 1) {
+                message = `${notification.triggerUsername || 'Someone'} voted in ${notification.count} matches`;
+                detail = `Including ${notification.matches.slice(0, 2).join(', ')}${notification.count > 2 ? ` +${notification.count - 2} more` : ''} • ${timeAgo}`;
+            } else {
+                detail = detail ? `${detail} • ${timeAgo}` : timeAgo;
+            }
 
             showBulletin({
                 priority: notification.priority || 5,
                 type: notification.type,
                 matchId: notification.matchId,
                 matchTitle: notification.matchTitle,
-                severityTier: notification.severityTier,
                 username: notification.triggerUsername,
                 triggerUserId: notification.triggerUserId,
                 thumbnailUrl: notification.thumbnailUrl,
-                message: notification.message,
-                detail: notification.detail ? `${notification.detail} • ${timeAgo}` : timeAgo,
+                message: message,
+                detail: detail,
                 icon: notification.icon || '🔔',
-                ctaText: notification.ctaText,
-                ctaAction: notification.ctaAction,
-                ctaData: notification.ctaData,
-                targetUrl: notification.targetUrl,
+                ctaText: notification.ctaText || 'View Profile',
+                ctaAction: 'navigate',
+                targetUrl: `/profile?user=${notification.triggerUsername}`,
                 relationship: notification.relationship,
             });
 
-            // Mark as shown so it NEVER comes back
-            markNotificationShown(notification.id);
-        }, i * 3000);
+            // ✅ Mark ALL this user's notifications as shown
+            notification.ids.forEach(id => markNotificationShown(id));
+            
+        }, i * 3000); // 3 second delay between toasts
     });
 
-    // Summary toast if more than 3
-    if (extraCount > 0) {
-        setTimeout(() => {
-            showBulletin({
-                type: 'summary',
-                priority: 10,
-                message: `+ ${extraCount} more notification${extraCount > 1 ? 's' : ''}`,
-                detail: 'Open notification center to see all',
-                icon: '🔔',
-                ctaText: 'View All',
-                ctaAction: 'open-panel',
-            });
-        }, toShow.length * 3000 + 1000);
-    }
-
-    // Update timestamp so we don’t run again this session
-    localStorage.setItem(lastCheckKey, now.toString());
+    // ✅ Update tracking
+    localStorage.setItem('lastVisitTimestamp', now.toString());
+    sessionStorage.setItem('missedNotificationsChecked', 'true');
 }
+
+// ========================================
+// CHECK MISSED NOTIFICATIONS ON LOAD
+// ========================================
 
 // Run once on load (after page settles)
 setTimeout(checkMissedNotifications, 4000);
 
-// Optional: run again when user returns from background tab
+// ✅ MODIFIED: Check when user returns from background tab
 let wasHidden = document.hidden;
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden && wasHidden) {
-        console.log('User returned — checking for missed notifications');
+        console.log('👀 User returned to tab — checking for missed notifications');
+        
+        // ✅ Clear the session flag so it can check again
+        sessionStorage.removeItem('missedNotificationsChecked');
+        
         setTimeout(checkMissedNotifications, 2000);
     }
     wasHidden = document.hidden;

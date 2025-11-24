@@ -324,7 +324,10 @@ async function loadNotificationsTab(content, userId, tab) {
         return;
     }
     
-    content.innerHTML = filtered.map(notification => {
+    // ✅ NEW: Group notifications by user + event type
+    const grouped = groupNotificationsByUser(filtered);
+    
+    content.innerHTML = grouped.map(notification => {
         return renderNotificationItem(notification);
     }).join('');
     
@@ -335,6 +338,53 @@ async function loadNotificationsTab(content, userId, tab) {
 window.openConversationModal = function(userId, username) {
     showMessageComposer(userId, username, {});
 };
+
+// ========================================
+// GROUP NOTIFICATIONS BY USER
+// ========================================
+
+function groupNotificationsByUser(notifications) {
+    // Group by user + relationship type
+    const grouped = new Map();
+    
+    notifications.forEach(n => {
+        // Create a unique key for grouping
+        const key = `${n.triggerUserId || 'system'}-${n.relationship || n.type}`;
+        
+        if (!grouped.has(key)) {
+            // First notification from this user for this type
+            grouped.set(key, {
+                ...n,
+                count: 1,
+                matches: [{
+                    matchId: n.matchId,
+                    matchTitle: n.matchTitle,
+                    detail: n.detail
+                }],
+                ids: [n.id]
+            });
+        } else {
+            // Add to existing group
+            const existing = grouped.get(key);
+            existing.count++;
+            existing.matches.push({
+                matchId: n.matchId,
+                matchTitle: n.matchTitle,
+                detail: n.detail
+            });
+            existing.ids.push(n.id);
+            
+            // Keep most recent timestamp
+            if (n.timestamp > existing.timestamp) {
+                existing.timestamp = n.timestamp;
+            }
+        }
+    });
+    
+    // Convert back to array and sort by timestamp
+    return Array.from(grouped.values())
+        .sort((a, b) => b.timestamp - a.timestamp);
+}
 
 async function updateBadgeCount() {
     const userId = localStorage.getItem('tournamentUserId');
@@ -491,7 +541,6 @@ function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
     
-    // ✅ NEW: Check if notification is from champion pack
     const championPack = window.championLoader?.getCurrentPack();
     const isChampionNotification = notification.type === 'live-activity' || 
                                    notification.type === 'danger' || 
@@ -503,7 +552,6 @@ function renderNotificationItem(notification) {
         ? `data-from-champion="${championPack.id}"` 
         : '';
 
-     // ✅ ADD THESE ICONS:
     const typeIcons = {
         'like': '❤️',
         'comment': '💬',
@@ -516,7 +564,30 @@ function renderNotificationItem(notification) {
     
     const icon = notification.icon || typeIcons[notification.type] || '📢';
     
-    // Determine what image to show
+    // ✅ NEW: Show count badge if multiple matches
+    const countBadge = notification.count > 1 
+        ? `<span class="notification-count">${notification.count}</span>`
+        : '';
+    
+    // ✅ NEW: Update message for grouped notifications
+    let displayMessage = notification.message;
+    let displayDetail = notification.detail || '';
+    
+    if (notification.count > 1) {
+        displayMessage = `${notification.triggerUsername} voted in ${notification.count} matches`;
+        
+        // Show first 2 match titles
+        const matchTitles = notification.matches
+            .slice(0, 2)
+            .map(m => m.matchTitle)
+            .join(', ');
+        
+        displayDetail = notification.count > 2 
+            ? `${matchTitles} +${notification.count - 2} more`
+            : matchTitles;
+    }
+    
+    // Image logic (unchanged)
     let imageHtml = '';
     
     if (notification.thumbnailUrl) {
@@ -525,7 +596,7 @@ function renderNotificationItem(notification) {
                 <img src="${notification.thumbnailUrl}" 
                      style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(200, 155, 60, 0.3);">
                 <div style="position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: linear-gradient(135deg, #C8AA6E, #B89A5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #1a1a2e;">
-                    ${notification.icon}
+                    ${icon}${countBadge}
                 </div>
             </div>
         `;
@@ -541,20 +612,20 @@ function renderNotificationItem(notification) {
                     ${initial}
                 </div>
                 <div style="position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: linear-gradient(135deg, #C8AA6E, #B89A5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #1a1a2e;">
-                    ${notification.icon}
+                    ${icon}${countBadge}
                 </div>
             </div>
         `;
     } else {
-        imageHtml = `<span class="notification-item-icon" style="font-size: 20px; margin-right: 8px;">${notification.icon}</span>`;
+        imageHtml = `<span class="notification-item-icon" style="font-size: 20px; margin-right: 8px;">${icon}${countBadge}</span>`;
     }
     
-    // Determine CTA button HTML
+    // CTA button logic (unchanged but uses notification.ids for grouped)
     let ctaHtml = '';
     if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
         ctaHtml = `
             <button class="notification-item-cta" 
-                    data-id="${notification.id}"
+                    data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
                     data-action="${notification.ctaAction}"
                     data-target-user="${notification.triggerUserId}"
                     data-url="${notification.targetUrl || ''}">
@@ -564,7 +635,7 @@ function renderNotificationItem(notification) {
     } else {
         ctaHtml = `
             <button class="notification-item-cta" 
-                    data-id="${notification.id}"
+                    data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
                     data-action="${notification.ctaAction}"
                     data-url="${notification.targetUrl || ''}">
                 ${notification.ctaText}
@@ -573,13 +644,14 @@ function renderNotificationItem(notification) {
     }
     
     return `
-        <div class="notification-item ${unreadClass}" data-id="${notification.id}"${championAttr}>
+        <div class="notification-item ${unreadClass}" 
+             data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
+             ${championAttr}>
             <div class="notification-item-header" style="display: flex; align-items: center;">
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
-                    <div class="notification-item-message">${notification.message}</div>
+                    <div class="notification-item-message">${displayMessage}</div>
                     
-                    <!-- ADD THIS: Clickable username below message -->
                     ${notification.triggerUsername ? `
                         <a href="/profile?user=${notification.triggerUsername}" 
                            style="color: #C8AA6E; text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-block; font-size: 0.85rem;"
@@ -588,14 +660,37 @@ function renderNotificationItem(notification) {
                         </a>
                     ` : ''}
                 </div>
-                <button class="notification-item-dismiss" data-id="${notification.id}">Dismiss</button>
+                <button class="notification-item-dismiss" 
+                        data-id="${notification.ids ? notification.ids.join(',') : notification.id}">
+                    Dismiss
+                </button>
             </div>
             
-            ${notification.detail ? `<div class="notification-item-detail">${notification.detail}</div>` : ''}
+            ${displayDetail ? `<div class="notification-item-detail">${displayDetail}</div>` : ''}
+            
+            ${notification.count > 1 ? `
+                <button class="notification-expand" 
+                        onclick="expandGroupedNotification('${notification.ids.join(',')}', event)"
+                        style="
+                            margin: 8px 0;
+                            background: rgba(200, 170, 110, 0.15);
+                            border: 1px solid rgba(200, 170, 110, 0.3);
+                            color: #C8AA6E;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            font-size: 0.75rem;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        "
+                        onmouseover="this.style.background='rgba(200, 170, 110, 0.25)'"
+                        onmouseout="this.style.background='rgba(200, 170, 110, 0.15)'">
+                    Show all ${notification.count} matches
+                </button>
+            ` : ''}
             
             <div class="notification-item-footer">
                 <span class="notification-item-time">${timeAgo}</span>
-            ${renderCtaButton(notification)}
+                ${ctaHtml}
             </div>
         </div>
     `;
@@ -1146,3 +1241,83 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ========================================
+// EXPAND GROUPED NOTIFICATION
+// ========================================
+
+window.expandGroupedNotification = async function(idString, event) {
+    event.stopPropagation();
+    
+    const ids = idString.split(',');
+    const userId = localStorage.getItem('tournamentUserId');
+    
+    // Get all notifications in this group
+    const allNotifications = await getUnreadNotifications(userId);
+    const groupNotifications = allNotifications.filter(n => ids.includes(n.id));
+    
+    // Create modal to show all matches
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10002;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        ">
+            <h3 style="margin: 0 0 16px 0; color: #C8AA6E;">
+                All Matches (${groupNotifications.length})
+            </h3>
+            ${groupNotifications.map(n => `
+                <div style="
+                    background: rgba(200, 170, 110, 0.05);
+                    border: 1px solid rgba(200, 170, 110, 0.2);
+                    border-radius: 8px;
+                    padding: 12px;
+                    margin-bottom: 12px;
+                ">
+                    <div style="font-weight: 600; color: #C8AA6E; margin-bottom: 4px;">
+                        ${n.matchTitle}
+                    </div>
+                    <div style="font-size: 0.85rem; color: #888;">
+                        ${n.detail}
+                    </div>
+                </div>
+            `).join('')}
+            <button onclick="this.closest('div[style*=fixed]').remove()" style="
+                width: 100%;
+                margin-top: 16px;
+                background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                border: none;
+                color: #1a1a2e;
+                padding: 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 700;
+            ">Close</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+};

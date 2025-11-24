@@ -31,55 +31,78 @@ export async function checkMatchOutcomes() {
         
         const outcomes = [];
         
-for (const [matchId, voteData] of Object.entries(userVotes)) {
-    // Skip if already notified
-    if (notifiedMatches.includes(matchId)) continue;
-    
-    // Find the match
-    const match = allMatches.find(m => (m.matchId || m.id) === matchId);
-    
-    if (!match) continue;
-    
-    // Only check completed matches
-    if (match.status !== 'completed') continue;
-    
-    // ✅ Determine outcome (now async)
-    const outcome = await determineOutcome(match, voteData);
-    
-    if (outcome) {
-        outcomes.push({
-            matchId: matchId,
-            matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
-            userPick: voteData.songTitle,
-            winner: outcome.winner,
-            loser: outcome.loser,
-            result: outcome.result,
-            finalVotes: outcome.finalVotes,
-            thumbnailUrl: getThumbnailUrl(match, voteData.songId)
-        });
+        for (const [matchId, voteData] of Object.entries(userVotes)) {
+            // Skip if already notified
+            if (notifiedMatches.includes(matchId)) continue;
+            
+            // Find the match
+            const match = allMatches.find(m => (m.matchId || m.id) === matchId);
+            
+            if (!match) continue;
+            
+            // Only check completed matches
+            if (match.status !== 'completed') continue;
+            
+            // Determine outcome
+            const outcome = await determineOutcome(match, voteData);
+            
+            if (outcome) {
+                outcomes.push({
+                    matchId: matchId,
+                    matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
+                    userPick: voteData.songTitle,
+                    winner: outcome.winner,
+                    loser: outcome.loser,
+                    result: outcome.result,
+                    finalVotes: outcome.finalVotes,
+                    thumbnailUrl: getThumbnailUrl(match, voteData.songId)
+                });
+                
+                // Mark as notified
+                notifiedMatches.push(matchId);
+            }
+        }
         
-        // Mark as notified
-        notifiedMatches.push(matchId);
-    }
-}
-        
-        // Save updated notified list
+        // ✅ NEW: Update Firebase votes with outcomes
         if (outcomes.length > 0) {
             localStorage.setItem('notifiedMatchOutcomes', JSON.stringify(notifiedMatches));
             
-            // Update win/loss counters for achievements
-            outcomes.forEach(outcome => {
-                if (outcome.result === 'won') {
-                    const wonCount = parseInt(localStorage.getItem('matchesWon') || '0');
-                    localStorage.setItem('matchesWon', (wonCount + 1).toString());
-                } else if (outcome.result === 'lost') {
-                    const lostCount = parseInt(localStorage.getItem('matchesLost') || '0');
-                    localStorage.setItem('matchesLost', (lostCount + 1).toString());
-                } else if (outcome.result === 'tied') {
-                    const tiedCount = parseInt(localStorage.getItem('matchesTied') || '0');
-                    localStorage.setItem('matchesTied', (tiedCount + 1).toString());
+            // Import Firebase functions
+            const { doc, updateDoc, collection, query, where, getDocs } = 
+                await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            
+            // Update each vote in Firebase
+            for (const outcome of outcomes) {
+                try {
+                    // Find the vote document
+                    const votesRef = collection(db, 'votes');
+                    const voteQuery = query(
+                        votesRef,
+                        where('userId', '==', userId),
+                        where('matchId', '==', outcome.matchId)
+                    );
+                    
+                    const voteSnapshot = await getDocs(voteQuery);
+                    
+                    if (!voteSnapshot.empty) {
+                        const voteDoc = voteSnapshot.docs[0];
+                        
+                        // ✅ Update vote with outcome
+                        await updateDoc(doc(db, 'votes', voteDoc.id), {
+                            outcome: outcome.result,
+                            matchCompleted: true,
+                            completedAt: new Date().toISOString()
+                        });
+                        
+                        console.log(`✅ Updated vote with outcome: ${outcome.result} for match ${outcome.matchId}`);
+                    } else {
+                        console.warn(`⚠️ No vote found for user ${userId} in match ${outcome.matchId}`);
+                    }
+                    
+                } catch (error) {
+                    console.error(`❌ Failed to update vote outcome for match ${outcome.matchId}:`, error);
                 }
-            });
+            }
         }
         
         return outcomes;
