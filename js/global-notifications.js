@@ -3370,14 +3370,21 @@ async function checkIncomingReactions() {
 // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
 // ========================================
 
+// ========================================
+// CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
+// ========================================
+
 async function checkMissedNotifications() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') return;
     
+    // ✅ Track shown notifications in this session to prevent spam
+    const sessionShown = JSON.parse(sessionStorage.getItem('shownMissedNotifications') || '[]');
+    
     console.log('🔍 Checking for missed notifications...');
     
-    // ✅ Match the 72-hour window from checkRecentVotes
-    const hoursToCheck = 72; // Same as SAVE_WINDOW_HOURS
+    // Match the 72-hour window from checkRecentVotes
+    const hoursToCheck = 72;
     const missedNotifications = await getRecentUnshownNotifications(userId, hoursToCheck * 60);
     
     if (missedNotifications.length === 0) {
@@ -3385,51 +3392,58 @@ async function checkMissedNotifications() {
         return;
     }
     
-    console.log(`📬 Found ${missedNotifications.length} missed notifications from last ${hoursToCheck}h`);
+    // ✅ Filter out already shown in this session
+    const newMissed = missedNotifications.filter(notif => !sessionShown.includes(notif.id));
     
- // ✅ Prioritize and deduplicate
-const prioritized = missedNotifications
-    .sort((a, b) => a.priority - b.priority);
-
-// ✅ Deduplicate by user + event type (keep only latest per user/event)
-const seen = new Map();
-const deduplicated = [];
-
-for (const notif of prioritized) {
-    const key = `${notif.triggerUserId}-${notif.eventType || notif.type}`;
-    
-    if (!seen.has(key)) {
-        seen.set(key, true);
-        deduplicated.push(notif);
+    if (newMissed.length === 0) {
+        console.log(`✅ No NEW missed notifications (${missedNotifications.length} total already shown this session)`);
+        return;
     }
-}
+    
+    console.log(`📬 Found ${newMissed.length} NEW missed notifications (${missedNotifications.length} total, ${sessionShown.length} already shown this session)`);
+    
+    // ✅ Prioritize and deduplicate
+    const prioritized = newMissed
+        .sort((a, b) => a.priority - b.priority);
 
-// ✅ Only show the top 3 most important as toasts
-const toShow = deduplicated.slice(0, 3);
-const remaining = deduplicated.length - toShow.length;
+    // ✅ Deduplicate by user + event type (keep only latest per user/event)
+    const seen = new Map();
+    const deduplicated = [];
+
+    for (const notif of prioritized) {
+        const key = `${notif.triggerUserId}-${notif.eventType || notif.type}`;
+        
+        if (!seen.has(key)) {
+            seen.set(key, true);
+            deduplicated.push(notif);
+        }
+    }
+
+    // ✅ Only show the top 3 most important as toasts
+    const toShow = deduplicated.slice(0, 3);
+    const remaining = deduplicated.length - toShow.length;
     
     // Show each as a toast with slight delay between them
     toShow.forEach((notification, index) => {
         setTimeout(() => {
             const hoursAgo = Math.floor((Date.now() - notification.timestamp) / (1000 * 60 * 60));
-           const timeAgo = hoursAgo < 1 
-    ? 'Less than 1 hour ago'  // ← Better than "just before you left"
-    : hoursAgo < 24 
-        ? `${hoursAgo}h ago` 
-        : `${Math.floor(hoursAgo / 24)}d ago`;
+            const timeAgo = hoursAgo < 1 
+                ? 'Less than 1 hour ago'
+                : hoursAgo < 24 
+                    ? `${hoursAgo}h ago` 
+                    : `${Math.floor(hoursAgo / 24)}d ago`;
             
             showBulletin({
                 priority: notification.priority,
                 type: notification.type,
                 matchId: notification.matchId,
                 matchTitle: notification.matchTitle,
-                            severityTier: notification.severityTier, // ✅ ADD THIS!
-
+                severityTier: notification.severityTier,
                 username: notification.triggerUsername,
                 triggerUserId: notification.triggerUserId,
                 thumbnailUrl: notification.thumbnailUrl,
-                message: notification.message, // ✅ Don't prefix "While you were away"
-    detail: `${notification.detail} • ${timeAgo}`,  // ← Time at end
+                message: notification.message,
+                detail: `${notification.detail} • ${timeAgo}`,
                 icon: notification.icon,
                 cta: notification.ctaText,
                 ctaText: notification.ctaText,
@@ -3440,11 +3454,15 @@ const remaining = deduplicated.length - toShow.length;
                 secondaryCta: notification.secondaryCta
             });
             
-            // Mark as shown
+            // Mark as shown in Firestore
             markNotificationShown(notification.id);
             
         }, index * 3000); // 3-second delay between toasts
     });
+    
+    // ✅ Save shown notification IDs to session storage
+    const newShownIds = toShow.map(n => n.id);
+    sessionStorage.setItem('shownMissedNotifications', JSON.stringify([...sessionShown, ...newShownIds]));
     
     // ✅ Show summary if there are more notifications
     if (remaining > 0) {
