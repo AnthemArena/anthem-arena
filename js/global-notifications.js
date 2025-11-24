@@ -842,8 +842,24 @@ const lastShown = recentlyShownBulletins.get(bulletinKey);
             recentlyShownBulletins.set(bulletinKey, Date.now());
             
             // Save to Firestore
-            if (userId && userId !== 'anonymous' && notification.matchId) {
-                await saveNotification(userId, {
+// Save to Firestore
+if (userId && userId !== 'anonymous' && notification.matchId) {
+    // ✅ For social notifications, check for recent duplicates
+    if (notification.type === 'causal-event' && notification.triggerUserId) {
+        const recentNotifs = await getRecentNotifications(userId, 60); // Past hour
+        
+        const isDuplicate = recentNotifs.some(n => 
+            n.type === 'causal-event' &&
+            n.triggerUserId === notification.triggerUserId &&
+            n.eventType === notification.eventType &&
+            (Date.now() - n.timestamp) < 3600000 // Within 1 hour
+        );
+        
+        if (isDuplicate) {
+            console.log(`⏭️ Skipping duplicate notification from ${notification.username}`);
+            break; // Skip saving this notification
+        }
+    }                await saveNotification(userId, {
                     type: notification.type,
                     priority: notification.priority,
                     message: notification.message,
@@ -852,6 +868,10 @@ const lastShown = recentlyShownBulletins.get(bulletinKey);
                     matchTitle: notification.song && notification.opponent ? 
                                `${notification.song} vs ${notification.opponent}` : '',
                     thumbnailUrl: notification.thumbnailUrl,
+                            triggerUsername: notification.username, // ✅ Add this
+        triggerUserId: notification.triggerUserId, // ✅ Add this
+        eventType: notification.eventType, // ✅ Add this
+
                     ctaText: notification.cta,
                     ctaAction: notification.action || 'navigate',
                     targetUrl: notification.targetUrl || `/vote.html?match=${notification.matchId}`,
@@ -3366,17 +3386,26 @@ async function checkMissedNotifications() {
     
     console.log(`📬 Found ${missedNotifications.length} missed notifications from last ${hoursToCheck}h`);
     
-    // ✅ Prioritize notifications (show most important first)
-    const prioritized = missedNotifications.sort((a, b) => {
-        // Sort by priority first (lower number = higher priority)
-        if (a.priority !== b.priority) return a.priority - b.priority;
-        // Then by recency (newer first)
-        return b.timestamp - a.timestamp;
-    });
+ // ✅ Prioritize and deduplicate
+const prioritized = missedNotifications
+    .sort((a, b) => a.priority - b.priority);
+
+// ✅ Deduplicate by user + event type (keep only latest per user/event)
+const seen = new Map();
+const deduplicated = [];
+
+for (const notif of prioritized) {
+    const key = `${notif.triggerUserId}-${notif.eventType || notif.type}`;
     
-    // ✅ Only show the top 3 most important as toasts
-    const toShow = prioritized.slice(0, 3);
-    const remaining = missedNotifications.length - toShow.length;
+    if (!seen.has(key)) {
+        seen.set(key, true);
+        deduplicated.push(notif);
+    }
+}
+
+// ✅ Only show the top 3 most important as toasts
+const toShow = deduplicated.slice(0, 3);
+const remaining = deduplicated.length - toShow.length;
     
     // Show each as a toast with slight delay between them
     toShow.forEach((notification, index) => {

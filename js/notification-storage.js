@@ -392,3 +392,38 @@ function getEmoteRestrictionReason(emotePrivacy, areFriends) {
             return null;
     }
 }
+// ========================================
+// GET RECENT NOTIFICATIONS (for duplicate check)
+// ========================================
+
+export async function getRecentNotifications(userId, minutes = 60) {
+    if (!userId || userId === 'anonymous') return [];
+    
+    const cutoffTime = Date.now() - (minutes * 60 * 1000);
+    
+    try {
+        const q = query(
+            collection(db, 'user-notifications'),
+            where('userId', '==', userId),
+            where('timestamp', '>', cutoffTime),
+            orderBy('timestamp', 'desc'),
+            limit(50)
+        );
+        
+        const snapshot = await getDocs(q);
+        const notifications = [];
+        
+        snapshot.forEach(doc => {
+            notifications.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        return notifications;
+        
+    } catch (error) {
+        console.error('❌ Error getting recent notifications:', error);
+        return [];
+    }
+}
