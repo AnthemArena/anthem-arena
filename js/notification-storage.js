@@ -75,7 +75,7 @@ export async function saveNotification(userId, notificationData) {
             ctaData: notificationData.ctaData || {},
             targetUrl: notificationData.targetUrl || null,
             
-            timestamp: Date.now(),
+timestamp: notificationData.timestamp || Date.now(),
             read: false,
             dismissed: false,
             shownAsToast: notificationData.shownAsToast || false,

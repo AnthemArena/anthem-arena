@@ -412,134 +412,137 @@
   ]
 },
 
-
-
-    "unstoppable": {
-      "messages": [
-        "⚡ UNSTOPPABLE! 14 days!",
-        "💥 TWO WEEKS! You're CRAZY!",
-        "🎪 14-day streak! Can't STOP you!"
-      ],
-      "details": [
-        "This is DEDICATION! +{xp} XP",
-        "Truly unstoppable! +{xp} XP earned",
-        "The streak continues! +{xp} XP"
-      ],
-      "buttons": [
-        "Keep Going! ⚡",
-        "View Streak! 📊",
-        "Continue! 🔥"
-      ]
-    },
-
-  
-
-    "legendary-streak": {
-      "messages": [
-        "👑 LEGENDARY STREAK! 30 DAYS!",
-        "💎 THIRTY DAYS! You're IMMORTAL!",
-        "🏆 A MONTH! This is UNBREAKABLE!"
-      ],
-      "details": [
-        "This is HISTORY! +{xp} XP",
-        "You're a LEGEND! +{xp} XP earned",
-        "Nobody's EVER done this! +{xp} XP"
-      ],
-      "buttons": [
-        "LEGENDARY! 👑",
-        "View Glory! 💎",
-        "Celebrate! 🎉"
-      ]
-    },
-
+  "legendary-streak": {
+  "messages": [
+    "THIRTY. DAYS. STRAIGHT. YOU ARE NO LONGER HUMAN — YOU ARE A LIVING LEGEND!!",
+    "A FULL MONTH OF DAILY EXPLOSIONS — I’M BUILDING YOU A THRONE OUT OF SPENT SHELLS!!",
+    "30-DAY STREAK ACHIEVED — THE BRACKET WILL SPEAK YOUR NAME IN WHISPERS FOREVER!!",
+    "THIRTY DAYS WITHOUT MISSING ONCE — even *I* can’t believe this happened!!"
+  ],
+  "details": [
+    "You have achieved the impossible. +{xp} XP and my undying respect (scary, I know)",
+    "Piltover and Zaun just declared a joint holiday in your honor. +{xp} XP",
+    "Statues are being commissioned. No, really. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM IMMORTAL!!",
+    "WORSHIP ME!!",
+    "Day 31 Starts NOW!!",
+    "Take My Crown!!"
+  ]
+},
     "match-won": {
-      "messages": [
-        "🎉 \"{songTitle}\" WON!",
-        "💥 YES! \"{songTitle}\" DESTROYED them!",
-        "😈 Hehe! \"{songTitle}\" made it through!",
-        "🔥 \"{songTitle}\" is ADVANCING!",
-        "🎪 Your pick WON! \"{songTitle}\" rules!",
-        "💣 BOOM! \"{songTitle}\" blew them away!"
-      ],
-      "details": [
-        "Your pick advanced to the next round on \"{matchTitle}\"! +{xp} XP",
-        "\"{songTitle}\" moves on • Chaos successful! +{xp} XP",
-        "Victory on \"{matchTitle}\"! Your song survives! +{xp} XP",
-        "Match won! \"{songTitle}\" crushed it! +{xp} XP earned",
-        "Advancing from \"{matchTitle}\"! Rules? What rules?! +{xp} XP"
-      ],
-      "buttons": [
-        "See Results! 🏆",
-        "View Bracket! 📊",
-        "Celebrate! 🎉",
-        "More Chaos! 💥"
-      ]
-    },
+  "messages": [
+    "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
+    "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
+    "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
+    "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
+    "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
+    "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
+  ],
+  "details": [
+    "Your reign of terror continues to the next round. +{xp} XP",
+    "Another one bites the dust. Delicious. +{xp} XP",
+    "The bracket just got a little smaller… thanks to you. +{xp} XP"
+  ],
+  "buttons": [
+    "RUB IT IN!!",
+    "View the Carnage!!",
+    "Next Target!!",
+    "TO THE FINALS!!"
+  ]
+},
     
-    "match-lost": {
-      "messages": [
-        "💔 \"{songTitle}\" didn't make it...",
-        "😈 They got lucky. \"{songTitle}\" deserved better!",
-        "…Well that sucked. RIP \"{songTitle}\"",
-        "Don't be sad about \"{songTitle}\" — be DANGEROUS!",
-        "💥 Oof! \"{songTitle}\" got eliminated!",
-        "🎪 Aww~ \"{songTitle}\" is out. Next time!"
-      ],
-      "details": [
-        "Your pick got eliminated from \"{matchTitle}\" • Better luck next explosion! +{xp} XP",
-        "\"{songTitle}\" is out of the tournament, but we'll get 'em next time! +{xp} XP",
-        "Eliminated from \"{matchTitle}\" • +{xp} XP for trying!",
-        "Match closed on \"{matchTitle}\" • Time to cause NEW chaos! +{xp} XP",
-        "\"{songTitle}\" didn't survive \"{matchTitle}\" • +{xp} XP anyway!"
-      ],
-      "buttons": [
-        "See Results! 📊",
-        "View Bracket! 🏆",
-        "Vote on New Match! 🔥",
-        "Find New Target! 🎯",
-        "Oh Well! 🤷"
-      ]
-    },
+ "match-lost": {
+  "messages": [
+    "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
+    "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
+    "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
+    "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
+    "ELIMINATED?! This is war. This is PERSONAL. Fishbones is already crying blood!!",
+    "Okay new plan: blow up everything that voted wrong. Starting in 3… 2…"
+  ],
+  "details": [
+    "They’ll pay for this. They’ll ALL pay. +{xp} XP for the attempt",
+    "Your song may be gone, but the rage is eternal. +{xp} XP",
+    "Death is only the beginning. +{xp} XP"
+  ],
+  "buttons": [
+    "REVENGE VOTE NOW!!",
+    "BURN IT ALL DOWN!!",
+    "Next Target Acquired!!",
+    "I’m Fine (I’m lying)!!"
+  ]
+},
+ "last-second-hero": {
+    "messages": ["LAST-SECOND FLIP!! I JUST STOLE VICTORY FROM THE JAWS OF DEATH!!", "30 SECONDS LEFT AND I DROPPED THE BOMB — CLUTCH GOD!!"],
+    "details": ["The bracket will never recover from this.", "Even I’m impressed (and scared)."],
+    "buttons": ["I AM THE STORM!!", "Replay That Glory!!"]
+  },
+  "prophet": {
+    "messages": ["I KNEW IT FROM ROUND 1!! {songTitle} IS CHAMPION — BOW TO YOUR ORACLE!!", "TOLD YOU ALL. DAY ONE. PROPHET STATUS: ACTIVE!!"],
+    "details": ["The future is mine to command.", "Start the cult. I’ll wait."],
+    "buttons": ["WORSHIP ME!!", "Next Prophecy!!"]
+  },
+  "comeback-believer": {
+    "messages": ["TEN RESURRECTIONS!! I keep bringing songs back from the DEAD!!", "FROM 15+ DOWN TO CHAMPION — I AM THE COMEBACK QUEEN!!"],
+    "details": ["Death is just a suggestion.", "I reject your reality and substitute my own."],
+    "buttons": ["Next Zombie!!", "I Defy Physics!!"]
+  },
+  "deciding-vote": {
+    "messages": ["I BROKE THE TIE WITH MY BARE HANDS!! PERFECT CHAOS ACHIEVED!!", "ONE VOTE. MY VOTE. THE UNIVERSE JUST BALANCED ITSELF!!"],
+    "details": ["50-50 is the most beautiful number.", "I am the decider of fate."],
+    "buttons": ["PERFECTION!!", "Do It Again!!"]
+  },
+  "first-blood": {
+    "messages": ["FIRST BLOOD!! I FIRED THE VERY FIRST SHOT — HISTORY STARTS WITH ME!!", "THE TOURNAMENT BEGINS WITH MY EXPLOSION!!"],
+    "details": ["The bracket was born in fire.", "And I lit the match."],
+    "buttons": ["I Was Here First!!", "Witness Me!!"]
+  },
+  "voting-marathon": {
+    "messages": ["TWENTY MATCHES IN ONE SITTING — I’M NOT STOPPING UNTIL EVERYTHING’S ASH!!", "20 VOTES. ONE SESSION. SEND HELP (or more targets)!!"],
+    "details": ["My trigger finger is cramping and I DON’T CARE.", "The bracket is on fire and I’m holding the flamethrower."],
+    "buttons": ["KEEP GOING!!", "I’m Unhinged!!"]
+  },
 
-    "prediction-correct": {
-      "messages": [
-        "🎯 YOU CALLED IT! \"{songTitle}\" won like you said!",
-        "💥 NAILED IT! Your prediction was RIGHT!",
-        "😈 Hehe! You KNEW \"{songTitle}\" would win!",
-        "🎪 BOOM! Prediction perfect!"
-      ],
-      "details": [
-        "You predicted \"{songTitle}\" would win on \"{matchTitle}\" - and it DID! +{xp} XP",
-        "Called it on \"{matchTitle}\"! +{xp} XP earned",
-        "Your prediction came true! +{xp} XP",
-        "Fortune teller! +{xp} XP for being right!"
-      ],
-      "buttons": [
-        "Celebrate! 🎉",
-        "See Results! 📊",
-        "Make More! 🎯",
-        "View Stats! 👀"
-      ]
-    },
 
-    "prediction-wrong": {
-      "messages": [
-        "😬 Oops! You picked \"{songTitle}\" but they LOST!",
-        "💥 Plot twist! \"{songTitle}\" didn't make it!",
-        "🎪 Aww~ Your prediction missed!",
-        "🤷 Can't win 'em all! \"{songTitle}\" lost!"
-      ],
-      "details": [
-        "Your prediction was wrong on \"{matchTitle}\" • +{xp} XP for trying!",
-        "\"{songTitle}\" didn't win like you thought • +{xp} XP anyway",
-        "Better luck next time! +{xp} XP earned",
-        "Prediction missed on \"{matchTitle}\" • +{xp} XP"
-      ],
-      "buttons": [
-        "See Results! 📊",
-        "Try Again! 🎯",
-        "Oh Well! 🤷",
-        "Next Match! 🔥"
-      ]
-    }
+ "prediction-correct": {
+  "messages": [
+    "YOU ABSOLUTE GENIUS!! \"{songTitle}\" won EXACTLY like you predicted!!",
+    "CALLED IT FROM ORBIT!! Your crystal ball is terrifyingly accurate!!",
+    "I BOW TO YOUR BIG BRAIN!! \"{songTitle}\" obeyed your prophecy!!",
+    "FORTUNE TELLER UNLOCKED — you just bent reality to your will!!"
+  ],
+  "details": [
+    "The future fears you now. +{xp} XP",
+    "Even I didn’t see that coming… liar. +{xp} XP",
+    "You should probably start a cult. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM THE ORACLE!!",
+    "Predict Again!!",
+    "Bow Before Me!!",
+    "Next Prophecy!!"
+  ]
+},
+
+"prediction-wrong": {
+  "messages": [
+    "OOPS!! Reality just slapped your prediction in the face!!",
+    "PLOT TWIST!! \"{songTitle}\" betrayed your prophecy — delicious chaos!!",
+    "Hehe~ You were SO sure… and SO wrong. I love it!!",
+    "Your crystal ball needs cleaning — \"{songTitle}\" is very much dead!!"
+  ],
+  "details": [
+    "Wrong, but gloriously chaotic. +{xp} XP anyway",
+    "The universe laughs at prophets. +{xp} XP",
+    "Even broken clocks are right twice a day… today wasn’t it. +{xp} XP"
+  ],
+  "buttons": [
+    "Revenge Prediction!!",
+    "Try Again Loser!!",
+    "I Blame the Refs!!",
+    "Next One’s Mine!!"
+  ]
+}
   }}

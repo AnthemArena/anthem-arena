@@ -940,7 +940,12 @@ if (userId && userId !== 'anonymous' && notification.matchId) {
 // ========================================
 
 let lastActivityCheck = 0;
-let lastSeenActivityIds = new Set(); // ✅ Track processed activities to avoid duplicates
+
+// ✅ Load from localStorage (persists across sessions)
+let lastSeenActivityIds = new Set(
+    JSON.parse(localStorage.getItem('lastSeenActivityIds') || '[]')
+);
+
 const ACTIVITY_CHECK_INTERVAL = 30000; // Check every 30 seconds
 
 // ✅ NEW: Configurable time windows
@@ -1030,19 +1035,24 @@ await saveNotification(userId, {
                 console.error('Failed to save notification:', error);
             }
 
-            // ✅ NEW: Track streaks
-const streakData = updateStreak(activity.username, activity.userId, activity.matchId, isAlly);
-if (streakData && streakData.isMilestone) {
-    // Show streak notification after a short delay (don't spam)
-    setTimeout(() => {
-        showStreakNotification(streakData);
-    }, 3000); // 3 second delay after ally/rival toast
-}
+        // ✅ NEW: Track streaks
+            const streakData = updateStreak(activity.username, activity.userId, activity.matchId, isAlly);
+            if (streakData && streakData.isMilestone) {
+                // Show streak notification after a short delay (don't spam)
+                setTimeout(() => {
+                    showStreakNotification(streakData);
+                }, 3000); // 3 second delay after ally/rival toast
+            }
             
             
             // ✅ Mark as processed
             lastSeenActivityIds.add(activity.activityId);
         }
+        
+        // ✅ SAVE TO LOCALSTORAGE (ADD THIS)
+        localStorage.setItem('lastSeenActivityIds', 
+            JSON.stringify(Array.from(lastSeenActivityIds))
+        );
         
         // ✅ Log summary
         if (savedCount > 0 || toastShown) {
@@ -1053,6 +1063,7 @@ if (streakData && streakData.isMilestone) {
         if (lastSeenActivityIds.size > 200) {
             const idsArray = Array.from(lastSeenActivityIds);
             lastSeenActivityIds = new Set(idsArray.slice(-100)); // Keep last 100
+            localStorage.setItem('lastSeenActivityIds', JSON.stringify(idsArray.slice(-100))); // ✅ ADD THIS LINE TOO
             console.log('🧹 Cleaned up activity ID cache');
         }
         
@@ -1402,35 +1413,6 @@ function showStreakNotification(streakData) {
             relationship: isAlly ? 'ally-streak' : 'rival-streak'
         });
     }
-}
-
-// ========================================
-// PERSIST PROCESSED IDs ON PAGE UNLOAD
-// ========================================
-
-window.addEventListener('beforeunload', () => {
-    try {
-        // Save processed activity IDs to sessionStorage
-        const idsArray = Array.from(lastSeenActivityIds);
-        sessionStorage.setItem('processedActivityIds', JSON.stringify(idsArray.slice(-100)));
-    } catch (e) {
-        console.warn('Could not persist activity IDs:', e);
-    }
-});
-
-// ========================================
-// RESTORE PROCESSED IDs ON PAGE LOAD
-// ========================================
-
-try {
-    const stored = sessionStorage.getItem('processedActivityIds');
-    if (stored) {
-        const idsArray = JSON.parse(stored);
-        lastSeenActivityIds = new Set(idsArray);
-        console.log(`✅ Restored ${lastSeenActivityIds.size} processed activity IDs`);
-    }
-} catch (e) {
-    console.warn('Could not restore activity IDs:', e);
 }
 
 

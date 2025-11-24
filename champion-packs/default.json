@@ -2,286 +2,178 @@
   "id": "default",
   "name": "Standard",
   "displayName": "Standard Notifications",
-  "emoji": "📢",
-    "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
+  "emoji": "Loudspeaker",
+  "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
   "description": "Professional, straightforward tournament notifications",
   "color": "#C8AA6E",
-  
+
   "alerts": {
     "danger": {
       "messages": [
-        "🚨 Your pick \"{songTitle}\" is in danger!",
-        "⚠️ \"{songTitle}\" is falling behind!",
-        "🆘 \"{songTitle}\" needs support!"
+        "Your pick \"{songTitle}\" is in danger!",
+        "\"{songTitle}\" is falling behind!",
+        "\"{songTitle}\" needs your support!"
       ],
       "details": [
-        "Behind by {voteDiff} votes ({userPct}% vs {opponentPct}%)",
-        "Currently losing {userPct}% to {opponentPct}%",
-        "Down {voteDiff} votes"
+        "Behind by {voteDiff} vote{voteDiffPlural}",
+        "Currently {userPct}% vs {opponentPct}%"
       ],
-      "buttons": [
-        "View Match Now!",
-        "Check Status",
-        "See Match"
-      ]
+      "buttons": ["View Match", "Check Status"]
     },
-    
+
     "nailbiter": {
       "messages": [
-        "🔥 \"{songTitle}\" is too close!",
-        "😰 \"{songTitle}\" is neck and neck!",
-        "🎯 \"{songTitle}\" is a tight race!"
+        "Neck and neck!",
+        "It's too close to call!",
+        "One vote could decide everything"
       ],
       "details": [
-        "Separated by just {voteDiff} vote{voteDiffPlural}!",
-        "Only {voteDiff} vote{voteDiffPlural} apart",
-        "{userPct}% to {opponentPct}% - very close!"
+        "Only {voteDiff} vote{voteDiffPlural} apart"
       ],
-      "buttons": [
-        "View Match!",
-        "Check Score",
-        "See Battle"
-      ]
+      "buttons": ["View Match"]
     },
-    
+
     "winning": {
       "messages": [
-        "🎯 Your pick \"{songTitle}\" is dominating!",
-        "✨ \"{songTitle}\" is leading!",
-        "🏆 \"{songTitle}\" is winning big!"
+        "\"{songTitle}\" is leading!",
+        "Your pick is dominating!",
+        "Strong performance so far"
       ],
       "details": [
-        "Leading {userPct}% to {opponentPct}%",
-        "Ahead by {voteDiff} votes",
-        "Dominating with {userPct}%"
+        "Ahead by {voteDiff} vote{voteDiffPlural}",
+        "Currently {userPct}%"
       ],
-      "buttons": [
-        "View Match!",
-        "See Victory",
-        "Check Status"
-      ]
+      "buttons": ["View Match"]
     },
-    
+
     "comeback": {
       "messages": [
-        "🎉 \"{songTitle}\" completed comeback!",
-        "✨ \"{songTitle}\" turned it around!",
-        "🏆 \"{songTitle}\" recovered!"
+        "Amazing comeback!",
+        "\"{songTitle}\" turned it around!",
+        "From behind to ahead!"
       ],
       "details": [
-        "Was losing, now winning {userPct}% to {opponentPct}%!",
-        "From behind to ahead!",
         "Now leading {userPct}% to {opponentPct}%"
       ],
-      "buttons": [
-        "View Match!",
-        "See Comeback",
-        "Check Score"
-      ]
+      "buttons": ["View Match"]
     },
-    
+
     "ally": {
       "messages": [
-        "🤝 {username} also voted for \"{songTitle}\"!",
-        "✨ {username} agrees with you!",
-        "👥 {username} backs your choice!"
+        "{username} also voted for \"{songTitle}\"",
+        "{username} agrees with your choice"
       ],
-      "details": [
-        "Standing with you",
-        "Your alliance grows",
-        "Great minds think alike"
-      ],
-      "buttons": [
-        "Send Thanks!",
-        "View Profile",
-        "Show Support"
-      ]
+      "buttons": ["View Profile"]
     },
-    
+
     "rival": {
       "messages": [
-        "⚔️ {username} picked \"{theirSong}\" vs your \"{yourSong}\"",
-        "🎯 {username} opposes you!",
-        "⚡ {username} voted differently!"
+        "{username} voted for the opponent",
+        "{username} chose differently"
       ],
-      "details": [
-        "The battle continues",
-        "Different sides",
-        "May the best song win"
-      ],
-      "buttons": [
-        "View Match",
-        "Check Battle",
-        "See Score"
-      ]
+      "buttons": ["View Match"]
     },
-    
-    "streak-ally-3": {
-      "messages": ["🔥 3-match streak with {username}!"],
-      "details": ["You've agreed 3 times in a row"],
-      "buttons": ["View Profile"]
-    },
-    
-    "streak-ally-5": {
-      "messages": ["🔥🔥 5-match alliance with {username}!"],
-      "details": ["Your taste aligns perfectly!"],
-      "buttons": ["View Profile"]
-    },
-    
+
     "streak-ally-10": {
-      "messages": ["🔥🔥🔥 Epic 10-match streak with {username}!"],
-      "details": ["You're music soulmates!"],
+      "messages": ["10-match alliance with {username}!"],
+      "details": ["You've agreed 10 times"],
       "buttons": ["View Profile"]
     },
-    
+
     "streak-ally-20": {
-      "messages": ["👑 Legendary {streakCount}-match streak with {username}!"],
-      "details": ["This alliance is unbreakable!"],
+      "messages": ["Legendary {streakCount}-match streak with {username}!"],
+      "details": ["Unbreakable alliance"],
       "buttons": ["View Profile"]
     },
-    
-    "streak-rival-3": {
-      "messages": ["⚔️ 3-match rivalry with {username}!"],
-      "details": ["You've opposed each other 3 times"],
-      "buttons": ["View Profile"]
-    },
-    
-    "streak-rival-5": {
-      "messages": ["⚔️⚔️ 5-match rivalry with {username}!"],
-      "details": ["The rivalry heats up!"],
-      "buttons": ["View Profile"]
-    },
-    
+
     "streak-rival-10": {
-      "messages": ["⚔️⚔️⚔️ Epic 10-match rivalry with {username}!"],
-      "details": ["A legendary battle of taste!"],
+      "messages": ["10-match rivalry with {username}!"],
+      "details": ["A true battle of taste"],
       "buttons": ["View Profile"]
     },
-    
+
     "streak-rival-20": {
-      "messages": ["👹 Legendary {streakCount}-match rivalry with {username}!"],
-      "details": ["The ultimate clash!"],
+      "messages": ["Legendary {streakCount}-match rivalry with {username}!"],
+      "details": ["The ultimate clash"],
       "buttons": ["View Profile"]
     },
-    
+
     "novotes": {
-      "messages": ["🆘 This match has zero votes!"],
-      "details": ["\"{song1}\" vs \"{song2}\" • Closes in {hoursLeft}h"],
-      "buttons": ["Cast First Vote!"]
+      "messages": ["This match has zero votes yet!"],
+      "details": ["\"{song1}\" vs \"{song2}\""],
+      "buttons": ["Be the First!"]
     },
-    
-    "lowvotes": {
-      "messages": ["⚠️ This match needs more votes!"],
-      "details": ["Only {totalVotes} vote{votesPlural} • {hoursLeft}h left"],
-      "buttons": ["Vote Now!"]
-    },
-    
+
     "welcome": {
-      "messages": ["🎵 Welcome to the League Music Tournament!"],
-      "details": ["{liveCount} matches live - cast your first vote!"],
+      "messages": ["Welcome to the tournament!"],
+      "details": ["{liveCount} matches live right now"],
       "buttons": ["Start Voting"]
     },
-    
-    "encouragement": {
-      "messages": ["👀 Still deciding?"],
-      "details": ["Pick your favorites and see the results!"],
-      "buttons": ["Browse Matches"]
+
+    "round-opening": {
+      "messages": ["Round {round} is now live!"],
+      "details": ["{matchCount} new matches available"],
+      "buttons": ["View Round"]
+    },
+
+    "match-won": {
+      "messages": ["\"{songTitle}\" advanced!"],
+      "details": ["Your pick won the match"],
+      "buttons": ["See Results"]
+    },
+
+    "match-lost": {
+      "messages": ["\"{songTitle}\" was eliminated"],
+      "details": ["Better luck next round"],
+      "buttons": ["View Bracket"]
+    },
+
+    "match-tied": {
+      "messages": ["Perfect tie!"],
+      "details": ["\"{songTitle}\" ended 50-50"],
+      "buttons": ["View Results"]
     }
   },
-  
+
   "achievements": {
     "opening-act": {
-      "messages": ["🏆 Achievement Unlocked: Opening Act"],
+      "messages": ["Achievement: Opening Act"],
       "details": ["Cast your first vote • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
     "encore": {
-      "messages": ["🏆 Achievement Unlocked: Encore"],
-      "details": ["Cast 5 votes • +{xp} XP"],
+      "messages": ["Achievement: Encore"],
+      "details": ["5 votes cast • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
-    "world-tour": {
-      "messages": ["🏆 Achievement Unlocked: World Tour"],
-      "details": ["Cast 10 votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
-    "headliner": {
-      "messages": ["🏆 Achievement Unlocked: Headliner"],
-      "details": ["Cast 25 votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
     "pentakill": {
-      "messages": ["🎸 Achievement Unlocked: Pentakill"],
-      "details": ["Cast 50 votes - Rock on! • +{xp} XP"],
+      "messages": ["Achievement: Pentakill"],
+      "details": ["50 votes • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
     "chart-topper": {
-      "messages": ["🏆 Achievement Unlocked: Chart Topper"],
-      "details": ["Cast 100 votes • +{xp} XP"],
+      "messages": ["Achievement: Chart Topper"],
+      "details": ["100 votes • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
     "hall-of-fame": {
-      "messages": ["👑 Achievement Unlocked: Hall of Fame"],
-      "details": ["Cast 250 votes - You are a legend! • +{xp} XP"],
+      "messages": ["Achievement: Hall of Fame"],
+      "details": ["250 votes • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
-    "on-fire": {
-      "messages": ["🔥 Achievement Unlocked: On Fire"],
-      "details": ["Vote 3 days in a row • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
     "hot-streak": {
-      "messages": ["🔥 Achievement Unlocked: Hot Streak"],
-      "details": ["Vote 7 days in a row • +{xp} XP"],
+      "messages": ["Achievement: Hot Streak"],
+      "details": ["7-day voting streak • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
-    "unstoppable": {
-      "messages": ["⚡ Achievement Unlocked: Unstoppable"],
-      "details": ["Vote 14 days in a row • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
     "legendary-streak": {
-      "messages": ["👑 Achievement Unlocked: Legendary"],
-      "details": ["Vote 30 days in a row - Unstoppable dedication! • +{xp} XP"],
+      "messages": ["Achievement: Legendary"],
+      "details": ["30-day voting streak • +{xp} XP"],
       "buttons": ["View Achievements"]
     },
-    
-    "underdog-champion": {
-      "messages": ["🎯 Achievement Unlocked: Underdog Champion"],
-      "details": ["Vote for 5 underdogs • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
-    "dark-horse": {
-      "messages": ["🐴 Achievement Unlocked: Dark Horse"],
-      "details": ["Vote for 15 underdogs • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
-    "rebel-heart": {
-      "messages": ["💔 Achievement Unlocked: Rebel Heart"],
-      "details": ["Vote for 30 underdogs • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
-    "founding-member": {
-      "messages": ["👑 Achievement Unlocked: Founding Member"],
-      "details": ["Voted before 1,000 total votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    
+
     "default": {
-      "messages": ["🏆 Achievement Unlocked: {name}"],
+      "messages": ["Achievement Unlocked: {name}"],
       "details": ["{description} • +{xp} XP"],
       "buttons": ["View Achievements"]
     }
@@ -289,28 +181,14 @@
 
   "welcomeDialogs": {
     "welcome-first-time": {
-      "messages": ["Welcome to the tournament!"],
-      "details": ["Your first visit - let's get started!"],
-      "buttons": ["Start Voting!"]
+      "messages": ["Welcome!"],
+      "details": ["Ready to vote on the best League songs?"],
+      "buttons": ["Let's Go!"]
     },
-    
-    "welcome-streak": {
-      "messages": ["Welcome back! Daily streak maintained!"],
-      "details": ["Keep up the momentum!"],
-      "buttons": ["Continue Voting!"]
-    },
-    
-    "welcome-comeback": {
-      "messages": ["Welcome back after {days} days!"],
-      "details": ["Good to see you again!"],
-      "buttons": ["Rejoin!"]
-    },
-    
     "welcome-back": {
       "messages": ["Welcome back!"],
-      "details": ["Ready to vote?"],
-      "buttons": ["Start Voting!"]
+      "details": ["{liveCount} matches are live"],
+      "buttons": ["Continue Voting"]
     }
   }
-
 }
