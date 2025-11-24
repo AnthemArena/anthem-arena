@@ -288,7 +288,7 @@ export async function calculateAchievementStats(allVotes) {
     stats.uniqueYears = uniqueYears.size;
   
     return stats;
-}
+
 
 /**
  * Check which achievements user has unlocked (Firebase-based)
