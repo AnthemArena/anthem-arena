@@ -416,73 +416,74 @@ async function checkAndShowBulletin() {
                 lastCheck: Date.now()
             };
             
-            // ========================================
-            // DANGER: User's pick is losing badly
-            // ========================================
-            
-            if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
-                const normalizedMatchId = getMatchId(match);
-                
-                // ✅ Determine severity tier for dismissal tracking
-                let severityTier;
-                if (voteDiff === 1) {
-                    severityTier = 'trailing-1';
-                } else if (voteDiff <= 3) {
-                    severityTier = 'trailing-2-3';
-                } else if (voteDiff <= 5) {
-                    severityTier = 'trailing-4-5';
-                } else if (voteDiff <= 10) {
-                    severityTier = 'trailing-6-10';
-                } else {
-                    severityTier = 'trailing-11plus';
-                }
-                
-                const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
-                
-                // ✅ Check if THIS specific severity tier was dismissed
-                if (dismissedBulletins.has(bulletinKey)) {
-                    console.log(`⏭️ Skipping danger alert (${severityTier} dismissed for 24h): ${bulletinKey}`);
-                    continue;
-                }
-                
-                // ✅ Check cooldown for this specific severity
-const lastShown = recentlyShownBulletins.get(bulletinKey);
-                if (lastShown && (Date.now() - lastShown) < BULLETIN_COOLDOWNS.DANGER) {
-                    continue;
-                }
-                
-                // Track alert count for escalation messaging
-                const dangerAlertKey = `danger-alert-count-${normalizedMatchId}`;
-                const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
-                const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
-                
-                const championMessage = window.championLoader?.getChampionMessage('danger', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-                    matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
-                    voteDiff: voteDiff,
-                    userPct: userPct,
-                    opponentPct: opponentPct
-                });
-                
-                notifications.push({
-                    priority: 1,
-                    type: notificationType,
-                    matchId: normalizedMatchId,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
-                    opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
-                    thumbnailUrl: getThumbnailUrl(userSong),
-                    userPct,
-                    opponentPct,
-                    voteDiff,
-                    severityTier, // ✅ Store for dismissal key
-                    message: championMessage?.message || `🚨 Your pick is in danger!`,
-                    detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
-                    cta: championMessage?.cta || 'View Match Now!'
-                });
-                
-                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-            }
+          // ========================================
+// DANGER: User's pick is losing badly
+// ========================================
+
+if (userPct < BULLETIN_THRESHOLDS.DANGER && userSongVotes < opponentVotes) {
+    const normalizedMatchId = getMatchId(match);
+    
+    // ✅ Determine severity tier for dismissal tracking
+    let severityTier;
+    if (voteDiff === 1) {
+        severityTier = 'trailing-1';
+    } else if (voteDiff <= 3) {
+        severityTier = 'trailing-2-3';
+    } else if (voteDiff <= 5) {
+        severityTier = 'trailing-4-5';
+    } else if (voteDiff <= 10) {
+        severityTier = 'trailing-6-10';
+    } else {
+        severityTier = 'trailing-11plus';
+    }
+    
+    const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
+    const repeatKey = `danger-repeat-${normalizedMatchId}-${severityTier}`;
+    
+    // ✅ Check if EITHER the original OR repeat was dismissed
+    if (dismissedBulletins.has(bulletinKey) || dismissedBulletins.has(repeatKey)) {
+        console.log(`⏭️ Skipping danger alert (${severityTier} dismissed for 24h): ${bulletinKey}, ${repeatKey}`);
+        continue;
+    }
+    
+    // ✅ Check cooldown for this specific severity
+    const lastShown = recentlyShownBulletins.get(bulletinKey);
+    if (lastShown && (Date.now() - lastShown) < (COOLDOWN_MINUTES.danger * 60000)) {
+        continue;
+    }
+    
+    // Track alert count for escalation messaging
+    const dangerAlertKey = `danger-alert-count-${normalizedMatchId}`;
+    const alertCount = parseInt(localStorage.getItem(dangerAlertKey) || '0');
+    const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
+    
+    const championMessage = window.championLoader?.getChampionMessage('danger', {
+        songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
+        voteDiff: voteDiff,
+        userPct: userPct,
+        opponentPct: opponentPct
+    });
+    
+    notifications.push({
+        priority: 1,
+        type: notificationType,
+        matchId: normalizedMatchId,
+        song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+        opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
+        thumbnailUrl: getThumbnailUrl(userSong),
+        userPct,
+        opponentPct,
+        voteDiff,
+        severityTier, // ✅ Store for dismissal key
+        message: championMessage?.message || `🚨 Your pick is in danger!`,
+        detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
+        cta: championMessage?.cta || 'View Match Now!'
+    });
+    
+    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+}
             
             // ========================================
             // COMEBACK: Was losing, now winning
