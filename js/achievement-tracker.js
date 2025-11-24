@@ -226,8 +226,6 @@ export async function calculateAchievementStats(allVotes) {
         votesInSession: votesThisSession.length,
         
     };
-
-        };
   
     // ADD THESE 3 LINES HERE
     stats.wonMatches  = allVotes.filter(v => v.outcome === 'won').length;
@@ -288,7 +286,7 @@ export async function calculateAchievementStats(allVotes) {
     stats.uniqueYears = uniqueYears.size;
   
     return stats;
-
+}
 
 /**
  * Check which achievements user has unlocked (Firebase-based)
