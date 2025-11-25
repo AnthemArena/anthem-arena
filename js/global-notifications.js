@@ -18,6 +18,8 @@ import {
     query, 
     where, 
     getDocs,
+    getDoc,
+    doc,
     limit,
       orderBy,      // ✅ ADD THIS
     onSnapshot    // ✅ ADD THIS (for real-time listener)
@@ -2702,6 +2704,56 @@ function initBulletinSystem() {
     console.log('✅ Bulletin system initialized with live activity');
 }
 
+
+// ========================================
+// LOAD USER'S CHAMPION PACK FROM PROFILE
+// ========================================
+async function loadUserChampionPack() {
+    const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
+    
+    if (!userId) {
+        // Load default Jinx pack for anonymous users
+        await window.championLoader?.loadChampion('jinx');
+        console.log('✅ Loaded default Jinx pack (anonymous user)');
+        return;
+    }
+    
+    try {
+        // ✅ Check localStorage first (fast path)
+        let championPackId = localStorage.getItem('selectedChampion');
+        
+        // ✅ If not cached, fetch from Firebase
+        if (!championPackId) {
+            const profileDoc = await getDoc(doc(db, 'profiles', userId));
+            
+            if (profileDoc.exists()) {
+                const profile = profileDoc.data();
+                championPackId = profile.championPackId || 'jinx';
+                
+                // Cache it
+                localStorage.setItem('selectedChampion', championPackId);
+                console.log(`✅ Loaded championPackId from Firebase: ${championPackId}`);
+            } else {
+                // No profile yet, use default
+                championPackId = 'jinx';
+                console.log('⚠️ No profile found, defaulting to Jinx');
+            }
+        } else {
+            console.log(`✅ Using cached championPackId: ${championPackId}`);
+        }
+        
+        // Load the pack
+        await window.championLoader?.loadChampion(championPackId);
+        console.log(`✅ User champion pack loaded: ${championPackId}`);
+        
+    } catch (error) {
+        console.error('❌ Error loading user champion pack:', error);
+        // Fallback to Jinx on error
+        await window.championLoader?.loadChampion('jinx');
+        console.log('⚠️ Fell back to Jinx pack due to error');
+    }
+}
+
 // ========================================
 // INITIALIZATION WITH NOTIFICATION CENTER
 // ========================================
@@ -2709,7 +2761,7 @@ function initBulletinSystem() {
 async function initializeNotificationSystem() {
     console.log('🎯 Initializing complete notification system...');
 
-      // Wait for navigation to be ready
+    // Wait for navigation to be ready
     await new Promise((resolve) => {
         const checkNav = setInterval(() => {
             const bell = document.getElementById('notificationBell');
@@ -2731,20 +2783,22 @@ async function initializeNotificationSystem() {
     });
 
     
-    // ✅ NEW: Initialize champion pack first
+    // ✅ NEW: Load user's champion pack FIRST
+    await loadUserChampionPack();
+    
+    // ✅ THEN initialize champion pack theme
     try {
         await window.championLoader.initializeChampionPack();
         const pack = window.championLoader.getCurrentPack();
-        console.log(`✅ Champion pack loaded: ${pack.name}`);
+        console.log(`✅ Champion pack initialized: ${pack.name}`);
     } catch (error) {
-        console.error('⚠️ Could not load champion pack:', error);
+        console.error('⚠️ Could not initialize champion pack:', error);
     }
     
     // Initialize notification center with tabs
     try {
-       // ✅ CORRECT
-const { initNotificationCenter } = await import('./notification-center.js');
-await initNotificationCenter();
+        const { initNotificationCenter } = await import('./notification-center.js');
+        await initNotificationCenter();
         console.log('✅ Notification center with tabs ready');
     } catch (error) {
         console.warn('⚠️ Could not load notification center:', error);

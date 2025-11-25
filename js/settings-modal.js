@@ -185,13 +185,43 @@ function createModalHTML() {
                         </div>
 
 
-<!-- ✅ NEW: Champion Pack Section -->
+<!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
 <div class="settings-section">
-    <h3><i class="fas fa-bullhorn"></i> Champion Announcer</h3>
-    <p class="section-description">Choose which champion voices your match notifications</p>
+    <h3><i class="fas fa-users"></i> Your Champion & Team Identity</h3>
+    <p class="section-description">
+        Choose your champion pack - this determines your <strong>team identity</strong> and voice throughout Anthem Arena. 
+        Your champion will narrate your votes, react to rivals, and represent you in faction battles.
+    </p>
     
     <div id="championPackSelector" class="champion-pack-grid">
-        <!-- Will be populated by JS -->
+        <!-- Champion pack options will be populated here with avatars -->
+    </div>
+    
+    <div class="team-identity-preview" id="teamPreview" style="
+        margin-top: 16px; 
+        padding: 16px; 
+        background: rgba(255,255,255,0.05); 
+        border-radius: 12px; 
+        display: none;
+        border-left: 4px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    ">
+        <img id="teamAvatar" src="" alt="Team Avatar" style="
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-gold);
+        ">
+        <div>
+            <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
+                Your Team: <span id="teamName">Team Jinx</span>
+            </div>
+            <small style="opacity: 0.7; font-size: 0.85em;">
+                Appears on match results and faction breakdowns
+            </small>
+        </div>
     </div>
 </div>
 
@@ -876,20 +906,25 @@ localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
             }
         });
         
-        // Save to Firebase profiles collection
-        const userId = localStorage.getItem('tournamentUserId');
-        if (userId) {
-            await setDoc(doc(db, 'profiles', userId), {
-                username: username,
-                avatar: avatar,
-                banner: banner,  // ✅ NEW: Save banner to Firebase
-                bio: bio,
-                    socialLinks: socialLinks,  // ✅ NEW: Add this line
+     // Around line 753 in handleSaveSettings()
+// Save to Firebase profiles collection
+const userId = localStorage.getItem('tournamentUserId');
+if (userId) {
+    // ✅ Get selected champion pack (if user changed it in settings)
+    const championPackId = window.championLoader?.getCurrentPack()?.id || 'jinx';
+    
+    await setDoc(doc(db, 'profiles', userId), {
+        username: username,
+        avatar: avatar,
+        championPackId: championPackId, // ✅ ADD THIS LINE
+        banner: banner,
+        bio: bio,
+        socialLinks: socialLinks,
+        privacy: privacySettings,
+        updatedAt: Date.now()
+    });
+    console.log('✅ Profile saved to Firebase with championPackId');
 
-                privacy: privacySettings,
-                updatedAt: Date.now()
-            });
-            console.log('✅ Profile saved to Firebase with banner and privacy settings');
             
             // Show updating history state
             if (saveBtn) {
@@ -1261,9 +1296,8 @@ function invalidateProfileCache(username) {
         console.warn('Could not invalidate cache:', e);
     }
 }
-
 // ========================================
-// CHAMPION PACK SELECTOR
+// CHAMPION PACK SELECTOR (Updated with Team Identity)
 // ========================================
 
 async function loadChampionPackSelector() {
@@ -1283,31 +1317,42 @@ async function loadChampionPackSelector() {
                 <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}" 
                      data-pack-id="${pack.id}"
                      ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
-                    ${pack.comingSoon ? '<span class="coming-soon-badge">🔒</span>' : ''}
                     
-                    <!-- ✅ UPDATED: Use champion icon with emoji fallback -->
-                    <div class="champion-pack-icon">
+                    ${isActive ? '<span class="active-badge">✓ Active</span>' : ''}
+                    ${pack.comingSoon ? '<span class="coming-soon-badge">🔒 Coming Soon</span>' : ''}
+                    
+                    <!-- ✅ Champion Avatar from Data Dragon -->
+                    <div class="champion-pack-avatar">
                         ${pack.icon 
                             ? `<img src="${pack.icon}" 
                                     alt="${pack.name}" 
-                                    class="champion-icon-img"
+                                    class="champion-avatar-img"
+                                    loading="lazy"
                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                <span class="champion-emoji-fallback" style="display: none;">${pack.emoji}</span>`
-                            : pack.emoji
+                            : `<span class="champion-emoji-only">${pack.emoji}</span>`
                         }
                     </div>
                     
+                    <!-- ✅ Team Name (emphasized) -->
+                    <div class="champion-pack-team">${pack.emoji} Team ${pack.name}</div>
                     <div class="champion-pack-name">${pack.name}</div>
                     <div class="champion-pack-description">${pack.description}</div>
+                    
                     ${!isDisabled ? `
                         <button class="champion-preview-btn" 
                                 onclick="event.stopPropagation(); previewChampionPack('${pack.id}')">
-                            Preview 👀
+                            <i class="fas fa-play"></i> Preview
                         </button>
                     ` : ''}
                 </div>
             `;
         }).join('');
+        
+        // ✅ Show current team preview
+        if (currentPack) {
+            updateTeamPreview(currentPack.id, currentPack.name, currentPack.icon, currentPack.emoji);
+        }
         
         console.log('✅ Champion pack selector loaded');
         
@@ -1323,18 +1368,48 @@ async function selectChampionPack(packId) {
     // Update UI immediately
     document.querySelectorAll('.champion-pack-card').forEach(card => {
         card.classList.remove('active');
+        card.querySelector('.active-badge')?.remove();
     });
+    
     const selectedCard = document.querySelector(`[data-pack-id="${packId}"]`);
     if (selectedCard) {
         selectedCard.classList.add('active');
+        
+        // Add active badge
+        if (!selectedCard.querySelector('.active-badge')) {
+            selectedCard.insertAdjacentHTML('afterbegin', '<span class="active-badge">✓ Active</span>');
+        }
     }
     
     // Save to champion loader
     await window.championLoader.setUserChampionPack(packId);
     
+    // ✅ Update Firebase profile with championPackId
+    const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
+    if (userId) {
+        try {
+            const { db } = await import('./firebase-config.js');
+            const { doc, updateDoc } = await import(
+                'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+            );
+            
+            await updateDoc(doc(db, 'profiles', userId), {
+                championPackId: packId,
+                updatedAt: Date.now()
+            });
+            
+            console.log(`✅ Updated Firebase profile with championPackId: ${packId}`);
+        } catch (error) {
+            console.warn('⚠️ Could not update Firebase profile:', error);
+        }
+    }
+    
     // Show confirmation
     const pack = await window.championLoader.loadChampionPack(packId);
-    showNotification(`${pack.emoji} ${pack.name} announcer activated!`, 'success');
+    showNotification(`${pack.emoji} Joined Team ${pack.name}!`, 'success');
+    
+    // ✅ Update team preview
+    updateTeamPreview(pack.id, pack.name, pack.icon, pack.emoji);
     
     // Mark as changed
     hasChanges = true;
@@ -1363,9 +1438,24 @@ async function previewChampionPack(packId) {
     }, 5000);
 }
 
+// ✅ NEW: Update team preview box
+function updateTeamPreview(packId, packName, packIcon, packEmoji) {
+    const preview = document.getElementById('teamPreview');
+    const teamName = document.getElementById('teamName');
+    const teamAvatar = document.getElementById('teamAvatar');
+    
+    if (!preview || !teamName || !teamAvatar) return;
+    
+    teamAvatar.src = packIcon || '';
+    teamAvatar.alt = `Team ${packName}`;
+    teamName.textContent = `${packEmoji} Team ${packName}`;
+    preview.style.display = 'flex';
+}
+
 // Make functions global so onclick can access them
 window.selectChampionPack = selectChampionPack;
 window.previewChampionPack = previewChampionPack;
+window.updateTeamPreview = updateTeamPreview;
 // ========================================
 // EXPORT AND GLOBAL ACCESS
 // ========================================

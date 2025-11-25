@@ -318,15 +318,17 @@ async function fetchUserProfileDirect(username) {
         const profileDoc = snapshot.docs[0];
         const profileData = profileDoc.data();
         
-        return {
-            userId: profileDoc.id,
-            username: profileData.username,
-            avatar: profileData.avatar || { type: 'emoji', value: '🎵' },
-            bio: profileData.bio || '',
-            privacy: profileData.privacy || {},
-            createdAt: profileData.createdAt,
-            updatedAt: profileData.updatedAt
-        };
+       // In fetchUserProfileDirect()
+return {
+    userId: profileDoc.id,
+    username: profileData.username,
+    avatar: profileData.avatar || { type: 'emoji', value: '🎵' },
+    championPackId: profileData.championPackId || 'jinx', // ✅ ADD THIS
+    bio: profileData.bio || '',
+    privacy: profileData.privacy || {},
+    createdAt: profileData.createdAt,
+    updatedAt: profileData.updatedAt
+};
         
     } catch (error) {
         console.error('❌ Error fetching profile from Firebase:', error);

@@ -1719,20 +1719,21 @@ async function submitVote(songId) {
             return;
         }
         
-        // Save vote to Firebase with username and avatar
-        await setDoc(voteRef, {
-            tournament: ACTIVE_TOURNAMENT,
-            matchId: currentMatch.id,
-            userId: userId,
-            username: username,  // ✅ From guaranteed profile
-            avatar: avatar,      // ✅ From guaranteed profile
-            choice: songId,
-            timestamp: Date.now(),
-            round: currentMatch.round,
-            // Store song details for analytics
-            votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
-            votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
-        });
+ // Save vote to Firebase with username and avatar
+await setDoc(voteRef, {
+    tournament: ACTIVE_TOURNAMENT,
+    matchId: currentMatch.id,
+    userId: userId,
+    username: username,  // ✅ From guaranteed profile
+    avatar: avatar,      // ✅ From guaranteed profile
+    championId: profile.championPackId || 'jinx',  // ✅ ADD THIS LINE
+    choice: songId,
+    timestamp: Date.now(),
+    round: currentMatch.round,
+    // Store song details for analytics
+    votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
+    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+});
         
         console.log('✅ CHECKPOINT 1: Vote record created in Firebase');
         
@@ -1776,22 +1777,23 @@ async function submitVote(songId) {
             console.log('🔍 votedVideoId:', votedVideoId);
             console.log('🔍 isPublic:', isPublic);
 
-            // Create activity data object
-            const activityData = {
-                activityId: activityId,
-                userId: userId,
-                username: username,  // ✅ From guaranteed profile
-                avatar: avatar,      // ✅ From guaranteed profile
-                matchId: currentMatch.id,
-                matchTitle: matchTitle,
-                songId: votedVideoId,
-                songTitle: votedSongName,
-                choice: songId,
-                timestamp: Date.now(),
-                round: currentMatch.round,
-                tournamentId: ACTIVE_TOURNAMENT,
-                isPublic: isPublic  // ✅ From guaranteed profile
-            };
+// Create activity data object
+const activityData = {
+    activityId: activityId,
+    userId: userId,
+    username: username,  // ✅ From guaranteed profile
+    avatar: avatar,      // ✅ From guaranteed profile
+    championId: profile.championPackId || 'jinx',  // ✅ ADD THIS LINE
+    matchId: currentMatch.id,
+    matchTitle: matchTitle,
+    songId: votedVideoId,
+    songTitle: votedSongName,
+    choice: songId,
+    timestamp: Date.now(),
+    round: currentMatch.round,
+    tournamentId: ACTIVE_TOURNAMENT,
+    isPublic: isPublic  // ✅ From guaranteed profile
+};
 
             console.log('🔍 COMPLETE ACTIVITY DATA TO WRITE:', JSON.stringify(activityData, null, 2));
 

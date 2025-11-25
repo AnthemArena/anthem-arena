@@ -28,6 +28,47 @@ const CHAMPIONS = [
 const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
 
 /**
+ * Map avatar champion to available champion pack
+ */
+function getChampionPackForAvatar(championName) {
+    if (!championName) return 'jinx';
+    
+    // Map champion names to available packs
+    const packMapping = {
+        'Jinx': 'jinx',
+        'Vi': 'vi',
+        'Darius': 'darius',
+        'Yasuo': 'yasuo',
+        'Ahri': 'ahri',
+        'Ekko': 'ekko',
+        'Garen': 'garen',
+        'Lux': 'lux',
+        // Add more as you create packs
+    };
+    
+    // Check if we have a pack for this champion
+    const packId = packMapping[championName];
+    
+    // If pack exists, use it; otherwise default to Jinx
+    if (packId && championPackExists(packId)) {
+        console.log(`✅ Matched ${championName} to ${packId} pack`);
+        return packId;
+    }
+    
+    console.log(`⚠️ No pack for ${championName}, defaulting to Jinx`);
+    return 'jinx';
+}
+
+/**
+ * Check if champion pack exists
+ */
+function championPackExists(packId) {
+    // List of available packs (update as you add more)
+    const availablePacks = ['jinx']; // Just Jinx for now, add more as you create them
+    return availablePacks.includes(packId);
+}
+
+/**
  * Check if user has a username - NO LONGER SHOWS PROMPT
  * Username is auto-generated on first visit in vote.js
  */
@@ -372,19 +413,21 @@ async function backfillUserActivity(username, avatar, isPublic) {
             const voteData = voteDoc.data();
             
             // Update if missing username or is "Anonymous"
-            if (!voteData.username || voteData.username === 'Anonymous') {
-                try {
-                    await updateDoc(doc(db, 'votes', voteDoc.id), {
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        backfilledAt: new Date().toISOString()
-                    });
-                    updatedVotes++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to update vote:`, error);
-                }
-            }
+           // Update if missing username or is "Anonymous"
+if (!voteData.username || voteData.username === 'Anonymous') {
+    try {
+        await updateDoc(doc(db, 'votes', voteDoc.id), {
+            username: username,
+            avatar: avatar,
+            championPackId: getChampionPackForAvatar(avatar.name || 'Jinx'), // ✅ ADD THIS
+            isPublic: isPublic,
+            backfilledAt: new Date().toISOString()
+        });
+        updatedVotes++;
+    } catch (error) {
+        console.warn(`⚠️ Failed to update vote:`, error);
+    }
+}
         }
         
         // ========================================
@@ -399,20 +442,21 @@ async function backfillUserActivity(username, avatar, isPublic) {
         for (const activityDoc of activitySnapshot.docs) {
             const activityData = activityDoc.data();
             
-            // Update if missing username or is "Anonymous"
-            if (!activityData.username || activityData.username === 'Anonymous') {
-                try {
-                    await updateDoc(doc(db, 'activity', activityDoc.id), {
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        backfilledAt: new Date().toISOString()
-                    });
-                    updatedActivity++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to update activity:`, error);
-                }
-            }
+           // Update if missing username or is "Anonymous"
+if (!activityData.username || activityData.username === 'Anonymous') {
+    try {
+        await updateDoc(doc(db, 'activity', activityDoc.id), {
+            username: username,
+            avatar: avatar,
+            championPackId: getChampionPackForAvatar(avatar.name || 'Jinx'), // ✅ ADD THIS
+            isPublic: isPublic,
+            backfilledAt: new Date().toISOString()
+        });
+        updatedActivity++;
+    } catch (error) {
+        console.warn(`⚠️ Failed to update activity:`, error);
+    }
+}
         }
         
         // ========================================
@@ -439,26 +483,27 @@ async function backfillUserActivity(username, avatar, isPublic) {
                 const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
                 const activityId = `${vote.matchId}_${vote.userId}`;
                 
-                try {
-                    await setDoc(doc(db, 'activity', activityId), {
-                        userId: userId,
-                        username: username,
-                        avatar: avatar,
-                        isPublic: isPublic,
-                        matchId: vote.matchId,
-                        songId: votedSong.videoId,
-                        songTitle: votedSong.shortTitle || votedSong.title,
-                        matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
-                        tournamentId: '2025-worlds-anthems',
-                        round: match.round || 1,
-                        timestamp: new Date(vote.timestamp).getTime(),
-                        createdFrom: 'auto-backfill'
-                    });
-                    
-                    createdActivity++;
-                } catch (error) {
-                    console.warn(`⚠️ Failed to create activity:`, error);
-                }
+               try {
+    await setDoc(doc(db, 'activity', activityId), {
+        userId: userId,
+        username: username,
+        avatar: avatar,
+        championPackId: getChampionPackForAvatar(avatar.name || 'Jinx'), // ✅ ADD THIS
+        isPublic: isPublic,
+        matchId: vote.matchId,
+        songId: votedSong.videoId,
+        songTitle: votedSong.shortTitle || votedSong.title,
+        matchTitle: `${match.song1.shortTitle || match.song1.title} vs ${match.song2.shortTitle || match.song2.title}`,
+        tournamentId: '2025-worlds-anthems',
+        round: match.round || 1,
+        timestamp: new Date(vote.timestamp).getTime(),
+        createdFrom: 'auto-backfill'
+    });
+    
+    createdActivity++;
+} catch (error) {
+    console.warn(`⚠️ Failed to create activity:`, error);
+}
             }
         }
         
