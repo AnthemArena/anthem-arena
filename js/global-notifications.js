@@ -2713,14 +2713,14 @@ async function loadUserChampionPack() {
     
     if (!userId) {
         // Load default Jinx pack for anonymous users
-        await window.championLoader?.loadChampion('jinx');
+        await window.championLoader?.loadChampionPack('jinx');  // ✅ FIXED
         console.log('✅ Loaded default Jinx pack (anonymous user)');
         return;
     }
     
     try {
-        // ✅ Check localStorage first (fast path)
-        let championPackId = localStorage.getItem('selectedChampion');
+        // ✅ Check localStorage first (fast path) - use consistent key
+        let championPackId = localStorage.getItem('championPack');  // ✅ FIXED: match champion-loader.js
         
         // ✅ If not cached, fetch from Firebase
         if (!championPackId) {
@@ -2730,8 +2730,8 @@ async function loadUserChampionPack() {
                 const profile = profileDoc.data();
                 championPackId = profile.championPackId || 'jinx';
                 
-                // Cache it
-                localStorage.setItem('selectedChampion', championPackId);
+                // Cache it with correct key
+                localStorage.setItem('championPack', championPackId);  // ✅ FIXED
                 console.log(`✅ Loaded championPackId from Firebase: ${championPackId}`);
             } else {
                 // No profile yet, use default
@@ -2742,14 +2742,14 @@ async function loadUserChampionPack() {
             console.log(`✅ Using cached championPackId: ${championPackId}`);
         }
         
-        // Load the pack
-        await window.championLoader?.loadChampion(championPackId);
+        // Load the pack with correct function name
+        await window.championLoader?.loadChampionPack(championPackId);  // ✅ FIXED
         console.log(`✅ User champion pack loaded: ${championPackId}`);
         
     } catch (error) {
         console.error('❌ Error loading user champion pack:', error);
         // Fallback to Jinx on error
-        await window.championLoader?.loadChampion('jinx');
+        await window.championLoader?.loadChampionPack('jinx');  // ✅ FIXED
         console.log('⚠️ Fell back to Jinx pack due to error');
     }
 }

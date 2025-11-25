@@ -60,15 +60,6 @@ function getChampionPackForAvatar(championName) {
 }
 
 /**
- * Check if champion pack exists
- */
-function championPackExists(packId) {
-    // List of available packs (update as you add more)
-    const availablePacks = ['jinx']; // Just Jinx for now, add more as you create them
-    return availablePacks.includes(packId);
-}
-
-/**
  * Check if user has a username - NO LONGER SHOWS PROMPT
  * Username is auto-generated on first visit in vote.js
  */
