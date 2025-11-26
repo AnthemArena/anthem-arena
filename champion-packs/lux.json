@@ -299,38 +299,6 @@
   ]
 },
     
- "welcome": {
-  "messages": [
-    "✨ Welcome, brave soul! {liveCount} dazzling battles shine before us right now!!",
-    "🌟 The light of Runeterra greets you! {liveCount} songs await your radiant judgment!!",
-    "💫 By the stars — you’ve arrived! {liveCount} matches glow, ready for your brilliance!!",
-    "⭐ Step into the dawn! {liveCount} epic duels of taste are live — let us illuminate them together!!",
-    "✨ The bracket sparkles with possibility! {liveCount} battles need the Lady of Luminosity… and YOU!!"
-  ],
-  "buttons": [
-    "Bring the Light!! ✨",
-    "Start Shining!! 🌟",
-    "Join the Radiance!! 💫",
-    "Illuminate the Bracket!! ⭐",
-    "To Victory and Beyond!! 👑"
-  ]
-},
-    "round-opening": {
-  "messages": [
-    "✨ ROUND {round} DAWNS IN GLORY!! {matchCount} new battles blaze with radiant potential!!",
-    "🌟 A new chapter of light begins! {matchCount} songs stand ready for your brilliance!!",
-    "💫 The heavens open — Round {round} arrives with {matchCount} dazzling duels!!",
-    "⭐ Demacia’s anthem plays! Round {round} is live with {matchCount} chances to shine!!",
-    "✨ Behold!! Round {round} sparkles into existence — {matchCount} battles await our light!!"
-  ],
-  "buttons": [
-    "To the Radiant Field!! ✨",
-    "View Round {round}!! 🌟",
-    "Let the Light Lead!! 💫",
-    "Charge into Glory!! ⭐",
-    "Illumination Awaits!! 👑"
-  ]
-},
     "match-tied": {
   "messages": [
     "✨ PERFECT HARMONY!! 50-50 — both songs shine in absolute equilibrium!!",
@@ -351,8 +319,66 @@
     "Glorious Stalemate!! ⭐",
     "Next Dawn Awaits!! 👑"
   ]
+},
+
+    "round-opening": {
+  "messages": [
+    "✨ ROUND {round} DAWNS IN GLORY!! {matchCount} new battles blaze with radiant potential!!",
+    "🌟 A new chapter of light begins! {matchCount} songs stand ready for your brilliance!!",
+    "💫 The heavens open — Round {round} arrives with {matchCount} dazzling duels!!",
+    "⭐ Demacia’s anthem plays! Round {round} is live with {matchCount} chances to shine!!",
+    "✨ Behold!! Round {round} sparkles into existence — {matchCount} battles await our light!!"
+  ],
+  "buttons": [
+    "To the Radiant Field!! ✨",
+    "View Round {round}!! 🌟",
+    "Let the Light Lead!! 💫",
+    "Charge into Glory!! ⭐",
+    "Illumination Awaits!! 👑"
+  ]
 }
    },
+
+
+ "welcome": {
+      "welcome-first-time": {
+
+  "messages": [
+    "✨ Welcome, brave soul! {liveCount} dazzling battles shine before us right now!!",
+    "🌟 The light of Runeterra greets you! {liveCount} songs await your radiant judgment!!",
+    "💫 By the stars — you’ve arrived! {liveCount} matches glow, ready for your brilliance!!",
+    "⭐ Step into the dawn! {liveCount} epic duels of taste are live — let us illuminate them together!!",
+    "✨ The bracket sparkles with possibility! {liveCount} battles need the Lady of Luminosity… and YOU!!"
+  ],
+  "buttons": [
+    "Bring the Light!! ✨",
+    "Start Shining!! 🌟",
+    "Join the Radiance!! 💫",
+    "Illuminate the Bracket!! ⭐",
+    "To Victory and Beyond!! 👑"
+  ]
+},
+ "welcome-streak": {
+    "messages": [
+      "💫 Day 2 of brilliance! Your dedication shines bright!"
+    ],
+    "buttons": ["Continue Shining!! 🔥"]
+  },
+  
+  "welcome-comeback": {
+    "messages": [
+      "⭐ You returned after {days} days! The light welcomes you back!"
+    ],
+    "buttons": ["Reignite the Light!! ✨"]
+  },
+  
+  "welcome-back": {
+    "messages": [
+      "🌟 The radiance returns! Welcome back, champion!"
+    ],
+    "buttons": ["Resume Shining!! ✨"]
+  }
+},
 
 "achievements": {
 "opening-act": {
@@ -407,7 +433,7 @@
     "The great stained-glass windows of the capital just gained a new panel: YOU. +{xp} XP",
     "Legends never die — and neither does your light. +{xp} XP"
  ],
- 
+
   "buttons": [
     "I Am the Light!!",
     "To One Hundred!!",

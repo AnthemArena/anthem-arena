@@ -1318,7 +1318,7 @@ async function loadChampionPackSelector() {
                      data-pack-id="${pack.id}"
                      ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
                     
-                    ${isActive ? '<span class="active-badge">✓ Active</span>' : ''}
+${isActive ? '<span class="active-badge"></span>' : ''}
                     ${pack.comingSoon ? '<span class="coming-soon-badge">🔒 Coming Soon</span>' : ''}
                     
                     <!-- ✅ Champion Avatar from Data Dragon -->

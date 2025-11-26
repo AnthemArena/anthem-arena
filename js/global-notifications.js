@@ -81,8 +81,8 @@ const BULLETIN_THRESHOLDS = {
 // ========================================
 
 const STREAK_CONFIG = {
-    MIN_STREAK: 3,        // Minimum matches for streak alert
-    MILESTONE_STREAKS: [3, 5, 10, 20], // Show special alerts at these numbers
+    MIN_STREAK: 10,        // ✅ Changed from 3 to 10
+    MILESTONE_STREAKS: [10, 20], // ✅ Removed 3, 5
     MAX_TRACKED: 50       // Track up to 50 people (prevent memory bloat)
 };
 
@@ -1243,17 +1243,17 @@ function showStreakNotification(streakData) {
     
     if (isAlly) {
         // ✅ ALLY STREAKS - Use champion messages for ALL cases
-        let alertType = 'streak-ally-3'; // Default
-        
-        if (streak >= 20) {
-            alertType = 'streak-ally-20';
-        } else if (streak >= 10) {
-            alertType = 'streak-ally-10';
-        } else if (streak >= 5) {
-            alertType = 'streak-ally-5';
-        } else if (streak >= 3) {
-            alertType = 'streak-ally-3';
-        }
+// ✅ ALLY STREAKS - Only check for 10 and 20
+let alertType = 'streak-ally-10'; // Default
+
+if (streak >= 20) {
+    alertType = 'streak-ally-20';
+} else if (streak >= 10) {
+    alertType = 'streak-ally-10';
+} else {
+    // Don't show alerts for streaks under 10
+    return null;
+}
         
         const championMessage = window.championLoader?.getChampionMessage(alertType, {
             username: username,
@@ -1266,17 +1266,19 @@ function showStreakNotification(streakData) {
             cta = championMessage.cta;
             icon = '🤝';
             
-            // Set priority based on streak size
-            if (streak >= 20) {
-                priority = 2;
-            } else if (streak >= 10) {
-                priority = 3;
-            } else if (streak >= 5) {
-                priority = 4;
-            } else {
-                priority = 5;
-            }
-        } else {
+     // ✅ RIVAL STREAKS - Only check for 10 and 20
+let alertType = 'streak-rival-10'; // Default
+
+if (streak >= 20) {
+    alertType = 'streak-rival-20';
+} else if (streak >= 10) {
+    alertType = 'streak-rival-10';
+} else {
+    // Don't show alerts for streaks under 10
+    return null;
+}
+}
+ else {
             // ✅ Fallback if champion pack doesn't have this alert
             if (streak === 3) {
                 message = `🔥 3-match streak with ${username}!`;

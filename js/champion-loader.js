@@ -180,8 +180,8 @@ function getChampionMessage(alertType, data) {
         
         return {
             message: replacePlaceholders(selectedMessage.message, data),
-            detail: replacePlaceholders(selectedMessage.detail, data),
-            cta: selectedMessage.cta,
+    detail: replacePlaceholders(selectedMessage.detail || '', data), // ✅ FIXED
+    cta: selectedMessage.cta || 'Continue', // ✅ Also add CTA fallback
             emoji: currentChampionPack.emoji
         };
     }

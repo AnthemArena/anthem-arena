@@ -245,21 +245,7 @@
     "I’LL DO IT MYSELF!! ⚡"
   ]
 },
-    
-    "welcome": {
-  "messages": [
-    "🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!",
-    "💥 HEY CUPCAKE!! {liveCount} songs are waiting to get blown up!!",
-    "😈 Hehe~ You’re here… {liveCount} fresh targets just spawned!!",
-    "🔥 RULES? NEVER HEARD OF ‘EM!! {liveCount} matches ready to explode!!"
-  ],
-  "buttons": [
-    "START THE MAYHEM!! 💥",
-    "Get Jinxed!! 😈",
-    "Cause Chaos!! 🎪",
-    "Light Everything Up!! 💣"
-  ]
-},
+  
     
 "round-opening": {
   "messages": [
@@ -354,6 +340,51 @@
       ]
     }
   },
+
+
+      "welcome": {
+              "welcome-first-time": {
+
+  "messages": [
+    "🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!",
+    "💥 HEY CUPCAKE!! {liveCount} songs are waiting to get blown up!!",
+    "😈 Hehe~ You’re here… {liveCount} fresh targets just spawned!!",
+    "🔥 RULES? NEVER HEARD OF ‘EM!! {liveCount} matches ready to explode!!"
+  ],
+  "buttons": [
+    "START THE MAYHEM!! 💥",
+    "Get Jinxed!! 😈",
+    "Cause Chaos!! 🎪",
+    "Light Everything Up!! 💣"
+  ]
+},
+"welcome-streak": {
+  "messages": [
+    "🔥 Day 2 of chaos! You're back for MORE?! I LOVE IT!!",
+    "💥 TWO DAYS of mayhem!! You're officially a repeat offender!!",
+    "🎪 Back again?! Day 2 streak!! Let's make it EXPLODE!!"
+  ],
+  "buttons": ["KEEP THE CHAOS GOING!! 💣", "MORE MAYHEM!! 🔥"]
+},
+
+"welcome-comeback": {
+  "messages": [
+    "💥 {days} DAYS?! Where've you BEEN?! I missed blowing stuff up with you!!",
+    "🎪 YOU'RE BACK after {days} days!! Time to catch up on ALL the chaos!!",
+    "💣 {days} days away?! Did you forget about me?! Let's EXPLODE some votes!!"
+  ],
+  "buttons": ["LET'S GO CRAZY!! 💥", "CATCH UP ON CHAOS!! 🎪"]
+},
+
+"welcome-back": {
+  "messages": [
+    "💥 HEYYYY!! You came back!! Ready for more explosions?!",
+    "🎪 The chaos queen returns!! Let's blow this place UP!!",
+    "💣 YOU'RE BACK!! Time to shake things up again!!"
+  ],
+  "buttons": ["GET JINXED!! 💥", "CHAOS TIME!! 🎪"]
+}
+      },
 
   "achievements": {
 
