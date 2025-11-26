@@ -298,7 +298,53 @@
     "Illuminate First!! ⭐"
   ]
 },
+
     
+"match-won": {
+  "messages": [
+    "🌟 VICTORY!! \"{songTitle}\" advances in a blaze of radiant glory!!",
+    "✨ Brilliant! \"{songTitle}\" shines through to the next round!!",
+    "💫 The light prevails!! \"{songTitle}\" illuminates the path forward!!",
+    "⭐ Justice and good taste triumph! \"{songTitle}\" moves on!!",
+    "🌟 As I always say — light finds a way! \"{songTitle}\" is victorious!!",
+    "✨ The bracket just got brighter! \"{songTitle}\" advances in glory!!"
+  ],
+  "details": [
+    "Your light guided this triumph!",
+    "Victory shines eternal!",
+    "The dawn always comes!",
+    "Together, we illuminate the path!"
+  ],
+  "buttons": [
+    "Celebrate Victory!! ✨",
+    "Shine Onward!! 🌟",
+    "Next Match!! 💫",
+    "To Greater Glory!! ⭐"
+  ]
+},
+
+"match-lost": {
+  "messages": [
+    "💫 \"{songTitle}\" fought with honor, but the journey ends here...",
+    "✨ Oh no... \"{songTitle}\" was eliminated, but the light never truly fades!",
+    "🌟 We gave it our all! \"{songTitle}\" may be gone, but hope remains bright!",
+    "💙 \"{songTitle}\" falls... but even in defeat, we shone brilliantly!",
+    "⚡ The shadows won this time, but \"{songTitle}\" will live on in our hearts!",
+    "💫 Sometimes even the brightest stars must set... farewell, \"{songTitle}\"."
+  ],
+  "details": [
+    "Even in defeat, we shine on.",
+    "Every setback is a chance to grow brighter.",
+    "The light will return stronger!",
+    "We fought with grace and honor."
+  ],
+  "buttons": [
+    "Stay Radiant!! 💫",
+    "Onward with Hope!! ✨",
+    "Next Battle!! 🌟",
+    "Keep Shining!! 💙"
+  ]
+},
     "match-tied": {
   "messages": [
     "✨ PERFECT HARMONY!! 50-50 — both songs shine in absolute equilibrium!!",

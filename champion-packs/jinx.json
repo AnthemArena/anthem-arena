@@ -261,6 +261,49 @@
     "GET JINXED!!"
   ]
 },
+"match-won": {
+  "messages": [
+    "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
+    "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
+    "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
+    "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
+    "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
+    "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
+  ],
+  "details": [
+    "Your reign of terror continues to the next round.",
+    "Another one bites the dust. Delicious.",
+    "The bracket just got a little smaller… thanks to you."
+  ],
+  "buttons": [
+    "RUB IT IN!!",
+    "View the Carnage!!",
+    "Next Target!!",
+    "TO THE FINALS!!"
+  ]
+},
+    
+"match-lost": {
+  "messages": [
+    "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
+    "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
+    "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
+    "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
+    "ELIMINATED?! This is war. This is PERSONAL. Fishbones is already crying blood!!",
+    "Okay new plan: blow up everything that voted wrong. Starting in 3… 2…"
+  ],
+  "details": [
+    "They'll pay for this. They'll ALL pay.",
+    "Your song may be gone, but the rage is eternal.",
+    "Death is only the beginning."
+  ],
+  "buttons": [
+    "REVENGE VOTE NOW!!",
+    "BURN IT ALL DOWN!!",
+    "Next Target Acquired!!",
+    "I'm Fine (I'm lying)!!"
+  ]
+},
     
  "match-tied": {
   "messages": [

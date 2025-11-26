@@ -241,12 +241,22 @@ export function showMatchOutcomeNotification(outcome) {
         return;
     }
     
+    // ✅ NEW: Check if this is user's first win/loss
+    const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+    const isFirstWin = outcome.result === 'won' && !unlockedAchievements.includes('match-won');
+    const isFirstLoss = outcome.result === 'lost' && !unlockedAchievements.includes('match-lost');
+    
+    // ✅ If first time, skip recurring alert (achievement system will handle it)
+    if (isFirstWin || isFirstLoss) {
+        console.log(`🏆 First-time ${outcome.result} - deferring to achievement system`);
+        return;
+    }
+    
     let championMessage;
     let priority;
     let type;
     
     if (outcome.result === 'won') {
-        // ✅ Victory!
         championMessage = championLoader.getChampionMessage('match-won', {
             songTitle: outcome.userPick
         });
@@ -254,7 +264,6 @@ export function showMatchOutcomeNotification(outcome) {
         type = 'match-won';
         
     } else if (outcome.result === 'lost') {
-        // ❌ Defeat
         championMessage = championLoader.getChampionMessage('match-lost', {
             songTitle: outcome.userPick
         });
@@ -262,7 +271,6 @@ export function showMatchOutcomeNotification(outcome) {
         type = 'match-lost';
         
     } else if (outcome.result === 'tied') {
-        // 😬 Tie
         championMessage = championLoader.getChampionMessage('match-tied', {
             songTitle: outcome.userPick
         });
