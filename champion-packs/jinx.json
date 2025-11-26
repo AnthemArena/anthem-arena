@@ -292,6 +292,69 @@
 }
 },
 
+  "factionAlerts": {
+    "match-won": {
+      "messages": [
+        "💥 WE CRUSHED IT!! Team Jinx led the charge with {jinxVotes} votes!!",
+        "🧨 BOOM BABY!! Team Jinx dominated with {jinxVotes} votes while Vi's losers only managed {viVotes}!!",
+        "💣 HAHA!! {jinxVotes} Jinx voters vs {viVotes} Vi wannabes — and we WON!! Told you chaos works!!",
+        "🎆 FACTION VICTORY!! Team Jinx: {jinxVotes} votes | Everyone else combined: {otherVotes} — WE RUN THIS PLACE!!",
+        "💥 {jinxPercent}% Team Jinx unity!! We DEMOLISHED the competition with {jinxVotes} votes!!",
+        "🧨 Team Jinx brought {jinxVotes} votes to the party — Vi's {viVotes} losers didn't stand a CHANCE!!"
+      ],
+      "details": [
+        "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters! +{xp} XP",
+        "Team Jinx dominated! You ranked #{yourFactionRank} in the winning faction! +{xp} XP",
+        "Faction power!! #{yourFactionRank} of {totalFactionVoters} Jinx voters — CHAOS REIGNS!! +{xp} XP"
+      ],
+      "buttons": [
+        "💥 RUB IT IN!!",
+        "🎯 View Faction Carnage!!",
+        "💣 Mock Vi's Team!!"
+      ]
+    },
+    
+    "match-lost": {
+      "messages": [
+        "😤 WE LOST?! Wait... {wrongPercent}% of Team Jinx voted for the WRONG song?! TRAITORS EVERYWHERE!!",
+        "😑 Vi's team actually won this one with {viVotes} votes... I'm going to pretend I didn't see that.",
+        "💣 {jinxVotes} of us voted right, but {wrongVotes} Jinx voters BETRAYED US!! At least Vi lost too... wait, she didn't?!",
+        "🔥 TEAM JINX WHAT ARE YOU DOING?! Only {jinxVotes} votes?! Meanwhile {otherVotes} votes went to the ENEMY?!",
+        "😠 {jinxPercent}% of Team Jinx got it RIGHT but we STILL LOST?! I'm surrounded by idiots!!",
+        "💥 This is embarrassing. {jinxVotes} Jinx votes vs {viVotes} Vi votes. Someone's getting kicked off the team..."
+      ],
+      "details": [
+        "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters (at least YOU tried) +{xp} XP",
+        "You ranked #{yourFactionRank} in your faction... but we still lost. Ugh. +{xp} XP",
+        "Faction failure! #{yourFactionRank} of {totalFactionVoters} Jinx voters — half of them are WRONG!! +{xp} XP"
+      ],
+      "buttons": [
+        "🔥 DISOWN MY TEAM!!",
+        "💥 Demand Revenge!!",
+        "😤 View The Carnage!!"
+      ]
+    },
+    
+    "comeback": {
+      "messages": [
+        "🎆 FROM {oldPercent}% TO {newPercent}%!! Team Jinx FLIPPED THIS MATCH while everyone else was SLEEPING!!",
+        "💥 COMEBACK BABY!! We were LOSING and then {jinxVoteSwing} Jinx voters showed up and SAVED US!!",
+        "🧨 We went from {oldPercent}% to {newPercent}% — Team Jinx went NUCLEAR in the final hour!! THAT'S MY PEOPLE!!",
+        "💣 EPIC TURNAROUND!! {jinxVoteSwing} last-minute Jinx votes turned this around — Vi's team is CRYING!!",
+        "🎪 THE COMEBACK!! Team Jinx pulled off a {swingPercent}% swing — from losing to DOMINATING!!"
+      ],
+      "details": [
+        "Legendary comeback! Team Jinx: +{jinxVoteSwing} votes in final stretch! You were part of history! +{xp} XP",
+        "Epic turnaround! #{yourFactionRank} among the {totalFactionVoters} Jinx voters who saved this!! +{xp} XP"
+      ],
+      "buttons": [
+        "💣 CELEBRATE!!",
+        "🎯 Replay The Comeback!!",
+        "💥 Mock The Doubters!!"
+      ]
+    }
+  },
+
   "achievements": {
 
  "opening-act": {

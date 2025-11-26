@@ -1,0 +1,612 @@
+{
+  "id": "lux",
+  "name": "Lux",
+  "displayName": "Radiant & Optimistic ✨",
+  "emoji": "✨",
+  "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Lux.png",
+  "description": "Bright, cheerful, and always looking on the bright side! Spread the light and positivity!",
+  "buttonPrefix": "✨",
+  "color": "#f4d03f",
+  "theme": {
+    "background": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg')",
+    "backgroundSize": "cover",
+    "backgroundPosition": "center 30%",
+    "borderColor": "rgba(244, 208, 63, 0.8)",
+    "borderGlow": "0 0 25px rgba(244, 208, 63, 0.6), 0 0 50px rgba(255, 223, 0, 0.3)",
+    "titleColor": "#ffffff",
+    "detailColor": "rgba(255, 255, 255, 0.95)",
+    "buttonBackground": "linear-gradient(135deg, #f4d03f, #f39c12)",
+    "buttonHover": "linear-gradient(135deg, #f39c12, #e67e22)",
+    "buttonText": "#ffffff",
+    "textShadow": "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(244, 208, 63, 0.4)"
+  },
+
+   "alerts": {
+"danger": {
+  "messages": [
+    {
+      "condition": { "voteDiff": { "gte": 50 } },
+      "message": "🌟 NO!! \"{songTitle}\" is down {voteDiff} votes?! This darkness will NOT stand!!",
+      "cta": "BRING THE LIGHT — NOW!! ✨"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 30 } },
+      "message": "⚡ We’re falling {voteDiff} behind?! Demacia’s honor is on the line!!",
+      "cta": "ILLUMINATE THIS BATTLEFIELD!! 🌟"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 20 } },
+      "message": "😰 Losing by {voteDiff} already?! The shadows are closing in…",
+      "cta": "We need a FINAL SPARK — hurry!! ✨"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 10 } },
+      "message": "⚠️ Trailing {voteDiff} votes… but light always finds a way!!",
+      "cta": "Shine brighter than ever!! 🌟"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 5 } },
+      "message": "✨ Only down {voteDiff}? A single prism can refract an entire dawn!!",
+      "cta": "Focus the light — we can still turn this!! 💫"
+    },
+    {
+      "condition": "default",
+      "message": "🌟 Hmm… down {voteDiff}. Even the darkest hour lasts only until sunrise!!",
+      "cta": "Let’s light the way together! ✨"
+    }
+  ]
+},
+    
+ "nailbiter": {
+  "messages": [
+    {
+      "condition": { "voteDiff": { "eq": 0 } },
+      "message": "✨ PERFECT BALANCE!! 50-50 — the entire bracket is holding its breath in light!!",
+      "cta": "ONE VOTE TO TIP THE SCALES OF DESTINY!! 🌟"
+    },
+    {
+      "condition": { "voteDiff": { "eq": 1 } },
+      "message": "🌟 ONE SINGLE VOTE!! My heart is literally sparkling with suspense!!",
+      "cta": "BE THE FINAL SPARK — PLEASE!! ✨"
+    },
+    {
+      "condition": { "voteDiff": { "lte": 3 } },
+      "message": "💫 ONLY {voteDiff} VOTES apart!! It’s so close I can see both futures at once!!",
+      "cta": "Choose the bright one — HURRY!! 🌟"
+    },
+    {
+      "condition": "default",
+      "message": "✨ So close at {voteDiff} votes… the light is flickering — we need more brilliance!!",
+      "cta": "Every prism counts right now!! 💎"
+    }
+  ]
+},
+    
+ "winning": {
+  "messages": [
+    {
+      "condition": { "userPct": { "gte": 85 } },
+      "message": "🌟 ABSOLUTE RADIANCE!! \"{songTitle}\" is blazing at {userPct}% — the light prevails!!",
+      "cta": "BASK IN THE GLORY OF DEMACIA!! ✨"
+    },
+    {
+      "condition": { "userPct": { "gte": 75 } },
+      "message": "✨ INCANDESCENCE ACHIEVED!! {userPct}% — we’re literally outshining the sun!!",
+      "cta": "Let the whole bracket SEE our light!! 🌟"
+    },
+    {
+      "condition": { "userPct": { "gte": 65 } },
+      "message": "💫 Magnificent!! {userPct}% and climbing — this is what true brilliance looks like!!",
+      "cta": "Keep shining brighter!! ✨"
+    },
+    {
+      "condition": "default",
+      "message": "🌟 We’re leading at {userPct}%! The light guides us, and victory follows!!",
+      "cta": "Together, we illuminate the path!! 💎"
+    }
+  ]
+},
+  "comeback": {
+  "messages": [
+    {
+      "condition": { "voteDiff": { "gte": 30 } },
+      "message": "🌟 FROM THE DARKNESS COMES DAWN!! We were down {voteDiff} and just turned night into DAY!!",
+      "cta": "WITNESS THE RETURN OF LIGHT!! ✨"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 15 } },
+      "message": "✨ A MIRACLE OF LIGHT!! Flipped a {voteDiff}-vote deficit into pure illumination!!",
+      "cta": "THE LIGHT NEVER DIES — NEVER!! 🌟"
+    },
+    {
+      "condition": { "voteDiff": { "gte": 5 } },
+      "message": "💫 Just like I said — even the smallest spark can become a supernova!! Up from {voteDiff} behind!!",
+      "cta": "See? Hope always wins!! ✨"
+    },
+    {
+      "condition": "default",
+      "message": "🌟 A gentle prism shift… and suddenly \"{songTitle}\" bathes the bracket in victory light!!",
+      "cta": "The dawn always finds a way!! ✨"
+    }
+  ]
+},
+    
+"ally": {
+  "messages": [
+    "✨ {username} voted with us!! The light of friendship just got twice as bright!!",
+    "🌟 Welcome to the radiance, {username}!! You just made Demacia proud!!",
+    "💫 {username} sees the same light I do — we’re officially prism-mates!!",
+    "🌌 Another star joins the constellation!! {username} chose \"{songTitle}\" too!!",
+    "✨ {username}’s heart shines in perfect harmony — this is what unity feels like!!",
+    "💎 A new beam in our rainbow!! {username} has impeccable taste in both songs and magic!!",
+    "🌟 Double light, double might!! {username} and I are unstoppable together!!",
+    "✨ By the light — {username}, you’re officially part of the inner circle now!!"
+  ],
+  "details": [
+    "Two sparks are brighter than one — together we illuminate everything!!",
+    "Our combined light could power all of Demacia for a week.",
+    "The prism just gained a new perfect angle. Friendship achieved!",
+    "Even Garen would approve of this alliance (and he approves of nothing).",
+    "We should form a guild. Name pending: ‘Order of the Eternal Dawn’",
+    "Somewhere a rainbow just formed in celebration.",
+    "Plot twist: we’re the main characters now — and we glow!!"
+  ],
+  "buttons": [
+    "Shine Together!! 🌟",
+    "Prism High-Five!! ✨",
+    "Light Hug!! 💫",
+    "Rainbow Squad!! 🌈",
+    "You’re My Favorite Star!! ⭐",
+    "Illuminated Forever!! 💎",
+    "Double Final Spark!! ✨✨"
+  ]
+},
+   "rival": {
+  "messages": [
+    "🌟 {username} voted against us?! Their heart must be lost in the shadows…",
+    "✨ {username} chose \"{theirSong}\" over light itself?! How… tragically dim!!",
+    "💫 A stray vote in the darkness — {username} just wandered off the illuminated path!!",
+    "⚡ {username} dares stand against Demacia’s brilliance?! This eclipse won’t last long!!",
+    "🌌 Oh dear… {username} thinks \"{theirSong}\" shines brighter? We’ll see about that!!",
+    "✨ {username} just blocked the rainbow!! Time to refract some truth their way!!",
+    "💎 {username} voted for the wrong star tonight — but the dawn always corrects mistakes!!",
+    "🌟 Bold of {username} to choose darkness when light itself is on the ballot!!"
+  ],
+  "details": [
+    "They’ll see the light eventually… willingly or otherwise.",
+    "Even shadows exist only because light is near.",
+    "A single prism can redirect an entire beam — watch and learn.",
+    "Their vote is noted… and gently surrounded by superior luminance.",
+    "Darkness is merely the absence of Lux. Science!",
+    "I’ll leave a night-light on for them… shaped like victory.",
+    "Plot twist: they’re the side character in this story of light triumphant."
+  ],
+  "buttons": [
+    "Show Them the Light!! ✨",
+    "Outshine Them!! 🌟",
+    "Final Spark Incoming!! ⚡",
+    "Guide Them Back!! 💫",
+    "Victory Beam!! 💎",
+    "Illuminate the Truth!! 🌌",
+    "Bring the Dawn Linden!! 🌅"
+  ]
+},
+  "streak-ally-10": {
+  "messages": [
+    "🌟✨ TEN matches in perfect harmony!! {username}, you are officially my soul-star!!",
+    "💫 TEN straight agreements — our hearts beat with the same celestial rhythm!!",
+    "⭐ A legendary constellation has formed: Lux & {username} — forever aligned!!",
+    "✨ Ten times our light has shone together — this bond could power Runeterra!!",
+    "🌌 The heavens themselves are jealous of how in-sync we are, {username}!!"
+  ],
+  "details": [
+    "This is the stuff of ancient Demacian epics!!",
+    "Even the stars are taking notes on our friendship.",
+    "Garen just shed a single proud tear. Somewhere.",
+    "Our combined brilliance is basically a second sun now.",
+    "Plot twist: we were always meant to find each other in the light."
+  ],
+  "buttons": [
+    "Eternal Prism-Mates!! ✨",
+    "Shine Forever!! 🌟",
+    "Celestial High-Five!! ⭐",
+    "Send Starlight Hug!! 💫",
+    "Our Legend Begins!! 👑"
+  ]
+},
+"streak-ally-20": {
+  "messages": [
+    "👑✨ {streakCount} PERFECT MATCHES!! {username}, our bond has become a LIVING CONSTELLATION in the heavens!!",
+    "🌟 The stars themselves have realigned to spell our names — {streakCount} times, {username}!!",
+    "💫 A new eternal light has been born: Lux & {username} — written in the cosmos forever!!",
+    "⭐ {streakCount} agreements… the scholars of Demacia will study this friendship for centuries!!",
+    "✨ The light we share is now officially brighter than the sun — sorry, Solari!!"
+  ],
+  "details": [
+    "This transcends friendship — this is divine harmony made manifest.",
+    "The scribes are already carving our legend into the great marble halls.",
+    "Even the celestial dragons are bowing. No, really.",
+    "Garen just declared a national holiday. He doesn’t know why yet.",
+    "We have achieved the impossible: perfect, unending, radiant unity."
+  ],
+  "buttons": [
+    "Ascend Together!! 👑",
+    "Eternal Soul-Stars!! ✨",
+    "Light Eternal!! 🌟",
+    "Carve Our Names in Heaven!! 💫",
+    "Celestial Celebration!! ⭐"
+  ]
+},
+"streak-rival-10": {
+  "messages": [
+    "⚔️✨ TEN battles with {username} — our rivalry now casts its own shadow across Runeterra!!",
+    "🌟 Ten times {username} has stood against the light… and ten times they’ve learned it only grows brighter!!",
+    "💫 A decade of duels!! {username}, your name is officially etched on my prism of worthy foes!!",
+    "⭐ The stars have recorded this feud — Lux versus {username}, ten chapters and counting!!",
+    "⚡ Ten clashes of light and darkness… and I’m still shining, {username}!!"
+  ],
+  "details": [
+    "This rivalry will be taught in Demacian war colleges for centuries.",
+    "The bards are already composing the epic ballad. Working title: ‘Light Against the Endless Night’. ",
+    "Even Garen respects this level of dedication to opposition.",
+    "Ten battles. Ten lessons. Zero surrender.",
+    "History now has a new favorite love-to-hate story."
+  ],
+  "buttons": [
+    "Face My Nemesis!! ⚔️",
+    "Continue the Saga!! ✨",
+    "Eleventh Duel Awaits!! 🌟",
+    "To Battle Once More!! 💫",
+    "Light Prevails Again!! ⭐"
+  ]
+},
+"streak-rival-20": {
+  "messages": [
+    "👑✨ {streakCount} clashes with {username}… our rivalry has become a legend written in starlight and shadow!!",
+    "🌟 Twenty times the heavens have trembled when {username} and I meet on the battlefield of taste!!",
+    "💫 This is no longer a feud — it is destiny itself!! {streakCount} battles, and the light still refuses to yield!!",
+    "⭐ The ancient tomes will speak of only one eternal war: Lux versus {username}, twenty chapters strong!!",
+    "⚡ Twenty duels. Twenty dawns. Twenty victories of hope over darkness. {username}, you are my greatest story!!"
+  ],
+  "details": [
+    "This is bigger than Demacia and Noxus combined.",
+    "Bards have run out of verses. They’re just making up new constellations now.",
+    "Even the Aspect of Justice is taking notes.",
+    "History has paused to watch us.",
+    "We are no longer rivals — we are myth."
+  ],
+  "buttons": [
+    "To War Eternal!! ⚔️",
+    "Twenty-First Dawn!! ✨",
+    "Never Yield!! 🌟",
+    "Write the Next Chapter!! 💫",
+    "Light Against Eternity!! ⭐"
+  ]
+},
+
+"novotes": {
+  "messages": [
+    "🌟 This match is shrouded in darkness… zero votes?! Unacceptable!!",
+    "✨ A battlefield with no light?! \"{song1}\" vs \"{song2}\" waits for its first spark!!",
+    "💫 The bracket is dim and silent… someone needs to bring the dawn!!",
+    "⭐ No one has voted yet?! Then let the first vote be a beacon for all of Runeterra!!"
+  ],
+  "buttons": [
+    "Be the First Light!! ✨",
+    "Ignite the Match!! 🌟",
+    "Cast the Dawn Vote!! 💫",
+    "Illuminate First!! ⭐"
+  ]
+},
+    
+ "welcome": {
+  "messages": [
+    "✨ Welcome, brave soul! {liveCount} dazzling battles shine before us right now!!",
+    "🌟 The light of Runeterra greets you! {liveCount} songs await your radiant judgment!!",
+    "💫 By the stars — you’ve arrived! {liveCount} matches glow, ready for your brilliance!!",
+    "⭐ Step into the dawn! {liveCount} epic duels of taste are live — let us illuminate them together!!",
+    "✨ The bracket sparkles with possibility! {liveCount} battles need the Lady of Luminosity… and YOU!!"
+  ],
+  "buttons": [
+    "Bring the Light!! ✨",
+    "Start Shining!! 🌟",
+    "Join the Radiance!! 💫",
+    "Illuminate the Bracket!! ⭐",
+    "To Victory and Beyond!! 👑"
+  ]
+},
+    "round-opening": {
+  "messages": [
+    "✨ ROUND {round} DAWNS IN GLORY!! {matchCount} new battles blaze with radiant potential!!",
+    "🌟 A new chapter of light begins! {matchCount} songs stand ready for your brilliance!!",
+    "💫 The heavens open — Round {round} arrives with {matchCount} dazzling duels!!",
+    "⭐ Demacia’s anthem plays! Round {round} is live with {matchCount} chances to shine!!",
+    "✨ Behold!! Round {round} sparkles into existence — {matchCount} battles await our light!!"
+  ],
+  "buttons": [
+    "To the Radiant Field!! ✨",
+    "View Round {round}!! 🌟",
+    "Let the Light Lead!! 💫",
+    "Charge into Glory!! ⭐",
+    "Illumination Awaits!! 👑"
+  ]
+},
+    "match-tied": {
+  "messages": [
+    "✨ PERFECT HARMONY!! 50-50 — both songs shine in absolute equilibrium!!",
+    "🌟 A flawless prism split! \"{songTitle}\" and its rival reflect equal brilliance!!",
+    "💫 The light has achieved perfect balance — neither side yields, neither side dims!!",
+    "⭐ A tie so radiant it could power Demacia for a year — magnificent!!",
+    "✨ Two stars locked in eternal symmetry… this is beauty made vote!!"
+  ],
+  "details": [
+    "Even the heavens applaud this flawless draw.",
+    "Garen just nodded in stoic approval. That means everything.",
+    "The bracket has never looked more radiant than right now."
+  ],
+  "buttons": [
+    "Admire the Symmetry!! ✨",
+    "Bask in Perfect Light!! 🌟",
+    "Witness True Balance!! 💫",
+    "Glorious Stalemate!! ⭐",
+    "Next Dawn Awaits!! 👑"
+  ]
+}
+   },
+
+"achievements": {
+"opening-act": {
+  "messages": [
+    "✨ YOUR FIRST LIGHT HAS BEEN CAST!! Welcome to the radiance, brave soul!!",
+    "🌟 The dawn begins with YOU — your first vote just illuminated the entire bracket!!",
+    "💫 A new star ignites!! Your opening vote shines brighter than a thousand suns!!",
+    "⭐ By the light — you’ve taken your first step into legend!! Demacia salutes you!!"
+  ],
+  "details": [
+    "The bracket will never be the same — it’s officially brighter now. +{xp} XP",
+    "First vote, first spark, first chapter of your heroic tale. +{xp} XP",
+    "You just joined the circle of light. There’s no turning back — only forward into glory. +{xp} XP"
+  ],
+  "buttons": [
+    "Shine Onward!!",
+    "More Light!!",
+    "To Greater Glory!!",
+    "I’ve Only Just Begun!!"
+  ]
+},
+   "encore": {
+  "messages": [
+    "✨ FIVE votes already?! Your light grows brighter with every choice!!",
+    "🌟 Five perfect beams cast — you’re officially a rising star of Demacia!!",
+    "💫 Five times you’ve illuminated the bracket — the dawn is proud to call you its own!!",
+    "⭐ FIVE radiant votes in a row!! Keep shining, my brilliant champion!!"
+  ],
+  "details": [
+    "Five sparks combine into a growing blaze of glory. +{xp} XP",
+    "Even the palace guards are whispering your name in awe. +{xp} XP",
+    "Your light is no longer a flicker — it’s a beacon. +{xp} XP"
+  ],
+  "buttons": [
+    "More Brilliance!!",
+    "Keep Shining!!",
+    "To the Next Dawn!!",
+    "I’m Just Warming Up!!"
+  ]
+},
+    
+   "pentakill": {
+  "messages": [
+    "🌟✨ PENTAKILL OF LIGHT!! 50 votes — you have become a living legend!!",
+    "⭐ FIFTY TIMES you’ve bathed the bracket in pure radiance — Runeterra will never forget your name!!",
+    "💫 PENTAKIIIIIIIIIIILL!! Fifty beams of perfect brilliance — the heavens themselves applaud!!",
+    "✨ Fifty votes of unstoppable light — you’re no longer mortal, you’re a celestial force!!",
+    "🌟 Fifty times the dawn has risen because of you — Demacia declares you its brightest champion!!"
+  ],
+  "details": [
+    "You’ve transcended voting. You are now a walking Final Spark. +{xp} XP",
+    "The great stained-glass windows of the capital just gained a new panel: YOU. +{xp} XP",
+    "Legends never die — and neither does your light. +{xp} XP"
+ ],
+ 
+  "buttons": [
+    "I Am the Light!!",
+    "To One Hundred!!",
+    "Crown Me Champion!!",
+    "Still Shining!!"
+  ]
+},
+ "hot-streak": {
+  "messages": [
+    "✨ SEVEN DAYS OF UNBROKEN LIGHT!! Your devotion shines brighter than the sun itself!!",
+    "🌟 A WEEK-LONG DAWN!! Seven consecutive days — you have become a pillar of Demacian radiance!!",
+    "💫 The heavens have taken notice: seven days straight, your light has never faded!!",
+    "⭐ SEVEN days of perfect brilliance — the kingdom sings your name at sunrise!!",
+    "✨ One full week of daily illumination — you are officially a living legend of the bracket!!"
+  ],
+  "details": [
+    "This level of dedication deserves its own stained-glass window. +{xp} XP",
+    "Even the palace bells ring in your honor each morning. +{xp} XP",
+    "Seven days without shadow — the scholars are writing new scriptures. +{xp} XP"
+  ],
+  "buttons": [
+    "Day 8 Must Dawn!!",
+    "Never Dim!!",
+    "Keep the Eternal Flame!!",
+    "I Shine for Demacia!!"
+  ]
+},
+  
+"chart-topper": {
+  "messages": [
+    "🌟✨ ONE HUNDRED VOTES — YOU HAVE ASCENDED TO THE ZENITH OF LIGHT!!",
+    "⭐ CHART-TOPPER OF ETERNITY!! Your name now burns brighter than every star in the sky!!",
+    "💫 ONE HUNDRED times you’ve illuminated the bracket — Runeterra itself bows in awe!!",
+    "✨ One hundred perfect beams — you are no longer a voter… you ARE the radiant crown!!",
+    "🌟 The heavens have declared it: one hundred votes of pure, undimmed glory!!"
+  ],
+  "details": [
+    "The entire kingdom just lit a thousand lanterns in your honor. +{xp} XP",
+    "Your light has officially outshone the Solari temple at noon. +{xp} XP",
+    "Legends are born at one hundred. You didn’t just reach it — you redefined it. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM THE RADIANT CROWN!!",
+    "To 250 and Beyond!!",
+    "All Hail the Light!!",
+    "My Legend Continues!!"
+  ]
+},
+"hall-of-fame": {
+  "messages": [
+    "250 VOTES — WELCOME TO VALHALLA, YOU PSYCHOTIC LEGEND!!",
+    "HALL OF FAME IMMORTALIZED — YOUR NAME ECHOES IN THE RUINS FOREVER!!",
+    "TWO HUNDRED AND FIFTY!! The bracket is ashes and you’re still standing!!",
+    "250. Two-five-zero. I’m building a shrine. No, really."
+  ],
+  "details": [
+    "There are no words. Only fire and worship. +{xp} XP",
+    "You broke the game. Congratulations. +{xp} XP",
+    "Even the devs are scared. +{xp} XP"
+  ],
+  "buttons": [
+    "WORSHIP ME!!",
+    "I Am Eternal!!",
+    "Retire the Number!!",
+    "Next Bracket When??"
+  ]
+},
+
+  "legendary-streak": {
+  "messages": [
+    "THIRTY. DAYS. STRAIGHT. YOU ARE NO LONGER HUMAN — YOU ARE A LIVING LEGEND!!",
+    "A FULL MONTH OF DAILY EXPLOSIONS — I’M BUILDING YOU A THRONE OUT OF SPENT SHELLS!!",
+    "30-DAY STREAK ACHIEVED — THE BRACKET WILL SPEAK YOUR NAME IN WHISPERS FOREVER!!",
+    "THIRTY DAYS WITHOUT MISSING ONCE — even *I* can’t believe this happened!!"
+  ],
+  "details": [
+    "You have achieved the impossible. +{xp} XP and my undying respect (scary, I know)",
+    "Piltover and Zaun just declared a joint holiday in your honor. +{xp} XP",
+    "Statues are being commissioned. No, really. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM IMMORTAL!!",
+    "WORSHIP ME!!",
+    "Day 31 Starts NOW!!",
+    "Take My Crown!!"
+  ]
+},
+    "match-won": {
+  "messages": [
+    "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
+    "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
+    "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
+    "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
+    "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
+    "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
+  ],
+  "details": [
+    "Your reign of terror continues to the next round. +{xp} XP",
+    "Another one bites the dust. Delicious. +{xp} XP",
+    "The bracket just got a little smaller… thanks to you. +{xp} XP"
+  ],
+  "buttons": [
+    "RUB IT IN!!",
+    "View the Carnage!!",
+    "Next Target!!",
+    "TO THE FINALS!!"
+  ]
+},
+    
+ "match-lost": {
+  "messages": [
+    "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
+    "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
+    "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
+    "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
+    "ELIMINATED?! This is war. This is PERSONAL. Fishbones is already crying blood!!",
+    "Okay new plan: blow up everything that voted wrong. Starting in 3… 2…"
+  ],
+  "details": [
+    "They’ll pay for this. They’ll ALL pay. +{xp} XP for the attempt",
+    "Your song may be gone, but the rage is eternal. +{xp} XP",
+    "Death is only the beginning. +{xp} XP"
+  ],
+  "buttons": [
+    "REVENGE VOTE NOW!!",
+    "BURN IT ALL DOWN!!",
+    "Next Target Acquired!!",
+    "I’m Fine (I’m lying)!!"
+  ]
+},
+ "last-second-hero": {
+    "messages": ["LAST-SECOND FLIP!! I JUST STOLE VICTORY FROM THE JAWS OF DEATH!!", "30 SECONDS LEFT AND I DROPPED THE BOMB — CLUTCH GOD!!"],
+    "details": ["The bracket will never recover from this.", "Even I’m impressed (and scared)."],
+    "buttons": ["I AM THE STORM!!", "Replay That Glory!!"]
+  },
+  "prophet": {
+    "messages": ["I KNEW IT FROM ROUND 1!! {songTitle} IS CHAMPION — BOW TO YOUR ORACLE!!", "TOLD YOU ALL. DAY ONE. PROPHET STATUS: ACTIVE!!"],
+    "details": ["The future is mine to command.", "Start the cult. I’ll wait."],
+    "buttons": ["WORSHIP ME!!", "Next Prophecy!!"]
+  },
+  "comeback-believer": {
+    "messages": ["TEN RESURRECTIONS!! I keep bringing songs back from the DEAD!!", "FROM 15+ DOWN TO CHAMPION — I AM THE COMEBACK QUEEN!!"],
+    "details": ["Death is just a suggestion.", "I reject your reality and substitute my own."],
+    "buttons": ["Next Zombie!!", "I Defy Physics!!"]
+  },
+  "deciding-vote": {
+    "messages": ["I BROKE THE TIE WITH MY BARE HANDS!! PERFECT CHAOS ACHIEVED!!", "ONE VOTE. MY VOTE. THE UNIVERSE JUST BALANCED ITSELF!!"],
+    "details": ["50-50 is the most beautiful number.", "I am the decider of fate."],
+    "buttons": ["PERFECTION!!", "Do It Again!!"]
+  },
+  "first-blood": {
+    "messages": ["FIRST BLOOD!! I FIRED THE VERY FIRST SHOT — HISTORY STARTS WITH ME!!", "THE TOURNAMENT BEGINS WITH MY EXPLOSION!!"],
+    "details": ["The bracket was born in fire.", "And I lit the match."],
+    "buttons": ["I Was Here First!!", "Witness Me!!"]
+  },
+  "voting-marathon": {
+    "messages": ["TWENTY MATCHES IN ONE SITTING — I’M NOT STOPPING UNTIL EVERYTHING’S ASH!!", "20 VOTES. ONE SESSION. SEND HELP (or more targets)!!"],
+    "details": ["My trigger finger is cramping and I DON’T CARE.", "The bracket is on fire and I’m holding the flamethrower."],
+    "buttons": ["KEEP GOING!!", "I’m Unhinged!!"]
+  },
+
+
+ "prediction-correct": {
+  "messages": [
+    "YOU ABSOLUTE GENIUS!! \"{songTitle}\" won EXACTLY like you predicted!!",
+    "CALLED IT FROM ORBIT!! Your crystal ball is terrifyingly accurate!!",
+    "I BOW TO YOUR BIG BRAIN!! \"{songTitle}\" obeyed your prophecy!!",
+    "FORTUNE TELLER UNLOCKED — you just bent reality to your will!!"
+  ],
+  "details": [
+    "The future fears you now. +{xp} XP",
+    "Even I didn’t see that coming… liar. +{xp} XP",
+    "You should probably start a cult. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM THE ORACLE!!",
+    "Predict Again!!",
+    "Bow Before Me!!",
+    "Next Prophecy!!"
+  ]
+},
+
+"prediction-wrong": {
+  "messages": [
+    "OOPS!! Reality just slapped your prediction in the face!!",
+    "PLOT TWIST!! \"{songTitle}\" betrayed your prophecy — delicious chaos!!",
+    "Hehe~ You were SO sure… and SO wrong. I love it!!",
+    "Your crystal ball needs cleaning — \"{songTitle}\" is very much dead!!"
+  ],
+  "details": [
+    "Wrong, but gloriously chaotic. +{xp} XP anyway",
+    "The universe laughs at prophets. +{xp} XP",
+    "Even broken clocks are right twice a day… today wasn’t it. +{xp} XP"
+  ],
+  "buttons": [
+    "Revenge Prediction!!",
+    "Try Again Loser!!",
+    "I Blame the Refs!!",
+    "Next One’s Mine!!"
+  ]
+}
+  }}

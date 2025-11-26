@@ -26,8 +26,8 @@
       "emoji": "✨",
       "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Lux.png",
       "description": "Positive energy and magical encouragement!",
-      "enabled": false,
-      "comingSoon": true
+      "enabled": true,
+      "comingSoon": false
     }
   ]
 }
