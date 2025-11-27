@@ -342,6 +342,13 @@ function replacePlaceholders(text, data) {
     if (data.theirSong) {
         result = result.replace(/\{theirSong\}/g, data.theirSong);
     }
+        // ADD THESE TWO LINES
+    if (data.winner) {
+        result = result.replace(/\{winner\}/g, data.winner);
+    }
+    if (data.loser) {
+        result = result.replace(/\{loser\}/g, data.loser);
+    }
     
     // Vote data
     if (data.voteDiff !== undefined) {

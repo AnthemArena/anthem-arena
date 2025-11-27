@@ -305,21 +305,27 @@
   ]
 },
     
- "match-tied": {
+"match-tied-alert": {
   "messages": [
-    "PERFECT 50-50 TIE!! \"{songTitle}\" is DEAD EVEN — I LOVE THIS CHAOS!!",
-    "STALEMATE ACHIEVED!! Both songs stuck at 50 % — MAXIMUM BOOM POTENTIAL!!",
-    "Hehe~ NO WINNER!! \"{matchTitle}\" ended in beautiful, glorious deadlock!!",
-    "TIED TO THE LAST VOTE!! This is the most fun outcome and I will fight anyone who disagrees!!"
-  ],
-  "buttons": [
-    "BEAUTIFUL CHAOS!!",
-    "View the Stalemate!!",
-    "Next Explosion!!",
-    "PERFECTION!!"
+    {
+      "condition": { "winner": "{songTitle}" },
+      "message": [
+        "50-50 TIE — AND YOU WON ON SEEDING!! CHAOS REWARDED!!",
+        "PERFECT DEADLOCK — and the bracket gave it to YOU!! BOOM!!"
+      ],
+      "cta": ["I WIN BABY!!", "SEEDING IS MY FRIEND!!"]
+    },
+    {
+      "condition": "default",
+      "message": [
+        "50-50 TIE — PURE CHAOS!! Nobody really won… except {winner} on boring seeding.",
+        "MAXIMUM TIE ACHIEVED — but some seed rule gave it to {winner}. LAME!"
+      ],
+      "cta": ["BEAUTIFUL CHAOS!!", "Next Explosion!!"]
+    }
   ]
-}
 },
+    
 
   "factionAlerts": {
     "match-won": {
@@ -427,7 +433,8 @@
   ],
   "buttons": ["GET JINXED!! 💥", "CHAOS TIME!! 🎪"]
 }
-      },
+      }
+    },
 
   "achievements": {
 
@@ -643,6 +650,44 @@
     "buttons": ["KEEP GOING!!", "I’m Unhinged!!"]
   },
 
+"level-up": {
+  "messages": [
+    "LEVEL UP!! You just got BIGGER, STRONGER, and MORE EXPLOSIVE!!",
+    "BOOM!! New level unlocked — the bracket’s about to feel the UPGRADE!!",
+    "💥 LEVEL UP TIME!! Fishbones says you’re ready to blow up BIGGER cities now!!",
+    "WHOA!! You leveled!! Pow-Pow is vibrating — let’s test the new firepower!!"
+  ],
+  "details": [
+    "The chaos meter just redlined. +{xp} XP",
+    "Even I’m impressed… and a little scared. +{xp} XP",
+    "Upgrade complete. Destruction imminent. +{xp} XP"
+  ],
+  "buttons": [
+    "BLOW SHIT UP!!",
+    "Test New Power!!",
+    "MORE DESTRUCTION!!",
+    "I’M UNSTOPPABLE!!"
+  ]
+},
+"match-tied": {
+  "messages": [
+    "50-50 TIE — PURE UNFILTERED CHAOS ACHIEVED!! NOBODY WON AND IT’S PERFECT!!",
+    "DEADLOCK BABY!! Votes tied to the LAST SECOND — THIS IS THE BEST THING EVER!!",
+    "PERFECT TIE!! The bracket just exploded from too much BEAUTIFUL DISORDER!!",
+    "HAHAHAHA STALEMATE!! Both songs survived — MAXIMUM BOOM DENIED AND I LOVE IT!!"
+  ],
+  "details": [
+    "This is the most fun outcome possible. Change my mind.",
+    "Pow-Pow and Fishbones are screaming in joy. So am I.",
+    "The scoreboard broke from pure chaos. Worth it."
+  ],
+  "buttons": [
+    "BEAUTIFUL CHAOS!!",
+    "TIE = BEST OUTCOME!!",
+    "MORE TIES PLEASE!!",
+    "I’M IN LOVE WITH THIS!!"
+  ]
+},
 
  "prediction-correct": {
   "messages": [
@@ -661,6 +706,82 @@
     "Predict Again!!",
     "Bow Before Me!!",
     "Next Prophecy!!"
+  ]
+},
+"founding-member": {
+  "messages": [
+    "FOUNDING MEMBER BABY!! YOU WERE HERE BEFORE THIS PLACE EVEN HAD 1,000 VOTES — TOTAL LEGEND!!",
+    "ONE OF THE OG 1,000 PSYCHOS!! You helped turn this bracket into a GIANT EXPLOSION!!",
+    "YOU’RE LITERALLY IN THE HISTORY BOOKS — FIRST 1,000 TICKETS TO THE CHAOS PARTY!!",
+    "BEFORE IT WAS COOL, YOU WERE BLOWING SHIT UP WITH ME!! FOUNDING CHAOS MEMBER!!"
+  ],
+  "details": [
+    "You were here when the counter was still tiny. Now look at the beautiful mess we made!!",
+    "Only the real ones were here at the start. You’re certified insane (in the best way).",
+    "Fishbones and Pow-Pow personally salute you for joining the madness early."
+  ],
+  "buttons": [
+    "OG CHAOS MEMBER!!",
+    "I STARTED THIS!!",
+    "FIRST 1,000 OR BUST!!",
+    "BOOM FROM DAY ONE!!"
+  ]
+},
+"quarter-final-supporter": {
+  "messages": [
+    "QUARTERFINALS BABY!! YOUR SONG MADE IT TO THE FINAL EIGHT — STILL ALIVE!!",
+    "TOP 8 CHAOS!! We’re in the big leagues now — LET’S BLOW UP THE REST!!",
+    "FROM TOTAL MAYHEM TO FINAL EIGHT — YOUR PICK IS STILL CAUSING DESTRUCTION!!",
+    "ONLY EIGHT LEFT STANDING — AND ONE OF THEM IS YOURS!! BOOM!!"
+  ],
+  "details": [
+    "We’ve eliminated 90% of the competition and we’re still here. This is getting GOOD.",
+    "Your song just entered the danger zone — and it’s loving every second.",
+    "Fishbones says: more explosions incoming. Pow-Pow agrees."
+  ],
+  "buttons": [
+    "KEEP THE CHAOS GOING!!",
+    "Final 8 = Final BOOM!!",
+    "Let’s Break the Bracket!!",
+    "Next Round = MORE FUN!!"
+  ]
+},
+"semi-final-supporter": {
+  "messages": [
+    "SEMIFINALS BABY!! YOUR SONG IS TOP 4 — THIS IS GETTING DANGEROUSLY FUN!!",
+    "FINAL FOUR CHAOS!! Only four left and WE’RE ONE OF THEM — LET’S BLOW UP THE STAGE!!",
+    "TOP 4 MAYHEM!! Your pick just entered the ‘about to explode’ zone!!",
+    "ONLY FOUR SONGS LEFT STANDING — AND WE’RE STILL HERE CAUSING PROBLEMS!!"
+  ],
+  "details": [
+    "We’ve made it to the final four. Time to turn the volume to MAXIMUM DESTRUCTION.",
+    "Everyone else is scared. We’re just getting started.",
+    "Fishbones is locked and loaded. Pow-Pow is giggling. This is gonna be GOOD."
+  ],
+  "buttons": [
+    "FINALS OR BUST!!",
+    "TOP 4 = TOP CHAOS!!",
+    "Let’s Break Everything!!",
+    "Next Stop: EXPLOSION!!"
+  ]
+},
+"championship-supporter": {
+  "messages": [
+    "FINALS BABY!! YOUR SONG IS IN THE CHAMPIONSHIP — TIME TO BLOW UP THE WHOLE STAGE!!",
+    "CHAMPIONSHIP CHAOS!! Only two left and WE’RE ONE — THIS IS THE BIG KABOOM!!",
+    "WE MADE IT TO THE FINALS!! Your pick is about to fight for TOTAL DESTRUCTION SUPREMACY!!",
+    "THE GRAND FINALE!! Two songs enter, one song leaves in GLORIOUS EXPLOSIONS!!"
+  ],
+  "details": [
+    "We’re in the final explosion. Everything we’ve done led to this beautiful disaster.",
+    "One match left. One winner. Maximum chaos guaranteed.",
+    "Fishbones and Pow-Pow are vibrating. They know what’s coming."
+  ],
+  "buttons": [
+    "BLOW UP THE FINALS!!",
+    "CROWN = MINE!!",
+    "TOTAL DESTRUCTION TIME!!",
+    "LET’S END THIS WITH A BANG!!"
   ]
 },
 

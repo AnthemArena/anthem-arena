@@ -343,25 +343,34 @@
     "Next Dawn Awaits!! ⭐"
   ]
 },
-    "match-tied": {
+"match-tied-alert": {
   "messages": [
-    "✨ PERFECT HARMONY!! 50-50 — both songs shine in absolute equilibrium!!",
-    "🌟 A flawless prism split! \"{songTitle}\" and its rival reflect equal brilliance!!",
-    "💫 The light has achieved perfect balance — neither side yields, neither side dims!!",
-    "⭐ A tie so radiant it could power Demacia for a year — magnificent!!",
-    "✨ Two stars locked in eternal symmetry… this is beauty made vote!!"
-  ],
-  "details": [
-    "Even the heavens applaud this flawless draw.",
-    "Garen just nodded in stoic approval. That means everything.",
-    "The bracket has never looked more radiant than right now."
-  ],
-  "buttons": [
-    "Admire the Symmetry!! ✨",
-    "Bask in Perfect Light!! 🌟",
-    "Witness True Balance!! 💫",
-    "Glorious Stalemate!! ⭐",
-    "Next Dawn Awaits!! 👑"
+    {
+      "condition": { "winner": "{songTitle}" },
+      "message": [
+        "A PERFECT 50-50 TIE — and YOUR song advances on higher seeding!!",
+        "The votes were equal, but destiny smiled upon YOU today!!",
+        "Flawless equilibrium — yet the light of {winner} prevails by honor!"
+      ],
+      "detail": [
+        "You fought to a sacred draw — and seeding crowned you victorious!",
+        "Demacia celebrates your perfect tie… and your advancement!"
+      ],
+      "cta": ["Glory Through Honor!!", "Shine Eternal!!"]
+    },
+    {
+      "condition": "default",
+      "message": [
+        "A PERFECT 50-50 TIE — every vote matched in radiant harmony!",
+        "The bracket holds its breath — true balance achieved!",
+        "Flawless symmetry… until higher seeding chose {winner}."
+      ],
+      "detail": [
+        "You fought to a sacred draw. The light remembers this moment.",
+        "{winner} advances on seeding — but honor was perfectly shared."
+      ],
+      "cta": ["Honor the Draw!!", "Witness True Balance!!"]
+    }
   ]
 },
 
@@ -744,6 +753,123 @@
     "The Crusade Never Ends!!"
   ]
 },
+
+"level-up": {
+  "messages": [
+    "✨ LEVEL UP!! Your light ascends to new heights of brilliance!!",
+    "🌟 A new dawn of power!! You’ve grown even more radiant!!",
+    "💫 The stars align in celebration — your legend levels up!!",
+    "⭐ By the light, you’ve transcended! Welcome to greater glory!!"
+  ],
+  "details": [
+    "Every level brings you closer to eternal radiance. +{xp} XP",
+    "The kingdom feels your growing power. Shine on! +{xp} XP",
+    "A new chapter of heroism begins now."
+  ],
+  "buttons": [
+    "Shine Brighter!! ✨",
+    "To New Heights!! 🌟",
+    "Power Unleashed!! 💫",
+    "Legend Continues!! ⭐"
+  ]
+},
+"quarter-final-supporter": {
+  "messages": [
+    "QUARTERFINALS ACHIEVED — YOUR SONG HAS REACHED THE FINAL EIGHT!!",
+    "THE LIGHT ADVANCES!! Your champion stands among the elite of Runeterra!!",
+    "FROM HUNDREDS TO EIGHT — YOUR SONG SHINES IN THE QUARTERFINALS!!",
+    "THE BRACKET TREMBLES — YOUR CHOSEN ONE IS NOW IN THE FINAL EIGHT!!"
+  ],
+  "details": [
+    "Only the strongest survive this far. Your faith has carried them to the Quarterfinals!",
+    "The stage is set. The light grows ever brighter. The journey continues.",
+    "Demacia salutes your song — now one of only eight remaining!"
+  ],
+  "buttons": [
+    "To the Semis!!",
+    "Light the Path!!",
+    "Onward to Victory!!",
+    "The Final Eight!!"
+  ]
+},
+"semi-final-supporter": {
+  "messages": [
+    "SEMIFINALS!! YOUR SONG IS NOW ONE OF THE FINAL FOUR!!",
+    "THE LIGHT HAS REACHED THE SEMIFINALS — ONLY FOUR REMAIN IN ALL OF RUNETERRA!!",
+    "FROM HUNDREDS TO FOUR — YOUR CHAMPION STANDS AT THE GATES OF DESTINY!!",
+    "THE FINAL FOUR!! YOUR SONG SHINES AMONG THE GREATEST OF THIS TOURNAMENT!!"
+  ],
+  "details": [
+    "Only the truly legendary reach this stage. Your belief has carried them to the Semifinals!",
+    "The entire bracket watches in awe — your song is now one of the final four.",
+    "Demacia holds its breath. The dawn of champions is upon us."
+  ],
+  "buttons": [
+    "To the Finals!!",
+    "One Step from Glory!!",
+    "The Final Four!!",
+    "My Light Prevails!!"
+  ]
+},
+"championship-supporter": {
+  "messages": [
+    "THE FINALS!! YOUR SONG HAS REACHED THE CHAMPIONSHIP — ONLY TWO REMAIN!!",
+    "CHAMPIONSHIP BOUND — YOUR CHAMPION WILL FIGHT FOR THE CROWN OF RUNETERRA!!",
+    "FROM HUNDREDS TO TWO — YOUR SONG STANDS AT THE THRESHOLD OF IMMORTALITY!!",
+    "THE GRAND FINALE AWAITS!! Your light has carried them to the ultimate stage!!"
+  ],
+  "details": [
+    "Only the greatest songs reach the Finals. Your unwavering faith made this moment possible.",
+    "The entire tournament converges on this single match. Destiny itself watches.",
+    "Demacia’s banners fly for your champion. The crown is within reach."
+  ],
+  "buttons": [
+    "To the Crown!!",
+    "Claim Eternal Glory!!",
+    "The Final Battle!!",
+    "Victory Is Near!!"
+  ]
+},
+"founding-member": {
+  "messages": [
+    "YOU ARE A FOUNDING LUMINARY — ONE OF THE FIRST 1,000 VOICES TO BRING LIGHT TO THIS TOURNAMENT!!",
+    "THE VERY FIRST DAWN WAS BORN BECAUSE OF YOU — A TRUE PILLAR OF DEMACIA’S HOPE!!",
+    "HISTORY WILL RECORD YOUR NAME IN GOLD — YOU HELPED BIRTH THIS LEGEND!!",
+    "BEFORE THE WORLD KNEW, YOU BELIEVED. THE LIGHT REMEMBERS ITS FOUNDERS!!"
+  ],
+  "details": [
+    "You stood with us at the beginning. The entire bracket shines brighter because you were here from day one.",
+    "The first 1,000 souls who dared to dream — you are forever one of them.",
+    "Legends aren’t just made in finals. They begin with pioneers like you."
+  ],
+  "buttons": [
+    "I Am Eternal!!",
+    "Founder of Light!!",
+    "My Legacy Begins!!",
+    "Demacia Remembers!!"
+  ]
+},
+"match-tied": {
+  "messages": [
+    "A PERFECT 50-50 TIE — THE LIGHT HAS ACHIEVED ABSOLUTE HARMONY!!",
+    "THE SCALES BALANCED TO PERFECTION — BOTH SONGS SHONE WITH EQUAL BRILLIANCE!!",
+    "FLAWLESS EQUILIBRIUM!! The bracket itself bows in awe of this sacred draw!!",
+    "EVERY VOTE MATCHED IN RADIANT SYMMETRY — THIS IS TRUE BEAUTY MADE MANIFEST!!"
+  ],
+  "details": [
+    "You have witnessed a miracle of balance. Demacia will speak of this tie for generations.",
+    "The prism split perfectly. Neither side dimmed. This moment is eternal.",
+    "Even Garen is speechless. And that never happens."
+  ],
+  "buttons": [
+    "Witness Perfection!!",
+    "Honor the Sacred Draw!!",
+    "My Light Was Perfect!!",
+    "Eternal Harmony Achieved!!"
+  ]
+},
+
+
 
 "prediction-correct": {
   "messages": [

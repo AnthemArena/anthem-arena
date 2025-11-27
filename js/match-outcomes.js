@@ -233,72 +233,74 @@ function getThumbnailUrl(match, votedSongId) {
 
 /**
  * Show match outcome notification
+/**
+ * Show match outcome notification
  */
 export function showMatchOutcomeNotification(outcome) {
     const championLoader = window.championLoader;
     if (!championLoader) {
-        console.warn('⚠️ Champion loader not available');
+        console.warn('Warning: Champion loader not available');
         return;
     }
-    
-    // ✅ NEW: Check if this is user's first win/loss
+
+    // Skip recurring alerts for first-ever win/loss (achievement system handles those)
     const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
-    const isFirstWin = outcome.result === 'won' && !unlockedAchievements.includes('match-won');
+    const isFirstWin  = outcome.result === 'won'  && !unlockedAchievements.includes('match-won');
     const isFirstLoss = outcome.result === 'lost' && !unlockedAchievements.includes('match-lost');
-    
-    // ✅ If first time, skip recurring alert (achievement system will handle it)
+
     if (isFirstWin || isFirstLoss) {
-        console.log(`🏆 First-time ${outcome.result} - deferring to achievement system`);
+        console.log(`First-time ${outcome.result} – letting achievement system handle the toast`);
         return;
     }
-    
+
+    // Common data passed to every outcome toast
+    const toastData = {
+        songTitle: outcome.userPick,
+        winner:    outcome.winner,   // ← the song that advanced (or null on true tie)
+        loser:     outcome.loser     // ← the song that didn't advance
+    };
+
     let championMessage;
-    let priority;
+    let priority = 3;
     let type;
-    
+
     if (outcome.result === 'won') {
-        championMessage = championLoader.getChampionMessage('match-won', {
-            songTitle: outcome.userPick
-        });
+        championMessage = championLoader.getChampionMessage('match-won', toastData);
         priority = 2;
         type = 'match-won';
-        
+
     } else if (outcome.result === 'lost') {
-        championMessage = championLoader.getChampionMessage('match-lost', {
-            songTitle: outcome.userPick
-        });
+        championMessage = championLoader.getChampionMessage('match-lost', toastData);
         priority = 3;
         type = 'match-lost';
-        
+
     } else if (outcome.result === 'tied') {
-        championMessage = championLoader.getChampionMessage('match-tied', {
-            songTitle: outcome.userPick
-        });
+        championMessage = championLoader.getChampionMessage('match-tied-alert', toastData);
         priority = 3;
         type = 'match-tied';
     }
-    
+
     if (!championMessage) {
-        console.warn(`⚠️ No message for outcome: ${outcome.result}`);
+        console.warn(`Warning: No champion message for outcome: ${outcome.result}`);
         return;
     }
-    
-    // Show bulletin
+
+    // Show the bulletin
     if (window.showBulletin) {
         window.showBulletin({
-            priority: priority,
-            type: type,
-            matchId: outcome.matchId,
-            song: outcome.userPick,
-            opponent: outcome.result === 'won' ? outcome.loser : outcome.winner,
+            priority:    priority,
+            type:        type,
+            matchId:     outcome.matchId,
+            song:        outcome.userPick,
+            opponent:    outcome.result === 'won' ? outcome.loser : outcome.winner,
             thumbnailUrl: outcome.thumbnailUrl,
-            message: championMessage.message,
-            detail: championMessage.detail,
-            cta: championMessage.cta,
-            action: 'navigate',
-            targetUrl: `/vote.html?match=${outcome.matchId}`
+            message:     championMessage.message,
+            detail:      championMessage.detail,
+            cta:         championMessage.cta,
+            action:      'navigate',
+            targetUrl:   `/vote.html?match=${outcome.matchId}`
         });
-        
-        console.log(`🏆 Match outcome shown: ${outcome.userPick} ${outcome.result} in ${outcome.matchTitle}`);
+
+        console.log(`Match outcome toast: ${outcome.userPick} → ${outcome.result} (winner: ${outcome.winner})`);
     }
 }
