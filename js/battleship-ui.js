@@ -153,23 +153,30 @@ getChampionIcon(championKey) {
 
     }
 
-    bindEvents() {
+bindEvents() {
     console.log('🔌 Binding events...');
     
-    // Character selection - FIX: Use btn instead of e.target
+    // Bind to BOTH buttons AND character cards
     this.elements.selectButtons.forEach(btn => {
-
-                console.log('🔍 Button:', btn, 'data-character:', btn.dataset.character);
-
-
-        btn.addEventListener('click', () => {
-            const character = btn.dataset.character; // ← Use btn, not e.target
-            console.log('🎯 Character clicked:', character);
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent double-firing
+            const character = btn.dataset.character;
+            console.log('🎯 Button clicked:', character);
+            this.selectCharacter(character);
+        });
+    });
+    
+    // ALSO bind to the character cards themselves
+    this.elements.characterCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const character = card.dataset.character;
+            console.log('🎯 Card clicked:', character);
             this.selectCharacter(character);
         });
     });
     
     console.log('✅ Bound', this.elements.selectButtons.length, 'character buttons');
+    console.log('✅ Bound', this.elements.characterCards.length, 'character cards');
 
     // Difficulty selection
     if (this.elements.difficultySelect) {
