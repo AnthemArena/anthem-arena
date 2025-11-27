@@ -1,0 +1,723 @@
+/* ============================================
+   HEXTECH WARFARE - BLACK & GOLD THEME
+   Matching your existing site design
+   ============================================ */
+
+/* Base Game Page */
+.game-page {
+    background: #000000;
+    color: #FFFFFF;
+    min-height: 100vh;
+}
+
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ============================================
+   CHARACTER SELECTION SCREEN
+   ============================================ */
+
+.character-select {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.game-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #C4A15B;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(196, 161, 91, 0.5);
+}
+
+.game-subtitle {
+    font-size: 1.2rem;
+    color: #888;
+    margin-bottom: 40px;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.character-card {
+    background: linear-gradient(135deg, #0A0A0A 0%, #141414 100%);
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    border-radius: 12px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.character-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(196, 161, 91, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.character-card:hover {
+    border-color: #C4A15B;
+    box-shadow: 0 8px 30px rgba(196, 161, 91, 0.3);
+    transform: translateY(-5px);
+}
+
+.character-card:hover::before {
+    opacity: 1;
+}
+
+/* Caitlyn-specific styling */
+.character-card[data-character="caitlyn"]:hover {
+    border-color: #0397AB;
+    box-shadow: 0 8px 30px rgba(3, 151, 171, 0.3);
+}
+
+/* Jinx-specific styling */
+.character-card[data-character="jinx"]:hover {
+    border-color: #FF3366;
+    box-shadow: 0 8px 30px rgba(255, 51, 102, 0.3);
+}
+
+.character-portrait {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.character-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.character-card h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #C4A15B;
+}
+
+.character-tagline {
+    color: #888;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.ability-list {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.ability-list li {
+    padding: 10px;
+    margin: 8px 0;
+    background: rgba(196, 161, 91, 0.05);
+    border-left: 3px solid #C4A15B;
+    font-size: 0.9rem;
+}
+
+.ability-list strong {
+    color: #C4A15B;
+}
+
+/* Buttons */
+.select-btn,
+.primary-btn {
+    width: 100%;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #C4A15B 0%, #8B7355 100%);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(196, 161, 91, 0.3);
+}
+
+.select-btn:hover,
+.primary-btn:hover {
+    background: linear-gradient(135deg, #EDDC91 0%, #C4A15B 100%);
+    box-shadow: 0 6px 25px rgba(196, 161, 91, 0.5);
+    transform: translateY(-2px);
+}
+
+.select-btn:active,
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    padding: 12px 24px;
+    background: transparent;
+    color: #C4A15B;
+    border: 2px solid #C4A15B;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.secondary-btn:hover {
+    background: rgba(196, 161, 91, 0.1);
+    border-color: #EDDC91;
+    color: #EDDC91;
+}
+
+.tertiary-btn {
+    padding: 10px 20px;
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.tertiary-btn:hover {
+    color: #C4A15B;
+    border-color: #C4A15B;
+}
+
+/* Difficulty Select */
+.difficulty-select {
+    margin-top: 30px;
+}
+
+.difficulty-select label {
+    display: block;
+    color: #C4A15B;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.difficulty-select select {
+    padding: 12px 20px;
+    background: #0A0A0A;
+    color: #FFF;
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    min-width: 250px;
+}
+
+.difficulty-select select:focus {
+    outline: none;
+    border-color: #C4A15B;
+}
+
+/* ============================================
+   SHIP PLACEMENT SCREEN
+   ============================================ */
+
+.ship-placement {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.ship-placement h2 {
+    color: #C4A15B;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.placement-instructions {
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.placement-grid-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.ship-selector {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.ship-item {
+    padding: 15px 20px;
+    background: rgba(196, 161, 91, 0.1);
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ship-item:hover {
+    border-color: #C4A15B;
+    background: rgba(196, 161, 91, 0.2);
+}
+
+.ship-item.placed {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ship-item.active {
+    border-color: #C4A15B;
+    background: rgba(196, 161, 91, 0.3);
+    box-shadow: 0 0 20px rgba(196, 161, 91, 0.4);
+}
+
+.ship-icon {
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   GAME BOARD (Grid)
+   ============================================ */
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    grid-template-rows: repeat(10, 40px);
+    gap: 2px;
+    background: #000;
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.grid-cell {
+    width: 40px;
+    height: 40px;
+    background: #0A0A0A;
+    border: 1px solid rgba(196, 161, 91, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.grid-cell:hover {
+    background: rgba(196, 161, 91, 0.2);
+    border-color: #C4A15B;
+}
+
+/* Cell States */
+.grid-cell.ship {
+    background: rgba(196, 161, 91, 0.3);
+    border-color: #C4A15B;
+}
+
+.grid-cell.hit {
+    background: #FF3366;
+    border-color: #FF6B8A;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+}
+
+.grid-cell.hit::after {
+    content: '💥';
+    font-size: 1.5rem;
+}
+
+.grid-cell.miss {
+    background: #0397AB;
+    border-color: #05B2CC;
+}
+
+.grid-cell.miss::after {
+    content: '○';
+    color: #FFF;
+    font-size: 1.2rem;
+}
+
+.grid-cell.sunk {
+    background: #8B0000;
+    border-color: #FF0000;
+    animation: sinkAnimation 0.5s ease;
+}
+
+@keyframes sinkAnimation {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* ============================================
+   BATTLE SCREEN LAYOUT
+   ============================================ */
+
+.battle-screen {
+    padding: 20px;
+}
+
+.battle-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr 250px;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Character Banners */
+.character-banner {
+    background: linear-gradient(135deg, #0A0A0A 0%, #141414 100%);
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    position: sticky;
+    top: 20px;
+}
+
+.character-banner.player-side {
+    border-color: rgba(3, 151, 171, 0.5);
+}
+
+.character-banner.opponent-side {
+    border-color: rgba(255, 51, 102, 0.5);
+}
+
+.banner-portrait {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 2px solid rgba(196, 161, 91, 0.3);
+}
+
+.banner-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.character-info h3 {
+    color: #C4A15B;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.character-status {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.ships-remaining {
+    display: flex;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.ship-icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(196, 161, 91, 0.3);
+    border: 2px solid #C4A15B;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C4A15B;
+    font-weight: bold;
+}
+
+.ship-icon.destroyed {
+    background: #8B0000;
+    border-color: #FF0000;
+    color: #FF0000;
+    opacity: 0.5;
+}
+
+/* Abilities */
+.abilities {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ability-btn {
+    padding: 12px;
+    background: rgba(196, 161, 91, 0.1);
+    border: 2px solid rgba(196, 161, 91, 0.3);
+    border-radius: 8px;
+    color: #C4A15B;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ability-btn:hover:not(:disabled) {
+    background: rgba(196, 161, 91, 0.2);
+    border-color: #C4A15B;
+    box-shadow: 0 0 15px rgba(196, 161, 91, 0.3);
+}
+
+.ability-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.ability-name {
+    font-weight: 600;
+}
+
+.ability-uses,
+.ability-cooldown {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Boards Container */
+.boards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+}
+
+.board-section {
+    text-align: center;
+}
+
+.board-section h3 {
+    color: #C4A15B;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+/* Quote Overlay */
+.quote-overlay {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+    border: 2px solid rgba(196, 161, 91, 0.5);
+    border-radius: 12px;
+    padding: 20px 40px;
+    max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.quote-content {
+    text-align: center;
+}
+
+.quote-character {
+    display: block;
+    color: #C4A15B;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.quote-text {
+    color: #FFF;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Turn Indicator */
+.turn-indicator {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(196, 161, 91, 0.9);
+    color: #000;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 20px rgba(196, 161, 91, 0.5);
+    z-index: 999;
+}
+
+/* ============================================
+   GAME OVER SCREEN
+   ============================================ */
+
+.game-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.game-over-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+}
+
+#resultTitle {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #C4A15B;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    text-shadow: 0 0 30px rgba(196, 161, 91, 0.7);
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px rgba(196, 161, 91, 0.5); }
+    50% { text-shadow: 0 0 40px rgba(196, 161, 91, 0.9); }
+}
+
+#resultTitle.defeat {
+    color: #FF3366;
+    text-shadow: 0 0 30px rgba(255, 51, 102, 0.7);
+}
+
+.result-character {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #C4A15B;
+    box-shadow: 0 0 40px rgba(196, 161, 91, 0.5);
+}
+
+.result-character img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.result-quote {
+    font-size: 1.3rem;
+color: #FFF;
+font-style: italic;
+margin: 20px 0 40px;
+line-height: 1.6;
+}
+.game-stats {
+display: flex;
+justify-content: space-around;
+margin: 40px 0;
+padding: 30px;
+background: rgba(196, 161, 91, 0.1);
+border-radius: 12px;
+border: 2px solid rgba(196, 161, 91, 0.3);
+}
+.stat {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.stat-label {
+color: #888;
+font-size: 0.9rem;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+.stat-value {
+color: #C4A15B;
+font-size: 2rem;
+font-weight: 700;
+}
+.game-over-actions {
+display: flex;
+gap: 15px;
+justify-content: center;
+flex-wrap: wrap;
+}
+/* ============================================
+UTILITY CLASSES
+============================================ */
+.hidden {
+display: none !important;
+}
+/* Responsive Design */
+@media (max-width: 1200px) {
+.battle-layout {
+grid-template-columns: 1fr;
+gap: 20px;
+}
+.character-banner {
+    position: relative;
+    top: 0;
+}
+}
+@media (max-width: 768px) {
+.game-title {
+font-size: 2rem;
+}
+.character-grid {
+    grid-template-columns: 1fr;
+}
+
+.game-grid {
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(10, 30px);
+}
+
+.grid-cell {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+}
+}

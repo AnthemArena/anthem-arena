@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hextech Warfare | League Music Hub</title>
+    
+    <!-- Your existing global styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- New game-specific styles -->
+    <link rel="stylesheet" href="css/battleship.css">
+</head>
+<body class="game-page">
+    
+    <!-- Header (matching your site's navigation) -->
+    <header class="site-header">
+        <nav>
+            <a href="index.html">🎵 Tournaments</a>
+            <a href="games.html" class="active">🎮 Games</a>
+            <a href="profile.html">👤 Profile</a>
+        </nav>
+    </header>
+
+    <!-- Game Container -->
+    <main class="game-container">
+        
+        <!-- Game Selection Screen (Initial) -->
+        <div id="characterSelect" class="character-select">
+            <h1 class="game-title">HEXTECH WARFARE</h1>
+            <p class="game-subtitle">Choose your champion</p>
+            
+            <div class="character-grid">
+                <!-- Caitlyn Card -->
+<!-- Caitlyn Card -->
+<div class="character-card" data-character="caitlyn">
+    <div class="character-portrait">
+        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg" alt="Caitlyn">
+    </div>
+    <h2>🎯 CAITLYN</h2>
+    <p class="character-tagline">The Sheriff of Piltover</p>
+    <ul class="ability-list">
+        <li><strong>Precision:</strong> Reveal adjacent squares on hit</li>
+        <li><strong>Ace in the Hole:</strong> Scan 3x3 area</li>
+    </ul>
+    <button class="select-btn" data-character="caitlyn">
+        SELECT CAITLYN
+    </button>
+</div>
+
+<!-- Jinx Card -->
+<div class="character-card" data-character="jinx">
+    <div class="character-portrait">
+        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg" alt="Jinx">
+    </div>
+    <h2>💥 JINX</h2>
+    <p class="character-tagline">The Loose Cannon</p>
+    <ul class="ability-list">
+        <li><strong>Chaos:</strong> Random explosions on hit</li>
+        <li><strong>Super Mega Rocket:</strong> 5 wild shots</li>
+    </ul>
+    <button class="select-btn" data-character="jinx">
+        SELECT JINX
+    </button>
+</div>
+            </div>
+
+            <!-- Difficulty Selection -->
+            <div class="difficulty-select">
+                <label>AI Difficulty:</label>
+                <select id="difficultySelect">
+                    <option value="easy">Easy - Powder Mode</option>
+                    <option value="medium" selected>Medium - Enforcer Mode</option>
+                    <option value="hard">Hard - Sheriff Mode</option>
+                    <option value="chaos">Chaos - Jinx Mode</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ship Placement Screen (Hidden initially) -->
+        <div id="shipPlacement" class="ship-placement hidden">
+            <h2>Place Your Fleet</h2>
+            <div class="placement-instructions">
+                <p>Click to place ships. Right-click to rotate.</p>
+            </div>
+            
+            <div class="placement-grid-container">
+                <div id="placementGrid" class="game-grid"></div>
+            </div>
+
+            <div class="ship-selector">
+                <div class="ship-item" data-ship="carrier" data-size="5">
+                    <span class="ship-icon">🚢</span>
+                    <span>Carrier (5)</span>
+                </div>
+                <div class="ship-item" data-ship="battleship" data-size="4">
+                    <span class="ship-icon">⛴️</span>
+                    <span>Battleship (4)</span>
+                </div>
+                <div class="ship-item" data-ship="cruiser" data-size="3">
+                    <span class="ship-icon">🚤</span>
+                    <span>Cruiser (3)</span>
+                </div>
+                <div class="ship-item" data-ship="submarine" data-size="3">
+                    <span class="ship-icon">🛥️</span>
+                    <span>Submarine (3)</span>
+                </div>
+                <div class="ship-item" data-ship="destroyer" data-size="2">
+                    <span class="ship-icon">⚓</span>
+                    <span>Destroyer (2)</span>
+                </div>
+            </div>
+
+            <button id="randomPlacement" class="secondary-btn">
+                🎲 Random Placement
+            </button>
+            <button id="startGame" class="primary-btn" disabled>
+                START BATTLE
+            </button>
+        </div>
+
+        <!-- Battle Screen (Hidden initially) -->
+        <div id="battleScreen" class="battle-screen hidden">
+            
+            <!-- Character Banners -->
+            <div class="battle-layout">
+                
+                <!-- Left Side - Player Character -->
+                <div id="playerBanner" class="character-banner player-side">
+                    <div class="banner-portrait">
+                        <img id="playerPortrait" src="" alt="">
+                    </div>
+                    <div class="character-info">
+                        <h3 id="playerName">CAITLYN</h3>
+                        <p class="character-status">Your Fleet</p>
+                        <div class="ships-remaining">
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                        </div>
+                    </div>
+                    <!-- Abilities -->
+                    <div class="abilities">
+                        <button class="ability-btn" id="ability1" disabled>
+                            <span class="ability-name">Precision</span>
+                            <span class="ability-cooldown">Passive</span>
+                        </button>
+                        <button class="ability-btn" id="ability2">
+                            <span class="ability-name">Ultimate</span>
+                            <span class="ability-uses">1x</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Center - Game Boards -->
+                <div class="boards-container">
+                    
+                    <!-- Your Board (defensive) -->
+                    <div class="board-section">
+                        <h3>YOUR FLEET</h3>
+                        <div id="playerGrid" class="game-grid player-grid"></div>
+                    </div>
+
+                    <!-- Enemy Board (offensive) -->
+                    <div class="board-section">
+                        <h3>ENEMY FLEET</h3>
+                        <div id="enemyGrid" class="game-grid enemy-grid"></div>
+                    </div>
+
+                </div>
+
+                <!-- Right Side - Opponent Character -->
+                <div id="opponentBanner" class="character-banner opponent-side">
+                    <div class="banner-portrait">
+                        <img id="opponentPortrait" src="" alt="">
+                    </div>
+                    <div class="character-info">
+                        <h3 id="opponentName">JINX</h3>
+                        <p class="character-status">Enemy Fleet</p>
+                        <div class="ships-remaining">
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                            <div class="ship-icon">■</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Character Quote Overlay -->
+            <div id="quoteOverlay" class="quote-overlay hidden">
+                <div class="quote-content">
+                    <span class="quote-character"></span>
+                    <p class="quote-text"></p>
+                </div>
+            </div>
+
+            <!-- Turn Indicator -->
+            <div id="turnIndicator" class="turn-indicator">
+                <p>YOUR TURN - Select target</p>
+            </div>
+
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="game-over hidden">
+            <div class="game-over-content">
+                <h1 id="resultTitle">VICTORY</h1>
+                <div id="resultCharacter" class="result-character">
+                    <img src="" alt="">
+                </div>
+                <p id="resultQuote" class="result-quote"></p>
+                
+                <div class="game-stats">
+                    <div class="stat">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value" id="accuracyStat">0%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Shots Fired</span>
+                        <span class="stat-value" id="shotsStat">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">XP Earned</span>
+                        <span class="stat-value" id="xpStat">+0</span>
+                    </div>
+                </div>
+
+                <div class="game-over-actions">
+                    <button id="playAgain" class="primary-btn">PLAY AGAIN</button>
+                    <button id="changeCharacter" class="secondary-btn">CHANGE CHARACTER</button>
+                    <a href="index.html" class="tertiary-btn">BACK TO TOURNAMENTS</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/character-quotes.js"></script>
+    <script src="js/battleship-game.js"></script>
+    <script src="js/battleship-ai.js"></script>
+    <script src="js/battleship-ui.js"></script>
+    
+    <!-- Firebase (your existing config) -->
+    <script src="firebase-config.js"></script>
+    <script>
+        // Track game start in Firebase
+        // (You can integrate with your existing analytics)
+    </script>
+</body>
+</html>

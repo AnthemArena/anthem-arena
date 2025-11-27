@@ -867,7 +867,93 @@ export const ACHIEVEMENTS = {
     rarity: 'epic',
     condition: (stats) => stats.sharesCount >= 15,
     progress: (stats) => ({ current: stats.sharesCount, target: 15 })
-  }
+  },
+
+  // ========================================
+  // BATTLESHIP (HEXTECH WARFARE) ACHIEVEMENTS
+  // ========================================
+  'battleship-first-game': {
+    id: 'battleship-first-game',
+    name: 'First Deployment',
+    description: 'Play your first Hextech Warfare match',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3068.png', // Sunfire
+    xp: 50,
+    category: 'battleship',
+    hidden: true,
+    tier: 'bronze',
+    rarity: 'common',
+    condition: (stats) => stats.battleship?.gamesPlayed >= 1,
+    progress: (stats) => ({ current: stats.battleship?.gamesPlayed || 0, target: 1 })
+  },
+  
+  'battleship-first-win': {
+    id: 'battleship-first-win',
+    name: 'First Blood',
+    description: 'Win your first Hextech Warfare match',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3142.png', // Youmuu's
+    xp: 100,
+    category: 'battleship',
+    hidden: true,
+    tier: 'silver',
+    rarity: 'uncommon',
+    condition: (stats) => stats.battleship?.gamesWon >= 1,
+    progress: (stats) => ({ current: stats.battleship?.gamesWon || 0, target: 1 })
+  },
+  
+  'battleship-sharpshooter': {
+    id: 'battleship-sharpshooter',
+    name: 'Sharpshooter',
+    description: 'Win with 90%+ accuracy as Caitlyn',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3031.png', // IE
+    xp: 300,
+    category: 'battleship',
+    hidden: true,
+    tier: 'gold',
+    rarity: 'epic',
+    condition: (stats) => stats.battleship?.bestAccuracy >= 90 && stats.battleship?.caitlynWins >= 1
+  },
+  
+  'battleship-chaos-master': {
+    id: 'battleship-chaos-master',
+    name: 'Beautiful Chaos',
+    description: 'Win 10 games as Jinx',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3087.png', // Statikk Shiv
+    xp: 250,
+    category: 'battleship',
+    hidden: true,
+    tier: 'gold',
+    rarity: 'rare',
+    condition: (stats) => stats.battleship?.jinxWins >= 10,
+    progress: (stats) => ({ current: stats.battleship?.jinxWins || 0, target: 10 })
+  },
+  
+  'battleship-flawless': {
+    id: 'battleship-flawless',
+    name: 'Flawless Victory',
+    description: 'Win without losing a single ship',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png', // GA
+    xp: 500,
+    category: 'battleship',
+    hidden: true,
+    tier: 'legendary',
+    rarity: 'legendary',
+    condition: (stats) => stats.battleship?.flawlessVictories >= 1
+  },
+  
+  'battleship-veteran': {
+    id: 'battleship-veteran',
+    name: 'Hextech Veteran',
+    description: 'Play 50 Hextech Warfare matches',
+    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3078.png', // Trinity Force
+    xp: 1000,
+    category: 'battleship',
+    hidden: true,
+    tier: 'legendary',
+    rarity: 'legendary',
+    condition: (stats) => stats.battleship?.gamesPlayed >= 50,
+    progress: (stats) => ({ current: stats.battleship?.gamesPlayed || 0, target: 50 })
+  },
+
 };
 
 // ========================================
@@ -934,6 +1020,12 @@ export const ACHIEVEMENT_CATEGORIES = {
     icon: '<i class="fa-solid fa-mobile-screen"></i>',
     color: '#ff69b4',
     description: 'Community engagement'
+  },
+  battleship: {
+    name: 'Hextech Warfare',
+    icon: '<i class="fa-solid fa-ship"></i>',
+    color: '#c8aa6e',
+    description: 'Battleship game achievements'
   }
 };
 

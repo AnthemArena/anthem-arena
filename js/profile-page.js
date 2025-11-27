@@ -1346,6 +1346,175 @@ async function loadAllFavoriteSongs(userId) {
 }
 
 // ========================================
+// LOAD BATTLESHIP STATS
+// ========================================
+
+async function loadBattleshipStats(userId) {
+    try {
+        console.log('🎮 Loading Battleship stats for:', userId);
+        
+        // Get profile to read battleship stats
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        
+        if (!profileDoc.exists()) {
+            console.log('⚠️ No profile found for Battleship stats');
+            return;
+        }
+        
+        const battleshipStats = profileDoc.data().stats?.battleship || {};
+        
+        // Update stat cards
+        const gamesPlayed = battleshipStats.gamesPlayed || 0;
+        const gamesWon = battleshipStats.gamesWon || 0;
+        const winRate = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
+        const bestAccuracy = battleshipStats.bestAccuracy || 0;
+        
+        document.getElementById('battleship-games-played').textContent = gamesPlayed;
+        document.getElementById('battleship-win-rate').textContent = `${winRate}%`;
+        document.getElementById('battleship-best-accuracy').textContent = `${bestAccuracy}%`;
+        
+        // Update tab count badge
+        document.getElementById('battleshipCount').textContent = gamesPlayed;
+        
+        if (gamesPlayed === 0) {
+            return; // Keep no-content state
+        }
+        
+        // Load match history
+        await loadBattleshipMatchHistory(userId);
+        
+        console.log('✅ Battleship stats loaded:', {
+            gamesPlayed,
+            gamesWon,
+            winRate,
+            bestAccuracy
+        });
+        
+    } catch (error) {
+        console.error('❌ Error loading Battleship stats:', error);
+    }
+}
+
+// ========================================
+// LOAD BATTLESHIP MATCH HISTORY
+// ========================================
+
+async function loadBattleshipMatchHistory(userId) {
+    try {
+        const matchesQuery = query(
+            collection(db, 'battleship_matches'),
+            where('userId', '==', userId),
+            orderBy('timestamp', 'desc'),
+            limit(20)
+        );
+        
+        const snapshot = await getDocs(matchesQuery);
+        
+        if (snapshot.empty) {
+            return; // Keep no-content state
+        }
+        
+        const matches = snapshot.docs.map(doc => doc.data());
+        
+        const container = document.getElementById('battleshipMatchHistory');
+        
+        container.innerHTML = matches.map(match => renderBattleshipMatchCard(match)).join('');
+        
+        console.log(`✅ Loaded ${matches.length} Battleship matches`);
+        
+    } catch (error) {
+        console.error('❌ Error loading Battleship match history:', error);
+    }
+}
+
+// ========================================
+// RENDER BATTLESHIP MATCH CARD
+// ========================================
+
+function renderBattleshipMatchCard(match) {
+    const characterData = {
+        caitlyn: {
+            name: 'Caitlyn',
+            emoji: '🎯',
+            color: '#0397AB',
+            portrait: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Caitlyn_0.jpg`
+        },
+        jinx: {
+            name: 'Jinx',
+            emoji: '💥',
+            color: '#FF3366',
+            portrait: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_0.jpg`
+        }
+    };
+    
+    const player = characterData[match.character] || characterData.caitlyn;
+    const opponent = characterData[match.opponent] || characterData.jinx;
+    
+    const statusClass = match.victory ? 'victory' : 'defeat';
+    const statusEmoji = match.victory ? '✅' : '❌';
+    const statusText = match.victory ? 'VICTORY' : 'DEFEAT';
+    
+    const timeAgo = formatTimeAgo(match.timestamp);
+    
+    // Format duration
+    const durationMinutes = Math.floor(match.duration / 60000);
+    const durationSeconds = Math.floor((match.duration % 60000) / 1000);
+    const durationText = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+    
+    return `
+        <div class="battleship-match-card ${statusClass}">
+            <div class="match-header">
+                <div class="match-status-badge ${statusClass}">
+                    ${statusEmoji} ${statusText}
+                </div>
+                <div class="match-timestamp">${timeAgo}</div>
+            </div>
+            
+            <div class="match-characters">
+                <div class="character-display player">
+                    <img src="${player.portrait}" alt="${player.name}" class="character-portrait">
+                    <div class="character-name">${player.emoji} ${player.name}</div>
+                </div>
+                
+                <div class="match-vs">VS</div>
+                
+                <div class="character-display opponent">
+                    <img src="${opponent.portrait}" alt="${opponent.name}" class="character-portrait">
+                    <div class="character-name">${opponent.emoji} ${opponent.name}</div>
+                </div>
+            </div>
+            
+            <div class="match-stats-row">
+                <div class="match-stat">
+                    <span class="stat-label">Accuracy</span>
+                    <span class="stat-value ${match.accuracy >= 70 ? 'good' : ''}">${match.accuracy}%</span>
+                </div>
+                <div class="match-stat">
+                    <span class="stat-label">Shots</span>
+                    <span class="stat-value">${match.shotsFired}</span>
+                </div>
+                <div class="match-stat">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value">${durationText}</span>
+                </div>
+                <div class="match-stat">
+                    <span class="stat-label">Difficulty</span>
+                    <span class="stat-value difficulty-${match.difficulty}">${capitalizeFirst(match.difficulty)}</span>
+                </div>
+            </div>
+            
+            <div class="match-footer">
+                <span class="xp-earned">+${match.xpEarned} XP</span>
+            </div>
+        </div>
+    `;
+}
+
+// Helper function
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+// ========================================
 // LOAD RECENT POSTS
 // ========================================
 
@@ -2033,6 +2202,11 @@ function setupTabs() {
             
             if (targetTab === 'songs' && document.getElementById('allFavoriteSongs').querySelector('.no-content')) {
                 await loadAllFavoriteSongs(currentProfile.userId);
+            }
+
+            // ✅ ADD THIS:
+            if (targetTab === 'battleship') {
+                await loadBattleshipStats(currentProfile.userId);
             }
         });
     });

@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                 Feed
             </a></li>
             <li><a href="/matches">Matches</a></li>
+
+            <li><a href="/battleship.html">
+    <i class="fa-solid fa-ship"></i>
+    Hextech Warfare
+</a></li>
             
             <li class="nav-separator"></li>
             

@@ -180,6 +180,9 @@
                     <button class="tab-btn" data-tab="songs">
                         <i class="fas fa-music"></i> Top Songs
                     </button>
+                    <button class="tab-btn" data-tab="battleship">
+    <i class="fas fa-ship"></i> Hextech Warfare <span class="tab-count" id="battleshipCount">0</span>
+</button>
                 </div>
                 
                 <!-- Tab Content -->
@@ -331,6 +334,41 @@
                         </div>
                         
                     </div>
+
+                    <!-- BATTLESHIP TAB -->
+<div class="tab-panel" id="tab-battleship">
+    <div class="battleship-stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="battleship-games-played">0</div>
+                <div class="stat-label">Games Played</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="battleship-win-rate">0%</div>
+                <div class="stat-label">Win Rate</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="battleship-best-accuracy">0%</div>
+                <div class="stat-label">Best Accuracy</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="battleshipMatchHistory" class="match-history-list">
+        <div class="no-content">
+            <i class="fas fa-ship"></i>
+            <p>No games played yet</p>
+            <a href="/battleship.html" class="btn-primary">Play Now</a>
+        </div>
+    </div>
+</div>
                     
                     <!-- ========================================
                          ACHIEVEMENTS TAB

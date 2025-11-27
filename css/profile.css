@@ -2978,3 +2978,199 @@
         font-size: 0.6rem;
     }
 }
+/* ========================================
+   BATTLESHIP TAB STYLES
+   ======================================== */
+
+.battleship-stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.match-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.battleship-match-card {
+    background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%);
+    border: 2px solid rgba(200, 170, 110, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.battleship-match-card:hover {
+    border-color: rgba(200, 170, 110, 0.4);
+    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.15);
+    transform: translateY(-2px);
+}
+
+.battleship-match-card.victory {
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.battleship-match-card.defeat {
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.match-status-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.match-status-badge.victory {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.match-status-badge.defeat {
+    background: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+}
+
+.match-timestamp {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.match-characters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.character-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.character-portrait {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    object-fit: cover;
+}
+
+.character-display.player .character-portrait {
+    border-color: rgba(3, 151, 171, 0.5);
+}
+
+.character-display.opponent .character-portrait {
+    border-color: rgba(255, 51, 102, 0.5);
+}
+
+.character-name {
+    color: #C8AA6E;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.match-vs {
+    color: #666;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.match-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+    padding: 16px 0;
+    border-top: 1px solid rgba(200, 170, 110, 0.1);
+    border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+}
+
+.match-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    color: #C8AA6E;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.stat-value.good {
+    color: #4CAF50;
+}
+
+.difficulty-easy {
+    color: #4CAF50;
+}
+
+.difficulty-medium {
+    color: #FF9800;
+}
+
+.difficulty-hard {
+    color: #F44336;
+}
+
+.difficulty-chaos {
+    color: #9C27B0;
+}
+
+.match-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.xp-earned {
+    color: #C8AA6E;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .match-characters {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .match-vs {
+        transform: rotate(90deg);
+    }
+    
+    .character-portrait {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .match-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
