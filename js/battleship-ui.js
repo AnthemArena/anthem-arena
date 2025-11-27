@@ -1109,12 +1109,12 @@ async checkBattleshipAchievements(userId, isVictory, stats) {
 // ============================================
 // INITIALIZE ON PAGE LOAD
 // ============================================
-
 let battleshipUI;
 
-// Initialize immediately since script is at end of body
-console.log('🚀 Starting Battleship UI initialization...');
-battleshipUI = new BattleshipUI();
-battleshipUI.init();
-
-console.log('✅ Battleship UI Loaded');
+// Initialize as async IIFE
+(async () => {
+    console.log('🚀 Starting Battleship UI initialization...');
+    battleshipUI = new BattleshipUI();
+    await battleshipUI.init();  // ← Now we wait!
+    console.log('✅ Battleship UI Loaded and ready');
+})();
