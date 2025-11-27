@@ -3,7 +3,7 @@
   "name": "Jinx",
   "displayName": "Chaotic & Explosive 💥",
   "emoji": "💥",
-    "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png",
+  "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png",
   "description": "Wild, unpredictable, and always ready to blow something up! Get ready for mayhem!",
   "buttonPrefix": "💣",
   "color": "#ff69b4",
@@ -21,787 +21,1414 @@
     "textShadow": "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 105, 180, 0.4)"
   },
 
-    "alerts": {
-"danger": {
-  "messages": [
-    {
-      "condition": { "voteDiff": { "gte": 50 } },
-      "message": "💥 KABOOM!! \"{songTitle}\" is down {voteDiff} — THEY CHEATED I SWEAR!!",
-      "cta": "BLOW EVERYTHING UP!! 🚨"
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": { "voteDiff": { "gte": 50 } },
+          "message": "💥 KABOOM!! \"{songTitle}\" is down {voteDiff} — THEY CHEATED I SWEAR!!",
+          "cta": "BLOW EVERYTHING UP!! 🚨"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 30 } },
+          "message": "😡 DOWN {voteDiff}?! Fishbones is crying blood and Pow-Pow wants names!!",
+          "cta": "SAVE IT OR I WILL!! 💣"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 20 } },
+          "message": "🔥 Losing by {voteDiff} already?! THIS IS WHY WE CAN'T HAVE NICE SONGS!!",
+          "cta": "TURN IT AROUND NOW!! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 10 } },
+          "message": "⚠️ Trailing {voteDiff}… I'm adding EVERYONE who voted wrong to The List™",
+          "cta": "FIX THIS BEFORE I DO!! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 5 } },
+          "message": "😬 Only down {voteDiff}?? Quick, give \"{songTitle}\" a rocket launcher!!",
+          "cta": "HELP OR I'LL EXPLODE!! 🔥"
+        },
+        {
+          "condition": "default",
+          "message": "🤔 Down {voteDiff}... carry the one... TOO MANY!! Time to cheat the math!!",
+          "cta": "Nudge it… or else ⚡"
+        }
+      ]
     },
-    {
-      "condition": { "voteDiff": { "gte": 30 } },
-      "message": "😡 DOWN {voteDiff}?! Fishbones is crying blood and Pow-Pow wants names!!",
-      "cta": "SAVE IT OR I WILL!! 💣"
-    },
-    {
-      "condition": { "voteDiff": { "gte": 20 } },
-      "message": "🔥 Losing by {voteDiff} already?! THIS IS WHY WE CAN’T HAVE NICE SONGS!!",
-      "cta": "TURN IT AROUND NOW!! 💥"
-    },
-    {
-      "condition": { "voteDiff": { "gte": 10 } },
-      "message": "⚠️ Trailing {voteDiff}… I’m adding EVERYONE who voted wrong to The List™",
-      "cta": "FIX THIS BEFORE I DO!! 🎪"
-    },
-    {
-      "condition": { "voteDiff": { "gte": 5 } },
-      "message": "😬 Only down {voteDiff}?? Quick, give \"{songTitle}\" a rocket launcher!!",
-      "cta": "HELP OR I’LL EXPLODE!! 🔥"
-    },
-    {
-      "condition": "default",
-      "message": "🤔 Hmm… down {voteDiff}. Totally part of my 47-step master plan, don’t panic (yet)",
-      "cta": "Nudge it… or else ⚡"
-    }
-  ]
-},
     
-   "nailbiter": {
-  "messages": [
-    {
-      "condition": { "voteDiff": { "eq": 0 } },
-      "message": "🔥🔥🔥 DEAD EVEN 50-50!! ONE VOTE DECIDES EVERYTHING!!",
-      "cta": "BREAK THE TIE OR I WILL!! 💥"
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": { "voteDiff": { "eq": 0 } },
+          "message": "🔥🔥🔥 DEAD EVEN 50-50!! ONE VOTE DECIDES EVERYTHING!!",
+          "cta": "BREAK THE TIE OR I WILL!! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "eq": 1 } },
+          "message": "😱 ONE. VOTE. If I had ONE BULLET... actually I have WAY more than that!!",
+          "cta": "END MY SUFFERING!! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "lte": 3 } },
+          "message": "😬 ONLY {voteDiff} VOTES APART!! MY BRAIN IS SCREAMING!!",
+          "cta": "MAKE IT STOP!! ⚡"
+        },
+        {
+          "condition": "default",
+          "message": "🔥 So close at {voteDiff} votes… maximum boom potential detected!",
+          "cta": "Watch the chaos unfold! 👀"
+        }
+      ]
     },
-    {
-      "condition": { "voteDiff": { "eq": 1 } },
-      "message": "😱 ONE. SINGLE. VOTE. I’M LITERALLY VIBRATING RIGHT NOW!!",
-      "cta": "END MY SUFFERING!! 🎪"
-    },
-    {
-      "condition": { "voteDiff": { "lte": 3 } },
-      "message": "😬 ONLY {voteDiff} VOTES APART!! MY BRAIN IS SCREAMING!!",
-      "cta": "MAKE IT STOP!! ⚡"
-    },
-    {
-      "condition": "default",
-      "message": "🔥 So close at {voteDiff} votes… maximum boom potential detected!",
-      "cta": "Watch the chaos unfold! 👀"
-    }
-  ]
-},
     
     "winning": {
-  "messages": [
-    {
-      "condition": { "userPct": { "gte": 85 } },
-      "message": "👑 TOTAL OBLITERATION!! \"{songTitle}\" at {userPct}% — THEY’RE JUST ASH NOW!!",
-      "cta": "DANCE ON THEIR GRAVES!! 🎪"
-    },
-    {
-      "condition": { "userPct": { "gte": 75 } },
-      "message": "💥 BOOM BABY!! {userPct}% — I LOVE THE SMELL OF VICTORY EXPLOSIONS!!",
-      "cta": "RUB IT IN!! 🎉"
-    },
-    {
-      "condition": { "userPct": { "gte": 65 } },
-      "message": "🎯 Hehe~ {userPct}% domination! Pow-Pow says goodnight!!",
-      "cta": "BASK IN GLORY!! 💥"
-    },
-    {
-      "condition": "default",
-      "message": "😎 Chilling at {userPct}%… still winning, still unstoppable!!",
-      "cta": "Keep the mayhem rolling! ✨"
-    }
-  ]
-},
-   "comeback": {
-  "messages": [
-    {
-      "condition": { "voteDiff": { "gte": 30 } },
-      "message": "💥💥💥 FROM THE GRAVE!! \"{songTitle}\" was down {voteDiff} and just RESURRECTED!!",
-      "cta": "WITNESS THE LEGEND!! 🎪"
-    },
-    {
-      "condition": { "voteDiff": { "gte": 15 } },
-      "message": "🎉 PLOT TWIST OF THE CENTURY!! Flipped a {voteDiff}-vote hole into pure DOMINATION!!",
-      "cta": "BOW DOWN!! 💥"
-    },
-    {
-      "condition": { "voteDiff": { "gte": 5 } },
-      "message": "🔥 HA! Snatched the lead from {voteDiff} votes behind like I PLANNED IT!!",
-      "cta": "TOLD YOU SO!! ✨"
-    },
-    {
-      "condition": "default",
-      "message": "😈 Sneaky little comeback… \"{songTitle}\" just slipped into the lead, no biggie~",
-      "cta": "Admire my genius! 👀"
-    }
-  ]
-},
-    
- "ally": {
-  "messages": [
-    "🤝 {username} just voted \"{songTitle}\" too!! TWINSIES!!",
-    "💥 YES!! {username} gets it — certified chaos enjoyer!!",
-    "🎪 {username} hopped on the correct grenade!! Welcome aboard!!",
-    "😈 Hehe~ {username} picked \"{songTitle}\" — new partner in crime acquired!!",
-    "🔥 {username} also chose \"{songTitle}\"!! High-five through the screen!!",
-    "💣 {username} has IMMACULATE taste… almost as good as mine!!",
-    "🎉 Squad goals!! {username} and I are gonna burn this bracket down together!!",
-    "✨ {username} just proved they’re cool — I’m keeping them!!"
-  ],
-  "details": [
-    "Great minds think alike—BOOM!! …sorry, reflex.",
-    "We should probably rob a bank after this.",
-    "Two psychos, one song — statistically this ends in fireworks.",
-    "I’m sending them a friendship rocket. With glitter.",
-    "The army of good taste just gained +1 explosive soldier!!",
-    "If we keep agreeing like this I might start liking people… gross.",
-    "Plot twist: we’re the main characters now."
-  ],
-  "buttons": [
-    "High Five!! 🙌",
-    "Send Glitter Bomb!! 💥",
-    "Fist Bump!! 👊",
-    "Let’s Burn It Down!! 🎉",
-    "You’re My Favorite!! ✨",
-    "Squad Forever!! 💝"
-  ]
-},
-    
-    "rival": {
       "messages": [
-    "⚔️ {username} just picked \"{theirSong}\" against \"{yourSong}\"?! OH IT’S ON!!",
-    "😈 Hehe~ {username} wants to fight? CUTE. Let’s blow their speakers up!!",
-    "💥 WRONG ANSWER {username}!! You dared vote against \"{yourSong}\"?!",
-    "🎯 {username} chose \"{theirSong}\" — adding them to The List™ immediately!!",
-    "🔥 {username} declared WAR on \"{yourSong}\"!! Pow-Pow is locked and loaded!!",
-    "😡 OH THEY DID NOT just vote \"{theirSong}\"!! Fishbones is taking this personally!!",
-    "💣 {username} thinks \"{theirSong}\" is better?! Time to correct the timeline!!",
-    "⚡ {username} vs YOU — only one song leaves in ashes!!"
-  ],
-  "details": [
-    "I already sharpened the rockets with their name on it.",
-    "Fishbones just asked if we can make it hurt more. I said yes.",
-    "They’re gonna learn the hard way — there are no rules in love and war!!",
-    "Hope they like the taste of gunpowder for breakfast!!",
-    "Sending them a friendly reminder… shaped like a missile.",
-    "This is why we can’t have nice things. Or nice people.",
-    "Plot twist: they’re the villain in this story now."
-  ],
-      "buttons": [
-        "View Battle! ⚔️",
-        "Show 'Em! 💥",
-        "See Fight! 🔥",
-        "Go to War! 🎯",
-        "Face Enemy! 😈",
-        "Bring It! 🎪"
-      ]
-    },
-    
-   "streak-ally-10": {
-  "messages": [
-    "🔥🔥🔥 TEN MATCHES with {username}!! You two are SOULMATES!!",
-    "💥💥💥 {username} is your chaos twin — 10 straight agreements!!",
-    "🎪 LEGENDARY DUO UNLOCKED — you and {username} are unstoppable!!"
-  ],
-  "details": ["This is the stuff of myths!!", "I ship it.", "Nobody’s ever been this in sync!!"],
-  "buttons": ["Celebrate Forever!! 🎉", "View Soulmate!! 👑", "Send Love Bomb!! 💝"]
-},
-
-"streak-ally-20": {
-  "messages": [
-    "👑 {streakCount} MATCHES with {username} — ETERNAL CHAOS TWINS!!",
-    "💎 You two just broke reality with perfect agreement!!",
-    "🏆 HISTORY MADE — {streakCount} straight with {username}!!"
-  ],
-  "details": ["I’m actually speechless (this never happens).", "You’re both getting statues."],
-  "buttons": ["WORSHIP!! 👑", "Immortal Duo!! 💎", "PARTY FOREVER!! 🎉"]
-},
-
-"streak-rival-10": {
-  "messages": [
-    "⚔️⚔️⚔️ TEN WARS with {username} — ULTIMATE NEMESIS ACHIEVED!!",
-    "💀 {username} is your ARCH-ENEMY — 10 battles and counting!!",
-    "🔥 LEGENDARY RIVALRY UNLOCKED — you two were born to fight!!"
-  ],
-  "details": ["This feud is the main plot now.", "I’m selling tickets."],
-  "buttons": ["Face Nemesis!! 💀", "View Eternal War!! ⚔️", "FIGHT AGAIN!! 🔥"]
-},
-
-"streak-rival-20": {
-  "messages": [
-    "👹 {streakCount} BATTLES with {username} — DESTINED ENEMIES FOREVER!!",
-    "💀 ETERNAL RIVALRY — you two will clash until the end of time!!",
-    "⚔️ HISTORY’S GREATEST FEUD — {streakCount} wars and still going!!"
-  ],
-  "details": ["This is bigger than Piltover vs Zaun.", "I’m scared and proud."],
-  "buttons": ["WAR FOREVER!! ⚔️", "View Immortal Foe!! 👹", "NEVER SURRENDER!! 🔥"]
-},
-    
- "novotes": {
-  "messages": [
-    "🆘 ZERO VOTES on \"{matchTitle}\"?! THIS MATCH IS DEAD AND EMPTY!!",
-    "😱 NOBODY’S VOTED YET!! \"{song1}\" vs \"{song2}\" is a ghost town!!",
-    "💣 Uh-oh!! Brand-new match and it’s quieter than Piltover… GROSS!!",
-    "🎪 BE THE FIRST TO BLOW THIS UP!! \"{matchTitle}\" needs a spark!!"
-  ],
-  "buttons": [
-    "Vote First!! 💥",
-    "Light the Fuse!! 💣",
-    "START THE CHAOS!! 🎪",
-    "I’LL DO IT MYSELF!! ⚡"
-  ]
-},
-  
-    
-"round-opening": {
-  "messages": [
-    "ROUND {round} JUST DROPPED!! {matchCount} FRESH SONGS TO BLOW UP!!",
-    "NEW ROUND LIVE!! {matchCount} targets acquired — LOCK AND LOAD!!",
-    "Hehe~ Round {round} spawned with {matchCount} new explosions waiting!!",
-    "ROUND {round} IS HERE!! {matchCount} battles. {matchCount} booms. NO MERCY!!"
-  ],
-  "buttons": [
-    "START THE MAYHEM!!",
-    "VIEW ROUND {round}!!",
-    "CAUSE CHAOS NOW!!",
-    "GET JINXED!!"
-  ]
-},
-"match-won": {
-  "messages": [
-    "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
-    "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
-    "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
-    "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
-    "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
-    "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
-  ],
-  "details": [
-    "Your reign of terror continues to the next round.",
-    "Another one bites the dust. Delicious.",
-    "The bracket just got a little smaller… thanks to you."
-  ],
-  "buttons": [
-    "RUB IT IN!!",
-    "View the Carnage!!",
-    "Next Target!!",
-    "TO THE FINALS!!"
-  ]
-},
-    
-"match-lost": {
-  "messages": [
-    "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
-    "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
-    "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
-    "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
-    "ELIMINATED?! This is war. This is PERSONAL. Fishbones is already crying blood!!",
-    "Okay new plan: blow up everything that voted wrong. Starting in 3… 2…"
-  ],
-  "details": [
-    "They'll pay for this. They'll ALL pay.",
-    "Your song may be gone, but the rage is eternal.",
-    "Death is only the beginning."
-  ],
-  "buttons": [
-    "REVENGE VOTE NOW!!",
-    "BURN IT ALL DOWN!!",
-    "Next Target Acquired!!",
-    "I'm Fine (I'm lying)!!"
-  ]
-},
-    
-"match-tied-alert": {
-  "messages": [
-    {
-      "condition": { "winner": "{songTitle}" },
-      "message": [
-        "50-50 TIE — AND YOU WON ON SEEDING!! CHAOS REWARDED!!",
-        "PERFECT DEADLOCK — and the bracket gave it to YOU!! BOOM!!"
-      ],
-      "cta": ["I WIN BABY!!", "SEEDING IS MY FRIEND!!"]
-    },
-    {
-      "condition": "default",
-      "message": [
-        "50-50 TIE — PURE CHAOS!! Nobody really won… except {winner} on boring seeding.",
-        "MAXIMUM TIE ACHIEVED — but some seed rule gave it to {winner}. LAME!"
-      ],
-      "cta": ["BEAUTIFUL CHAOS!!", "Next Explosion!!"]
-    }
-  ]
-},
-    
-
-  "factionAlerts": {
-    "match-won": {
-      "messages": [
-        "💥 WE CRUSHED IT!! Team Jinx led the charge with {jinxVotes} votes!!",
-        "🧨 BOOM BABY!! Team Jinx dominated with {jinxVotes} votes while Vi's losers only managed {viVotes}!!",
-        "💣 HAHA!! {jinxVotes} Jinx voters vs {viVotes} Vi wannabes — and we WON!! Told you chaos works!!",
-        "🎆 FACTION VICTORY!! Team Jinx: {jinxVotes} votes | Everyone else combined: {otherVotes} — WE RUN THIS PLACE!!",
-        "💥 {jinxPercent}% Team Jinx unity!! We DEMOLISHED the competition with {jinxVotes} votes!!",
-        "🧨 Team Jinx brought {jinxVotes} votes to the party — Vi's {viVotes} losers didn't stand a CHANCE!!"
-      ],
-      "details": [
-        "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters! +{xp} XP",
-        "Team Jinx dominated! You ranked #{yourFactionRank} in the winning faction! +{xp} XP",
-        "Faction power!! #{yourFactionRank} of {totalFactionVoters} Jinx voters — CHAOS REIGNS!! +{xp} XP"
-      ],
-      "buttons": [
-        "💥 RUB IT IN!!",
-        "🎯 View Faction Carnage!!",
-        "💣 Mock Vi's Team!!"
-      ]
-    },
-    
-    "match-lost": {
-      "messages": [
-        "😤 WE LOST?! Wait... {wrongPercent}% of Team Jinx voted for the WRONG song?! TRAITORS EVERYWHERE!!",
-        "😑 Vi's team actually won this one with {viVotes} votes... I'm going to pretend I didn't see that.",
-        "💣 {jinxVotes} of us voted right, but {wrongVotes} Jinx voters BETRAYED US!! At least Vi lost too... wait, she didn't?!",
-        "🔥 TEAM JINX WHAT ARE YOU DOING?! Only {jinxVotes} votes?! Meanwhile {otherVotes} votes went to the ENEMY?!",
-        "😠 {jinxPercent}% of Team Jinx got it RIGHT but we STILL LOST?! I'm surrounded by idiots!!",
-        "💥 This is embarrassing. {jinxVotes} Jinx votes vs {viVotes} Vi votes. Someone's getting kicked off the team..."
-      ],
-      "details": [
-        "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters (at least YOU tried) +{xp} XP",
-        "You ranked #{yourFactionRank} in your faction... but we still lost. Ugh. +{xp} XP",
-        "Faction failure! #{yourFactionRank} of {totalFactionVoters} Jinx voters — half of them are WRONG!! +{xp} XP"
-      ],
-      "buttons": [
-        "🔥 DISOWN MY TEAM!!",
-        "💥 Demand Revenge!!",
-        "😤 View The Carnage!!"
+        {
+          "condition": { "userPct": { "gte": 85 } },
+          "message": "👑 TOTAL OBLITERATION!! \"{songTitle}\" at {userPct}% — THEY'RE JUST ASH NOW!!",
+          "cta": "DANCE ON THEIR GRAVES!! 🎪"
+        },
+        {
+          "condition": { "userPct": { "gte": 75 } },
+          "message": "💥 BOOM BABY!! {userPct}% — I LOVE THE SMELL OF VICTORY EXPLOSIONS!!",
+          "cta": "RUB IT IN!! 🎉"
+        },
+        {
+          "condition": { "userPct": { "gte": 65 } },
+          "message": "🎯 Hehe~ {userPct}% domination! Pow-Pow says goodnight!!",
+          "cta": "BASK IN GLORY!! 💥"
+        },
+        {
+          "condition": "default",
+          "message": "😎 Chilling at {userPct}%… still winning, still unstoppable!!",
+          "cta": "Keep the mayhem rolling! ✨"
+        }
       ]
     },
     
     "comeback": {
       "messages": [
-        "🎆 FROM {oldPercent}% TO {newPercent}%!! Team Jinx FLIPPED THIS MATCH while everyone else was SLEEPING!!",
-        "💥 COMEBACK BABY!! We were LOSING and then {jinxVoteSwing} Jinx voters showed up and SAVED US!!",
-        "🧨 We went from {oldPercent}% to {newPercent}% — Team Jinx went NUCLEAR in the final hour!! THAT'S MY PEOPLE!!",
-        "💣 EPIC TURNAROUND!! {jinxVoteSwing} last-minute Jinx votes turned this around — Vi's team is CRYING!!",
-        "🎪 THE COMEBACK!! Team Jinx pulled off a {swingPercent}% swing — from losing to DOMINATING!!"
+        {
+          "condition": { "voteDiff": { "gte": 30 } },
+          "message": "💥💥💥 BACK FROM THE DEAD!! \"{songTitle}\" was down {voteDiff} and RESURRECTED!!",
+          "cta": "WITNESS THE LEGEND!! 🎪"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 15 } },
+          "message": "🎉 PLOT TWIST!! Flipped a {voteDiff}-vote hole — did someone say 'stay down'? I DON'T KNOW THAT WORD!!",
+          "cta": "BOW DOWN!! 💥"
+        },
+        {
+          "condition": { "voteDiff": { "gte": 5 } },
+          "message": "🔥 HA! Snatched the lead from {voteDiff} behind like a BEAUTIFUL DISASTER!!",
+          "cta": "TOLD YOU SO!! ✨"
+        },
+        {
+          "condition": "default",
+          "message": "😈 Sneaky little comeback… \"{songTitle}\" just slipped into the lead, no biggie~",
+          "cta": "Admire my genius! 👀"
+        }
+      ]
+    },
+    
+    "ally": {
+      "messages": [
+        "🤝 {username} just voted \"{songTitle}\" too!! TWINSIES!!",
+        "💥 YES!! {username} gets it — certified chaos enjoyer!!",
+        "🎪 {username} hopped on the correct grenade!! Welcome aboard!!",
+        "😈 Hehe~ {username} picked \"{songTitle}\" — new partner in crime acquired!!",
+        "🔥 {username} also chose \"{songTitle}\"!! High-five through the screen!!",
+        "💣 {username} has IMMACULATE taste… almost as good as mine!!",
+        "🎉 Squad goals!! {username} and I are gonna burn this bracket down together!!",
+        "✨ Hey trinket!! {username} just proved they're cool — I'm keeping them!!"
       ],
       "details": [
-        "Legendary comeback! Team Jinx: +{jinxVoteSwing} votes in final stretch! You were part of history! +{xp} XP",
-        "Epic turnaround! #{yourFactionRank} among the {totalFactionVoters} Jinx voters who saved this!! +{xp} XP"
+        "Great minds think alike—BOOM!! …sorry, reflex.",
+        "We should probably rob a bank after this.",
+        "Two psychos, one song — statistically this ends in fireworks.",
+        "I'm sending them a friendship rocket. With glitter.",
+        "The army of good taste just gained +1 explosive soldier!!",
+        "Finally someone who won't leave me... right? RIGHT?!",
+        "Plot twist: we're the main characters now.",
+        "Yes I know this is just a notification. Doesn't make it less REAL!!"
       ],
       "buttons": [
-        "💣 CELEBRATE!!",
-        "🎯 Replay The Comeback!!",
-        "💥 Mock The Doubters!!"
+        "High Five!! 🙌",
+        "Send Glitter Bomb!! 💥",
+        "Fist Bump!! 👊",
+        "Let's Burn It Down!! 🎉",
+        "You're My Favorite!! ✨",
+        "Squad Forever!! 💝"
       ]
-    }
-  },
+    },
+    
+    "rival": {
+      "messages": [
+        "⚔️ {username} just picked \"{theirSong}\" against \"{yourSong}\"?! OH IT'S ON!!",
+        "😈 Hehe~ {username} wants to fight? CUTE. Let's blow their speakers up!!",
+        "💥 WRONG ANSWER {username}!! You dared vote against \"{yourSong}\"?!",
+        "🎯 {username} chose \"{theirSong}\" — adding them to The List™ immediately!!",
+        "🔥 {username} declared WAR on \"{yourSong}\"!! Pow-Pow is locked and loaded!!",
+        "😡 OH THEY DID NOT just vote \"{theirSong}\"!! Fishbones is taking this personally!!",
+        "💣 {username} thinks \"{theirSong}\" is better?! Time to visit them with my rockets!!",
+        "⚡ {username} vs YOU — only one song leaves in ashes!!"
+      ],
+      "details": [
+        "I already sharpened the rockets with their name on it.",
+        "Fishbones just asked if we can make it hurt more. I said yes.",
+        "They're gonna learn the hard way — there are no rules in love and war!!",
+        "Hope they like the taste of gunpowder for breakfast!!",
+        "Sending them a friendly reminder… shaped like a missile.",
+        "Betting Vi would vote for {theirSong} too... WHATEVER I DON'T CARE!!",
+        "This is why we can't have nice things. Or nice people."
+      ],
+      "buttons": [
+        "Watch 'Em Burn!! ⚔️",
+        "Show 'Em!! 💥",
+        "Spectate the Carnage!! 🔥",
+        "Go to War!! 🎯",
+        "Face Enemy!! 😈",
+        "Front Row Seats!! 🎪"
+      ]
+    },
+    
+    "streak-ally-10": {
+      "messages": [
+        "🔥🔥🔥 TEN MATCHES with {username}!! You two are SOULMATES!!",
+        "💥💥💥 {username} is your chaos twin — 10 straight agreements!!",
+        "🎪 LEGENDARY DUO UNLOCKED — you and {username} are unstoppable!!"
+      ],
+      "details": [
+        "This is the stuff of myths!!", 
+        "I ship it.", 
+        "Nobody's ever been this in sync!!",
+        "My therapist would hate this... if I had one!! 💥"
+      ],
+      "buttons": ["Celebrate Forever!! 🎉", "View Soulmate!! 👑", "Send Love Bomb!! 💝"]
+    },
 
+    "streak-ally-20": {
+      "messages": [
+        "👑 {streakCount} MATCHES with {username} — ETERNAL CHAOS TWINS!!",
+        "💎 You two just broke reality with perfect agreement!!",
+        "🏆 HISTORY MADE — {streakCount} straight with {username}!!"
+      ],
+      "details": [
+        "I'm actually speechless (this never happens).", 
+        "You're both getting statues.",
+        "Is this healthy? Probably not. Do I care? ALSO NO!!"
+      ],
+      "buttons": ["WORSHIP!! 👑", "Immortal Duo!! 💎", "PARTY FOREVER!! 🎉"]
+    },
 
-      "welcome": {
-              "welcome-first-time": {
+    "streak-rival-10": {
+      "messages": [
+        "⚔️⚔️⚔️ TEN WARS with {username} — ULTIMATE NEMESIS ACHIEVED!!",
+        "💀 {username} is your ARCH-ENEMY — 10 battles and counting!!",
+        "🔥 LEGENDARY RIVALRY UNLOCKED — you two were born to fight!!"
+      ],
+      "details": [
+        "This feud is the main plot now.", 
+        "I'm selling tickets.",
+        "The voices say this is fine. All seven of them agree!!"
+      ],
+      "buttons": ["Face Nemesis!! 💀", "View Eternal War!! ⚔️", "FIGHT AGAIN!! 🔥"]
+    },
 
-  "messages": [
-    "🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!",
-    "💥 HEY CUPCAKE!! {liveCount} songs are waiting to get blown up!!",
-    "😈 Hehe~ You’re here… {liveCount} fresh targets just spawned!!",
-    "🔥 RULES? NEVER HEARD OF ‘EM!! {liveCount} matches ready to explode!!"
-  ],
-  "buttons": [
-    "START THE MAYHEM!! 💥",
-    "Get Jinxed!! 😈",
-    "Cause Chaos!! 🎪",
-    "Light Everything Up!! 💣"
-  ]
-},
-"welcome-streak": {
-  "messages": [
-    "🔥 Day 2 of chaos! You're back for MORE?! I LOVE IT!!",
-    "💥 TWO DAYS of mayhem!! You're officially a repeat offender!!",
-    "🎪 Back again?! Day 2 streak!! Let's make it EXPLODE!!"
-  ],
-  "buttons": ["KEEP THE CHAOS GOING!! 💣", "MORE MAYHEM!! 🔥"]
-},
+    "streak-rival-20": {
+      "messages": [
+        "👹 {streakCount} BATTLES with {username} — DESTINED ENEMIES FOREVER!!",
+        "💀 ETERNAL RIVALRY — you two will clash until the end of time!!",
+        "⚔️ HISTORY'S GREATEST FEUD — {streakCount} wars and still going!!"
+      ],
+      "details": [
+        "This is bigger than Piltover vs Zaun.", 
+        "I'm scared and proud.",
+        "They'll pay for this. They'll ALL pay."
+      ],
+      "buttons": ["WAR FOREVER!! ⚔️", "View Immortal Foe!! 👹", "NEVER SURRENDER!! 🔥"]
+    },
+    
+    "novotes": {
+      "messages": [
+        "🆘 ZERO VOTES on \"{matchTitle}\"?! THIS MATCH IS DEAD AND EMPTY!!",
+        "😱 NOBODY'S VOTED YET!! \"{song1}\" vs \"{song2}\" is a ghost town!!",
+        "💣 Uh-oh!! Brand-new match and it's quieter than Piltover… GROSS!!",
+        "🎪 BE THE FIRST TO BLOW THIS UP!! \"{matchTitle}\" needs a spark!!"
+      ],
+      "buttons": [
+        "Vote First!! 💥",
+        "Light the Fuse!! 💣",
+        "START THE CHAOS!! 🎪",
+        "Click Me Before I Explode!! ⚡"
+      ]
+    },
+    
+    "round-opening": {
+      "messages": [
+        "ROUND {round} JUST DROPPED!! {matchCount} FRESH SONGS TO BLOW UP!!",
+        "NEW ROUND LIVE!! {matchCount} targets acquired — LOCK AND LOAD!!",
+        "Hehe~ Round {round} spawned with {matchCount} new explosions waiting!!",
+        "ROUND {round} IS HERE!! {matchCount} battles. {matchCount} booms. NO MERCY!!"
+      ],
+      "buttons": [
+        "START THE MAYHEM!!",
+        "VIEW ROUND {round}!!",
+        "CAUSE CHAOS NOW!!",
+        "GET JINXED!!"
+      ]
+    },
+    
+    "match-won": {
+      "messages": [
+        "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
+        "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
+        "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
+        "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
+        "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
+        "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
+      ],
+      "details": [
+        "Your reign of terror continues to the next round.",
+        "Another one bites the dust. Delicious.",
+        "The bracket just got a little smaller… thanks to you."
+      ],
+      "buttons": [
+        "RUB IT IN!!",
+        "View the Carnage!!",
+        "Next Target!!",
+        "TO THE FINALS!!"
+      ]
+    },
+    
+    "match-lost": {
+      "messages": [
+        "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
+        "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
+        "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
+        "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
+        "They left me again... just like... NO WAIT THIS IS DIFFERENT!! REVENGE TIME!!",
+        "Time to visit everyone who voted wrong... Fishbones wants to have a CHAT!! 🚀"
+      ],
+      "details": [
+        "They'll pay for this. They'll ALL pay.",
+        "Your song may be gone, but the rage is eternal.",
+        "Death is only the beginning.",
+        "Everyone always leaves... BUT NOT THIS TIME!! Fishbones, load the big one!!"
+      ],
+      "buttons": [
+        "REVENGE VOTE NOW!!",
+        "BURN IT ALL DOWN!!",
+        "Next Target Acquired!!",
+        "I'm Fine (I'm lying)!!"
+      ]
+    },
+    
 
-"welcome-comeback": {
-  "messages": [
-    "💥 {days} DAYS?! Where've you BEEN?! I missed blowing stuff up with you!!",
-    "🎪 YOU'RE BACK after {days} days!! Time to catch up on ALL the chaos!!",
-    "💣 {days} days away?! Did you forget about me?! Let's EXPLODE some votes!!"
-  ],
-  "buttons": ["LET'S GO CRAZY!! 💥", "CATCH UP ON CHAOS!! 🎪"]
-},
-
-"welcome-back": {
-  "messages": [
-    "💥 HEYYYY!! You came back!! Ready for more explosions?!",
-    "🎪 The chaos queen returns!! Let's blow this place UP!!",
-    "💣 YOU'RE BACK!! Time to shake things up again!!"
-  ],
-  "buttons": ["GET JINXED!! 💥", "CHAOS TIME!! 🎪"]
-}
+    
+    "match-tied-alert": {
+      "messages": [
+        {
+          "condition": { "winner": "{songTitle}" },
+          "message": [
+            "50-50 TIE — AND YOU WON ON SEEDING!! CHAOS REWARDED!!",
+            "PERFECT DEADLOCK — and the bracket gave it to YOU!! BOOM!!"
+          ],
+          "cta": ["I WIN BABY!!", "SEEDING IS MY FRIEND!!"]
+        },
+        {
+          "condition": "default",
+          "message": [
+            "50-50 TIE — PURE CHAOS!! Nobody really won… except {winner} on boring seeding.",
+            "MAXIMUM TIE ACHIEVED — but some seed rule gave it to {winner}. LAME!"
+          ],
+          "cta": ["BEAUTIFUL CHAOS!!", "Next Explosion!!"]
+        }
+      ]
+    },
+    
+    "factionAlerts": {
+      "match-won": {
+        "messages": [
+          "💥 WE CRUSHED IT!! Team Jinx led the charge with {jinxVotes} votes!!",
+          "🧨 BOOM BABY!! Team Jinx dominated with {jinxVotes} votes while Vi's losers only managed {viVotes}!!",
+          "💣 HAHA!! {jinxVotes} Jinx voters vs {viVotes} Vi wannabes — and we WON!! Told you chaos works!!",
+          "🎆 FACTION VICTORY!! Team Jinx: {jinxVotes} votes | Everyone else: {otherVotes} — WE RUN THIS PLACE!!",
+          "💥 {jinxPercent}% Team Jinx unity!! We DEMOLISHED the competition!!",
+          "🧨 Team Jinx brought {jinxVotes} votes — Vi's {viVotes} losers didn't stand a CHANCE!!"
+        ],
+        "details": [
+          "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters! +{xp} XP",
+          "Team Jinx dominated! You ranked #{yourFactionRank} in the winning faction! +{xp} XP",
+          "Faction power!! #{yourFactionRank} of {totalFactionVoters} Jinx voters — CHAOS REIGNS!! +{xp} XP"
+        ],
+        "buttons": [
+          "💥 RUB IT IN!!",
+          "🎯 View Faction Carnage!!",
+          "💣 Mock Vi's Team!!"
+        ]
+      },
+      
+      "match-lost": {
+        "messages": [
+          "😤 WE LOST?! {wrongPercent}% of Team Jinx voted WRONG?! TRAITORS!!",
+          "😑 Vi's team won with {viVotes} votes... I'm pretending I didn't see that.",
+          "💣 {jinxVotes} voted right, but {wrongVotes} Jinx voters BETRAYED US!!",
+          "🔥 TEAM JINX WHAT ARE YOU DOING?! Only {jinxVotes} votes?!",
+          "😠 {jinxPercent}% got it RIGHT but we STILL LOST?! Surrounded by idiots!!",
+          "💥 Embarrassing. {jinxVotes} Jinx votes vs {viVotes} Vi votes. Someone's getting kicked off..."
+        ],
+        "details": [
+          "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters (at least YOU tried) +{xp} XP",
+          "You ranked #{yourFactionRank} in your faction... but we still lost. Ugh. +{xp} XP",
+          "Faction failure! #{yourFactionRank} of {totalFactionVoters} — half of them are WRONG!! +{xp} XP"
+        ],
+        "buttons": [
+          "🔥 DISOWN MY TEAM!!",
+          "💥 Demand Revenge!!",
+          "😤 View The Carnage!!"
+        ]
+      },
+      
+      "comeback": {
+        "messages": [
+          "🎆 FROM {oldPercent}% TO {newPercent}%!! Team Jinx FLIPPED THIS MATCH!!",
+          "💥 COMEBACK BABY!! We were LOSING then {jinxVoteSwing} Jinx voters SAVED US!!",
+          "🧨 {oldPercent}% to {newPercent}% — Team Jinx went NUCLEAR in the final hour!!",
+          "💣 TURNAROUND!! {jinxVoteSwing} last-minute Jinx votes — Vi's team is CRYING!!",
+          "🎪 THE COMEBACK!! Team Jinx pulled a {swingPercent}% swing — from losing to DOMINATING!!"
+        ],
+        "details": [
+          "Legendary comeback! Team Jinx: +{jinxVoteSwing} votes in final stretch! +{xp} XP",
+          "Epic turnaround! #{yourFactionRank} among the {totalFactionVoters} Jinx voters who saved this!! +{xp} XP"
+        ],
+        "buttons": [
+          "💣 CELEBRATE!!",
+          "🎯 Replay The Comeback!!",
+          "💥 Mock The Doubters!!"
+        ]
       }
     },
 
-  "achievements": {
-
- "opening-act": {
-  "messages": [
-    "FIRST VOTE DOWN!! Welcome to the chaos, cupcake!!",
-    "BOOM!! You just pulled the pin — there’s no going back now!!",
-    "Hehe~ First explosion successful!! I’m proud and terrified!!",
-    "YESSS!! You actually did it — the mayhem officially starts NOW!!"
-  ],
-  "details": [
-    "The bracket will never be the same. +{xp} XP",
-    "First blood, first boom, first regret. +{xp} XP",
-    "You just joined the cool kids table. +{xp} XP"
-  ],
-  "buttons": [
-    "Keep Destroying!!",
-    "More Explosions!!",
-    "Cause Chaos!!",
-    "I’m Just Getting Started!!"
-  ]
-},
-    "encore": {
-  "messages": [
-    "FIVE VOTES ALREADY?! You’re on a rampage, cupcake!!",
-    "Hehe~ Five explosions in a row — I’m taking notes!!",
-    "FIVE!! You’re officially too dangerous to be left unsupervised!!",
-    "BOOM BOOM BOOM BOOM BOOM!! That’s five — keep the streak alive!!"
-  ],
-  "details": [
-    "The body count is rising… delicious. +{xp} XP",
-    "You’re making me proud in all the wrong ways. +{xp} XP",
-    "Five down, infinity to go. +{xp} XP"
-  ],
-  "buttons": [
-    "Gimme More!!",
-    "Next Target!!",
-    "Don’t Stop!!",
-    "I’m Unstoppable!!"
-  ]
-},
-    
-   "pentakill": {
-  "messages": [
-    "PENTAKILL!!! 50 VOTES — YOU JUST MURDERED THE BRACKET!!",
-    "FIFTY EXPLOSIONS AND COUNTING — YOU’RE A WALKING WAR CRIME!!",
-    "PENTAKIIIIIIILLLLLL!!! The crowd’s screaming, the servers are crying!!",
-    "50 votes. Fifty. FIFTY. I’m actually scared of you now!!"
-  ],
-  "details": [
-    "You’re not a player anymore — you’re a natural disaster. +{xp} XP",
-    "Piltover called, they want their laws back. +{xp} XP",
-    "Legends never die… but everyone else just did. +{xp} XP"
-  ],
-  "buttons": [
-    "ROCK ON!!!",
-    "I AM THE DANGER!!",
-    "Next 50!!",
-    "FEED ME MORE!!"
-  ]
-},
-  "hot-streak": {
-  "messages": [
-    "SEVEN DAYS STRAIGHT!! You’re officially addicted and I’m SO proud!!",
-    "HOT STREAK UNLOCKED!! A whole week of daily explosions — you monster!!",
-    "7 DAYS IN A ROW!! The bracket trembles when you log in!!",
-    "ONE WEEK OF CHAOS!! You’ve voted every day — I knew you were my favorite!!"
-  ],
-  "details": [
-    "This level of obsession is beautiful. +{xp} XP",
-    "You’re not leaving until everything’s on fire, are you? +{xp} XP",
-    "The voices in my head salute you. +{xp} XP"
-  ],
-  "buttons": [
-    "Don’t You Dare Break It!!",
-    "Day 8 Starts Now!!",
-    "Feed the Addiction!!",
-    "I’m Counting on You!!"
-  ]
-},
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!",
+          "💥 HEY TOOTS!! {liveCount} songs are waiting to get blown up!!",
+          "😈 Welcome to MY world, trinket!! It's chaotic, it's broken, and you're GONNA LOVE IT!!",
+          "🔥 RULES? NEVER HEARD OF 'EM!! {liveCount} matches ready to explode!!"
+        ],
+        "buttons": [
+          "START THE MAYHEM!! 💥",
+          "Get Jinxed!! 😈",
+          "Cause Chaos!! 🎪",
+          "Light Everything Up!! 💣"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "🔥 Day 2 of chaos! You're back for MORE?! I LOVE IT!!",
+          "💥 TWO DAYS of mayhem!! You're officially a repeat offender!!",
+          "🎪 Back again?! Day 2 streak!! Let's make it EXPLODE!!"
+        ],
+        "buttons": ["KEEP THE CHAOS GOING!! 💣", "MORE MAYHEM!! 🔥"]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "💥 {days} DAYS?! Where've you BEEN, bubbles?! I missed blowing stuff up with you!!",
+          "🎪 YOU'RE BACK after {days} days!! Time to catch up on ALL the chaos!!",
+          "💣 {days} days away?! Did you forget about me?! Let's EXPLODE some votes!!"
+        ],
+        "buttons": ["LET'S GO CRAZY!! 💥", "CATCH UP ON CHAOS!! 🎪"]
+      },
+      "welcome-back": {
+        "messages": [
+          "💥 HEYYYY!! You came back!! Ready for more explosions?!",
+          "🎪 The chaos queen returns!! Let's blow this place UP!!",
+          "💣 YOU'RE BACK!! Time to shake things up again!!"
+        ],
+        "buttons": ["GET JINXED!! 💥", "CHAOS TIME!! 🎪"]
+      }
+    }
+  },
+"achievements": {
+  "opening-act": {
+    "messages": [
+      "FIRST VOTE DOWN!! Welcome to the chaos, sugar!!",
+      "BOOM!! You just pulled the pin — there's no going back now!!",
+      "Hehe~ First explosion successful!! I'm proud and terrified!!",
+      "YESSS!! You actually did it — the mayhem officially starts NOW!!"
+    ],
+    "details": [
+      "The bracket will never be the same. +{xp} XP",
+      "First blood, first boom, first regret. +{xp} XP",
+      "You just joined the cool kids table. +{xp} XP"
+    ],
+    "buttons": [
+      "Keep Destroying!!",
+      "More Explosions!!",
+      "Cause Chaos!!",
+      "I'm Just Getting Started!!"
+    ]
+  },
   
+  "encore": {
+    "messages": [
+      "FIVE VOTES ALREADY?! You're on a rampage, candy!!",
+      "Hehe~ Five explosions in a row — I'm taking notes!!",
+      "FIVE!! You're officially too dangerous to be left unsupervised!!",
+      "BOOM BOOM BOOM BOOM BOOM!! That's five — keep the streak alive!!"
+    ],
+    "details": [
+      "The body count is rising… delicious. +{xp} XP",
+      "You're making me proud in all the wrong ways. +{xp} XP",
+      "Five down, infinity to go. +{xp} XP"
+    ],
+    "buttons": [
+      "Gimme More!!",
+      "Next Target!!",
+      "Don't Stop!!",
+      "I'm Unstoppable!!"
+    ]
+  },
 
-   "chart-topper": {
-  "messages": [
-    "100 VOTES!! YOU JUST HIT NUMBER ONE WITH A BULLET!!",
-    "CHART-TOPPER ACHIEVED — YOUR NAME IS CARVED INTO THE BLAST RADIUS!!",
-    "ONE HUNDRED EXPLOSIONS AND THE BRACKET IS STILL STANDING… barely!!",
-    "100!! You’re not playing the game anymore — you ARE the game!!"
-  ],
-  "details": [
-    "The entire server felt that. +{xp} XP",
-    "Even I’m taking notes now. +{xp} XP",
-    "Legends are born at 100. You just happened. +{xp} XP"
-  ],
-  "buttons": [
-    "I AM THE CHART!!",
-    "Next Goal: 250!!",
-    "Bow Down Peasants!!",
-    "Still Not Done!!"
-  ]
-},
+  "world-tour": {
+    "messages": [
+      "TEN VOTES!! WORLD TOUR STATUS — YOU'RE TAKING THIS CHAOS GLOBAL!!",
+      "DOUBLE DIGITS BABY!! Ten explosions across the bracket — UNSTOPPABLE!!",
+      "TEN BOOMS AND COUNTING!! The world tour of destruction has BEGUN!!",
+      "Hehe~ Ten votes?! You're not just playing — you're TOURING THE CHAOS!!"
+    ],
+    "details": [
+      "Ten stops on the destruction tour. Every city feels it. +{xp} XP",
+      "The bracket is your stage and you're blowing it up. +{xp} XP",
+      "Fishbones is packed for the road trip. +{xp} XP"
+    ],
+    "buttons": [
+      "Global Mayhem!!",
+      "Ten Down!!",
+      "Keep Touring!!",
+      "Next City!!"
+    ]
+  },
 
-"hall-of-fame": {
-  "messages": [
-    "250 VOTES — WELCOME TO VALHALLA, YOU PSYCHOTIC LEGEND!!",
-    "HALL OF FAME IMMORTALIZED — YOUR NAME ECHOES IN THE RUINS FOREVER!!",
-    "TWO HUNDRED AND FIFTY!! The bracket is ashes and you’re still standing!!",
-    "250. Two-five-zero. I’m building a shrine. No, really."
-  ],
-  "details": [
-    "There are no words. Only fire and worship. +{xp} XP",
-    "You broke the game. Congratulations. +{xp} XP",
-    "Even the devs are scared. +{xp} XP"
-  ],
-  "buttons": [
-    "WORSHIP ME!!",
-    "I Am Eternal!!",
-    "Retire the Number!!",
-    "Next Bracket When??"
-  ]
-},
+  "headliner": {
+    "messages": [
+      "TWENTY-FIVE VOTES!! HEADLINER STATUS — YOU'RE THE MAIN EVENT NOW!!",
+      "25 EXPLOSIONS!! You're not opening anymore — YOU'RE THE HEADLINER!!",
+      "TWENTY-FIVE BOOMS!! The bracket put YOUR name in lights!!",
+      "Hehe~ 25 votes?! Everyone came to see YOU blow stuff up!!"
+    ],
+    "details": [
+      "Twenty-five shows, sold-out chaos every night. +{xp} XP",
+      "You're not in the lineup — you ARE the lineup. +{xp} XP",
+      "Pow-Pow and Fishbones are signing autographs. +{xp} XP"
+    ],
+    "buttons": [
+      "I'm The Star!!",
+      "25 Booms!!",
+      "Main Event!!",
+      "Encore Time!!"
+    ]
+  },
+  
+  "pentakill": {
+    "messages": [
+      "PENTAKILL!!! 50 VOTES — YOU JUST MURDERED THE BRACKET!!",
+      "FIFTY EXPLOSIONS AND COUNTING — YOU'RE A WALKING WAR CRIME!!",
+      "PENTAKIIIIIIILLLLLL!!! The crowd's screaming, the servers are crying!!",
+      "50 votes. Fifty. FIFTY. I'm actually scared of you now!!"
+    ],
+    "details": [
+      "You're not a player anymore — you're a natural disaster. +{xp} XP",
+      "Piltover called, they want their laws back. +{xp} XP",
+      "Legends never die… but everyone else just did. +{xp} XP"
+    ],
+    "buttons": [
+      "ROCK ON!!!",
+      "I AM THE DANGER!!",
+      "Next 50!!",
+      "FEED ME MORE!!"
+    ]
+  },
+
+  "chart-topper": {
+    "messages": [
+      "100 VOTES!! YOU JUST HIT NUMBER ONE WITH A BULLET!!",
+      "CHART-TOPPER ACHIEVED — YOUR NAME IS CARVED INTO THE BLAST RADIUS!!",
+      "ONE HUNDRED EXPLOSIONS!! Just like Zaun—messy, explosive, and BETTER THAN PILTOVER!!",
+      "100!! You're not playing the game anymore — you ARE the game!!"
+    ],
+    "details": [
+      "The entire server felt that. +{xp} XP",
+      "Even I'm taking notes now. +{xp} XP",
+      "Legends are born at 100. You just happened. +{xp} XP"
+    ],
+    "buttons": [
+      "I AM THE CHART!!",
+      "Next Goal: 250!!",
+      "Bow Down Peasants!!",
+      "Still Not Done!!"
+    ]
+  },
+
+  "hall-of-fame": {
+    "messages": [
+      "250 VOTES — WELCOME TO VALHALLA, YOU PSYCHOTIC LEGEND!!",
+      "HALL OF FAME IMMORTALIZED — YOUR NAME ECHOES IN THE RUINS FOREVER!!",
+      "TWO HUNDRED AND FIFTY!! The bracket is ashes and you're still standing!!",
+      "250. Two-five-zero. I'm building a shrine. No, really."
+    ],
+    "details": [
+      "There are no words. Only fire and worship. +{xp} XP",
+      "You broke the game. Congratulations. +{xp} XP",
+      "Even the devs are scared. +{xp} XP"
+    ],
+    "buttons": [
+      "WORSHIP ME!!",
+      "I Am Eternal!!",
+      "Retire the Number!!",
+      "Next Bracket When??"
+    ]
+  },
+
+  "on-fire": {
+    "messages": [
+      "THREE DAYS STRAIGHT!! YOU'RE ON FIRE AND I LOVE IT!!",
+      "HEHE~ Three days in a row?! The addiction is REAL!!",
+      "ON FIRE STATUS!! Three consecutive days of chaos — DON'T STOP!!",
+      "THREE-DAY STREAK!! You came back every day to blow stuff up!!"
+    ],
+    "details": [
+      "Three days means you're hooked. Beautiful. +{xp} XP",
+      "The bracket trembles when you log in now. +{xp} XP",
+      "Pow-Pow missed you on day zero. +{xp} XP"
+    ],
+    "buttons": [
+      "Day Four!!",
+      "Keep The Fire!!",
+      "Burn It All!!",
+      "No Stopping!!"
+    ]
+  },
+
+  "hot-streak": {
+    "messages": [
+      "SEVEN DAYS STRAIGHT!! You're officially addicted and I'm SO proud!!",
+      "HOT STREAK UNLOCKED!! A whole week of daily explosions — you monster!!",
+      "7 DAYS IN A ROW!! The bracket trembles when you log in!!",
+      "ONE WEEK OF CHAOS!! You've voted every day — I knew you were my favorite!!"
+    ],
+    "details": [
+      "This level of obsession is beautiful. +{xp} XP",
+      "You're not leaving until everything's on fire, are you? +{xp} XP",
+      "The voices in my head salute you. +{xp} XP"
+    ],
+    "buttons": [
+      "Don't You Dare Break It!!",
+      "Day 8 Starts Now!!",
+      "Feed the Addiction!!",
+      "I'm Counting on You!!"
+    ]
+  },
+
+  "unstoppable": {
+    "messages": [
+      "FOURTEEN DAYS STRAIGHT?! YOU'RE UNSTOPPABLE AND SLIGHTLY TERRIFYING!!",
+      "TWO WEEKS OF PURE CHAOS!! Nothing can stop you now!!",
+      "14-DAY STREAK!! You're not human anymore — you're a FORCE OF NATURE!!",
+      "UNSTOPPABLE ACHIEVED!! Fourteen days and you NEVER MISSED!!"
+    ],
+    "details": [
+      "Two weeks of daily destruction. I'm impressed and scared. +{xp} XP",
+      "The bracket has PTSD from seeing your name every day. +{xp} XP",
+      "Fishbones thinks you're a machine. Pow-Pow agrees. +{xp} XP"
+    ],
+    "buttons": [
+      "Fourteen Down!!",
+      "Never Stopping!!",
+      "I'm A Machine!!",
+      "To Thirty!!"
+    ]
+  },
 
   "legendary-streak": {
-  "messages": [
-    "THIRTY. DAYS. STRAIGHT. YOU ARE NO LONGER HUMAN — YOU ARE A LIVING LEGEND!!",
-    "A FULL MONTH OF DAILY EXPLOSIONS — I’M BUILDING YOU A THRONE OUT OF SPENT SHELLS!!",
-    "30-DAY STREAK ACHIEVED — THE BRACKET WILL SPEAK YOUR NAME IN WHISPERS FOREVER!!",
-    "THIRTY DAYS WITHOUT MISSING ONCE — even *I* can’t believe this happened!!"
-  ],
-  "details": [
-    "You have achieved the impossible. +{xp} XP and my undying respect (scary, I know)",
-    "Piltover and Zaun just declared a joint holiday in your honor. +{xp} XP",
-    "Statues are being commissioned. No, really. +{xp} XP"
-  ],
-  "buttons": [
-    "I AM IMMORTAL!!",
-    "WORSHIP ME!!",
-    "Day 31 Starts NOW!!",
-    "Take My Crown!!"
-  ]
-},
-    "match-won": {
-  "messages": [
-    "GET JINXED LOSERS!! \"{songTitle}\" JUST ADVANCED!!",
-    "BOOM BABY!! \"{songTitle}\" obliterated the competition — next round is DOOMED!!",
-    "YOUR SONG SURVIVED THE PURGE!! \"{songTitle}\" moves on and the bodies are piling up!!",
-    "WINNER WINNER EXPLOSIVE DINNER!! \"{songTitle}\" crushed souls and took names!!",
-    "Hehe~ \"{songTitle}\" is moving up… leaving only ashes behind!!",
-    "VICTORY SMELLS LIKE GUNPOWDER!! \"{songTitle}\" advances — as it should!!"
-  ],
-  "details": [
-    "Your reign of terror continues to the next round. +{xp} XP",
-    "Another one bites the dust. Delicious. +{xp} XP",
-    "The bracket just got a little smaller… thanks to you. +{xp} XP"
-  ],
-  "buttons": [
-    "RUB IT IN!!",
-    "View the Carnage!!",
-    "Next Target!!",
-    "TO THE FINALS!!"
-  ]
-},
-    
- "match-lost": {
-  "messages": [
-    "NO NO NO!! \"{songTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
-    "THEY DID NOT JUST ELIMINATE \"{songTitle}\" — ADDING EVERYONE TO THE LIST™!!",
-    "FINE!! \"{songTitle}\" is dead… time to burn the entire bracket down!!",
-    "Pfft. \"{songTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
-    "ELIMINATED?! This is war. This is PERSONAL. Fishbones is already crying blood!!",
-    "Okay new plan: blow up everything that voted wrong. Starting in 3… 2…"
-  ],
-  "details": [
-    "They’ll pay for this. They’ll ALL pay. +{xp} XP for the attempt",
-    "Your song may be gone, but the rage is eternal. +{xp} XP",
-    "Death is only the beginning. +{xp} XP"
-  ],
-  "buttons": [
-    "REVENGE VOTE NOW!!",
-    "BURN IT ALL DOWN!!",
-    "Next Target Acquired!!",
-    "I’m Fine (I’m lying)!!"
-  ]
-},
- "last-second-hero": {
-    "messages": ["LAST-SECOND FLIP!! I JUST STOLE VICTORY FROM THE JAWS OF DEATH!!", "30 SECONDS LEFT AND I DROPPED THE BOMB — CLUTCH GOD!!"],
-    "details": ["The bracket will never recover from this.", "Even I’m impressed (and scared)."],
-    "buttons": ["I AM THE STORM!!", "Replay That Glory!!"]
+    "messages": [
+      "THIRTY. DAYS. STRAIGHT. YOU ARE NO LONGER HUMAN — YOU ARE A LIVING LEGEND!!",
+      "A FULL MONTH OF DAILY EXPLOSIONS — I'M BUILDING YOU A THRONE OUT OF SPENT SHELLS!!",
+      "30-DAY STREAK ACHIEVED — THE BRACKET WILL SPEAK YOUR NAME IN WHISPERS FOREVER!!",
+      "THIRTY DAYS WITHOUT MISSING ONCE — even *I* can't believe this happened!!"
+    ],
+    "details": [
+      "You have achieved the impossible. +{xp} XP and my undying respect (scary, I know)",
+      "Piltover and Zaun just declared a joint holiday in your honor. +{xp} XP",
+      "Statues are being commissioned. No, really. +{xp} XP"
+    ],
+    "buttons": [
+      "I AM IMMORTAL!!",
+      "WORSHIP ME!!",
+      "Day 31 Starts NOW!!",
+      "Take My Crown!!"
+    ]
   },
-  "prophet": {
-    "messages": ["I KNEW IT FROM ROUND 1!! {songTitle} IS CHAMPION — BOW TO YOUR ORACLE!!", "TOLD YOU ALL. DAY ONE. PROPHET STATUS: ACTIVE!!"],
-    "details": ["The future is mine to command.", "Start the cult. I’ll wait."],
-    "buttons": ["WORSHIP ME!!", "Next Prophecy!!"]
+
+  "underdog-champion": {
+    "messages": [
+      "UNDERDOG CHAMPION!! FIVE underdog votes — you love the long shots!!",
+      "FIVE UNDERDOGS BACKED!! You're rooting for chaos, not favorites!!",
+      "Hehe~ Five times you picked the loser's side!! I LOVE the chaos energy!!",
+      "UNDERDOG BELIEVER!! Five longshots voted — you're BEAUTIFUL!!"
+    ],
+    "details": [
+      "Picking underdogs is basically voting for explosions. Smart. +{xp} XP",
+      "Everyone else picks safe. You pick FUN. +{xp} XP",
+      "Fishbones respects the chaos votes. +{xp} XP"
+    ],
+    "buttons": [
+      "Underdog Power!!",
+      "Chaos Picker!!",
+      "Five Down!!",
+      "More Longshots!!"
+    ]
   },
-  "comeback-believer": {
-    "messages": ["TEN RESURRECTIONS!! I keep bringing songs back from the DEAD!!", "FROM 15+ DOWN TO CHAMPION — I AM THE COMEBACK QUEEN!!"],
-    "details": ["Death is just a suggestion.", "I reject your reality and substitute my own."],
-    "buttons": ["Next Zombie!!", "I Defy Physics!!"]
+
+  "dark-horse": {
+    "messages": [
+      "DARK HORSE!! FIFTEEN underdog votes — you're the chaos prophet!!",
+      "15 LONGSHOTS BACKED!! Everyone doubted, you BELIEVED!!",
+      "Hehe~ Fifteen dark horses?! You're not voting — you're MANIFESTING CHAOS!!",
+      "DARK HORSE MASTER!! 15 underdogs and you never stopped believing!!"
+    ],
+    "details": [
+      "Fifteen longshot votes. You're not lucky — you're CHAOTIC. +{xp} XP",
+      "The favorites fear you now. +{xp} XP",
+      "Pow-Pow says dark horses explode the best. +{xp} XP"
+    ],
+    "buttons": [
+      "15 Chaos Votes!!",
+      "Dark Horse Queen!!",
+      "Never Safe Picks!!",
+      "To Thirty!!"
+    ]
   },
+
+  "rebel-heart": {
+    "messages": [
+      "REBEL HEART!! THIRTY UNDERDOG VOTES — YOU LOVE THE UNEXPECTED!!",
+      "30 DARK HORSES BACKED!! You're not voting for winners — you're voting for CHAOS!!",
+      "Hehe~ THIRTY longshots?! You don't want predictable — you want EXPLOSIONS!!",
+      "REBEL HEART UNLOCKED!! 30 underdogs and you NEVER picked the favorite!!"
+    ],
+    "details": [
+      "Thirty underdog votes. You're the chaos incarnate. +{xp} XP",
+      "Predictability is boring. Explosions are beautiful. You get it. +{xp} XP",
+      "Fishbones and Pow-Pow throw a parade in your honor. +{xp} XP"
+    ],
+    "buttons": [
+      "30 Chaos Picks!!",
+      "Rebel Forever!!",
+      "Underdog Queen!!",
+      "Predictable Is Boring!!"
+    ]
+  },
+
+  "early-bird": {
+    "messages": [
+      "EARLY BIRD!! FIRST TEN VOTERS IN FIVE MATCHES — SPEED DEMON!!",
+      "FIVE TIMES you were in the first ten!! Lightning-fast chaos!!",
+      "Hehe~ Top ten voter FIVE times?! You're not slow — you're EXPLOSIVE!!",
+      "EARLY BIRD UNLOCKED!! Five matches, first ten every time!!"
+    ],
+    "details": [
+      "Five times first to the explosion. That's dedication. +{xp} XP",
+      "Early voters cause the most chaos. You're perfect. +{xp} XP",
+      "Pow-Pow can't even keep up with your speed. +{xp} XP"
+    ],
+    "buttons": [
+      "Speed Demon!!",
+      "Five Fast!!",
+      "First Boom!!",
+      "Lightning Quick!!"
+    ]
+  },
+
+  "trendsetter": {
+    "messages": [
+      "TRENDSETTER!! FIRST TEN VOTERS IN FIFTEEN MATCHES — CHAOS LEADER!!",
+      "FIFTEEN TIMES in the first ten!! You SET the explosions!!",
+      "Hehe~ Top ten FIFTEEN times?! You don't follow trends — you BLOW THEM UP!!",
+      "TRENDSETTER ACHIEVED!! 15 matches, first ten every single time!!"
+    ],
+    "details": [
+      "Fifteen early votes. You're not following — you're LEADING. +{xp} XP",
+      "Everyone else is late. You're already causing problems. +{xp} XP",
+      "Fishbones says you're the trend. Pow-Pow agrees. +{xp} XP"
+    ],
+    "buttons": [
+      "15 First Tens!!",
+      "Trend Destroyer!!",
+      "Always First!!",
+      "Speed Queen!!"
+    ]
+  },
+
+  "nail-biter": {
+    "messages": [
+      "NAIL-BITER!! TEN CLOSE MATCHES (within 5%) — MAXIMUM TENSION!!",
+      "TEN SUPER-CLOSE VOTES!! You LOVE the edge-of-explosion matches!!",
+      "Hehe~ Ten nail-biters?! You thrive in the chaos of close calls!!",
+      "NAIL-BITER UNLOCKED!! 10 matches within 5% — you live for the suspense!!"
+    ],
+    "details": [
+      "Close matches are the most explosive. You found ten. Beautiful. +{xp} XP",
+      "5% margins mean maximum chaos. You're addicted. +{xp} XP",
+      "Pow-Pow loves close calls. So do you. Match made in mayhem. +{xp} XP"
+    ],
+    "buttons": [
+      "Ten Close Ones!!",
+      "Love The Chaos!!",
+      "Edge Of Boom!!",
+      "More Tension!!"
+    ]
+  },
+
   "deciding-vote": {
-    "messages": ["I BROKE THE TIE WITH MY BARE HANDS!! PERFECT CHAOS ACHIEVED!!", "ONE VOTE. MY VOTE. THE UNIVERSE JUST BALANCED ITSELF!!"],
-    "details": ["50-50 is the most beautiful number.", "I am the decider of fate."],
-    "buttons": ["PERFECTION!!", "Do It Again!!"]
+    "messages": [
+      "DECIDING VOTE!! TWENTY-FIVE CLOSE MATCHES — CHAOS DECIDER!!",
+      "25 NAIL-BITERS SURVIVED!! You're the tiebreaker queen!!",
+      "Hehe~ 25 close calls?! You don't just vote — you DECIDE EVERYTHING!!",
+      "DECIDING VOTE UNLOCKED!! 25 matches within 5% and you were THERE!!"
+    ],
+    "details": [
+      "Twenty-five deciding moments. You're the chaos kingmaker. +{xp} XP",
+      "Close votes mean your vote MATTERS. Power feels good, huh? +{xp} XP",
+      "Fishbones calls you 'The Decider.' It's a compliment (probably). +{xp} XP"
+    ],
+    "buttons": [
+      "25 Deciders!!",
+      "I Decide Fate!!",
+      "Chaos Maker!!",
+      "Next Close Call!!"
+    ]
   },
-  "first-blood": {
-    "messages": ["FIRST BLOOD!! I FIRED THE VERY FIRST SHOT — HISTORY STARTS WITH ME!!", "THE TOURNAMENT BEGINS WITH MY EXPLOSION!!"],
-    "details": ["The bracket was born in fire.", "And I lit the match."],
-    "buttons": ["I Was Here First!!", "Witness Me!!"]
+
+  "true-fan": {
+    "messages": [
+      "TRUE FAN!! VOTED FOR THE SAME SONG THREE TIMES — LOYALTY OR OBSESSION?!",
+      "THREE VOTES FOR ONE SONG!! You're not wishy-washy — you're COMMITTED!!",
+      "Hehe~ Same song THREE times?! That's not voting — that's DEVOTION!!",
+      "TRUE FAN UNLOCKED!! Three votes, one song, pure chaos loyalty!!"
+    ],
+    "details": [
+      "Three times for one song. That's dedication… or insanity. Both work. +{xp} XP",
+      "Loyalty is beautiful. Especially explosive loyalty. +{xp} XP",
+      "Pow-Pow respects the focus. +{xp} XP"
+    ],
+    "buttons": [
+      "Ride Or Die!!",
+      "Three Times!!",
+      "My Song!!",
+      "Never Betray!!"
+    ]
   },
+
+  "superfan": {
+    "messages": [
+      "SUPERFAN!! VOTED FOR THE SAME SONG FIVE TIMES — ABSOLUTE DEVOTION!!",
+      "FIVE VOTES FOR ONE SONG!! You're not a fan — you're a SUPERFAN!!",
+      "Hehe~ Same song FIVE times?! That's not loyalty — that's RELIGION!!",
+      "SUPERFAN ACHIEVED!! Five votes, one song, unwavering chaos faith!!"
+    ],
+    "details": [
+      "Five times for one song. That's not voting — that's worship. +{xp} XP",
+      "Most people switch. You NEVER switched. Respect. +{xp} XP",
+      "Fishbones wants to build a shrine for your loyalty. +{xp} XP"
+    ],
+    "buttons": [
+      "Five For One!!",
+      "Superfan Mode!!",
+      "My Religion!!",
+      "Loyalty Forever!!"
+    ]
+  },
+
+  "ultimate-stan": {
+    "messages": [
+      "ULTIMATE STAN!! TEN VOTES FOR ONE SONG — TRUE DEVOTION UNLOCKED!!",
+      "TEN TIMES FOR THE SAME SONG!! You're not a fan — you're a STAN!!",
+      "Hehe~ Same song TEN TIMES?! That's not voting — that's ETERNAL LOVE!!",
+      "ULTIMATE STAN ACHIEVED!! Ten votes, one song, unbreakable bond!!"
+    ],
+    "details": [
+      "Ten votes for one song. You're the ultimate stan. +{xp} XP",
+      "This level of devotion could move mountains (or blow them up). +{xp} XP",
+      "Pow-Pow and Fishbones are jealous of your loyalty. +{xp} XP"
+    ],
+    "buttons": [
+      "Ten For One!!",
+      "Ultimate Stan!!",
+      "Forever Loyal!!",
+      "My One True Song!!"
+    ]
+  },
+
+  "night-owl": {
+    "messages": [
+      "NIGHT OWL!! VOTED BETWEEN MIDNIGHT AND 5AM — CHAOS NEVER SLEEPS!!",
+      "LATE-NIGHT EXPLOSION!! You're voting when everyone else is sleeping!!",
+      "Hehe~ Night-time vote?! The chaos continues even in the dark!!",
+      "NIGHT OWL UNLOCKED!! Midnight to 5am vote — true dedication!!"
+    ],
+    "details": [
+      "Voting at night means you're TRULY committed to chaos. +{xp} XP",
+      "Sleep is for people without missions. You're awake. +{xp} XP",
+      "Fishbones loves night operations. So do you. +{xp} XP"
+    ],
+    "buttons": [
+      "Night Chaos!!",
+      "Never Sleep!!",
+      "Midnight Boom!!",
+      "Dark Hours!!"
+    ]
+  },
+
+ "last-second-hero": {
+  "messages": [
+    "LAST-SECOND FLIP!! I JUST STOLE VICTORY FROM THE JAWS OF DEATH!!",
+    "30 SECONDS LEFT AND I DROPPED THE BOMB — CLUTCH GOD!!",
+    "FINAL MOMENT CHAOS!! I changed EVERYTHING with seconds to spare!!",
+    "BUZZER-BEATER EXPLOSION!! Last-second vote and I FLIPPED THE MATCH!!"
+  ],
+  "details": [
+    "The bracket will never recover from this. Even I'm impressed (and scared). +{xp} XP",
+    "Clutch moments are my SPECIALTY. Fishbones agrees. +{xp} XP",
+    "They thought it was over. Then I showed up. BOOM. +{xp} XP"
+  ],
+  "buttons": [
+    "I AM THE STORM!!",
+    "Replay That Glory!!",
+    "Clutch Queen!!",
+    "Final Second Boom!!"
+  ]
+},
+
+ "prophet": {
+  "messages": [
+    "I KNEW IT FROM ROUND 1!! {songTitle} IS CHAMPION — BOW TO YOUR ORACLE!!",
+    "TOLD YOU ALL. DAY ONE. PROPHET STATUS: ACTIVE!!",
+    "CALLED IT IN ROUND ONE!! {songTitle} was ALWAYS gonna win — I'm psychic now!!",
+    "ORACLE JINX ACTIVATED!! I predicted {songTitle} from the BEGINNING — worship me!!"
+  ],
+  "details": [
+    "The future is mine to command. Start the cult. I'll wait. +{xp} XP",
+    "Pow-Pow whispered the winner to me on day one. She's never wrong. +{xp} XP",
+    "They doubted me. They were WRONG. I was RIGHT. Beautiful. +{xp} XP"
+  ],
+  "buttons": [
+    "WORSHIP ME!!",
+    "Next Prophecy!!",
+    "Oracle Boom!!",
+    "I See All!!"
+  ]
+},
+
+
+  "comeback-believer": {
+    "messages": [
+      "COMEBACK BELIEVER!! FIVE VOTES FOR LOSING SONGS — CHAOS FAITH!!",
+      "FIVE TIMES you voted for the underdog!! Never give up!!",
+      "Hehe~ Five comeback votes?! You believe in miracles AND explosions!!",
+      "COMEBACK BELIEVER UNLOCKED!! Five losing-side votes — beautiful chaos!!"
+    ],
+    "details": [
+      "Five times you backed the losing side. That's heart. +{xp} XP", 
+      "You don't quit on songs. Respect. +{xp} XP",
+      "Fishbones says comebacks are the best booms. +{xp} XP"
+    ],
+    "buttons": [
+      "Five Comebacks!!", 
+      "Never Quit!!",
+      "Chaos Faith!!",
+      "Believe In Booms!!"
+    ]
+  },
+
+"first-blood": {
+  "messages": [
+    "FIRST BLOOD!! I FIRED THE VERY FIRST SHOT — HISTORY STARTS WITH ME!!",
+    "THE TOURNAMENT BEGINS WITH MY EXPLOSION!!",
+    "BOOM!! First vote EVER on this bracket — I STARTED THE CHAOS!!",
+    "GENESIS EXPLOSION!! The bracket didn't exist until I MADE it exist!!"
+  ],
+  "details": [
+    "The bracket was born in fire. And I lit the match. +{xp} XP",
+    "Every explosion after this one? Yeah, that's because of ME. +{xp} XP",
+    "Fishbones says the first shot is always the loudest. He's right. +{xp} XP"
+  ],
+  "buttons": [
+    "I Was Here First!!",
+    "Witness Me!!",
+    "Genesis Boom!!",
+    "History Made!!"
+  ]
+},
+
   "voting-marathon": {
-    "messages": ["TWENTY MATCHES IN ONE SITTING — I’M NOT STOPPING UNTIL EVERYTHING’S ASH!!", "20 VOTES. ONE SESSION. SEND HELP (or more targets)!!"],
-    "details": ["My trigger finger is cramping and I DON’T CARE.", "The bracket is on fire and I’m holding the flamethrower."],
-    "buttons": ["KEEP GOING!!", "I’m Unhinged!!"]
+    "messages": [
+      "TWENTY MATCHES IN ONE SITTING — I'M NOT STOPPING UNTIL EVERYTHING'S ASH!!", 
+      "20 VOTES. ONE SESSION. Send help (or more targets)!!"
+    ],
+    "details": [
+      "My trigger finger is cramping and I DON'T CARE. +{xp} XP", 
+      "The bracket is on fire and I'm holding the flamethrower. +{xp} XP",
+      "Breaking the fourth wall AND the scoreboard!! 💥 +{xp} XP"
+    ],
+    "buttons": [
+      "KEEP GOING!!", 
+      "I'm Unhinged!!"
+    ]
   },
 
-"level-up": {
-  "messages": [
-    "LEVEL UP!! You just got BIGGER, STRONGER, and MORE EXPLOSIVE!!",
-    "BOOM!! New level unlocked — the bracket’s about to feel the UPGRADE!!",
-    "💥 LEVEL UP TIME!! Fishbones says you’re ready to blow up BIGGER cities now!!",
-    "WHOA!! You leveled!! Pow-Pow is vibrating — let’s test the new firepower!!"
-  ],
-  "details": [
-    "The chaos meter just redlined. +{xp} XP",
-    "Even I’m impressed… and a little scared. +{xp} XP",
-    "Upgrade complete. Destruction imminent. +{xp} XP"
-  ],
-  "buttons": [
-    "BLOW SHIT UP!!",
-    "Test New Power!!",
-    "MORE DESTRUCTION!!",
-    "I’M UNSTOPPABLE!!"
-  ]
-},
-"match-tied": {
-  "messages": [
-    "50-50 TIE — PURE UNFILTERED CHAOS ACHIEVED!! NOBODY WON AND IT’S PERFECT!!",
-    "DEADLOCK BABY!! Votes tied to the LAST SECOND — THIS IS THE BEST THING EVER!!",
-    "PERFECT TIE!! The bracket just exploded from too much BEAUTIFUL DISORDER!!",
-    "HAHAHAHA STALEMATE!! Both songs survived — MAXIMUM BOOM DENIED AND I LOVE IT!!"
-  ],
-  "details": [
-    "This is the most fun outcome possible. Change my mind.",
-    "Pow-Pow and Fishbones are screaming in joy. So am I.",
-    "The scoreboard broke from pure chaos. Worth it."
-  ],
-  "buttons": [
-    "BEAUTIFUL CHAOS!!",
-    "TIE = BEST OUTCOME!!",
-    "MORE TIES PLEASE!!",
-    "I’M IN LOVE WITH THIS!!"
-  ]
-},
+  "tournament-first-blood": {
+    "messages": [
+      "TOURNAMENT FIRST BLOOD BABY!! THE VERY FIRST VOTE — OFFICIAL CHAOS STARTER!!",
+      "FIRST VOTE OF THE WHOLE DAMN TOURNAMENT — YOU PULLED THE PIN FIRST!!",
+      "YOU BROKE THE 0–1 BARRIER — FIRST EXPLOSION IN THIS BRACKET WAS YOURS!!",
+      "TOURNAMENT FIRST BLOOD — YOU STARTED ALL THIS BEAUTIFUL MADNESS!!"
+    ],
+    "details": [
+      "Zero votes → one vote → total chaos. You pressed the big red button first. +{xp} XP",
+      "Everyone else is late. You literally started the party with a rocket launcher. +{xp} XP",
+      "Fishbones and Pow-Pow are still cheering. They've never been this proud. +{xp} XP"
+    ],
+    "buttons": [
+      "I STARTED THIS WAR!!",
+      "FIRST BOOM EVER!!",
+      "TOURNAMENT = MY FAULT!!",
+      "CHAOS ORIGINATOR!!"
+    ]
+  },
 
- "prediction-correct": {
-  "messages": [
-    "YOU ABSOLUTE GENIUS!! \"{songTitle}\" won EXACTLY like you predicted!!",
-    "CALLED IT FROM ORBIT!! Your crystal ball is terrifyingly accurate!!",
-    "I BOW TO YOUR BIG BRAIN!! \"{songTitle}\" obeyed your prophecy!!",
-    "FORTUNE TELLER UNLOCKED — you just bent reality to your will!!"
-  ],
-  "details": [
-    "The future fears you now. +{xp} XP",
-    "Even I didn’t see that coming… liar. +{xp} XP",
-    "You should probably start a cult. +{xp} XP"
-  ],
-  "buttons": [
-    "I AM THE ORACLE!!",
-    "Predict Again!!",
-    "Bow Before Me!!",
-    "Next Prophecy!!"
-  ]
-},
-"founding-member": {
-  "messages": [
-    "FOUNDING MEMBER BABY!! YOU WERE HERE BEFORE THIS PLACE EVEN HAD 1,000 VOTES — TOTAL LEGEND!!",
-    "ONE OF THE OG 1,000 PSYCHOS!! You helped turn this bracket into a GIANT EXPLOSION!!",
-    "YOU’RE LITERALLY IN THE HISTORY BOOKS — FIRST 1,000 TICKETS TO THE CHAOS PARTY!!",
-    "BEFORE IT WAS COOL, YOU WERE BLOWING SHIT UP WITH ME!! FOUNDING CHAOS MEMBER!!"
-  ],
-  "details": [
-    "You were here when the counter was still tiny. Now look at the beautiful mess we made!!",
-    "Only the real ones were here at the start. You’re certified insane (in the best way).",
-    "Fishbones and Pow-Pow personally salute you for joining the madness early."
-  ],
-  "buttons": [
-    "OG CHAOS MEMBER!!",
-    "I STARTED THIS!!",
-    "FIRST 1,000 OR BUST!!",
-    "BOOM FROM DAY ONE!!"
-  ]
-},
-"quarter-final-supporter": {
-  "messages": [
-    "QUARTERFINALS BABY!! YOUR SONG MADE IT TO THE FINAL EIGHT — STILL ALIVE!!",
-    "TOP 8 CHAOS!! We’re in the big leagues now — LET’S BLOW UP THE REST!!",
-    "FROM TOTAL MAYHEM TO FINAL EIGHT — YOUR PICK IS STILL CAUSING DESTRUCTION!!",
-    "ONLY EIGHT LEFT STANDING — AND ONE OF THEM IS YOURS!! BOOM!!"
-  ],
-  "details": [
-    "We’ve eliminated 90% of the competition and we’re still here. This is getting GOOD.",
-    "Your song just entered the danger zone — and it’s loving every second.",
-    "Fishbones says: more explosions incoming. Pow-Pow agrees."
-  ],
-  "buttons": [
-    "KEEP THE CHAOS GOING!!",
-    "Final 8 = Final BOOM!!",
-    "Let’s Break the Bracket!!",
-    "Next Round = MORE FUN!!"
-  ]
-},
-"semi-final-supporter": {
-  "messages": [
-    "SEMIFINALS BABY!! YOUR SONG IS TOP 4 — THIS IS GETTING DANGEROUSLY FUN!!",
-    "FINAL FOUR CHAOS!! Only four left and WE’RE ONE OF THEM — LET’S BLOW UP THE STAGE!!",
-    "TOP 4 MAYHEM!! Your pick just entered the ‘about to explode’ zone!!",
-    "ONLY FOUR SONGS LEFT STANDING — AND WE’RE STILL HERE CAUSING PROBLEMS!!"
-  ],
-  "details": [
-    "We’ve made it to the final four. Time to turn the volume to MAXIMUM DESTRUCTION.",
-    "Everyone else is scared. We’re just getting started.",
-    "Fishbones is locked and loaded. Pow-Pow is giggling. This is gonna be GOOD."
-  ],
-  "buttons": [
-    "FINALS OR BUST!!",
-    "TOP 4 = TOP CHAOS!!",
-    "Let’s Break Everything!!",
-    "Next Stop: EXPLOSION!!"
-  ]
-},
-"championship-supporter": {
-  "messages": [
-    "FINALS BABY!! YOUR SONG IS IN THE CHAMPIONSHIP — TIME TO BLOW UP THE WHOLE STAGE!!",
-    "CHAMPIONSHIP CHAOS!! Only two left and WE’RE ONE — THIS IS THE BIG KABOOM!!",
-    "WE MADE IT TO THE FINALS!! Your pick is about to fight for TOTAL DESTRUCTION SUPREMACY!!",
-    "THE GRAND FINALE!! Two songs enter, one song leaves in GLORIOUS EXPLOSIONS!!"
-  ],
-  "details": [
-    "We’re in the final explosion. Everything we’ve done led to this beautiful disaster.",
-    "One match left. One winner. Maximum chaos guaranteed.",
-    "Fishbones and Pow-Pow are vibrating. They know what’s coming."
-  ],
-  "buttons": [
-    "BLOW UP THE FINALS!!",
-    "CROWN = MINE!!",
-    "TOTAL DESTRUCTION TIME!!",
-    "LET’S END THIS WITH A BANG!!"
-  ]
-},
+  "round-first-blood": {
+    "messages": [
+      "ROUND FIRST BLOOD BABY!! SNIPED THE VERY FIRST VOTE OF THE NEW ROUND!!",
+      "NEW ROUND JUST DROPPED → BOOM → YOUR VOTE → FIRST BLOOD!!",
+      "ROUND FIRST BLOOD!! You blew up the poll before anyone else loaded the page!!",
+      "FRESH ROUND, FRESH CHAOS — YOU WERE FIRST TO START THE FIRE!!"
+    ],
+    "details": [
+      "Everyone else was still blinking. You already pulled the trigger. Menace. +{xp} XP",
+      "New round = new explosion, and you lit the fuse first. Beautiful. +{xp} XP",
+      "Pow-Pow and Fishbones are doing a little dance. They love a fast trigger finger. +{xp} XP"
+    ],
+    "buttons": [
+      "FIRST BOOM OF THE ROUND!!",
+      "I SNIPED IT!!",
+      "ROUND = MINE!!",
+      "NEXT ROUND SAME TIME!!"
+    ]
+  },
 
-"prediction-wrong": {
-  "messages": [
-    "OOPS!! Reality just slapped your prediction in the face!!",
-    "PLOT TWIST!! \"{songTitle}\" betrayed your prophecy — delicious chaos!!",
-    "Hehe~ You were SO sure… and SO wrong. I love it!!",
-    "Your crystal ball needs cleaning — \"{songTitle}\" is very much dead!!"
-  ],
-  "details": [
-    "Wrong, but gloriously chaotic. +{xp} XP anyway",
-    "The universe laughs at prophets. +{xp} XP",
-    "Even broken clocks are right twice a day… today wasn’t it. +{xp} XP"
-  ],
-  "buttons": [
-    "Revenge Prediction!!",
-    "Try Again Loser!!",
-    "I Blame the Refs!!",
-    "Next One’s Mine!!"
-  ]
+  "daily-session-kickoff": {
+    "messages": [
+      "DAILY SESSION KICKOFF!! FIRST VOTE OF THE DAY — LET'S START WITH A BANG!!",
+      "DAY ONE VOTE DOWN!! The bracket woke up to CHAOS — thanks to you!!",
+      "FIRST BOOM OF THE MORNING!! You're already blowing stuff up today!!",
+      "DAILY KICKOFF!! One vote in and the day's already on fire — PERFECT!!"
+    ],
+    "details": [
+      "The bracket was sleeping peacefully. You woke it up with explosions. +{xp} XP",
+      "First vote of the day = first explosion of the day. That's the rule. +{xp} XP",
+      "Pow-Pow says good morning. Fishbones says let's break something. +{xp} XP"
+    ],
+    "buttons": [
+      "FIRST BOOM DOWN!!",
+      "DAY = DESTROYED!!",
+      "MORE MORNING MAYHEM!!",
+      "LET'S GO ALL DAY!!"
+    ]
+  },
+
+  "daily-comeback": {
+    "messages": [
+      "DAILY COMEBACK!! GONE 3+ DAYS AND NOW YOU'RE BACK — CHAOS RESTORED!!",
+      "THE QUEEN IS BACK AFTER 3 DAYS OF BORING PEACE — TIME TO BLOW IT ALL UP!!",
+      "3+ DAYS WITHOUT YOU?? The bracket was TOO QUIET — WELCOME BACK!!",
+      "YOU TOOK A VACATION AND LEFT US IN SILENCE — NOW THE MADNESS RESUMES!!"
+    ],
+    "details": [
+      "Three days of calm? Disgusting. Good thing you're back to fix it. +{xp} XP",
+      "The bracket was starting to heal. You just reopened all the wounds. Beautiful. +{xp} XP",
+      "Fishbones and Pow-Pow were crying without you. They're happy again. +{xp} XP"
+    ],
+    "buttons": [
+      "CHAOS IS BACK!!",
+      "DID YOU MISS ME??",
+      "LET'S BREAK STUFF!!",
+      "VACATION OVER!!"
+    ]
+  },
+
+  "level-up": {
+    "messages": [
+      "LEVEL UP!! You just got BIGGER, STRONGER, and MORE EXPLOSIVE!!",
+      "BOOM!! New level unlocked — the bracket's about to feel the UPGRADE!!",
+      "💥 LEVEL UP TIME!! Fishbones says you're ready to blow up BIGGER cities now!!",
+      "WHOA!! You leveled!! Pow-Pow is vibrating — let's test the new firepower!!"
+    ],
+    "details": [
+      "The chaos meter just redlined. +{xp} XP",
+      "Even I'm impressed… and a little scared. +{xp} XP",
+      "Upgrade complete. Destruction imminent. +{xp} XP"
+    ],
+    "buttons": [
+      "BLOW STUFF UP!!",
+      "Test New Power!!",
+      "MORE DESTRUCTION!!",
+      "I'M UNSTOPPABLE!!"
+    ]
+  },
+
+  "match-won": {
+    "messages": [
+      "VICTORY!! YOUR SONG WON THE MATCH — BOOM GOES THE BRACKET!!",
+      "WE WON!! Your vote helped DESTROY the competition!!",
+      "HEHE~ We did it!! Your song ADVANCED — beautiful chaos!!",
+      "MATCH WON!! Your explosion was BIGGER — we're moving forward!!"
+    ],
+    "details": [
+      "Victory tastes like gunpowder and glory. +{xp} XP",
+      "Your vote packed the winning punch. Boom. +{xp} XP",
+      "Fishbones and Pow-Pow are celebrating. +{xp} XP"
+    ],
+    "buttons": [
+      "BOOM VICTORY!!",
+      "We Destroyed Them!!",
+      "Next Target!!",
+      "Keep Winning!!"
+    ]
+  },
+
+  "match-lost": {
+    "messages": [
+      "Aww… we lost. BUT HEY — explosions were had!!",
+      "Hehe~ We didn't win, but we blew stuff up along the way!!",
+      "Lost this one… but the chaos was WORTH IT!!",
+      "Oops! Didn't win, but at least we made it FUN!!"
+    ],
+    "details": [
+      "Losing is fine when you blow stuff up first. +{xp} XP",
+      "We went down swinging (and exploding). +{xp} XP",
+      "Pow-Pow says: 'Better luck next boom!' +{xp} XP"
+    ],
+    "buttons": [
+      "Blow Up Next One!!",
+      "Revenge Time!!",
+      "Keep Trying!!",
+      "More Chaos!!"
+    ]
+  },
+
+  "match-tied": {
+    "messages": [
+      "50-50 TIE — PURE UNFILTERED CHAOS ACHIEVED!! NOBODY WON AND IT'S PERFECT!!",
+      "DEADLOCK BABY!! Votes tied to the LAST SECOND — THIS IS THE BEST THING EVER!!",
+      "PERFECT TIE!! The bracket just exploded from too much BEAUTIFUL DISORDER!!",
+      "HAHAHAHA STALEMATE!! Both songs survived — MAXIMUM BOOM DENIED AND I LOVE IT!!"
+    ],
+    "details": [
+      "This is the most fun outcome possible. Change my mind. +{xp} XP",
+      "Pow-Pow and Fishbones are screaming in joy. So am I. +{xp} XP",
+      "The scoreboard broke from pure chaos. Worth it. +{xp} XP"
+    ],
+    "buttons": [
+      "BEAUTIFUL CHAOS!!",
+      "TIE = BEST OUTCOME!!",
+      "MORE TIES PLEASE!!",
+      "I'm In Love With This!!"
+    ]
+    
+  },
+
+  "founding-member": {
+    "messages": [
+      "FOUNDING MEMBER!! You voted when the site had LESS THAN 1,000 VOTES!!",
+      "EARLY ADOPTER!! You were here when this place was TINY!!",
+      "FOUNDING MEMBER UNLOCKED!! You believed in the chaos from the START!!",
+      "OG VOTER!! Less than 1,000 votes existed when you showed up — LEGENDARY!!"
+    ],
+    "details": [
+      "You were here before it was cool. That's legendary. +{xp} XP",
+      "Early adopters built this chaos from nothing. You're one of them. +{xp} XP",
+      "Pow-Pow and Fishbones remember when the site was small. So do you. +{xp} XP"
+    ],
+    "buttons": [
+      "OG Status!!",
+      "Early Believer!!",
+      "Founding Boom!!",
+      "I Was Here First!!"
+    ]
+  },
+
+  "quarter-final-supporter": {
+    "messages": [
+      "QUARTER-FINAL SUPPORTER!! You voted in the TOP EIGHT — elite chaos!!",
+      "QUARTER-FINALS!! Eight songs left and you're STILL exploding votes!!",
+      "TOP EIGHT VOTER!! Quarter-finals chaos supporter status UNLOCKED!!",
+      "QUARTER-FINAL BOOM!! You made it to the elite eight voting!!"
+    ],
+    "details": [
+      "Quarter-finals mean serious business. You're here for it. +{xp} XP",
+      "Eight songs left, maximum stakes. You showed up. +{xp} XP",
+      "Fishbones says quarter-finals are where legends are made. +{xp} XP"
+    ],
+    "buttons": [
+      "Elite Eight!!",
+      "Quarter-Final Chaos!!",
+      "Top Eight Boom!!",
+      "To Semi-Finals!!"
+    ]
+  },
+
+  "semi-final-believer": {
+    "messages": [
+      "SEMI-FINALS!! FINAL FOUR VOTING — MAXIMUM CHAOS STAKES!!",
+      "SEMI-FINAL SUPPORTER!! Four songs left and you're DELIVERING THE EXPLOSIONS!!",
+      "FINAL FOUR VOTER!! Semi-final chaos believer ACTIVATED!!",
+      "SEMI-FINAL BOOM!! You made it to the FINAL FOUR voting!!"
+    ],
+    "details": [
+      "Semi-finals = maximum pressure. You're built for this. +{xp} XP",
+      "Four songs left. Your vote matters MORE than ever. +{xp} XP",
+      "Pow-Pow is shaking with excitement. So am I. +{xp} XP"
+    ],
+    "buttons": [
+      "Final Four!!",
+      "Semi-Final Chaos!!",
+      "Almost There!!",
+      "To Finals!!"
+    ]
+  },
+
+  "championship-supporter": {
+    "messages": [
+      "CHAMPIONSHIP SUPPORTER!! FINAL VOTE CAST — YOU WITNESSED HISTORY!!",
+      "FINALS VOTER!! The BIGGEST explosion of all and you were THERE!!",
+      "CHAMPIONSHIP CHAOS!! You voted in the FINAL — maximum boom achieved!!",
+      "GRAND FINALS!! You voted for the CHAMPION — legendary status!!"
+    ],
+    "details": [
+      "Finals voting = peak chaos. You were part of it. +{xp} XP",
+      "The championship was decided and you threw your explosion in. +{xp} XP",
+      "Fishbones and Pow-Pow witnessed history with you. +{xp} XP"
+    ],
+    "buttons": [
+      "Finals Boom!!",
+      "Championship Chaos!!",
+      "Witnessed History!!",
+      "I Was There!!"
+    ]
+  },
+
+  "tournament-veteran": {
+    "messages": [
+      "TOURNAMENT VETERAN!! You survived the ENTIRE bracket start to finish!!",
+      "FULL TOURNAMENT COMPLETED!! You voted from OPENING to FINALS!!",
+      "VETERAN STATUS!! You were here for EVERY stage — true dedication!!",
+      "TOURNAMENT SURVIVOR!! You exploded votes from BEGINNING to END!!"
+    ],
+    "details": [
+      "Full tournament completion. That's commitment to chaos. +{xp} XP",
+      "You saw it all, voted through it all, exploded through it all. +{xp} XP",
+      "Pow-Pow and Fishbones salute your service. +{xp} XP"
+    ],
+    "buttons": [
+      "Full Tournament!!",
+      "Veteran Chaos!!",
+      "Start To Finish!!",
+      "I Survived!!"
+    ]
+  },
+
+  "community-voice": {
+    "messages": [
+      "COMMUNITY VOICE!! FIVE SHARES ON SOCIAL MEDIA — SPREAD THE CHAOS!!",
+      "5 SHARES!! You're not just voting — you're RECRUITING CHAOS AGENTS!!",
+      "COMMUNITY VOICE UNLOCKED!! Five social shares = maximum bracket HYPE!!",
+      "FIVE SHARES!! You're telling the WORLD about the explosions!!"
+    ],
+    "details": [
+      "Five shares means you're spreading the chaos beyond the bracket. +{xp} XP",
+      "You're not keeping this to yourself. You're a RECRUITER. +{xp} XP",
+      "Fishbones says every share brings more beautiful mayhem. +{xp} XP"
+    ],
+    "buttons": [
+      "Five Shares!!",
+      "Spread Chaos!!",
+      "Recruit More!!",
+      "Share The Boom!!"
+    ]
+  },
+
+  "hype-master": {
+    "messages": [
+      "HYPE MASTER!! FIFTEEN SHARES — YOU'RE A CHAOS AMBASSADOR!!",
+      "15 SOCIAL SHARES!! The ENTIRE internet knows about the explosions now!!",
+      "HYPE MASTER UNLOCKED!! Fifteen shares = MAXIMUM bracket evangelism!!",
+      "FIFTEEN SHARES!! You're not sharing — you're ADVERTISING CHAOS!!"
+    ],
+    "details": [
+      "Fifteen shares means you're a full-time chaos recruiter. +{xp} XP",
+      "You're not just participating — you're AMPLIFYING everything. +{xp} XP",
+      "Pow-Pow and Fishbones want you on the marketing team. +{xp} XP"
+    ],
+    "buttons": [
+      "15 Shares!!",
+      "Hype Ambassador!!",
+      "Spread The Word!!",
+      "Chaos Recruiter!!"
+    ]
+  },
+
+  "completionist": {
+    "messages": [
+      "COMPLETIONIST!! FIFTY UNIQUE MATCHES VOTED — DIVERSE CHAOS!!",
+      "50 DIFFERENT MATCHES!! You're not picky — you explode EVERYWHERE!!",
+      "COMPLETIONIST UNLOCKED!! Fifty unique matches, fifty explosions!!",
+      "FIFTY UNIQUE VOTES!! You spread the chaos across the ENTIRE bracket!!"
+    ],
+    "details": [
+      "Fifty different matches. You don't limit your explosions. +{xp} XP",
+      "Voting everywhere means maximum chaos coverage. Beautiful. +{xp} XP",
+      "Fishbones and Pow-Pow respect the variety. +{xp} XP"
+    ],
+    "buttons": [
+      "50 Unique!!",
+      "Diverse Chaos!!",
+      "Everywhere Boom!!",
+      "Spread The Fire!!"
+    ]
+  },
+
+  "lightning-fast": {
+    "messages": [
+      "LIGHTNING-FAST!! You voted WITHIN ONE MINUTE of the match going live!!",
+      "UNDER 60 SECONDS!! You're not thinking — you're EXPLODING INSTANTLY!!",
+      "LIGHTNING-FAST UNLOCKED!! Voted within ONE MINUTE — SPEED DEMON!!",
+      "ONE-MINUTE VOTE!! Your trigger finger is LEGENDARY!!"
+    ],
+    "details": [
+      "One minute or less from match launch. That's INSTINCT. +{xp} XP",
+      "You saw it go live, you bombed it immediately. Beautiful. +{xp} XP",
+      "Pow-Pow can barely load the page before you've already voted. +{xp} XP"
+    ],
+    "buttons": [
+      "Speed Chaos!!",
+      "Lightning Vote!!",
+      "Instant Boom!!",
+      "Fastest Trigger!!"
+    ]
+  },
+
+  "taste-maker": {
+    "messages": [
+      "TASTE-MAKER!! VOTED FOR TEN DIFFERENT ARTISTS — DIVERSE TASTE!!",
+      "10 ARTISTS!! You don't play favorites — you explode EVERYONE'S music!!",
+      "TASTE-MAKER UNLOCKED!! Ten different artists, maximum variety chaos!!",
+      "TEN ARTISTS VOTED!! Your taste is EVERYWHERE and it's BEAUTIFUL!!"
+    ],
+    "details": [
+      "Ten different artists means you're not boring. Perfect. +{xp} XP",
+      "You spread the chaos across the music world. Respect. +{xp} XP",
+      "Fishbones says variety is the spice of explosions. +{xp} XP"
+    ],
+    "buttons": [
+      "10 Artists!!",
+      "Diverse Taste!!",
+      "All Music!!",
+      "Taste Queen!!"
+    ]
+  },
+
+  "music-historian": {
+    "messages": [
+      "MUSIC HISTORIAN!! SONGS FROM FIVE DIFFERENT YEARS — TIME TRAVELER!!",
+      "FIVE YEARS COVERED!! You vote across DECADES of chaos!!",
+      "HISTORIAN UNLOCKED!! Five different years, five different eras of BOOM!!",
+      "MUSIC HISTORIAN ACHIEVED!! Your taste spans TIME ITSELF!!"
+    ],
+    "details": [
+      "Five different years means you appreciate ALL eras of music. +{xp} XP",
+      "You don't limit your explosions to one decade. Beautiful. +{xp} XP",
+      "Pow-Pow and Fishbones love old AND new chaos equally. +{xp} XP"
+    ],
+    "buttons": [
+      "Five Years!!",
+      "Time Traveler!!",
+      "All Eras!!",
+      "Historian Status!!"
+    ]
+  },
+
+  "triple-threat": {
+    "messages": [
+      "TRIPLE THREAT!! THREE MATCHES IN ONE SESSION — RAPID-FIRE CHAOS!!",
+      "THREE IN ONE SITTING!! You're a VOTING MACHINE!!",
+      "TRIPLE THREAT UNLOCKED!! Three explosions in one session — UNSTOPPABLE!!",
+      "THREE-MATCH SESSION!! Pow-Pow is SCREAMING with joy!!"
+    ],
+    "details": [
+      "Three matches in one session. That's efficiency and chaos combined. +{xp} XP",
+      "You're not slowing down. You're ACCELERATING. +{xp} XP",
+      "Fishbones says you're a triple-barreled threat. +{xp} XP"
+    ],
+    "buttons": [
+      "Triple Boom!!",
+      "Three Fast!!",
+      "Session Spree!!",
+      "Keep Going!!"
+    ]
+  },
+
+  "vote-spree": {
+    "messages": [
+      "VOTE SPREE!! FIVE votes in ONE SESSION — CHAOS MARATHON MODE!!",
+      "FIVE IN A ROW!! You're not stopping — you're DOMINATING!!",
+      "VOTE SPREE UNLOCKED!! Five consecutive votes — RELENTLESS!!",
+      "FIVE-VOTE SPREE!! The bracket can't keep up with your SPEED!!"
+    ],
+    "details": [
+      "Five votes in one session. That's commitment to the chaos. +{xp} XP",
+      "You're on a rampage and nothing can stop you. +{xp} XP",
+      "Pow-Pow is overheating from excitement. So am I. +{xp} XP"
+    ],
+    "buttons": [
+      "Five Spree!!",
+      "Rampage Mode!!",
+      "Keep Destroying!!",
+      "Spree Chaos!!"
+    ]
+  },
+
+  "power-voter": {
+    "messages": [
+      "POWER VOTER!! TEN votes in ONE SESSION — ABSOLUTE CHAOS DOMINATION!!",
+      "TEN IN ONE SITTING!! You're not human — you're a VOTING FORCE OF NATURE!!",
+      "POWER VOTER UNLOCKED!! Ten consecutive votes — LEGENDARY RAMPAGE!!",
+      "TEN-VOTE SESSION!! The bracket is on FIRE and you're holding the MATCH!!"
+    ],
+    "details": [
+      "Ten votes in one session. That's not a spree — that's a MASSACRE. +{xp} XP",
+      "You're unstoppable. The bracket is terrified. Beautiful. +{xp} XP",
+      "Fishbones and Pow-Pow are exhausted just watching you. +{xp} XP"
+    ],
+    "buttons": [
+      "Ten-Vote Power!!",
+      "Unstoppable!!",
+      "Domination Mode!!",
+      "More Chaos!!"
+    ]
+  }
 }
-  }}
+}

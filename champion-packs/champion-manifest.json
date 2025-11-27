@@ -28,6 +28,16 @@
       "description": "Positive energy and magical encouragement!",
       "enabled": true,
       "comingSoon": false
+    },
+    {
+      "id": "vi",
+      "name": "Vi",
+      "displayName": "Punch First, Ask Later 👊",
+      "emoji": "👊",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Vi.png",
+      "description": "Street-tough, no-nonsense, and ready to throw down. Your votes hit harder than her gauntlets!",
+      "enabled": true,
+      "comingSoon": false
     }
   ]
 }
