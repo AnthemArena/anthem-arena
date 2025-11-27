@@ -259,41 +259,172 @@ document.addEventListener('contextmenu', (e) => {
     // ============================================
     // CHARACTER SELECTION
     // ============================================
+// ============================================
+// CHARACTER SELECTION WITH LOADING
+// ============================================
 
-    selectCharacter(characterId) {
-        this.selectedCharacter = characterId;
-        
-        // Opponent is the other character
-        this.opponentCharacter = characterId === 'caitlyn' ? 'jinx' : 'caitlyn';
-        
-        // Show quote
-        this.showQuote(this.selectedCharacter, 'welcome');
-        
-        // Proceed to ship placement after brief delay
-        setTimeout(() => {
-            this.showShipPlacement();
-        }, 2000);
+selectCharacter(characterId) {
+    this.selectedCharacter = characterId;
+    
+    // Opponent is the other character
+    this.opponentCharacter = characterId === 'caitlyn' ? 'jinx' : 'caitlyn';
+    
+    // Add selected state to card
+    const selectedCard = document.querySelector(`.character-card[data-character="${characterId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
     }
+    
+    // Disable all cards
+    document.querySelectorAll('.character-card').forEach(card => {
+        card.style.pointerEvents = 'none';
+    });
+    
+    // Show welcome quote
+    this.showQuote(this.selectedCharacter, 'welcome');
+    
+    // Show loading screen
+    setTimeout(() => {
+        this.showLoadingScreen();
+    }, 1500);
+    
+    // Proceed to ship placement after loading
+    setTimeout(() => {
+        this.hideLoadingScreen();
+        this.showShipPlacement();
+    }, 4000);
+}
+
+showLoadingScreen() {
+    const loadingScreen = document.createElement('div');
+    loadingScreen.id = 'matchLoadingScreen';
+    loadingScreen.className = 'match-loading';
+    
+    const playerData = this.characters[this.selectedCharacter];
+    const opponentData = this.characters[this.opponentCharacter];
+    
+    loadingScreen.innerHTML = `
+        <div class="loading-content">
+            <div class="loading-versus">
+                <!-- Player Side -->
+                <div class="loading-champion player-side">
+                    <div class="champion-portrait">
+                        <img src="${this.getChampionSplash(playerData.championKey, playerData.skinNumber)}" 
+                             alt="${playerData.displayName}">
+                        <div class="champion-overlay" style="background: linear-gradient(to right, transparent, ${playerData.color}20);"></div>
+                    </div>
+                    <div class="champion-info">
+                        <h2>${playerData.emoji} ${playerData.displayName}</h2>
+                        <p>${playerData.title}</p>
+                        <div class="champion-tag">YOU</div>
+                    </div>
+                </div>
+                
+                <!-- VS Badge -->
+                <div class="vs-badge">
+                    <span>VS</span>
+                </div>
+                
+                <!-- Opponent Side -->
+                <div class="loading-champion opponent-side">
+                    <div class="champion-info">
+                        <h2>${opponentData.emoji} ${opponentData.displayName}</h2>
+                        <p>${opponentData.title}</p>
+                        <div class="champion-tag">OPPONENT</div>
+                    </div>
+                    <div class="champion-portrait">
+                        <img src="${this.getChampionSplash(opponentData.championKey, opponentData.skinNumber)}" 
+                             alt="${opponentData.displayName}">
+                        <div class="champion-overlay" style="background: linear-gradient(to left, transparent, ${opponentData.color}20);"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading Bar -->
+            <div class="loading-bar-container">
+                <div class="loading-label">PREPARING BATTLEFIELD</div>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <div class="loading-tips">
+                    <p class="loading-tip">${this.getRandomTip()}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(loadingScreen);
+    
+    // Animate in
+    setTimeout(() => {
+        loadingScreen.classList.add('show');
+    }, 50);
+}
+
+hideLoadingScreen() {
+    const loadingScreen = document.getElementById('matchLoadingScreen');
+    if (loadingScreen) {
+        loadingScreen.classList.remove('show');
+        setTimeout(() => {
+            loadingScreen.remove();
+        }, 500);
+    }
+}
+
+getRandomTip() {
+    const tips = [
+        "💡 Tip: Use Caitlyn's ultimate to reveal a 3x3 area on the enemy grid",
+        "💡 Tip: Jinx's Fishbones explodes on every 3rd hit",
+        "💡 Tip: Right-click to rotate ships during placement",
+        "💡 Tip: Hit all parts of a ship to sink it completely",
+        "💡 Tip: Adjacent cells are revealed when Caitlyn hits a ship",
+        "💡 Tip: Place ships in corners to make them harder to find",
+        "💡 Tip: The AI gets smarter on higher difficulties",
+        "💡 Tip: Spread your ships out to avoid cluster hits",
+        "💡 Tip: Each ship has a different size - plan accordingly",
+        "💡 Tip: Ultimate abilities can only be used once per game"
+    ];
+    return tips[Math.floor(Math.random() * tips.length)];
+}
 
     // ============================================
     // SHIP PLACEMENT
     // ============================================
 
-    showShipPlacement() {
-        this.showScreen('shipPlacement');
-        this.currentShipIndex = 0;
-        this.playerShipsPlaced = [];
-        this.isHorizontal = true;
-        
-        // Reset game
-        game.reset();
-        
-        // Create placement grid
-        this.createPlacementGrid();
-        
-        // Highlight first ship
-        this.updateShipSelector();
+   showShipPlacement() {
+    this.showScreen('shipPlacement');
+    this.currentShipIndex = 0;
+    this.playerShipsPlaced = [];
+    this.isHorizontal = true;
+    
+    // Reset game
+    game.reset();
+    
+    // ✅ ADD THIS: Reset UI visibility
+    if (this.elements.currentShipPreview) {
+        this.elements.currentShipPreview.style.display = 'block';
     }
+    if (this.elements.shipSelector) {
+        this.elements.shipSelector.style.display = 'flex';
+    }
+    if (this.elements.randomPlacementBtn) {
+        this.elements.randomPlacementBtn.style.display = 'block';
+    }
+    
+    // Reset instructions
+    const instructionsEl = document.querySelector('.placement-instructions');
+    if (instructionsEl) {
+        instructionsEl.innerHTML = `
+            <p>Click to place ships. Right-click to rotate.</p>
+        `;
+    }
+    
+    // Create placement grid
+    this.createPlacementGrid();
+    
+    // Highlight first ship
+    this.updateShipSelector();
+}
 
     createPlacementGrid() {
         this.elements.placementGrid.innerHTML = '';
@@ -348,37 +479,38 @@ document.addEventListener('contextmenu', (e) => {
         }
     }
 
-    placePlayerShip(row, col) {
-        if (this.currentShipIndex >= game.ships.length) return;
+   placePlayerShip(row, col) {
+    if (this.currentShipIndex >= game.ships.length) return;
 
-        const currentShip = game.ships[this.currentShipIndex];
-        const placed = game.placeShip(
-            game.playerGrid, 
-            game.playerShips, 
-            currentShip, 
-            row, 
-            col, 
-            this.isHorizontal
-        );
+    const currentShip = game.ships[this.currentShipIndex];
+    const placed = game.placeShip(
+        game.playerGrid, 
+        game.playerShips, 
+        currentShip, 
+        row, 
+        col, 
+        this.isHorizontal
+    );
 
-        if (placed) {
-            // Update visual grid
-            this.updatePlacementGrid();
-            
-            // Mark ship as placed
-            this.playerShipsPlaced.push(currentShip.name);
-            
-            // Move to next ship
-            this.currentShipIndex++;
-            this.updateShipSelector();
-            
-            // Check if all ships placed
-            if (this.currentShipIndex >= game.ships.length) {
-                this.elements.startGameBtn.disabled = false;
-                this.showQuote(this.selectedCharacter, 'ships_placed');
-            }
+    if (placed) {
+        // Update visual grid
+        this.updatePlacementGrid();
+        
+        // Mark ship as placed
+        this.playerShipsPlaced.push(currentShip.name);
+        
+        // Move to next ship
+        this.currentShipIndex++;
+        this.updateShipSelector();
+        
+        // ✅ ADD THIS: Check if all ships placed
+        if (this.currentShipIndex >= game.ships.length) {
+            this.hideShipPlacementUI();  // ← NEW LINE
+            this.elements.startGameBtn.disabled = false;
+            this.showQuote(this.selectedCharacter, 'ships_placed');
         }
     }
+}
 
     updatePlacementGrid() {
         for (let row = 0; row < game.gridSize; row++) {
@@ -442,6 +574,39 @@ updateShipPreview() {
     }
 }
 
+// ============================================
+// HIDE SHIP PLACEMENT UI WHEN COMPLETE
+// ============================================
+
+hideShipPlacementUI() {
+    // Hide ship preview
+    if (this.elements.currentShipPreview) {
+        this.elements.currentShipPreview.style.display = 'none';
+    }
+    
+    // Hide ship selector
+    if (this.elements.shipSelector) {
+        this.elements.shipSelector.style.display = 'none';
+    }
+    
+    // Hide random placement button
+    if (this.elements.randomPlacementBtn) {
+        this.elements.randomPlacementBtn.style.display = 'none';
+    }
+    
+    // Show completion message
+    const instructionsEl = document.querySelector('.placement-instructions');
+    if (instructionsEl) {
+        instructionsEl.innerHTML = `
+            <p class="fleet-ready">
+                ✅ <strong>Fleet Deployed!</strong> All ships in position.
+            </p>
+        `;
+    }
+    
+    console.log('✅ All ships placed - UI hidden');
+}
+
     randomPlacement() {
         // Clear existing placement
         game.playerGrid = game.createEmptyGrid();
@@ -465,11 +630,11 @@ updateShipPreview() {
     // BATTLE SCREEN
     // ============================================
 
-   startBattle() {
+startBattle() {
     // Place enemy ships randomly
     game.placeShipsRandomly(game.enemyGrid, game.enemyShips);
     
-    // Initialize AI (using imported class)
+    // Initialize AI
     aiOpponent = new BattleshipAI(this.difficulty);
     
     // Start game
@@ -481,8 +646,14 @@ updateShipPreview() {
     this.setupBattleScreen();
     this.createBattleGrids();
     
-    // Show start quote
+    // Show game start quote
     this.showQuote(this.selectedCharacter, 'game_start');
+    
+    // Show first turn announcement after delay
+    setTimeout(() => {
+        this.showTurnAnnouncement(this.selectedCharacter, true);
+        this.updateTurnIndicator('player');
+    }, 2500);
 }
 
   setupBattleScreen() {
@@ -511,26 +682,26 @@ updateShipPreview() {
     this.setupAbilities();
 }
 
-   setupAbilities() {
+  setupAbilities() {
     const abilityData = {
         caitlyn: {
             passive: {
-                name: 'Headshot',
-                description: 'Reveals adjacent cells around each hit'
+                name: 'Precision',  // ← Changed from 'Headshot'
+                description: 'Automatically reveals adjacent cells when you hit a ship (Passive - Always Active)'
             },
             ultimate: {
                 name: 'Ace in the Hole',
-                description: 'Reveals a 3x3 area on the enemy grid'
+                description: 'Reveals a 3x3 area on the enemy grid (One-Time Use)'
             }
         },
         jinx: {
             passive: {
-                name: 'Fishbones',
-                description: 'Every 3rd hit causes an explosion in adjacent cells'
+                name: 'Get Excited!',  // ← Jinx's actual passive name
+                description: 'Every 3rd hit causes an explosion in adjacent cells (Passive - Always Active)'
             },
             ultimate: {
                 name: 'Super Mega Death Rocket',
-                description: 'Fires 5 random shots at the enemy fleet'
+                description: 'Fires 5 random shots at the enemy fleet (One-Time Use)'
             }
         }
     };
@@ -539,6 +710,7 @@ updateShipPreview() {
     
     if (this.elements.ability1) {
         this.elements.ability1.querySelector('.ability-name').textContent = abilities.passive.name;
+        this.elements.ability1.querySelector('.ability-cooldown').textContent = 'Passive';
         
         // Update tooltip
         let tooltip = this.elements.ability1.querySelector('.ability-tooltip');
@@ -552,6 +724,7 @@ updateShipPreview() {
     
     if (this.elements.ability2) {
         this.elements.ability2.querySelector('.ability-name').textContent = abilities.ultimate.name;
+        this.elements.ability2.querySelector('.ability-uses').textContent = '1 Use';
         
         // Update tooltip
         let tooltip = this.elements.ability2.querySelector('.ability-tooltip');
@@ -603,130 +776,265 @@ updateShipPreview() {
     }
 
     // ============================================
+// TURN ANNOUNCEMENTS & FLOW
+// ============================================
+
+showTurnAnnouncement(character, isPlayer) {
+    const announcement = document.createElement('div');
+    announcement.className = 'turn-announcement';
+    announcement.innerHTML = `
+        <div class="turn-announcement-content">
+            <h2>${this.characters[character].emoji} ${this.characters[character].displayName}'S TURN!</h2>
+        </div>
+    `;
+    
+    document.body.appendChild(announcement);
+    
+    // Animate in
+    setTimeout(() => {
+        announcement.classList.add('show');
+    }, 50);
+    
+    // Remove after animation
+    setTimeout(() => {
+        announcement.classList.remove('show');
+        setTimeout(() => {
+            announcement.remove();
+        }, 500);
+    }, 1500);
+}
+
+showShotAnnouncement(character, row, col, hit) {
+    const announcement = document.createElement('div');
+    announcement.className = 'shot-announcement';
+    
+    const coords = this.getCoordinateLabel(row, col);
+    const resultText = hit ? '💥 HIT!' : '💦 MISS!';
+    const resultClass = hit ? 'hit-result' : 'miss-result';
+    
+    announcement.innerHTML = `
+        <div class="shot-announcement-content ${resultClass}">
+            <p class="shooter">${this.characters[character].displayName}</p>
+            <p class="target">fires at ${coords}!</p>
+            <p class="result">${resultText}</p>
+        </div>
+    `;
+    
+    document.body.appendChild(announcement);
+    
+    // Animate in
+    setTimeout(() => {
+        announcement.classList.add('show');
+    }, 50);
+    
+    // Remove after animation
+    setTimeout(() => {
+        announcement.classList.remove('show');
+        setTimeout(() => {
+            announcement.remove();
+        }, 500);
+    }, 2000);
+}
+
+getCoordinateLabel(row, col) {
+    const letters = 'ABCDEFGHIJ';
+    return `${letters[col]}${row + 1}`;
+}
+
+    // ============================================
     // COMBAT
     // ============================================
 
-    playerAttack(row, col) {
-        if (game.currentTurn !== 'player' || !game.gameActive) return;
+    async playerAttack(row, col) {
+    if (game.currentTurn !== 'player' || !game.gameActive) return;
 
-        const result = game.playerShoot(row, col);
+    const result = game.playerShoot(row, col);
+    
+    if (!result.valid) return;
+
+    // 1. PRE-SHOT QUOTE (before showing result)
+    const preShotQuotes = ['taking_shot', 'attacking'];
+    this.showQuote(this.selectedCharacter, preShotQuotes[Math.floor(Math.random() * preShotQuotes.length)]);
+    
+    await this.delay(1500);
+
+    // 2. SHOT ANNOUNCEMENT
+    this.showShotAnnouncement(this.selectedCharacter, row, col, result.hit);
+    
+    await this.delay(1000);
+
+    // 3. UPDATE VISUAL
+    const cell = this.elements.enemyGrid.querySelector(
+        `[data-row="${row}"][data-col="${col}"]`
+    );
+    
+    if (result.hit) {
+        cell.classList.add('hit');
         
-        if (!result.valid) return;
-
-        // Update enemy grid visual
-        const cell = this.elements.enemyGrid.querySelector(
-            `[data-row="${row}"][data-col="${col}"]`
-        );
+        await this.delay(500);
         
-        if (result.hit) {
-            cell.classList.add('hit');
-            this.showQuote(this.selectedCharacter, 'hit');
-            
-            // Character-specific abilities
-            if (this.selectedCharacter === 'caitlyn') {
-                // Headshot passive: reveal adjacent
-                const revealed = game.caitlynHeadshotPassive(row, col);
-                this.visualizeRevealedCells(revealed);
-            } else if (this.selectedCharacter === 'jinx') {
-                // Fishbones: explosion on every 3rd hit
-                this.jinxHitCounter++;
-                if (this.jinxHitCounter % 3 === 0) {
-                    setTimeout(() => {
-                        this.showQuote('jinx', 'fishbones_proc');
-                        const explosionResults = game.jinxFishbonesExplosion(row, col);
-                        this.visualizeExplosion(explosionResults);
-                    }, 1000);
-                }
+        // 4. PLAYER REACTION
+        this.showQuote(this.selectedCharacter, 'hit');
+        
+        await this.delay(800);
+        
+        // 5. OPPONENT REACTION (getting hit)
+        this.showQuote(this.opponentCharacter, 'got_hit');
+        
+        // Character-specific abilities
+        if (this.selectedCharacter === 'caitlyn') {
+            const revealed = game.caitlynHeadshotPassive(row, col);
+            this.visualizeRevealedCells(revealed);
+        } else if (this.selectedCharacter === 'jinx') {
+            this.jinxHitCounter++;
+            if (this.jinxHitCounter % 3 === 0) {
+                await this.delay(1000);
+                this.showQuote('jinx', 'fishbones_proc');
+                const explosionResults = game.jinxFishbonesExplosion(row, col);
+                this.visualizeExplosion(explosionResults);
             }
-            
-            if (result.sunk) {
-                this.showQuote(this.selectedCharacter, 'ship_sunk');
-                this.updateShipIndicators('opponent');
-                this.highlightSunkShip(result.coordinates, 'enemy');
-            }
-        } else {
-            cell.classList.add('miss');
-            this.showQuote(this.selectedCharacter, 'miss');
         }
-
-        // Check game over
-        if (result.gameOver) {
-            setTimeout(() => {
-                this.endGame(result.winner);
-            }, 2000);
-            return;
+        
+        if (result.sunk) {
+            await this.delay(1000);
+            this.showQuote(this.selectedCharacter, 'ship_sunk');
+            this.updateShipIndicators('opponent');
+            this.highlightSunkShip(result.coordinates, 'enemy');
         }
+    } else {
+        cell.classList.add('miss');
+        
+        await this.delay(500);
+        
+        // 4. PLAYER REACTION (to missing)
+        this.showQuote(this.selectedCharacter, 'miss');
+        
+        await this.delay(800);
+        
+        // 5. OPPONENT REACTION (taunt)
+        this.showQuote(this.opponentCharacter, 'enemy_miss');
+    }
 
-        // Enemy turn if we missed
-        if (!result.hit) {
-            setTimeout(() => {
-                this.enemyTurn();
-            }, 1500);
+    // Check game over
+    if (result.gameOver) {
+        await this.delay(2000);
+        this.endGame(result.winner);
+        return;
+    }
+
+    // Enemy turn if we missed
+    if (!result.hit) {
+        await this.delay(1500);
+        this.enemyTurn();
+    }
+}
+
+// Helper method for delays
+delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+async enemyTurn() {
+    if (game.currentTurn !== 'enemy' || !game.gameActive) return;
+
+    // 1. TURN ANNOUNCEMENT
+    this.showTurnAnnouncement(this.opponentCharacter, false);
+    this.updateTurnIndicator('enemy');
+    
+    await this.delay(1500);
+    
+    // 2. PRE-SHOT QUOTE
+    this.showQuote(this.opponentCharacter, 'taking_shot');
+    
+    await this.delay(1500);
+
+    // 3. AI DECIDES TARGET
+    const target = aiOpponent.getNextShot(game);
+    
+    if (!target) {
+        console.error('AI could not find target');
+        return;
+    }
+
+    // 4. SHOT ANNOUNCEMENT
+    this.showShotAnnouncement(this.opponentCharacter, target.row, target.col, false); // Don't reveal hit yet
+    
+    await this.delay(1500);
+
+    // 5. EXECUTE SHOT
+    const result = game.enemyShoot(target.row, target.col);
+    
+    if (!result.valid) {
+        this.enemyTurn();
+        return;
+    }
+
+    // Update announcement with result
+    const lastAnnouncement = document.querySelector('.shot-announcement');
+    if (lastAnnouncement) {
+        const resultEl = lastAnnouncement.querySelector('.result');
+        if (resultEl) {
+            resultEl.textContent = result.hit ? '💥 HIT!' : '💦 MISS!';
+            lastAnnouncement.querySelector('.shot-announcement-content').classList.add(result.hit ? 'hit-result' : 'miss-result');
         }
     }
 
-    enemyTurn() {
-        if (game.currentTurn !== 'enemy' || !game.gameActive) return;
-
-        this.updateTurnIndicator('enemy');
+    // 6. UPDATE VISUAL
+    const cell = this.elements.playerGrid.querySelector(
+        `[data-row="${target.row}"][data-col="${target.col}"]`
+    );
+    
+    if (result.hit) {
+        cell.classList.add('hit');
         
-        // AI decides target
-        const target = aiOpponent.getNextShot(game);
+        await this.delay(500);
         
-        if (!target) {
-            console.error('AI could not find target');
-            return;
+        // 7. OPPONENT REACTION
+        this.showQuote(this.opponentCharacter, 'hit');
+        
+        await this.delay(800);
+        
+        // 8. PLAYER REACTION (getting hit)
+        this.showQuote(this.selectedCharacter, 'got_hit');
+        
+        aiOpponent.onHit(game, target.row, target.col, result.sunk);
+        
+        if (result.sunk) {
+            await this.delay(1000);
+            this.showQuote(this.opponentCharacter, 'ship_sunk');
+            this.updateShipIndicators('player');
+            this.highlightSunkShip(result.coordinates, 'player');
         }
-
-        setTimeout(() => {
-            const result = game.enemyShoot(target.row, target.col);
-            
-            if (!result.valid) {
-                // Try again if invalid
-                this.enemyTurn();
-                return;
-            }
-
-            // Update player grid visual
-            const cell = this.elements.playerGrid.querySelector(
-                `[data-row="${target.row}"][data-col="${target.col}"]`
-            );
-            
-            if (result.hit) {
-                cell.classList.add('hit');
-                this.showQuote(this.opponentCharacter, 'hit');
-                
-                // Inform AI about hit
-                aiOpponent.onHit(game, target.row, target.col, result.sunk);
-                
-                if (result.sunk) {
-                    this.showQuote(this.opponentCharacter, 'ship_sunk');
-                    this.updateShipIndicators('player');
-                    this.highlightSunkShip(result.coordinates, 'player');
-                }
-            } else {
-                cell.classList.add('miss');
-                this.showQuote(this.opponentCharacter, 'miss');
-            }
-
-            // Check game over
-            if (result.gameOver) {
-                setTimeout(() => {
-                    this.endGame(result.winner);
-                }, 2000);
-                return;
-            }
-
-            // Continue enemy turn if hit, otherwise player turn
-            if (result.hit) {
-                setTimeout(() => {
-                    this.enemyTurn();
-                }, 1500);
-            } else {
-                this.updateTurnIndicator('player');
-            }
-        }, 1000);
+    } else {
+        cell.classList.add('miss');
+        
+        await this.delay(500);
+        
+        // 7. OPPONENT REACTION (to missing)
+        this.showQuote(this.opponentCharacter, 'miss');
+        
+        await this.delay(800);
+        
+        // 8. PLAYER REACTION (taunt)
+        this.showQuote(this.selectedCharacter, 'enemy_miss');
     }
+
+    // Check game over
+    if (result.gameOver) {
+        await this.delay(2000);
+        this.endGame(result.winner);
+        return;
+    }
+
+    // Continue enemy turn if hit, otherwise player turn
+    if (result.hit) {
+        await this.delay(1500);
+        this.enemyTurn();
+    } else {
+        await this.delay(1500);
+        this.showTurnAnnouncement(this.selectedCharacter, true);
+        this.updateTurnIndicator('player');
+    }
+}
 
     // ============================================
     // ABILITIES
@@ -873,6 +1181,10 @@ updateShipPreview() {
     // CHARACTER QUOTES
     // ============================================
 
+// ============================================
+// CHARACTER QUOTES WITH AVATAR
+// ============================================
+
 showQuote(character, eventType) {
     // Get quote from quotes system
     const quote = characterQuotes.getQuote(character, eventType);
@@ -885,8 +1197,24 @@ showQuote(character, eventType) {
     const quoteElement = this.elements.characterQuote;
     if (!quoteElement) return;
     
-    // Update quote text
-    quoteElement.textContent = `"${quote}"`;
+    // Get character data
+    const characterData = this.characters[character];
+    
+    // Build quote HTML with avatar
+    quoteElement.innerHTML = `
+        <div class="quote-avatar">
+            <img src="${this.getChampionIcon(characterData.championKey)}" alt="${characterData.displayName}">
+        </div>
+        <div class="quote-content">
+            <div class="quote-speaker">${characterData.displayName}</div>
+            <div class="quote-text">"${quote}"</div>
+        </div>
+    `;
+    
+    // Add character-specific styling
+    quoteElement.style.borderColor = characterData.color;
+    quoteElement.classList.remove('caitlyn-quote', 'jinx-quote');
+    quoteElement.classList.add(`${character}-quote`);
     
     // Trigger animation
     quoteElement.classList.remove('show');

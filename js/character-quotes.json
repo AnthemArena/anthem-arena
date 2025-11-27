@@ -22,39 +22,64 @@
       "Let's see if you can match my precision.",
       "I've got you in my sights."
     ],
+    "taking_shot": [
+      "Calculating trajectory...",
+      "Target acquired.",
+      "Taking the shot.",
+      "I never miss.",
+      "Lining up the perfect shot.",
+      "Precision strike incoming."
+    ],
     "hit": [
       "Direct hit. As expected.",
       "Target struck. Adjusting aim.",
       "One shot, one hit. Predictable outcome.",
       "Another hit. Your fleet won't last long.",
-      "Precision never fails."
+      "Precision never fails.",
+      "Right on target.",
+      "Perfect shot."
     ],
     "miss": [
       "Miss. Recalculating trajectory.",
       "Unfortunate. Adjusting my approach.",
       "That was... unexpected. Won't happen twice.",
-      "A minor setback. I'll compensate."
+      "A minor setback. I'll compensate.",
+      "Recalibrating."
     ],
     "ship_sunk": [
       "Enemy vessel neutralized. One down.",
       "Target eliminated. Moving to the next.",
       "Your fleet is diminishing. As calculated.",
-      "Another one removed from play. Efficient."
+      "Another one removed from play. Efficient.",
+      "Confirmed kill. Next target."
     ],
     "ultimate": [
       "Ace in the Hole activated. Let me show you something.",
       "Time to reveal your secrets. Scanning now.",
-      "I see everything. There's nowhere to hide."
+      "I see everything. There's nowhere to hide.",
+      "Revealing your position. Nowhere to run."
     ],
-    "hit_received": [
+    "got_hit": [
       "Direct hit on my position. Concerning.",
       "They got through. Adjusting defenses.",
-      "A lucky shot. It won't happen again."
+      "A lucky shot. It won't happen again.",
+      "Tch! I've been hit!",
+      "Unacceptable!",
+      "How did they...?"
     ],
     "ship_lost": [
       "One vessel down. This is... unfortunate.",
       "Lost a ship. I need to be more careful.",
-      "Unacceptable. They'll pay for that."
+      "Unacceptable. They'll pay for that.",
+      "Damage sustained. Recalculating strategy."
+    ],
+    "enemy_miss": [
+      "Not even close.",
+      "You'll have to do better than that.",
+      "Is that all you've got?",
+      "Pathetic aim.",
+      "Did you even try?",
+      "Amateur."
     ],
     "victory": [
       "Case closed. Justice is served.",
@@ -95,51 +120,79 @@
       "I'm gonna sink ALL your ships! Hehehe!",
       "Catch me if you can! ...Or I'll catch YOU!"
     ],
+    "taking_shot": [
+      "Time to blow stuff up!",
+      "Let's see what happens!",
+      "Here comes the BOOM!",
+      "Catch THIS!",
+      "Eeny, meeny, miny, BOOM!",
+      "Pick a spot, ANY spot!",
+      "Let's make some NOISE!"
+    ],
     "hit": [
       "BOOM! Got one! Hehehe!",
       "YES! That went SPLAT!",
       "Oooh that was a good one!",
       "Haha! Did you SEE that?!",
       "Another one! This is SO much fun!",
-      "SCORE! I'm on FIRE! ...literally maybe?"
+      "SCORE! I'm on FIRE! ...literally maybe?",
+      "Ka-BOOM! Perfect!",
+      "That's what I'm talking about!"
     ],
     "miss": [
       "Aww, that was my favorite guess!",
       "Oops! Missed! Oh well!",
       "Dang it! ...Wait, where was I aiming again?",
       "Noooo! So close!",
-      "Meh. Next one's gonna be HUGE!"
+      "Meh. Next one's gonna be HUGE!",
+      "That didn't work. Let's try something else!"
     ],
     "ship_sunk": [
       "DOWN IT GOES! Splishy-splashy!",
       "HAHA! Bye bye ship!",
       "Watch it sink! Isn't it pretty?",
       "One less! This is AWESOME!",
-      "Glug glug glug! To the bottom!"
+      "Glug glug glug! To the bottom!",
+      "Lights out!",
+      "KABOOM! Sunk it!"
     ],
     "ultimate": [
       "SUPER MEGA DEATH ROCKET! Catch 'em all!",
       "SURPRISE! Did I get ya? Did I?!",
       "HERE COMES THE BIG ONE!",
-      "Time for the GRAND FINALE! Well... one of them!"
+      "Time for the GRAND FINALE! Well... one of them!",
+      "MAXIMUM CHAOS MODE!"
     ],
     "fishbones_proc": [
       "FISHBONES GOES BOOM! Extra explosion!",
       "Ooh, that one really BOOMED good!",
       "Hehe! Love it when that happens!",
-      "MORE EXPLOSIONS! I love this gun!"
+      "MORE EXPLOSIONS! I love this gun!",
+      "Triple trouble! BOOM BOOM BOOM!"
     ],
-    "hit_received": [
+    "got_hit": [
       "HEY! That was my favorite spot!",
       "Ouch! That actually hurt!",
       "No fair! I wasn't looking!",
-      "Owie! You're pretty good!"
+      "Owie! You're pretty good!",
+      "OW! Stop it!",
+      "That hurt! You're gonna PAY!"
     ],
     "ship_lost": [
       "NOOOO! Fishbones! Come back!",
       "Aww, I liked that one!",
       "That was my best ship! ...I think?",
-      "Hey! That's MINE! You can't have it!"
+      "Hey! That's MINE! You can't have it!",
+      "Not cool! NOT COOL!"
+    ],
+    "enemy_miss": [
+      "HAHA! Missed me!",
+      "Too slow!",
+      "Can't catch the wind!",
+      "Nice try, LOSER!",
+      "Whiff! Total whiff!",
+      "Is that the best you got?",
+      "Nope! Try again!"
     ],
     "victory": [
       "I WON! I WON! Did you see?! I WON!",
