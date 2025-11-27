@@ -3,7 +3,7 @@
 // Different difficulty levels with personalities
 // ============================================
 
-class BattleshipAI {
+export class BattleshipAI {
     constructor(difficulty = 'medium') {
         this.difficulty = difficulty;
         this.huntMode = false;
@@ -315,5 +315,9 @@ class BattleshipAI {
 // ============================================
 
 let aiOpponent = new BattleshipAI('medium');
+
+export default BattleshipAI;
+
+
 
 console.log('✅ Battleship AI Loaded');

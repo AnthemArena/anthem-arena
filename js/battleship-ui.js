@@ -1,7 +1,15 @@
-// ============================================
-// HEXTECH WARFARE - UI CONTROLLER
-// Handles all DOM interactions and animations
-// ============================================
+// ========================================
+// BATTLESHIP UI CONTROLLER
+// Manages all UI interactions and screens
+// ========================================
+
+// Import dependencies
+import characterQuotes from './character-quotes.js';
+import game from './battleship-game.js';
+import BattleshipAI from './battleship-ai.js';
+
+// Global AI instance
+let aiOpponent = null;
 
 class BattleshipUI {
     constructor() {
@@ -17,34 +25,37 @@ class BattleshipUI {
         // UI elements (will be set in init)
         this.elements = {};
         
-       // Data Dragon configuration
-this.dataDragonVersion = '14.23.1'; // Update to latest patch
-this.dataDragonBase = `https://ddragon.leagueoflegends.com/cdn/${this.dataDragonVersion}`;
-
-// Character data - using Data Dragon
-this.characters = {
-    caitlyn: {
-        name: 'Caitlyn',
-        displayName: 'CAITLYN',
-        title: 'The Sheriff of Piltover',
-        championKey: 'Caitlyn',
-        skinNumber: 13, // 0 = base skin
-        color: '#0397AB',
-        emoji: '🎯'
-    },
-    jinx: {
-        name: 'Jinx',
-        displayName: 'JINX',
-        title: 'The Loose Cannon',
-        championKey: 'Jinx',
-        skinNumber: 29,
-        color: '#FF3366',
-        emoji: '💥'
-    }
-};
+        // Data Dragon configuration
+        this.dataDragonVersion = '14.23.1';
+        this.dataDragonBase = `https://ddragon.leagueoflegends.com/cdn/${this.dataDragonVersion}`;
+        
+        // Character data
+        this.characters = {
+            caitlyn: {
+                name: 'Caitlyn',
+                displayName: 'CAITLYN',
+                title: 'The Sheriff of Piltover',
+                championKey: 'Caitlyn',
+                skinNumber: 0,
+                color: '#0397AB',
+                emoji: '🎯'
+            },
+            jinx: {
+                name: 'Jinx',
+                displayName: 'JINX',
+                title: 'The Loose Cannon',
+                championKey: 'Jinx',
+                skinNumber: 0,
+                color: '#FF3366',
+                emoji: '💥'
+            }
+        };
         
         // Track Jinx's hit counter for Fishbones passive
         this.jinxHitCounter = 0;
+        
+        // Track game start time
+        this.gameStartTime = null;
     }
 
     // ============================================
@@ -70,20 +81,18 @@ getChampionIcon(championKey) {
     // INITIALIZATION
     // ============================================
 
-    init() {
-        console.log('🎮 Initializing Battleship UI...');
-        
-        // Cache DOM elements
-        this.cacheElements();
-        
-        // Bind event listeners
-        this.bindEvents();
-        
-        // Show character select screen
-        this.showScreen('characterSelect');
-        
-        console.log('✅ UI Initialized');
-    }
+ async init() {
+    console.log('🎮 Initializing Battleship UI...');
+    
+    // Load character quotes
+    await characterQuotes.load();
+    
+    this.cacheElements();
+    this.bindEvents();
+    this.showScreen('characterSelect');
+    
+    console.log('✅ UI Initialized');
+}
 
     cacheElements() {
         this.elements = {
@@ -384,24 +393,25 @@ getChampionIcon(championKey) {
     // BATTLE SCREEN
     // ============================================
 
-    startBattle() {
-        // Place enemy ships randomly
-        game.placeShipsRandomly(game.enemyGrid, game.enemyShips);
-        
-        // Initialize AI
-        aiOpponent = new BattleshipAI(this.difficulty);
-        
-        // Start game
-        game.startGame();
-        
-        // Setup battle UI
-        this.showScreen('battleScreen');
-        this.setupBattleScreen();
-        this.createBattleGrids();
-        
-        // Show start quote
-        this.showQuote(this.selectedCharacter, 'game_start');
-    }
+   startBattle() {
+    // Place enemy ships randomly
+    game.placeShipsRandomly(game.enemyGrid, game.enemyShips);
+    
+    // Initialize AI (using imported class)
+    aiOpponent = new BattleshipAI(this.difficulty);
+    
+    // Start game
+    game.startGame();
+    this.gameStartTime = Date.now();
+    
+    // Setup battle UI
+    this.showScreen('battleScreen');
+    this.setupBattleScreen();
+    this.createBattleGrids();
+    
+    // Show start quote
+    this.showQuote(this.selectedCharacter, 'game_start');
+}
 
     setupBattleScreen() {
     const player = this.characters[this.selectedCharacter];
@@ -761,39 +771,32 @@ getChampionIcon(championKey) {
     // CHARACTER QUOTES
     // ============================================
 
-    async showQuote(character, situation) {
-        // Load quotes from JSON
-        if (!window.characterQuotes) {
-            try {
-                const response = await fetch('js/character-quotes.json');
-                window.characterQuotes = await response.json();
-            } catch (error) {
-                console.error('Failed to load character quotes:', error);
-                return;
-            }
-        }
-
-        const quotes = window.characterQuotes[character]?.[situation];
-        if (!quotes || quotes.length === 0) return;
-
-        // Pick random quote
-        const quote = quotes[Math.floor(Math.random() * quotes.length)];
-        
-        // Display quote
-        const overlay = this.elements.quoteOverlay;
-        const characterSpan = overlay.querySelector('.quote-character');
-        const textP = overlay.querySelector('.quote-text');
-        
-        characterSpan.textContent = `${this.characters[character].emoji} ${this.characters[character].displayName}`;
-        textP.textContent = quote;
-        
-        overlay.classList.remove('hidden');
-        
-        // Auto-hide after 3 seconds
-        setTimeout(() => {
-            overlay.classList.add('hidden');
-        }, 3000);
+showQuote(character, eventType) {
+    // Get quote from quotes system
+    const quote = characterQuotes.getQuote(character, eventType);
+    
+    if (!quote) {
+        console.warn(`No quote available for ${character} - ${eventType}`);
+        return;
     }
+    
+    const quoteElement = this.elements.characterQuote;
+    if (!quoteElement) return;
+    
+    // Update quote text
+    quoteElement.textContent = `"${quote}"`;
+    
+    // Trigger animation
+    quoteElement.classList.remove('show');
+    setTimeout(() => {
+        quoteElement.classList.add('show');
+    }, 50);
+    
+    // Hide after 4 seconds
+    setTimeout(() => {
+        quoteElement.classList.remove('show');
+    }, 4000);
+}
 
     // ============================================
     // GAME OVER

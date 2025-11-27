@@ -3,7 +3,7 @@
 // Pure game state management (no UI)
 // ============================================
 
-class BattleshipGame {
+export class BattleshipGame {
     constructor() {
         this.gridSize = 10;
         this.ships = [
@@ -476,7 +476,10 @@ class BattleshipGame {
 // INITIALIZE GLOBAL GAME INSTANCE
 // ============================================
 
-// This will be used by UI and AI files
-let game = new BattleshipGame();
+// Create and export singleton instance
+const game = new BattleshipGame();
+export default game;
+
+
 
 console.log('✅ Battleship Game Logic Loaded');

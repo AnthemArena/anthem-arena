@@ -3,65 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hextech Warfare | League Music Hub</title>
+    <title>Hextech Warfare - Battleship Game | Anthem Arena</title>
+    <meta name="description" content="Play Hextech Warfare - A League of Legends themed battleship game. Choose Caitlyn or Jinx and battle the AI!">
     
-    <!-- Your existing global styles -->
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- New game-specific styles -->
-    <link rel="stylesheet" href="css/battleship.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/battleship.css">
+    
+    <!-- ✅ CRITICAL: Load global systems FIRST -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
+
 <body class="game-page">
     
-    <!-- Header (matching your site's navigation) -->
-    <header class="site-header">
-        <nav>
-            <a href="index.html">🎵 Tournaments</a>
-            <a href="games.html" class="active">🎮 Games</a>
-            <a href="profile.html">👤 Profile</a>
-        </nav>
-    </header>
+    <!-- Navigation (matches your site) -->
+    <div id="nav-placeholder"></div>
+    <script type="module" src="/js/navigation.js"></script>
 
     <!-- Game Container -->
     <main class="game-container">
         
-        <!-- Game Selection Screen (Initial) -->
+        <!-- Character Selection Screen -->
         <div id="characterSelect" class="character-select">
             <h1 class="game-title">HEXTECH WARFARE</h1>
             <p class="game-subtitle">Choose your champion</p>
             
             <div class="character-grid">
                 <!-- Caitlyn Card -->
-<!-- Caitlyn Card -->
-<div class="character-card" data-character="caitlyn">
-    <div class="character-portrait">
-        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg" alt="Caitlyn">
-    </div>
-    <h2>🎯 CAITLYN</h2>
-    <p class="character-tagline">The Sheriff of Piltover</p>
-    <ul class="ability-list">
-        <li><strong>Precision:</strong> Reveal adjacent squares on hit</li>
-        <li><strong>Ace in the Hole:</strong> Scan 3x3 area</li>
-    </ul>
-    <button class="select-btn" data-character="caitlyn">
-        SELECT CAITLYN
-    </button>
-</div>
+                <div class="character-card" data-character="caitlyn">
+                    <div class="character-portrait">
+                        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg" alt="Caitlyn">
+                    </div>
+                    <h2>🎯 CAITLYN</h2>
+                    <p class="character-tagline">The Sheriff of Piltover</p>
+                    <ul class="ability-list">
+                        <li><strong>Precision:</strong> Reveal adjacent squares on hit</li>
+                        <li><strong>Ace in the Hole:</strong> Scan 3x3 area</li>
+                    </ul>
+                    <button class="select-btn" data-character="caitlyn">
+                        SELECT CAITLYN
+                    </button>
+                </div>
 
-<!-- Jinx Card -->
-<div class="character-card" data-character="jinx">
-    <div class="character-portrait">
-        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg" alt="Jinx">
-    </div>
-    <h2>💥 JINX</h2>
-    <p class="character-tagline">The Loose Cannon</p>
-    <ul class="ability-list">
-        <li><strong>Chaos:</strong> Random explosions on hit</li>
-        <li><strong>Super Mega Rocket:</strong> 5 wild shots</li>
-    </ul>
-    <button class="select-btn" data-character="jinx">
-        SELECT JINX
-    </button>
-</div>
+                <!-- Jinx Card -->
+                <div class="character-card" data-character="jinx">
+                    <div class="character-portrait">
+                        <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg" alt="Jinx">
+                    </div>
+                    <h2>💥 JINX</h2>
+                    <p class="character-tagline">The Loose Cannon</p>
+                    <ul class="ability-list">
+                        <li><strong>Chaos:</strong> Random explosions on hit</li>
+                        <li><strong>Super Mega Rocket:</strong> 5 wild shots</li>
+                    </ul>
+                    <button class="select-btn" data-character="jinx">
+                        SELECT JINX
+                    </button>
+                </div>
             </div>
 
             <!-- Difficulty Selection -->
@@ -76,7 +90,7 @@
             </div>
         </div>
 
-        <!-- Ship Placement Screen (Hidden initially) -->
+        <!-- Ship Placement Screen -->
         <div id="shipPlacement" class="ship-placement hidden">
             <h2>Place Your Fleet</h2>
             <div class="placement-instructions">
@@ -118,13 +132,12 @@
             </button>
         </div>
 
-        <!-- Battle Screen (Hidden initially) -->
+        <!-- Battle Screen -->
         <div id="battleScreen" class="battle-screen hidden">
             
-            <!-- Character Banners -->
             <div class="battle-layout">
                 
-                <!-- Left Side - Player Character -->
+                <!-- Player Character -->
                 <div id="playerBanner" class="character-banner player-side">
                     <div class="banner-portrait">
                         <img id="playerPortrait" src="" alt="">
@@ -140,7 +153,6 @@
                             <div class="ship-icon">■</div>
                         </div>
                     </div>
-                    <!-- Abilities -->
                     <div class="abilities">
                         <button class="ability-btn" id="ability1" disabled>
                             <span class="ability-name">Precision</span>
@@ -153,24 +165,19 @@
                     </div>
                 </div>
 
-                <!-- Center - Game Boards -->
+                <!-- Game Boards -->
                 <div class="boards-container">
-                    
-                    <!-- Your Board (defensive) -->
                     <div class="board-section">
                         <h3>YOUR FLEET</h3>
                         <div id="playerGrid" class="game-grid player-grid"></div>
                     </div>
-
-                    <!-- Enemy Board (offensive) -->
                     <div class="board-section">
                         <h3>ENEMY FLEET</h3>
                         <div id="enemyGrid" class="game-grid enemy-grid"></div>
                     </div>
-
                 </div>
 
-                <!-- Right Side - Opponent Character -->
+                <!-- Opponent Character -->
                 <div id="opponentBanner" class="character-banner opponent-side">
                     <div class="banner-portrait">
                         <img id="opponentPortrait" src="" alt="">
@@ -190,13 +197,8 @@
 
             </div>
 
-            <!-- Character Quote Overlay -->
-            <div id="quoteOverlay" class="quote-overlay hidden">
-                <div class="quote-content">
-                    <span class="quote-character"></span>
-                    <p class="quote-text"></p>
-                </div>
-            </div>
+            <!-- Character Quote Display -->
+            <div id="characterQuote" class="character-quote"></div>
 
             <!-- Turn Indicator -->
             <div id="turnIndicator" class="turn-indicator">
@@ -232,24 +234,24 @@
                 <div class="game-over-actions">
                     <button id="playAgain" class="primary-btn">PLAY AGAIN</button>
                     <button id="changeCharacter" class="secondary-btn">CHANGE CHARACTER</button>
-                    <a href="index.html" class="tertiary-btn">BACK TO TOURNAMENTS</a>
+                    <a href="/index.html" class="tertiary-btn">BACK TO TOURNAMENTS</a>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Scripts -->
-    <script src="js/character-quotes.json"></script>
-    <script src="js/battleship-game.js"></script>
-    <script src="js/battleship-ai.js"></script>
-    <script src="js/battleship-ui.js"></script>
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+
+    <!-- ✅ Game Scripts - Load as ES Modules -->
+    <script type="module" src="/js/character-quotes.js"></script>
+    <script type="module" src="/js/battleship-game.js"></script>
+    <script type="module" src="/js/battleship-ai.js"></script>
+    <script type="module" src="/js/battleship-ui.js"></script>
     
-    <!-- Firebase (your existing config) -->
-    <script src="firebase-config.js"></script>
-    <script>
-        // Track game start in Firebase
-        // (You can integrate with your existing analytics)
-    </script>
+    <!-- Buy Me a Coffee Widget -->
+    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="anthemarena" data-description="Support me on Buy me a coffee!" data-message="Thanks for playing!" data-color="#d4af37" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </body>
 </html>
