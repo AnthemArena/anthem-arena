@@ -96,7 +96,13 @@
             <div class="placement-instructions">
                 <p>Click to place ships. Right-click to rotate.</p>
             </div>
-              <!-- ✅ ADD THIS: Current Ship Display -->
+           
+            
+            <div class="placement-grid-container">
+                <div id="placementGrid" class="game-grid"></div>
+            </div>
+
+               <!-- ✅ ADD THIS: Current Ship Display -->
     <div class="current-ship-display">
         <p class="ship-label">Now Placing:</p>
         <div class="ship-preview" id="currentShipPreview">
@@ -104,10 +110,6 @@
         </div>
         <p class="ship-hint">Right-click to rotate • Click grid to place</p>
     </div>
-            
-            <div class="placement-grid-container">
-                <div id="placementGrid" class="game-grid"></div>
-            </div>
 
             <div class="ship-selector">
                 <div class="ship-item" data-ship="carrier" data-size="5">
@@ -161,16 +163,24 @@
                             <div class="ship-icon">■</div>
                         </div>
                     </div>
-                    <div class="abilities">
-                        <button class="ability-btn" id="ability1" disabled>
-                            <span class="ability-name">Precision</span>
-                            <span class="ability-cooldown">Passive</span>
-                        </button>
-                        <button class="ability-btn" id="ability2">
-                            <span class="ability-name">Ultimate</span>
-                            <span class="ability-uses">1x</span>
-                        </button>
-                    </div>
+                   <div class="abilities">
+    <button class="ability-btn" id="ability1" disabled>
+        <span class="ability-name">Precision</span>
+        <span class="ability-cooldown">Passive</span>
+        <div class="ability-tooltip">
+            <strong>Headshot (Caitlyn)</strong><br>
+            Reveals adjacent cells around each hit
+        </div>
+    </button>
+    <button class="ability-btn" id="ability2">
+        <span class="ability-name">Ultimate</span>
+        <span class="ability-uses">1x</span>
+        <div class="ability-tooltip">
+            <strong>Ace in the Hole (Caitlyn)</strong><br>
+            Reveals a 3x3 area on the enemy grid
+        </div>
+    </button>
+</div>
                 </div>
 
                 <!-- Game Boards -->

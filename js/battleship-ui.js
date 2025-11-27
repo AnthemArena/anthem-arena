@@ -203,16 +203,16 @@ bindEvents() {
         });
     }
 
-    // Right-click to rotate ships
-    document.addEventListener('contextmenu', (e) => {
-        if (this.elements.shipPlacement && !this.elements.shipPlacement.classList.contains('hidden')) {
-            e.preventDefault();
-            this.isHorizontal = !this.isHorizontal;
-            this.updatePlacementPreview();
-                    this.updateShipPreview(); // ← ADD THIS
-
-        }
-    });
+// Right-click to rotate ships
+document.addEventListener('contextmenu', (e) => {
+    if (this.elements.shipPlacement && !this.elements.shipPlacement.classList.contains('hidden')) {
+        e.preventDefault();
+        this.isHorizontal = !this.isHorizontal;
+        console.log('🔄 Rotated to:', this.isHorizontal ? 'horizontal' : 'vertical');
+        this.updateShipPreview(); // ← Make sure this is here
+        this.showPlacementPreview(0, 0); // ← Also update grid preview if exists
+    }
+});
 
     // Abilities
     if (this.elements.ability2) {
@@ -485,16 +485,16 @@ updateShipPreview() {
     this.showQuote(this.selectedCharacter, 'game_start');
 }
 
-    setupBattleScreen() {
+  setupBattleScreen() {
     const player = this.characters[this.selectedCharacter];
     const opponent = this.characters[this.opponentCharacter];
     
-    // Use splash art instead of loading screen for better framing
+    // Use splash art for better face visibility
     this.elements.playerPortrait.src = this.getChampionSplash(
         player.championKey,
         player.skinNumber
     );
-    this.elements.opponentPortrait.src = this.getChampionPortrait(
+    this.elements.opponentPortrait.src = this.getChampionSplash(
         opponent.championKey,
         opponent.skinNumber
     );
@@ -511,28 +511,58 @@ updateShipPreview() {
     this.setupAbilities();
 }
 
-    setupAbilities() {
-        const abilityNames = {
-            caitlyn: {
-                ultimate: 'Ace in the Hole',
-                passive: 'Headshot'
+   setupAbilities() {
+    const abilityData = {
+        caitlyn: {
+            passive: {
+                name: 'Headshot',
+                description: 'Reveals adjacent cells around each hit'
             },
-            jinx: {
-                ultimate: 'Super Mega Death Rocket',
-                passive: 'Fishbones'
+            ultimate: {
+                name: 'Ace in the Hole',
+                description: 'Reveals a 3x3 area on the enemy grid'
             }
-        };
-        
-        const abilities = abilityNames[this.selectedCharacter];
-        
-        if (this.elements.ability1) {
-            this.elements.ability1.querySelector('.ability-name').textContent = abilities.passive;
+        },
+        jinx: {
+            passive: {
+                name: 'Fishbones',
+                description: 'Every 3rd hit causes an explosion in adjacent cells'
+            },
+            ultimate: {
+                name: 'Super Mega Death Rocket',
+                description: 'Fires 5 random shots at the enemy fleet'
+            }
         }
+    };
+    
+    const abilities = abilityData[this.selectedCharacter];
+    
+    if (this.elements.ability1) {
+        this.elements.ability1.querySelector('.ability-name').textContent = abilities.passive.name;
         
-        if (this.elements.ability2) {
-            this.elements.ability2.querySelector('.ability-name').textContent = abilities.ultimate;
+        // Update tooltip
+        let tooltip = this.elements.ability1.querySelector('.ability-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'ability-tooltip';
+            this.elements.ability1.appendChild(tooltip);
         }
+        tooltip.innerHTML = `<strong>${abilities.passive.name}</strong><br>${abilities.passive.description}`;
     }
+    
+    if (this.elements.ability2) {
+        this.elements.ability2.querySelector('.ability-name').textContent = abilities.ultimate.name;
+        
+        // Update tooltip
+        let tooltip = this.elements.ability2.querySelector('.ability-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'ability-tooltip';
+            this.elements.ability2.appendChild(tooltip);
+        }
+        tooltip.innerHTML = `<strong>${abilities.ultimate.name}</strong><br>${abilities.ultimate.description}`;
+    }
+}
 
     createBattleGrids() {
         // Create player grid (defensive view)
