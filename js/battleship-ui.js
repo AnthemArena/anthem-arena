@@ -158,6 +158,10 @@ getChampionIcon(championKey) {
     
     // Character selection - FIX: Use btn instead of e.target
     this.elements.selectButtons.forEach(btn => {
+
+                console.log('🔍 Button:', btn, 'data-character:', btn.dataset.character);
+
+
         btn.addEventListener('click', () => {
             const character = btn.dataset.character; // ← Use btn, not e.target
             console.log('🎯 Character clicked:', character);
@@ -1108,9 +1112,9 @@ async checkBattleshipAchievements(userId, isVictory, stats) {
 
 let battleshipUI;
 
-document.addEventListener('DOMContentLoaded', () => {
-    battleshipUI = new BattleshipUI();
-    battleshipUI.init();
-});
+// Initialize immediately since script is at end of body
+console.log('🚀 Starting Battleship UI initialization...');
+battleshipUI = new BattleshipUI();
+battleshipUI.init();
 
 console.log('✅ Battleship UI Loaded');
