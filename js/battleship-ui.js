@@ -140,66 +140,87 @@ getChampionIcon(championKey) {
             playAgain: document.getElementById('playAgain'),
             changeCharacter: document.getElementById('changeCharacter')
         };
+          // ✅ ADD THIS DEBUG
+    console.log('✅ Cached:', {
+        selectButtons: this.elements.selectButtons.length,
+        screens: {
+            characterSelect: !!this.elements.characterSelect,
+            shipPlacement: !!this.elements.shipPlacement,
+            battleScreen: !!this.elements.battleScreen,
+            gameOverScreen: !!this.elements.gameOverScreen
+        }
+    });
+
     }
 
     bindEvents() {
-        // Character selection
-        this.elements.selectButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const character = e.target.dataset.character;
-                this.selectCharacter(character);
-            });
+    console.log('🔌 Binding events...');
+    
+    // Character selection - FIX: Use btn instead of e.target
+    this.elements.selectButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const character = btn.dataset.character; // ← Use btn, not e.target
+            console.log('🎯 Character clicked:', character);
+            this.selectCharacter(character);
         });
+    });
+    
+    console.log('✅ Bound', this.elements.selectButtons.length, 'character buttons');
 
-        // Difficulty selection
-        if (this.elements.difficultySelect) {
-            this.elements.difficultySelect.addEventListener('change', (e) => {
-                this.difficulty = e.target.value;
-            });
-        }
-
-        // Ship placement
-        if (this.elements.randomPlacementBtn) {
-            this.elements.randomPlacementBtn.addEventListener('click', () => {
-                this.randomPlacement();
-            });
-        }
-
-        if (this.elements.startGameBtn) {
-            this.elements.startGameBtn.addEventListener('click', () => {
-                this.startBattle();
-            });
-        }
-
-        // Right-click to rotate ships
-        document.addEventListener('contextmenu', (e) => {
-            if (this.elements.shipPlacement && !this.elements.shipPlacement.classList.contains('hidden')) {
-                e.preventDefault();
-                this.isHorizontal = !this.isHorizontal;
-                this.updatePlacementPreview();
-            }
+    // Difficulty selection
+    if (this.elements.difficultySelect) {
+        this.elements.difficultySelect.addEventListener('change', (e) => {
+            this.difficulty = e.target.value;
+            console.log('🎮 Difficulty:', this.difficulty);
         });
-
-        // Abilities
-        if (this.elements.ability2) {
-            this.elements.ability2.addEventListener('click', () => {
-                this.useUltimate();
-            });
-        }
-
-        // Game over
-        if (this.elements.playAgain) {
-            this.elements.playAgain.addEventListener('click', () => {
-                this.resetGame();
-            });
-        }
-
-        if (this.elements.changeCharacter) {
-            this.elements.changeCharacter.addEventListener('click', () => {
-                this.resetToCharacterSelect();
-            });
-        }
     }
+
+    // Ship placement
+    if (this.elements.randomPlacementBtn) {
+        this.elements.randomPlacementBtn.addEventListener('click', () => {
+            console.log('🎲 Random placement');
+            this.randomPlacement();
+        });
+    }
+
+    if (this.elements.startGameBtn) {
+        this.elements.startGameBtn.addEventListener('click', () => {
+            console.log('⚔️ Start battle');
+            this.startBattle();
+        });
+    }
+
+    // Right-click to rotate ships
+    document.addEventListener('contextmenu', (e) => {
+        if (this.elements.shipPlacement && !this.elements.shipPlacement.classList.contains('hidden')) {
+            e.preventDefault();
+            this.isHorizontal = !this.isHorizontal;
+            this.updatePlacementPreview();
+        }
+    });
+
+    // Abilities
+    if (this.elements.ability2) {
+        this.elements.ability2.addEventListener('click', () => {
+            this.useUltimate();
+        });
+    }
+
+    // Game over
+    if (this.elements.playAgain) {
+        this.elements.playAgain.addEventListener('click', () => {
+            this.resetGame();
+        });
+    }
+
+    if (this.elements.changeCharacter) {
+        this.elements.changeCharacter.addEventListener('click', () => {
+            this.resetToCharacterSelect();
+        });
+    }
+    
+    console.log('✅ All events bound');
+}
 
     // ============================================
     // SCREEN MANAGEMENT
