@@ -721,3 +721,94 @@ font-size: 2rem;
     font-size: 1rem;
 }
 }
+/* Current Ship Display */
+.current-ship-display {
+    background: rgba(200, 170, 110, 0.1);
+    border: 2px solid rgba(200, 170, 110, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.ship-label {
+    color: #c8aa6e;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.ship-preview {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 15px 0;
+}
+
+.ship-preview.vertical {
+    flex-direction: column;
+    align-items: center;
+}
+
+.preview-cells {
+    display: flex;
+    gap: 4px;
+}
+
+.ship-preview.vertical .preview-cells {
+    flex-direction: column;
+}
+
+.preview-cell {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #0397AB 0%, #025965 100%);
+    border: 2px solid #0397AB;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(3, 151, 171, 0.4);
+}
+
+.ship-hint {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+/* Ship Icons - Different for each ship */
+.ships-remaining {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ship-icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(200, 170, 110, 0.3);
+    border: 2px solid #c8aa6e;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.ship-icon::before {
+    content: '🚢';
+}
+
+.ship-icon:nth-child(1)::before { content: '🚢'; } /* Carrier */
+.ship-icon:nth-child(2)::before { content: '⛴️'; } /* Battleship */
+.ship-icon:nth-child(3)::before { content: '🚤'; } /* Cruiser */
+.ship-icon:nth-child(4)::before { content: '🛥️'; } /* Submarine */
+.ship-icon:nth-child(5)::before { content: '⚓'; } /* Destroyer */
+
+.ship-icon.destroyed {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: #f44336;
+    opacity: 0.5;
+}
+
+.ship-icon.destroyed::before {
+    content: '💥';
+}

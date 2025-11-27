@@ -113,6 +113,8 @@ getChampionIcon(championKey) {
             shipItems: document.querySelectorAll('.ship-item'),
             randomPlacementBtn: document.getElementById('randomPlacement'),
             startGameBtn: document.getElementById('startGame'),
+                    currentShipPreview: document.getElementById('currentShipPreview'), // ← ADD
+
             
             // Battle screen
             playerGrid: document.getElementById('playerGrid'),
@@ -124,7 +126,7 @@ getChampionIcon(championKey) {
             playerName: document.getElementById('playerName'),
             opponentName: document.getElementById('opponentName'),
             turnIndicator: document.getElementById('turnIndicator'),
-            quoteOverlay: document.getElementById('quoteOverlay'),
+characterQuote: document.getElementById('characterQuote'),
             
             // Abilities
             ability1: document.getElementById('ability1'),
@@ -207,6 +209,8 @@ bindEvents() {
             e.preventDefault();
             this.isHorizontal = !this.isHorizontal;
             this.updatePlacementPreview();
+                    this.updateShipPreview(); // ← ADD THIS
+
         }
     });
 
@@ -390,17 +394,53 @@ bindEvents() {
         }
     }
 
-    updateShipSelector() {
-        this.elements.shipItems.forEach((item, index) => {
-            item.classList.remove('active', 'placed');
-            
-            if (index < this.currentShipIndex) {
-                item.classList.add('placed');
-            } else if (index === this.currentShipIndex) {
-                item.classList.add('active');
-            }
-        });
+updateShipSelector() {
+    this.elements.shipItems.forEach((item, index) => {
+        item.classList.remove('active', 'placed');
+        
+        if (index < this.currentShipIndex) {
+            item.classList.add('placed');
+        } else if (index === this.currentShipIndex) {
+            item.classList.add('active');
+        }
+    });
+    
+    // ✅ ADD THIS: Update preview display
+    this.updateShipPreview();
+}
+
+// ✅ ADD THIS NEW METHOD:
+updateShipPreview() {
+    const previewContainer = document.getElementById('currentShipPreview');
+    if (!previewContainer) return;
+    
+    if (this.currentShipIndex >= game.ships.length) {
+        previewContainer.style.display = 'none';
+        return;
     }
+    
+    previewContainer.style.display = 'block';
+    
+    const currentShip = game.ships[this.currentShipIndex];
+    const previewCells = previewContainer.querySelector('.preview-cells');
+    
+    // Update orientation class
+    previewContainer.className = 'ship-preview ' + (this.isHorizontal ? 'horizontal' : 'vertical');
+    
+    // Clear and rebuild cells
+    previewCells.innerHTML = '';
+    for (let i = 0; i < currentShip.size; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'preview-cell';
+        previewCells.appendChild(cell);
+    }
+    
+    // Update label
+    const label = document.querySelector('.ship-label');
+    if (label) {
+        label.textContent = `Now Placing: ${currentShip.name} (${currentShip.size} cells)`;
+    }
+}
 
     randomPlacement() {
         // Clear existing placement
@@ -449,8 +489,8 @@ bindEvents() {
     const player = this.characters[this.selectedCharacter];
     const opponent = this.characters[this.opponentCharacter];
     
-    // Set portraits using Data Dragon
-    this.elements.playerPortrait.src = this.getChampionPortrait(
+    // Use splash art instead of loading screen for better framing
+    this.elements.playerPortrait.src = this.getChampionSplash(
         player.championKey,
         player.skinNumber
     );
