@@ -225,6 +225,28 @@
 
         </div>
 
+        <!-- Hidden YouTube Player -->
+<div id="youtube-player" style="position: absolute; left: -9999px;"></div>
+
+<!-- Music Indicator (bottom right corner) -->
+<div id="music-indicator" class="music-indicator">
+    <span class="music-icon">🎵</span>
+    <span class="theme-name">-</span>
+    <div class="music-controls">
+        <button class="music-btn" onclick="musicManager.pause()" title="Pause">⏸️</button>
+        <button class="music-btn" onclick="musicManager.resume()" title="Play">▶️</button>
+        <input 
+            type="range" 
+            class="volume-slider" 
+            min="0" 
+            max="50" 
+            value="15"
+            oninput="musicManager.setVolume(this.value)"
+            title="Volume"
+        >
+    </div>
+</div>
+
         <!-- Game Over Screen -->
         <div id="gameOverScreen" class="game-over hidden">
             <div class="game-over-content">
@@ -268,6 +290,8 @@
     <script type="module" src="/js/battleship-game.js"></script>
     <script type="module" src="/js/battleship-ai.js"></script>
     <script type="module" src="/js/battleship-ui.js"></script>
+<script type="module" src="/js/music-manager.js"></script>
+
     
     <!-- Buy Me a Coffee Widget -->
     <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="anthemarena" data-description="Support me on Buy me a coffee!" data-message="Thanks for playing!" data-color="#d4af37" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

@@ -1760,3 +1760,42 @@ font-size: 2rem;
         opacity: 0.7;
     }
 }
+/* =====================================
+   MUSIC INDICATOR (Subtle, Bottom Right)
+   ===================================== */
+
+.music-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 10, 20, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateX(120%);
+    transition: all 0.4s ease;
+    z-index: 1000;
+}
+
+.music-indicator.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.music-icon {
+    animation: pulse 2s infinite;
+    font-size: 16px;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+

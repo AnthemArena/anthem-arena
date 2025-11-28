@@ -5,6 +5,8 @@
 
 // Import dependencies
 import characterQuotes from './character-quotes.js';
+import { musicManager, championThemes } from './music-manager.js';
+
 import game from './battleship-game.js';
 import BattleshipAI from './battleship-ai.js';
 
@@ -268,6 +270,13 @@ selectCharacter(characterId) {
     
     // Opponent is the other character
     this.opponentCharacter = characterId === 'caitlyn' ? 'jinx' : 'caitlyn';
+
+  // ✅ ADD THIS LINE:
+    musicManager.playTheme(
+        championThemes[characterId].videoId,
+        championThemes[characterId].name
+    );
+
     
     // Add selected state to card
     const selectedCard = document.querySelector(`.character-card[data-character="${characterId}"]`);
