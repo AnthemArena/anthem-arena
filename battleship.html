@@ -233,18 +233,18 @@
     <span class="music-icon">🎵</span>
     <span class="theme-name">-</span>
     <div class="music-controls">
-        <button class="music-btn" onclick="musicManager.pause()" title="Pause">⏸️</button>
-        <button class="music-btn" onclick="musicManager.resume()" title="Play">▶️</button>
-        <input 
-            type="range" 
-            class="volume-slider" 
-            min="0" 
-            max="50" 
-            value="15"
-            oninput="musicManager.setVolume(this.value)"
-            title="Volume"
-        >
-    </div>
+    <button class="music-btn" id="music-pause" title="Pause">⏸️</button>
+    <button class="music-btn" id="music-play" title="Play">▶️</button>
+    <input 
+        type="range" 
+        class="volume-slider" 
+        id="music-volume"
+        min="0" 
+        max="50" 
+        value="15"
+        title="Volume"
+    >
+</div>
 </div>
 
         <!-- Game Over Screen -->

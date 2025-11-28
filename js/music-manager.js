@@ -166,4 +166,32 @@ const musicManager = new YouTubeMusicManager();
 // ✅ EXPORT for use in battleship-ui.js
 export { musicManager, championThemes };
 
+// ======================================
+// SETUP MUSIC CONTROLS
+// ======================================
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Pause button
+    const pauseBtn = document.getElementById('music-pause');
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => musicManager.pause());
+    }
+    
+    // Play button
+    const playBtn = document.getElementById('music-play');
+    if (playBtn) {
+        playBtn.addEventListener('click', () => musicManager.resume());
+    }
+    
+    // Volume slider
+    const volumeSlider = document.getElementById('music-volume');
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            musicManager.setVolume(e.target.value);
+        });
+    }
+});
+
+
 console.log('🎵 Music Manager loaded');
