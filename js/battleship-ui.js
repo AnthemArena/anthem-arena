@@ -1007,7 +1007,6 @@ showTargetIndicator(row, col) {
 async enemyTurn() {
     if (game.currentTurn !== 'enemy' || !game.gameActive) return;
 
-    // BREATHING SPACE: Before enemy turn starts
     await this.delay(1000);
 
     // 1. TURN ANNOUNCEMENT
@@ -1029,12 +1028,7 @@ async enemyTurn() {
         return;
     }
 
-    // 4. SHOT ANNOUNCEMENT
-    this.showShotAnnouncement(this.opponentCharacter, target.row, target.col, false);
-    
-    await this.delay(2000);
-
-    // 5. EXECUTE SHOT
+    // ✅ 4. EXECUTE SHOT FIRST
     const result = game.enemyShoot(target.row, target.col);
     
     if (!result.valid) {
@@ -1042,22 +1036,17 @@ async enemyTurn() {
         return;
     }
 
-    // ✅ FIX: Safely update announcement with result
-    const lastAnnouncement = document.querySelector('.shot-announcement');
-    if (lastAnnouncement) {
-        const shotContent = lastAnnouncement.querySelector('.shot-announcement-content');
-        const resultEl = lastAnnouncement.querySelector('.result');
-        
-        if (resultEl && shotContent) {
-            resultEl.textContent = result.hit ? '💥 HIT!' : '💦 MISS!';
-            shotContent.classList.remove('hit-result', 'miss-result'); // Remove existing
-            shotContent.classList.add(result.hit ? 'hit-result' : 'miss-result');
-        }
-    }
+    // ✅ 5. SHOW ANNOUNCEMENT WITH RESULT
+    this.showShotAnnouncement(
+        this.opponentCharacter, 
+        target.row, 
+        target.col, 
+        result.hit  // ← Already know the result!
+    );
+    
+    await this.delay(2000);
 
-    await this.delay(800);
-
-    // 6. UPDATE VISUAL
+    // 6. UPDATE VISUAL (rest of your code continues...)
     const cell = this.elements.playerGrid.querySelector(
         `[data-row="${target.row}"][data-col="${target.col}"]`
     );
