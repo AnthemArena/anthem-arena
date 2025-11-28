@@ -343,10 +343,7 @@
     box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
 }
 
-.grid-cell.hit::after {
-    content: '💥';
-    font-size: 1.5rem;
-}
+
 
 .grid-cell.miss {
     background: #0397AB;
@@ -809,9 +806,7 @@ font-size: 2rem;
     opacity: 0.5;
 }
 
-.ship-icon.destroyed::before {
-    content: '💥';
-}
+
 /* Ability Tooltips */
 .ability-btn {
     position: relative;
@@ -1967,14 +1962,7 @@ font-size: 2rem;
     content: '💧';
 }
 
-/* Jinx's chaos markers */
-.jinx-attacking .grid-cell.hit::after {
-    content: '💥';
-}
 
-.jinx-attacking .grid-cell.miss::after {
-    content: '💦';
-}
 /* Caitlyn's hits glow blue */
 .caitlyn-attacking .grid-cell.hit {
     box-shadow: 
