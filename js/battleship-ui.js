@@ -808,6 +808,12 @@ showTurnAnnouncement(character, isPlayer) {
 }
 
 showShotAnnouncement(character, row, col, hit) {
+    // ✅ Remove any existing announcement first
+    const existing = document.querySelector('.shot-announcement');
+    if (existing) {
+        existing.remove();
+    }
+    
     const announcement = document.createElement('div');
     announcement.className = 'shot-announcement';
     
@@ -834,7 +840,9 @@ showShotAnnouncement(character, row, col, hit) {
     setTimeout(() => {
         announcement.classList.remove('show');
         setTimeout(() => {
-            announcement.remove();
+            if (announcement.parentNode) { // ✅ Check if still in DOM
+                announcement.remove();
+            }
         }, 500);
     }, 2000);
 }
@@ -855,13 +863,12 @@ getCoordinateLabel(row, col) {
     
     if (!result.valid) return;
 
-    // ✅ INSTANT FEEDBACK: Show targeting animation immediately
+    // INSTANT FEEDBACK
     const cell = this.elements.enemyGrid.querySelector(
         `[data-row="${row}"][data-col="${col}"]`
     );
     cell.classList.add('targeting');
     
-    // ✅ Show crosshair/target indicator
     this.showTargetIndicator(row, col);
 
     // 1. PRE-SHOT QUOTE
@@ -874,7 +881,7 @@ getCoordinateLabel(row, col) {
     
     await this.delay(1500);
 
-    // 3. UPDATE VISUAL - Remove targeting, add result
+    // 3. UPDATE VISUAL
     cell.classList.remove('targeting');
     
     if (result.hit) {
@@ -909,7 +916,14 @@ getCoordinateLabel(row, col) {
         
         if (result.sunk) {
             await this.delay(1500);
-            this.showQuote(this.selectedCharacter, 'ship_sunk');
+            
+            // ✅ Check if champion was destroyed
+            if (result.unitName && result.unitName.includes(this.characters[this.opponentCharacter].displayName)) {
+                this.showQuote(this.selectedCharacter, 'champion_sunk');
+            } else {
+                this.showQuote(this.selectedCharacter, 'ship_sunk');
+            }
+            
             await this.delay(1000);
             this.updateShipIndicators('opponent');
             this.highlightSunkShip(result.coordinates, 'enemy');
@@ -1000,12 +1014,12 @@ async enemyTurn() {
     this.showTurnAnnouncement(this.opponentCharacter, false);
     this.updateTurnIndicator('enemy');
     
-    await this.delay(2000); // ← INCREASED: was 1500
+    await this.delay(2000);
     
     // 2. PRE-SHOT QUOTE
     this.showQuote(this.opponentCharacter, 'taking_shot');
     
-    await this.delay(2000); // ← INCREASED: was 1500
+    await this.delay(2000);
 
     // 3. AI DECIDES TARGET
     const target = aiOpponent.getNextShot(game);
@@ -1018,7 +1032,7 @@ async enemyTurn() {
     // 4. SHOT ANNOUNCEMENT
     this.showShotAnnouncement(this.opponentCharacter, target.row, target.col, false);
     
-    await this.delay(2000); // ← INCREASED: was 1500
+    await this.delay(2000);
 
     // 5. EXECUTE SHOT
     const result = game.enemyShoot(target.row, target.col);
@@ -1028,17 +1042,20 @@ async enemyTurn() {
         return;
     }
 
-    // Update announcement with result
+    // ✅ FIX: Safely update announcement with result
     const lastAnnouncement = document.querySelector('.shot-announcement');
     if (lastAnnouncement) {
+        const shotContent = lastAnnouncement.querySelector('.shot-announcement-content');
         const resultEl = lastAnnouncement.querySelector('.result');
-        if (resultEl) {
+        
+        if (resultEl && shotContent) {
             resultEl.textContent = result.hit ? '💥 HIT!' : '💦 MISS!';
-            lastAnnouncement.querySelector('.shot-announcement-content').classList.add(result.hit ? 'hit-result' : 'miss-result');
+            shotContent.classList.remove('hit-result', 'miss-result'); // Remove existing
+            shotContent.classList.add(result.hit ? 'hit-result' : 'miss-result');
         }
     }
 
-    await this.delay(800); // ← Let result display
+    await this.delay(800);
 
     // 6. UPDATE VISUAL
     const cell = this.elements.playerGrid.querySelector(
@@ -1048,46 +1065,53 @@ async enemyTurn() {
     if (result.hit) {
         cell.classList.add('hit');
         
-        await this.delay(800); // ← INCREASED: was 500
+        await this.delay(800);
         
         // 7. OPPONENT REACTION
         this.showQuote(this.opponentCharacter, 'hit');
         
-        await this.delay(1500); // ← INCREASED: was 800
+        await this.delay(1500);
         
         // 8. PLAYER REACTION (getting hit)
         this.showQuote(this.selectedCharacter, 'got_hit');
         
-        await this.delay(1500); // ← ADDED: breathing space
+        await this.delay(1500);
         
         aiOpponent.onHit(game, target.row, target.col, result.sunk);
         
         if (result.sunk) {
-            await this.delay(1500); // ← INCREASED: was 1000
-            this.showQuote(this.opponentCharacter, 'ship_sunk');
-            await this.delay(1000); // ← ADDED: let quote display
+            await this.delay(1500);
+            
+            // ✅ Check if champion was destroyed
+            if (result.unitName && result.unitName.includes(this.characters[this.selectedCharacter].displayName)) {
+                this.showQuote(this.opponentCharacter, 'champion_sunk');
+            } else {
+                this.showQuote(this.opponentCharacter, 'ship_sunk');
+            }
+            
+            await this.delay(1000);
             this.updateShipIndicators('player');
             this.highlightSunkShip(result.coordinates, 'player');
         }
     } else {
         cell.classList.add('miss');
         
-        await this.delay(800); // ← INCREASED: was 500
+        await this.delay(800);
         
         // 7. OPPONENT REACTION (to missing)
         this.showQuote(this.opponentCharacter, 'miss');
         
-        await this.delay(1500); // ← INCREASED: was 800
+        await this.delay(1500);
         
         // 8. PLAYER REACTION (taunt)
         this.showQuote(this.selectedCharacter, 'enemy_miss');
         
-        await this.delay(1500); // ← ADDED: breathing space
+        await this.delay(1500);
     }
 
     // Check game over
     if (result.gameOver) {
-        await this.delay(2500); // ← INCREASED: was 2000
+        await this.delay(2500);
         this.endGame(result.winner);
         return;
     }
@@ -1097,10 +1121,10 @@ async enemyTurn() {
 
     // Continue enemy turn if hit, otherwise player turn
     if (result.hit) {
-        await this.delay(1000); // ← INCREASED: was 1500
+        await this.delay(1000);
         this.enemyTurn();
     } else {
-        await this.delay(2000); // ← INCREASED: was 1500
+        await this.delay(2000);
         this.showTurnAnnouncement(this.selectedCharacter, true);
         this.updateTurnIndicator('player');
     }

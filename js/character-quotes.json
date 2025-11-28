@@ -46,12 +46,20 @@
       "A minor setback. I'll compensate.",
       "Recalibrating."
     ],
+    "champion_sunk": [
+      "Target neutralized. You're finished.",
+      "The Sheriff never misses. Case closed.",
+      "Eliminated. Justice is served."
+    ],
     "ship_sunk": [
       "Enemy vessel neutralized. One down.",
       "Target eliminated. Moving to the next.",
       "Your fleet is diminishing. As calculated.",
       "Another one removed from play. Efficient.",
-      "Confirmed kill. Next target."
+      "Confirmed kill. Next target.",
+       "Enemy asset destroyed.",
+      "Unit eliminated. Moving to the next.",
+      "Structure neutralized."
     ],
     "ultimate": [
       "Ace in the Hole activated. Let me show you something.",
@@ -147,6 +155,12 @@
       "Meh. Next one's gonna be HUGE!",
       "That didn't work. Let's try something else!"
     ],
+     "champion_sunk": [
+      "GOT YOU! You're DONE FOR!",
+      "HAHA! The big kahuna goes BOOM!",
+      "That's what you GET! KABOOM!",
+      "You just got JINXED! For real this time!"
+    ],
     "ship_sunk": [
       "DOWN IT GOES! Splishy-splashy!",
       "HAHA! Bye bye ship!",
@@ -154,7 +168,11 @@
       "One less! This is AWESOME!",
       "Glug glug glug! To the bottom!",
       "Lights out!",
-      "KABOOM! Sunk it!"
+      "KABOOM! Sunk it!",
+       "BOOM! Down it goes!",
+      "Haha! Bye bye!",
+      "Watch it EXPLODE!",
+      "One less thing! KABOOM!"
     ],
     "ultimate": [
       "SUPER MEGA DEATH ROCKET! Catch 'em all!",
