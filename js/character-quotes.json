@@ -28,7 +28,8 @@
         "Target acquired. Commencing operation.",
         "Rules of engagement: No mercy.",
         "Let's see if you can match my precision.",
-        "I've got you in my sights."
+        "I've got you in my sights.",
+        "I've already calculated your patterns."
       ],
       "taking_shot": [
         "Calculating trajectory...",
@@ -36,7 +37,9 @@
         "Taking the shot.",
         "I never miss.",
         "Lining up the perfect shot.",
-        "Precision strike incoming."
+        "Precision strike incoming.",
+          "In the name of the law..."
+
       ],
       "hit": [
         "Direct hit. As expected.",
@@ -115,7 +118,8 @@
         "Impossible. I never lose...",
         "This... requires further analysis.",
         "An unexpected outcome. Unacceptable.",
-        "I underestimated you. It won't happen again."
+        "I underestimated you. It won't happen again.",
+          "This is... unacceptable. A complete failure of protocol."
       ]
     },
     "rivals": {
@@ -185,7 +189,9 @@
           "Lucky shot, Jinx!",
           "Stop playing around, criminal!",
           "You'll pay for that, Jinx!",
-          "This isn't a game!"
+          "This isn't a game!",
+          "That's enough, Jinx! This ends NOW!"
+
         ],
         "hextech_rifle_lost": [
           "You destroyed my parents' rifle, Jinx! This is personal now!",
@@ -246,7 +252,8 @@
         "Let's make this REALLY interesting! Random or careful? ...Random!",
         "They'll NEVER expect ships in THESE spots! Hehe!",
         "Deployment schmoyment! Just put 'em somewhere fun!",
-        "This is the boring part... can we skip to the explosions?"
+        "This is the boring part... can we skip to the explosions?",
+          "Okay so... wait, which one goes where? Eh, whatever! Surprise!"
       ],
       "random_placement": [
         "Ehh, wherever! Who cares where they go!",
@@ -273,7 +280,8 @@
         "Catch THIS!",
         "Eeny, meeny, miny, BOOM!",
         "Pick a spot, ANY spot!",
-        "Let's make some NOISE!"
+        "Let's make some NOISE!",
+          "Pow-Pow says hi! Wait, does Fishbones wanna play too?"
       ],
       "hit": [
         "BOOM! Got one! Hehehe!",
@@ -290,7 +298,8 @@
         "Dang it! ...Wait, where was I aiming again?",
         "Noooo! So close!",
         "Meh. Next one's gonna be HUGE!",
-        "That didn't work. Let's try something else!"
+        "That didn't work. Let's try something else!",
+        "Aww! But Cait, you make it look SO easy!"
       ],
       "champion_sunk": [
         "GOT YOU! You're DONE FOR!",
@@ -386,7 +395,8 @@
         "HAHA! That was AWESOME! Let's do it again!",
         "Jinx wins! Everybody loses! Well, except me!",
         "I'm the BEST! Did I mention I WON?",
-        "Victory! Now where's my prize? There's a prize, right?"
+        "Victory! Now where's my prize? There's a prize, right?",
+          "WOOHOO! Did you SEE all those EXPLOSIONS?! That was ME! I DID THAT!"
       ],
       "defeat": [
         "What?! NO! That's not fair!",
