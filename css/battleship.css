@@ -1968,3 +1968,65 @@ font-size: 2rem;
     background-image: var(--attacker-portrait); /* Enemy's portrait on hits/misses */
     /* ... rest of styling ... */
 }
+/* Ship Icons - Themed */
+.ship-icon {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ship-icon:hover {
+    transform: scale(1.1);
+    border-color: var(--gold-light);
+    box-shadow: 0 0 15px rgba(207, 181, 59, 0.6);
+}
+
+/* When ship is destroyed */
+.ship-icon.destroyed {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    border-color: rgba(207, 181, 59, 0.3);
+}
+
+/* Loading state */
+.ship-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Ship cells with themed backgrounds */
+.grid-cell.ship {
+    background-color: rgba(207, 181, 59, 0.3); /* Gold tint */
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px rgba(207, 181, 59, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Ship cells when hit - Red overlay with icon still visible */
+.grid-cell.ship.hit {
+    background-color: rgba(255, 51, 102, 0.85) !important; /* Red overlay */
+    border: 2px solid rgba(255, 51, 102, 1) !important;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.5) !important;
+    background-blend-mode: multiply !important; /* Icon shows through red */
+}
+
+/* Preview during placement */
+.grid-cell.preview {
+    background-color: rgba(207, 181, 59, 0.5);
+    border: 2px dashed var(--gold);
+}
+
+.grid-cell.invalid-preview {
+    background-color: rgba(255, 51, 102, 0.5);
+    border: 2px dashed rgba(255, 51, 102, 1);
+}

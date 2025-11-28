@@ -158,6 +158,13 @@
           "Your chaos ends here, one ship at a time.",
           "Another piece of stolen equipment destroyed."
         ],
+        "enemy_miss": [
+      "Your aim is as chaotic as your personality, Jinx.",
+      "Missed by a mile. Typical Jinx.",
+      "Is that really your best shot, criminal?",
+      "You'll need better aim than that to beat me, Jinx.",
+      "Sloppy. I expected better, even from you."
+    ],
         "enemy_fishbones_sunk": [
           "Fishbones destroyed. Your favorite weapon is scrap, Jinx.",
           "That rocket launcher caused enough damage. It's over.",
@@ -193,6 +200,12 @@
           "That's enough, Jinx! This ends NOW!"
 
         ],
+        "miss": [
+  "Damn it, Jinx! Hold still!",
+  "You're harder to hit than I remembered, criminal.",
+  "Missed. You've gotten faster, Jinx.",
+  "Stop moving around so much!"
+],
         "hextech_rifle_lost": [
           "You destroyed my parents' rifle, Jinx! This is personal now!",
           "The Hextech Rifle... you'll answer for this!",
@@ -230,6 +243,11 @@
           "The Sheriff wins. As it should be, Jinx.",
           "This chase is over. You're coming with me."
         ],
+        "ship_lost": [
+  "You'll pay for that, Jinx!",
+  "Lucky shot, criminal.",
+  "That's coming out of YOUR hide!"
+],
         "defeat": [
           "How did you... No. This can't be right.",
           "Jinx... you won't get away with this.",
@@ -469,6 +487,17 @@
           "Haha! No badge, no authority! You're just regular Cait now!",
           "Badge go bye bye! Who's the law NOW?"
         ],
+        "miss": [
+  "Aww! But you're RIGHT THERE, Cait!",
+  "How did I miss?! You're so... still!",
+  "Dang it! Your fancy hat is distracting!",
+  "I NEVER miss! ...Okay fine, sometimes I miss!"
+],
+"ship_lost": [
+  "HEY! Cait, that's not FAIR!",
+  "Owie! You're too good at this, cupcake!",
+  "My ship! This is WAR now, Sheriff!"
+],
         "got_hit": [
           "OW! That was too accurate, Cait!",
           "No fair! You actually AIM!",
@@ -482,6 +511,13 @@
           "My rocket launcher! You'll regret that, Sheriff!",
           "FISHBONES! This is PERSONAL now, Cait!"
         ],
+         "enemy_miss": [
+      "HAHA! The 'perfect shot' MISSED! Not so perfect NOW, cupcake!",
+      "Even the Sheriff whiffs sometimes! Hehe!",
+      "Miss! How does THAT feel, fancy hat?!",
+      "You're supposed to be the sniper, Cait! What happened?!",
+      "Too slow, Sheriff! WAY too slow!"
+    ],
         "pow_pow_lost": [
           "POW-POW! Cait, you're SO gonna get it now!",
           "You broke my FAVORITE gun, Sheriff!",

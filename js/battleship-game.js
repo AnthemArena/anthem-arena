@@ -74,22 +74,22 @@ setCharacterShips(character) {
         };
     }
 
-    // Create empty 10x10 grid
     createEmptyGrid() {
-        const grid = [];
-        for (let row = 0; row < this.gridSize; row++) {
-            grid[row] = [];
-            for (let col = 0; col < this.gridSize; col++) {
-                grid[row][col] = {
-                    hasShip: false,
-                    shipId: null,
-                    isHit: false,
-                    isMiss: false
-                };
-            }
+    const grid = [];
+    for (let row = 0; row < this.gridSize; row++) {
+        grid[row] = [];
+        for (let col = 0; col < this.gridSize; col++) {
+            grid[row][col] = {
+                hasShip: false,
+                shipId: null,
+                shipName: null,  // ✅ ADD THIS
+                isHit: false,
+                isMiss: false
+            };
         }
-        return grid;
     }
+    return grid;
+}
 
     // ============================================
     // SHIP PLACEMENT
@@ -131,6 +131,8 @@ setCharacterShips(character) {
         
         grid[row][col].hasShip = true;
         grid[row][col].shipId = shipId;
+        grid[row][col].shipName = ship.name;  // ✅ ADD THIS
+        grid[row][col].unitName = unitName;
         
         coordinates.push({ row, col });
     }
@@ -138,12 +140,14 @@ setCharacterShips(character) {
     ships.push({
         id: shipId,
         name: ship.name,
+        displayName: ship.displayName,  // ✅ Make sure this is here
         size: ship.size,
         icon: ship.icon,
-        unitName: unitName,  // ✅ ADD THIS - store the champion name
+        unitName: unitName,
         coordinates: coordinates,
         hits: 0,
-        isSunk: false
+        isSunk: false,
+        isChampion: ship.isChampion  // ✅ ADD THIS
     });
 
     return true;

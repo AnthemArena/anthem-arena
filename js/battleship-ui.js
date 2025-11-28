@@ -66,6 +66,22 @@ class BattleshipUI {
         
         // Track game start time
         this.gameStartTime = null;
+
+         // ✅ ADD THIS:
+    this.ddVersion = '15.23.1';
+    this.shipIconMap = {
+        'Hextech Rifle': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/champion/Caitlyn.png`,
+        'Yordle Snap Trap': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/CaitlynW.png`,
+        '90 Caliber Net': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/CaitlynE.png`,
+        'Piltover Peacemaker': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/CaitlynQ.png`,
+        "Sheriff's Badge": `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/CaitlynR.png`,
+        'Fishbones': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/JinxR.png`,
+        'Pow-Pow': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/JinxQ.png`,
+        'Flame Chompers': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/JinxE.png`,
+        'Zapper': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/JinxW.png`,
+        'Super Mega Death Rocket': `https://ddragon.leagueoflegends.com/cdn/${this.ddVersion}/img/spell/JinxR.png`
+    };
+
     }
 
     // ============================================
@@ -550,19 +566,39 @@ getRandomTip() {
     }
 }
 
-    updatePlacementGrid() {
-        for (let row = 0; row < game.gridSize; row++) {
-            for (let col = 0; col < game.gridSize; col++) {
-                const cell = this.elements.placementGrid.querySelector(
-                    `[data-row="${row}"][data-col="${col}"]`
-                );
+  updatePlacementGrid() {
+    for (let row = 0; row < game.gridSize; row++) {
+        for (let col = 0; col < game.gridSize; col++) {
+            const cell = this.elements.placementGrid.querySelector(
+                `[data-row="${row}"][data-col="${col}"]`
+            );
+            
+            const cellData = game.playerGrid[row][col];
+            
+            if (cell && cellData.hasShip) {
+                cell.classList.add('ship');
                 
-                if (cell && game.playerGrid[row][col].hasShip) {
-                    cell.classList.add('ship');
+                // ✅ ADD SHIP ICON DURING PLACEMENT
+                const iconUrl = this.shipIconMap[cellData.shipName];
+                if (iconUrl) {
+                    cell.style.backgroundImage = `url('${iconUrl}')`;
+                    cell.style.backgroundSize = '70%';
+                    cell.style.backgroundPosition = 'center';
+                    cell.style.backgroundRepeat = 'no-repeat';
+                    cell.style.backgroundBlendMode = 'screen';
+                    
+                    const img = new Image();
+                    img.onerror = () => {
+                        const ship = game.playerShips.find(s => s.name === cellData.shipName);
+                        cell.textContent = ship?.icon || '🚢';
+                        cell.style.backgroundImage = 'none';
+                    };
+                    img.src = iconUrl;
                 }
             }
         }
     }
+}
 
 updateShipSelector() {
     this.elements.shipItems.forEach((item, index) => {
@@ -740,14 +776,77 @@ startBattle() {
     
     // Setup abilities based on character
     this.setupAbilities();
+
+     // Setup themed ship icons
+    this.setupThemedShipIcons();
+
 }
 
-  setupAbilities() {
+setupThemedShipIcons() {
+    const ddVersion = '15.23.1'; // Latest Data Dragon version
+    
+    const shipIconMap = {
+        caitlyn: {
+            'Hextech Rifle': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/Caitlyn.png`,
+            'Yordle Snap Trap': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/CaitlynW.png`,
+            '90 Caliber Net': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/CaitlynE.png`,
+            'Piltover Peacemaker': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/CaitlynQ.png`,
+            "Sheriff's Badge": `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/CaitlynR.png`
+        },
+        jinx: {
+            'Fishbones': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/JinxR.png`,
+            'Pow-Pow': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/JinxQ.png`,
+            'Zap!': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/JinxW.png`,
+            'Flame Chompers': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/spell/JinxE.png`,
+            'Minigun': `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/passive/Jinx_Passive.png`
+        }
+    };
+    
+    // Update player ship icons
+    const playerShips = this.elements.playerBanner.querySelectorAll('.ship-icon');
+    const playerShipData = game.playerShips;
+    
+    playerShips.forEach((icon, index) => {
+        if (playerShipData[index]) {
+            const shipName = playerShipData[index].name;
+            const iconUrl = shipIconMap[this.selectedCharacter][shipName];
+            
+            if (iconUrl) {
+                // Replace emoji with image
+                icon.style.backgroundImage = `url('${iconUrl}')`;
+                icon.style.backgroundSize = 'cover';
+                icon.style.backgroundPosition = 'center';
+                icon.textContent = ''; // Remove emoji
+                icon.title = shipName; // Add tooltip
+            }
+        }
+    });
+    
+    // Update opponent ship icons
+    const opponentShips = this.elements.opponentBanner.querySelectorAll('.ship-icon');
+    const opponentShipData = game.enemyShips;
+    
+    opponentShips.forEach((icon, index) => {
+        if (opponentShipData[index]) {
+            const shipName = opponentShipData[index].name;
+            const iconUrl = shipIconMap[this.opponentCharacter][shipName];
+            
+            if (iconUrl) {
+                icon.style.backgroundImage = `url('${iconUrl}')`;
+                icon.style.backgroundSize = 'cover';
+                icon.style.backgroundPosition = 'center';
+                icon.textContent = '';
+                icon.title = shipName;
+            }
+        }
+    });
+}
+setupAbilities() {
     const abilityData = {
         caitlyn: {
             passive: {
-                name: 'Precision',  // ← Changed from 'Headshot'
-                description: 'Automatically reveals adjacent cells when you hit a ship (Passive - Always Active)'
+                name: 'Precision',
+                description: 'Automatically reveals adjacent cells when you hit a ship (Passive)'
             },
             ultimate: {
                 name: 'Ace in the Hole',
@@ -756,7 +855,7 @@ startBattle() {
         },
         jinx: {
             passive: {
-                name: 'Get Excited!',  // ← Jinx's actual passive name
+                name: 'Get Excited!',
                 description: 'Every 3rd hit causes an explosion in adjacent cells (Passive - Always Active)'
             },
             ultimate: {
@@ -766,13 +865,15 @@ startBattle() {
         }
     };
     
+    // ============================================
+    // PLAYER ABILITIES (your banner)
+    // ============================================
     const abilities = abilityData[this.selectedCharacter];
     
     if (this.elements.ability1) {
         this.elements.ability1.querySelector('.ability-name').textContent = abilities.passive.name;
         this.elements.ability1.querySelector('.ability-cooldown').textContent = 'Passive';
         
-        // Update tooltip
         let tooltip = this.elements.ability1.querySelector('.ability-tooltip');
         if (!tooltip) {
             tooltip = document.createElement('div');
@@ -786,7 +887,6 @@ startBattle() {
         this.elements.ability2.querySelector('.ability-name').textContent = abilities.ultimate.name;
         this.elements.ability2.querySelector('.ability-uses').textContent = '1 Use';
         
-        // Update tooltip
         let tooltip = this.elements.ability2.querySelector('.ability-tooltip');
         if (!tooltip) {
             tooltip = document.createElement('div');
@@ -794,6 +894,51 @@ startBattle() {
             this.elements.ability2.appendChild(tooltip);
         }
         tooltip.innerHTML = `<strong>${abilities.ultimate.name}</strong><br>${abilities.ultimate.description}`;
+    }
+    
+    // ============================================
+    // ✅ OPPONENT ABILITIES (opponent banner)
+    // ============================================
+    const opponentAbilities = abilityData[this.opponentCharacter];
+    
+    // Find opponent ability buttons
+    const opponentAbility1 = this.elements.opponentBanner.querySelector('.ability-btn:nth-child(1)');
+    const opponentAbility2 = this.elements.opponentBanner.querySelector('.ability-btn:nth-child(2)');
+    
+    if (opponentAbility1) {
+        const nameEl = opponentAbility1.querySelector('.ability-name');
+        const cooldownEl = opponentAbility1.querySelector('.ability-cooldown');
+        
+        if (nameEl) nameEl.textContent = opponentAbilities.passive.name;
+        if (cooldownEl) cooldownEl.textContent = 'Passive';
+        
+        let tooltip = opponentAbility1.querySelector('.ability-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'ability-tooltip';
+            opponentAbility1.appendChild(tooltip);
+        }
+        tooltip.innerHTML = `<strong>${opponentAbilities.passive.name}</strong><br>${opponentAbilities.passive.description}`;
+        
+        opponentAbility1.disabled = true; // Can't click opponent abilities
+    }
+    
+    if (opponentAbility2) {
+        const nameEl = opponentAbility2.querySelector('.ability-name');
+        const usesEl = opponentAbility2.querySelector('.ability-uses');
+        
+        if (nameEl) nameEl.textContent = opponentAbilities.ultimate.name;
+        if (usesEl) usesEl.textContent = '1 Use';
+        
+        let tooltip = opponentAbility2.querySelector('.ability-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'ability-tooltip';
+            opponentAbility2.appendChild(tooltip);
+        }
+        tooltip.innerHTML = `<strong>${opponentAbilities.ultimate.name}</strong><br>${opponentAbilities.ultimate.description}`;
+        
+        opponentAbility2.disabled = true; // Can't click opponent abilities
     }
 }
 
@@ -858,31 +1003,55 @@ createBattleGrids() {
     // ============================================
     // ✅ CREATE PLAYER GRID (defensive view - top)
     // ============================================
-    this.elements.playerGrid.innerHTML = '';
+    // ============================================
+// ✅ CREATE PLAYER GRID (defensive view - top)
+// ============================================
+this.elements.playerGrid.innerHTML = '';
 
-    // ✅ ADD CHARACTER CLASS - Enemy attacks show THEIR portrait
-    this.elements.playerGrid.classList.add(`${this.opponentCharacter}-attacking`);
+// ✅ ADD CHARACTER CLASS - Enemy attacks show THEIR portrait
+this.elements.playerGrid.classList.add(`${this.opponentCharacter}-attacking`);
 
-     // ✅ SET CSS VARIABLE FOR PORTRAIT URL
-    const opponentPortrait = this.getChampionIcon(this.characters[this.opponentCharacter].championKey);
-    this.elements.playerGrid.style.setProperty('--attacker-portrait', `url(${opponentPortrait})`);
-    
+// ✅ SET CSS VARIABLE FOR PORTRAIT URL
+const opponentPortrait = this.getChampionIcon(this.characters[this.opponentCharacter].championKey);
+this.elements.playerGrid.style.setProperty('--attacker-portrait', `url(${opponentPortrait})`);
 
-    for (let row = 0; row < game.gridSize; row++) {
-        for (let col = 0; col < game.gridSize; col++) {
-            const cell = document.createElement('div');
-            cell.classList.add('grid-cell');
-            cell.dataset.row = row;
-            cell.dataset.col = col;
+for (let row = 0; row < game.gridSize; row++) {
+    for (let col = 0; col < game.gridSize; col++) {
+        const cell = document.createElement('div');
+        cell.classList.add('grid-cell');
+        cell.dataset.row = row;
+        cell.dataset.col = col;
+        
+        const cellData = game.playerGrid[row][col];
+        
+        // ✅ SHOW YOUR SHIPS WITH ICONS
+        if (cellData.hasShip) {
+            cell.classList.add('ship');
             
-            // Show YOUR ships on this grid
-            if (game.playerGrid[row][col].hasShip) {
-                cell.classList.add('ship');
+            // Get ship icon URL
+            const iconUrl = this.shipIconMap[cellData.shipName];
+            if (iconUrl) {
+                cell.style.backgroundImage = `url('${iconUrl}')`;
+                cell.style.backgroundSize = '70%';
+                cell.style.backgroundPosition = 'center';
+                cell.style.backgroundRepeat = 'no-repeat';
+                cell.style.backgroundBlendMode = 'screen';
+                
+                // Fallback handling
+                const img = new Image();
+                img.onerror = () => {
+                    // Find the ship to get its emoji icon
+                    const ship = game.playerShips.find(s => s.name === cellData.shipName);
+                    cell.textContent = ship?.icon || '🚢';
+                    cell.style.backgroundImage = 'none';
+                };
+                img.src = iconUrl;
             }
-            
-            this.elements.playerGrid.appendChild(cell);
         }
+        
+        this.elements.playerGrid.appendChild(cell);
     }
+}
     
     console.log('✅ Both grids created');
 }
@@ -1037,21 +1206,36 @@ if (result.sunk) {
     if (result.isChampion) {
         this.showQuote(this.selectedCharacter, 'champion_sunk');
     } else {
-        // Try ship-specific quote with opponent context
+        // ✅ TRY SHIP-SPECIFIC QUOTE
         const shipKey = this.getShipQuoteKey(result.shipName);
+        
+        // Try rival-specific quote first
         const specificQuote = characterQuotes.getQuote(
             this.selectedCharacter, 
             `enemy_${shipKey}_sunk`,
-            this.opponentCharacter  // ← ADD THIS for rival quotes
+            this.opponentCharacter
         );
         
         if (specificQuote) {
+            // Has rival-specific quote for sinking this ship
             this.showQuote(this.selectedCharacter, `enemy_${shipKey}_sunk`);
         } else {
-            // Fall back to generic with ship name tag
-            this.showQuote(this.selectedCharacter, 'enemy_ship_sunk_specific', {
-                shipName: result.displayName  // ← Use dynamic tag
-            });
+            // Try general ship-specific quote
+            const generalShipQuote = characterQuotes.getQuote(
+                this.selectedCharacter,
+                `enemy_${shipKey}_sunk`,
+                null  // No rival, check general
+            );
+            
+            if (generalShipQuote) {
+                // Has general quote for sinking this specific ship type
+                this.showQuote(this.selectedCharacter, `enemy_${shipKey}_sunk`);
+            } else {
+                // Fall back to generic with ship name tag
+                this.showQuote(this.selectedCharacter, 'enemy_ship_sunk_specific', {
+                    shipName: result.displayName
+                });
+            }
         }
     }
     
@@ -1202,60 +1386,74 @@ async enemyTurn() {
         
         aiOpponent.onHit(game, target.row, target.col, result.sunk);
         
-        // ✅ ONLY RUN SHIP SUNK LOGIC IF SHIP ACTUALLY SUNK
-        if (result.sunk) {
-            await this.delay(1500);
+       // ✅ ONLY RUN SHIP SUNK LOGIC IF SHIP ACTUALLY SUNK
+if (result.sunk) {
+    await this.delay(1500);
+    
+    // Check if it's champion ship
+    if (result.isChampion) {
+        // Opponent celebrates sinking champion
+        this.showQuote(this.opponentCharacter, 'champion_sunk');
+        
+        await this.delay(1500);
+        
+        // Player reacts to losing champion
+        const shipKey = this.getShipQuoteKey(result.shipName);
+        this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
+    } else {
+        // Opponent celebrates sinking regular ship
+        const shipKey = this.getShipQuoteKey(result.shipName);
+        
+        // Try rival-specific quote first
+        const opponentSpecificQuote = characterQuotes.getQuote(
+            this.opponentCharacter, 
+            `enemy_${shipKey}_sunk`,
+            this.selectedCharacter
+        );
+        
+        if (opponentSpecificQuote) {
+            this.showQuote(this.opponentCharacter, `enemy_${shipKey}_sunk`);
+        } else {
+            this.showQuote(this.opponentCharacter, 'ship_sunk');
+        }
+        
+        await this.delay(1500);
+        
+        // ✅ PLAYER REACTS TO LOSING SPECIFIC SHIP
+        // Try rival-specific ship lost quote first
+        const playerRivalQuote = characterQuotes.getQuote(
+            this.selectedCharacter,
+            `${shipKey}_lost`,
+            this.opponentCharacter
+        );
+        
+        if (playerRivalQuote) {
+            // Has rival-specific quote for this ship
+            this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
+        } else {
+            // Try general ship-specific quote
+            const playerGeneralShipQuote = characterQuotes.getQuote(
+                this.selectedCharacter,
+                `${shipKey}_lost`,
+                null  // No rival, check general
+            );
             
-            // Check if it's champion ship
-            if (result.isChampion) {
-                // Opponent celebrates sinking champion
-                this.showQuote(this.opponentCharacter, 'champion_sunk');
-                
-                await this.delay(1500);
-                
-                // Player reacts to losing champion
-                const shipKey = this.getShipQuoteKey(result.shipName);
+            if (playerGeneralShipQuote) {
+                // Has general quote for this specific ship
                 this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
             } else {
-                // Opponent celebrates sinking regular ship
-                const shipKey = this.getShipQuoteKey(result.shipName);
-                
-                // Try rival-specific quote first
-                const opponentSpecificQuote = characterQuotes.getQuote(
-                    this.opponentCharacter, 
-                    `enemy_${shipKey}_sunk`,
-                    this.selectedCharacter  // Their rival is YOU
-                );
-                
-                if (opponentSpecificQuote) {
-                    this.showQuote(this.opponentCharacter, `enemy_${shipKey}_sunk`);
-                } else {
-                    this.showQuote(this.opponentCharacter, 'ship_sunk');
-                }
-                
-                await this.delay(1500);
-                
-                // Player reacts to losing specific ship
-                const playerSpecificQuote = characterQuotes.getQuote(
-                    this.selectedCharacter, 
-                    `${shipKey}_lost`,
-                    this.opponentCharacter  // Your rival
-                );
-                
-                if (playerSpecificQuote) {
-                    this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
-                } else {
-                    // Fall back with ship name tag
-                    this.showQuote(this.selectedCharacter, 'ship_lost_specific', {
-                        shipName: result.displayName
-                    });
-                }
+                // Fall back to generic ship_lost_specific with tag
+                this.showQuote(this.selectedCharacter, 'ship_lost_specific', {
+                    shipName: result.displayName
+                });
             }
-            
-            await this.delay(1000);
-            this.updateShipIndicators('player');
-            this.highlightSunkShip(result.coordinates, 'player');
         }
+    }
+    
+    await this.delay(1000);
+    this.updateShipIndicators('player');
+    this.highlightSunkShip(result.coordinates, 'player');
+}
         // ✅ END OF if (result.sunk) BLOCK
         
     } else {
@@ -1338,7 +1536,7 @@ getShipQuoteKey(shipName) {
     }
 
     useCaitlynUltimate() {
-        this.showQuote('caitlyn', 'ultimate');
+    this.showQuote(this.selectedCharacter, 'ultimate');  // ✅ Use this.selectedCharacter
         
         // Get center of grid for demo (you could let player choose)
         const centerRow = Math.floor(game.gridSize / 2);
@@ -1354,7 +1552,7 @@ getShipQuoteKey(shipName) {
     }
 
     useJinxUltimate() {
-        this.showQuote('jinx', 'ultimate');
+    this.showQuote(this.selectedCharacter, 'ultimate');  // ✅ Use this.selectedCharacter
         
         const result = game.useJinxUltimate();
         
@@ -1441,16 +1639,19 @@ getShipQuoteKey(shipName) {
     }
 
     updateShipIndicators(side) {
-        const banner = side === 'player' ? this.elements.playerBanner : this.elements.opponentBanner;
-        const remaining = side === 'player' ? game.playerShipsRemaining : game.enemyShipsRemaining;
-        const shipIcons = banner.querySelectorAll('.ship-icon');
-        
-        shipIcons.forEach((icon, index) => {
-            if (index >= remaining) {
-                icon.classList.add('destroyed');
-            }
-        });
-    }
+    const banner = side === 'player' ? this.elements.playerBanner : this.elements.opponentBanner;
+    const ships = side === 'player' ? game.playerShips : game.enemyShips;
+    const shipIcons = banner.querySelectorAll('.ship-icon');
+    
+    shipIcons.forEach((icon, index) => {
+        if (ships[index] && ships[index].hits >= ships[index].size) {
+            // Ship is destroyed
+            icon.classList.add('destroyed');
+            icon.style.opacity = '0.3';
+            icon.style.filter = 'grayscale(100%) brightness(0.5)';
+        }
+    });
+}
 
     updateTurnIndicator(turn) {
         const indicator = this.elements.turnIndicator;
