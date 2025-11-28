@@ -738,7 +738,9 @@ startBattle() {
 }
 
 createBattleGrids() {
-    // Create enemy grid (offensive view)
+    // ============================================
+    // CREATE ENEMY GRID (where you attack - bottom)
+    // ============================================
     this.elements.enemyGrid.innerHTML = '';
     for (let row = 0; row < game.gridSize; row++) {
         for (let col = 0; col < game.gridSize; col++) {
@@ -776,7 +778,29 @@ createBattleGrids() {
             this.elements.enemyGrid.appendChild(cell);
         }
     }
+    
+    // ============================================
+    // ✅ CREATE PLAYER GRID (defensive view - top)
+    // ============================================
+    this.elements.playerGrid.innerHTML = '';
+    for (let row = 0; row < game.gridSize; row++) {
+        for (let col = 0; col < game.gridSize; col++) {
+            const cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            
+            // Show YOUR ships on this grid
+            if (game.playerGrid[row][col].hasShip) {
+                cell.classList.add('ship');
+            }
+            
+            this.elements.playerGrid.appendChild(cell);
+        }
     }
+    
+    console.log('✅ Both grids created');
+}
 
     // ============================================
 // TURN ANNOUNCEMENTS & FLOW
