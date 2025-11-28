@@ -1831,3 +1831,160 @@ font-size: 2rem;
     grid-template-rows: repeat(10, 1fr);
     gap: 2px;
 }
+/* ========================================
+   CHARACTER PORTRAIT BACKGROUNDS FOR HITS/MISSES
+   ======================================== */
+
+/* Base styling for hit and miss cells with character portraits */
+.grid-cell.hit,
+.grid-cell.miss {
+    background-image: var(--attacker-portrait);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Red overlay for hits */
+.grid-cell.hit {
+    background-color: rgba(255, 51, 102, 0.85);
+    border: 2px solid rgba(255, 51, 102, 1);
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+}
+
+/* Blue overlay for misses */
+.grid-cell.miss {
+    background-color: rgba(3, 151, 171, 0.7);
+    border: 2px solid rgba(3, 151, 171, 1);
+    box-shadow: 0 0 8px rgba(3, 151, 171, 0.4);
+}
+
+/* Dark overlay for better contrast and readability */
+.grid-cell.hit::before,
+.grid-cell.miss::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Keep emoji icons on top with better visibility */
+.grid-cell.hit::after,
+.grid-cell.miss::after {
+    position: relative;
+    z-index: 3;
+    font-size: 24px;
+    text-shadow: 
+        0 0 8px rgba(0, 0, 0, 0.9),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+/* Optional: Add pulse animation on hit */
+.grid-cell.hit {
+    animation: hit-pulse 0.5s ease-out;
+}
+
+@keyframes hit-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(255, 51, 102, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+    }
+}
+
+/* Optional: Add ripple animation on miss */
+.grid-cell.miss {
+    animation: miss-ripple 0.6s ease-out;
+}
+
+@keyframes miss-ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Optional: Character-specific color tints */
+.caitlyn-attacking .grid-cell.hit {
+    border-color: rgba(3, 151, 171, 1); /* Caitlyn's blue accent */
+    box-shadow: 0 0 10px rgba(3, 151, 171, 0.6);
+}
+
+.jinx-attacking .grid-cell.hit {
+    border-color: rgba(255, 51, 102, 1); /* Jinx's pink accent */
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
+}
+
+/* Sunk ships with portraits (if you want different styling) */
+.grid-cell.sunk {
+    background-image: var(--attacker-portrait);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 2px solid rgba(255, 215, 0, 0.8);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.grid-cell.sunk::before {
+    background: rgba(0, 0, 0, 0.6);
+}/* Fade portrait more on misses for less visual noise */
+.grid-cell.miss {
+    background-color: rgba(3, 151, 171, 0.85); /* More opaque overlay */
+}
+
+.grid-cell.miss::before {
+    background: rgba(0, 0, 0, 0.5); /* Darker overlay on misses */
+}
+/* Caitlyn's precision markers */
+.caitlyn-attacking .grid-cell.hit::after {
+    content: '🎯';
+}
+
+.caitlyn-attacking .grid-cell.miss::after {
+    content: '💧';
+}
+
+/* Jinx's chaos markers */
+.jinx-attacking .grid-cell.hit::after {
+    content: '💥';
+}
+
+.jinx-attacking .grid-cell.miss::after {
+    content: '💦';
+}
+/* Caitlyn's hits glow blue */
+.caitlyn-attacking .grid-cell.hit {
+    box-shadow: 
+        0 0 10px rgba(3, 151, 171, 0.6),
+        inset 0 0 20px rgba(3, 151, 171, 0.3);
+}
+
+/* Jinx's hits glow pink */
+.jinx-attacking .grid-cell.hit {
+    box-shadow: 
+        0 0 10px rgba(255, 51, 102, 0.6),
+        inset 0 0 20px rgba(255, 51, 102, 0.3);
+}

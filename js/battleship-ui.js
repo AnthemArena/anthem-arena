@@ -802,6 +802,15 @@ createBattleGrids() {
     // CREATE ENEMY GRID (where you attack - bottom)
     // ============================================
     this.elements.enemyGrid.innerHTML = '';
+
+     // ✅ ADD CHARACTER CLASS - Your attacks show YOUR portrait
+    this.elements.enemyGrid.classList.add(`${this.selectedCharacter}-attacking`);
+
+      // ✅ SET CSS VARIABLE FOR PORTRAIT URL (best of both worlds!)
+    const playerPortrait = this.getChampionIcon(this.characters[this.selectedCharacter].championKey);
+    this.elements.enemyGrid.style.setProperty('--attacker-portrait', `url(${playerPortrait})`);
+    
+
     for (let row = 0; row < game.gridSize; row++) {
         for (let col = 0; col < game.gridSize; col++) {
             const cell = document.createElement('div');
@@ -850,6 +859,15 @@ createBattleGrids() {
     // ✅ CREATE PLAYER GRID (defensive view - top)
     // ============================================
     this.elements.playerGrid.innerHTML = '';
+
+    // ✅ ADD CHARACTER CLASS - Enemy attacks show THEIR portrait
+    this.elements.playerGrid.classList.add(`${this.opponentCharacter}-attacking`);
+
+     // ✅ SET CSS VARIABLE FOR PORTRAIT URL
+    const opponentPortrait = this.getChampionIcon(this.characters[this.opponentCharacter].championKey);
+    this.elements.playerGrid.style.setProperty('--attacker-portrait', `url(${opponentPortrait})`);
+    
+
     for (let row = 0; row < game.gridSize; row++) {
         for (let col = 0; col < game.gridSize; col++) {
             const cell = document.createElement('div');
@@ -954,7 +972,7 @@ getCoordinateLabel(row, col) {
         opponent: this.opponentCharacter,
         opponentWillSayGotHit: this.opponentCharacter
     });
-    
+
     if (game.currentTurn !== 'player' || !game.gameActive) return;
 
     const result = game.playerShoot(row, col);
