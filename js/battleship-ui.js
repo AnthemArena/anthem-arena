@@ -863,10 +863,14 @@ createBattleGrids() {
     // ✅ ADD CHARACTER CLASS - Enemy attacks show THEIR portrait
     this.elements.playerGrid.classList.add(`${this.opponentCharacter}-attacking`);
 
-     // ✅ SET CSS VARIABLE FOR PORTRAIT URL
+    // ✅ SET OPPONENT PORTRAIT (for when they hit you)
     const opponentPortrait = this.getChampionIcon(this.characters[this.opponentCharacter].championKey);
     this.elements.playerGrid.style.setProperty('--attacker-portrait', `url(${opponentPortrait})`);
     
+    // ✅ ALSO SET YOUR PORTRAIT (for your ships)
+    const playerPortrait = this.getChampionIcon(this.characters[this.selectedCharacter].championKey);
+    this.elements.playerGrid.style.setProperty('--owner-portrait', `url(${playerPortrait})`);
+
 
     for (let row = 0; row < game.gridSize; row++) {
         for (let col = 0; col < game.gridSize; col++) {

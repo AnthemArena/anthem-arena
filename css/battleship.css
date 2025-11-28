@@ -1976,3 +1976,15 @@ font-size: 2rem;
         0 0 10px rgba(255, 51, 102, 0.6),
         inset 0 0 20px rgba(255, 51, 102, 0.3);
 }
+/* Player's ships use their own portrait */
+#playerGrid .grid-cell.ship {
+    background-image: var(--owner-portrait); /* Your portrait on your ships */
+    /* ... rest of styling ... */
+}
+
+/* When hit/miss, show attacker's portrait */
+#playerGrid .grid-cell.hit,
+#playerGrid .grid-cell.miss {
+    background-image: var(--attacker-portrait); /* Enemy's portrait on hits/misses */
+    /* ... rest of styling ... */
+}
