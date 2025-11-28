@@ -112,27 +112,27 @@
     </div>
 
     <div class="ship-selector">
-        <div class="ship-item" data-ship="carrier" data-size="5">
-            <span class="ship-icon">🎯</span>
-            <span>Main Weapon (5)</span>
-        </div>
-        <div class="ship-item" data-ship="battleship" data-size="4">
-            <span class="ship-icon">💥</span>
-            <span>Heavy Unit (4)</span>
-        </div>
-        <div class="ship-item" data-ship="cruiser" data-size="3">
-            <span class="ship-icon">🪤</span>
-            <span>Tactical Unit (3)</span>
-        </div>
-        <div class="ship-item" data-ship="submarine" data-size="3">
-            <span class="ship-icon">🕸️</span>
-            <span>Support Unit (3)</span>
-        </div>
-        <div class="ship-item" data-ship="destroyer" data-size="2">
-            <span class="ship-icon">⭐</span>
-            <span>Light Unit (2)</span>
-        </div>
+    <div class="ship-item" data-ship="carrier" data-size="5">
+        <span class="ship-icon"></span> <!-- ❌ Remove 🎯 -->
+        <span>Main Weapon (5)</span>
     </div>
+    <div class="ship-item" data-ship="battleship" data-size="4">
+        <span class="ship-icon"></span> <!-- ❌ Remove 💥 -->
+        <span>Heavy Unit (4)</span>
+    </div>
+    <div class="ship-item" data-ship="cruiser" data-size="3">
+        <span class="ship-icon"></span> <!-- ❌ Remove 🪤 -->
+        <span>Tactical Unit (3)</span>
+    </div>
+    <div class="ship-item" data-ship="submarine" data-size="3">
+        <span class="ship-icon"></span> <!-- ❌ Remove 🕸️ -->
+        <span>Support Unit (3)</span>
+    </div>
+    <div class="ship-item" data-ship="destroyer" data-size="2">
+        <span class="ship-icon"></span> <!-- ❌ Remove ⭐ -->
+        <span>Light Unit (2)</span>
+    </div>
+</div>
 
             <button id="randomPlacement" class="secondary-btn">
                 🎲 Random Placement
@@ -154,7 +154,7 @@
                     </div>
                     <div class="character-info">
                         <h3 id="playerName">CAITLYN</h3>
-                        <p class="character-status">Your Fleet</p>
+                        <p class="character-status">Your Arsenal</p>
                         <div class="ships-remaining">
                             <div class="ship-icon"></div>
                             <div class="ship-icon"></div>
@@ -186,11 +186,11 @@
                 <!-- Game Boards -->
                 <div class="boards-container">
                     <div class="board-section">
-                        <h3>YOUR FLEET</h3>
+                        <h3>YOUR ARSENAL</h3>
                         <div id="playerGrid" class="game-grid player-grid"></div>
                     </div>
                     <div class="board-section">
-                        <h3>ENEMY FLEET</h3>
+                        <h3>ENEMY ARSENAL</h3>
                         <div id="enemyGrid" class="game-grid enemy-grid"></div>
                     </div>
                 </div>
