@@ -6,6 +6,14 @@
       "Every move calculated. Every shot counts.",
       "I don't miss. Let's prove it."
     ],
+     "deployment": [
+      "Let's maintain perfect formation. Every ship has its place.",
+      "Precision and planning win battles. Position your fleet carefully.",
+      "A well-organized fleet is half the victory.",
+      "The Sheriff of Piltover doesn't leave anything to chance.",
+      "Tactical positioning is key. Make every placement count.",
+      "Your fleet placement reveals your strategy. Choose wisely."
+    ],
     "random_placement": [
       "Strategic positioning complete. Standard deployment.",
       "Fleet arranged. All units accounted for.",
@@ -109,6 +117,14 @@
       "Jinx is here! Let's make some chaos!",
       "Hehe! Ready to watch the fireworks?",
       "Rules? What rules? Let's just PLAY!"
+    ],
+    "deployment": [
+      "Ooh, where should I put these? Surprise positions are the best!",
+      "Let's make this REALLY interesting! Random or careful? ...Random!",
+      "They'll NEVER expect ships in THESE spots! Hehe!",
+      "Deployment schmoyment! Just put 'em somewhere fun!",
+      "This is the boring part... can we skip to the explosions?",
+      "Rules say I gotta place ships? Fine! But I'm doing it MY way!"
     ],
     "random_placement": [
       "Ehh, wherever! Who cares where they go!",

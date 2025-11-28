@@ -8,7 +8,7 @@ class YouTubeMusicManager {
         this.player = null;
         this.currentVideoId = null;
         this.isReady = false;
-        this.defaultVolume = 15; // Low volume for ambience (0-100)
+        this.defaultVolume = 8; // Low volume for ambience (0-100)
         
         // Load YouTube IFrame API
         this.loadAPI();
@@ -142,6 +142,18 @@ class YouTubeMusicManager {
             }
             indicator.classList.add('visible');
         }
+    }
+    // ✅ ADD THIS NEW METHOD (before the closing brace of class)
+    setVolumeForGameState(state) {
+        const volumes = {
+            characterSelect: 12,  // Slightly louder during selection
+            placement: 8,         // Very quiet during ship placement
+            battle: 6,            // Even quieter during battle (focus)
+            victory: 20,          // Pump it up on win!
+            defeat: 10            // Moderate on loss
+        };
+        
+        this.fadeVolume(volumes[state] || 8, 1500);
     }
 }
 

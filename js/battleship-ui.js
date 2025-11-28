@@ -23,6 +23,11 @@ class BattleshipUI {
         this.currentShipIndex = 0;
         this.isHorizontal = true;
         this.playerShipsPlaced = [];
+
+          // ✅ ADD THESE TWO LINES:
+    this.lastQuoteTime = 0;
+    this.minQuoteCooldown = 3000; // 3 seconds between quotes
+
         
         // UI elements (will be set in init)
         this.elements = {};
@@ -277,7 +282,11 @@ selectCharacter(characterId) {
         championThemes[characterId].name
     );
 
-    
+      // ✅ ADD THIS - Set volume for character select
+    setTimeout(() => {
+        musicManager.setVolumeForGameState('characterSelect');
+    }, 500);
+
     // Add selected state to card
     const selectedCard = document.querySelector(`.character-card[data-character="${characterId}"]`);
     if (selectedCard) {
@@ -402,12 +411,20 @@ getRandomTip() {
 
    showShipPlacement() {
     this.showScreen('shipPlacement');
+    // ✅ ADD THIS - Quieter during placement
+    musicManager.setVolumeForGameState('placement');
     this.currentShipIndex = 0;
     this.playerShipsPlaced = [];
     this.isHorizontal = true;
     
     // Reset game
     game.reset();
+
+    // ✅ ADD THIS - Show deployment quote after a brief delay
+    setTimeout(() => {
+        this.showQuote(this.selectedCharacter, 'deployment');
+    }, 800);
+    
     
     // ✅ ADD THIS: Reset UI visibility
     if (this.elements.currentShipPreview) {
@@ -649,6 +666,8 @@ startBattle() {
     // Start game
     game.startGame();
     this.gameStartTime = Date.now();
+    // ✅ ADD THIS - Even quieter during battle
+    musicManager.setVolumeForGameState('battle');
     
     // Setup battle UI
     this.showScreen('battleScreen');
@@ -1364,6 +1383,12 @@ showQuote(character, eventType) {
         const stats = game.getGameStats();
         const isVictory = winner === 'player';
         const resultChar = isVictory ? this.selectedCharacter : this.opponentCharacter;
+        // ✅ ADD THIS - Volume boost on victory/defeat
+    if (isVictory) {
+        musicManager.setVolumeForGameState('victory');
+    } else {
+        musicManager.setVolumeForGameState('defeat');
+    }
         
         // Update result screen
         this.elements.resultTitle.textContent = isVictory ? 'VICTORY' : 'DEFEAT';
