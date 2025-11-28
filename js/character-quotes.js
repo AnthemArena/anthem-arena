@@ -28,8 +28,8 @@ class CharacterQuotes {
         }
     }
 
-    // Get a random quote for a character and event
-    getQuote(character, eventType) {
+    // Get a random quote for a character and event with dynamic tag replacement
+    getQuote(character, eventType, opponent = null, tags = {}) {
         if (!this.loaded) {
             console.warn('⚠️ Quotes not loaded yet');
             return null;
@@ -41,19 +41,60 @@ class CharacterQuotes {
             return null;
         }
 
-        const eventQuotes = characterQuotes[eventType];
-        if (!eventQuotes || eventQuotes.length === 0) {
+        let selectedQuote = null;
+
+        // ✅ CHECK FOR RIVAL-SPECIFIC QUOTES FIRST
+        if (opponent && characterQuotes.rivals && characterQuotes.rivals[opponent]) {
+            const rivalQuotes = characterQuotes.rivals[opponent][eventType];
+            if (rivalQuotes && rivalQuotes.length > 0) {
+                selectedQuote = rivalQuotes[Math.floor(Math.random() * rivalQuotes.length)];
+                console.log(`🎭 Using rival quote: ${character} vs ${opponent} - ${eventType}`);
+            }
+        }
+
+        // ✅ FALL BACK TO GENERAL QUOTES IF NO RIVAL QUOTE FOUND
+        if (!selectedQuote && characterQuotes.general) {
+            const generalQuotes = characterQuotes.general[eventType];
+            if (generalQuotes && generalQuotes.length > 0) {
+                selectedQuote = generalQuotes[Math.floor(Math.random() * generalQuotes.length)];
+                console.log(`💬 Using general quote: ${character} - ${eventType}`);
+            }
+        }
+
+        if (!selectedQuote) {
             console.warn(`⚠️ No quotes found for ${character} - ${eventType}`);
             return null;
         }
 
-        // Return random quote
-        return eventQuotes[Math.floor(Math.random() * eventQuotes.length)];
+        // ✅ REPLACE DYNAMIC TAGS (e.g., {shipName}, {opponentName})
+        return this.replaceTags(selectedQuote, tags);
+    }
+
+    // Replace dynamic tags in quotes
+    replaceTags(quote, tags) {
+        let processedQuote = quote;
+        
+        for (const [key, value] of Object.entries(tags)) {
+            const regex = new RegExp(`\\{${key}\\}`, 'g');
+            processedQuote = processedQuote.replace(regex, value);
+        }
+        
+        return processedQuote;
     }
 
     // Get all quotes for a character and event
-    getAllQuotes(character, eventType) {
-        return this.quotes[character]?.[eventType] || [];
+    getAllQuotes(character, eventType, opponent = null) {
+        const characterQuotes = this.quotes[character];
+        if (!characterQuotes) return [];
+
+        // Check rival quotes first
+        if (opponent && characterQuotes.rivals && characterQuotes.rivals[opponent]) {
+            const rivalQuotes = characterQuotes.rivals[opponent][eventType];
+            if (rivalQuotes) return rivalQuotes;
+        }
+
+        // Fall back to general quotes
+        return characterQuotes.general?.[eventType] || [];
     }
 
     // Check if quotes are loaded
@@ -68,27 +109,42 @@ class CharacterQuotes {
 
     // Get available event types for a character
     getEventTypes(character) {
-        return Object.keys(this.quotes[character] || {});
+        const characterQuotes = this.quotes[character];
+        if (!characterQuotes) return [];
+        
+        const generalEvents = Object.keys(characterQuotes.general || {});
+        const rivalEvents = Object.keys(characterQuotes.rivals || {});
+        
+        return [...new Set([...generalEvents, ...rivalEvents])];
+    }
+
+    // Get rivals for a character
+    getRivals(character) {
+        return Object.keys(this.quotes[character]?.rivals || {});
     }
 
     // Fallback quotes if JSON fails to load
     getFallbackQuotes() {
         return {
             caitlyn: {
-                welcome: ["The Sheriff is here."],
-                hit: ["Direct hit."],
-                miss: ["Miss. Recalculating."],
-                ship_sunk: ["Target eliminated."],
-                victory: ["Case closed."],
-                defeat: ["Unacceptable."]
+                general: {
+                    welcome: ["The Sheriff is here."],
+                    hit: ["Direct hit."],
+                    miss: ["Miss. Recalculating."],
+                    ship_sunk: ["Target eliminated."],
+                    victory: ["Case closed."],
+                    defeat: ["Unacceptable."]
+                }
             },
             jinx: {
-                welcome: ["Let's PLAY!"],
-                hit: ["BOOM!"],
-                miss: ["Oops!"],
-                ship_sunk: ["Bye bye ship!"],
-                victory: ["I WON!"],
-                defeat: ["What?! NO!"]
+                general: {
+                    welcome: ["Let's PLAY!"],
+                    hit: ["BOOM!"],
+                    miss: ["Oops!"],
+                    ship_sunk: ["Bye bye ship!"],
+                    victory: ["I WON!"],
+                    defeat: ["What?! NO!"]
+                }
             }
         };
     }

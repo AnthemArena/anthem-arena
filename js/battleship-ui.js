@@ -272,9 +272,11 @@ document.addEventListener('contextmenu', (e) => {
 
 selectCharacter(characterId) {
     this.selectedCharacter = characterId;
-    
     // Opponent is the other character
     this.opponentCharacter = characterId === 'caitlyn' ? 'jinx' : 'caitlyn';
+
+     // ✅ SET CHARACTER-SPECIFIC SHIPS
+    game.setCharacterShips(characterId);
 
   // ✅ ADD THIS LINE:
     musicManager.playTheme(
@@ -424,7 +426,7 @@ getRandomTip() {
     setTimeout(() => {
         this.showQuote(this.selectedCharacter, 'deployment');
     }, 800);
-    
+
     
     // ✅ ADD THIS: Reset UI visibility
     if (this.elements.currentShipPreview) {
@@ -657,8 +659,17 @@ hideShipPlacementUI() {
     // ============================================
 
 startBattle() {
+
+     // ✅ SET OPPONENT SHIPS
+    const opponentShips = game.characterShips[this.opponentCharacter];
+    game.ships = opponentShips; // Temporarily set for placement
+
     // Place enemy ships randomly
     game.placeShipsRandomly(game.enemyGrid, game.enemyShips);
+
+      // ✅ RESTORE PLAYER SHIPS
+    game.ships = game.characterShips[this.selectedCharacter];
+
     
     // Initialize AI
     aiOpponent = new BattleshipAI(this.difficulty);
@@ -936,50 +947,65 @@ getCoordinateLabel(row, col) {
     // 3. UPDATE VISUAL
     cell.classList.remove('targeting');
     
-    if (result.hit) {
-        cell.classList.add('hit');
+ if (result.hit) {
+    cell.classList.add('hit');
+    
+    await this.delay(800);
+    
+    // 4. PLAYER REACTION
+    this.showQuote(this.selectedCharacter, 'hit');
+    
+    await this.delay(2000);  // ✅ CHANGED FROM 1500 TO 2000
+    
+    // 5. OPPONENT REACTION (getting hit)
+    this.showQuote(this.opponentCharacter, 'got_hit');
+    
+    await this.delay(2000);  // ✅ CHANGED FROM 1500 TO 2000
+    
+    // Character-specific abilities
+    if (this.selectedCharacter === 'caitlyn') {
+        const revealed = game.caitlynHeadshotPassive(row, col);
+        this.visualizeRevealedCells(revealed);
+    } else if (this.selectedCharacter === 'jinx') {
+        this.jinxHitCounter++;
+     if (this.jinxHitCounter % 3 === 0) {
+    await this.delay(1500);
+    this.showQuote('jinx', 'get_excited');  // ← ADD THIS
+    await this.delay(1000);
+    const explosionResults = game.jinxFishbonesExplosion(row, col);
+    this.visualizeExplosion(explosionResults);
+}
+    }
+    
+if (result.sunk) {
+    await this.delay(1500);
+    
+    // Check if it's the champion ship (largest)
+    if (result.isChampion) {
+        this.showQuote(this.selectedCharacter, 'champion_sunk');
+    } else {
+        // Try ship-specific quote with opponent context
+        const shipKey = this.getShipQuoteKey(result.shipName);
+        const specificQuote = characterQuotes.getQuote(
+            this.selectedCharacter, 
+            `enemy_${shipKey}_sunk`,
+            this.opponentCharacter  // ← ADD THIS for rival quotes
+        );
         
-        await this.delay(800);
-        
-        // 4. PLAYER REACTION
-        this.showQuote(this.selectedCharacter, 'hit');
-        
-        await this.delay(1500);
-        
-        // 5. OPPONENT REACTION (getting hit)
-        this.showQuote(this.opponentCharacter, 'got_hit');
-        
-        await this.delay(1500);
-        
-        // Character-specific abilities
-        if (this.selectedCharacter === 'caitlyn') {
-            const revealed = game.caitlynHeadshotPassive(row, col);
-            this.visualizeRevealedCells(revealed);
-        } else if (this.selectedCharacter === 'jinx') {
-            this.jinxHitCounter++;
-            if (this.jinxHitCounter % 3 === 0) {
-                await this.delay(1500);
-                this.showQuote('jinx', 'fishbones_proc');
-                await this.delay(1000);
-                const explosionResults = game.jinxFishbonesExplosion(row, col);
-                this.visualizeExplosion(explosionResults);
-            }
+        if (specificQuote) {
+            this.showQuote(this.selectedCharacter, `enemy_${shipKey}_sunk`);
+        } else {
+            // Fall back to generic with ship name tag
+            this.showQuote(this.selectedCharacter, 'enemy_ship_sunk_specific', {
+                shipName: result.displayName  // ← Use dynamic tag
+            });
         }
-        
-        if (result.sunk) {
-            await this.delay(1500);
-            
-            // ✅ Check if champion was destroyed
-            if (result.unitName && result.unitName.includes(this.characters[this.opponentCharacter].displayName)) {
-                this.showQuote(this.selectedCharacter, 'champion_sunk');
-            } else {
-                this.showQuote(this.selectedCharacter, 'ship_sunk');
-            }
-            
-            await this.delay(1000);
-            this.updateShipIndicators('opponent');
-            this.highlightSunkShip(result.coordinates, 'enemy');
-        }
+    }
+    
+    await this.delay(1000);
+    this.updateShipIndicators('opponent');
+    this.highlightSunkShip(result.coordinates, 'enemy');
+}
     } else {
         cell.classList.add('miss');
         
@@ -988,12 +1014,12 @@ getCoordinateLabel(row, col) {
         // 4. PLAYER REACTION (to missing)
         this.showQuote(this.selectedCharacter, 'miss');
         
-        await this.delay(1500);
+    await this.delay(2000);  // ✅ CHANGED FROM 1500 TO 2000
         
         // 5. OPPONENT REACTION (taunt)
         this.showQuote(this.opponentCharacter, 'enemy_miss');
         
-        await this.delay(1500);
+    await this.delay(2000);  // ✅ CHANGED FROM 1500 TO 2000
     }
 
     // Check game over
@@ -1080,7 +1106,7 @@ async enemyTurn() {
         return;
     }
 
-    // ✅ 4. EXECUTE SHOT FIRST
+    // 4. EXECUTE SHOT FIRST
     const result = game.enemyShoot(target.row, target.col);
     
     if (!result.valid) {
@@ -1088,17 +1114,17 @@ async enemyTurn() {
         return;
     }
 
-    // ✅ 5. SHOW ANNOUNCEMENT WITH RESULT
+    // 5. SHOW ANNOUNCEMENT WITH RESULT
     this.showShotAnnouncement(
         this.opponentCharacter, 
         target.row, 
         target.col, 
-        result.hit  // ← Already know the result!
+        result.hit
     );
     
     await this.delay(2000);
 
-    // 6. UPDATE VISUAL (rest of your code continues...)
+    // 6. UPDATE VISUAL
     const cell = this.elements.playerGrid.querySelector(
         `[data-row="${target.row}"][data-col="${target.col}"]`
     );
@@ -1111,43 +1137,86 @@ async enemyTurn() {
         // 7. OPPONENT REACTION
         this.showQuote(this.opponentCharacter, 'hit');
         
-        await this.delay(1500);
+        await this.delay(2000);
         
         // 8. PLAYER REACTION (getting hit)
         this.showQuote(this.selectedCharacter, 'got_hit');
         
-        await this.delay(1500);
+        await this.delay(2000);
         
         aiOpponent.onHit(game, target.row, target.col, result.sunk);
         
+        // ✅ ONLY RUN SHIP SUNK LOGIC IF SHIP ACTUALLY SUNK
         if (result.sunk) {
             await this.delay(1500);
             
-            // ✅ Check if champion was destroyed
-            if (result.unitName && result.unitName.includes(this.characters[this.selectedCharacter].displayName)) {
+            // Check if it's champion ship
+            if (result.isChampion) {
+                // Opponent celebrates sinking champion
                 this.showQuote(this.opponentCharacter, 'champion_sunk');
+                
+                await this.delay(1500);
+                
+                // Player reacts to losing champion
+                const shipKey = this.getShipQuoteKey(result.shipName);
+                this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
             } else {
-                this.showQuote(this.opponentCharacter, 'ship_sunk');
+                // Opponent celebrates sinking regular ship
+                const shipKey = this.getShipQuoteKey(result.shipName);
+                
+                // Try rival-specific quote first
+                const opponentSpecificQuote = characterQuotes.getQuote(
+                    this.opponentCharacter, 
+                    `enemy_${shipKey}_sunk`,
+                    this.selectedCharacter  // Their rival is YOU
+                );
+                
+                if (opponentSpecificQuote) {
+                    this.showQuote(this.opponentCharacter, `enemy_${shipKey}_sunk`);
+                } else {
+                    this.showQuote(this.opponentCharacter, 'ship_sunk');
+                }
+                
+                await this.delay(1500);
+                
+                // Player reacts to losing specific ship
+                const playerSpecificQuote = characterQuotes.getQuote(
+                    this.selectedCharacter, 
+                    `${shipKey}_lost`,
+                    this.opponentCharacter  // Your rival
+                );
+                
+                if (playerSpecificQuote) {
+                    this.showQuote(this.selectedCharacter, `${shipKey}_lost`);
+                } else {
+                    // Fall back with ship name tag
+                    this.showQuote(this.selectedCharacter, 'ship_lost_specific', {
+                        shipName: result.displayName
+                    });
+                }
             }
             
             await this.delay(1000);
             this.updateShipIndicators('player');
             this.highlightSunkShip(result.coordinates, 'player');
         }
+        // ✅ END OF if (result.sunk) BLOCK
+        
     } else {
+        // MISS LOGIC
         cell.classList.add('miss');
         
         await this.delay(800);
         
-        // 7. OPPONENT REACTION (to missing)
+        // Opponent reaction (to missing)
         this.showQuote(this.opponentCharacter, 'miss');
         
-        await this.delay(1500);
+        await this.delay(2000);
         
-        // 8. PLAYER REACTION (taunt)
+        // Player reaction (taunt)
         this.showQuote(this.selectedCharacter, 'enemy_miss');
         
-        await this.delay(1500);
+        await this.delay(2000);
     }
 
     // Check game over
@@ -1169,6 +1238,27 @@ async enemyTurn() {
         this.showTurnAnnouncement(this.selectedCharacter, true);
         this.updateTurnIndicator('player');
     }
+}
+
+// Convert ship display names to quote keys
+getShipQuoteKey(shipName) {
+    const keyMap = {
+        // Caitlyn ships
+        'Hextech Rifle': 'hextech_rifle',
+        'Yordle Snap Trap': 'snap_trap',
+        '90 Caliber Net': 'caliber_net',
+        'Piltover Peacemaker': 'peacemaker',
+        "Sheriff's Badge": 'badge',
+        
+        // Jinx ships
+        'Fishbones': 'fishbones',
+        'Pow-Pow': 'pow_pow',
+        'Flame Chompers': 'chompers',
+        'Zapper': 'zapper',
+        'Super Mega Death Rocket': 'mega_rocket'
+    };
+    
+    return keyMap[shipName] || 'ship';
 }
 
     // ============================================
@@ -1320,16 +1410,25 @@ async enemyTurn() {
 // CHARACTER QUOTES WITH AVATAR
 // ============================================
 
-showQuote(character, eventType) {
-    // ✅ CHECK COOLDOWN
+showQuote(character, eventType, tags = {}) {
+    // Priority quotes that bypass cooldown
+    const priorityQuotes = ['got_hit', 'enemy_miss', 'hit', 'miss'];
+    const bypassCooldown = priorityQuotes.includes(eventType);
+    
+    // Check cooldown
     const now = Date.now();
-    if (now - this.lastQuoteTime < this.minQuoteCooldown) {
+    if (!bypassCooldown && now - this.lastQuoteTime < this.minQuoteCooldown) {
         console.log(`⏱️ Quote cooldown active, skipping: ${character} - ${eventType}`);
         return;
     }
     
-    // Get quote from quotes system
-    const quote = characterQuotes.getQuote(character, eventType);
+    // ✅ PASS OPPONENT FOR RIVAL QUOTES
+    const quote = characterQuotes.getQuote(
+        character, 
+        eventType,
+        this.opponentCharacter,  // ← ADD THIS
+        tags                      // ← For {shipName} replacements
+    );
     
     if (!quote) {
         console.warn(`No quote available for ${character} - ${eventType}`);
@@ -1339,13 +1438,10 @@ showQuote(character, eventType) {
     const quoteElement = this.elements.characterQuote;
     if (!quoteElement) return;
     
-    // ✅ UPDATE LAST QUOTE TIME
     this.lastQuoteTime = now;
     
-    // Get character data
     const characterData = this.characters[character];
     
-    // Build quote HTML with avatar
     quoteElement.innerHTML = `
         <div class="quote-avatar">
             <img src="${this.getChampionIcon(characterData.championKey)}" alt="${characterData.displayName}">
@@ -1356,18 +1452,15 @@ showQuote(character, eventType) {
         </div>
     `;
     
-    // Add character-specific styling
     quoteElement.style.borderColor = characterData.color;
     quoteElement.classList.remove('caitlyn-quote', 'jinx-quote');
     quoteElement.classList.add(`${character}-quote`);
     
-    // Trigger animation
     quoteElement.classList.remove('show');
     setTimeout(() => {
         quoteElement.classList.add('show');
     }, 50);
     
-    // Hide after 4 seconds
     setTimeout(() => {
         quoteElement.classList.remove('show');
     }, 4000);
@@ -1418,26 +1511,26 @@ this.elements.resultCharacter.querySelector('img').src = this.getChampionPortrai
             this.showScreen('gameOverScreen');
         }, 1000);
     }
-
-    async getResultQuote(character, isVictory) {
-        if (!window.characterQuotes) {
-            try {
-                const response = await fetch('js/character-quotes.json');
-                window.characterQuotes = await response.json();
-            } catch (error) {
-                console.error('Failed to load character quotes:', error);
-                return;
-            }
-        }
-
-        const situation = isVictory ? 'victory' : 'defeat';
-        const quotes = window.characterQuotes[character]?.[situation];
-        
-        if (quotes && quotes.length > 0) {
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            this.elements.resultQuote.textContent = quote;
-        }
+async getResultQuote(character, isVictory) {
+    // Use the already-loaded characterQuotes instance instead
+    const situation = isVictory ? 'victory' : 'defeat';
+    
+    // ✅ TRY RIVAL-SPECIFIC QUOTE FIRST
+    const quote = characterQuotes.getQuote(
+        character,
+        situation,
+        this.opponentCharacter  // ← Pass opponent for rival quotes
+    );
+    
+    if (quote) {
+        this.elements.resultQuote.textContent = quote;
+    } else {
+        // Fallback if no quote found
+        this.elements.resultQuote.textContent = isVictory 
+            ? "Victory!" 
+            : "Defeat...";
     }
+}
 
     calculateXP(isVictory, stats) {
         let xp = 0;

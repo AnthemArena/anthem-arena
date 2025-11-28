@@ -6,16 +6,44 @@
 export class BattleshipGame {
     constructor() {
         this.gridSize = 10;
-        this.ships = [
-            { name: 'carrier', size: 5, icon: '🚢' },
-            { name: 'battleship', size: 4, icon: '⛴️' },
-            { name: 'cruiser', size: 3, icon: '🚤' },
-            { name: 'submarine', size: 3, icon: '🛥️' },
-            { name: 'destroyer', size: 2, icon: '⚓' }
-        ];
-        
-        this.reset();
+    
+       
+    // Character-specific ship names
+    this.characterShips = {
+        caitlyn: [
+            { name: 'Hextech Rifle', displayName: 'Hextech Rifle', size: 5, icon: '🎯', isChampion: true },
+            { name: 'Yordle Snap Trap', displayName: 'Yordle Snap Trap', size: 4, icon: '🪤' },
+            { name: '90 Caliber Net', displayName: '90 Caliber Net', size: 3, icon: '🕸️' },
+            { name: 'Piltover Peacemaker', displayName: 'Piltover Peacemaker', size: 3, icon: '💥' },
+            { name: "Sheriff's Badge", displayName: "Sheriff's Badge", size: 2, icon: '⭐' }
+        ],
+        jinx: [
+            { name: 'Fishbones', displayName: 'Fishbones', size: 5, icon: '🦈', isChampion: true },
+            { name: 'Pow-Pow', displayName: 'Pow-Pow', size: 4, icon: '🔫' },
+            { name: 'Flame Chompers', displayName: 'Flame Chompers', size: 3, icon: '💣' },
+            { name: 'Zapper', displayName: 'Zapper', size: 3, icon: '⚡' },
+            { name: 'Super Mega Death Rocket', displayName: 'Super Mega Death Rocket', size: 2, icon: '🚀' }
+        ]
+    };
+
+      // Default to generic ships (will be overridden)
+    this.ships = [
+        { name: 'carrier', size: 5, icon: '🚢' },
+        { name: 'battleship', size: 4, icon: '⛴️' },
+        { name: 'cruiser', size: 3, icon: '🚤' },
+        { name: 'submarine', size: 3, icon: '🛥️' },
+        { name: 'destroyer', size: 2, icon: '⚓' }
+    ];
+    
+    this.reset();
+}
+// Add method to set character-specific ships
+setCharacterShips(character) {
+    if (this.characterShips[character]) {
+        this.ships = [...this.characterShips[character]]; // Clone array
+        console.log(`✅ Ships set for ${character}:`, this.ships.map(s => s.displayName));
     }
+}
 
     reset() {
         // Player grids
@@ -89,36 +117,37 @@ export class BattleshipGame {
         return true;
     }
 
-    placeShip(grid, ships, ship, startRow, startCol, isHorizontal) {
-        if (!this.canPlaceShip(grid, ship, startRow, startCol, isHorizontal)) {
-            return false;
-        }
-
-        const shipId = ships.length;
-        const coordinates = [];
-
-        for (let i = 0; i < ship.size; i++) {
-            const row = isHorizontal ? startRow : startRow + i;
-            const col = isHorizontal ? startCol + i : startCol;
-            
-            grid[row][col].hasShip = true;
-            grid[row][col].shipId = shipId;
-            
-            coordinates.push({ row, col });
-        }
-
-        ships.push({
-            id: shipId,
-            name: ship.name,
-            size: ship.size,
-            icon: ship.icon,
-            coordinates: coordinates,
-            hits: 0,
-            isSunk: false
-        });
-
-        return true;
+   placeShip(grid, ships, ship, startRow, startCol, isHorizontal, unitName = null) {
+    if (!this.canPlaceShip(grid, ship, startRow, startCol, isHorizontal)) {
+        return false;
     }
+
+    const shipId = ships.length;
+    const coordinates = [];
+
+    for (let i = 0; i < ship.size; i++) {
+        const row = isHorizontal ? startRow : startRow + i;
+        const col = isHorizontal ? startCol + i : startCol;
+        
+        grid[row][col].hasShip = true;
+        grid[row][col].shipId = shipId;
+        
+        coordinates.push({ row, col });
+    }
+
+    ships.push({
+        id: shipId,
+        name: ship.name,
+        size: ship.size,
+        icon: ship.icon,
+        unitName: unitName,  // ✅ ADD THIS - store the champion name
+        coordinates: coordinates,
+        hits: 0,
+        isSunk: false
+    });
+
+    return true;
+}
 
     // Random ship placement (for AI or quick setup)
     placeShipsRandomly(grid, ships) {
@@ -173,26 +202,29 @@ export class BattleshipGame {
             const ship = targetShips[cell.shipId];
             ship.hits++;
 
-            // Check if ship is sunk
-            if (ship.hits >= ship.size) {
-                ship.isSunk = true;
-                
-                // Update remaining ships
-                if (targetGrid === this.enemyGrid) {
-                    this.enemyShipsRemaining--;
-                } else {
-                    this.playerShipsRemaining--;
-                }
+        // Check if ship is sunk
+if (ship.hits >= ship.size) {
+    ship.isSunk = true;
+    
+    // Update remaining ships
+    if (targetGrid === this.enemyGrid) {
+        this.enemyShipsRemaining--;
+    } else {
+        this.playerShipsRemaining--;
+    }
 
-                return {
-                    valid: true,
-                    hit: true,
-                    sunk: true,
-                    shipName: ship.name,
-                    shipIcon: ship.icon,
-                    coordinates: ship.coordinates
-                };
-            }
+    return {
+        valid: true,
+        hit: true,
+        sunk: true,
+        shipName: ship.name,
+                displayName: ship.displayName,  // ✅ ADD THIS
+        shipIcon: ship.icon,
+                isChampion: ship.isChampion,   // ✅ ADD THIS
+        unitName: ship.unitName,  // ✅ ADD THIS - return champion name if exists
+        coordinates: ship.coordinates
+    };
+}
 
             return {
                 valid: true,
