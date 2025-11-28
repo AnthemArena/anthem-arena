@@ -778,22 +778,6 @@ font-size: 2rem;
     transition: all 0.3s ease;
 }
 
-.ship-icon::before {
-    content: '🚢';
-}
-
-.ship-icon:nth-child(1)::before { content: '🚢'; } /* Carrier */
-.ship-icon:nth-child(2)::before { content: '⛴️'; } /* Battleship */
-.ship-icon:nth-child(3)::before { content: '🚤'; } /* Cruiser */
-.ship-icon:nth-child(4)::before { content: '🛥️'; } /* Submarine */
-.ship-icon:nth-child(5)::before { content: '⚓'; } /* Destroyer */
-
-.ship-icon.destroyed {
-    background: rgba(244, 67, 54, 0.3);
-    border-color: #f44336;
-    opacity: 0.5;
-}
-
 
 /* Ability Tooltips */
 .ability-btn {
