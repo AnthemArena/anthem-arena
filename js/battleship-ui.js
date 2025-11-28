@@ -437,9 +437,8 @@ getRandomTip() {
     // SHIP PLACEMENT
     // ============================================
 
-   showShipPlacement() {
+showShipPlacement() {
     this.showScreen('shipPlacement');
-    // ✅ ADD THIS - Quieter during placement
     musicManager.setVolumeForGameState('placement');
     this.currentShipIndex = 0;
     this.playerShipsPlaced = [];
@@ -448,13 +447,15 @@ getRandomTip() {
     // Reset game
     game.reset();
 
-    // ✅ ADD THIS - Show deployment quote after a brief delay
+    // ✅ ADD THIS - Populate ship selector with character-specific ships
+    this.updateShipSelectorForCharacter();
+
+    // Show deployment quote after a brief delay
     setTimeout(() => {
         this.showQuote(this.selectedCharacter, 'deployment');
     }, 800);
-
     
-    // ✅ ADD THIS: Reset UI visibility
+    // Reset UI visibility
     if (this.elements.currentShipPreview) {
         this.elements.currentShipPreview.style.display = 'block';
     }
@@ -469,7 +470,7 @@ getRandomTip() {
     const instructionsEl = document.querySelector('.placement-instructions');
     if (instructionsEl) {
         instructionsEl.innerHTML = `
-            <p>Click to place ships. Right-click to rotate.</p>
+            <p>Click to place weapons. Right-click to rotate.</p>
         `;
     }
     
@@ -478,6 +479,55 @@ getRandomTip() {
     
     // Highlight first ship
     this.updateShipSelector();
+}
+
+// ✅ ADD THIS NEW METHOD:
+updateShipSelectorForCharacter() {
+    const shipItems = this.elements.shipSelector.querySelectorAll('.ship-item');
+    const characterShips = game.characterShips[this.selectedCharacter];
+    
+    shipItems.forEach((item, index) => {
+        if (characterShips[index]) {
+            const ship = characterShips[index];
+            
+            // Update the icon
+            const iconElement = item.querySelector('.ship-icon');
+            const iconUrl = this.shipIconMap[ship.name];
+            
+            if (iconElement && iconUrl) {
+                // Clear emoji text
+                iconElement.textContent = '';
+                
+                // Set ability icon as background
+                iconElement.style.backgroundImage = `url('${iconUrl}')`;
+                iconElement.style.backgroundSize = 'cover';
+                iconElement.style.backgroundPosition = 'center';
+                iconElement.style.backgroundRepeat = 'no-repeat';
+                iconElement.style.display = 'inline-block';
+                iconElement.style.width = '32px';
+                iconElement.style.height = '32px';
+                iconElement.style.verticalAlign = 'middle';
+                
+                // Fallback if image fails
+                const img = new Image();
+                img.onerror = () => {
+                    iconElement.textContent = ship.icon;
+                    iconElement.style.backgroundImage = 'none';
+                };
+                img.src = iconUrl;
+            }
+            
+            // Update the name
+            const nameElement = item.querySelector('span:last-child');
+            if (nameElement) {
+                nameElement.textContent = `${ship.displayName} (${ship.size})`;
+            }
+            
+            // Update data attributes
+            item.dataset.ship = ship.name;
+            item.dataset.size = ship.size;
+        }
+    });
 }
 
     createPlacementGrid() {

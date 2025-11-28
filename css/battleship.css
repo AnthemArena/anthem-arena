@@ -2030,3 +2030,36 @@ font-size: 2rem;
     background-color: rgba(255, 51, 102, 0.5);
     border: 2px dashed rgba(255, 51, 102, 1);
 }
+/* Ship selector icons */
+.ship-item .ship-icon {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 8px;
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.ship-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ship-item.active {
+    background: rgba(207, 181, 59, 0.3);
+    border-color: var(--gold-light);
+    box-shadow: 0 0 15px rgba(207, 181, 59, 0.5);
+}
+
+.ship-item.placed {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
