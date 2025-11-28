@@ -28,6 +28,9 @@ class BattleshipUI {
     this.lastQuoteTime = 0;
     this.minQuoteCooldown = 3000; // 3 seconds between quotes
 
+        this.isTurnTransitioning = false;  // Prevents clicks during turn changes
+
+
         
         // UI elements (will be set in init)
         this.elements = {};
@@ -274,6 +277,13 @@ selectCharacter(characterId) {
     this.selectedCharacter = characterId;
     // Opponent is the other character
     this.opponentCharacter = characterId === 'caitlyn' ? 'jinx' : 'caitlyn';
+
+     // ✅ ADD DEBUG
+    console.log('✅ Characters set:', {
+        player: this.selectedCharacter,
+        opponent: this.opponentCharacter
+    });
+
 
      // ✅ SET CHARACTER-SPECIFIC SHIPS
     game.setCharacterShips(characterId);
@@ -660,6 +670,10 @@ hideShipPlacementUI() {
 
 startBattle() {
 
+     // ✅ ADD THIS - Start with lock enabled
+    this.isTurnTransitioning = true;
+
+
      // ✅ SET OPPONENT SHIPS
     const opponentShips = game.characterShips[this.opponentCharacter];
     game.ships = opponentShips; // Temporarily set for placement
@@ -692,7 +706,14 @@ startBattle() {
     setTimeout(() => {
         this.showTurnAnnouncement(this.selectedCharacter, true);
         this.updateTurnIndicator('player');
-    }, 2500);
+
+
+   // ✅ ADD THIS - Enable clicks after initial announcement
+    setTimeout(() => {
+        this.isTurnTransitioning = false;
+        console.log('✅ Game started - clicks enabled');
+    }, 1500);
+}, 2500);
 }
 
   setupBattleScreen() {
@@ -800,6 +821,13 @@ createBattleGrids() {
             
             // Click to attack
             cell.addEventListener('click', () => {
+
+                  // ✅ ADD THIS CHECK FIRST:
+    if (this.isTurnTransitioning) {
+        console.log('⏸️ Turn transitioning, click blocked');
+        return;
+    }
+
                 // ✅ PREVENT MULTIPLE CLICKS
                 if (this.elements.enemyGrid.classList.contains('targeting-active')) {
                     return;
@@ -920,6 +948,13 @@ getCoordinateLabel(row, col) {
     // ============================================
 
   async playerAttack(row, col) {
+        // ✅ TEMPORARY DEBUG
+    console.log('🎯 Attack context:', {
+        player: this.selectedCharacter,
+        opponent: this.opponentCharacter,
+        opponentWillSayGotHit: this.opponentCharacter
+    });
+    
     if (game.currentTurn !== 'player' || !game.gameActive) return;
 
     const result = game.playerShoot(row, col);
@@ -1085,6 +1120,9 @@ showTargetIndicator(row, col) {
 async enemyTurn() {
     if (game.currentTurn !== 'enemy' || !game.gameActive) return;
 
+    // ✅ ADD THIS - Lock clicks during enemy turn
+    this.isTurnTransitioning = true;
+
     await this.delay(1000);
 
     // 1. TURN ANNOUNCEMENT
@@ -1237,6 +1275,12 @@ async enemyTurn() {
         await this.delay(2000);
         this.showTurnAnnouncement(this.selectedCharacter, true);
         this.updateTurnIndicator('player');
+
+         // ✅ ADD THIS - Unlock clicks AFTER turn announcement shows
+    await this.delay(1500);  // Wait for announcement to display
+    this.isTurnTransitioning = false;
+    console.log('✅ Player turn active - clicks enabled');
+
     }
 }
 
@@ -1411,6 +1455,15 @@ getShipQuoteKey(shipName) {
 // ============================================
 
 showQuote(character, eventType, tags = {}) {
+
+     // ✅ ADD DEBUG LOGGING
+    console.log('🎤 showQuote called:', {
+        character: character,
+        eventType: eventType,
+        opponentCharacter: this.opponentCharacter,
+        tags: tags
+    });
+
     // Priority quotes that bypass cooldown
     const priorityQuotes = ['got_hit', 'enemy_miss', 'hit', 'miss'];
     const bypassCooldown = priorityQuotes.includes(eventType);
@@ -1429,6 +1482,14 @@ showQuote(character, eventType, tags = {}) {
         this.opponentCharacter,  // ← ADD THIS
         tags                      // ← For {shipName} replacements
     );
+
+     // ✅ ADD MORE DEBUG
+    console.log('📝 Got quote:', quote);
+    console.log('🔍 Full context:', {
+        speakingCharacter: character,
+        theirOpponent: this.opponentCharacter,
+        player: this.selectedCharacter
+    });
     
     if (!quote) {
         console.warn(`No quote available for ${character} - ${eventType}`);
