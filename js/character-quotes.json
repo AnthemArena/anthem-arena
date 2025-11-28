@@ -8,20 +8,20 @@
         "I don't miss. Let's prove it."
       ],
       "deployment": [
-        "Let's maintain perfect formation. Every ship has its place.",
-        "Precision and planning win battles. Position your fleet carefully.",
-        "A well-organized fleet is half the victory.",
+        "Let's maintain perfect formation. Every weapon has its place.",
+        "Precision and planning win battles. Position your arsenal carefully.",
+        "A well-organized arsenal is half the victory.",
         "The Sheriff of Piltover doesn't leave anything to chance.",
         "Tactical positioning is key. Make every placement count."
       ],
       "random_placement": [
         "Strategic positioning complete. Standard deployment.",
-        "Fleet arranged. All units accounted for.",
+        "Arsenal arranged. All units accounted for.",
         "Adequate positioning. Let's proceed."
       ],
       "ships_placed": [
-        "All vessels deployed. Ready for engagement.",
-        "Fleet positioned. Time to hunt.",
+        "All weapons deployed. Ready for engagement.",
+        "Arsenal positioned. Time to hunt.",
         "Preparation complete. Let the operation begin."
       ],
       "game_start": [
@@ -38,14 +38,13 @@
         "I never miss.",
         "Lining up the perfect shot.",
         "Precision strike incoming.",
-          "In the name of the law..."
-
+        "In the name of the law..."
       ],
       "hit": [
         "Direct hit. As expected.",
         "Target struck. Adjusting aim.",
         "One shot, one hit. Predictable outcome.",
-        "Another hit. Your fleet won't last long.",
+        "Another hit. Your arsenal won't last long.",
         "Precision never fails.",
         "Right on target.",
         "Perfect shot."
@@ -58,14 +57,14 @@
         "Recalibrating."
       ],
       "champion_sunk": [
-        "Their flagship is down. Decisive victory.",
+        "Their main weapon is down. Decisive victory.",
         "Champion unit neutralized. Excellent.",
-        "The enemy's pride is sinking."
+        "The enemy's pride is destroyed."
       ],
       "ship_sunk": [
-        "Enemy vessel neutralized. One down.",
+        "Enemy weapon neutralized. One down.",
         "Target eliminated. Moving to the next.",
-        "Your fleet is diminishing. As calculated.",
+        "Your arsenal is diminishing. As calculated.",
         "Another one removed from play. Efficient.",
         "Confirmed kill. Next target."
       ],
@@ -83,8 +82,8 @@
         "How did they...?"
       ],
       "ship_lost": [
-        "One vessel down. This is... unfortunate.",
-        "Lost a ship. I need to be more careful.",
+        "One weapon down. This is... unfortunate.",
+        "Lost a position. I need to be more careful.",
         "Unacceptable. They'll pay for that.",
         "Damage sustained. Recalculating strategy."
       ],
@@ -119,7 +118,7 @@
         "This... requires further analysis.",
         "An unexpected outcome. Unacceptable.",
         "I underestimated you. It won't happen again.",
-          "This is... unacceptable. A complete failure of protocol."
+        "This is... unacceptable. A complete failure of protocol."
       ]
     },
     "rivals": {
@@ -148,23 +147,23 @@
           "That's what happens when you face the law."
         ],
         "champion_sunk": [
-          "Your flagship is down, Jinx. Surrender now.",
+          "Your main weapon is down, Jinx. Surrender now.",
           "Case closed. You're finished, criminal.",
           "Justice is served. Take her away."
         ],
         "ship_sunk": [
           "One of your toys is broken, Jinx.",
           "That's what happens when you challenge the law.",
-          "Your chaos ends here, one ship at a time.",
+          "Your chaos ends here, one weapon at a time.",
           "Another piece of stolen equipment destroyed."
         ],
         "enemy_miss": [
-      "Your aim is as chaotic as your personality, Jinx.",
-      "Missed by a mile. Typical Jinx.",
-      "Is that really your best shot, criminal?",
-      "You'll need better aim than that to beat me, Jinx.",
-      "Sloppy. I expected better, even from you."
-    ],
+          "Your aim is as chaotic as your personality, Jinx.",
+          "Missed by a mile. Typical Jinx.",
+          "Is that really your best shot, criminal?",
+          "You'll need better aim than that to beat me, Jinx.",
+          "Sloppy. I expected better, even from you."
+        ],
         "enemy_fishbones_sunk": [
           "Fishbones destroyed. Your favorite weapon is scrap, Jinx.",
           "That rocket launcher caused enough damage. It's over.",
@@ -198,14 +197,13 @@
           "You'll pay for that, Jinx!",
           "This isn't a game!",
           "That's enough, Jinx! This ends NOW!"
-
         ],
         "miss": [
-  "Damn it, Jinx! Hold still!",
-  "You're harder to hit than I remembered, criminal.",
-  "Missed. You've gotten faster, Jinx.",
-  "Stop moving around so much!"
-],
+          "Damn it, Jinx! Hold still!",
+          "You're harder to hit than I remembered, criminal.",
+          "Missed. You've gotten faster, Jinx.",
+          "Stop moving around so much!"
+        ],
         "hextech_rifle_lost": [
           "You destroyed my parents' rifle, Jinx! This is personal now!",
           "The Hextech Rifle... you'll answer for this!",
@@ -244,10 +242,10 @@
           "This chase is over. You're coming with me."
         ],
         "ship_lost": [
-  "You'll pay for that, Jinx!",
-  "Lucky shot, criminal.",
-  "That's coming out of YOUR hide!"
-],
+          "You'll pay for that, Jinx!",
+          "Lucky shot, criminal.",
+          "That's coming out of YOUR hide!"
+        ],
         "defeat": [
           "How did you... No. This can't be right.",
           "Jinx... you won't get away with this.",
@@ -268,10 +266,10 @@
       "deployment": [
         "Ooh, where should I put these? Surprise positions are the best!",
         "Let's make this REALLY interesting! Random or careful? ...Random!",
-        "They'll NEVER expect ships in THESE spots! Hehe!",
+        "They'll NEVER expect weapons in THESE spots! Hehe!",
         "Deployment schmoyment! Just put 'em somewhere fun!",
         "This is the boring part... can we skip to the explosions?",
-          "Okay so... wait, which one goes where? Eh, whatever! Surprise!"
+        "Okay so... wait, which one goes where? Eh, whatever! Surprise!"
       ],
       "random_placement": [
         "Ehh, wherever! Who cares where they go!",
@@ -288,7 +286,7 @@
       "game_start": [
         "Time to make some noise! BOOM!",
         "Let's see what goes BOOM first!",
-        "I'm gonna sink ALL your ships! Hehehe!",
+        "I'm gonna wreck ALL your stuff! Hehehe!",
         "Catch me if you can! ...Or I'll catch YOU!"
       ],
       "taking_shot": [
@@ -299,7 +297,7 @@
         "Eeny, meeny, miny, BOOM!",
         "Pick a spot, ANY spot!",
         "Let's make some NOISE!",
-          "Pow-Pow says hi! Wait, does Fishbones wanna play too?"
+        "Pow-Pow says hi! Wait, does Fishbones wanna play too?"
       ],
       "hit": [
         "BOOM! Got one! Hehehe!",
@@ -326,12 +324,12 @@
         "You just got JINXED! For real this time!"
       ],
       "ship_sunk": [
-        "DOWN IT GOES! Splishy-splashy!",
-        "HAHA! Bye bye ship!",
-        "Watch it sink! Isn't it pretty?",
+        "DOWN IT GOES! BOOM!",
+        "HAHA! Bye bye weapon!",
+        "Watch it explode! Isn't it pretty?",
         "One less! This is AWESOME!",
-        "Glug glug glug! To the bottom!",
-        "KABOOM! Sunk it!",
+        "KA-POW! Another one bites the dust!",
+        "KABOOM! Destroyed it!",
         "BOOM! Down it goes!"
       ],
       "enemy_ship_sunk_specific": [
@@ -349,7 +347,7 @@
       ],
       "ship_lost": [
         "Aww, I liked that one!",
-        "That was my best ship! ...I think?",
+        "That was my best weapon! ...I think?",
         "Hey! That's MINE! You can't have it!",
         "Not cool! NOT COOL!"
       ],
@@ -382,7 +380,7 @@
       ],
       "mega_rocket_lost": [
         "My rocket! My beautiful, explodey rocket!",
-        "They sank my Super Mega Death Rocket! The irony!",
+        "They destroyed my Super Mega Death Rocket! The irony!",
         "But that was my SUPER MEGA one!"
       ],
       "enemy_miss": [
@@ -414,7 +412,7 @@
         "Jinx wins! Everybody loses! Well, except me!",
         "I'm the BEST! Did I mention I WON?",
         "Victory! Now where's my prize? There's a prize, right?",
-          "WOOHOO! Did you SEE all those EXPLOSIONS?! That was ME! I DID THAT!"
+        "WOOHOO! Did you SEE all those EXPLOSIONS?! That was ME! I DID THAT!"
       ],
       "defeat": [
         "What?! NO! That's not fair!",
@@ -446,19 +444,19 @@
         "hit": [
           "BOOM! Take THAT, fancy hat!",
           "Got you, Caitlyn! Hehe!",
-          "Sheriff down! Well, her ship anyway!",
+          "Sheriff down! Well, her weapon anyway!",
           "How's THAT for precision, cupcake?!"
         ],
         "champion_sunk": [
-          "HAHA! Your fancy flagship goes BOOM, Sheriff!",
+          "HAHA! Your fancy main weapon goes BOOM, Sheriff!",
           "The great Sheriff LOSES! This is PERFECT!",
-          "Sunk your best ship, Cait! How's THAT feel?!"
+          "Destroyed your best weapon, Cait! How's THAT feel?!"
         ],
         "ship_sunk": [
-          "Ooh! Did that ship cost a lot, Cait? Too bad!",
+          "Ooh! Did that weapon cost a lot, Cait? Too bad!",
           "Another one of your perfect plans goes BOOM!",
           "Law and order? More like law and EXPLODE-er!",
-          "Your fancy fleet is sinking, Sheriff!"
+          "Your fancy arsenal is falling apart, Sheriff!"
         ],
         "enemy_hextech_rifle_sunk": [
           "Ooh! Your parents' gun? That's... actually kinda sad. BUT STILL FUNNY!",
@@ -474,7 +472,7 @@
         ],
         "enemy_caliber_net_sunk": [
           "Your net's all tangled up! Hehe!",
-          "90 Caliber Net? More like 90 Caliber WET! ...Get it? Cuz it's in the water?",
+          "90 Caliber Net? More like 90 Caliber WET! ...Get it? Cuz it's destroyed?",
           "No more nets, Sheriff! I'm FREE!"
         ],
         "enemy_peacemaker_sunk": [
@@ -488,16 +486,16 @@
           "Badge go bye bye! Who's the law NOW?"
         ],
         "miss": [
-  "Aww! But you're RIGHT THERE, Cait!",
-  "How did I miss?! You're so... still!",
-  "Dang it! Your fancy hat is distracting!",
-  "I NEVER miss! ...Okay fine, sometimes I miss!"
-],
-"ship_lost": [
-  "HEY! Cait, that's not FAIR!",
-  "Owie! You're too good at this, cupcake!",
-  "My ship! This is WAR now, Sheriff!"
-],
+          "Aww! But you're RIGHT THERE, Cait!",
+          "How did I miss?! You're so... still!",
+          "Dang it! Your fancy hat is distracting!",
+          "I NEVER miss! ...Okay fine, sometimes I miss!"
+        ],
+        "ship_lost": [
+          "HEY! Cait, that's not FAIR!",
+          "Owie! You're too good at this, cupcake!",
+          "My weapon! This is WAR now, Sheriff!"
+        ],
         "got_hit": [
           "OW! That was too accurate, Cait!",
           "No fair! You actually AIM!",
@@ -511,13 +509,13 @@
           "My rocket launcher! You'll regret that, Sheriff!",
           "FISHBONES! This is PERSONAL now, Cait!"
         ],
-         "enemy_miss": [
-      "HAHA! The 'perfect shot' MISSED! Not so perfect NOW, cupcake!",
-      "Even the Sheriff whiffs sometimes! Hehe!",
-      "Miss! How does THAT feel, fancy hat?!",
-      "You're supposed to be the sniper, Cait! What happened?!",
-      "Too slow, Sheriff! WAY too slow!"
-    ],
+        "enemy_miss": [
+          "HAHA! The 'perfect shot' MISSED! Not so perfect NOW, cupcake!",
+          "Even the Sheriff whiffs sometimes! Hehe!",
+          "Miss! How does THAT feel, fancy hat?!",
+          "You're supposed to be the sniper, Cait! What happened?!",
+          "Too slow, Sheriff! WAY too slow!"
+        ],
         "pow_pow_lost": [
           "POW-POW! Cait, you're SO gonna get it now!",
           "You broke my FAVORITE gun, Sheriff!",
@@ -536,7 +534,7 @@
         ],
         "mega_rocket_lost": [
           "My SUPER MEGA DEATH ROCKET! Cait, that was my ULTIMATE!",
-          "You sank my biggest rocket! That took FOREVER to build!",
+          "You destroyed my biggest rocket! That took FOREVER to build!",
           "The mega rocket! You're SO paying for that, Sheriff!"
         ],
         "ultimate": [
