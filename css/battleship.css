@@ -337,18 +337,7 @@
     border-color: #C4A15B;
 }
 
-.grid-cell.hit {
-    background: #FF3366;
-    border-color: #FF6B8A;
-    box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
-}
 
-
-
-.grid-cell.miss {
-    background: #0397AB;
-    border-color: #05B2CC;
-}
 
 .grid-cell.miss::after {
     color: #FFF;
