@@ -996,11 +996,24 @@ async function loadProfileStats(userId) {
             }
         }
         
-        // ✅ Read achievements count (always fresh from Firebase)
-        const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        const unlockedAchievements = profileDoc.exists() 
-            ? (profileDoc.data().unlockedAchievements || [])
-            : [];
+     // NEW FIXED CODE (copy-paste this)
+let unlockedAchievements = [];
+
+// First try: Firebase profile (normal case)
+const profileDoc = await getDoc(doc(db, 'profiles', userId));
+if (profileDoc.exists()) {
+    unlockedAchievements = profileDoc.data().unlockedAchievements || [];
+    console.log(`Achievements loaded from Firebase: ${unlockedAchievements.length}`);
+} 
+// Second try: Fallback to localStorage (for users who never edited profile)
+else if (isViewingOwnProfile) {
+    const localAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+    unlockedAchievements = localAchievements;
+    console.log(`No Firebase profile → loaded ${unlockedAchievements.length} achievements from localStorage`);
+} 
+else {
+    console.log('No Firebase profile and not own profile → showing 0 achievements (normal)');
+}
         const achievementsCount = unlockedAchievements.length;
         
         console.log(`🏆 Found ${achievementsCount} unlocked achievements`);
@@ -1079,8 +1092,17 @@ async function loadFeaturedAchievements(userId) {
             return;
         }
         
-        const unlockedIds = await getUnlockedAchievementsFromFirebase(userId);
-        console.log('🏆 Unlocked achievement IDs:', unlockedIds);
+let unlockedIds = [];
+
+// Try Firebase first
+const profileDoc = await getDoc(doc(db, 'profiles', userId));
+if (profileDoc.exists()) {
+    unlockedIds = profileDoc.data().unlockedAchievements || [];
+} 
+// Fallback for own profile
+else if (userId === currentUserId) {
+    unlockedIds = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+}        console.log('🏆 Unlocked achievement IDs:', unlockedIds);
         
         if (unlockedIds.length === 0) {
             console.log('⚠️ No achievements unlocked yet');
