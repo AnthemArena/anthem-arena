@@ -320,7 +320,26 @@
         "Throw First Punch!! ⚡"
       ]
     },
-
+"lowvotes": {
+  "messages": [
+    "⚠️ This match needs backup! Only a few votes in!",
+    "👊 Low turnout here! Let's change that!",
+    "💪 Barely anyone's voted! Time to step up!",
+    "🥊 This match needs some muscle! Let's go!"
+  ],
+  "details": [
+    "Every punch counts! Help this match out!",
+    "Give it the attention it deserves!",
+    "Let's make this count!",
+    "Time to make some noise!"
+  ],
+  "ctas": [
+    "VOTE NOW!!",
+    "HIT IT!!",
+    "LET'S GO!!",
+    "PUNCH IN!!"
+  ]
+},
     "round-opening": {
       "messages": [
         "💥 ROUND {round} IS LIVE!! {matchCount} new fights just opened up — let's CRUSH them!!",
@@ -524,6 +543,27 @@
           "Ready to Go!! ⚡"
         ]
       },
+      "encouragement": {
+  "messages": [
+    "👀 Still browsing? Pick one and throw a punch already!!",
+    "💪 C'mon, don't overthink it — just vote and move on!!",
+    "👊 Decisions aren't that hard. Pick your favorite and HIT IT!!",
+    "🥊 You gonna stand there all day or actually vote?",
+    "⚡ Just choose one, kid! They're all good fights!!"
+  ],
+  "details": [
+    "Every vote counts — even if you're second-guessing.",
+    "Trust your gut. That's what fighters do.",
+    "Don't overthink it. Just swing.",
+    "Your opinion matters. Now use it."
+  ],
+  "buttons": [
+    "Vote Now!! 👊",
+    "Pick One!! 💥",
+    "Let's Go!! 🥊",
+    "Do It!! ⚡"
+  ]
+},
 
       "welcome-back": {
         "messages": [

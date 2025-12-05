@@ -836,6 +836,8 @@ action: 'dismiss'
 function testMatchWon() {
     const msg = window.championLoader?.getChampionMessage('match-won', {
         songTitle: 'GODS',
+        winner: 'GODS',
+        loser: 'RISE',
         finalScore: '156-142'
     });
     
@@ -853,9 +855,12 @@ function testMatchWon() {
     });
 }
 
+
 function testMatchLost() {
     const msg = window.championLoader?.getChampionMessage('match-lost', {
         songTitle: 'GODS',
+        winner: 'RISE',
+        loser: 'GODS',
         finalScore: '142-156'
     });
     
@@ -874,8 +879,10 @@ function testMatchLost() {
 }
 
 function testMatchTied() {
-    const msg = window.championLoader?.getChampionMessage('match-tied-alert', {
+    const msg = window.championLoader?.getChampionMessage('match-tied', {  // Changed from 'match-tied-alert'
         songTitle: 'GODS',
+        song1: 'GODS',
+        song2: 'RISE',
         finalScore: '150-150'
     });
     
@@ -899,7 +906,7 @@ function testMatchTied() {
 
 function testRoundOpening() {
     const msg = window.championLoader?.getChampionMessage('round-opening', {
-        roundName: 'Quarterfinals',
+        round: 'Quarterfinals',
         matchCount: 8
     });
     

@@ -153,9 +153,15 @@ function getChampionMessage(alertType, data) {
     
     const alert = currentChampionPack.alerts[alertType];
     
-    if (!alert) {
+       if (!alert) {
         console.warn(`⚠️ Alert type "${alertType}" not found in pack "${currentChampionPack.id}"`);
-        return null;
+        console.warn(`   Available alerts:`, Object.keys(currentChampionPack.alerts).join(', '));
+        return {
+            message: `Alert "${alertType}" not configured`,
+            detail: 'Using fallback message',
+            cta: 'Continue',
+            emoji: '❓'
+        };
     }
     
     // ✅ NEW: Check if messages is an array of conditional objects

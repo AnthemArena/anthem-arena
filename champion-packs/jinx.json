@@ -264,6 +264,27 @@
         "Click Me Before I Explode!! ⚡"
       ]
     },
+
+    "lowvotes": {
+  "messages": [
+    "⚠️ This match is practically empty! Like... THREE votes? That's sad!",
+    "😬 Only a handful of votes here! Let's blow that number up!",
+    "🎯 Low turnout alert! Time to pump those numbers up!",
+    "👀 Barely anyone's voted here! Let's fix that, yeah?"
+  ],
+  "details": [
+    "Give it some love! Every vote counts!",
+    "Help this match get the attention it deserves!",
+    "Let's make some noise here!",
+    "Time to show this match some chaos!"
+  ],
+  "ctas": [
+    "VOTE NOW!!",
+    "FIX THIS!!",
+    "SHOOT!!",
+    "LET'S GO!!"
+  ]
+},
     
     "round-opening": {
       "messages": [
@@ -327,7 +348,7 @@
     
 
     
-    "match-tied-alert": {
+    "match-tied": {
       "messages": [
         {
           "condition": { "winner": "{songTitle}" },
@@ -410,6 +431,26 @@
         ]
       }
     },
+    "encouragement": {
+  "messages": [
+    "👀 Still browsing? Pick something! Anything! BOOM!",
+    "😊 No pressure, but... you gonna vote or just stare?",
+    "🎯 C'mon! Just click one! They're all good!",
+    "💥 Decisions, decisions! Just shoot and see what happens!"
+  ],
+  "details": [
+    "Every vote makes a difference!",
+    "Your opinion matters! Sort of!",
+    "Don't overthink it!",
+    "Trust your gut!"
+  ],
+  "buttons": [
+    "VOTE NOW!!",
+    "PICK ONE!!",
+    "DO IT!!",
+    "SHOOT!!"
+  ]
+},
 
     "welcome": {
       "welcome-first-time": {
