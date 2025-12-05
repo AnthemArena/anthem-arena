@@ -1247,7 +1247,7 @@ export function hasAchievementsInCategory(category) {
 }
 
 /**
- * Get achievement display name with rarity emoji
+ * Get achievement display name with rarity emojis
  */
 export function getAchievementDisplayName(achievementId) {
   const achievement = ACHIEVEMENTS[achievementId];
