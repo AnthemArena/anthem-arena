@@ -108,6 +108,23 @@ let currentBulletin = null;
 let dismissedBulletins = new Set();
 let matchStates = {}; // Track previous states for comeback detection
 let recentlyShownBulletins = new Map(); // ✅ NEW: Track shown toasts with timestamps
+let isAchievementToastActive = false;
+let justVoted = false;                    // ← NEW
+let justVotedTimestamp = 0;               // ← NEW
+
+// This little function says "someone just voted!"
+window.markJustVoted = function() {
+    justVoted = true;
+    justVotedTime = Date.now();          // saves the exact time
+    console.log('Player just voted — protecting achievements for 20 seconds');
+
+    // After 20 seconds, we go back to normal
+    setTimeout(() => {
+        justVoted = false;
+        console.log('20 seconds over — normal toasts can come back');
+    }, 20000); // 20000 milliseconds = 20 seconds
+};
+
 
 const COOLDOWN_MINUTES = {
     danger: 5,           // ✅ Keep - urgent
@@ -1676,6 +1693,34 @@ async function checkForClosingMatches() {
 
 function showBulletin(notification) {
 
+      // If someone just voted in the last 20 seconds, only let achievements show
+    if (justVoted && Date.now() - justVotedTime < 20000) {
+        // Allow only achievement and level-up toasts
+        if (notification.type !== 'achievement' && notification.type !== 'level-up') {
+            console.log('Blocking toast — player is enjoying their achievement!');
+            // Try again in 21 seconds
+            setTimeout(() => showBulletin(notification), 21000);
+            return; // stops here, doesn’t show the toast now
+        }
+    }
+    
+
+        // PREVENT OVERWRITING ACHIEVEMENT TOASTS
+    if (isAchievementToastActive && notification.type !== 'achievement' && notification.type !== 'level-up') {
+        console.log('Achievement toast active – queuing non-achievement bulletin');
+        setTimeout(() => showBulletin(notification), 6000); // Try again in 6 seconds
+        return;
+    }
+
+    if (notification.type === 'achievement' || notification.type === 'level-up') {
+        isAchievementToastActive = true;
+        
+        // Auto-clear protection after 8 seconds
+        setTimeout(() => {
+            isAchievementToastActive = false;
+        }, 8000);
+    }
+
     // ✅ Final safety net
     if (!notification.matchId) {
         const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up'];
@@ -2552,6 +2597,9 @@ window.dismissBulletin = function() {
     
     console.log(`🚫 Dismissed: ${dismissalKeys.join(', ')} (expires in 24h)`);
     
+        isAchievementToastActive = false;  // ADD THIS LINE
+
+
     hideBulletin();
     currentBulletin = null;
 };
@@ -2559,16 +2607,16 @@ window.dismissBulletin = function() {
 window.handleBulletinCTA = function() {
     if (!currentBulletin) return;
     
-    console.log(`📤 Bulletin CTA clicked: ${currentBulletin.type}`);
+    console.log(`Bulletin CTA clicked: ${currentBulletin.type}`);
     
-    // ✅ PRIORITY 1: Check for ctaAction function (level-up, achievement, etc.)
+    // PRIORITY 1: Check for ctaAction function (level-up, achievement, etc.)
     if (currentBulletin.ctaAction && typeof currentBulletin.ctaAction === 'function') {
         currentBulletin.ctaAction();
         hideBulletin();
         return;
     }
     
-    // ✅ PRIORITY 2: Handle emote sending (NEW!)
+    // PRIORITY 2: Handle emote sending
     if (currentBulletin.action === 'send-emote' && currentBulletin.emoteData) {
         window.handleEmoteClick(
             currentBulletin.emoteData.targetUsername,
@@ -2580,24 +2628,32 @@ window.handleBulletinCTA = function() {
         return;
     }
     
+    // === STEP 4: CLEAR ACHIEVEMENT PROTECTION WHEN CTA IS CLICKED ===
+    if (currentBulletin.type === 'achievement' || currentBulletin.type === 'level-up') {
+        isAchievementToastActive = false;   // ← ADD THIS LINE
+        console.log('Achievement/level-up toast protection cleared on CTA');
+    }
+    // ================================================================
+
     // Handle all match-specific alerts
     if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
             window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
-            return; // ✅ Don't hide - page is navigating away
+            return; // Page is navigating away
         } else {
             showNotificationToast('Match not available', 'error');
-            hideBulletin(); // ✅ Hide only on error
+            hideBulletin();
             return;
         }
     }
+    
     // Handle general navigation (welcome, encouragement, etc.)
     else if (currentBulletin.action === 'navigate' && currentBulletin.targetUrl) {
         window.location.href = currentBulletin.targetUrl;
-        return; // ✅ Don't hide - page is navigating away
+        return; // Page is navigating away
     }
     
-    // ✅ Only hide if no navigation happened
+    // Only hide if no navigation happened
     hideBulletin();
 };
 

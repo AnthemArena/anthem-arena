@@ -227,10 +227,6 @@ export async function calculateAchievementStats(allVotes) {
         
     };
   
-    // ADD THESE 3 LINES HERE
-    stats.wonMatches  = allVotes.filter(v => v.outcome === 'won').length;
-    stats.lostMatches = allVotes.filter(v => v.outcome === 'lost').length;
-    stats.tiedMatches = allVotes.filter(v => v.outcome === 'tied').length;
   
 
   

@@ -785,21 +785,27 @@ startBattle() {
     this.setupBattleScreen();
     this.createBattleGrids();
     
-    // Show game start quote
+ // ✅ PRE-BATTLE EXCHANGE
+// Player speaks first
+setTimeout(() => {
     this.showQuote(this.selectedCharacter, 'game_start');
+}, 1000);
+
+// Opponent responds
+setTimeout(() => {
+    this.showQuote(this.opponentCharacter, 'game_start');
+}, 4000);
+
+// Show first turn announcement after exchange
+setTimeout(() => {
+    this.showTurnAnnouncement(this.selectedCharacter, true);
+    this.updateTurnIndicator('player');
     
-    // Show first turn announcement after delay
-    setTimeout(() => {
-        this.showTurnAnnouncement(this.selectedCharacter, true);
-        this.updateTurnIndicator('player');
-
-
-   // ✅ ADD THIS - Enable clicks after initial announcement
     setTimeout(() => {
         this.isTurnTransitioning = false;
         console.log('✅ Game started - clicks enabled');
     }, 1500);
-}, 2500);
+}, 7000); // ← 7 seconds total (1s + 3s for first quote + 3s for second quote)
 }
 
   setupBattleScreen() {
@@ -1724,17 +1730,15 @@ getShipQuoteKey(shipName) {
 // ============================================
 
 showQuote(character, eventType, tags = {}) {
-
-     // ✅ ADD DEBUG LOGGING
+    // ✅ ADD DEBUG LOGGING
     console.log('🎤 showQuote called:', {
         character: character,
         eventType: eventType,
-        opponentCharacter: this.opponentCharacter,
         tags: tags
     });
 
     // Priority quotes that bypass cooldown
-    const priorityQuotes = ['got_hit', 'enemy_miss', 'hit', 'miss'];
+const priorityQuotes = ['got_hit', 'enemy_miss', 'hit', 'miss', 'game_start', 'welcome', 'ships_placed', 'taking_shot'];
     const bypassCooldown = priorityQuotes.includes(eventType);
     
     // Check cooldown
@@ -1744,19 +1748,29 @@ showQuote(character, eventType, tags = {}) {
         return;
     }
     
-    // ✅ PASS OPPONENT FOR RIVAL QUOTES
+    // ✅ FIX: Determine the correct opponent for THIS character
+    let opponentForQuote;
+    if (character === this.selectedCharacter) {
+        // Player is speaking, opponent is AI character
+        opponentForQuote = this.opponentCharacter;
+    } else {
+        // AI character is speaking, opponent is player
+        opponentForQuote = this.selectedCharacter;
+    }
+    
+    // ✅ PASS CORRECT OPPONENT FOR RIVAL QUOTES
     const quote = characterQuotes.getQuote(
-        character, 
-        eventType,
-        this.opponentCharacter,  // ← ADD THIS
-        tags                      // ← For {shipName} replacements
+        character,           // Who's speaking
+        eventType,           // What they're saying
+        opponentForQuote,    // ✅ Who they're speaking ABOUT/TO
+        tags                 // For {shipName} replacements
     );
 
-     // ✅ ADD MORE DEBUG
+    // ✅ ADD MORE DEBUG
     console.log('📝 Got quote:', quote);
     console.log('🔍 Full context:', {
         speakingCharacter: character,
-        theirOpponent: this.opponentCharacter,
+        theirOpponent: opponentForQuote,
         player: this.selectedCharacter
     });
     

@@ -929,7 +929,7 @@ function renderPostContent(post) {
     }
     
     return '';
-}
+}   
 
 // ========================================
 // ✅ NEW: RENDER YOUTUBE EMBED

@@ -1956,7 +1956,8 @@ try {
             showPostVoteModal(songName, songData, xpData, rank);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
-       
+       // Tell the notification system: a vote just happened!
+if (window.markJustVoted) window.markJustVoted();
 
         // Load other live matches
         await loadOtherLiveMatches();
@@ -1998,168 +1999,72 @@ if (!hasUsername && !tipShown) {
 // ✅ IMPROVED: ACHIEVEMENT CHECK AFTER VOTING
 // ========================================
 
+// ✅ FIXED: Get FULL vote history from Firebase instead of localStorage + partial matches
 async function checkForAchievementUnlocks() {
     try {
-        console.log('🏆 Checking for achievement unlocks...');
+        console.log('Checking for achievement unlocks...');
 
-        // ✅ NEW: Initialize session tracking
-        if (!sessionStorage.getItem('sessionStart')) {
-            sessionStorage.setItem('sessionStart', Date.now().toString());
-            console.log('📍 New voting session started');
-        }
-
-        // ✅ FIX: Get userId FIRST (before doing any work)
         const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
-        
         if (!userId) {
-            console.warn('⚠️ No userId found, skipping achievement check');
+            console.warn('No userId found, skipping achievement check');
             return;
         }
+
+        // 🔥 THIS IS THE FIX: Pull complete vote history from Firebase
+        const votesQuery = query(
+            collection(db, 'votes'),
+            where('userId', '==', userId),
+            where('tournament', '==', ACTIVE_TOURNAMENT)
+        );
+        const voteSnapshots = await getDocs(votesQuery);
         
-        console.log('🔍 Checking achievements for userId:', userId);
-        
-        // Get user's complete vote history from localStorage
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const voteIds = Object.keys(userVotes);
-        
-        if (voteIds.length === 0) {
-            console.log('ℹ️ No votes found in history');
-            return;
-        }
-        
-        // ✅ FIX: Get match data to properly categorize votes
-        const allMatches = await getMatchesForThisPageLoad();
-        
-        if (!allMatches || allMatches.length === 0) {
-            console.warn('⚠️ No match data available for achievement checking');
-            return;
-        }
-        
-        const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
-        
-        // Build proper vote history with match context
-        const allVotes = voteIds.map(matchId => {
-            const voteData = userVotes[matchId];
-            const matchData = matchMap.get(matchId);
-            
-            if (!matchData) {
-                return {
-                    matchId,
-                    timestamp: voteData.timestamp || new Date().toISOString(),
-                    voteType: 'balanced',
-                    round: 1,
-                    votedForSeed: null,
-                    votedForName: null,
-                    choice: voteData.songId,
-                    match: {}
-                };
-            }
-            
-            // Determine vote type based on match data
-            const votedForSong = voteData.songId === 'song1' ? matchData.song1 : matchData.song2;
-            const opponentSong = voteData.songId === 'song1' ? matchData.song2 : matchData.song1;
-            
-            const song1Votes = matchData.song1?.votes || 0;
-            const song2Votes = matchData.song2?.votes || 0;
-            const totalMatchVotes = song1Votes + song2Votes;
-            
-            const votedSongVotes = voteData.songId === 'song1' ? song1Votes : song2Votes;
-            const votedSongPercentage = totalMatchVotes > 0 
-                ? Math.round((votedSongVotes / totalMatchVotes) * 100) 
-                : 50;
-            
-            // Categorize vote type
-            let voteType = 'balanced';
-            if (votedSongPercentage < 40) {
-                voteType = 'underdog';
-            } else if (votedSongPercentage > 60) {
-                voteType = 'mainstream';
-            } else {
-                voteType = 'closeCall';
-            }
-            
-            return {
+        const allVotes = [];
+        for (const voteDoc of voteSnapshots.docs) {
+            const vote = voteDoc.data();
+            const matchId = vote.matchId;
+
+            // Get full match data for context (seed, round, etc.)
+            let matchData = null;
+            try {
+                const matchDoc = await getDoc(doc(db, 'matches', matchId));
+                if (matchDoc.exists()) matchData = matchDoc.data();
+            } catch (e) { console.warn('Could not fetch match', matchId); }
+
+            // Reconstruct the exact same shape your achievement-tracker expects
+            const votedSong = vote.choice === 'song1' ? matchData?.song1 : matchData?.song2;
+            const opponentSong = vote.choice === 'song1' ? matchData?.song2 : matchData?.song1;
+
+            allVotes.push({
                 matchId,
-                timestamp: voteData.timestamp || new Date().toISOString(),
-                voteType,
-                round: matchData.round || 1,
-                votedForSeed: votedForSong?.seed,
-                votedForName: votedForSong?.shortTitle || votedForSong?.title,
-                votedForArtist: votedForSong?.artist,
-                votedSongPercentage,
-                choice: voteData.songId,
-                match: matchData
-            };
-        });
-        
-      // ✅ DEFENSIVE: Import and check achievements safely
-const { checkAchievements } = await import('./achievement-tracker.js');
-
-if (typeof checkAchievements !== 'function') {
-    console.error('❌ checkAchievements is not a function');
-    return;
-}
-
-// ✅ FIX: Pass context object with afterVote flag (not userId!)
-console.log('🔍 Calling checkAchievements with', allVotes.length, 'votes (afterVote: true)');
-const achievementResult = await checkAchievements(allVotes, { afterVote: true });
-
-// ✅ DEFENSIVE: Handle undefined/null results
-if (!achievementResult) {
-    console.warn('⚠️ checkAchievements returned undefined');
-    return;
-}
-
-const newlyUnlocked = achievementResult.newlyUnlocked || [];
-        
-        // Show notifications for newly unlocked achievements
-        if (newlyUnlocked && newlyUnlocked.length > 0) {
-            console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
-            
-            // ✅ Limit to 3 toasts max per vote session to prevent spam
-            const MAX_TOASTS_PER_SESSION = 3;
-            const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
-            
-            // Stagger notifications by 2.5 seconds each
-            toastsToShow.forEach((achievement, index) => {
-                setTimeout(() => {
-                    if (window.showAchievementUnlock && typeof window.showAchievementUnlock === 'function') {
-                        window.showAchievementUnlock(achievement);
-                    }
-                }, index * 2500);
+                timestamp: vote.timestamp,
+                choice: vote.choice,
+                round: vote.round || matchData?.round || 1,
+                votedForSeed: votedSong?.seed,
+                votedForName: votedSong?.name || votedSong?.shortTitle,
+                votedForArtist: votedSong?.artist,
+                voteType: vote.voteType || 'balanced', // fallback
+                match: matchData || {}
             });
-            
-            // Log if any were skipped
-            if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
-                console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
-                
-                // Optional: Show a summary toast after the individual ones
-                setTimeout(() => {
-                    if (window.showBulletin && typeof window.showBulletin === 'function') {
-                        window.showBulletin({
-                            type: 'achievement',
-                            message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
-                            detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
-                            cta: 'View All Achievements',
-                            ctaAction: () => window.location.href = 'my-votes.html',
-                            duration: 4000
-                        });
-                    }
-                }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
-            }
-            
-            // Update navigation rank (achievements award XP)
-            if (window.updateNavProfile && typeof window.updateNavProfile === 'function') {
-                window.updateNavProfile();
-            }
-        } else {
-            console.log('✅ No new achievements unlocked this vote');
         }
-        
-    } catch (error) {
-        console.error('⚠️ Error checking achievements:', error);
-        console.error('Stack trace:', error.stack);
-        // Don't block vote submission if achievements fail
+
+        // Sort oldest → newest (important for streaks!)
+        allVotes.sort((a, b) => a.timestamp - b.timestamp);
+
+        console.log(`Loaded ${allVotes.length} votes from Firebase for achievement check`);
+
+        // Now call the real checker
+        const { checkAchievements } = await import('./achievement-tracker.js');
+        const result = await checkAchievements(allVotes, { afterVote: true });
+
+        const newlyUnlocked = result?.newlyUnlocked || [];
+
+            if (newlyUnlocked.length > 0) {
+            console.log(`NEW ACHIEVEMENTS:`, newlyUnlocked.map(a => a.id));
+            window.updateNavProfile?.();
+        }
+
+    } catch (err) {
+        console.error('Achievement check failed:', err);
     }
 }
 
