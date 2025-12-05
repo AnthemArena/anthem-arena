@@ -348,7 +348,7 @@
     
 
     
-    "match-tied": {
+    "match-tied-alert": {
       "messages": [
         {
           "condition": { "winner": "{songTitle}" },
