@@ -166,6 +166,14 @@ async function loadProfile(username) {
         
         currentProfile = profile;
         isOwnProfile = (username === currentUsername);
+
+            // ADD THIS LINE RIGHT HERE — PERFECT SPOT
+        if (isOwnProfile && profile.userId) {
+            await syncLocalAchievementsToFirebase(profile.userId);
+        }
+        // End of new line
+
+        
         
         await renderProfile(profile);
         
@@ -1066,6 +1074,49 @@ else {
         
     } catch (error) {
         console.error('❌ Error loading stats:', error);
+    }
+}
+
+// NEW: Sync local achievements to Firebase if missing
+async function syncLocalAchievementsToFirebase(userId) {
+    try {
+        // Get local achievements (from browser storage)
+        const localAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+        
+        if (localAchievements.length === 0) {
+            console.log('No local achievements to sync');
+            return;
+        }
+        
+        // Get Firebase profile
+        const profileRef = doc(db, 'profiles', userId);
+        const profileDoc = await getDoc(profileRef);
+        
+        let firebaseAchievements = [];
+        if (profileDoc.exists()) {
+            firebaseAchievements = profileDoc.data().unlockedAchievements || [];
+        }
+        
+        // Find missing ones in Firebase
+        const missingInFirebase = localAchievements.filter(id => !firebaseAchievements.includes(id));
+        
+        if (missingInFirebase.length === 0) {
+            console.log('All achievements already synced');
+            return;
+        }
+        
+        console.log(`Syncing ${missingInFirebase.length} missing achievements to Firebase...`);
+        
+        // Add them to Firebase
+        await updateDoc(profileRef, {
+            unlockedAchievements: arrayUnion(...missingInFirebase),
+            lastAchievementSync: Date.now()
+        });
+        
+        console.log('✅ Achievements synced to Firebase!');
+        
+    } catch (error) {
+        console.error('Error syncing achievements:', error);
     }
 }
 

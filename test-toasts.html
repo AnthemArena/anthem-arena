@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎪 Toast Testing Suite - Anthem Arena</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    
+    <!-- Your exact stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Test suite specific styles -->
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(200, 170, 110, 0.3);
+        }
+        
+        .header h1 {
+            color: #C8AA6E;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+        
+        .champion-selector {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .champion-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(180, 150, 90, 0.2));
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 8px;
+            color: #C8AA6E;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .champion-btn:hover {
+            background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), rgba(180, 150, 90, 0.3));
+            border-color: #C8AA6E;
+            transform: translateY(-2px);
+        }
+        
+        .champion-btn.active {
+            background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+            color: #0a0a0a;
+            border-color: #C8AA6E;
+        }
+        
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(200, 170, 110, 0.2);
+        }
+        
+        .test-section h2 {
+            color: #C8AA6E;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .test-btn {
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(200, 170, 110, 0.15), rgba(180, 150, 90, 0.15));
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .test-btn:hover {
+            background: linear-gradient(135deg, rgba(200, 170, 110, 0.25), rgba(180, 150, 90, 0.25));
+            border-color: #C8AA6E;
+            transform: translateX(4px);
+        }
+        
+        .test-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .test-btn-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        .test-btn-label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.25rem;
+        }
+        
+        .action-bar {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        
+        .action-btn {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+            border: none;
+            border-radius: 8px;
+            color: #0a0a0a;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(135deg, #D4B876, #C8AA6E);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+        }
+        
+        .current-pack {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(200, 170, 110, 0.3);
+            border-radius: 8px;
+            color: #C8AA6E;
+            font-weight: 700;
+            z-index: 999;
+        }
+        
+        .severity-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .severity-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid rgba(200, 170, 110, 0.3);
+            border-radius: 4px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .severity-btn:hover {
+            background: rgba(200, 170, 110, 0.2);
+            color: #fff;
+        }
+
+        .keyboard-hints {
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid rgba(200, 170, 110, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+        }
+
+        .keyboard-hints h3 {
+            color: #C8AA6E;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .keyboard-hints code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: #C8AA6E;
+        }
+    </style>
+    
+    <!-- ✅ CRITICAL: Load in same order as index.html -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
+</head>
+
+<body>
+    
+    <div class="current-pack" id="currentPack">
+        <i class="fas fa-sync fa-spin"></i> Loading...
+    </div>
+    
+    <div class="header">
+        <h1>🎪 Champion Toast Testing Suite</h1>
+        <p>Test all notification types with different champion packs</p>
+        <div style="margin-top: 1rem;">
+            <a href="/" style="color: #C8AA6E; text-decoration: none;">
+                <i class="fas fa-home"></i> Back to Homepage
+            </a>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Guide -->
+    <div class="keyboard-hints">
+        <h3>⌨️ Keyboard Shortcuts</h3>
+        <p>
+            <code>D</code> Danger | 
+            <code>N</code> Nailbiter | 
+            <code>C</code> Comeback | 
+            <code>W</code> Winning | 
+            <code>A</code> Ally | 
+            <code>R</code> Rival | 
+            <code>X</code> Clear All | 
+            <code>Ctrl+Space</code> Run Full Sequence
+        </p>
+    </div>
+    
+    <!-- Champion Pack Selector -->
+    <div class="champion-selector">
+        <button class="champion-btn" onclick="switchChampion('jinx')" id="btn-jinx">
+            💥 Jinx
+        </button>
+        <button class="champion-btn" onclick="switchChampion('vi')" id="btn-vi">
+            👊 Vi
+        </button>
+        <!-- Add more champions as you create them -->
+    </div>
+    
+    <!-- Match State Alerts -->
+    <div class="test-section">
+        <h2><i class="fas fa-shield-alt"></i> Match State Alerts</h2>
+        <div class="test-grid">
+            <div>
+                <button class="test-btn" onclick="testDanger(15)">
+                    <span class="test-btn-icon">🚨</span>
+                    <strong>Danger</strong>
+                    <span class="test-btn-label">Your song is losing</span>
+                </button>
+                <div class="severity-selector">
+                    <button class="severity-btn" onclick="testDanger(5)">-5 votes</button>
+                    <button class="severity-btn" onclick="testDanger(15)">-15 votes</button>
+                    <button class="severity-btn" onclick="testDanger(30)">-30 votes</button>
+                </div>
+            </div>
+            
+            <button class="test-btn" onclick="testNailbiter(0)">
+                <span class="test-btn-icon">⚖️</span>
+                <strong>Perfect Tie</strong>
+                <span class="test-btn-label">50-50 deadlock</span>
+            </button>
+            
+            <button class="test-btn" onclick="testNailbiter(1)">
+                <span class="test-btn-icon">🔥</span>
+                <strong>Nailbiter (1 vote)</strong>
+                <span class="test-btn-label">Separated by 1</span>
+            </button>
+            
+            <button class="test-btn" onclick="testNailbiter(3)">
+                <span class="test-btn-icon">🔥</span>
+                <strong>Nailbiter (3 votes)</strong>
+                <span class="test-btn-label">Very close</span>
+            </button>
+            
+            <div>
+                <button class="test-btn" onclick="testComeback(5)">
+                    <span class="test-btn-icon">🎉</span>
+                    <strong>Comeback</strong>
+                    <span class="test-btn-label">Flipped the match!</span>
+                </button>
+                <div class="severity-selector">
+                    <button class="severity-btn" onclick="testComeback(5)">+5 lead</button>
+                    <button class="severity-btn" onclick="testComeback(20)">+20 lead</button>
+                </div>
+            </div>
+            
+            <div>
+                <button class="test-btn" onclick="testWinning(68)">
+                    <span class="test-btn-icon">🎯</span>
+                    <strong>Winning</strong>
+                    <span class="test-btn-label">Leading comfortably</span>
+                </button>
+                <div class="severity-selector">
+                    <button class="severity-btn" onclick="testWinning(65)">65%</button>
+                    <button class="severity-btn" onclick="testWinning(75)">75%</button>
+                    <button class="severity-btn" onclick="testWinning(85)">85%</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Social Alerts -->
+    <div class="test-section">
+        <h2><i class="fas fa-users"></i> Social Interactions</h2>
+        <div class="test-grid">
+            <button class="test-btn" onclick="testAlly()">
+                <span class="test-btn-icon">🤝</span>
+                <strong>Ally Vote</strong>
+                <span class="test-btn-label">Someone agrees with you</span>
+            </button>
+            
+            <button class="test-btn" onclick="testRival()">
+                <span class="test-btn-icon">⚔️</span>
+                <strong>Rival Vote</strong>
+                <span class="test-btn-label">Someone opposes you</span>
+            </button>
+            
+            <button class="test-btn" onclick="testStreak('ally', 10)">
+                <span class="test-btn-icon">🤝🔥</span>
+                <strong>10-Match Ally Streak</strong>
+                <span class="test-btn-label">Perfect agreement</span>
+            </button>
+            
+            <button class="test-btn" onclick="testStreak('ally', 20)">
+                <span class="test-btn-icon">👑</span>
+                <strong>20-Match Ally Streak</strong>
+                <span class="test-btn-label">Legendary alliance</span>
+            </button>
+            
+            <button class="test-btn" onclick="testStreak('rival', 10)">
+                <span class="test-btn-icon">⚔️🔥</span>
+                <strong>10-Match Rival Streak</strong>
+                <span class="test-btn-label">Epic rivalry</span>
+            </button>
+            
+            <button class="test-btn" onclick="testStreak('rival', 20)">
+                <span class="test-btn-icon">💀</span>
+                <strong>20-Match Rival Streak</strong>
+                <span class="test-btn-label">Eternal enemies</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Match Issues -->
+    <div class="test-section">
+        <h2><i class="fas fa-exclamation-triangle"></i> Match Issues</h2>
+        <div class="test-grid">
+            <button class="test-btn" onclick="testNoVotes()">
+                <span class="test-btn-icon">🆘</span>
+                <strong>No Votes</strong>
+                <span class="test-btn-label">Match needs attention</span>
+            </button>
+            
+            <button class="test-btn" onclick="testLowVotes()">
+                <span class="test-btn-icon">⚠️</span>
+                <strong>Low Votes</strong>
+                <span class="test-btn-label">Only a few votes</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Match Results -->
+<div class="test-section">
+    <h2><i class="fas fa-flag-checkered"></i> Match Results</h2>
+    <div class="test-grid">
+        <button class="test-btn" onclick="testMatchWon()">
+            <span class="test-btn-icon">🎉</span>
+            <strong>Match Won</strong>
+            <span class="test-btn-label">Your pick won the match</span>
+        </button>
+        
+        <button class="test-btn" onclick="testMatchLost()">
+            <span class="test-btn-icon">😢</span>
+            <strong>Match Lost</strong>
+            <span class="test-btn-label">Your pick lost</span>
+        </button>
+        
+        <button class="test-btn" onclick="testMatchTied()">
+            <span class="test-btn-icon">⚖️</span>
+            <strong>Match Tied</strong>
+            <span class="test-btn-label">Perfect tie at close</span>
+        </button>
+    </div>
+</div>
+
+<!-- Tournament Events -->
+<div class="test-section">
+    <h2><i class="fas fa-calendar-alt"></i> Tournament Events</h2>
+    <div class="test-grid">
+        <button class="test-btn" onclick="testRoundOpening()">
+            <span class="test-btn-icon">🚀</span>
+            <strong>Round Opening</strong>
+            <span class="test-btn-label">New tournament round begins</span>
+        </button>
+        
+        <button class="test-btn" onclick="testWelcomeBack()">
+            <span class="test-btn-icon">👋</span>
+            <strong>Welcome Back</strong>
+            <span class="test-btn-label">Return after 1 day</span>
+        </button>
+        
+        <button class="test-btn" onclick="testEncouragement()">
+            <span class="test-btn-icon">👀</span>
+            <strong>Gentle Encouragement</strong>
+            <span class="test-btn-label">Nudge for non-voters</span>
+        </button>
+    </div>
+</div>
+
+<!-- Faction Alerts (if you have factions) -->
+<div class="test-section">
+    <h2><i class="fas fa-flag"></i> Faction Alerts</h2>
+    <div class="test-grid">
+        <button class="test-btn" onclick="testFactionWon()">
+            <span class="test-btn-icon">🏆</span>
+            <strong>Faction Victory</strong>
+            <span class="test-btn-label">Your faction won majority</span>
+        </button>
+        
+        <button class="test-btn" onclick="testFactionLost()">
+            <span class="test-btn-icon">💔</span>
+            <strong>Faction Defeat</strong>
+            <span class="test-btn-label">Your faction lost majority</span>
+        </button>
+        
+        <button class="test-btn" onclick="testFactionComeback()">
+            <span class="test-btn-icon">⚡</span>
+            <strong>Faction Comeback</strong>
+            <span class="test-btn-label">Faction flipped the match</span>
+        </button>
+    </div>
+</div>
+    
+    <!-- Welcome & Onboarding -->
+    <div class="test-section">
+        <h2><i class="fas fa-hand-wave"></i> Welcome Messages</h2>
+        <div class="test-grid">
+            <button class="test-btn" onclick="testWelcome('first-time')">
+                <span class="test-btn-icon">🎵</span>
+                <strong>First Time Visitor</strong>
+                <span class="test-btn-label">New user welcome</span>
+            </button>
+            
+            <button class="test-btn" onclick="testWelcome('streak')">
+                <span class="test-btn-icon">🔥</span>
+                <strong>Day 2 Streak</strong>
+                <span class="test-btn-label">Returning user</span>
+            </button>
+            
+            <button class="test-btn" onclick="testWelcome('comeback')">
+                <span class="test-btn-icon">👋</span>
+                <strong>Comeback (3+ days)</strong>
+                <span class="test-btn-label">Long-time returner</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Achievements -->
+    <div class="test-section">
+        <h2><i class="fas fa-trophy"></i> Achievements</h2>
+        <div class="test-grid">
+            <button class="test-btn" onclick="testAchievement('opening-act')">
+                <span class="test-btn-icon">🎤</span>
+                <strong>Opening Act</strong>
+                <span class="test-btn-label">First vote</span>
+            </button>
+            
+            <button class="test-btn" onclick="testAchievement('pentakill')">
+                <span class="test-btn-icon">💀</span>
+                <strong>Pentakill</strong>
+                <span class="test-btn-label">50 votes</span>
+            </button>
+            
+            <button class="test-btn" onclick="testLevelUp(5)">
+                <span class="test-btn-icon">⬆️</span>
+                <strong>Level Up</strong>
+                <span class="test-btn-label">Reached level 5</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="action-btn" onclick="testAllSequence()">
+            <i class="fas fa-play-circle"></i> Run All Tests
+        </button>
+        <button class="action-btn" onclick="clearAllToasts()">
+            <i class="fas fa-trash"></i> Clear
+        </button>
+    </div>
+    
+    <script>
+        // Wait for systems to load
+        window.addEventListener('load', async () => {
+            console.log('🎪 Test suite loaded, waiting for champion loader...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateCurrentPack();
+        });
+        
+        function updateCurrentPack() {
+            const pack = window.championLoader?.getCurrentPack();
+            const packEl = document.getElementById('currentPack');
+            
+            if (pack) {
+                packEl.innerHTML = `${pack.emoji} <strong>${pack.name}</strong>`;
+                
+                // Update active button
+                document.querySelectorAll('.champion-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(`btn-${pack.id}`)?.classList.add('active');
+                
+                console.log(`✅ Current pack: ${pack.name}`);
+            } else {
+                packEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No pack loaded';
+                console.warn('⚠️ No champion pack detected');
+            }
+        }
+        
+        async function switchChampion(packId) {
+            console.log(`🔄 Switching to ${packId}...`);
+            await window.championLoader?.loadChampionPack(packId);
+            localStorage.setItem('championPack', packId);
+            updateCurrentPack();
+        }
+        
+        // ========================================
+        // MATCH STATE TESTS
+        // ========================================
+        
+        function testDanger(voteDiff = 15) {
+            const userPct = Math.round((100 - voteDiff) / 2);
+            const opponentPct = 100 - userPct;
+            
+            const msg = window.championLoader?.getChampionMessage('danger', {
+                songTitle: 'GODS',
+                voteDiff: voteDiff,
+                userPct: userPct,
+                opponentPct: opponentPct
+            });
+            
+            console.log('Testing danger:', msg);
+            
+            if (window.showBulletin) {
+                window.showBulletin({
+                    priority: 1,
+                    type: 'danger',
+                    matchId: 'test-danger',
+                    song: 'GODS',
+                    opponent: 'RISE',
+                    thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+                    userPct: userPct,
+                    opponentPct: opponentPct,
+                    voteDiff: voteDiff,
+                    message: msg?.message || '🚨 Your pick is in danger!',
+                    detail: msg?.detail || `Behind by ${voteDiff} votes`,
+                    cta: msg?.cta || 'View Match Now!'
+                });
+            } else {
+                console.error('❌ showBulletin not available');
+            }
+        }
+        
+        function testNailbiter(voteDiff = 2) {
+            const userPct = voteDiff === 0 ? 50 : 49;
+            const opponentPct = 100 - userPct;
+            
+            const msg = window.championLoader?.getChampionMessage('nailbiter', {
+                songTitle: 'GODS',
+                voteDiff: voteDiff,
+                userPct: userPct,
+                opponentPct: opponentPct
+            });
+            
+            window.showBulletin?.({
+                priority: 2,
+                type: 'nailbiter',
+                matchId: 'test-nailbiter',
+                song: 'GODS',
+                opponent: 'RISE',
+                thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+                voteDiff: voteDiff,
+                userPct: userPct,
+                opponentPct: opponentPct,
+                message: msg?.message || '🔥 Too close!',
+                detail: msg?.detail || `${voteDiff === 0 ? 'Perfectly tied!' : `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`}`,
+                cta: msg?.cta || 'View Match!'
+            });
+        }
+        
+        function testComeback(voteDiff = 10) {
+            const userPct = 50 + Math.round(voteDiff / 2);
+            const opponentPct = 100 - userPct;
+            
+            const msg = window.championLoader?.getChampionMessage('comeback', {
+                songTitle: 'GODS',
+                voteDiff: voteDiff,
+                userPct: userPct,
+                opponentPct: opponentPct
+            });
+            
+            window.showBulletin?.({
+                priority: 3,
+                type: 'comeback',
+                matchId: 'test-comeback',
+                song: 'GODS',
+                opponent: 'RISE',
+                thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+                userPct: userPct,
+                opponentPct: opponentPct,
+                voteDiff: voteDiff,
+                message: msg?.message || '🎉 Comeback complete!',
+                detail: msg?.detail || `Now leading by ${voteDiff}!`,
+                cta: msg?.cta || 'View Match!'
+            });
+        }
+        
+        function testWinning(userPct = 72) {
+            const opponentPct = 100 - userPct;
+            const voteDiff = Math.abs(userPct - opponentPct);
+            
+            const msg = window.championLoader?.getChampionMessage('winning', {
+                songTitle: 'GODS',
+                userPct: userPct,
+                opponentPct: opponentPct,
+                voteDiff: voteDiff
+            });
+            
+            window.showBulletin?.({
+                priority: 4,
+                type: 'winning',
+                matchId: 'test-winning',
+                song: 'GODS',
+                opponent: 'RISE',
+                thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+                userPct: userPct,
+                opponentPct: opponentPct,
+                voteDiff: voteDiff,
+                message: msg?.message || '🎯 Dominating!',
+                detail: msg?.detail || `Leading ${userPct}% to ${opponentPct}%`,
+                cta: msg?.cta || 'View Match!'
+            });
+        }
+        
+        // ========================================
+        // SOCIAL TESTS
+        // ========================================
+        
+        function testAlly() {
+            const msg = window.championLoader?.getChampionMessage('ally', {
+                username: 'SummonerElite',
+                songTitle: 'GODS',
+                matchTitle: 'GODS vs RISE'
+            });
+            
+            window.showBulletin?.({
+                priority: 7,
+                type: 'live-activity',
+                matchId: 'test-ally',
+                matchTitle: 'GODS vs RISE',
+                username: 'SummonerElite',
+                song: 'GODS',
+                thumbnailUrl: 'https://via.placeholder.com/64/3498db/ffffff?text=SE',
+                secondaryThumbnail: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+                relationship: 'ally',
+                icon: '🤝',
+                message: msg?.message || '🤝 SummonerElite also voted for GODS!',
+                detail: msg?.detail || 'Standing with you in GODS vs RISE',
+                cta: msg?.cta || 'Send Thanks!',
+                ctaAction: 'dismiss'
+            });
+        }
+        
+        function testRival() {
+            const msg = window.championLoader?.getChampionMessage('rival', {
+                username: 'NoxianWarrior',
+                theirSong: 'RISE',
+                yourSong: 'GODS',
+                matchTitle: 'GODS vs RISE'
+            });
+            
+            window.showBulletin?.({
+                priority: 7,
+                type: 'live-activity',
+                matchId: 'test-rival',
+                matchTitle: 'GODS vs RISE',
+                username: 'NoxianWarrior',
+                song: 'RISE',
+                userSong: 'GODS',
+                thumbnailUrl: 'https://via.placeholder.com/64/e74c3c/ffffff?text=NW',
+                secondaryThumbnail: 'https://img.youtube.com/vi/fB8TyLTD7EE/mqdefault.jpg',
+                relationship: 'opponent',
+                icon: '⚔️',
+                message: msg?.message || '⚔️ NoxianWarrior picked RISE vs your GODS!',
+                detail: msg?.detail || 'The battle continues',
+                cta: msg?.cta || 'View Battle!'
+            });
+        }
+        
+        function testStreak(type, count) {
+            const isAlly = type === 'ally';
+            const username = isAlly ? 'MusicSoulmate' : 'EternalRival';
+            
+            let alertType = isAlly ? 'streak-ally-10' : 'streak-rival-10';
+            if (count >= 20) {
+                alertType = isAlly ? 'streak-ally-20' : 'streak-rival-20';
+            }
+            
+            const msg = window.championLoader?.getChampionMessage(alertType, {
+                username: username,
+                streakCount: count
+            });
+            
+            window.showBulletin?.({
+                priority: isAlly ? 4 : 3,
+                type: 'streak',
+                matchId: 'test-streak',
+                username: username,
+                streakCount: count,
+                relationship: isAlly ? 'ally-streak' : 'rival-streak',
+                icon: isAlly ? '🤝' : '⚔️',
+                message: msg?.message || `${isAlly ? '🤝' : '⚔️'} ${count}-match ${type} streak with ${username}!`,
+                detail: msg?.detail || `You've ${isAlly ? 'agreed' : 'opposed'} each other ${count} times`,
+                cta: msg?.cta || 'View Profile'
+            });
+        }
+        
+        // ========================================
+        // MATCH ISSUE TESTS
+        // ========================================
+        
+        function testNoVotes() {
+            const msg = window.championLoader?.getCustomMessage('novotes');
+            
+            window.showBulletin?.({
+                priority: 1,
+                type: 'novotes',
+                matchId: 'test-novotes',
+                song: 'Warriors',
+                opponent: 'Phoenix',
+                thumbnailUrl: 'https://img.youtube.com/vi/fmI_Ndrxy14/mqdefault.jpg',
+                hoursLeft: 4,
+                message: msg?.message || '🆘 URGENT: Match has ZERO votes!',
+detail: msg?.detail || 'Warriors vs Phoenix • Closes in 4h',
+cta: msg?.cta || 'Cast First Vote!',
+action: 'dismiss'
+});
+}
+    function testLowVotes() {
+        window.showBulletin?.({
+            priority: 6,
+            type: 'lowvotes',
+            matchId: 'test-lowvotes',
+            song: 'Legends Never Die',
+            opponent: 'Ignite',
+            thumbnailUrl: 'https://img.youtube.com/vi/r6zIGXun57U/mqdefault.jpg',
+            totalVotes: 3,
+            hoursLeft: 6,
+            message: '⚠️ Match needs more votes!',
+            detail: 'Legends Never Die vs Ignite • Only 3 votes • 6h left',
+            cta: 'Help This Match!',
+            action: 'dismiss'
+        });
+    }
+    
+    // ========================================
+    // WELCOME TESTS
+    // ========================================
+    
+    function testWelcome(type = 'first-time') {
+        const msg = window.championLoader?.getCustomMessage(`welcome-${type}`);
+        
+        const messages = {
+            'first-time': { icon: '🎵', default: 'Welcome to Anthem Arena!' },
+            'streak': { icon: '🔥', default: 'Day 2! You came back!' },
+            'comeback': { icon: '👋', default: 'Welcome back after 5 days!' }
+        };
+        
+        const config = messages[type] || messages['first-time'];
+        
+        window.showBulletin?.({
+            priority: 5,
+            type: 'welcome',
+            matchId: 'welcome',
+            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+            message: msg?.message || `${config.icon} ${config.default}`,
+            detail: msg?.detail || '15 live matches waiting for your vote!',
+            cta: msg?.cta || 'Start Voting',
+            action: 'dismiss'
+        });
+    }
+
+    // ========================================
+// MATCH RESULT TESTS
+// ========================================
+
+function testMatchWon() {
+    const msg = window.championLoader?.getChampionMessage('match-won', {
+        songTitle: 'GODS',
+        finalScore: '156-142'
+    });
+    
+    window.showBulletin?.({
+        priority: 1,
+        type: 'match-won',
+        matchId: 'test-match-won',
+        song: 'GODS',
+        opponent: 'RISE',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        finalScore: '156-142',
+        message: msg?.message || '🎉 Your pick won!',
+        detail: msg?.detail || 'GODS defeated RISE 156-142',
+        cta: msg?.cta || 'View Results'
+    });
+}
+
+function testMatchLost() {
+    const msg = window.championLoader?.getChampionMessage('match-lost', {
+        songTitle: 'GODS',
+        finalScore: '142-156'
+    });
+    
+    window.showBulletin?.({
+        priority: 1,
+        type: 'match-lost',
+        matchId: 'test-match-lost',
+        song: 'GODS',
+        opponent: 'RISE',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        finalScore: '142-156',
+        message: msg?.message || '😢 Your pick lost',
+        detail: msg?.detail || 'GODS lost to RISE 142-156',
+        cta: msg?.cta || 'View Results'
+    });
+}
+
+function testMatchTied() {
+    const msg = window.championLoader?.getChampionMessage('match-tied-alert', {
+        songTitle: 'GODS',
+        finalScore: '150-150'
+    });
+    
+    window.showBulletin?.({
+        priority: 2,
+        type: 'match-tied',
+        matchId: 'test-match-tied',
+        song: 'GODS',
+        opponent: 'RISE',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        finalScore: '150-150',
+        message: msg?.message || '⚖️ Perfect tie!',
+        detail: msg?.detail || 'GODS vs RISE ended 150-150',
+        cta: msg?.cta || 'View Tiebreaker'
+    });
+}
+
+// ========================================
+// TOURNAMENT EVENT TESTS
+// ========================================
+
+function testRoundOpening() {
+    const msg = window.championLoader?.getChampionMessage('round-opening', {
+        roundName: 'Quarterfinals',
+        matchCount: 8
+    });
+    
+    window.showBulletin?.({
+        priority: 3,
+        type: 'round-opening',
+        matchId: 'test-round-opening',
+        roundName: 'Quarterfinals',
+        matchCount: 8,
+        thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+        message: msg?.message || '🚀 Quarterfinals now open!',
+        detail: msg?.detail || '8 new matches ready for voting',
+        cta: msg?.cta || 'Start Voting!'
+    });
+}
+
+function testWelcomeBack() {
+    const msg = window.championLoader?.getCustomMessage('welcome-back');
+    
+    window.showBulletin?.({
+        priority: 5,
+        type: 'welcome',
+        matchId: 'welcome-back',
+        thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+        message: msg?.message || '👋 Welcome back!',
+        detail: msg?.detail || '12 matches waiting for your vote',
+        cta: msg?.cta || 'Continue Voting',
+        action: 'dismiss'
+    });
+}
+
+function testEncouragement() {
+    const msg = window.championLoader?.getCustomMessage('encouragement');
+    
+    window.showBulletin?.({
+        priority: 5,
+        type: 'encouragement',
+        matchId: 'encouragement',
+        thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+        message: msg?.message || '👀 Still deciding?',
+        detail: msg?.detail || 'Pick your favorites and see results live!',
+        cta: msg?.cta || 'Browse Matches',
+        action: 'dismiss'
+    });
+}
+
+// ========================================
+// FACTION TESTS
+// ========================================
+
+function testFactionWon() {
+    const msg = window.championLoader?.getChampionMessage('factionAlerts.match-won', {
+        songTitle: 'GODS',
+        factionName: 'Team Jinx'
+    });
+    
+    window.showBulletin?.({
+        priority: 2,
+        type: 'faction-won',
+        matchId: 'test-faction-won',
+        song: 'GODS',
+        factionName: 'Team Jinx',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        message: msg?.message || '🏆 Your faction won!',
+        detail: msg?.detail || 'Team Jinx secured majority for GODS',
+        cta: msg?.cta || 'View Results'
+    });
+}
+
+function testFactionLost() {
+    const msg = window.championLoader?.getChampionMessage('factionAlerts.match-lost', {
+        songTitle: 'GODS',
+        factionName: 'Team Jinx'
+    });
+    
+    window.showBulletin?.({
+        priority: 2,
+        type: 'faction-lost',
+        matchId: 'test-faction-lost',
+        song: 'GODS',
+        factionName: 'Team Jinx',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        message: msg?.message || '💔 Your faction lost',
+        detail: msg?.detail || 'Team Jinx lost majority for GODS',
+        cta: msg?.cta || 'View Results'
+    });
+}
+
+function testFactionComeback() {
+    const msg = window.championLoader?.getChampionMessage('factionAlerts.comeback', {
+        songTitle: 'GODS',
+        factionName: 'Team Jinx'
+    });
+    
+    window.showBulletin?.({
+        priority: 3,
+        type: 'faction-comeback',
+        matchId: 'test-faction-comeback',
+        song: 'GODS',
+        factionName: 'Team Jinx',
+        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
+        message: msg?.message || '⚡ Faction comeback!',
+        detail: msg?.detail || 'Team Jinx flipped the match for GODS!',
+        cta: msg?.cta || 'View Match'
+    });
+}
+
+    
+    // ========================================
+    // ACHIEVEMENT TESTS
+    // ========================================
+    
+    function testAchievement(achievementId = 'opening-act') {
+        const achievements = {
+            'opening-act': {
+                icon: '🎤',
+                title: 'Opening Act',
+                description: 'Cast your first vote!'
+            },
+            'pentakill': {
+                icon: '💀',
+                title: 'Pentakill',
+                description: '50 votes - you\'re a natural disaster!'
+            }
+        };
+        
+        const achievement = achievements[achievementId] || achievements['opening-act'];
+        const msg = window.championLoader?.getAchievementMessage(achievementId);
+        
+        window.showBulletin?.({
+            priority: 1,
+            type: 'achievement',
+            matchId: 'achievement',
+            icon: achievement.icon,
+            thumbnailUrl: achievement.icon,
+            message: msg?.message || `🏆 Achievement Unlocked: ${achievement.title}`,
+            detail: msg?.detail || achievement.description,
+            cta: msg?.cta || 'View Achievements'
+        });
+    }
+    
+    function testLevelUp(level = 5) {
+        const msg = window.championLoader?.getAchievementMessage('level-up', { level });
+        
+        window.showBulletin?.({
+            priority: 1,
+            type: 'levelup',
+            matchId: 'levelup',
+            icon: '⬆️',
+            level: level,
+            message: msg?.message || `⬆️ Level Up! You're now Level ${level}!`,
+            detail: msg?.detail || `Keep voting to reach Level ${level + 1}`,
+            cta: msg?.cta || 'Continue Voting'
+        });
+    }
+    
+    // ========================================
+    // SEQUENCE TEST
+    // ========================================
+    
+   function testAllSequence() {
+    console.log('🎬 Running COMPLETE test sequence...');
+    
+    const tests = [
+        { fn: () => testDanger(15), delay: 0, name: 'Danger' },
+        { fn: () => testNailbiter(2), delay: 6000, name: 'Nailbiter' },
+        { fn: () => testComeback(10), delay: 12000, name: 'Comeback' },
+        { fn: () => testWinning(75), delay: 18000, name: 'Winning' },
+        { fn: () => testAlly(), delay: 24000, name: 'Ally Vote' },
+        { fn: () => testRival(), delay: 30000, name: 'Rival Vote' },
+        { fn: () => testNoVotes(), delay: 36000, name: 'No Votes' },
+        { fn: () => testMatchWon(), delay: 42000, name: 'Match Won' },
+        { fn: () => testMatchLost(), delay: 48000, name: 'Match Lost' },
+        { fn: () => testRoundOpening(), delay: 54000, name: 'Round Opening' },
+        { fn: () => testAchievement('opening-act'), delay: 60000, name: 'Achievement' }
+    ];
+    
+    tests.forEach(test => {
+        setTimeout(() => {
+            console.log(`🎯 Testing: ${test.name}`);
+            test.fn();
+        }, test.delay);
+    });
+    
+    console.log(`⏱️ Full sequence: ${tests[tests.length - 1].delay / 1000}s (${Math.ceil(tests[tests.length - 1].delay / 60000)} min)`);
+}
+    
+    function clearAllToasts() {
+        document.querySelectorAll('.bulletin-toast').forEach(el => el.remove());
+        console.log('🗑️ Cleared all toasts');
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'd' || e.key === 'D') testDanger(15);
+        if (e.key === 'n' || e.key === 'N') testNailbiter(2);
+        if (e.key === 'c' || e.key === 'C') testComeback(10);
+        if (e.key === 'w' || e.key === 'W') testWinning(75);
+        if (e.key === 'a' || e.key === 'A') testAlly();
+        if (e.key === 'r' || e.key === 'R') testRival();
+        if (e.key === 'x' || e.key === 'X') clearAllToasts();
+        if (e.key === ' ' && e.ctrlKey) {
+            e.preventDefault();
+            testAllSequence();
+        }
+    });
+    
+    console.log('⌨️ Keyboard shortcuts ready');
+</script>
+</body>
+</html>
