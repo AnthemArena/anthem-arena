@@ -2000,7 +2000,7 @@ if (!hasUsername && !tipShown) {
 // ========================================
 
 // ✅ FIXED: Get FULL vote history from Firebase instead of localStorage + partial matches
-async function checkForAchievementUnlocks() {
+export async function checkForAchievementUnlocks() {
     try {
         console.log('Checking for achievement unlocks...');
 
