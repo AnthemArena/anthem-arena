@@ -1956,8 +1956,7 @@ try {
             showPostVoteModal(songName, songData, xpData, rank);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
-       // Tell the notification system: a vote just happened!
-if (window.markJustVoted) window.markJustVoted();
+       
 
         // Load other live matches
         await loadOtherLiveMatches();
@@ -2000,7 +1999,7 @@ if (!hasUsername && !tipShown) {
 // ========================================
 
 // ✅ FIXED: Get FULL vote history from Firebase instead of localStorage + partial matches
-export async function checkForAchievementUnlocks() {
+async function checkForAchievementUnlocks() {
     try {
         console.log('Checking for achievement unlocks...');
 
@@ -2058,8 +2057,26 @@ export async function checkForAchievementUnlocks() {
 
         const newlyUnlocked = result?.newlyUnlocked || [];
 
-            if (newlyUnlocked.length > 0) {
+        if (newlyUnlocked.length > 0) {
             console.log(`NEW ACHIEVEMENTS:`, newlyUnlocked.map(a => a.id));
+
+            // Show toasts (still capped at 4 to avoid spam)
+            newlyUnlocked.slice(0, 4).forEach((ach, i) => {
+                setTimeout(() => window.showAchievementUnlock?.(ach), i * 2800);
+            });
+
+            if (newlyUnlocked.length > 4) {
+                setTimeout(() => {
+                    window.showBulletin?.({
+                        type: 'achievement',
+                        message: `+${newlyUnlocked.length - 4} more achievements!`,
+                        detail: 'Check My Votes to see them all',
+                        cta: 'View Achievements',
+                        ctaAction: () => location.href = 'my-votes.html'
+                    });
+                }, 4 * 2800 + 1000);
+            }
+
             window.updateNavProfile?.();
         }
 
@@ -2397,7 +2414,7 @@ function showNotification(message, type = 'success') {
 function showPostVoteModal(songName, songData, xpData, rank) {
     const book = songData ? getBookForSong(songData) : null;
     
-    // Calculate voting situation
+    // ✨ Calculate voting situation
     const votedFor = songData.seed === currentMatch.competitor1.seed ? 'song1' : 'song2';
     const userVotes = votedFor === 'song1' ? currentMatch.competitor1.votes : currentMatch.competitor2.votes;
     const opponentVotes = votedFor === 'song1' ? currentMatch.competitor2.votes : currentMatch.competitor1.votes;
@@ -2408,162 +2425,377 @@ function showPostVoteModal(songName, songData, xpData, rank) {
     const totalVotes = currentMatch.totalVotes;
     const pctDiff = Math.abs(userPct - opponentPct);
 
-    // Timing logic
-    const matchStartTime = new Date(currentMatch.startDate).getTime();
-    const matchEndTime = new Date(currentMatch.endDate).getTime();
-    const now = Date.now();
-    const timeRemaining = matchEndTime - now;
-    const hoursRemaining = timeRemaining / (1000 * 60 * 60);
+    // ========================================
+// DETERMINE VOTING SITUATION
+// ========================================
 
-    const isEarlyVoting = totalVotes < 10;
-    const isFinalHours = hoursRemaining <= 10 && hoursRemaining > 0;
+// ✅ Calculate match timing using your Firebase fields
+const matchStartTime = new Date(currentMatch.startDate).getTime();
+const matchEndTime = new Date(currentMatch.endDate).getTime();
+const now = Date.now();
+const timeRemaining = matchEndTime - now;
+const hoursRemaining = timeRemaining / (1000 * 60 * 60);
 
-    let situationType = '';
-    let modalIcon = '';
-    let modalTitle = '';
-    let successMessage = '';
-    let shareMessage = '';
-    let shareContext = '';
+// ✅ Determine timing phase
+const isEarlyVoting = totalVotes < 10; // First 10 votes
+const isFinalHours = hoursRemaining <= 10 && hoursRemaining > 0;
+const isMiddlePeriod = !isEarlyVoting && !isFinalHours;
 
-    // ——— YOUR FULL SITUATION LOGIC (unchanged) ———
-    if (isEarlyVoting) {
-        situationType = 'early';
-        modalIcon = 'Early Voter!';
-        modalTitle = 'Early Voter!';
-        successMessage = `<p class="modal-message early">You voted for <strong>"${songName}"</strong><br><span class="stakes-text">Only ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} so far — this match needs more voters!</span></p>`;
-        shareContext = 'early';
-        shareMessage = `<div class="share-cta urgent"><div class="share-header"><span class="share-icon">Rocket</span><strong>Be a Pioneer!</strong></div><p class="share-text">This match just started! Help shape the results from the beginning.</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else if (voteDiff === 0) {
-        situationType = 'tied';
-        modalIcon = 'Perfect Tie!';
-        modalTitle = 'Perfect Tie!';
-        successMessage = `<p class="modal-message special">You just broke the deadlock!<br><span class="stakes-text">"${songName}" and "${opponentName}" were exactly ${userVotes}-${opponentVotes}</span></p>`;
-        shareContext = 'tied';
-        const tiedUrgency = isFinalHours ? 'FINAL HOURS - PERFECTLY TIED!' : 'This is INSANE!';
-        const tiedMessage = isFinalHours ? `Final hours and these songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Your vote could be the tiebreaker.` : `These songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Every single vote decides the winner.`;
-        shareMessage = `<div class="share-cta extreme"><div class="share-header"><span class="share-icon">Tie</span><strong>${tiedUrgency}</strong></div><p class="share-text">${tiedMessage}</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else if (voteDiff <= 2) {
-        situationType = 'nailbiter';
-        modalIcon = 'Nail-Biter!';
-        modalTitle = 'Nail-Biter!';
-        successMessage = `<p class="modal-message special">You voted for <strong>"${songName}"</strong><br><span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span></p>`;
-        shareContext = 'nailbiter';
-        const nailbiterHeader = isFinalHours ? 'FINAL HOURS - TOO CLOSE!' : 'TOO CLOSE TO CALL!';
-        const nailbiterMessage = isFinalHours ? `"${songName}" needs your vote! Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs in the FINAL HOURS!` : `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs. Your vote could decide everything!`;
-        shareMessage = `<div class="share-cta extreme"><div class="share-header"><span class="share-icon">Fire</span><strong>${nailbiterHeader}</strong></div><p class="share-text">${nailbiterMessage}</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else if (userPct < opponentPct && voteDiff <= 5) {
-        situationType = 'losing-close';
-        modalIcon = 'Fighting for It!';
-        modalTitle = 'Fighting for It!';
-        successMessage = `<p class="modal-message special">You're fighting for <strong>"${songName}"</strong>!<br><span class="stakes-text">Behind by just ${voteDiff} votes (${userPct}% vs ${opponentPct}%)</span></p>`;
-        shareContext = 'losing-close';
-        const comebackHeader = isFinalHours ? 'FINAL HOURS - Comeback Time!' : 'Comeback Time!';
-        const comebackMessage = isFinalHours ? `"${songName}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!` : `"${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
-        shareMessage = `<div class="share-cta urgent"><div class="share-header"><span class="share-icon">Sword</span><strong>${comebackHeader}</strong></div><p class="share-text">${comebackMessage}</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else if (userPct < opponentPct) {
-        situationType = 'losing-bad';
-        modalIcon = 'Save It!';
-        modalTitle = 'Save It!';
-        successMessage = `<p class="modal-message special">You voted to save <strong>"${songName}"</strong>!<br><span class="stakes-text">But it's losing ${userPct}% to ${opponentPct}% — it needs a miracle!</span></p>`;
-        shareContext = 'losing-bad';
-        const emergencyHeader = isFinalHours ? 'FINAL HOURS - CODE RED!' : 'EMERGENCY: Rally the Community!';
-        const emergencyMessage = isFinalHours ? `"${songName}" is down ${pctDiff}% with only hours remaining! This is the LAST CHANCE!` : `"${songName}" is down ${pctDiff}% and needs your help to survive. Share now to rally supporters!`;
-        shareMessage = `<div class="share-cta urgent"><div class="share-header"><span class="share-icon">Speaker</span><strong>${emergencyHeader}</strong></div><p class="share-text">${emergencyMessage}</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-bad')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-bad')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else if (pctDiff <= 10) {
-        situationType = 'winning-close';
-        modalIcon = 'Leading!';
-        modalTitle = 'Leading!';
-        successMessage = `<p class="modal-message">Great choice! <strong>"${songName}"</strong> is leading!<br><span class="stakes-text">Currently ${userPct}% to ${opponentPct}% — but it's still competitive!</span></p>`;
-        shareContext = 'winning-close';
-        const leadHeader = isFinalHours ? 'FINAL HOURS - Seal the Victory!' : 'Maintain the Lead!';
-        const leadMessage = isFinalHours ? `"${songName}" is ahead in the FINAL HOURS, but it's still competitive. Help seal the win!` : `"${songName}" is ahead but the race is still close. Help secure the victory!`;
-        shareMessage = `<div class="share-cta"><div class="share-header"><span class="share-icon">Chart</span><strong>${leadHeader}</strong></div><p class="share-text">${leadMessage}</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'winning-close')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'winning-close')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
-    else {
-        situationType = 'dominating';
-        modalIcon = 'Dominating!';
-        modalTitle = 'Dominating!';
-        successMessage = `<p class="modal-message victory">"${songName}" is crushing it at ${userPct}%!<br><span class="stakes-text">Keep the momentum going!</span></p>`;
-        shareContext = 'dominating';
-        shareMessage = `<div class="share-cta calm"><div class="share-header"><span class="share-icon">Target</span><strong>Victory Lap!</strong></div><p class="share-text">"${songName}" is dominating! Share the tournament with the community:</p><div class="share-buttons"><button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')"><span class="btn-icon">Twitter</span> Tweet</button><button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')"><span class="btn-icon">Reddit</span> Reddit</button><button class="share-btn copy" onclick="copyMatchLink()"><span class="btn-icon">Link</span> Copy Link</button></div></div>`;
-    }
+let situationType = '';
+let modalIcon = '';
+let modalTitle = '';
+let successMessage = '';
+let shareMessage = '';
+let shareContext = '';
 
-    // ——— CHAMPION PERSONALITY INJECTION ———
-    const pack = window.championLoader?.getCurrentPack() || {};
-    const alerts = pack.alerts || {};
-
-    let championQuote = "BOOM BABY!!";
-    let championCta = "KEEP VOTING!!";
-
-    if (situationType === 'early') {
-        championQuote = alerts['novotes']?.messages?.[0] || "FRESH MEAT!!";
-        championCta = alerts['novotes']?.buttons?.[0] || "LIGHT IT UP!!";
-    }
-    else if (situationType === 'tied') {
-        championQuote = alerts['nailbiter']?.messages?.find(m => m.condition?.voteDiff?.eq === 0)?.message?.[0] || 
-                       alerts['nailbiter']?.messages?.[0] || "DEAD EVEN!!";
-        championCta = alerts['nailbiter']?.buttons?.[0] || "BREAK THE TIE!!";
-    }
-    else if (situationType.includes('winning')) {
-        championQuote = alerts['winning']?.messages?.[0] || "WE'RE CRUSHING IT!!";
-        championCta = alerts['winning']?.buttons?.[0] || "RUB IT IN!!";
-    }
-    else if (situationType.includes('losing')) {
-        championQuote = alerts['danger']?.messages?.[0] || "WE'RE LOSING?!";
-        championCta = alerts['danger']?.buttons?.[0] || "SAVE IT!!";
-    }
-
-    // Play champion voice line
-    window.championLoader?.playRandomVictoryLine?.();
-
-    // ——— YOUR XP, BOOK, BMC SECTIONS (100% unchanged) ———
-    let xpSection = `
-        <div class="xp-earned-section">
-            <div class="xp-header">
-                <span class="xp-icon">Sparkles</span>
-                <div class="xp-details">
-                    <div class="xp-amount">+${xpData.totalXP} XP Earned!</div>
-                    <div class="xp-breakdown">
-                        <span class="xp-base">+${xpData.baseXP} Base vote</span>
-                        ${xpData.bonuses.length > 0 ? xpData.bonuses.map(bonus => `
-                            <span class="xp-bonus surprise">+${bonus.xp} ${bonus.type}</span>
-                        `).join('') : ''}
-                    </div>
-                </div>
+// Early voting (< 10 votes total)
+if (isEarlyVoting) {
+    situationType = 'early';
+    modalIcon = '🌟';
+    modalTitle = 'Early Voter!';
+    successMessage = `
+        <p class="modal-message early">
+            You voted for <strong>"${songName}"</strong><br>
+            <span class="stakes-text">Only ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} so far — this match needs more voters!</span>
+        </p>
+    `;
+    shareContext = 'early';
+    shareMessage = `
+        <div class="share-cta urgent">
+            <div class="share-header">
+                <span class="share-icon">🚀</span>
+                <strong>Be a Pioneer!</strong>
             </div>
-            ${xpData.bonuses.length > 0 ? `
-                <div class="bonus-reveal">
-                    <span class="reveal-icon">Party</span>
-                    <span class="reveal-text">Bonus! You earned ${xpData.bonuses.length} extra reward${xpData.bonuses.length === 1 ? '' : 's'}!</span>
-                </div>
-            ` : ''}
-            <div class="xp-progress-container">
-                <div class="xp-level-info">
-                    <span class="xp-level-badge">${rank.currentLevel.title}</span>
-                    <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
-                </div>
-                ${rank.nextLevel ? `
-                    <div class="xp-bar-wrapper">
-                        <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
-                    </div>
-                    <div class="xp-next-level">
-                        ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} XP to Level ${rank.nextLevel.level}
-                    </div>
-                ` : `<div class="xp-max-level">Maximum Level Reached!</div>`}
+            <p class="share-text">
+                This match just started! Help shape the results from the beginning.
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
             </div>
         </div>
     `;
-
+}
+// Perfect tie
+else if (voteDiff === 0) {
+    situationType = 'tied';
+    modalIcon = '⚖️';
+    modalTitle = 'Perfect Tie!';
+    successMessage = `
+        <p class="modal-message special">
+            You just broke the deadlock!<br>
+            <span class="stakes-text">"${songName}" and "${opponentName}" were exactly ${userVotes}-${opponentVotes}</span>
+        </p>
+    `;
+    shareContext = 'tied';
+    
+    // ✅ Dynamic based on timing
+    const tiedUrgency = isFinalHours 
+        ? 'FINAL HOURS - PERFECTLY TIED!' 
+        : 'This is INSANE!';
+    const tiedMessage = isFinalHours
+        ? `Final hours and these songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Your vote could be the tiebreaker.`
+        : `These songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Every single vote decides the winner.`;
+    
+    shareMessage = `
+        <div class="share-cta extreme">
+            <div class="share-header">
+                <span class="share-icon">⚖️</span>
+                <strong>${tiedUrgency}</strong>
+            </div>
+            <p class="share-text">
+                ${tiedMessage}
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// Nail-biter (within 2 votes)
+else if (voteDiff <= 2) {
+    situationType = 'nailbiter';
+    modalIcon = '🔥';
+    modalTitle = 'Nail-Biter!';
+    successMessage = `
+        <p class="modal-message special">
+            You voted for <strong>"${songName}"</strong><br>
+            <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
+        </p>
+    `;
+    shareContext = 'nailbiter';
+    
+    // ✅ Dynamic based on timing
+    const nailbiterHeader = isFinalHours 
+        ? 'FINAL HOURS - TOO CLOSE!' 
+        : 'TOO CLOSE TO CALL!';
+    const nailbiterMessage = isFinalHours
+        ? `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs in the FINAL HOURS! This could go either way!`
+        : `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs. Your vote could decide everything!`;
+    
+    shareMessage = `
+        <div class="share-cta extreme">
+            <div class="share-header">
+                <span class="share-icon">🔥</span>
+                <strong>${nailbiterHeader}</strong>
+            </div>
+            <p class="share-text">
+                ${nailbiterMessage}
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// Losing but salvageable (behind by 3-5 votes)
+else if (userPct < opponentPct && voteDiff <= 5) {
+    situationType = 'losing-close';
+    modalIcon = '⚔️';
+    modalTitle = 'Fighting for It!';
+    successMessage = `
+        <p class="modal-message special">
+            You're fighting for <strong>"${songName}"</strong>!<br>
+            <span class="stakes-text">Behind by just ${voteDiff} votes (${userPct}% vs ${opponentPct}%)</span>
+        </p>
+    `;
+    shareContext = 'losing-close';
+    
+    // ✅ Dynamic based on timing
+    const comebackHeader = isFinalHours 
+        ? 'FINAL HOURS - Comeback Time!' 
+        : 'Comeback Time!';
+    const comebackMessage = isFinalHours
+        ? `"${songName}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
+        : `"${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
+    
+    shareMessage = `
+        <div class="share-cta urgent">
+            <div class="share-header">
+                <span class="share-icon">⚔️</span>
+                <strong>${comebackHeader}</strong>
+            </div>
+            <p class="share-text">
+                ${comebackMessage}
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// Losing badly (behind by 6+ votes)
+else if (userPct < opponentPct) {
+    situationType = 'losing-bad';
+    modalIcon = '🆘';
+    modalTitle = 'Save It!';
+    successMessage = `
+        <p class="modal-message special">
+            You voted to save <strong>"${songName}"</strong>!<br>
+            <span class="stakes-text">But it's losing ${userPct}% to ${opponentPct}% — it needs a miracle!</span>
+        </p>
+    `;
+    shareContext = 'losing-bad';
+    
+    // ✅ Dynamic based on timing
+    const emergencyHeader = isFinalHours 
+        ? 'FINAL HOURS - CODE RED!' 
+        : 'EMERGENCY: Rally the Community!';
+    const emergencyMessage = isFinalHours
+        ? `"${songName}" is down ${pctDiff}% with only hours remaining! This is the LAST CHANCE!`
+        : `"${songName}" is down ${pctDiff}% and needs your help to survive. Share now to rally supporters!`;
+    
+    shareMessage = `
+        <div class="share-cta urgent">
+            <div class="share-header">
+                <span class="share-icon">📢</span>
+                <strong>${emergencyHeader}</strong>
+            </div>
+            <p class="share-text">
+                ${emergencyMessage}
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-bad')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-bad')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// Winning but close (within 10%)
+else if (pctDiff <= 10) {
+    situationType = 'winning-close';
+    modalIcon = '📊';
+    modalTitle = 'Leading!';
+    successMessage = `
+        <p class="modal-message">
+            Great choice! <strong>"${songName}"</strong> is leading!<br>
+            <span class="stakes-text">Currently ${userPct}% to ${opponentPct}% — but it's still competitive!</span>
+        </p>
+    `;
+    shareContext = 'winning-close';
+    
+    // ✅ Dynamic based on timing
+    const leadHeader = isFinalHours 
+        ? 'FINAL HOURS - Seal the Victory!' 
+        : 'Maintain the Lead!';
+    const leadMessage = isFinalHours
+        ? `"${songName}" is ahead in the FINAL HOURS, but it's still competitive. Help seal the win!`
+        : `"${songName}" is ahead but the race is still close. Help secure the victory!`;
+    
+    shareMessage = `
+        <div class="share-cta">
+            <div class="share-header">
+                <span class="share-icon">📊</span>
+                <strong>${leadHeader}</strong>
+            </div>
+            <p class="share-text">
+                ${leadMessage}
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'winning-close')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'winning-close')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// Dominating (winning by 10%+)
+else {
+    situationType = 'dominating';
+    modalIcon = '🎯';
+    modalTitle = 'Dominating!';
+    successMessage = `
+        <p class="modal-message victory">
+            "${songName}" is crushing it at ${userPct}%!<br>
+            <span class="stakes-text">Keep the momentum going!</span>
+        </p>
+    `;
+    shareContext = 'dominating';
+    shareMessage = `
+        <div class="share-cta calm">
+            <div class="share-header">
+                <span class="share-icon">🎯</span>
+                <strong>Victory Lap!</strong>
+            </div>
+            <p class="share-text">
+                "${songName}" is dominating! Share the tournament with the community:
+            </p>
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')">
+        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                </button>
+                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')">
+        <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                </button>
+                <button class="share-btn copy" onclick="copyMatchLink()">
+        <span class="btn-icon"><i class="fa-solid fa-link"></i></span> Copy Link
+                </button>
+            </div>
+        </div>
+    `;
+}
+// ========================================
+// ✅ IMPROVED: XP EARNED SECTION
+// ========================================
+let xpSection = `
+    <div class="xp-earned-section">
+        <div class="xp-header">
+        <span class="xp-icon"><i class="fa-solid fa-sparkles"></i></span>
+            <div class="xp-details">
+                <div class="xp-amount">+${xpData.totalXP} XP Earned!</div>
+                <div class="xp-breakdown">
+                    <span class="xp-base">+${xpData.baseXP} Base vote</span>
+                    ${xpData.bonuses.length > 0 ? `
+                        ${xpData.bonuses.map(bonus => `
+                            <span class="xp-bonus surprise">
+                                🎁 +${bonus.xp} ${bonus.type}
+                            </span>
+                        `).join('')}
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+        
+        ${xpData.bonuses.length > 0 ? `
+            <div class="bonus-reveal">
+                <span class="reveal-icon">🎉</span>
+                <span class="reveal-text">
+                    Bonus! You earned ${xpData.bonuses.length} extra reward${xpData.bonuses.length === 1 ? '' : 's'}!
+                </span>
+            </div>
+        ` : ''}
+        
+        <div class="xp-progress-container">
+            <div class="xp-level-info">
+                <span class="xp-level-badge">${rank.currentLevel.title}</span>
+                <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
+            </div>
+            ${rank.nextLevel ? `
+                <div class="xp-bar-wrapper">
+                    <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
+                </div>
+                <div class="xp-next-level">
+                    ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} XP to Level ${rank.nextLevel.level}
+                </div>
+            ` : `
+                <div class="xp-max-level">🏆 Maximum Level Reached!</div>
+            `}
+        </div>
+    </div>
+`;
+    
+    // ========================================
+    // BUILD BOOK SECTION (existing code)
+    // ========================================
     let bookSection = '';
     if (book) {
         bookSection = `
             <div class="book-earned-section">
-                <div class="book-icon">${book.icon || 'Book'}</div>
+                <div class="book-icon">${book.icon || '📖'}</div>
                 <div class="book-info">
                     <h3 class="book-title">${book.title}</h3>
                     <p class="book-description">${book.description}</p>
@@ -2576,63 +2808,66 @@ function showPostVoteModal(songName, songData, xpData, rank) {
         `;
     }
 
-    let bmcSection = `
-        <div class="bmc-support-section">
-            <div class="bmc-callout">
-                <span class="bmc-icon">Coffee</span>
-                <div class="bmc-text">
-                    <strong>Enjoying the tournament?</strong>
-                    <p>Help keep it running with a coffee!</p>
-                </div>
+    // ========================================
+// BMC SUPPORT SECTION
+// ========================================
+let bmcSection = `
+    <div class="bmc-support-section">
+        <div class="bmc-callout">
+            <span class="bmc-icon">☕</span>
+            <div class="bmc-text">
+                <strong>Enjoying the tournament?</strong>
+                <p>Help keep it running with a coffee!</p>
             </div>
-            <a href="https://buymeacoffee.com/anthemarena" target="_blank" class="bmc-button">
-                Buy Me a Coffee
-            </a>
         </div>
-    `;
-
-    // ——— FINAL MODAL WITH CHAMPION QUOTE ———
+        <a href="https://buymeacoffee.com/anthemarena" target="_blank" class="bmc-button">
+            Buy Me a Coffee
+        </a>
+    </div>
+`;
+    
+    // ========================================
+    // MODAL HTML
+    // ========================================
     const modal = document.getElementById('vote-modal');
     modal.innerHTML = `
         <div class="modal-overlay" onclick="closePostVoteModal()"></div>
-        <div class="modal-content post-vote-content ${situationType}" 
-             style="background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), 
-                    url('${pack.theme?.background || songData.thumbnail}') center/cover">
-            
+        <div class="modal-content post-vote-content ${situationType}">
             <button class="modal-close" onclick="closePostVoteModal()">×</button>
             
-            <!-- CHAMPION QUOTE -->
-            <div class="champion-celebration-quote" style="color: ${pack.color || '#ff69b4'}">
-                ${championQuote}
+            <div class="modal-success-icon ${situationType}">
+                ${modalIcon}
             </div>
-
-            <div class="modal-success-icon ${situationType}">${modalIcon}</div>
-            <h2 class="modal-title">${modalTitle}</h2>
+            <h2 class="modal-title">
+                ${modalTitle}
+            </h2>
             ${successMessage}
             
             ${xpSection}
-            ${bmcSection}
+
+                    ${bmcSection}
+
+            
             ${bookSection}
+            
             ${shareMessage}
             
             <div class="modal-actions">
-                <button class="modal-btn primary champion-cta" 
-                        style="background: ${pack.theme?.buttonBackground || 'linear-gradient(135deg, #ff69b4, #ff1493'}">
-                    ${championCta}
+                <button class="modal-btn primary" onclick="closePostVoteModal()">
+                    Continue Voting
                 </button>
-                <a href="/matches.html" class="modal-btn secondary">View All Matches</a>
+                <a href="/matches.html" class="modal-btn secondary">
+                    View All Matches
+                </a>
             </div>
         </div>
     `;
-
+    
     modal.classList.add('active');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-
-    // Block other toasts for 20 seconds
-    if (window.markJustVoted) window.markJustVoted();
-
-    console.log(`Post-vote modal shown (${situationType}) with champion quote: "${championQuote}"`);
+    
+    console.log(`✅ Post-vote modal shown (${situationType}) with ${xpData.totalXP} XP`);
 }
 
 // ========================================
