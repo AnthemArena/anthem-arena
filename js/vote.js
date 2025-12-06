@@ -1998,7 +1998,7 @@ if (!hasUsername && !tipShown) {
 // ✅ IMPROVED: ACHIEVEMENT CHECK AFTER VOTING
 // ========================================
 
-async function checkForAchievementUnlocks() {
+export async function checkForAchievementUnlocks() {
     try {
         console.log('🏆 Checking for achievement unlocks...');
 
