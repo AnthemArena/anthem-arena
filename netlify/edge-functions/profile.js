@@ -4,7 +4,7 @@
 // ========================================
 
 const CACHE_DURATION = 30; // 30 seconds
-const FIREBASE_PROJECT = "league-music-tournament";
+const FIREBASE_PROJECT = "arcane-moments";
 
 // Edge cache storage
 const edgeCache = new Map();
