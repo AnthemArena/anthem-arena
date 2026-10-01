@@ -5,11 +5,15 @@ const json = (statusCode, body, headers = {}) => ({
   body: JSON.stringify(body)
 });
 
+// Usage: ?playlistId=PL...   or   ?handle=theundercityedit&limit=12 (channel uploads)
 export async function handler(event) {
   const apiKey = process.env.YOUTUBE_API_KEY_SERVER;
-  const playlistId = event.queryStringParameters?.playlistId;
+  const qs = event.queryStringParameters || {};
+  let playlistId = qs.playlistId;
+  const handle = (qs.handle || "").replace(/^@/, "");
+  const limit = Math.min(Number(qs.limit) || 0, 200);
   if (!apiKey) return json(500, { error: "YouTube API key is not configured." });
-  if (!playlistId) return json(400, { error: "playlistId is required." });
+  if (!playlistId && !handle) return json(400, { error: "playlistId or handle is required." });
 
   try {
     const call = async (path, params) => {
@@ -23,8 +27,16 @@ export async function handler(event) {
       return data;
     };
 
-    const pl = (await call("playlists", { part: "snippet", id: playlistId })).items?.[0];
-    if (!pl) return json(404, { error: "YouTube playlist not found." });
+    let description = "";
+    if (handle) {
+      const ch = (await call("channels", { part: "contentDetails", forHandle: handle })).items?.[0];
+      if (!ch) return json(404, { error: "YouTube channel not found." });
+      playlistId = ch.contentDetails.relatedPlaylists.uploads;
+    } else {
+      const pl = (await call("playlists", { part: "snippet", id: playlistId })).items?.[0];
+      if (!pl) return json(404, { error: "YouTube playlist not found." });
+      description = pl.snippet?.description || "";
+    }
 
     const items = [];
     let pageToken = "";
@@ -45,10 +57,10 @@ export async function handler(event) {
           publishedAt: s.publishedAt || ""
         });
       }
-      pageToken = data.nextPageToken || "";
+      pageToken = limit && items.length >= limit ? "" : data.nextPageToken || "";
     } while (pageToken);
 
-    return json(200, { description: pl.snippet?.description || "", items }, {
+    return json(200, { description, items: limit ? items.slice(0, limit) : items }, {
       "Cache-Control": "public, max-age=300, s-maxage=900"
     });
   } catch (e) {

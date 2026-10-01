@@ -8,6 +8,8 @@ const SITE_CONFIG = {
     x: "https://x.com/ArcaneMoment",
     tumblr: "https://www.tumblr.com/arcanemoments"
   },
+  // Auto-updating row of the newest uploads (set to null to hide)
+  latest: { title: "Latest Shorts", subtitle: "Fresh from the channel", handle: "theundercityedit", limit: 12 },
   playlists: [
     { title: "Arcane Moments | Season 1", subtitle: "", id: "PLDWd0_FOU4I0" },
     { title: "Vi Moments | Arcane", subtitle: "", id: "PLRGGq2SYHtWc" },
@@ -48,8 +50,11 @@ function applyConfiguredLinks() {
   }).join("");
 }
 
-async function fetchPlaylist(id) {
-  const res = await fetch("/.netlify/functions/arcane-playlist?playlistId=" + encodeURIComponent(id));
+async function fetchPlaylist(p) {
+  const q = p.handle
+    ? "handle=" + encodeURIComponent(p.handle) + "&limit=" + (p.limit || 12)
+    : "playlistId=" + encodeURIComponent(p.id);
+  const res = await fetch("/.netlify/functions/arcane-playlist?" + q);
   const data = await res.json();
   if (!res.ok || data.error) throw new Error(data.error || "Request failed: " + res.status);
   return { description: data.description || "", items: Array.isArray(data.items) ? data.items : [] };
@@ -79,6 +84,17 @@ function buildModal() {
   modal.querySelector(".player-prev").addEventListener("click", () => step(-1));
   modal.querySelector(".player-next").addEventListener("click", () => step(1));
 
+  // Swipe up/down to change video. Touches on the video itself go to YouTube's
+  // iframe, so this works on the edge strips and the area around the video.
+  let y0 = null;
+  modal.addEventListener("touchstart", (e) => { y0 = e.touches[0].clientY; }, { passive: true });
+  modal.addEventListener("touchend", (e) => {
+    if (y0 == null) return;
+    const dy = e.changedTouches[0].clientY - y0;
+    y0 = null;
+    if (Math.abs(dy) > 60) step(dy < 0 ? 1 : -1);
+  }, { passive: true });
+
   document.addEventListener("keydown", (e) => {
     if (modal.hidden) return;
     if (e.key === "Escape") closePlayer();
@@ -90,7 +106,7 @@ function buildModal() {
 function showVideo() {
   const v = queue[idx];
   modal.querySelector(".player-frame").innerHTML =
-    `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.videoId)}?autoplay=1&playsinline=1&rel=0" title="${esc(v.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.videoId)}?autoplay=1&playsinline=1&rel=0" title="${esc(v.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><span class="swipe-zone swipe-l"></span><span class="swipe-zone swipe-r"></span>`;
   modal.querySelector(".player-yt").href = "https://www.youtube.com/shorts/" + encodeURIComponent(v.videoId);
   modal.querySelector(".player-prev").disabled = idx === 0;
   modal.querySelector(".player-next").disabled = idx === queue.length - 1;
@@ -137,7 +153,7 @@ function renderRow(playlist, data) {
   section.innerHTML =
     `<div class="playlist-row-header"><div><h3 class="playlist-row-title">${esc(playlist.title)}</h3>` +
     `<p class="playlist-row-subtitle">${esc(data.description || playlist.subtitle)}</p></div>` +
-    `<a class="playlist-link" href="https://www.youtube.com/playlist?list=${encodeURIComponent(playlist.id)}" target="_blank" rel="noopener">Open playlist <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div>` +
+    `<a class="playlist-link" href="${playlist.handle ? "https://www.youtube.com/@" + encodeURIComponent(playlist.handle) + "/shorts" : "https://www.youtube.com/playlist?list=" + encodeURIComponent(playlist.id)}" target="_blank" rel="noopener">${playlist.handle ? "View all" : "Open playlist"} <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div>` +
     `<div class="video-scroller">${cards}</div>`;
   section.querySelector(".video-scroller").addEventListener("click", (e) => {
     const card = e.target.closest(".video-card");
@@ -157,9 +173,9 @@ function renderError(playlist, section) {
 async function loadRow(playlist, section) {
   section.innerHTML = '<div class="loading-state"><span class="loading-dot"></span><span>Loading…</span></div>';
   try {
-    const data = await fetchPlaylist(playlist.id);
+    const data = await fetchPlaylist(playlist);
     if (!data.items.length) return section.remove();
-    allRows.set(playlist.id, data.items);
+    allRows.set(playlist.id || "latest", data.items);
     section.replaceWith(renderRow(playlist, data));
   } catch (err) {
     console.error("Failed to load " + playlist.title, err);
@@ -169,7 +185,7 @@ async function loadRow(playlist, section) {
 
 async function renderPlaylists() {
   const container = document.getElementById("playlist-rows");
-  const configured = SITE_CONFIG.playlists.filter((p) => p.id);
+  const configured = [SITE_CONFIG.latest, ...SITE_CONFIG.playlists].filter((p) => p && (p.id || p.handle));
   if (!configured.length) {
     container.innerHTML = '<div class="empty-state">Add playlist IDs in <code>/js/arcane-home.js</code>.</div>';
     return;
