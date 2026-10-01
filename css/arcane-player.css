@@ -51,3 +51,11 @@ body.modal-open{overflow:hidden}
   .player-prev i,.player-next i{transform:rotate(-90deg)}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* Swipe strips (touch devices only) */
+.player-frame{position:relative}
+.swipe-zone{display:none}
+@media (pointer:coarse){
+  .swipe-zone{display:block;position:absolute;top:0;bottom:64px;width:15%;z-index:2}
+  .swipe-l{left:0}.swipe-r{right:0}
+}
