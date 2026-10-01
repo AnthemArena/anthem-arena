@@ -59,11 +59,11 @@ async function getGuaranteedProfile() {
     const cachedIsPublic = localStorage.getItem('isPublic');
     const cachedAvatar = localStorage.getItem('avatar');
 
-    if (cachedUsername && 
-        cachedUsername !== 'null' && 
-        cachedUsername !== 'Anonymous' && 
+    if (cachedUsername &&
+        cachedUsername !== 'null' &&
+        cachedUsername !== 'Anonymous' &&
         cachedIsPublic !== null) {
-        
+
         return {
             username: cachedUsername,
             isPublic: cachedIsPublic === 'true',
@@ -72,8 +72,8 @@ async function getGuaranteedProfile() {
     }
 
     // 2. Get userId (critical — support both your keys)
-    const userId = localStorage.getItem('userId') || 
-                   localStorage.getItem('tournamentUserId') || 
+    const userId = localStorage.getItem('userId') ||
+                   localStorage.getItem('tournamentUserId') ||
                    auth.currentUser?.uid;
 
     if (!userId) {
@@ -129,16 +129,16 @@ function updateVotingStreak() {
     const today = new Date().toDateString();
     const lastVoteDate = localStorage.getItem('lastVoteDate');
     const currentStreak = parseInt(localStorage.getItem('votingStreak') || '0');
-    
+
     if (lastVoteDate === today) {
         // Already voted today, keep streak
         return;
     }
-    
+
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toDateString();
-    
+
     if (lastVoteDate === yesterdayStr) {
         // Consecutive day - increment streak
         localStorage.setItem('votingStreak', (currentStreak + 1).toString());
@@ -152,7 +152,7 @@ function updateVotingStreak() {
         console.log(`❌ Streak broken after ${currentStreak} days. Starting fresh.`);
         localStorage.setItem('votingStreak', '1');
     }
-    
+
     localStorage.setItem('lastVoteDate', today);
 }
 
@@ -163,11 +163,11 @@ function updateVotingStreak() {
 
 function getTimeRemaining(endDate) {
     if (!endDate) return null;
-    
+
     const now = new Date();
     const end = new Date(endDate);
     const diff = end - now;
-    
+
     if (diff <= 0) {
         return {
             text: '<i class="fa-solid fa-stopwatch"></i> Voting Closed', // ✅ Changed
@@ -176,11 +176,11 @@ function getTimeRemaining(endDate) {
             expired: true
         };
     }
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     // Critical (< 1 hour)
     if (days === 0 && hours === 0) {
         return {
@@ -190,7 +190,7 @@ function getTimeRemaining(endDate) {
             expired: false
         };
     }
-    
+
     // Urgent (< 6 hours)
     if (days === 0 && hours < 6) {
         return {
@@ -200,7 +200,7 @@ function getTimeRemaining(endDate) {
             expired: false
         };
     }
-    
+
     // Moderate (< 24 hours)
     if (days === 0) {
         return {
@@ -210,7 +210,7 @@ function getTimeRemaining(endDate) {
             expired: false
         };
     }
-    
+
     // Calm (1+ days)
     return {
         text: `<i class="fa-solid fa-clock"></i> ${days}d ${hours}h left`, // ✅ Changed
@@ -222,8 +222,7 @@ function getTimeRemaining(endDate) {
 
 
     // ✅ ADD THIS LINE:
-    const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
-
+const ACTIVE_TOURNAMENT = 'arcane-test-01';
 
     // Current match data
     let currentMatch = null;
@@ -251,34 +250,17 @@ function getTimeRemaining(endDate) {
         }
     }
 
-    /**
-     * Get embedAllowed status from JSON data
-     * @param {string} videoId - YouTube video ID
-     * @returns {boolean} - True if embedding is allowed
-     */
-    function isEmbedAllowed(videoId) {
-        const song = allSongsData.find(s => s.videoId === videoId);
-        
-        if (!song) {
-            console.warn(`⚠️ Song not found for videoId: ${videoId}, defaulting to allowed`);
-            return true; // Default to allowed if not found
-        }
-        
-        const allowed = song.embedAllowed !== false;
-        console.log(`🎵 Video ${videoId} (${song.shortTitle}): embedAllowed =`, allowed);
-        return allowed;
-    }
 
     // ========================================
     // PAGE INITIALIZATION
     // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎵 Vote page loaded');
-    
+
     // ⭐ Get user ID first
     userId = await getUserId();
     console.log('👤 User ID:', userId);
-    
+
     // ✅ CRITICAL: Pre-warm profile cache
     console.log('🔄 Pre-warming profile cache...');
     try {
@@ -287,7 +269,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('⚠️ Failed to pre-warm profile:', error);
     }
-    
+
     // ✅ Sync username on page load
     syncUsernameOnLoad();
 
@@ -297,18 +279,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initFoundingMemberTracking();
       // ✅ One-time XP backfill for existing badge holders
   await backfillFoundingMemberXP();
-    
+
     // Get match ID from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const matchId = urlParams.get('id') || urlParams.get('match');   
+    const matchId = urlParams.get('id') || urlParams.get('match');
         if (!matchId) {
             showNotification('No match specified', 'error');
             console.error('❌ No match ID in URL');
             return;
         }
-        
+
         console.log('📍 Loading match:', matchId);
-        
+
         // Load match data
         loadMatchData(matchId);
     });
@@ -372,113 +354,100 @@ async function getUserId() {
             !!window.localStorage,
             navigator.hardwareConcurrency || 0
         ].join('|');
-        
+
         // Simple hash
         return btoa(components).substring(0, 16);
     }
 
-    // ========================================
-    // LOAD COMPETITOR DATA (JSON + FIREBASE)
-    // ========================================
-  // ========================================
-// LOAD COMPETITOR DATA (JSON + FIREBASE)
-// ========================================
-async function getCompetitorData(songSeed) {  // ← Parameter is actually a seed number
-    try {
-        // Make sure song data is loaded
-        if (allSongsData.length === 0) {
-            const response = await fetch('/data/music-videos.json');
-            allSongsData = await response.json();
-        }
-        
-        // ✅ FIX: Find by seed, not by id
-        const songData = allSongsData.find(v => v.seed === songSeed);
-        
-        if (!songData) {
-            console.warn(`⚠️ No JSON data found for seed: ${songSeed}`);
-            // Return minimal data so the page doesn't break
-            return {
-                seed: songSeed,
-                stats: { championships: 0 },
-                accolade: 'competitor',
-                liveStats: {
-                    wins: 0,
-                    losses: 0,
-                    winRecord: "0-0",
-                    winRate: "0%",
-                    totalMatches: 0
-                }
-            };
-        }
-        
-        // Get live tournament stats from Firebase (shared with gallery)
-        const tournamentStats = await getAllTournamentStats();
-        const liveStats = tournamentStats[songData.id] || {
+ function getCompetitorData(competitor) {
+    if (!competitor) {
+        return {
+            stats: {
+                championships: 0,
+                finals: 0,
+                semifinals: 0,
+                quarterfinals: 0
+            },
+            liveStats: {
+                wins: 0,
+                losses: 0,
+                winRecord: '0-0',
+                winRate: '0%',
+                totalMatches: 0
+            }
+        };
+    }
+
+    return {
+        id: competitor.id,
+        shortTitle: competitor.name,
+        title: competitor.name,
+        videoId: competitor.videoId,
+        artist: 'Arcane',
+        year: 2021,
+
+        stats: {
+            championships: 0,
+            finals: 0,
+            semifinals: 0,
+            quarterfinals: 0
+        },
+
+        liveStats: {
             wins: 0,
             losses: 0,
-            winRecord: "0-0",
-            winRate: "0%",
+            winRecord: '0-0',
+            winRate: '0%',
             totalMatches: 0
-        };
-        
-        console.log(`✅ Loaded data for ${songData.shortTitle} (seed ${songSeed}): ${liveStats.winRecord}`);
-        
-        return {
-            ...songData,
-            liveStats
-        };
-        
-    } catch (error) {
-        console.error('❌ Error loading competitor data:', error);
-        return null;
-    }
+        }
+    };
 }
-    
+
 
 // ========================================
 // UPDATE COMPETITOR DESCRIPTION (NOW ACCOMPLISHMENTS ONLY)
 // ========================================
 function updateCompetitorDescription(songData, competitor, currentRound, accomplishmentsSection) {
     if (!accomplishmentsSection) return;
-    
+
     const accomplishmentsText = accomplishmentsSection.querySelector('.accomplishments-text');
     if (!accomplishmentsText) return;
-    
+
     const championships = songData.stats?.championships || 0;
     const semifinals = songData.stats?.semifinals || 0;
     const quarterfinals = songData.stats?.quarterfinals || 0;
     const finals = songData.stats?.finals || 0;
-    
+
     let accomplishments = [];
-    
+
     // Championships
     if (championships > 1) {
         accomplishments.push(`${championships}x Champion`);
     } else if (championships === 1) {
         accomplishments.push('Champion');
     }
-    
+
     // Finals (but not champion)
     if (finals > championships && finals > 1) {
         accomplishments.push(`${finals}x Finalist`);
     } else if (finals > championships && finals === 1) {
         accomplishments.push('Finalist');
     }
-    
+
     // Semifinals
     if (semifinals > 1) {
         accomplishments.push(`${semifinals}x Semifinalist`);
     } else if (semifinals === 1) {
         accomplishments.push('Semifinalist');
     }
-    
+
     // Quarterfinals
     if (quarterfinals > 1) {
         accomplishments.push(`${quarterfinals}x Quarterfinalist`);
     } else if (quarterfinals === 1) {
         accomplishments.push('Quarterfinalist');
     }
-    
+
     // Show/hide section based on accomplishments
     if (accomplishments.length > 0) {
         accomplishmentsText.textContent = accomplishments.join(' • ');
@@ -494,14 +463,14 @@ function updateCompetitorDescription(songData, competitor, currentRound, accompl
 function updateSongAbout(songData, competitorNum) {
     const aboutSection = document.getElementById(`competitor${competitorNum}-about`);
     const aboutText = document.getElementById(`competitor${competitorNum}-about-text`);
-    
+
     if (!aboutSection || !aboutText) return;
-    
+
     if (songData.about) {
         aboutText.textContent = songData.about;
     } else {
         // Fallback if no "about" text exists in JSON
-        aboutText.textContent = 'A League of Legends music video competing in the tournament.';
+        aboutText.textContent = 'An Arcane moment competing in the Arcane Moments tournament.';
     }
 }
 
@@ -511,37 +480,36 @@ function updateSongAbout(songData, competitorNum) {
 async function updateCompetitorInfo(match) {
     try {
         console.log('🎯 Starting updateCompetitorInfo...');
-        
-        const [comp1Data, comp2Data, h2hRecord] = await Promise.all([
-            getCompetitorData(match.competitor1.seed),
-            getCompetitorData(match.competitor2.seed),
-        ]);
-        
+
+     const comp1Data = getCompetitorData(match.competitor1);
+const comp2Data = getCompetitorData(match.competitor2);
+const h2hRecord = undefined;
+
         console.log('H2H Record:', h2hRecord);
-        
+
         if (!comp1Data || !comp2Data) {
             console.error('❌ Could not load competitor data');
             return;
         }
-        
+
         // Get elements
         const comp1Accomplishments = document.getElementById('competitor1-accomplishments');
         const comp1Meta = document.getElementById('competitor1-meta');
         const comp2Accomplishments = document.getElementById('competitor2-accomplishments');
         const comp2Meta = document.getElementById('competitor2-meta');
-        
+
         // Update accomplishments
         updateCompetitorDescription(comp1Data, match.competitor1, match.round, comp1Accomplishments);
         updateCompetitorDescription(comp2Data, match.competitor2, match.round, comp2Accomplishments);
-        
+
         // Update "about this song" text
         updateSongAbout(comp1Data, 1);
         updateSongAbout(comp2Data, 2);
-        
+
         // Update meta info
         updateCompetitorMeta(comp1Data, match.competitor1, comp1Meta);
         updateCompetitorMeta(comp2Data, match.competitor2, comp2Meta);
-        
+
         console.log('✅ Competitor info updated with accomplishments and about text');
     } catch (error) {
         console.error('❌ Error updating competitor info:', error);
@@ -556,13 +524,13 @@ async function updateCompetitorInfo(match) {
     // ========================================
     function updateCompetitorMeta(songData, competitor, metaElement) {
     if (!metaElement) return;
-    
+
     const artist = competitor.source.split('•')[0]?.trim();
     const year = competitor.source.split('•')[1]?.trim();
     const liveStats = songData.liveStats;
-    
+
     let metaHTML = '';
-    
+
     // Always show basic info
     metaHTML += `
         <div class="meta-row basic-info">
@@ -583,11 +551,11 @@ async function updateCompetitorInfo(match) {
             </span>
         </div>
     `;
-    
+
     // Show tournament accomplishments if they exist
     if (liveStats.totalMatches > 0) {
         const accolades = [];
-        
+
         // Add championship badges
         if (songData.stats?.championships >= 2) {
             accolades.push(`
@@ -604,7 +572,7 @@ async function updateCompetitorInfo(match) {
                 </span>
             `);
         }
-        
+
         // Add finalist badge
         if (songData.accolade === 'contender' && songData.stats?.championships === 0) {
             accolades.push(`
@@ -614,7 +582,7 @@ async function updateCompetitorInfo(match) {
                 </span>
             `);
         }
-        
+
         // Only show tournament stats row if there are accolades to display
         if (accolades.length > 0) {
             metaHTML += `
@@ -634,7 +602,7 @@ async function updateCompetitorInfo(match) {
             </div>
         `;
     }
-    
+
     metaElement.innerHTML = metaHTML;
 }
 
@@ -647,17 +615,14 @@ async function updateCompetitorInfo(match) {
     try {
              // ✅ Show spinner immediately
         showLoadingSpinner('Loading match...');
-        
+
         console.log('📥 Loading match data from edge cache...');
 
-        // ⭐ Load song data from JSON first
-        if (allSongsData.length === 0) {
-            await loadSongData();
-        }
-        
+
+
         // ✅ NEW: Get match from edge-cached API
         const matchData = await getMatch(matchId);
-        
+
         if (!matchData) {
                         hideLoadingSpinner(); // ✅ Hide spinner on error
 
@@ -665,12 +630,12 @@ async function updateCompetitorInfo(match) {
             showNotification('Match not found', 'error');
             return;
         }
-        
+
         console.log('✅ Match data loaded from edge cache:', matchData);
 
         // ✅ NEW: Track page view
 await trackMatchView(matchData.id || matchId);
-            
+
             // Convert Firebase format to page format
           // ---- REPLACEMENT (paste over the old block) ----
 currentMatch = {
@@ -706,7 +671,7 @@ if (currentMatch.totalVotes > 0 && !matchData.song1?.percentage) {
     currentMatch.competitor1.percentage = Math.round((currentMatch.competitor1.votes / currentMatch.totalVotes) * 100);
     currentMatch.competitor2.percentage = Math.round((currentMatch.competitor2.votes / currentMatch.totalVotes) * 100);
 }
-            
+
          // ⭐ Check if user already voted (using new system)
 await checkVoteStatus();
 
@@ -735,7 +700,7 @@ await loadOtherLiveMatches();
             // ✨ NEW: START REAL-TIME UPDATES
             // ========================================
         // ✨ Real-time updates will start AFTER user votes (not before)
-            
+
         } catch (error) {
                     hideLoadingSpinner(); // ✅ Hide spinner on error
 
@@ -753,7 +718,7 @@ await loadOtherLiveMatches();
  */async function loadOtherLiveMatches() {
     try {
         console.log('📥 Loading other live matches...');
-        
+
        let allMatches = [];
 try {
     allMatches = await getMatchesForThisPageLoad();  // ✅ NEW
@@ -762,47 +727,47 @@ try {
             document.getElementById('other-matches-section').style.display = 'none';
             return;
         }
-        
+
         // ✅ Safety check
         if (!allMatches || !Array.isArray(allMatches)) {
             console.warn('⚠️ No matches returned from API');
             document.getElementById('other-matches-section').style.display = 'none';
             return;
         }
-        
+
         // ✅ STEP 1: Get user votes FIRST (before filtering)
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        
+
         // ✅ STEP 2: Filter - only live matches user HASN'T voted on yet (excluding current match)
         const otherLiveMatches = allMatches.filter(match => {
             const isLive = match.status === 'live';
             const isNotCurrentMatch = match.id !== currentMatch.id;
             const hasNotVoted = !userVotes[match.id];
-            
+
             return isLive && isNotCurrentMatch && hasNotVoted;
         });
-        
+
         console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
-        
+
         if (otherLiveMatches.length === 0) {
             document.getElementById('other-matches-section').style.display = 'none';
             return;
         }
-        
+
         // ✅ STEP 3: Transform match data (userVotes already declared above)
         const enhancedMatches = otherLiveMatches.map(match => {
             const userVote = userVotes[match.id];
             const hasVoted = !!userVote;
             const userVotedSongId = hasVoted ? userVote.songId : null;
-            
+
             // Calculate vote percentages
             const totalVotes = match.totalVotes || 0;
             const song1Votes = match.song1?.votes || 0;
             const song2Votes = match.song2?.votes || 0;
-            
+
             const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
             const song2Percentage = totalVotes > 0 ? 100 - song1Percentage : 50;
-            
+
             return {
                 id: match.matchId || match.id,
                 tournament: match.tournament || '2025-worlds-anthems',
@@ -837,7 +802,7 @@ try {
                 }
             };
         });
-        
+
         // ✅ STEP 4: Render match cards as DOM elements
         const grid = document.getElementById('other-matches-grid');
         grid.innerHTML = '';
@@ -855,9 +820,9 @@ try {
 
         // Show the section
         document.getElementById('other-matches-section').style.display = 'block';
-        
+
         console.log('✅ Unvoted matches rendered');
-        
+
     } catch (error) {
         console.error('❌ Error loading other matches:', error);
         document.getElementById('other-matches-section').style.display = 'none';
@@ -871,41 +836,41 @@ async function checkVoteStatus() {
     try {
         // ✅ NEW: Check localStorage FIRST (free, instant)
         const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
-        
+
         if (localVote) {
             hasVoted = true;
             console.log('✅ Found vote in localStorage:', localVote);
-            
+
             // Make sure it's saved in the new format too
             saveVoteForOtherPages(currentMatch.id, localVote);
-            
+
             // Update UI with current vote counts
             updateVoteCountsUI();
-            
+
             // Disable voting and show stats
             disableVoting(localVote);
-            
-    
-            
+
+
+
             return; // ← EXIT EARLY - no Firebase call needed!
         }
-        
+
         // ✅ Only check Firebase if localStorage is empty (new device/cleared cache)
         console.log('🔍 No local vote found, checking Firebase...');
-        
+
         const voteId = `${currentMatch.id}_${userId}`;
         const voteRef = doc(db, 'votes', voteId);
         const voteDoc = await getDoc(voteRef);
-        
+
         if (voteDoc.exists()) {
             hasVoted = true;
             const voteData = voteDoc.data();
             console.log('✅ User already voted (found in Firebase):', voteData.choice);
-            
+
             // Store in localStorage for next time
             localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
             saveVoteForOtherPages(currentMatch.id, voteData.choice);
-            
+
             updateVoteCountsUI();
             disableVoting(voteData.choice);
             await loadOtherLiveMatches();
@@ -930,35 +895,35 @@ async function checkVoteStatus() {
      */
     function disableVoting(votedFor) {
         const voteButtons = document.querySelectorAll('.vote-btn');
-        
+
         voteButtons.forEach(btn => {
             const isVotedButton = btn.dataset.competitor === votedFor;
-            
+
             // Disable all buttons
             btn.disabled = true;
             btn.style.cursor = 'not-allowed';
-            
+
             if (isVotedButton) {
                 // Button they voted for - show as selected
                 btn.style.opacity = '1';
                 btn.classList.add('voted');
-                
+
                 // Change button text
                 const textSpan = btn.querySelector('.vote-text');
                 if (textSpan) {
                     textSpan.textContent = ' You Voted For This';
                 }
-                
+
                 // Change icon color
                 const iconSpan = btn.querySelector('.vote-icon');
                 if (iconSpan) {
                     iconSpan.style.filter = 'brightness(1.2)';
                 }
-                
+
             } else {
                 // Button they didn't vote for - dim it
                 btn.style.opacity = '0.4';
-                
+
                 // Change button text
                 const textSpan = btn.querySelector('.vote-text');
                 if (textSpan) {
@@ -966,12 +931,12 @@ async function checkVoteStatus() {
                 }
             }
         });
-        
+
         // Show indicator banner at top
-        const songName = votedFor === 'song1' 
-            ? currentMatch.competitor1.name 
+        const songName = votedFor === 'song1'
+            ? currentMatch.competitor1.name
             : currentMatch.competitor2.name;
-        
+
         const indicator = document.createElement('div');
         indicator.className = 'voted-indicator';
         indicator.innerHTML = `
@@ -992,7 +957,7 @@ async function checkVoteStatus() {
             margin: 0 0 2rem 0;
             animation: slideDown 0.3s ease;
         `;
-        
+
         // Insert at top of voting arena
         const arena = document.querySelector('.voting-arena .container-wide');
         if (arena) {
@@ -1005,7 +970,7 @@ async function checkVoteStatus() {
             el.classList.add('revealed');
             el.classList.remove('hidden');
         });
-        
+
         console.log('📊 Vote statistics revealed');
     }
 
@@ -1018,30 +983,30 @@ async function createAutoGeneratedProfile(userId) {
         // Check if profile already exists
         const profileRef = doc(db, 'profiles', userId);
         const profileDoc = await getDoc(profileRef);
-        
+
 if (profileDoc.exists()) {
     console.log('✅ Profile already exists, syncing to localStorage...');
-    
+
     // ✅ Sync from Firestore to localStorage
     const profile = profileDoc.data();
     localStorage.setItem('username', profile.username);
     localStorage.setItem('avatar', JSON.stringify(profile.avatar));
-    
+
     // ✅ FIX: SYNC isPublic!!!
     const isPublic = profile.privacy?.isPublic ?? true;
     localStorage.setItem('isPublic', isPublic ? 'true' : 'false');
-    
-    console.log('✅ Profile synced:', { 
-        username: profile.username, 
-        isPublic: isPublic 
+
+    console.log('✅ Profile synced:', {
+        username: profile.username,
+        isPublic: isPublic
     });
-    
+
     return;
 }
-        
+
         // ✅ Generate username
         const username = generateUsername();
-        
+
         // ✅ Pick random champion avatar
         const randomChampion = CHAMPIONS[Math.floor(Math.random() * CHAMPIONS.length)];
         const avatar = {
@@ -1049,7 +1014,7 @@ if (profileDoc.exists()) {
             value: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${randomChampion}.png`,
             name: randomChampion
         };
-        
+
         // ✅ Default privacy settings
         const privacy = {
             isPublic: true,  // Default to public so votes show
@@ -1057,7 +1022,7 @@ if (profileDoc.exists()) {
             emotePrivacy: 'everyone',
             showOnlineStatus: true
         };
-        
+
         // ✅ Create profile in Firebase
         await setDoc(profileRef, {
             userId: userId,
@@ -1069,22 +1034,22 @@ if (profileDoc.exists()) {
             createdAt: Date.now(),
             autoGenerated: true  // ✅ Flag so we know it's auto-generated
         });
-        
+
         // ✅ Save to localStorage
         localStorage.setItem('username', username);
         localStorage.setItem('tournamentUsername', username);
         localStorage.setItem('avatar', JSON.stringify(avatar));
         localStorage.setItem('isPublic', 'true');
-        
+
         console.log('🎉 Auto-generated profile created:', username);
-        
+
         // ✅ Show welcome toast
         setTimeout(() => {
             if (window.showNotification) {
                 showNotification(`Welcome, ${username}! You can change your name anytime in settings.`, 'success');
             }
         }, 2000);
-        
+
     } catch (error) {
         console.error('❌ Error creating auto profile:', error);
         // Fallback to Anonymous
@@ -1099,21 +1064,21 @@ if (profileDoc.exists()) {
 
 function generateUsername() {
     const adjectives = [
-        'Epic', 'Legendary', 'Supreme', 'Elite', 'Mystic', 
+        'Epic', 'Legendary', 'Supreme', 'Elite', 'Mystic',
         'Shadow', 'Golden', 'Silver', 'Royal', 'Grand',
         'Swift', 'Fierce', 'Noble', 'Brave', 'Mighty'
     ];
-    
+
     const nouns = [
         'Summoner', 'Champion', 'Voter', 'Fan', 'Hunter',
         'Legend', 'Warrior', 'Scout', 'Ranger', 'Guardian',
         'Hero', 'Seeker', 'Watcher', 'Striker', 'Sentinel'
     ];
-    
+
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const noun = nouns[Math.floor(Math.random() * nouns.length)];
     const num = Math.floor(Math.random() * 1000);
-    
+
     return `${adj}${noun}${num}`;
 }
     // ========================================
@@ -1123,8 +1088,8 @@ function generateUsername() {
     async function updatePageContent() {
         console.log('📝 Updating page content...');
         console.log('🔍 Current match data:', currentMatch);
-        
-        
+
+
         // Update breadcrumb
         const breadcrumbRound = document.getElementById('breadcrumb-round');
         if (breadcrumbRound) {
@@ -1133,20 +1098,20 @@ function generateUsername() {
             console.log('🎯 Round number:', roundNumber, '→', roundName);
             breadcrumbRound.textContent = roundName;
         }
-        
+
         // Update match title
         const matchTitle = document.getElementById('match-title');
         if (matchTitle) {
             matchTitle.textContent = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
         }
-        
+
         // Update tournament badge
         const tournamentBadge = document.getElementById('tournament-badge');
         if (tournamentBadge) {
             const roundName = getRoundName(currentMatch.round || 1);
             tournamentBadge.innerHTML = `🏆 Anthem Arena Championship - ${roundName}`;
         }
-        
+
        // Update time remaining with countdown support
 const timeRemaining = document.getElementById('time-remaining');
 if (timeRemaining) {
@@ -1160,12 +1125,12 @@ if (timeRemaining) {
         // ✅ Check for endDate to show countdown
         if (currentMatch.endDate) {
             const timer = getTimeRemaining(currentMatch.endDate);
-            
+
             if (timer && !timer.expired) {
                 timeRemaining.innerHTML = timer.text;
                 timeRemaining.style.color = timer.color;
                 timeRemaining.style.fontWeight = '600';
-                
+
                 if (timer.urgent) {
                     timeRemaining.classList.add('urgent');
                 }
@@ -1187,7 +1152,7 @@ if (timeRemaining) {
         timeRemaining.style.color = '#ffaa00';
     }
 }
-        
+
         // Update total votes
         const totalVotesEl = document.getElementById('total-votes');
         if (totalVotesEl) {
@@ -1197,21 +1162,21 @@ if (timeRemaining) {
            // Update vote button text with song names
     const voteSong1Name = document.getElementById('vote-song1-name');
     const voteSong2Name = document.getElementById('vote-song2-name');
-    
+
     if (voteSong1Name) voteSong1Name.textContent = currentMatch.competitor1.name;
     if (voteSong2Name) voteSong2Name.textContent = currentMatch.competitor2.name;
-        
+
         // ========================================
         // UPDATE COMPETITOR 1 - BASIC INFO
         // ========================================
-        
+
         const comp1Seed = document.getElementById('competitor1-seed');
         const comp1Name = document.getElementById('competitor1-name');
         const comp1Source = document.getElementById('competitor1-source');
         const comp1Percentage = document.getElementById('competitor1-percentage');
         const comp1Votes = document.getElementById('competitor1-votes');
         const comp1Video = document.getElementById('competitor1-video');
-        
+
         if (comp1Seed) comp1Seed.textContent = `#${currentMatch.competitor1.seed} Seed`;
         if (comp1Name) comp1Name.textContent = currentMatch.competitor1.name;
         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
@@ -1220,17 +1185,15 @@ if (comp1Votes) comp1Votes.style.display = 'none'; // ✅ Hide vote count
 if (comp1Video) {
     const song1Name = currentMatch.competitor1.name;
     const artist1 = currentMatch.competitor1.source.split('•')[0]?.trim();
-    
-    comp1Video.src = `https://www.youtube.com/embed/${currentMatch.competitor1.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
-    comp1Video.title = `${song1Name} by ${artist1} - League of Legends Music Video`;
+
+const origin = encodeURIComponent(window.location.origin);
+
+comp1Video.src = `https://www.youtube.com/embed/${currentMatch.competitor1.videoId}?enablejsapi=1&origin=${origin}&rel=0`;
+    comp1Video.title = `${song1Name} by ${artist1} - Arcane moment`;
     comp1Video.loading = 'lazy';
-}        
-        // Check embedAllowed from JSON data
-        if (!isEmbedAllowed(currentMatch.competitor1.videoId)) {
-            console.log('🚫 Competitor 1 cannot be embedded, showing thumbnail');
-            showThumbnailForCompetitor(1, currentMatch.competitor1.videoId);
-        }
-        
+}
+
+
   // ========================================
 // UPDATE COMPETITOR 2 - BASIC INFO
 // ========================================
@@ -1251,28 +1214,22 @@ if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
 if (comp2Video) {
     const song2Name = currentMatch.competitor2.name;
     const artist2 = currentMatch.competitor2.source.split('•')[0]?.trim();
-    
-    comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&rel=0&modestbranding=1`;
+    const origin = encodeURIComponent(window.location.origin);
+
+comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&origin=${origin}&rel=0`;
     comp2Video.title = `${song2Name} by ${artist2} - League of Legends Music Video`;
     comp2Video.loading = 'lazy';
 }
 
-// Check embedAllowed from JSON data
-if (!isEmbedAllowed(currentMatch.competitor2.videoId)) {
-    console.log('🚫 Competitor 2 cannot be embedded, showing thumbnail');
-    showThumbnailForCompetitor(2, currentMatch.competitor2.videoId);
-}
-        
 
-    
-        
-        
+
+
+
         // ========================================
         // UPDATE PAGE TITLE
         // ========================================
-        
-        document.title = `Vote: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name} | League Music Tournament`;
-        
+
+document.title = `Vote: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name} | Arcane Moments`;
         console.log('✅ Page content updated (stats will be added by updateCompetitorInfo)');
 
          // ✅ ADD THIS LINE:
@@ -1286,65 +1243,63 @@ if (!isEmbedAllowed(currentMatch.competitor2.videoId)) {
 
 function updateDynamicMetaTags() {
     if (!currentMatch) return;
-    
+
     const song1 = currentMatch.competitor1.name;
     const song2 = currentMatch.competitor2.name;
     const roundName = getRoundName(currentMatch.round || 1);
-    
+
     // Dynamic title
-    const title = `Vote: ${song1} vs ${song2} | ${roundName} | Anthem Arena`;
-    
+const title = `Vote: ${song1} vs ${song2} | ${roundName} | Arcane Moments`;
     // Dynamic description
-    const description = `Cast your vote in the ${roundName}! Watch and vote: "${song1}" vs "${song2}" in the League of Legends music tournament. ${currentMatch.totalVotes} votes cast so far.`;
-    
+const description = `Cast your vote between ${song1} and ${song2} in Arcane Moments.`;
     // Update <title>
     document.title = title;
-    
+
     // Update meta description
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
         metaDesc.setAttribute('content', description);
     }
-    
+
     // Update canonical URL (in case match ID is in URL)
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
         canonical.setAttribute('href', window.location.href);
     }
-    
+
     // ========================================
     // UPDATE OPEN GRAPH TAGS
     // ========================================
-    
+
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) {
         ogTitle.setAttribute('content', title);
     }
-    
+
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) {
         ogDesc.setAttribute('content', description);
     }
-    
+
     const ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) {
         ogUrl.setAttribute('content', window.location.href);
     }
-    
+
     // ========================================
     // UPDATE TWITTER CARD TAGS
     // ========================================
-    
+
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
     if (twitterTitle) {
         twitterTitle.setAttribute('content', title);
     }
-    
+
     const twitterDesc = document.querySelector('meta[name="twitter:description"]');
     if (twitterDesc) {
         twitterDesc.setAttribute('content', description);
     }
-    
+
     console.log('✅ Dynamic meta tags updated:', title);
 }
     // ========================================
@@ -1366,22 +1321,22 @@ function updateDynamicMetaTags() {
     function showMatchStatus() {
         // ✅ ONLY show AFTER voting (reversed logic)
         if (!hasVoted) return;
-        
+
         const comp1Votes = currentMatch.competitor1.votes;
         const comp2Votes = currentMatch.competitor2.votes;
         const totalVotes = currentMatch.totalVotes;
-        
+
         // Don't show if no votes yet
         if (totalVotes === 0) return;
-        
+
         const comp1Pct = currentMatch.competitor1.percentage;
         const comp2Pct = currentMatch.competitor2.percentage;
         const diff = Math.abs(comp1Votes - comp2Votes);
-        
+
         let message = '';
         let icon = '';
         let color = '';
-        
+
         // Determine message based on vote spread
         if (Math.abs(comp1Pct - comp2Pct) <= 5) {
             // CLOSE RACE
@@ -1399,7 +1354,7 @@ function updateDynamicMetaTags() {
             message = `🚨 <strong>${leader}</strong> dominating ${comp1Pct}-${comp2Pct}! Can <strong>${loser}</strong> make a comeback?`;
             color = '#ff4444'; // Red
         }
-        
+
         const banner = document.createElement('div');
         banner.className = 'match-status-banner';
         banner.innerHTML = `
@@ -1417,7 +1372,7 @@ function updateDynamicMetaTags() {
             margin-bottom: 2rem;
             animation: slideDown 0.4s ease;
         `;
-        
+
         const arena = document.querySelector('.voting-arena .container-wide');
         if (arena) {
             arena.insertBefore(banner, arena.firstChild);
@@ -1433,25 +1388,25 @@ function trackShare(platform, context) {
     // Increment share count in localStorage
     const currentShares = parseInt(localStorage.getItem('sharesCount') || '0');
     localStorage.setItem('sharesCount', (currentShares + 1).toString());
-    
+
     // Award XP using rank system
     const SHARE_XP = 5; // Matches rank-system.js xpSources.share
     const newTotalXP = addXP(SHARE_XP, 'share');
-    
+
     console.log(`📤 Share tracked: ${platform} (${context}) - Share #${currentShares + 1} - +${SHARE_XP} XP`);
-    
+
     // Show notification
     showNotification(`+${SHARE_XP} XP for sharing! 📤 (${currentShares + 1} total shares)`, 'success');
-    
+
     // Check for achievement unlocks (social achievements)
     setTimeout(async () => {
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const voteIds = Object.keys(userVotes);
-        
+
         if (voteIds.length > 0) {
             const allMatches = await getAllMatches();
             const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
-            
+
             const allVotes = voteIds.map(matchId => {
                 const voteData = userVotes[matchId];
                 const matchData = matchMap.get(matchId);
@@ -1461,9 +1416,9 @@ function trackShare(platform, context) {
                     match: matchData || {}
                 };
             });
-            
+
             const { newlyUnlocked } = checkAchievements(allVotes);
-            
+
             // Show social achievement notifications
             newlyUnlocked
                 .filter(a => a.category === 'social')
@@ -1487,7 +1442,7 @@ function trackShare(platform, context) {
 function showLoadingSpinner(message = 'Loading...') {
     const overlay = document.getElementById('loading-overlay');
     const spinnerText = document.getElementById('spinner-text');
-    
+
     if (overlay && spinnerText) {
         spinnerText.textContent = message;
         overlay.style.display = 'flex';
@@ -1501,7 +1456,7 @@ function showLoadingSpinner(message = 'Loading...') {
  */
 function hideLoadingSpinner() {
     const overlay = document.getElementById('loading-overlay');
-    
+
     if (overlay) {
         overlay.classList.remove('active');
         setTimeout(() => {
@@ -1518,23 +1473,23 @@ function hideLoadingSpinner() {
             if (!hasVoted) return; // ✅ Don't show urgency until after voting
 
         if (currentMatch.totalVotes === 0) return;
-        
+
         const comp1Pct = currentMatch.competitor1.percentage;
         const comp2Pct = currentMatch.competitor2.percentage;
         const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-        
+
         // Determine if it's a close race
         const isClose = Math.abs(comp1Pct - comp2Pct) <= 5;
-        
+
         // Determine who's losing
         const loser = comp1Pct < comp2Pct ? currentMatch.competitor1 : currentMatch.competitor2;
         const loserSide = comp1Pct < comp2Pct ? 1 : 2;
-        
+
         // Add urgency banner if close
         if (isClose && currentMatch.status === 'live' && !hasVoted) {
             showUrgencyBanner(loser, voteDiff, loserSide);
         }
-        
+
         // Add visual indicators to vote cards
         updateVoteCardUrgency(comp1Pct, comp2Pct, voteDiff);
         // ✨ ADD THIS:
@@ -1549,7 +1504,7 @@ function hideLoadingSpinner() {
         // Remove existing banner
         const existing = document.querySelector('.urgency-banner');
         if (existing) existing.remove();
-        
+
         const banner = document.createElement('div');
         banner.className = 'urgency-banner';
         banner.innerHTML = `
@@ -1564,7 +1519,7 @@ function hideLoadingSpinner() {
                 </button>
             </div>
         `;
-        
+
         // Insert at top of voting arena
         const arena = document.querySelector('.voting-arena .container-wide');
         if (arena) {
@@ -1579,13 +1534,13 @@ function hideLoadingSpinner() {
     function updateVoteCardUrgency(comp1Pct, comp2Pct, voteDiff) {
         const card1 = document.querySelector('[data-competitor="song1"]')?.closest('.competitor-card');
         const card2 = document.querySelector('[data-competitor="song2"]')?.closest('.competitor-card');
-        
+
         if (!card1 || !card2) return;
-        
+
         // Reset classes
         card1.classList.remove('losing', 'winning', 'tied');
         card2.classList.remove('losing', 'winning', 'tied');
-        
+
         if (Math.abs(comp1Pct - comp2Pct) <= 2) {
             // Too close to call
             card1.classList.add('tied');
@@ -1593,7 +1548,7 @@ function hideLoadingSpinner() {
         } else if (comp1Pct < comp2Pct) {
             card1.classList.add('losing');
             card2.classList.add('winning');
-            
+
             // Add "SAVE THIS SONG" text to losing card
             if (!hasVoted && currentMatch.status === 'live') {
                 addSavePrompt(card1, voteDiff);
@@ -1601,7 +1556,7 @@ function hideLoadingSpinner() {
         } else {
             card1.classList.add('winning');
             card2.classList.add('losing');
-            
+
             if (!hasVoted && currentMatch.status === 'live') {
                 addSavePrompt(card2, voteDiff);
             }
@@ -1616,7 +1571,7 @@ function hideLoadingSpinner() {
         // Remove existing prompt
         const existing = card.querySelector('.save-prompt');
         if (existing) existing.remove();
-        
+
         const prompt = document.createElement('div');
         prompt.className = 'save-prompt';
         prompt.innerHTML = `
@@ -1624,7 +1579,7 @@ function hideLoadingSpinner() {
             <span class="save-text">Being Eliminated!</span>
             <span class="save-diff">${voteDiff.toLocaleString()} votes behind</span>
         `;
-        
+
         // Insert before vote button
         const voteBtn = card.querySelector('.vote-btn');
         if (voteBtn && voteBtn.parentNode) {
@@ -1640,7 +1595,7 @@ function hideLoadingSpinner() {
         const button = document.querySelector(`[data-competitor="song${competitorNumber}"]`);
         if (button) {
             button.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
+
             // Pulse animation
             button.style.animation = 'pulse 0.6s ease-in-out 3';
         }
@@ -1665,15 +1620,15 @@ async function submitVote(songId) {
         showNotification('You have already voted in this match!', 'error');
         return;
     }
-    
+
     // Check if match is live
     if (currentMatch.status !== 'live') {
         showNotification('Voting is not open for this match', 'error');
         return;
     }
-    
+
     console.log('🗳️ Voting for: Song ' + songId);
-    
+
     try {
         // ✅ CRITICAL: Get guaranteed good profile FIRST
         console.log('🔄 Getting guaranteed user profile...');
@@ -1682,9 +1637,9 @@ async function submitVote(songId) {
         const username = profile.username;
         const isPublic = profile.isPublic;
         const avatar = profile.avatar;
-        
+
         console.log('✅ Guaranteed profile loaded:', { username, isPublic, avatar: !!avatar });
-        
+
         // Disable voting buttons immediately
         hasVoted = true;
         const voteButtons = document.querySelectorAll('.vote-btn');
@@ -1693,22 +1648,22 @@ async function submitVote(songId) {
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
         });
-        
+
         // ✅ Show spinner with voting message
         showLoadingSpinner('Submitting your vote...');
-        
+
         // Determine which song was voted for (song1 or song2)
         const votedForSong1 = songId === 'song1';
-        
+
         console.log('🗳️ Voting for:', votedForSong1 ? 'Song 1' : 'Song 2');
         console.log('👤 User ID:', userId);
         console.log('👤 Username:', username);
         console.log('🔓 isPublic:', isPublic);
-        
+
         // ⭐ Create vote record in Firebase
         const voteId = `${currentMatch.id}_${userId}`;
         const voteRef = doc(db, 'votes', voteId);
-        
+
         // Check if vote already exists (extra safety)
         const existingVote = await getDoc(voteRef);
         if (existingVote.exists()) {
@@ -1718,7 +1673,7 @@ async function submitVote(songId) {
             disableVoting(existingVote.data().choice);
             return;
         }
-        
+
  // Save vote to Firebase with username and avatar
 await setDoc(voteRef, {
     tournament: ACTIVE_TOURNAMENT,
@@ -1734,16 +1689,16 @@ await setDoc(voteRef, {
     votedForSeed: votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed,
     votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
 });
-        
+
         console.log('✅ CHECKPOINT 1: Vote record created in Firebase');
-        
+
         // ✅ Use API client to submit vote (updates match counts)
         await submitVoteToAPI(currentMatch.id, songId);
         console.log('✅ CHECKPOINT 2: Vote submitted via API client');
-        
+
         // Save vote locally as backup
         localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
-        
+
         // ✅ Also save in userVotes format for homepage/matches pages
         saveVoteForOtherPages(currentMatch.id, songId);
         console.log('✅ CHECKPOINT 3: LocalStorage saved');
@@ -1758,12 +1713,12 @@ await setDoc(voteRef, {
             const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
             const otherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
             const activityId = `${userId}_${currentMatch.id}`;
-            
+
             const votedVideoId = votedSong.videoId;
             const votedSongName = votedSong.name || 'Unknown Song';
             const otherSongName = otherSong.name || 'Unknown Song';
             const matchTitle = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
-            
+
             // ✅ DEBUG: Log exactly what we're about to write
             console.log('📝 Logging activity:', {
                 matchId: currentMatch.id,
@@ -1811,11 +1766,11 @@ const activityData = {
                     console.log('   - matchId:', currentMatch.id);
                     console.log('   - songId:', votedVideoId);
                     console.log('   - choice:', songId);
-                    
+
                     const { createVotePost } = await import('./social-feed.js');
-                    
+
                     console.log('✅ social-feed.js imported successfully');
-                    
+
                     const postData = {
                         matchId: currentMatch.id,
                         matchTitle: matchTitle,
@@ -1828,18 +1783,18 @@ const activityData = {
                         round: currentMatch.round,
                         tournamentId: ACTIVE_TOURNAMENT
                     };
-                    
+
                     console.log('🔍 SOCIAL POST DATA:', JSON.stringify(postData, null, 2));
-                    
+
                     await createVotePost(postData);
-                    
+
                     console.log('✅ Social feed post created for:', username);
                 } catch (postError) {
                     console.error('❌ SOCIAL FEED POST FAILED!');
                     console.error('Error type:', postError.constructor.name);
                     console.error('Error message:', postError.message);
                     console.error('Full stack:', postError.stack);
-                    
+
                     // ✅ Show a notification so you know it failed
                     if (window.showNotification) {
                         showNotification('Vote saved but social post failed', 'warning');
@@ -1855,34 +1810,47 @@ const activityData = {
             console.error('Error message:', activityError.message);
             console.error('Stack trace:', activityError.stack);
         }
-        
-        // ========================================
-        // ✅ NEW: CALCULATE AND AWARD XP
-        // ========================================
-        const xpData = calculateVoteXP({
-            isUnderdog: checkIfUnderdog(votedForSong1),
-            isCloseMatch: checkIfCloseMatch(),
-            isFirstVoteInMatch: checkIfFirstVoter()
-        });
-        
-        const newTotalXP = addXP(xpData.totalXP);
-        const rank = getUserRank(newTotalXP);
 
-        // ✅ Track voting streak
-        updateVotingStreak();
+     // ========================================
+// ✅ NEW: CALCULATE AND AWARD XP
+// ========================================
+const xpData = calculateVoteXP({
+    isUnderdog: checkIfUnderdog(votedForSong1),
+    isCloseMatch: checkIfCloseMatch(),
+    isFirstVoteInMatch: checkIfFirstVoter()
+});
 
-        // ✅ NEW: Sync profile stats to Firestore after voting
+const newTotalXP = addXP(xpData.totalXP);
+
+// ✅ Track voting streak
+updateVotingStreak();
+
+// ✅ Check for achievement unlocks
+// Achievements can award additional XP, so do this before the
+// final profile sync and final rank calculation.
+await checkForAchievementUnlocks();
+
+// ✅ Recalculate final XP/rank after achievement rewards
+const finalTotalXP = parseInt(
+    localStorage.getItem('userTotalXP') || '0',
+    10
+);
+
+const rank = getUserRank(finalTotalXP);
+
+console.log(
+    `📈 Final XP after achievements: ${finalTotalXP} XP (Level ${rank.currentLevel.level})`
+);
+
+// ✅ Sync final profile stats to Firestore
 try {
     const { syncProfileStatsToFirestore } = await import('./rank-system.js');
     await syncProfileStatsToFirestore();
-    console.log('✅ Profile synced to Firestore after vote');
+    console.log('✅ Final profile stats synced to Firestore');
 } catch (syncError) {
     console.warn('⚠️ Profile sync failed (non-critical):', syncError);
     // Don't block vote submission if sync fails
 }
-
-        // ✅ NEW: Check for achievement unlocks
-        await checkForAchievementUnlocks();
 
         // ========================================
 // ✅ CHECK DAILY SESSION KICKOFF
@@ -1890,7 +1858,7 @@ try {
 try {
     const { markDailySessionStarted } = await import('./daily-welcome.js');
     const isFirstVoteToday = markDailySessionStarted();
-    
+
     if (isFirstVoteToday) {
         console.log('🌅 First vote of the day!');
         // Achievement will be checked in next checkAchievements() call
@@ -1900,7 +1868,9 @@ try {
 }
 
 
-        console.log(`✨ Earned ${xpData.totalXP} XP! New total: ${newTotalXP} XP (Level ${rank.currentLevel.level})`);
+console.log(
+    `✨ Earned ${xpData.totalXP} vote XP! Final total: ${finalTotalXP} XP (Level ${rank.currentLevel.level})`
+);
 
         // ✅ Update nav display immediately (with safety check)
         if (window.updateNavProfile) {
@@ -1915,7 +1885,7 @@ try {
             console.log('👑 User earned Founding Member badge!');
             // Toast will show automatically from founding-member-tracker.js
         }
-        
+
         // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
         const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
         const songSeed = votedSong.seed;
@@ -1956,18 +1926,18 @@ try {
             showPostVoteModal(songName, songData, xpData, rank);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
-       
+
 
         // Load other live matches
         await loadOtherLiveMatches();
 
         console.log('✅ Vote submitted successfully!');
-        
+
     } catch (error) { // ✅ NOW THE CATCH PROPERLY PAIRS WITH TRY
         hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
-        
+
         // Re-enable voting on error
         hasVoted = false;
         const voteButtons = document.querySelectorAll('.vote-btn');
@@ -2010,38 +1980,38 @@ export async function checkForAchievementUnlocks() {
 
         // ✅ FIX: Get userId FIRST (before doing any work)
         const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
-        
+
         if (!userId) {
             console.warn('⚠️ No userId found, skipping achievement check');
             return;
         }
-        
+
         console.log('🔍 Checking achievements for userId:', userId);
-        
+
         // Get user's complete vote history from localStorage
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const voteIds = Object.keys(userVotes);
-        
+
         if (voteIds.length === 0) {
             console.log('ℹ️ No votes found in history');
             return;
         }
-        
+
         // ✅ FIX: Get match data to properly categorize votes
         const allMatches = await getMatchesForThisPageLoad();
-        
+
         if (!allMatches || allMatches.length === 0) {
             console.warn('⚠️ No match data available for achievement checking');
             return;
         }
-        
+
         const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
-        
+
         // Build proper vote history with match context
         const allVotes = voteIds.map(matchId => {
             const voteData = userVotes[matchId];
             const matchData = matchMap.get(matchId);
-            
+
             if (!matchData) {
                 return {
                     matchId,
@@ -2054,20 +2024,20 @@ export async function checkForAchievementUnlocks() {
                     match: {}
                 };
             }
-            
+
             // Determine vote type based on match data
             const votedForSong = voteData.songId === 'song1' ? matchData.song1 : matchData.song2;
             const opponentSong = voteData.songId === 'song1' ? matchData.song2 : matchData.song1;
-            
+
             const song1Votes = matchData.song1?.votes || 0;
             const song2Votes = matchData.song2?.votes || 0;
             const totalMatchVotes = song1Votes + song2Votes;
-            
+
             const votedSongVotes = voteData.songId === 'song1' ? song1Votes : song2Votes;
-            const votedSongPercentage = totalMatchVotes > 0 
-                ? Math.round((votedSongVotes / totalMatchVotes) * 100) 
+            const votedSongPercentage = totalMatchVotes > 0
+                ? Math.round((votedSongVotes / totalMatchVotes) * 100)
                 : 50;
-            
+
             // Categorize vote type
             let voteType = 'balanced';
             if (votedSongPercentage < 40) {
@@ -2077,7 +2047,7 @@ export async function checkForAchievementUnlocks() {
             } else {
                 voteType = 'closeCall';
             }
-            
+
             return {
                 matchId,
                 timestamp: voteData.timestamp || new Date().toISOString(),
@@ -2091,7 +2061,7 @@ export async function checkForAchievementUnlocks() {
                 match: matchData
             };
         });
-        
+
       // ✅ DEFENSIVE: Import and check achievements safely
 const { checkAchievements } = await import('./achievement-tracker.js');
 
@@ -2111,15 +2081,15 @@ if (!achievementResult) {
 }
 
 const newlyUnlocked = achievementResult.newlyUnlocked || [];
-        
+
         // Show notifications for newly unlocked achievements
         if (newlyUnlocked && newlyUnlocked.length > 0) {
             console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
-            
+
             // ✅ Limit to 3 toasts max per vote session to prevent spam
             const MAX_TOASTS_PER_SESSION = 3;
             const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
-            
+
             // Stagger notifications by 2.5 seconds each
             toastsToShow.forEach((achievement, index) => {
                 setTimeout(() => {
@@ -2128,11 +2098,11 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
                     }
                 }, index * 2500);
             });
-            
+
             // Log if any were skipped
             if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
                 console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
-                
+
                 // Optional: Show a summary toast after the individual ones
                 setTimeout(() => {
                     if (window.showBulletin && typeof window.showBulletin === 'function') {
@@ -2147,7 +2117,7 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
                     }
                 }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
             }
-            
+
             // Update navigation rank (achievements award XP)
             if (window.updateNavProfile && typeof window.updateNavProfile === 'function') {
                 window.updateNavProfile();
@@ -2155,7 +2125,7 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
         } else {
             console.log('✅ No new achievements unlocked this vote');
         }
-        
+
     } catch (error) {
         console.error('⚠️ Error checking achievements:', error);
         console.error('Stack trace:', error.stack);
@@ -2171,15 +2141,15 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
  */
 function saveVoteForOtherPages(matchId, songId) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    
+
     const votedSong = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
     const opponentSong = songId === 'song1' ? currentMatch.competitor2 : currentMatch.competitor1;
-    
+
     // ✅ Calculate voteType at time of voting
     const votedSongPercentage = currentMatch.totalVotes > 0
         ? Math.round((votedSong.votes / currentMatch.totalVotes) * 100)
         : 50;
-    
+
     let voteType = 'balanced';
     if (votedSongPercentage < 40) {
         voteType = 'underdog';
@@ -2188,7 +2158,7 @@ function saveVoteForOtherPages(matchId, songId) {
     } else {
         voteType = 'closeCall';
     }
-    
+
     userVotes[matchId] = {
         songId: songId,
         songTitle: votedSong.name,
@@ -2198,7 +2168,7 @@ function saveVoteForOtherPages(matchId, songId) {
         round: currentMatch.round,  // ✅ NEW
         totalVotesAtTime: currentMatch.totalVotes  // ✅ NEW (for early voter tracking)
     };
-    
+
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
 }
 
@@ -2236,16 +2206,16 @@ function checkIfFirstVoter() {
  async function reloadMatchData(bypassCache = false) {
     try {
         console.log(`🔄 Reloading match data${bypassCache ? ' (BYPASSING CACHE)' : ''}...`);
-        
+
         const matchData = await getMatch(currentMatch.id, bypassCache);
-            
+
         if (matchData) {
             console.log('📥 Received match data:', {
                 totalVotes: matchData.totalVotes,
                 song1Votes: matchData.song1?.votes,  // ✅ Check song1
                 song2Votes: matchData.song2?.votes   // ✅ Check song2
             });
-            
+
             // ✅ FIX: Read from song1/song2, not competitor1/competitor2
             currentMatch.competitor1.votes = matchData.song1?.votes ?? 0;
             currentMatch.competitor2.votes = matchData.song2?.votes ?? 0;
@@ -2259,10 +2229,10 @@ function checkIfFirstVoter() {
                 currentMatch.competitor1.percentage = 50;
                 currentMatch.competitor2.percentage = 50;
             }
-            
+
             // Update UI with new counts
             updateVoteCountsUI();
-            
+
             console.log('✅ Match data reloaded:', {
                 totalVotes: currentMatch.totalVotes,
                 percentages: `${currentMatch.competitor1.percentage}% - ${currentMatch.competitor2.percentage}%`
@@ -2367,13 +2337,13 @@ function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
+
     const bgColor = {
         'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
         'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
         'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
     }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
-    
+
     notification.style.cssText = `
         position: fixed;
         bottom: 2rem;
@@ -2390,9 +2360,9 @@ function showNotification(message, type = 'success') {
         animation: slideIn 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
@@ -2416,39 +2386,39 @@ function showNotification(message, type = 'success') {
     const wrapper = document.getElementById(`competitor${competitorNum}-wrapper`);
     const fallback = document.getElementById(`competitor${competitorNum}-youtube-fallback`);
     const thumbnail = document.getElementById(`competitor${competitorNum}-thumbnail`);
-    
+
     if (!wrapper || !fallback || !thumbnail) {
         console.warn(`Could not find thumbnail elements for competitor ${competitorNum}`);
         return;
     }
-    
+
     // ✅ NEW: Get song name for alt text
     const songData = competitorNum === 1 ? currentMatch.competitor1 : currentMatch.competitor2;
     const songName = songData.name || 'League of Legends Music Video';
     const artist = songData.source.split('•')[0]?.trim() || 'Unknown Artist';
-    
+
     // Set thumbnail image
     thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    
+
     // ✅ NEW: Add descriptive alt text
     thumbnail.alt = `${songName} by ${artist} - League of Legends Music Video Thumbnail`;
-    
+
     // ✅ NEW: Add loading="lazy" for performance
     thumbnail.loading = 'lazy';
-    
+
     // Fallback to medium quality if max doesn't exist
     thumbnail.onerror = () => {
         thumbnail.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
     };
-    
+
     // Set YouTube link
     fallback.href = `https://www.youtube.com/watch?v=${videoId}`;
-    
+
     // Show thumbnail, hide iframe
     wrapper.classList.add('show-thumbnail');
     fallback.classList.add('active');
     fallback.style.display = 'block';
-    
+
     console.log(`📺 Showing thumbnail for competitor ${competitorNum} (video: ${videoId}) with alt text`);
 }
 
@@ -2460,11 +2430,11 @@ function showNotification(message, type = 'success') {
             console.error('No current match loaded');
             return;
         }
-        
-        const videoId = competitorNumber === 1 
-            ? currentMatch.competitor1.videoId 
+
+        const videoId = competitorNumber === 1
+            ? currentMatch.competitor1.videoId
             : currentMatch.competitor2.videoId;
-        
+
         showThumbnailForCompetitor(competitorNumber, videoId);
     };
 
@@ -2491,7 +2461,7 @@ function showNotification(message, type = 'success') {
  */
 function showPostVoteModal(songName, songData, xpData, rank) {
     const book = songData ? getBookForSong(songData) : null;
-    
+
     // ✨ Calculate voting situation
     const votedFor = songData.seed === currentMatch.competitor1.seed ? 'song1' : 'song2';
     const userVotes = votedFor === 'song1' ? currentMatch.competitor1.votes : currentMatch.competitor2.votes;
@@ -2573,15 +2543,15 @@ else if (voteDiff === 0) {
         </p>
     `;
     shareContext = 'tied';
-    
+
     // ✅ Dynamic based on timing
-    const tiedUrgency = isFinalHours 
-        ? 'FINAL HOURS - PERFECTLY TIED!' 
+    const tiedUrgency = isFinalHours
+        ? 'FINAL HOURS - PERFECTLY TIED!'
         : 'This is INSANE!';
     const tiedMessage = isFinalHours
         ? `Final hours and these songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Your vote could be the tiebreaker.`
         : `These songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Every single vote decides the winner.`;
-    
+
     shareMessage = `
         <div class="share-cta extreme">
             <div class="share-header">
@@ -2617,15 +2587,15 @@ else if (voteDiff <= 2) {
         </p>
     `;
     shareContext = 'nailbiter';
-    
+
     // ✅ Dynamic based on timing
-    const nailbiterHeader = isFinalHours 
-        ? 'FINAL HOURS - TOO CLOSE!' 
+    const nailbiterHeader = isFinalHours
+        ? 'FINAL HOURS - TOO CLOSE!'
         : 'TOO CLOSE TO CALL!';
     const nailbiterMessage = isFinalHours
         ? `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs in the FINAL HOURS! This could go either way!`
         : `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs. Your vote could decide everything!`;
-    
+
     shareMessage = `
         <div class="share-cta extreme">
             <div class="share-header">
@@ -2661,15 +2631,15 @@ else if (userPct < opponentPct && voteDiff <= 5) {
         </p>
     `;
     shareContext = 'losing-close';
-    
+
     // ✅ Dynamic based on timing
-    const comebackHeader = isFinalHours 
-        ? 'FINAL HOURS - Comeback Time!' 
+    const comebackHeader = isFinalHours
+        ? 'FINAL HOURS - Comeback Time!'
         : 'Comeback Time!';
     const comebackMessage = isFinalHours
         ? `"${songName}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
         : `"${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
-    
+
     shareMessage = `
         <div class="share-cta urgent">
             <div class="share-header">
@@ -2705,15 +2675,15 @@ else if (userPct < opponentPct) {
         </p>
     `;
     shareContext = 'losing-bad';
-    
+
     // ✅ Dynamic based on timing
-    const emergencyHeader = isFinalHours 
-        ? 'FINAL HOURS - CODE RED!' 
+    const emergencyHeader = isFinalHours
+        ? 'FINAL HOURS - CODE RED!'
         : 'EMERGENCY: Rally the Community!';
     const emergencyMessage = isFinalHours
         ? `"${songName}" is down ${pctDiff}% with only hours remaining! This is the LAST CHANCE!`
         : `"${songName}" is down ${pctDiff}% and needs your help to survive. Share now to rally supporters!`;
-    
+
     shareMessage = `
         <div class="share-cta urgent">
             <div class="share-header">
@@ -2749,15 +2719,15 @@ else if (pctDiff <= 10) {
         </p>
     `;
     shareContext = 'winning-close';
-    
+
     // ✅ Dynamic based on timing
-    const leadHeader = isFinalHours 
-        ? 'FINAL HOURS - Seal the Victory!' 
+    const leadHeader = isFinalHours
+        ? 'FINAL HOURS - Seal the Victory!'
         : 'Maintain the Lead!';
     const leadMessage = isFinalHours
         ? `"${songName}" is ahead in the FINAL HOURS, but it's still competitive. Help seal the win!`
         : `"${songName}" is ahead but the race is still close. Help secure the victory!`;
-    
+
     shareMessage = `
         <div class="share-cta">
             <div class="share-header">
@@ -2837,7 +2807,7 @@ let xpSection = `
                 </div>
             </div>
         </div>
-        
+
         ${xpData.bonuses.length > 0 ? `
             <div class="bonus-reveal">
                 <span class="reveal-icon">🎉</span>
@@ -2846,7 +2816,7 @@ let xpSection = `
                 </span>
             </div>
         ` : ''}
-        
+
         <div class="xp-progress-container">
             <div class="xp-level-info">
                 <span class="xp-level-badge">${rank.currentLevel.title}</span>
@@ -2865,7 +2835,7 @@ let xpSection = `
         </div>
     </div>
 `;
-    
+
     // ========================================
     // BUILD BOOK SECTION (existing code)
     // ========================================
@@ -2903,7 +2873,7 @@ let bmcSection = `
         </a>
     </div>
 `;
-    
+
     // ========================================
     // MODAL HTML
     // ========================================
@@ -2912,7 +2882,7 @@ let bmcSection = `
         <div class="modal-overlay" onclick="closePostVoteModal()"></div>
         <div class="modal-content post-vote-content ${situationType}">
             <button class="modal-close" onclick="closePostVoteModal()">×</button>
-            
+
             <div class="modal-success-icon ${situationType}">
                 ${modalIcon}
             </div>
@@ -2920,16 +2890,16 @@ let bmcSection = `
                 ${modalTitle}
             </h2>
             ${successMessage}
-            
+
             ${xpSection}
 
                     ${bmcSection}
 
-            
+
             ${bookSection}
-            
+
             ${shareMessage}
-            
+
             <div class="modal-actions">
                 <button class="modal-btn primary" onclick="closePostVoteModal()">
                     Continue Voting
@@ -2940,11 +2910,11 @@ let bmcSection = `
             </div>
         </div>
     `;
-    
+
     modal.classList.add('active');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
+
     console.log(`✅ Post-vote modal shown (${situationType}) with ${xpData.totalXP} XP`);
 }
 
@@ -2959,13 +2929,13 @@ let bmcSection = `
 window.shareToTwitter = function(songName, context) {
     const matchUrl = window.location.href;
     let tweetText = '';
-    
-    const opponentName = songName === currentMatch.competitor1.name 
-        ? currentMatch.competitor2.name 
+
+    const opponentName = songName === currentMatch.competitor1.name
+        ? currentMatch.competitor2.name
         : currentMatch.competitor1.name;
-    
+
     const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-    
+
     switch(context) {
         case 'early':
             tweetText = `🌟 Just cast an early vote for "${songName}" in the League Music Tournament! Be part of the action:\n\n${matchUrl}\n\n#LeagueMusicTournament`;
@@ -2991,13 +2961,13 @@ window.shareToTwitter = function(songName, context) {
         default:
             tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\n${matchUrl}\n\n#LeagueMusicTournament`;
     }
-    
+
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
-    
+
     // ✅ ADD THIS:
     trackShare('twitter', context);
-    
+
     console.log(`📤 Shared to Twitter (${context})`);
 };
 
@@ -3005,12 +2975,12 @@ window.shareToReddit = function(songName, context) {
     const matchUrl = window.location.href;
     let title = '';
     let text = '';
-    
-    const opponentName = songName === currentMatch.competitor1.name 
-        ? currentMatch.competitor2.name 
+
+    const opponentName = songName === currentMatch.competitor1.name
+        ? currentMatch.competitor2.name
         : currentMatch.competitor1.name;
     const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-    
+
     switch(context) {
         case 'early':
             title = `Early voting is open for "${songName}" in the League Music Tournament!`;
@@ -3044,22 +3014,22 @@ window.shareToReddit = function(songName, context) {
             title = `League Music Tournament - Vote for your favorite songs!`;
             text = `I just voted in the League Music Tournament! Come vote for your favorites.\n\n${matchUrl}`;
     }
-    
+
     const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
     window.open(redditUrl, '_blank', 'width=800,height=600');
-    
+
     // ✅ ADD THIS:
     trackShare('reddit', context);
-    
+
     console.log(`📤 Shared to Reddit (${context})`);
 };
 
 window.copyMatchLink = function() {
     const matchUrl = window.location.href;
-    
+
     navigator.clipboard.writeText(matchUrl).then(() => {
         showNotification('Link copied to clipboard! 🔗', 'success');
-        
+
         // ✅ ADD THIS:
         trackShare('copy-link', 'manual');
     }).catch(() => {
@@ -3071,11 +3041,11 @@ window.copyMatchLink = function() {
         document.execCommand('copy');
         document.body.removeChild(tempInput);
         showNotification('Link copied! 🔗', 'success');
-        
+
         // ✅ ADD THIS:
         trackShare('copy-link', 'manual');
     });
-    
+
     console.log('📋 Match link copied to clipboard');
 };
 
@@ -3089,7 +3059,7 @@ function closePostVoteModal() {
         modal.style.display = 'none';
         document.body.style.overflow = '';
     }
-    
+
 }
 
 /**
@@ -3114,7 +3084,7 @@ window.trackBookClick = trackBookClick;
         if (e.target.classList.contains('vote-btn') || e.target.closest('.vote-btn')) {
             const button = e.target.classList.contains('vote-btn') ? e.target : e.target.closest('.vote-btn');
             const songId = button.dataset.competitor;
-            
+
             if (songId && currentMatch) {
                 await submitVote(songId);
             }
@@ -3127,7 +3097,7 @@ window.trackBookClick = trackBookClick;
             const button = e.target.classList.contains('replay-btn') ? e.target : e.target.closest('.replay-btn');
             const videoId = button.dataset.video;
             const iframe = document.getElementById(`${videoId}-video`);
-            
+
             if (iframe) {
                 const src = iframe.src;
                 iframe.src = src; // Reload iframe to replay video
@@ -3142,7 +3112,7 @@ window.trackBookClick = trackBookClick;
             const button = e.target.classList.contains('fullscreen-btn') ? e.target : e.target.closest('.fullscreen-btn');
             const videoId = button.dataset.video;
             const iframe = document.getElementById(`${videoId}-video`);
-            
+
             if (iframe) {
                 if (iframe.requestFullscreen) {
                     iframe.requestFullscreen();
@@ -3166,20 +3136,20 @@ window.trackBookClick = trackBookClick;
             const shareText = encodeURIComponent(`Vote now: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name} | League Music Tournament`);
             window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
         }
-        
+
         // Facebook share
         if (e.target.classList.contains('facebook') || e.target.closest('.facebook')) {
             const shareUrl = encodeURIComponent(window.location.href);
             window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, '_blank');
         }
-        
+
         // Reddit share
         if (e.target.classList.contains('reddit') || e.target.closest('.reddit')) {
             const shareUrl = encodeURIComponent(window.location.href);
             const shareText = encodeURIComponent(`Vote now: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`);
             window.open(`https://reddit.com/submit?url=${shareUrl}&title=${shareText}`, '_blank');
         }
-        
+
         // Copy link
         if (e.target.classList.contains('copy') || e.target.closest('.copy')) {
             navigator.clipboard.writeText(window.location.href).then(() => {
@@ -3233,7 +3203,7 @@ async function trackMatchView(matchId) {
                 timestamp: Date.now()
             })
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             console.log(`👀 View tracked: ${data.totalViews} total, ${data.recentViews} recent`);
@@ -3260,7 +3230,7 @@ function showProfileTip() {
             <button class="tip-close" onclick="this.parentElement.parentElement.remove()">✕</button>
         </div>
     `;
-    
+
     tip.style.cssText = `
         position: fixed;
         bottom: 2rem;
@@ -3275,9 +3245,9 @@ function showProfileTip() {
         animation: slideInRight 0.4s ease;
         font-family: 'Lora', serif;
     `;
-    
+
     document.body.appendChild(tip);
-    
+
     // Auto-remove after 8 seconds
     setTimeout(() => {
         tip.style.animation = 'slideOutRight 0.4s ease';
@@ -3298,13 +3268,13 @@ function showProfileTip() {
 function syncUsernameOnLoad() {
     const username = localStorage.getItem('username');
     const tournamentUsername = localStorage.getItem('tournamentUsername');
-    
+
     // ✅ If BOTH are missing, trigger profile creation
     if (!username && !tournamentUsername) {
         console.log('⚠️ No username found, profile should have been created');
         return;
     }
-    
+
     if (username && !tournamentUsername) {
         localStorage.setItem('tournamentUsername', username);
         console.log('✅ Synced tournamentUsername from username:', username);

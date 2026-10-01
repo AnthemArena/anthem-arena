@@ -6,8 +6,10 @@
 // Import Firebase (using CDN - no npm needed)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';  // ← ADD THIS LINE
-
+import {
+    getAuth,
+    signInAnonymously
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 // Your Firebase configuration (copied from Firebase Console)
 const firebaseConfig = {
   apiKey: "AIzaSyCApnc605mPNOEsAcVnKeXbBTokk7iZP5E",
@@ -23,6 +25,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+// Sign visitors in anonymously so Firestore can securely identify them.
+signInAnonymously(auth)
+    .then(({ user }) => {
+        localStorage.setItem('tournamentUserId', user.uid);
+        localStorage.setItem('userId', user.uid);
+
+        console.log('✅ Anonymous Firebase user:', user.uid);
+    })
+    .catch(error => {
+        console.error('❌ Anonymous Firebase sign-in failed:', error);
+    });
 
 console.log('✅ Firebase connected!');
 

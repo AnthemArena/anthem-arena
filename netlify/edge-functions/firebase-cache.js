@@ -5,7 +5,7 @@
 
 const CACHE_DURATION = 30; // 30 seconds
 const FIREBASE_PROJECT = "arcane-moments";
-const TOURNAMENT = "2025-worlds-anthems";
+const TOURNAMENT = "arcane-test-01";
 
 // Edge cache storage
 const edgeCache = new Map();
@@ -626,12 +626,17 @@ function transformFirestoreData(firestoreData) {
   if (firestoreData.documents && Array.isArray(firestoreData.documents)) {
     return firestoreData.documents.map(doc => convertDocument(doc));
   }
-  
+
+  // Handle empty collection
+  if (!firestoreData.fields && !firestoreData.documents) {
+    return [];
+  }
+
   // Handle single document
   if (firestoreData.fields) {
     return convertDocument(firestoreData);
   }
-  
+
   // Fallback
   return firestoreData;
 }

@@ -8,15 +8,15 @@ import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-
 
 // Champion list (same as username-system.js)
 const CHAMPIONS = [
-    'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Aphelios', 
+    'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Aphelios',
     'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Belveth', 'Blitzcrank', 'Brand', 'Braum', 'Briar',
-    'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki', 'Darius', 'Diana', 'Draven', 
-    'DrMundo', 'Ekko', 'Elise', 'Evelynn', 'Ezreal', 'Fiddlesticks', 'Fiora', 'Fizz', 
+    'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki', 'Darius', 'Diana', 'Draven',
+    'DrMundo', 'Ekko', 'Elise', 'Evelynn', 'Ezreal', 'Fiddlesticks', 'Fiora', 'Fizz',
     'Galio', 'Gangplank', 'Garen', 'Gnar', 'Gragas', 'Graves', 'Gwen', 'Hecarim', 'Heimerdinger',
     'Hwei', 'Illaoi', 'Irelia', 'Ivern', 'Janna', 'JarvanIV', 'Jax', 'Jayce', 'Jhin', 'Jinx',
     'Kaisa', 'Kalista', 'Karma', 'Karthus', 'Kassadin', 'Katarina', 'Kayle', 'Kayn', 'Kennen',
     'Khazix', 'Kindred', 'Kled', 'KogMaw', 'KSante', 'Leblanc', 'LeeSin', 'Leona', 'Lillia',
-    'Lissandra', 'Lucian', 'Lulu', 'Lux', 'Malphite', 'Malzahar', 'Maokai', 'MasterYi', 
+    'Lissandra', 'Lucian', 'Lulu', 'Lux', 'Malphite', 'Malzahar', 'Maokai', 'MasterYi',
     'Milio', 'MissFortune', 'Mordekaiser', 'Morgana', 'Naafiri', 'Nami', 'Nasus', 'Nautilus',
     'Neeko', 'Nidalee', 'Nilah', 'Nocturne', 'Nunu', 'Olaf', 'Orianna', 'Ornn', 'Pantheon',
     'Poppy', 'Pyke', 'Qiyana', 'Quinn', 'Rakan', 'Rammus', 'RekSai', 'Rell', 'Renata', 'Renekton',
@@ -41,24 +41,24 @@ let modalElement = null;
 
 export function openSettingsModal() {
     console.log('⚙️ Opening settings modal...');
-    
+
     // Create modal if it doesn't exist
     if (!modalElement) {
         createModalHTML();
     }
-    
+
     // Load current profile
     loadCurrentProfile();
-    
+
     // Render champion grid
     renderChampionGrid();
-    
+
     // Setup event listeners
     setupEventListeners();
-    
+
     // ✅ NEW: Setup banner preview
     setupBannerPreview();
-    
+
     // Show modal with animation
     setTimeout(() => {
         modalElement.classList.add('active');
@@ -72,21 +72,21 @@ export function openSettingsModal() {
 
 function closeSettingsModal() {
     if (!modalElement) return;
-    
+
     // Check for unsaved changes
     if (hasChanges) {
         if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
             return;
         }
     }
-    
+
     modalElement.classList.remove('active');
     document.body.style.overflow = ''; // Re-enable scroll
-    
+
     // Reset state
     hasChanges = false;
     selectedChampion = null;
-    
+
     console.log('✅ Settings modal closed');
 }
 
@@ -104,7 +104,7 @@ function createModalHTML() {
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
+
                 <div class="settings-modal-body">
                     <!-- Profile Preview -->
                     <div class="profile-preview-card" id="profilePreview">
@@ -120,15 +120,15 @@ function createModalHTML() {
 
                     <!-- Settings Form -->
                     <form id="settingsForm" class="settings-form">
-                        
+
                         <!-- Username Section -->
                         <div class="settings-section">
                             <h3><i class="fas fa-user"></i> Username</h3>
                             <div class="form-group">
-                                <input 
-                                    type="text" 
-                                    id="usernameInput" 
-                                    placeholder="Enter username..." 
+                                <input
+                                    type="text"
+                                    id="usernameInput"
+                                    placeholder="Enter username..."
                                     maxlength="20"
                                     autocomplete="off"
                                 />
@@ -140,18 +140,20 @@ function createModalHTML() {
                   <!-- Avatar Section -->
                         <div class="settings-section">
                             <h3><i class="fas fa-image"></i> Avatar</h3>
-                            <p class="section-description">Choose a League champion</p>
-                            
+<p class="section-description">
+    Choose your profile avatar from League of Legends characters
+</p>
+
                             <div class="avatar-search-wrapper">
-                                <input 
-                                    type="text" 
-                                    id="avatarSearch" 
-                                    placeholder="Search champions..." 
+                                <input
+                                    type="text"
+                                    id="avatarSearch"
+                                    placeholder="Search champions..."
                                     autocomplete="off"
                                 />
                                 <span class="search-icon">🔍</span>
                             </div>
-                            
+
                             <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
                                 <img id="selectedAvatarImg" src="" alt="Selected avatar" />
                                 <span id="selectedAvatarName">No champion selected</span>
@@ -159,7 +161,7 @@ function createModalHTML() {
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
-                            
+
                             <div class="avatar-grid" id="avatarGrid">
                                 <!-- Champion grid will be inserted here -->
                             </div>
@@ -169,11 +171,11 @@ function createModalHTML() {
                         <div class="settings-section">
                             <h3><i class="fas fa-pen"></i> Bio</h3>
                             <p class="section-description">Tell others about yourself (optional)</p>
-                            
+
                             <div class="form-group">
-                                <textarea 
-                                    id="bioInput" 
-                                    placeholder="Music enthusiast, League fan, proud underdog supporter..." 
+                                <textarea
+                                    id="bioInput"
+                                    placeholder="Music enthusiast, League fan, proud underdog supporter..."
                                     maxlength="200"
                                     rows="3"
                                     autocomplete="off"
@@ -187,21 +189,21 @@ function createModalHTML() {
 
 <!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
 <div class="settings-section">
-    <h3><i class="fas fa-users"></i> Your Champion & Team Identity</h3>
-    <p class="section-description">
-        Choose your champion pack - this determines your <strong>team identity</strong> and voice throughout Anthem Arena. 
-        Your champion will narrate your votes, react to rivals, and represent you in faction battles.
-    </p>
-    
+   <h3><i class="fas fa-user-astronaut"></i> Your Arcane Companion</h3>
+<p class="section-description">
+    Choose your Arcane companion. They’ll provide personality-driven notifications,
+    react to tournament activity, and accompany you throughout Arcane Moments.
+</p>
+
     <div id="championPackSelector" class="champion-pack-grid">
         <!-- Champion pack options will be populated here with avatars -->
     </div>
-    
+
     <div class="team-identity-preview" id="teamPreview" style="
-        margin-top: 16px; 
-        padding: 16px; 
-        background: rgba(255,255,255,0.05); 
-        border-radius: 12px; 
+        margin-top: 16px;
+        padding: 16px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
         display: none;
         border-left: 4px solid var(--accent-gold);
         display: flex;
@@ -216,10 +218,10 @@ function createModalHTML() {
         ">
         <div>
             <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
-                Your Team: <span id="teamName">Team Jinx</span>
+Your Companion: <span id="teamName">Jinx</span>
             </div>
             <small style="opacity: 0.7; font-size: 0.85em;">
-                Appears on match results and faction breakdowns
+Your companion can react to matches, achievements, and other site activity
             </small>
         </div>
     </div>
@@ -231,58 +233,58 @@ function createModalHTML() {
         <i class="fas fa-share-nodes"></i> Social Media
     </label>
     <small class="setting-hint">Add your social media profiles (optional)</small>
-    
+
     <div class="social-inputs">
         <div class="social-input-row">
 <i class="fab fa-twitter"></i>
-            <input 
-                type="text" 
-                id="socialTwitter" 
-                class="setting-input" 
+            <input
+                type="text"
+                id="socialTwitter"
+                class="setting-input"
                 placeholder="@username"
                 maxlength="50"
             >
         </div>
-        
+
         <div class="social-input-row">
             <i class="fab fa-instagram"></i>
-            <input 
-                type="text" 
-                id="socialInstagram" 
-                class="setting-input" 
+            <input
+                type="text"
+                id="socialInstagram"
+                class="setting-input"
                 placeholder="@username"
                 maxlength="50"
             >
         </div>
-        
+
         <div class="social-input-row">
             <i class="fab fa-twitch"></i>
-            <input 
-                type="text" 
-                id="socialTwitch" 
-                class="setting-input" 
+            <input
+                type="text"
+                id="socialTwitch"
+                class="setting-input"
                 placeholder="username"
                 maxlength="50"
             >
         </div>
-        
+
         <div class="social-input-row">
             <i class="fab fa-youtube"></i>
-            <input 
-                type="text" 
-                id="socialYoutube" 
-                class="setting-input" 
+            <input
+                type="text"
+                id="socialYoutube"
+                class="setting-input"
                 placeholder="@channelname"
                 maxlength="50"
             >
         </div>
-        
+
         <div class="social-input-row">
             <i class="fab fa-discord"></i>
-            <input 
-                type="text" 
-                id="socialDiscord" 
-                class="setting-input" 
+            <input
+                type="text"
+                id="socialDiscord"
+                class="setting-input"
                 placeholder="username#0000"
                 maxlength="50"
             >
@@ -338,7 +340,7 @@ function createModalHTML() {
 <div class="settings-section">
     <h3><i class="fas fa-shield-alt"></i> Privacy & Social</h3>
     <p class="section-description">Control who can interact with you</p>
-    
+
     <div class="privacy-settings">
         <!-- Public Profile -->
         <label class="toggle-label">
@@ -349,7 +351,7 @@ function createModalHTML() {
                 <p>Show your votes in Community Activity feed</p>
             </div>
         </label>
-        
+
         <!-- Message Privacy -->
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
@@ -361,7 +363,7 @@ function createModalHTML() {
                 </select>
             </div>
         </div>
-        
+
         <!-- Show Online Status -->
         <label class="toggle-label">
             <input type="checkbox" id="showOnlineStatusToggle" class="toggle-input" />
@@ -371,7 +373,7 @@ function createModalHTML() {
                 <p>Let others see when you're active</p>
             </div>
         </label>
-        
+
         <!-- Emote Privacy -->
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
@@ -398,14 +400,14 @@ function createModalHTML() {
             </div>
         </div>
     `;
-    
+
     // Inject modal into body
     const modalContainer = document.createElement('div');
     modalContainer.innerHTML = modalHTML;
     document.body.appendChild(modalContainer.firstElementChild);
-    
+
     modalElement = document.getElementById('settingsModalOverlay');
-    
+
     console.log('✅ Settings modal created');
 }
 
@@ -418,7 +420,7 @@ function loadCurrentProfile() {
     const avatarJson = localStorage.getItem('avatar');
         const bio = localStorage.getItem('bio') || ''; // ✅ ADD THIS
 
-    
+
     // ✅ Load privacy settings with defaults
     const privacyDefaults = {
         isPublic: 'true',
@@ -427,23 +429,23 @@ function loadCurrentProfile() {
         showOnlineStatus: 'true',
         emotePrivacy: 'everyone'
     };
-    
+
     // Load or set defaults
     Object.keys(privacyDefaults).forEach(key => {
         if (localStorage.getItem(key) === null) {
             localStorage.setItem(key, privacyDefaults[key]);
         }
     });
-    
+
     const isPublic = localStorage.getItem('isPublic') === 'true';
 const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Changed
     const messagePrivacy = localStorage.getItem('messagePrivacy') || 'everyone';
     const showOnlineStatus = localStorage.getItem('showOnlineStatus') === 'true';
     const emotePrivacy = localStorage.getItem('emotePrivacy') || 'everyone';
-    
+
     const currentXP = getUserXPFromStorage();
     const rank = getUserRank(currentXP);
-    
+
     // Parse avatar
     let avatar;
     try {
@@ -451,14 +453,14 @@ const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Ch
     } catch {
         avatar = { type: 'emoji', value: '🎵' };
     }
-    
+
     // Update preview card
     updatePreviewCard(username, avatar, rank, currentXP);
-    
+
     // Update form fields
     document.getElementById('usernameInput').value = username;
 
-     
+
     // ✅ ADD BIO LOADING
     const bioInput = document.getElementById('bioInput');
     if (bioInput) {
@@ -471,25 +473,25 @@ const socialLinksJson = localStorage.getItem('socialLinks');
 if (socialLinksJson) {
     try {
         const socialLinks = JSON.parse(socialLinksJson);
-        
+
         if (socialLinks.twitter) document.getElementById('socialTwitter').value = socialLinks.twitter;
         if (socialLinks.instagram) document.getElementById('socialInstagram').value = socialLinks.instagram;
         if (socialLinks.twitch) document.getElementById('socialTwitch').value = socialLinks.twitch;
         if (socialLinks.youtube) document.getElementById('socialYoutube').value = socialLinks.youtube;
         if (socialLinks.discord) document.getElementById('socialDiscord').value = socialLinks.discord;
-        
+
         console.log('✅ Social links loaded');
     } catch (e) {
         console.warn('Could not load social links:', e);
     }
 }
-    
+
   // ✅ Set all privacy toggles
 document.getElementById('publicToggle').checked = isPublic;
 document.getElementById('messagePrivacySelect').value = messagePrivacy;
 document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
 document.getElementById('emotePrivacySelect').value = emotePrivacy;
-    
+
     // Show selected avatar if exists
     if (avatar && avatar.type === 'url') {
         selectedChampion = {
@@ -499,7 +501,7 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
         };
         showSelectedAvatar();
     }
-    
+
      // ✅ NEW: Load champion pack selector
     loadChampionPackSelector();
 
@@ -515,23 +517,23 @@ function updatePreviewCard(username, avatar, rank, xp) {
     const previewUsername = document.getElementById('previewUsername');
     const previewRank = document.getElementById('previewRank');
     const previewStats = document.getElementById('previewStats');
-    
+
     if (!previewAvatar || !previewUsername || !previewRank || !previewStats) return;
-    
+
     // Update avatar
     if (avatar && avatar.type === 'url') {
         previewAvatar.innerHTML = `<img src="${avatar.value}" alt="Avatar" class="preview-avatar-img" />`;
     } else {
         previewAvatar.textContent = avatar?.value || '🎵';
     }
-    
+
     // Update username
     previewUsername.textContent = username || 'Guest';
-    
+
     // Update rank
     const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
     previewRank.textContent = `Level ${rank.currentLevel.level} - ${cleanTitle}`;
-    
+
     // Update stats
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
     const totalVotes = Object.keys(userVotes).length;
@@ -548,7 +550,7 @@ function updatePreviewCard(username, avatar, rank, xp) {
 function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
     if (!grid) return;
-    
+
     const html = CHAMPIONS.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
         return `
@@ -557,7 +559,7 @@ function renderChampionGrid() {
             </div>
         `;
     }).join('');
-    
+
     grid.innerHTML = html;
 }
 
@@ -566,7 +568,7 @@ function renderChampionGrid() {
 function updateBioCharCount() {
     const bioInput = document.getElementById('bioInput');
     const charCount = document.getElementById('bioCharCount');
-    
+
     if (bioInput && charCount) {
         charCount.textContent = bioInput.value.length;
     }
@@ -583,42 +585,42 @@ function setupEventListeners() {
         form.removeEventListener('submit', handleSaveSettings); // Remove old listener
         form.addEventListener('submit', handleSaveSettings);
     }
-    
+
     // Close buttons
     const closeBtn = document.getElementById('settingsModalClose');
     const cancelBtn = document.getElementById('cancelBtn');
     const overlay = document.getElementById('settingsModalOverlay');
-    
+
     if (closeBtn) {
         closeBtn.removeEventListener('click', closeSettingsModal);
         closeBtn.addEventListener('click', closeSettingsModal);
     }
-    
+
     if (cancelBtn) {
         cancelBtn.removeEventListener('click', closeSettingsModal);
         cancelBtn.addEventListener('click', closeSettingsModal);
     }
-    
+
     // Click outside to close
     if (overlay) {
         overlay.removeEventListener('click', handleOverlayClick);
         overlay.addEventListener('click', handleOverlayClick);
     }
-    
+
     // Avatar search
     const searchInput = document.getElementById('avatarSearch');
     if (searchInput) {
         searchInput.removeEventListener('input', handleAvatarSearch);
         searchInput.addEventListener('input', handleAvatarSearch);
     }
-    
+
     // Champion selection
     const avatarGrid = document.getElementById('avatarGrid');
     if (avatarGrid) {
         avatarGrid.removeEventListener('click', handleChampionClick);
         avatarGrid.addEventListener('click', handleChampionClick);
     }
-    
+
     // Clear avatar button
     const clearBtn = document.getElementById('clearAvatarBtn');
     if (clearBtn) {
@@ -632,7 +634,7 @@ function setupEventListeners() {
         bioInput.removeEventListener('input', handleBioInput);
         bioInput.addEventListener('input', handleBioInput);
     }
-    
+
    // Track changes on all inputs
     const trackableInputs = [
         'usernameInput',
@@ -641,17 +643,17 @@ function setupEventListeners() {
         'showOnlineStatusToggle',
         'emotePrivacySelect'
     ];
-    
+
     trackableInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            const eventType = element.tagName === 'SELECT' ? 'change' : 
+            const eventType = element.tagName === 'SELECT' ? 'change' :
                              element.type === 'checkbox' ? 'change' : 'input';
             element.removeEventListener(eventType, trackChanges);
             element.addEventListener(eventType, trackChanges);
         }
     });
-    
+
     // ESC key to close
     document.removeEventListener('keydown', handleEscapeKey);
     document.addEventListener('keydown', handleEscapeKey);
@@ -686,7 +688,7 @@ function handleOverlayClick(e) {
 function handleAvatarSearch(e) {
     const query = e.target.value.toLowerCase();
     const champions = document.querySelectorAll('.champion-avatar-option');
-    
+
     champions.forEach(champ => {
         const searchText = champ.dataset.search;
         if (searchText.includes(query)) {
@@ -704,28 +706,28 @@ function handleAvatarSearch(e) {
 function handleChampionClick(e) {
     const option = e.target.closest('.champion-avatar-option');
     if (!option) return;
-    
+
     const champion = option.dataset.champion;
     const displayName = option.title;
     const imageUrl = `${CHAMPION_CDN}${champion}.png`;
-    
+
     selectedChampion = {
         name: champion,
         displayName: displayName,
         url: imageUrl
     };
-    
+
     hasChanges = true;
     showSelectedAvatar();
-    
+
     // Remove previous selection styling
     document.querySelectorAll('.champion-avatar-option').forEach(opt => {
         opt.classList.remove('selected');
     });
-    
+
     // Add selection styling
     option.classList.add('selected');
-    
+
     console.log('✅ Champion selected:', displayName);
 }
 
@@ -735,11 +737,11 @@ function handleChampionClick(e) {
 
 function showSelectedAvatar() {
     if (!selectedChampion) return;
-    
+
     const display = document.getElementById('selectedAvatarDisplay');
     const img = document.getElementById('selectedAvatarImg');
     const name = document.getElementById('selectedAvatarName');
-    
+
     if (display && img && name) {
         img.src = selectedChampion.url;
         name.textContent = selectedChampion.displayName;
@@ -754,17 +756,17 @@ function showSelectedAvatar() {
 function clearSelectedAvatar() {
     selectedChampion = null;
     hasChanges = true;
-    
+
     const display = document.getElementById('selectedAvatarDisplay');
     if (display) {
         display.style.display = 'none';
     }
-    
+
     // Remove selection styling
     document.querySelectorAll('.champion-avatar-option').forEach(opt => {
         opt.classList.remove('selected');
     });
-    
+
     console.log('🗑️ Avatar cleared');
 }
 
@@ -776,15 +778,15 @@ function validateUsername(username) {
     if (!username || username.length < 3) {
         return { valid: false, error: 'Username must be at least 3 characters' };
     }
-    
+
     if (username.length > 20) {
         return { valid: false, error: 'Username must be 20 characters or less' };
     }
-    
+
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
         return { valid: false, error: 'Username can only contain letters, numbers, and underscores' };
     }
-    
+
     return { valid: true };
 }
 // ========================================
@@ -793,17 +795,17 @@ function validateUsername(username) {
 
 async function handleSaveSettings(e) {
     e.preventDefault();
-    
+
     const usernameInput = document.getElementById('usernameInput');
     const bioInput = document.getElementById('bioInput');
     const errorEl = document.getElementById('usernameError');
     const saveBtn = e.target.querySelector('button[type="submit"]') || e.submitter;
-    
+
     if (!usernameInput || !errorEl) return;
-    
+
     const username = usernameInput.value.trim();
     const bio = bioInput?.value.trim() || '';
-    
+
     // ✅ Get all privacy settings
     const privacySettings = {
         isPublic: document.getElementById('publicToggle')?.checked ?? true,
@@ -826,7 +828,7 @@ if (socialLinks.twitter) socialLinks.twitter = socialLinks.twitter.replace(/^@/,
 if (socialLinks.instagram) socialLinks.instagram = socialLinks.instagram.replace(/^@/, '');
 if (socialLinks.youtube) socialLinks.youtube = socialLinks.youtube.replace(/^@/, '');
 
-    
+
     // ✅ FIXED: Get banner selection with proper default
 const bannerSelect = document.getElementById('bannerSelect');
 const bannerValue = bannerSelect ? bannerSelect.value : 'auto';
@@ -845,7 +847,7 @@ if (bannerValue === 'default') {
         skinNumber: 0
     };
 }
-    
+
     // Validate username
     const validation = validateUsername(username);
     if (!validation.valid) {
@@ -854,10 +856,10 @@ if (bannerValue === 'default') {
         usernameInput.focus();
         return false;
     }
-    
+
     // Hide error
     errorEl.style.display = 'none';
-    
+
     // Determine avatar
     let avatar;
     if (selectedChampion) {
@@ -875,19 +877,19 @@ if (bannerValue === 'default') {
             avatar = { type: 'emoji', value: '🎵' };
         }
     }
-    
+
     // ========================================
     // SAVE WITH LOADING STATES
     // ========================================
     const originalBtnText = saveBtn ? saveBtn.innerHTML : '';
-    
+
     try {
         // Disable button and show loading
         if (saveBtn) {
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
         }
-        
+
         // Save to localStorage (backward compatible)
         localStorage.setItem('username', username);
         localStorage.setItem('avatar', JSON.stringify(avatar));
@@ -895,7 +897,7 @@ if (bannerValue === 'default') {
         localStorage.setItem('banner', JSON.stringify(banner)); // ✅ NEW: Save banner
         // ✅ NEW: Save social links to localStorage
 localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
-        
+
         // Save all privacy settings
         Object.keys(privacySettings).forEach(key => {
             const value = privacySettings[key];
@@ -905,42 +907,50 @@ localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
                 localStorage.setItem(key, value);
             }
         });
-        
+
      // Around line 753 in handleSaveSettings()
 // Save to Firebase profiles collection
 const userId = localStorage.getItem('tournamentUserId');
 if (userId) {
-    // ✅ Get selected champion pack (if user changed it in settings)
-    const championPackId = window.championLoader?.getCurrentPack()?.id || 'jinx';
-    
-    await setDoc(doc(db, 'profiles', userId), {
-        username: username,
-        avatar: avatar,
-        championPackId: championPackId, // ✅ ADD THIS LINE
-        banner: banner,
-        bio: bio,
-        socialLinks: socialLinks,
-        privacy: privacySettings,
-        updatedAt: Date.now()
-    });
-    console.log('✅ Profile saved to Firebase with championPackId');
+   const companionId =
+    window.championLoader?.getUserCompanionPack?.() ||
+    window.championLoader?.getCurrentPack?.()?.id ||
+    'jinx';
 
-            
+await setDoc(doc(db, 'profiles', userId), {
+    username: username,
+    avatar: avatar,
+
+    // New canonical field
+    companionId: companionId,
+
+    // Temporary compatibility field for legacy modules
+    championPackId: companionId,
+    banner: banner,
+    bio: bio,
+    socialLinks: socialLinks,
+    privacy: privacySettings,
+    updatedAt: Date.now()
+}, { merge: true });
+
+console.log('✅ Profile saved to Firebase with Arcane companion:', companionId);
+
+
             // Show updating history state
             if (saveBtn) {
                 saveBtn.innerHTML = '<span class="spinner"></span> Updating history...';
             }
-            
+
             // Automatically backfill old votes/activity (batched)
             await backfillUserHistory(userId, username, avatar, privacySettings.isPublic);
-            
+
             // Invalidate profile cache after save
             invalidateProfileCache(username);
             console.log('🗑️ Profile cache invalidated');
         }
-        
+
         hasChanges = false;
-        
+
        console.log('✅ Settings saved:', { username, avatar, banner, privacy: privacySettings });
 
 // ✅ Invalidate profile cache
@@ -971,27 +981,27 @@ setTimeout(() => {
         saveBtn.style.background = '';
         saveBtn.disabled = false;
     }
-    
+
     // ✅ Hard reload if on profile page (force fresh data)
     if (window.location.pathname.includes('profile')) {
         console.log('🔄 Reloading profile page with fresh data...');
         window.location.reload(true);
     }
 }, 1500);
-        
+
         return true;
-        
+
     } catch (error) {
         console.error('❌ Error saving settings:', error);
-        
+
         // Show error state
         if (saveBtn) {
             saveBtn.innerHTML = '❌ Error';
             saveBtn.style.background = '#f44336';
         }
-        
+
         showNotification('❌ Failed to save profile', 'error');
-        
+
         // Reset button after delay
         setTimeout(() => {
             if (saveBtn) {
@@ -1000,7 +1010,7 @@ setTimeout(() => {
                 saveBtn.disabled = false;
             }
         }, 2000);
-        
+
         return false;
     }
 }
@@ -1012,14 +1022,14 @@ setTimeout(() => {
 function setupBannerPreview() {
     const bannerSelect = document.getElementById('bannerSelect');
     const bannerPreview = document.getElementById('bannerPreview');
-    
+
     if (!bannerSelect || !bannerPreview) return;
-    
+
     // Update preview when selection changes
     bannerSelect.addEventListener('change', () => {
         updateBannerPreview(bannerSelect.value);
     });
-    
+
     // Initial preview
     updateBannerPreview(bannerSelect.value);
 }
@@ -1027,28 +1037,28 @@ function setupBannerPreview() {
 function updateBannerPreview(selection) {
     const bannerPreview = document.getElementById('bannerPreview');
     if (!bannerPreview) return;
-    
+
     console.log('🖼️ Updating banner preview:', selection);
-    
+
     if (selection === 'default') {
         // Gold gradient
         bannerPreview.style.background = `
-            linear-gradient(135deg, 
-                rgba(200, 170, 110, 0.9) 0%, 
+            linear-gradient(135deg,
+                rgba(200, 170, 110, 0.9) 0%,
                 rgba(26, 26, 46, 0.95) 50%,
                 rgba(10, 10, 10, 0.98) 100%
             )
         `;
         bannerPreview.style.backgroundImage = '';
-        
+
     } else if (selection === 'auto' || !selection) {
         // Show current avatar's champion (if champion avatar)
         const currentAvatar = getCurrentAvatarSelection();
-        
+
         // ✅ Check both selectedChampion and stored avatar
         if (currentAvatar.type === 'champion' || currentAvatar.type === 'url') {
             const championId = currentAvatar.championId || (currentAvatar.name ? currentAvatar.name.replace(/['\s]/g, '') : null);
-            
+
             if (championId) {
                 const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
                 bannerPreview.style.backgroundImage = `
@@ -1060,8 +1070,8 @@ function updateBannerPreview(selection) {
             } else {
                 // Fallback to gradient
                 bannerPreview.style.background = `
-                    linear-gradient(135deg, 
-                        rgba(200, 170, 110, 0.9) 0%, 
+                    linear-gradient(135deg,
+                        rgba(200, 170, 110, 0.9) 0%,
                         rgba(26, 26, 46, 0.95) 50%,
                         rgba(10, 10, 10, 0.98) 100%
                     )
@@ -1071,15 +1081,15 @@ function updateBannerPreview(selection) {
         } else {
             // Fallback to gradient for emoji avatars
             bannerPreview.style.background = `
-                linear-gradient(135deg, 
-                    rgba(200, 170, 110, 0.9) 0%, 
+                linear-gradient(135deg,
+                    rgba(200, 170, 110, 0.9) 0%,
                     rgba(26, 26, 46, 0.95) 50%,
                     rgba(10, 10, 10, 0.98) 100%
                 )
             `;
             bannerPreview.style.backgroundImage = '';
         }
-        
+
     } else {
         // Specific champion
         const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${selection}_0.jpg`;
@@ -1103,11 +1113,11 @@ function getCurrentAvatarSelection() {
             name: window.selectedChampion.name
         };
     }
-    
+
     // Otherwise, get from localStorage
     try {
         const avatar = JSON.parse(localStorage.getItem('avatar') || '{}');
-        
+
         if (avatar.type === 'url' && avatar.name) {
             // Extract championId from champion name
             const championId = avatar.name.replace(/['\s]/g, '');
@@ -1117,7 +1127,7 @@ function getCurrentAvatarSelection() {
                 name: avatar.name
             };
         }
-        
+
         return avatar;
     } catch {
         return { type: 'emoji', value: '🎵' };
@@ -1138,18 +1148,18 @@ function showNotification(message, type = 'success') {
         window.showNotification(message, type);
         return;
     }
-    
+
     // Fallback notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
+
     const bgColor = {
         'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
         'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
         'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
     }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
-    
+
     notification.style.cssText = `
         position: fixed;
         bottom: 2rem;
@@ -1166,9 +1176,9 @@ function showNotification(message, type = 'success') {
         animation: slideIn 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -1192,37 +1202,37 @@ function showNotification(message, type = 'success') {
  */
 async function backfillUserHistory(userId, username, avatar, isPublic) {
     console.log('🔄 Updating all votes/activity with new profile...');
-    
+
     try {
-        const { collection, query, where, getDocs, writeBatch } = 
+        const { collection, query, where, getDocs, writeBatch } =
             await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-        
+
         const updates = {
             username,
             avatar,
             isPublic,
             updatedAt: Date.now()
         };
-        
+
         let totalUpdated = 0;
-        
+
         // ========================================
         // 1. UPDATE VOTES (batched)
         // ========================================
         const votesQuery = query(collection(db, 'votes'), where('userId', '==', userId));
         const votesSnapshot = await getDocs(votesQuery);
-        
+
         if (votesSnapshot.size > 0) {
             // Firebase batch limit is 500 operations
             const BATCH_SIZE = 500;
             let batch = writeBatch(db);
             let batchCount = 0;
-            
+
             for (const voteDoc of votesSnapshot.docs) {
                 batch.update(voteDoc.ref, updates);
                 batchCount++;
                 totalUpdated++;
-                
+
                 // Commit batch if we hit the limit
                 if (batchCount === BATCH_SIZE) {
                     await batch.commit();
@@ -1230,47 +1240,47 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
                     batchCount = 0;
                 }
             }
-            
+
             // Commit remaining updates
             if (batchCount > 0) {
                 await batch.commit();
             }
-            
+
             console.log(`✅ Updated ${votesSnapshot.size} votes`);
         }
-        
+
         // ========================================
         // 2. UPDATE ACTIVITY (batched)
         // ========================================
         const activityQuery = query(collection(db, 'activity'), where('userId', '==', userId));
         const activitySnapshot = await getDocs(activityQuery);
-        
+
         if (activitySnapshot.size > 0) {
             const BATCH_SIZE = 500;
             let batch = writeBatch(db);
             let batchCount = 0;
-            
+
             for (const activityDoc of activitySnapshot.docs) {
                 batch.update(activityDoc.ref, updates);
                 batchCount++;
                 totalUpdated++;
-                
+
                 if (batchCount === BATCH_SIZE) {
                     await batch.commit();
                     batch = writeBatch(db);
                     batchCount = 0;
                 }
             }
-            
+
             if (batchCount > 0) {
                 await batch.commit();
             }
-            
+
             console.log(`✅ Updated ${activitySnapshot.size} activity records`);
         }
-        
+
         console.log(`\n🎉 Profile backfill complete! Updated ${totalUpdated} total records`);
-        
+
     } catch (error) {
         console.error('❌ Backfill error:', error);
         // Don't throw - profile save succeeded even if backfill fails
@@ -1286,9 +1296,9 @@ async function backfillUserHistory(userId, username, avatar, isPublic) {
  */
 function invalidateProfileCache(username) {
     if (!username) return;
-    
+
     const cacheKey = `profile-${username}`;
-    
+
     try {
         localStorage.removeItem(cacheKey);
         console.log(`🗑️ Invalidated cache for ${username}`);
@@ -1303,29 +1313,29 @@ function invalidateProfileCache(username) {
 async function loadChampionPackSelector() {
     const container = document.getElementById('championPackSelector');
     if (!container) return;
-    
+
     try {
         // Get available packs from manifest
         const manifest = await window.championLoader.getManifest();
         const currentPack = window.championLoader.getCurrentPack();
-        
+
         container.innerHTML = manifest.packs.map(pack => {
             const isActive = pack.id === currentPack.id;
             const isDisabled = !pack.enabled || pack.comingSoon;
-            
+
             return `
-                <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}" 
+                <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}"
                      data-pack-id="${pack.id}"
                      ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
-                    
+
 ${isActive ? '<span class="active-badge"></span>' : ''}
                     ${pack.comingSoon ? '<span class="coming-soon-badge">🔒 Coming Soon</span>' : ''}
-                    
+
                     <!-- ✅ Champion Avatar from Data Dragon -->
                     <div class="champion-pack-avatar">
-                        ${pack.icon 
-                            ? `<img src="${pack.icon}" 
-                                    alt="${pack.name}" 
+                        ${pack.icon
+                            ? `<img src="${pack.icon}"
+                                    alt="${pack.name}"
                                     class="champion-avatar-img"
                                     loading="lazy"
                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1333,14 +1343,14 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
                             : `<span class="champion-emoji-only">${pack.emoji}</span>`
                         }
                     </div>
-                    
+
                     <!-- ✅ Team Name (emphasized) -->
                     <div class="champion-pack-team">${pack.emoji} Team ${pack.name}</div>
                     <div class="champion-pack-name">${pack.name}</div>
                     <div class="champion-pack-description">${pack.description}</div>
-                    
+
                     ${!isDisabled ? `
-                        <button class="champion-preview-btn" 
+                        <button class="champion-preview-btn"
                                 onclick="event.stopPropagation(); previewChampionPack('${pack.id}')">
                             <i class="fas fa-play"></i> Preview
                         </button>
@@ -1348,14 +1358,14 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
                 </div>
             `;
         }).join('');
-        
+
         // ✅ Show current team preview
         if (currentPack) {
             updateTeamPreview(currentPack.id, currentPack.name, currentPack.icon, currentPack.emoji);
         }
-        
+
         console.log('✅ Champion pack selector loaded');
-        
+
     } catch (error) {
         console.error('❌ Failed to load champion packs:', error);
         container.innerHTML = '<p style="color: rgba(255,255,255,0.6); text-align: center;">Failed to load champion packs</p>';
@@ -1364,26 +1374,25 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
 
 async function selectChampionPack(packId) {
     console.log(`🎭 User selected: ${packId}`);
-    
+
     // Update UI immediately
     document.querySelectorAll('.champion-pack-card').forEach(card => {
         card.classList.remove('active');
         card.querySelector('.active-badge')?.remove();
     });
-    
+
     const selectedCard = document.querySelector(`[data-pack-id="${packId}"]`);
     if (selectedCard) {
         selectedCard.classList.add('active');
-        
+
         // Add active badge
         if (!selectedCard.querySelector('.active-badge')) {
             selectedCard.insertAdjacentHTML('afterbegin', '<span class="active-badge">✓ Active</span>');
         }
     }
-    
-    // Save to champion loader
-    await window.championLoader.setUserChampionPack(packId);
-    
+
+  await window.championLoader.setUserCompanionPack(packId);
+
     // ✅ Update Firebase profile with championPackId
     const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
     if (userId) {
@@ -1392,45 +1401,43 @@ async function selectChampionPack(packId) {
             const { doc, updateDoc } = await import(
                 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
             );
-            
+
             await updateDoc(doc(db, 'profiles', userId), {
                 championPackId: packId,
                 updatedAt: Date.now()
             });
-            
+
             console.log(`✅ Updated Firebase profile with championPackId: ${packId}`);
         } catch (error) {
             console.warn('⚠️ Could not update Firebase profile:', error);
         }
     }
-    
+
     // Show confirmation
     const pack = await window.championLoader.loadChampionPack(packId);
-    showNotification(`${pack.emoji} Joined Team ${pack.name}!`, 'success');
-    
+showNotification(`${pack.emoji} ${pack.name} is now your companion!`, 'success');
     // ✅ Update team preview
     updateTeamPreview(pack.id, pack.name, pack.icon, pack.emoji);
-    
+
     // Mark as changed
     hasChanges = true;
-    
-    console.log(`✅ Champion pack set to: ${packId}`);
-}
+
+console.log(`✅ Arcane companion set to: ${packId}`);}
 
 async function previewChampionPack(packId) {
     console.log(`👀 Previewing: ${packId}`);
-    
+
     // Temporarily load the pack
     const originalPack = window.championLoader.getCurrentPack().id;
     await window.championLoader.loadChampionPack(packId);
-    
+
     // Show a test notification
     if (window.testBulletin) {
         window.testBulletin('danger');
     }
-    
+
     showNotification('Preview notification sent! Check bottom-right corner', 'info');
-    
+
     // Wait 5 seconds, then restore original pack
     setTimeout(async () => {
         await window.championLoader.loadChampionPack(originalPack);
@@ -1443,9 +1450,9 @@ function updateTeamPreview(packId, packName, packIcon, packEmoji) {
     const preview = document.getElementById('teamPreview');
     const teamName = document.getElementById('teamName');
     const teamAvatar = document.getElementById('teamAvatar');
-    
+
     if (!preview || !teamName || !teamAvatar) return;
-    
+
     teamAvatar.src = packIcon || '';
     teamAvatar.alt = `Team ${packName}`;
     teamName.textContent = `${packEmoji} Team ${packName}`;

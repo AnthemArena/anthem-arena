@@ -16,6 +16,7 @@ import {
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
@@ -331,7 +332,13 @@ return {
     userId: profileDoc.id,
     username: profileData.username,
     avatar: profileData.avatar || { type: 'emoji', value: '🎵' },
-    championPackId: profileData.championPackId || 'jinx', // ✅ ADD THIS
+
+    // Prefer the new Arcane field, fall back to the legacy field
+    companionId: profileData.companionId || profileData.championPackId || 'jinx',
+
+    // Keep legacy field available to older profile code for now
+    championPackId: profileData.championPackId || profileData.companionId || 'jinx',
+
     bio: profileData.bio || '',
     privacy: profileData.privacy || {},
     createdAt: profileData.createdAt,
@@ -375,7 +382,9 @@ function generateFallbackProfile(username) {
             championId: champion.championId,
             imageUrl: champion.imageUrl
         },
-        bio: 'New to Anthem Arena',
+bio: 'New to Arcane Moments',
+companionId: 'jinx',
+championPackId: 'jinx',
         privacy: {
             isPublic: true
         },
@@ -1390,26 +1399,27 @@ async function loadAllFavoriteSongs(userId) {
             const rank = medals[index] || `#${index + 1}`;
             
             return `
-                <div class="favorite-song-card">
-                    <div class="song-rank">${rank}</div>
-                    <img 
-                        src="${song.thumbnail}" 
-                        alt="${song.name}"
-                        class="song-thumbnail"
-                        loading="lazy"
-                        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵'"
-                    />
-                    <div class="song-details">
-                        <div class="song-title">${song.name}</div>
-                        <div class="song-meta">
-                            <span>${song.artist}</span>
-                            <span class="song-meta-separator">•</span>
-                            <span>Seed #${song.seed}</span>
-                            <span class="song-meta-separator">•</span>
-                            <span class="song-vote-count">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
-                        </div>
-                    </div>
-                </div>
+             <div class="favorite-song-card">
+    <div class="song-rank">${medals[index] || (index + 1)}</div>
+
+    <img
+        src="${song.thumbnail}"
+        alt="${song.name}"
+        class="song-thumbnail"
+        loading="lazy"
+        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎬'"
+    />
+
+    <div class="song-details">
+        <div class="song-title">${song.name}</div>
+
+        <div class="song-meta">
+            <span>${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
+            <span class="song-meta-separator">•</span>
+            <span>Supported by you</span>
+        </div>
+    </div>
+</div>
             `;
         }).join('');
         
@@ -1722,12 +1732,10 @@ async function loadRecentVotes(userId, limitCount = 5) {
     try {
         console.log(`📥 Loading recent ${limitCount} votes for user:`, userId);
         
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId),
-            orderBy('timestamp', 'desc'),
-            limit(limitCount)  // ✅ Now limit() is the Firestore function, limitCount is the value
-        );
+       const votesQuery = query(
+    collection(db, 'votes'),
+    where('userId', '==', userId)
+);
         
         const snapshot = await getDocs(votesQuery);
         
@@ -1748,10 +1756,14 @@ async function loadRecentVotes(userId, limitCount = 5) {
         const allMatches = await getAllMatches();
         const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
         
-        // Render votes
-        const votesHTML = snapshot.docs
-            .map(doc => renderVoteCard(doc.data(), matchMap))
-            .join('');
+      const recentVotes = snapshot.docs
+    .map(doc => doc.data())
+    .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
+    .slice(0, limitCount);
+
+const votesHTML = recentVotes
+    .map(vote => renderVoteCard(vote, matchMap))
+    .join('');
         
         recentVotesContainer.innerHTML = votesHTML;
         
@@ -1779,11 +1791,10 @@ async function loadAllVotes(userId) {
     try {
         console.log(`📥 Loading all votes for user:`, userId);
         
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId),
-            orderBy('timestamp', 'desc')
-        );
+       const votesQuery = query(
+    collection(db, 'votes'),
+    where('userId', '==', userId)
+);
         
         const snapshot = await getDocs(votesQuery);
         
@@ -1805,11 +1816,16 @@ async function loadAllVotes(userId) {
         const allMatches = await getAllMatches();
         const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
         
-        // Store votes for filtering
-        allUserVotes = snapshot.docs.map(doc => ({
-            voteData: doc.data(),
-            match: matchMap.get(doc.data().matchId)
-        }));
+       allUserVotes = snapshot.docs
+    .map(doc => ({
+        voteData: doc.data(),
+        match: matchMap.get(doc.data().matchId)
+    }))
+    .sort(
+        (a, b) =>
+            Number(b.voteData.timestamp || 0) -
+            Number(a.voteData.timestamp || 0)
+    );
         
         // Render with current filter
         renderFilteredVotes(currentVoteFilter);
@@ -1885,7 +1901,7 @@ function renderFilteredVotes(filter) {
 
 function renderVoteCard(vote, matchMap) {
     const match = matchMap.get(vote.matchId);
-    
+
     if (!match) {
         return `
             <div class="vote-card-error">
@@ -1894,126 +1910,135 @@ function renderVoteCard(vote, matchMap) {
             </div>
         `;
     }
-    
+
     const { song1, song2 } = match;
 
-    // ✅ Helper to get artist/champion name with fallback
-    const getArtistName = (song) => {
-        if (!song) return 'Unknown';
-        return song.artist || song.champion || 'League of Legends';
+    const getThumbnail = (moment) => {
+        if (!moment) {
+            return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
+        }
+
+        if (moment.videoId) {
+            return getYoutubeThumbnail(moment.videoId);
+        }
+
+        if (typeof moment.thumbnail === 'string' && moment.thumbnail.includes('http')) {
+            return moment.thumbnail;
+        }
+
+        return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
     };
-    
-    // ✅ GET THUMBNAILS FROM YOUTUBE (like activity.js)
-    const getThumbnail = (song) => {
-        if (!song) return 'https://via.placeholder.com/160x90?text=No+Image';
-        
-        // Try to get from music data using videoId
-        if (song.videoId) {
-            return getYoutubeThumbnail(song.videoId);
-        }
-        
-        // Try to get from music data using song ID
-        if (song.id) {
-            return getYoutubeThumbnail(song.id);
-        }
-        
-        // Fallback: check if thumbnail is already a string URL
-        if (typeof song.thumbnail === 'string' && song.thumbnail.includes('http')) {
-            return song.thumbnail;
-        }
-        
-        // Last resort placeholder
-        return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵';
-    };
-    
-    // Determine vote status
+
     const status = getVoteStatus(vote, match);
+
     const statusConfig = {
-        won: { emoji: '✅', label: 'WON', class: 'won' },
-        lost: { emoji: '❌', label: 'LOST', class: 'lost' },
-        live: { emoji: '🔴', label: 'LIVE', class: 'live' }
+        won: {
+            emoji: '✅',
+            label: 'ADVANCED',
+            class: 'won'
+        },
+        lost: {
+            emoji: '❌',
+            label: 'ELIMINATED',
+            class: 'lost'
+        },
+        live: {
+            emoji: '🔴',
+            label: 'LIVE',
+            class: 'live'
+        }
     };
-    
+
     const statusInfo = statusConfig[status];
-    
-    // Get chosen and opponent songs
-    const votedForSong1 = vote.choice === 'song1';
-    const chosenSong = votedForSong1 ? song1 : song2;
-    const opponentSong = votedForSong1 ? song2 : song1;
-    
-    // ✅ Get thumbnails
-    const chosenThumbnail = getThumbnail(chosenSong);
-    const opponentThumbnail = getThumbnail(opponentSong);
-    
-    // Format timestamp
+
+    const choseFirst = vote.choice === 'song1';
+    const chosenMoment = choseFirst ? song1 : song2;
+    const opponentMoment = choseFirst ? song2 : song1;
+
+    const chosenTitle =
+        chosenMoment?.shortTitle ||
+        chosenMoment?.title ||
+        'Unknown Moment';
+
+    const opponentTitle =
+        opponentMoment?.shortTitle ||
+        opponentMoment?.title ||
+        'Unknown Moment';
+
+    const chosenThumbnail = getThumbnail(chosenMoment);
+    const opponentThumbnail = getThumbnail(opponentMoment);
+
     const timeAgo = formatTimeAgo(vote.timestamp);
-    
-    // Get tournament name
-    const tournamentName = match.tournamentName || 'League of Legends';
-    
-    console.log('🖼️ Thumbnails:', {
-        chosenSong: chosenSong.title,
-        chosenThumbnail,
-        chosenArtist: getArtistName(chosenSong),
-        opponentSong: opponentSong.title,
-        opponentThumbnail,
-        opponentArtist: getArtistName(opponentSong)
-    });
-    
+
     return `
         <div class="vote-card ${status}">
             <div class="vote-header">
                 <div class="vote-status-badge ${statusInfo.class}">
                     ${statusInfo.emoji} ${statusInfo.label}
                 </div>
+
                 <div class="vote-timestamp">${timeAgo}</div>
             </div>
-            
+
             <div class="vote-matchup">
-                <!-- Chosen Song (Left) -->
+
                 <div class="vote-song chosen">
                     <div class="vote-song-thumbnail">
-                        <img src="${chosenThumbnail}" alt="${chosenSong.title}" loading="lazy">
+                        <img
+                            src="${chosenThumbnail}"
+                            alt="${chosenTitle}"
+                            loading="lazy"
+                        >
                     </div>
+
                     <div class="vote-song-info">
-                        <div class="vote-song-title">${chosenSong.shortTitle || chosenSong.title}</div>
-                        <div class="vote-song-meta">${getArtistName(chosenSong)} • Seed #${chosenSong.seed}</div>
+                        <div class="vote-song-title">${chosenTitle}</div>
+                        <div class="vote-song-meta">
+                            Your Choice
+                        </div>
                     </div>
                 </div>
-                
-                <!-- VS Separator -->
+
                 <div class="vote-vs">VS</div>
-                
-                <!-- Opponent Song (Right) -->
+
                 <div class="vote-song opponent">
                     <div class="vote-song-thumbnail">
-                        <img src="${opponentThumbnail}" alt="${opponentSong.title}" loading="lazy">
+                        <img
+                            src="${opponentThumbnail}"
+                            alt="${opponentTitle}"
+                            loading="lazy"
+                        >
                     </div>
+
                     <div class="vote-song-info">
-                        <div class="vote-song-title">${opponentSong.shortTitle || opponentSong.title}</div>
-                        <div class="vote-song-meta">${getArtistName(opponentSong)} • Seed #${opponentSong.seed}</div>
+                        <div class="vote-song-title">${opponentTitle}</div>
+                        <div class="vote-song-meta">
+                            Opponent
+                        </div>
                     </div>
                 </div>
+
             </div>
-            
+
             <div class="vote-footer">
-                <span class="vote-tournament">${tournamentName}</span>
-                <span class="vote-round">Round ${match.round}</span>
-                <a href="/vote.html?id=${vote.matchId}" class="view-match-link">
+                <span class="vote-tournament">
+                    Arcane Moments
+                </span>
+
+                <span class="vote-round">
+                    Round ${match.round || 1}
+                </span>
+
+                <a
+                    href="/vote.html?id=${vote.matchId}"
+                    class="view-match-link"
+                >
                     View Match →
                 </a>
             </div>
         </div>
     `;
 }
-
-// ========================================
-// HELPER: Determine vote status
-// ========================================
-
-// ========================================
-// HELPER: Determine vote status
-// ========================================
 
 // ========================================
 // HELPER: Determine vote status
@@ -2381,117 +2406,129 @@ function invalidateProfileCache(username) {
 // CALCULATE TOURNAMENT PARTICIPATION
 // ========================================
 
-// ========================================
-// CALCULATE TOURNAMENT PARTICIPATION (CURRENT TOURNAMENT ONLY)
-// ========================================
-
 async function calculateTournamentParticipation(userId) {
     try {
-        console.log('📊 Loading participation data...');
-        
-        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
-        
-        // Total possible matches per round
-        const TOTAL_MATCHES_BY_ROUND = {
-            1: 29,
-            2: 16,
-            3: 8,
-            4: 4,
-            5: 2,
-            6: 1
-        };
-        
-        // Get ALL matches to filter by tournament
+        console.log('📊 Loading Arcane participation data...');
+
+        const CURRENT_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+        const TOURNAMENT_NAME = ARCANE_CONFIG.tournamentName;
+
+        // Get all matches from the current Arcane tournament.
         const { getAllMatches } = await import('./api-client.js');
         const allMatches = await getAllMatches();
-        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
-        
-        console.log(`📊 Found ${tournamentMatches.length} matches in current tournament`);
-        
-        // Get user's votes
+
+        const tournamentMatches = allMatches.filter(
+            match => match.tournament === CURRENT_TOURNAMENT
+        );
+
+        console.log(
+            `📊 Found ${tournamentMatches.length} matches in ${TOURNAMENT_NAME}`
+        );
+
+        // Group actual tournament matches by round.
+        const matchesByRound = {};
+
+        tournamentMatches.forEach(match => {
+            const roundValue = match.round ?? 1;
+            const roundNumber =
+                parseInt(String(roundValue).replace(/\D/g, ''), 10) || 1;
+
+            if (!matchesByRound[roundNumber]) {
+                matchesByRound[roundNumber] = 0;
+            }
+
+            matchesByRound[roundNumber]++;
+        });
+
+        // Get user's votes.
         const votesQuery = query(
             collection(db, 'votes'),
             where('userId', '==', userId)
         );
-        
+
         const snapshot = await getDocs(votesQuery);
-        
-        if (snapshot.empty) {
-            return {
-                overallPercentage: 0,
-                byRound: Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => ({
-                    round: parseInt(round),
-                    roundName: getRoundName(parseInt(round)),
-                    voted: 0,
-                    total,
-                    percentage: 0
-                })),
-                totalVotes: 0,
-                totalPossible: 60
-            };
-        }
-        
-        // Filter votes to only include current tournament matches
+
+        // Match IDs belonging to this tournament.
+        const tournamentMatchIds = new Set(
+            tournamentMatches.map(match => match.matchId || match.id)
+        );
+
+        // Only count votes for the current Arcane tournament.
         const tournamentVotes = snapshot.docs
             .map(doc => doc.data())
-            .filter(vote => {
-                // Check if this vote's match is in the current tournament
-                const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
-                return match !== undefined;
-            });
-        
-        console.log(`📊 User has ${tournamentVotes.length} votes in current tournament (${snapshot.size} total votes)`);
-        
-        // Count votes by round (only current tournament)
+            .filter(vote => tournamentMatchIds.has(vote.matchId));
+
+        // Count distinct matches voted in.
+        const votedMatchIds = new Set(
+            tournamentVotes.map(vote => vote.matchId)
+        );
+
+        // Count votes by round.
         const votesByRound = {};
+
         tournamentVotes.forEach(vote => {
-            const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
-            if (match) {
-                const round = match.round || vote.round || 1;
-                votesByRound[round] = (votesByRound[round] || 0) + 1;
-            }
+            const match = tournamentMatches.find(
+                item => (item.matchId || item.id) === vote.matchId
+            );
+
+            if (!match) return;
+
+            const roundValue = match.round ?? vote.round ?? 1;
+            const roundNumber =
+                parseInt(String(roundValue).replace(/\D/g, ''), 10) || 1;
+
+            votesByRound[roundNumber] =
+                (votesByRound[roundNumber] || 0) + 1;
         });
-        
-        // Calculate participation by round
-        const byRound = Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => {
-            const voted = votesByRound[round] || 0;
-            const percentage = total > 0 ? Math.round((voted / total) * 100) : 0;
-            
-            return {
-                round: parseInt(round),
-                roundName: getRoundName(parseInt(round)),
-                voted,
-                total,
-                percentage
-            };
-        });
-        
-        // Calculate overall participation (current tournament only)
-        const totalPossible = Object.values(TOTAL_MATCHES_BY_ROUND).reduce((a, b) => a + b, 0);
-        const totalVotes = tournamentVotes.length;
-        const overallPercentage = Math.round((totalVotes / totalPossible) * 100);
-        
-        console.log('✅ Participation calculated:', {
-            overallPercentage,
-            totalVotes,
-            totalPossible,
-            byRound
-        });
-        
+
+        // Build round-by-round participation from the actual tournament.
+        const byRound = Object.keys(matchesByRound)
+            .map(Number)
+            .sort((a, b) => a - b)
+            .map(roundNumber => {
+                const total = matchesByRound[roundNumber];
+                const voted = votesByRound[roundNumber] || 0;
+                const percentage =
+                    total > 0
+                        ? Math.round((voted / total) * 100)
+                        : 0;
+
+                return {
+                    round: roundNumber,
+                    roundName: getRoundName(roundNumber),
+                    voted,
+                    total,
+                    percentage
+                };
+            });
+
+        const totalPossible = tournamentMatches.length;
+        const totalVotes = votedMatchIds.size;
+
+        const overallPercentage =
+            totalPossible > 0
+                ? Math.round((totalVotes / totalPossible) * 100)
+                : 0;
+
         return {
+            tournamentId: CURRENT_TOURNAMENT,
+            tournamentName: TOURNAMENT_NAME,
             overallPercentage,
             byRound,
             totalVotes,
             totalPossible
         };
-        
+
     } catch (error) {
-        console.error('❌ Error calculating participation:', error);
+        console.error('❌ Error calculating Arcane participation:', error);
+
         return {
+            tournamentId: ARCANE_CONFIG.tournamentId,
+            tournamentName: ARCANE_CONFIG.tournamentName,
             overallPercentage: 0,
             byRound: [],
             totalVotes: 0,
-            totalPossible: 60
+            totalPossible: 0
         };
     }
 }
@@ -2632,7 +2669,9 @@ function renderParticipationTab() {
     const summary = document.getElementById('participationSummary');
     summary.innerHTML = `
         <div style="margin-bottom: 1rem;">
-            <strong style="color: #c8aa6e; font-size: 1.1rem;">🏆 2025 Worlds Anthems Championship</strong>
+<strong style="color: #c8aa6e; font-size: 1.1rem;">
+    🎬 ${participation.tournamentName}
+</strong>
         </div>
         <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches in this tournament.</p>
     `;
@@ -2665,26 +2704,28 @@ function renderParticipationTab() {
 
 async function loadUserPosts(userId, limitCount = null) {
     try {
-        const postsQuery = limitCount 
-            ? query(
-                collection(db, 'posts'),
-                where('userId', '==', userId),
-                orderBy('timestamp', 'desc'),
-                limit(limitCount)
-              )
-            : query(
-                collection(db, 'posts'),
-                where('userId', '==', userId),
-                orderBy('timestamp', 'desc')
-              );
-        
+        const postsQuery = query(
+            collection(db, 'posts'),
+            where('userId', '==', userId)
+        );
+
         const snapshot = await getDocs(postsQuery);
-        
-        return snapshot.docs.map(doc => ({
+
+        let posts = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
-        
+
+        posts.sort(
+            (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+        );
+
+        if (limitCount) {
+            posts = posts.slice(0, limitCount);
+        }
+
+        return posts;
+
     } catch (error) {
         console.error('❌ Error loading posts:', error);
         return [];

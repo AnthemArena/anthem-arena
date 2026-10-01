@@ -25,7 +25,7 @@ export async function initializeFeedWidgets() {
         loadPersonalRankCard(),
         loadRoundProgress(),
         loadFeaturedAchievement(),
-        loadTopSong(),
+        loadTopMoment(),
         // Existing widgets
         loadLiveMatches(),
         loadRecentActivity(),
@@ -178,7 +178,7 @@ async function loadPersonalRankCard() {
                         <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
                     </div>
                     <div class="progress-text">
-                        ${rank.currentXP.toLocaleString()} / ${rank.nextLevel.xpNeeded.toLocaleString()} XP
+                        ${(rank.currentXP || 0).toLocaleString()} / ${(rank.nextLevel?.xpNeeded || 0).toLocaleString()} XP
                     </div>
                 </div>
                 
@@ -547,7 +547,7 @@ async function loadFeaturedAchievement() {
 // ✅ NEW: TOP SONG WIDGET
 // ========================================
 
-async function loadTopSong() {
+async function loadTopMoment() {
     const container = document.getElementById('topSongWidget');
     if (!container) return;
     
@@ -573,21 +573,21 @@ async function loadTopSong() {
         }
         
         // Load music data for thumbnails
-        let musicVideos = [];
+        let momentData = [];
         try {
             const response = await fetch('/data/music-videos.json');
-            musicVideos = await response.json();
+            momentData = await response.json();
         } catch (error) {
-            console.warn('⚠️ Could not load music videos:', error);
+            console.warn('⚠️ Could not load moment data:', error);
         }
         
-        // Get matches for song data
+        // Get matches for moment data
         const { getAllMatches } = await import('./api-client.js');
         const allMatches = await getAllMatches();
         const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
         
-        // Count song votes
-        const songCounts = {};
+        // Count moment votes
+        const momentCounts = {};
         
         snapshot.docs.forEach(docSnap => {
             const vote = docSnap.data();
@@ -595,47 +595,47 @@ async function loadTopSong() {
             
             if (!match) return;
             
-            const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
-            if (!votedSong) return;
+            const votedMoment = vote.choice === 'song1' ? match.song1 : match.song2;
+            if (!votedMoment) return;
             
-            const songId = votedSong.id;
+            const momentId = votedMoment.id;
             
-            if (!songCounts[songId]) {
-                const songData = musicVideos.find(v => v.id === songId || v.videoId === votedSong.videoId);
+            if (!momentCounts[momentId]) {
+                const data = momentData.find(v => v.id === momentId || v.videoId === votedMoment.videoId);
                 
-                songCounts[songId] = {
-                    id: songId,
-                    name: votedSong.shortTitle || votedSong.title,
-                    artist: votedSong.artist,
-                    videoId: votedSong.videoId,
-                    thumbnail: songData?.videoId 
-                        ? `https://img.youtube.com/vi/${songData.videoId}/mqdefault.jpg`
+                momentCounts[momentId] = {
+                    id: momentId,
+                    name: votedMoment.shortTitle || votedMoment.title,
+                    character: votedMoment.artist || votedMoment.character,
+                    videoId: votedMoment.videoId,
+                    thumbnail: data?.videoId 
+                        ? `https://img.youtube.com/vi/${data.videoId}/mqdefault.jpg`
                         : null,
                     count: 0
                 };
             }
             
-            songCounts[songId].count++;
+            momentCounts[momentId].count++;
         });
         
-        // Get top song
-        const topSong = Object.values(songCounts)
+        // Get top moment
+        const topMoment = Object.values(momentCounts)
             .sort((a, b) => b.count - a.count)[0];
         
-        if (!topSong) {
+        if (!topMoment) {
             container.style.display = 'none';
             return;
         }
         
         container.innerHTML = `
-            <div class="top-song-card" onclick="window.open('https://youtube.com/watch?v=${topSong.videoId}', '_blank')">
+            <div class="top-song-card" onclick="window.open('https://youtube.com/watch?v=${topMoment.videoId}', '_blank')">
                 <div class="song-widget-header">
-                    <i class="fa-solid fa-music"></i>
-                    <span>Your Top Song</span>
+                    <i class="fa-solid fa-film"></i>
+                    <span>Your Top Moment</span>
                 </div>
-                ${topSong.thumbnail ? `
+                ${topMoment.thumbnail ? `
                     <div class="song-thumbnail-container">
-                        <img src="${topSong.thumbnail}" alt="${topSong.name}" class="song-thumbnail">
+                        <img src="${topMoment.thumbnail}" alt="${topMoment.name}" class="song-thumbnail">
                         <div class="play-overlay">
                             <i class="fa-solid fa-play"></i>
                         </div>
@@ -644,15 +644,15 @@ async function loadTopSong() {
                 <div class="song-info">
                     <div class="song-medal">🥇</div>
                     <div class="song-details">
-                        <div class="song-title">${topSong.name}</div>
-                        <div class="song-artist">${topSong.artist}</div>
-                        <div class="song-votes">${topSong.count} ${topSong.count === 1 ? 'vote' : 'votes'}</div>
+                        <div class="song-title">${topMoment.name}</div>
+                        <div class="song-artist">${topMoment.character}</div>
+                        <div class="song-votes">${topMoment.count} ${topMoment.count === 1 ? 'vote' : 'votes'}</div>
                     </div>
                 </div>
             </div>
         `;
         
-        console.log('✅ Top song loaded');
+        console.log('✅ Top moment loaded');
         
     } catch (error) {
         console.error('❌ Error loading top song:', error);
@@ -726,7 +726,7 @@ function transformToMatchCardFormat(apiMatch) {
         
         competitor1: {
             seed: apiMatch.song1?.seed || 1,
-            name: apiMatch.song1?.shortTitle || apiMatch.song1?.title || 'Song 1',
+            name: apiMatch.song1?.shortTitle || apiMatch.song1?.title || 'Moment 1',
             source: apiMatch.song1?.artist || 'Artist',
             videoId: apiMatch.song1?.videoId,
             votes: apiMatch.song1?.votes || 0,
@@ -736,7 +736,7 @@ function transformToMatchCardFormat(apiMatch) {
         
         competitor2: {
             seed: apiMatch.song2?.seed || 2,
-            name: apiMatch.song2?.shortTitle || apiMatch.song2?.title || 'Song 2',
+            name: apiMatch.song2?.shortTitle || apiMatch.song2?.title || 'Moment 2',
             source: apiMatch.song2?.artist || 'Artist',
             videoId: apiMatch.song2?.videoId,
             votes: apiMatch.song2?.votes || 0,
@@ -754,16 +754,19 @@ async function loadRecentActivity() {
     const container = document.getElementById('recentActivityWidget');
     
     try {
-        // Fetch recent activity
+        // ✅ Fetch recent activity without composite index requirement
+        // Query by timestamp only, filter private entries client-side
         const activityQuery = query(
             collection(db, 'activity'),
-            where('isPublic', '!=', false),
             orderBy('timestamp', 'desc'),
-            limit(5)
+            limit(10)
         );
         
         const snapshot = await getDocs(activityQuery);
-        const activities = snapshot.docs.map(doc => doc.data());
+        const activities = snapshot.docs
+            .map(doc => doc.data())
+            .filter(a => a.isPublic !== false)
+            .slice(0, 5);
         
         if (activities.length === 0) {
             container.innerHTML = '<p class="widget-loading">No recent activity</p>';

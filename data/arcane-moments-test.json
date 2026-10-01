@@ -1,0 +1,54 @@
+[
+  {
+    "id": "powders-big-jump",
+    "title": "Powder's Big Jump",
+    "shortTitle": "Powder's Big Jump",
+    "slug": "powders-big-jump",
+    "episode": 1,
+    "videoId": "HB1jH2GOV2s",
+    "category": "character",
+    "characters": ["Powder"],
+    "description": "Powder takes a leap of faith during the heist, determined to prove she can keep up with Vi and the others.",
+    "year": 2021,
+    "seed": 1
+  },
+  {
+    "id": "hextech-crystal-explosion",
+    "title": "The Hextech Crystal Explosion",
+    "shortTitle": "The Hextech Crystal Explosion",
+    "slug": "hextech-crystal-explosion",
+    "episode": 1,
+    "videoId": "jOYnp2JyGzU",
+    "category": "story",
+    "characters": ["Powder", "Vi"],
+    "description": "Powder's mistake with the stolen Hextech crystals causes a devastating explosion in Jayce's home.",
+    "year": 2021,
+    "seed": 2
+  },
+  {
+    "id": "the-alley-brawl",
+    "title": "The Alley Brawl",
+    "shortTitle": "The Alley Brawl",
+    "slug": "the-alley-brawl",
+    "episode": 1,
+    "videoId": "JcPc6Mbcvt0",
+    "category": "action",
+    "characters": ["Vi"],
+    "description": "Deckard's gang picks the wrong people to mess with as Vi takes on the entire crew in a brutal Zaun alley fight.",
+    "year": 2021,
+    "seed": 3
+  },
+  {
+    "id": "escape-from-topside",
+    "title": "Escape From Topside",
+    "shortTitle": "Escape From Topside",
+    "slug": "escape-from-topside",
+    "episode": 1,
+    "videoId": "n7v3c5g7Zow",
+    "category": "action",
+    "characters": ["Vi", "Powder", "Mylo", "Claggor"],
+    "description": "Vi, Powder, Mylo and Claggor race to escape Piltover after the heist goes disastrously wrong.",
+    "year": 2021,
+    "seed": 4
+  }
+]

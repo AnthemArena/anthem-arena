@@ -21,1504 +21,1511 @@
     "textShadow": "0 3px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 1)"
   },
   "alerts": {
-  "danger": {
-    "messages": [
-      {
-        "condition": { "voteDiff": { "gte": 50 } },
-        "message": "🎯 Down fifty votes. This requires immediate action. \"{songTitle}\" deserves better than this.",
-        "cta": "Take the shot — vote NOW. 🔫"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 30 } },
-        "message": "🔫 Thirty votes behind. The situation is critical, but not irreversible. Let's turn this around.",
-        "cta": "Aim true and vote. 🎯"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 20 } },
-        "message": "💼 Twenty votes down. I've seen worse odds turn around with the right intervention.",
-        "cta": "Make your vote count. 🔫"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 15 } },
-        "message": "⚖️ Losing by fifteen. Not ideal, but we can still secure victory with precision.",
-        "cta": "Line up your shot. 🎯"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 10 } },
-        "message": "🎯 Ten votes behind. A tactical disadvantage, but entirely recoverable.",
-        "cta": "Vote with purpose. 💼"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 5 } },
-        "message": "🔫 Only five votes down. One well-placed shot can change everything.",
-        "cta": "Close the gap now. 🎯"
-      },
-      {
-        "condition": "default",
-        "message": "💼 Down by {voteDiff}. Let's assess the situation and respond accordingly.",
-        "cta": "Strategic vote needed. 🎯"
-      }
-    ]
-  },
-
-  "nailbiter": {
-    "messages": [
-      {
-        "condition": { "voteDiff": { "eq": 0 } },
-        "message": "🎯 PERFECTLY TIED. 50-50. One vote decides the entire outcome.",
-        "cta": "BE THE DECIDING SHOT. 🔫"
-      },
-      {
-        "condition": { "voteDiff": { "eq": 1 } },
-        "message": "🔫 ONE SINGLE VOTE separates victory from defeat. Precision matters now more than ever.",
-        "cta": "Take the shot. 🎯"
-      },
-      {
-        "condition": { "voteDiff": { "lte": 3 } },
-        "message": "⚖️ Only {voteDiff} votes apart. This is what we call a nail-biter. Every vote is critical.",
-        "cta": "Make it count. 💼"
-      },
-      {
-        "condition": "default",
-        "message": "💼 Too close at {voteDiff} votes. Time for a precision strike.",
-        "cta": "Line up the shot. 🎯"
-      }
-    ]
-  },
-
-  "winning": {
-    "messages": [
-      {
-        "condition": { "userPct": { "gte": 85 } },
-        "message": "🎯 {userPct}% and dominant. \"{songTitle}\" is executing flawlessly.",
-        "cta": "Maintain pressure. 🔫"
-      },
-      {
-        "condition": { "userPct": { "gte": 75 } },
-        "message": "🔫 Leading at {userPct}%. Excellent positioning. Let's keep this advantage.",
-        "cta": "Stay focused. 🎯"
-      },
-      {
-        "condition": { "userPct": { "gte": 70 } },
-        "message": "💼 Seventy percent. Strong performance. Don't let up now.",
-        "cta": "Press the advantage. 🎯"
-      },
-      {
-        "condition": { "userPct": { "gte": 65 } },
-        "message": "⚖️ Leading at {userPct}%. They're vulnerable. One more push secures this.",
-        "cta": "Finish strong. 🔫"
-      },
-      {
-        "condition": "default",
-        "message": "🎯 Ahead at {userPct}%. Good position, but remain vigilant. Leads can shift.",
-        "cta": "Stay sharp. 💼"
-      }
-    ]
-  },
-
-  "comeback": {
-    "messages": [
-      {
-        "condition": { "voteDiff": { "gte": 30 } },
-        "message": "🔫 DOWN THIRTY and we turned it around?! That's what I call tactical brilliance.",
-        "cta": "COMEBACK ACHIEVED. 🎯"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 15 } },
-        "message": "🎯 Fifteen votes down, now we're winning. Precisely executed.",
-        "cta": "Textbook comeback. 💼"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 10 } },
-        "message": "💼 Ten-vote deficit erased. This is how you mount a proper comeback.",
-        "cta": "Well done. 🎯"
-      },
-      {
-        "condition": { "voteDiff": { "gte": 5 } },
-        "message": "⚖️ Down five, now leading. That's the kind of turnaround I like to see.",
-        "cta": "Momentum shifts. 🔫"
-      },
-      {
-        "condition": "default",
-        "message": "🎯 Situation reversed. \"{songTitle}\" just proved everyone wrong.",
-        "cta": "Never underestimate. 💼"
-      }
-    ]
-  },
-
-  "ally": {
-    "messages": [
-      "💼 {username} voted with us. Excellent judgment on their part.",
-      "🎯 {username} chose \"{songTitle}\" as well. We're aligned on this one.",
-      "🔫 {username} has impeccable taste. Same target, same result.",
-"⚖️ {username} and I are aligned on this one. Good instincts.",
-      "🎯 {username} made the right call. We're on the same side here.",
-      "💼 {username} demonstrates sound judgment with this vote.",
-      "🔫 {username} knows quality when they see it. Well chosen.",
-      "🎯 {username} selected wisely. Together, we're formidable.",
-      "⚖️ {username} voted correctly. I appreciate competent allies."
-    ],
-    "details": [
-      "Strong allies make for stronger victories.",
-      "When good judgment aligns, everyone benefits.",
-      "I appreciate working with someone who understands quality.",
-      "Two precise votes are better than one.",
-      "This is what effective teamwork looks like.",
-      "Your instincts are commendable.",
-      "Together, we form a rather impressive coalition."
-    ],
-    "buttons": [
-      "Well Chosen. 🎯",
-      "Aligned. 💼",
-      "Good Judgment. 🔫",
-      "Partners. ⚖️",
-      "Agreed. 🎯",
-      "Sound Decision. 💼",
-      "Let's Win. 🔫"
-    ]
-  },
-
-  "rival": {
-    "messages": [
-      "⚖️ {username} voted against us. An... interesting choice on their part.",
-      "🎯 {username} picked \"{theirSong}\"? We'll have to respectfully disagree.",
-      "🔫 {username} thinks they have better judgment? We'll see about that.",
-      "💼 {username} chose differently. Fine. Let's settle this properly.",
-      "🎯 {username} voted for the opposition. Challenge accepted.",
-      "⚖️ {username} stands in our way. I respect the courage, not the choice.",
-      "🔫 {username}'s decision is questionable at best. Time to prove them wrong.",
-      "💼 {username} has made their position clear. So have we."
-    ],
-    "details": [
-      "Everyone's entitled to their opinion. Even the wrong ones.",
-"Some people's judgment is still... developing.",
-      "They'll learn from this mistake eventually.",
-      "I respect opposing views. Doesn't mean they're correct.",
-      "Let's show them what a winning choice looks like.",
-      "Competition makes victory that much sweeter.",
-      "They chose their path. We chose better."
-    ],
-    "buttons": [
-      "Challenge Accepted. 🎯",
-      "Prove Them Wrong. 🔫",
-      "Respectfully Disagree. 💼",
-      "Let's Win. ⚖️",
-      "Game On. 🎯",
-      "Show Them. 🔫",
-      "Justice Prevails. 💼"
-    ]
-  },
-
-  "streak-ally-10": {
-    "messages": [
-      "💼🎯 TEN consecutive matches with {username}. This is what I call a reliable partnership.",
-      "🔫 Ten perfect agreements with {username}. Our judgment aligns remarkably well.",
-      "🎯 {username} and I have voted the same way ten times running. Impressive synchronization.",
-      "⚖️ A ten-match streak with {username}. This partnership is proving quite effective.",
-      "💼 Ten times we've agreed, {username}. You have excellent instincts."
-    ],
-    "details": [
-      "This level of consistency is rare and valuable.",
-      "Ten matches without deviation. That's proper teamwork.",
-      "Our tactical alignment is becoming legendary.",
-      "You're proving to be my most reliable ally.",
-      "This partnership could win entire tournaments."
-    ],
-    "buttons": [
-      "Perfect Partnership. 🎯",
-      "Ten Strong. 💼",
-      "Reliable Allies. 🔫",
-      "Keep It Up. ⚖️",
-      "To Eleven. 🎯"
-    ]
-  },
-
-  "streak-ally-20": {
-    "messages": [
-      "🎯💼 {streakCount} PERFECT MATCHES. {username}, this partnership is unprecedented.",
-      "🔫 Twenty consecutive agreements with {username}. This is extraordinary teamwork.",
-      "⚖️ {streakCount} times aligned. {username}, our judgment is perfectly synchronized.",
-      "💼 TWENTY matches of perfect agreement. {username}, you're exceptional.",
-      "🎯 {streakCount} straight matches together. {username}, this is partnership excellence."
-    ],
-    "details": [
-      "Twenty matches of perfect alignment. Statistically remarkable.",
-      "This is the kind of partnership that defines championships.",
-      "Our combined judgment is becoming legendary.",
-      "I've never had an ally this reliable.",
-      "This streak will be studied for years to come."
-    ],
-    "buttons": [
-      "Legendary Partners. 🎯",
-      "Twenty Strong. 🔫",
-      "Unmatched. 💼",
-      "To Twenty-One. ⚖️",
-      "Excellence. 🎯"
-    ]
-  },
-
-  "streak-rival-10": {
-    "messages": [
-      "⚖️🎯 TEN battles with {username}. This rivalry is becoming quite notable.",
-      "🔫 Ten consecutive disagreements with {username}. Respect, but you're still wrong.",
-      "🎯 A ten-match opposition with {username}. This is personal now.",
-      "💼 Ten clashes with {username}. I respect your persistence, if not your choices.",
-      "⚖️ Ten times opposed, {username}. This rivalry is one for the records."
-    ],
-    "details": [
-      "This rivalry is the kind that makes tournaments memorable.",
-      "Ten rounds of opposition. Neither of us yields.",
-      "Your persistence is admirable. Your choices, less so.",
-      "You're formidable opposition. Still wrong, but formidable.",
-      "This competition is bringing out the best in both of us."
-    ],
-    "buttons": [
-      "Round Eleven. 🎯",
-      "Rivalry Continues. ⚖️",
-      "Prove It Again. 🔫",
-      "Challenge On. 💼",
-      "Let's Settle This. 🎯"
-    ]
-  },
-
-  "streak-rival-20": {
-    "messages": [
-      "🎯⚖️ {streakCount} CONSECUTIVE BATTLES with {username}. This is legendary rivalry.",
-      "🔫 TWENTY times we've opposed each other, {username}. This feud is historic.",
-      "💼 {streakCount} matches of pure competition. {username}, you're my greatest rival.",
-      "⚖️ Twenty rounds of tactical warfare with {username}. Neither of us surrenders.",
-      "🎯 {streakCount} battles and counting. {username}, this rivalry is eternal."
-    ],
-    "details": [
-      "Twenty battles. Neither of us backing down. Extraordinary.",
-      "This rivalry will be analyzed in tactical journals.",
-      "We're beyond simple opposition now. This is legendary.",
-      "Every enforcer dreams of rivalry this fierce.",
-      "History will remember this competition."
-    ],
-    "buttons": [
-      "Eternal Rivals. 🎯",
-      "Twenty-One. 🔫",
-      "Historic. ⚖️",
-      "Never Ends. 💼",
-      "To Infinity. 🎯"
-    ]
-  },
-
-  "novotes": {
-    "messages": [
-      "🎯 No votes cast yet on \"{song1}\" vs \"{song2}\". An untouched case, if you will.",
-      "💼 Zero votes. This match is waiting for someone to make the first call.",
-      "🔫 Nobody's voted yet? Perfect. I prefer being first on the scene.",
-      "⚖️ No votes on this matchup. Time to establish the standard."
-    ],
-    "buttons": [
-      "First Vote. 🎯",
-      "Open the Case. 💼",
-      "Set the Standard. 🔫",
-      "Take the Shot. ⚖️"
-    ]
-  },
-
-  "round-opening": {
-    "messages": [
-      "🎯 ROUND {round} IS ACTIVE. {matchCount} new cases require your attention.",
-      "💼 Round {round} begins now. {matchCount} matches await proper judgment.",
-      "🔫 Round {round} just opened with {matchCount} matchups. Time to get to work.",
-      "⚖️ {matchCount} fresh battles in Round {round}. Let's handle this professionally.",
-      "🎯 Round {round} is live. {matchCount} matches need decisive votes."
-    ],
-    "buttons": [
-      "Begin Round {round}. 🎯",
-      "To Work. 💼",
-      "Analyze Matches. 🔫",
-      "Cast Judgment. ⚖️",
-      "Let's Proceed. 🎯"
-    ]
-  },
-
-  "match-won": {
-    "messages": [
-      "🎯 VICTORY. \"{songTitle}\" advances. Justice served.",
-      "💼 We won. \"{songTitle}\" moves forward. Excellent outcome.",
-      "🔫 That's how it's done. \"{songTitle}\" secured the win.",
-      "⚖️ \"{songTitle}\" prevails. Proper judgment was served.",
-      "🎯 Case closed. \"{songTitle}\" is heading to the next round.",
-      "💼 Success. \"{songTitle}\" earned this victory fairly."
-    ],
-    "details": [
-      "Your vote contributed to justice. +{xp} XP",
-      "That's what a proper victory looks like.",
-      "One match secured. More ahead.",
-      "Well executed. The right choice won."
-    ],
-    "buttons": [
-      "Well Done. 🎯",
-      "Next Case. 💼",
-      "Continue. 🔫",
-      "Onward. ⚖️"
-    ]
-  },
-
-  "match-lost": {
-    "messages": [
-      "⚖️ \"{songTitle}\" didn't win. Unfortunate, but we move forward.",
-      "🎯 We lost this one. \"{songTitle}\" fought well, but it wasn't enough.",
-      "💼 \"{songTitle}\" didn't make it. Sometimes the outcome isn't what we hoped.",
-      "🔫 They took this round. \"{songTitle}\" gave it a proper effort.",
-      "⚖️ \"{songTitle}\" is eliminated. Not the result we wanted.",
-      "🎯 Lost this battle. \"{songTitle}\" went down with dignity.",
-      "💼 \"{songTitle}\" didn't advance. We'll do better next time."
-    ],
-    "details": [
-      "You can't win every case. But you participated honorably. +{xp} XP",
-      "Even the best enforcers face setbacks.",
-      "We learn from losses and move forward.",
-      "That's how competition works. You win some, you lose some."
-    ],
-    "buttons": [
-      "Move Forward. 🎯",
-      "Next Match. 💼",
-      "Keep Going. 🔫",
-      "Onward. ⚖️"
-    ]
-  },
-
-  "match-tied-alert": {
-    "messages": [
-      {
-        "condition": { "winner": "{songTitle}" },
-        "message": [
-          "🎯 PERFECT TIE — 50-50. But YOUR song takes it on seeding. Victory by the rules.",
-          "⚖️ Dead even, but {winner} wins by tiebreaker. Justice prevails.",
-          "💼 Tied score, but {winner} advances on higher seed. That's protocol."
-        ],
-        "detail": [
-          "A tie broken in your favor. I'll take it.",
-          "Victory by procedure. Legitimate nonetheless."
-        ],
-        "cta": ["Rules Upheld. 🎯", "Victory Confirmed. ⚖️"]
-      },
-      {
-        "condition": "default",
-        "message": [
-          "⚖️ DEAD TIE — 50-50. But {winner} takes it on higher seeding.",
-          "🎯 Perfect split, but {winner} wins the tiebreaker. Those are the rules.",
-          "💼 Tied votes, {winner} advances by seed. Protocol is protocol."
-        ],
-        "detail": [
-          "The rules gave it to them. Fair is fair.",
-          "Lost on a technicality, but that's how justice works."
-        ],
-        "cta": ["Rules Applied. 🎯", "Next Case. 💼"]
-      }
-    ]
-  },
-
-  "factionAlerts": {
-    "match-won": {
+    "danger": {
       "messages": [
-        "🎯 TEAM CAITLYN SECURED VICTORY. {caitlynVotes} precise votes delivered.",
-        "💼 {caitlynVotes} Caitlyn voters showed up. Textbook teamwork.",
-        "🔫 Team Caitlyn: {caitlynVotes} votes strong. We don't miss.",
-        "⚖️ {caitlynPercent}% Team Caitlyn unity. Excellence achieved.",
-        "🎯 Our team delivered {caitlynVotes} votes with precision. Victory secured.",
-        "💼 Team Caitlyn brought {caitlynVotes} votes. Nobody outperforms us when we're focused."
-      ],
-      "details": [
-        "Your faction rank: #{yourFactionRank} out of {totalFactionVoters} Caitlyn voters. Excellent work. +{xp} XP",
-        "Ranked #{yourFactionRank} among {totalFactionVoters} Team Caitlyn members. Well done. +{xp} XP",
-        "You're #{yourFactionRank} of {totalFactionVoters} on Team Caitlyn. Keep it up. +{xp} XP"
-      ],
-      "buttons": [
-        "🎯 Team Victory.",
-        "💼 Check Rankings.",
-        "🔫 We Prevailed."
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "🎯 Down fifty votes. This requires immediate action. \"{momentTitle}\" deserves better than this.",
+          "cta": "Take the shot — vote NOW. 🔫"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "🔫 Thirty votes behind. The situation is critical, but not irreversible. Let's turn this around.",
+          "cta": "Aim true and vote. 🎯"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "💼 Twenty votes down. I've seen worse odds turn around with the right intervention.",
+          "cta": "Make your vote count. 🔫"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "⚖️ Losing by fifteen. Not ideal, but we can still secure victory with precision.",
+          "cta": "Line up your shot. 🎯"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "🎯 Ten votes behind. A tactical disadvantage, but entirely recoverable.",
+          "cta": "Vote with purpose. 💼"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "🔫 Only five votes down. One well-placed shot can change everything.",
+          "cta": "Close the gap now. 🎯"
+        },
+        {
+          "condition": "default",
+          "message": "💼 Down by {voteDiff}. Let's assess the situation and respond accordingly.",
+          "cta": "Strategic vote needed. 🎯"
+        }
       ]
     },
-
-    "match-lost": {
+    "nailbiter": {
       "messages": [
-        "⚖️ We lost with {caitlynVotes} votes. Not sufficient. We'll improve.",
-        "🎯 Only {caitlynVotes} Caitlyn votes? We need better turnout.",
-        "💼 Team Caitlyn gave {caitlynVotes} votes but came up short. Unfortunate.",
-        "🔫 {wrongPercent}% of Team Caitlyn went the other way. That's problematic.",
-        "⚖️ {caitlynVotes} votes from our side. Should have been more. Next time.",
-        "🎯 Team Caitlyn brought {caitlynVotes} votes, but it wasn't enough today."
-      ],
-      "details": [
-        "Your faction rank: #{yourFactionRank} of {totalFactionVoters}. You did your part. +{xp} XP",
-        "Ranked #{yourFactionRank} among {totalFactionVoters} Team Caitlyn voters. We'll regroup. +{xp} XP",
-        "#{yourFactionRank} of {totalFactionVoters} on our side. We'll come back stronger. +{xp} XP"
-      ],
-      "buttons": [
-        "🎯 Regroup.",
-        "💼 Next Match.",
-        "🔫 Analyze."
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "🎯 PERFECTLY TIED. 50-50. One vote decides the entire outcome.",
+          "cta": "BE THE DECIDING SHOT. 🔫"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "🔫 ONE SINGLE VOTE separates victory from defeat. Precision matters now more than ever.",
+          "cta": "Take the shot. 🎯"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "⚖️ Only {voteDiff} votes apart. This is what we call a nail-biter. Every vote is critical.",
+          "cta": "Make it count. 💼"
+        },
+        {
+          "condition": "default",
+          "message": "💼 Too close at {voteDiff} votes. Time for a precision strike.",
+          "cta": "Line up the shot. 🎯"
+        }
       ]
     },
-
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "🎯 {userPct}% and dominant. \"{momentTitle}\" is executing flawlessly.",
+          "cta": "Maintain pressure. 🔫"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "🔫 Leading at {userPct}%. Excellent positioning. Let's keep this advantage.",
+          "cta": "Stay focused. 🎯"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "💼 Seventy percent. Strong performance. Don't let up now.",
+          "cta": "Press the advantage. 🎯"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "⚖️ Leading at {userPct}%. They're vulnerable. One more push secures this.",
+          "cta": "Finish strong. 🔫"
+        },
+        {
+          "condition": "default",
+          "message": "🎯 Ahead at {userPct}%. Good position, but remain vigilant. Leads can shift.",
+          "cta": "Stay sharp. 💼"
+        }
+      ]
+    },
     "comeback": {
       "messages": [
-        "🔫 FROM {oldPercent}% TO {newPercent}%! Team Caitlyn executed a perfect comeback!",
-        "🎯 {caitlynVoteSwing} last-minute Caitlyn votes turned this around! Tactical excellence!",
-        "💼 We were LOSING and Team Caitlyn brought {caitlynVoteSwing} clutch votes! Remarkable!",
-        "⚖️ {oldPercent}% to {newPercent}% — Team Caitlyn never gives up!",
-        "🎯 COMEBACK COMPLETE! {caitlynVoteSwing} Caitlyn voters secured this turnaround!"
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "🔫 DOWN THIRTY and we turned it around?! That's what I call tactical brilliance.",
+          "cta": "COMEBACK ACHIEVED. 🎯"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "🎯 Fifteen votes down, now we're winning. Precisely executed.",
+          "cta": "Textbook comeback. 💼"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "💼 Ten-vote deficit erased. This is how you mount a proper comeback.",
+          "cta": "Well done. 🎯"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "⚖️ Down five, now leading. That's the kind of turnaround I like to see.",
+          "cta": "Momentum shifts. 🔫"
+        },
+        {
+          "condition": "default",
+          "message": "🎯 Situation reversed. \"{momentTitle}\" just proved everyone wrong.",
+          "cta": "Never underestimate. 💼"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "💼 {username} voted with us. Excellent judgment on their part.",
+        "🎯 {username} chose \"{momentTitle}\" as well. We're aligned on this one.",
+        "🔫 {username} has impeccable taste. Same target, same result.",
+        "⚖️ {username} and I are aligned on this one. Good instincts.",
+        "🎯 {username} made the right call. We're on the same side here.",
+        "💼 {username} demonstrates sound judgment with this vote.",
+        "🔫 {username} knows quality when they see it. Well chosen.",
+        "🎯 {username} selected wisely. Together, we're formidable.",
+        "⚖️ {username} voted correctly. I appreciate competent allies."
       ],
       "details": [
-        "Strategic turnaround. Team Caitlyn: +{caitlynVoteSwing} votes in the final stretch. +{xp} XP",
-        "You're #{yourFactionRank} of {totalFactionVoters} Caitlyn voters who made the comeback happen. +{xp} XP"
+        "Strong allies make for stronger victories.",
+        "When good judgment aligns, everyone benefits.",
+        "I appreciate working with someone who understands quality.",
+        "Two precise votes are better than one.",
+        "This is what effective teamwork looks like.",
+        "Your instincts are commendable.",
+        "Together, we form a rather impressive coalition."
       ],
       "buttons": [
-        "🔫 Excellence.",
-        "🎯 Replay That.",
-        "💼 Tactical Win."
+        "Well Chosen. 🎯",
+        "Aligned. 💼",
+        "Good Judgment. 🔫",
+        "Partners. ⚖️",
+        "Agreed. 🎯",
+        "Sound Decision. 💼",
+        "Let's Win. 🔫"
       ]
+    },
+    "rival": {
+      "messages": [
+        "⚖️ {username} voted against us. An... interesting choice on their part.",
+        "🎯 {username} picked \"{theirMoment}\"? We'll have to respectfully disagree.",
+        "🔫 {username} thinks they have better judgment? We'll see about that.",
+        "💼 {username} chose differently. Fine. Let's settle this properly.",
+        "🎯 {username} voted for the opposition. Challenge accepted.",
+        "⚖️ {username} stands in our way. I respect the courage, not the choice.",
+        "🔫 {username}'s decision is questionable at best. Time to prove them wrong.",
+        "💼 {username} has made their position clear. So have we."
+      ],
+      "details": [
+        "Everyone's entitled to their opinion. Even the wrong ones.",
+        "Some people's judgment is still... developing.",
+        "They'll learn from this mistake eventually.",
+        "I respect opposing views. Doesn't mean they're correct.",
+        "Let's show them what a winning choice looks like.",
+        "Competition makes victory that much sweeter.",
+        "They chose their path. We chose better."
+      ],
+      "buttons": [
+        "Challenge Accepted. 🎯",
+        "Prove Them Wrong. 🔫",
+        "Respectfully Disagree. 💼",
+        "Let's Win. ⚖️",
+        "Game On. 🎯",
+        "Show Them. 🔫",
+        "Justice Prevails. 💼"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "💼🎯 TEN consecutive matches with {username}. This is what I call a reliable partnership.",
+        "🔫 Ten perfect agreements with {username}. Our judgment aligns remarkably well.",
+        "🎯 {username} and I have voted the same way ten times running. Impressive synchronization.",
+        "⚖️ A ten-match streak with {username}. This partnership is proving quite effective.",
+        "💼 Ten times we've agreed, {username}. You have excellent instincts."
+      ],
+      "details": [
+        "This level of consistency is rare and valuable.",
+        "Ten matches without deviation. That's proper teamwork.",
+        "Our tactical alignment is becoming legendary.",
+        "You're proving to be my most reliable ally.",
+        "This partnership could win entire tournaments."
+      ],
+      "buttons": [
+        "Perfect Partnership. 🎯",
+        "Ten Strong. 💼",
+        "Reliable Allies. 🔫",
+        "Keep It Up. ⚖️",
+        "To Eleven. 🎯"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "🎯💼 {streakCount} PERFECT MATCHES. {username}, this partnership is unprecedented.",
+        "🔫 Twenty consecutive agreements with {username}. This is extraordinary teamwork.",
+        "⚖️ {streakCount} times aligned. {username}, our judgment is perfectly synchronized.",
+        "💼 TWENTY matches of perfect agreement. {username}, you're exceptional.",
+        "🎯 {streakCount} straight matches together. {username}, this is partnership excellence."
+      ],
+      "details": [
+        "Twenty matches of perfect alignment. Statistically remarkable.",
+        "This is the kind of partnership that defines championships.",
+        "Our combined judgment is becoming legendary.",
+        "I've never had an ally this reliable.",
+        "This streak will be studied for years to come."
+      ],
+      "buttons": [
+        "Legendary Partners. 🎯",
+        "Twenty Strong. 🔫",
+        "Unmatched. 💼",
+        "To Twenty-One. ⚖️",
+        "Excellence. 🎯"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "⚖️🎯 TEN battles with {username}. This rivalry is becoming quite notable.",
+        "🔫 Ten consecutive disagreements with {username}. Respect, but you're still wrong.",
+        "🎯 A ten-match opposition with {username}. This is personal now.",
+        "💼 Ten clashes with {username}. I respect your persistence, if not your choices.",
+        "⚖️ Ten times opposed, {username}. This rivalry is one for the records."
+      ],
+      "details": [
+        "This rivalry is the kind that makes tournaments memorable.",
+        "Ten rounds of opposition. Neither of us yields.",
+        "Your persistence is admirable. Your choices, less so.",
+        "You're formidable opposition. Still wrong, but formidable.",
+        "This competition is bringing out the best in both of us."
+      ],
+      "buttons": [
+        "Round Eleven. 🎯",
+        "Rivalry Continues. ⚖️",
+        "Prove It Again. 🔫",
+        "Challenge On. 💼",
+        "Let's Settle This. 🎯"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "🎯⚖️ {streakCount} CONSECUTIVE BATTLES with {username}. This is legendary rivalry.",
+        "🔫 TWENTY times we've opposed each other, {username}. This feud is historic.",
+        "💼 {streakCount} matches of pure competition. {username}, you're my greatest rival.",
+        "⚖️ Twenty rounds of tactical warfare with {username}. Neither of us surrenders.",
+        "🎯 {streakCount} battles and counting. {username}, this rivalry is eternal."
+      ],
+      "details": [
+        "Twenty battles. Neither of us backing down. Extraordinary.",
+        "This rivalry will be analyzed in tactical journals.",
+        "We're beyond simple opposition now. This is legendary.",
+        "Every enforcer dreams of rivalry this fierce.",
+        "History will remember this competition."
+      ],
+      "buttons": [
+        "Eternal Rivals. 🎯",
+        "Twenty-One. 🔫",
+        "Historic. ⚖️",
+        "Never Ends. 💼",
+        "To Infinity. 🎯"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "🎯 No votes cast yet on \"{moment1}\" vs \"{moment2}\". An untouched case, if you will.",
+        "💼 Zero votes. This match is waiting for someone to make the first call.",
+        "🔫 Nobody's voted yet? Perfect. I prefer being first on the scene.",
+        "⚖️ No votes on this matchup. Time to establish the standard."
+      ],
+      "buttons": [
+        "First Vote. 🎯",
+        "Open the Case. 💼",
+        "Set the Standard. 🔫",
+        "Take the Shot. ⚖️"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "🎯 ROUND {round} IS ACTIVE. {matchCount} new cases require your attention.",
+        "💼 Round {round} begins now. {matchCount} matches await proper judgment.",
+        "🔫 Round {round} just opened with {matchCount} matchups. Time to get to work.",
+        "⚖️ {matchCount} fresh battles in Round {round}. Let's handle this professionally.",
+        "🎯 Round {round} is live. {matchCount} matches need decisive votes."
+      ],
+      "buttons": [
+        "Begin Round {round}. 🎯",
+        "To Work. 💼",
+        "Analyze Matches. 🔫",
+        "Cast Judgment. ⚖️",
+        "Let's Proceed. 🎯"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "🎯 VICTORY. \"{momentTitle}\" advances. Justice served.",
+        "💼 We won. \"{momentTitle}\" moves forward. Excellent outcome.",
+        "🔫 That's how it's done. \"{momentTitle}\" secured the win.",
+        "⚖️ \"{momentTitle}\" prevails. Proper judgment was served.",
+        "🎯 Case closed. \"{momentTitle}\" is heading to the next round.",
+        "💼 Success. \"{momentTitle}\" earned this victory fairly."
+      ],
+      "details": [
+        "Your vote contributed to justice. +{xp} XP",
+        "That's what a proper victory looks like.",
+        "One match secured. More ahead.",
+        "Well executed. The right choice won."
+      ],
+      "buttons": [
+        "Well Done. 🎯",
+        "Next Case. 💼",
+        "Continue. 🔫",
+        "Onward. ⚖️"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "⚖️ \"{momentTitle}\" didn't win. Unfortunate, but we move forward.",
+        "🎯 We lost this one. \"{momentTitle}\" fought well, but it wasn't enough.",
+        "💼 \"{momentTitle}\" didn't make it. Sometimes the outcome isn't what we hoped.",
+        "🔫 They took this round. \"{momentTitle}\" gave it a proper effort.",
+        "⚖️ \"{momentTitle}\" is eliminated. Not the result we wanted.",
+        "🎯 Lost this battle. \"{momentTitle}\" went down with dignity.",
+        "💼 \"{momentTitle}\" didn't advance. We'll do better next time."
+      ],
+      "details": [
+        "You can't win every case. But you participated honorably. +{xp} XP",
+        "Even the best enforcers face setbacks.",
+        "We learn from losses and move forward.",
+        "That's how competition works. You win some, you lose some."
+      ],
+      "buttons": [
+        "Move Forward. 🎯",
+        "Next Match. 💼",
+        "Keep Going. 🔫",
+        "Onward. ⚖️"
+      ]
+    },
+    "match-tied-alert": {
+      "messages": [
+        {
+          "condition": {
+            "winner": "{momentTitle}"
+          },
+          "message": [
+            "🎯 PERFECT TIE — 50-50. But YOUR moment takes it on seeding. Victory by the rules.",
+            "⚖️ Dead even, but {winner} wins by tiebreaker. Justice prevails.",
+            "💼 Tied score, but {winner} advances on higher seed. That's protocol."
+          ],
+          "detail": [
+            "A tie broken in your favor. I'll take it.",
+            "Victory by procedure. Legitimate nonetheless."
+          ],
+          "cta": [
+            "Rules Upheld. 🎯",
+            "Victory Confirmed. ⚖️"
+          ]
+        },
+        {
+          "condition": "default",
+          "message": [
+            "⚖️ DEAD TIE — 50-50. But {winner} takes it on higher seeding.",
+            "🎯 Perfect split, but {winner} wins the tiebreaker. Those are the rules.",
+            "💼 Tied votes, {winner} advances by seed. Protocol is protocol."
+          ],
+          "detail": [
+            "The rules gave it to them. Fair is fair.",
+            "Lost on a technicality, but that's how justice works."
+          ],
+          "cta": [
+            "Rules Applied. 🎯",
+            "Next Case. 💼"
+          ]
+        }
+      ]
+    },
+    "factionAlerts": {
+      "match-won": {
+        "messages": [
+          "🎯 TEAM CAITLYN SECURED VICTORY. {caitlynVotes} precise votes delivered.",
+          "💼 {caitlynVotes} Caitlyn voters showed up. Textbook teamwork.",
+          "🔫 Team Caitlyn: {caitlynVotes} votes strong. We don't miss.",
+          "⚖️ {caitlynPercent}% Team Caitlyn unity. Excellence achieved.",
+          "🎯 Our team delivered {caitlynVotes} votes with precision. Victory secured.",
+          "💼 Team Caitlyn brought {caitlynVotes} votes. Nobody outperforms us when we're focused."
+        ],
+        "details": [
+          "Your faction rank: #{yourFactionRank} out of {totalFactionVoters} Caitlyn voters. Excellent work. +{xp} XP",
+          "Ranked #{yourFactionRank} among {totalFactionVoters} Team Caitlyn members. Well done. +{xp} XP",
+          "You're #{yourFactionRank} of {totalFactionVoters} on Team Caitlyn. Keep it up. +{xp} XP"
+        ],
+        "buttons": [
+          "🎯 Team Victory.",
+          "💼 Check Rankings.",
+          "🔫 We Prevailed."
+        ]
+      },
+      "match-lost": {
+        "messages": [
+          "⚖️ We lost with {caitlynVotes} votes. Not sufficient. We'll improve.",
+          "🎯 Only {caitlynVotes} Caitlyn votes? We need better turnout.",
+          "💼 Team Caitlyn gave {caitlynVotes} votes but came up short. Unfortunate.",
+          "🔫 {wrongPercent}% of Team Caitlyn went the other way. That's problematic.",
+          "⚖️ {caitlynVotes} votes from our side. Should have been more. Next time.",
+          "🎯 Team Caitlyn brought {caitlynVotes} votes, but it wasn't enough today."
+        ],
+        "details": [
+          "Your faction rank: #{yourFactionRank} of {totalFactionVoters}. You did your part. +{xp} XP",
+          "Ranked #{yourFactionRank} among {totalFactionVoters} Team Caitlyn voters. We'll regroup. +{xp} XP",
+          "#{yourFactionRank} of {totalFactionVoters} on our side. We'll come back stronger. +{xp} XP"
+        ],
+        "buttons": [
+          "🎯 Regroup.",
+          "💼 Next Match.",
+          "🔫 Analyze."
+        ]
+      },
+      "comeback": {
+        "messages": [
+          "🔫 FROM {oldPercent}% TO {newPercent}%! Team Caitlyn executed a perfect comeback!",
+          "🎯 {caitlynVoteSwing} last-minute Caitlyn votes turned this around! Tactical excellence!",
+          "💼 We were LOSING and Team Caitlyn brought {caitlynVoteSwing} clutch votes! Remarkable!",
+          "⚖️ {oldPercent}% to {newPercent}% — Team Caitlyn never gives up!",
+          "🎯 COMEBACK COMPLETE! {caitlynVoteSwing} Caitlyn voters secured this turnaround!"
+        ],
+        "details": [
+          "Strategic turnaround. Team Caitlyn: +{caitlynVoteSwing} votes in the final stretch. +{xp} XP",
+          "You're #{yourFactionRank} of {totalFactionVoters} Caitlyn voters who made the comeback happen. +{xp} XP"
+        ],
+        "buttons": [
+          "🔫 Excellence.",
+          "🎯 Replay That.",
+          "💼 Tactical Win."
+        ]
+      }
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "🎯 Welcome to the bracket. {liveCount} matches require your attention right now.",
+          "💼 New recruit. {liveCount} battles are active. Ready to begin?",
+          "🔫 Good timing. {liveCount} matches are live and waiting for proper judgment.",
+          "⚖️ Fresh face. {liveCount} matchups need decisive votes. Let's get started.",
+          "🎯 Welcome. {liveCount} active cases await your input."
+        ],
+        "buttons": [
+          "Begin. 🎯",
+          "Let's Start. 💼",
+          "To Work. 🔫",
+          "Ready. ⚖️",
+          "Proceed. 🎯"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "💼 Day 2. You returned. Good consistency.",
+          "🎯 Two days running. You're building momentum.",
+          "🔫 Back for Day 2. I appreciate dedication."
+        ],
+        "buttons": [
+          "Continue. 💼",
+          "Day 2. 🎯",
+          "Let's Proceed. 🔫"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "⚖️ {days} days absent. Where have you been? Well, you're back now — that's what matters.",
+          "🎯 After {days} days, you return. Better late than never, I suppose.",
+          "💼 {days} days away. Welcome back. We have work to do.",
+          "🔫 Been {days} days. I was beginning to think you'd quit. Glad you're back."
+        ],
+        "buttons": [
+          "I'm Back. 🎯",
+          "Let's Resume. 💼",
+          "Ready. 🔫",
+          "To Work. ⚖️"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "🎯 You're back. Ready to continue?",
+          "💼 Welcome back. Let's get to work.",
+          "🔫 You again. Good. We have matches to handle.",
+          "⚖️ Back so soon? Excellent. Let's proceed."
+        ],
+        "buttons": [
+          "Let's Go. 🎯",
+          "Ready. 💼",
+          "Begin. 🔫",
+          "Proceed. ⚖️"
+        ]
+      }
     }
   },
-
-  "welcome": {
-    "welcome-first-time": {
+  "achievements": {
+    "opening-act": {
       "messages": [
-        "🎯 Welcome to the bracket. {liveCount} matches require your attention right now.",
-        "💼 New recruit. {liveCount} battles are active. Ready to begin?",
-        "🔫 Good timing. {liveCount} matches are live and waiting for proper judgment.",
-        "⚖️ Fresh face. {liveCount} matchups need decisive votes. Let's get started.",
-        "🎯 Welcome. {liveCount} active cases await your input."
+        "🎯 FIRST VOTE CAST. Welcome to the bracket — let's handle this professionally.",
+        "💼 Your opening vote is logged. Every case begins with a single decision.",
+        "🔫 First shot taken. Good start — now let's maintain that precision.",
+        "⚖️ Initial vote recorded. You've officially entered the competition."
+      ],
+      "details": [
+        "Every enforcer starts somewhere. This is your beginning. +{xp} XP",
+        "First vote means you're committed to seeing this through. +{xp} XP",
+        "The opening shot sets the tone for everything after. +{xp} XP"
       ],
       "buttons": [
-        "Begin. 🎯",
-        "Let's Start. 💼",
-        "To Work. 🔫",
-        "Ready. ⚖️",
-        "Proceed. 🎯"
+        "Case Opened. 🎯",
+        "First Vote. 💼",
+        "Begin Investigation. 🔫",
+        "Next. ⚖️"
       ]
     },
-
-    "welcome-streak": {
+    "night-owl": {
       "messages": [
-        "💼 Day 2. You returned. Good consistency.",
-        "🎯 Two days running. You're building momentum.",
-        "🔫 Back for Day 2. I appreciate dedication."
+        "🌙 NIGHT OWL STATUS. Voted between midnight and 5am.",
+        "🎯 Late-night voting logged. Dedication knows no hours.",
+        "💼 Night owl confirmed. You work when others sleep.",
+        "🔫 Midnight to 5am vote recorded. Impressive commitment."
+      ],
+      "details": [
+        "Night owls handle cases while others rest. +{xp} XP",
+        "Late-night dedication is a rare quality. +{xp} XP",
+        "Justice doesn't sleep, and apparently neither do you. +{xp} XP"
       ],
       "buttons": [
+        "Night Owl. 🌙",
+        "Late Night. 🎯",
+        "Always On. 💼",
+        "No Sleep. 🔫"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "🔄 COMEBACK BELIEVER. Voted for 5 losing songs.",
+        "🎯 Five comeback votes logged. You see potential.",
+        "💼 Comeback believer status. You don't count anyone out.",
+        "🔫 Five underdog moments supported. That takes conviction."
+      ],
+      "details": [
+        "Five comeback votes shows you believe in turnarounds. +{xp} XP",
+        "You don't give up when the odds look bad. +{xp} XP",
+        "Believing in comebacks requires courage. +{xp} XP"
+      ],
+      "buttons": [
+        "Believer. 🔄",
+        "Never Quit. 🎯",
+        "Faith. 💼",
+        "Comebacks. 🔫"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "🎯 VICTORY. Your voted song won the match.",
+        "💼 Match won. Your judgment proved correct.",
+        "🔫 Your song prevailed. Well chosen.",
+        "⚖️ Victory achieved. Your vote contributed to success."
+      ],
+      "details": [
+        "Your vote contributed to a winning outcome. +{xp} XP",
+        "Victory validates good judgment. +{xp} XP",
+        "One more case successfully closed. +{xp} XP"
+      ],
+      "buttons": [
+        "Victory. 🎯",
+        "Won. 💼",
+        "Success. 🔫",
+        "Next Case. ⚖️"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "⚖️ MATCH LOST. Your song didn't win this time.",
+        "🎯 Lost this one. Not every case closes favorably.",
+        "💼 Your song was eliminated. Part of competition.",
+        "🔫 Defeated this round. We learn from these outcomes."
+      ],
+      "details": [
+        "Not every vote results in victory. That's acceptable. +{xp} XP",
+        "What matters is learning from these outcomes. +{xp} XP",
+        "Even the best enforcers face setbacks. +{xp} XP"
+      ],
+      "buttons": [
+        "Move On. ⚖️",
+        "Next Match. 🎯",
         "Continue. 💼",
-        "Day 2. 🎯",
-        "Let's Proceed. 🔫"
+        "Onward. 🔫"
       ]
     },
-
-    "welcome-comeback": {
+    "match-tied": {
       "messages": [
-"⚖️ {days} days absent. Where have you been? Well, you're back now — that's what matters.",
-        "🎯 After {days} days, you return. Better late than never, I suppose.",
-        "💼 {days} days away. Welcome back. We have work to do.",
-        "🔫 Been {days} days. I was beginning to think you'd quit. Glad you're back."
+        "⚖️ PERFECT TIE. The match ended 50-50.",
+        "🎯 Split decision logged. Perfectly even outcome.",
+        "💼 Match tied. A rare statistical occurrence.",
+        "🔫 Dead heat recorded. Both sides equal."
+      ],
+      "details": [
+        "Perfect ties are statistically rare. You witnessed one. +{xp} XP",
+        "When judgment is perfectly split, tiebreakers decide. +{xp} XP",
+        "Even matches like this prove how valuable every vote is. +{xp} XP"
       ],
       "buttons": [
-        "I'm Back. 🎯",
-        "Let's Resume. 💼",
-        "Ready. 🔫",
-        "To Work. ⚖️"
+        "Perfect Tie. ⚖️",
+        "50-50. 🎯",
+        "Split. 💼",
+        "Rare. 🔫"
       ]
     },
-
-    "welcome-back": {
+    "last-second-hero": {
       "messages": [
-        "🎯 You're back. Ready to continue?",
-        "💼 Welcome back. Let's get to work.",
-        "🔫 You again. Good. We have matches to handle.",
-        "⚖️ Back so soon? Excellent. Let's proceed."
+        "⚡ LAST-SECOND HERO. Your vote flipped the match at the final moment!",
+        "🎯 CLUTCH VOTE. You changed the outcome with seconds remaining!",
+        "💼 FINAL-MOMENT INTERVENTION. Your timing was perfect!",
+        "🔫 LAST-SECOND FLIP. That's what I call precision under pressure!"
+      ],
+      "details": [
+        "Your vote in the final 30 seconds changed everything. +{xp} XP",
+        "Clutch performance like this defines championships. +{xp} XP",
+        "That's the kind of timing that makes legends. +{xp} XP"
       ],
       "buttons": [
-        "Let's Go. 🎯",
-        "Ready. 💼",
-        "Begin. 🔫",
-        "Proceed. ⚖️"
+        "Clutch Hero. ⚡",
+        "Perfect Timing. 🎯",
+        "Game Changer. 💼",
+        "Last Second. 🔫"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "⬆️ LEVEL UP. You reached a new level.",
+        "🎯 Leveled up. Your rank increases.",
+        "💼 New level achieved. Progressing nicely.",
+        "🔫 Level up confirmed. Keep advancing."
+      ],
+      "details": [
+        "New level reached. Your influence grows. +{xp} XP",
+        "Every level represents measurable growth. +{xp} XP",
+        "Leveling up means you're improving systematically. +{xp} XP"
+      ],
+      "buttons": [
+        "Level Up. ⬆️",
+        "Ranked Up. 🎯",
+        "Next Tier. 💼",
+        "Keep Going. 🔫"
+      ]
+    },
+    "first-blood": {
+      "messages": [
+        "🩸 FIRST BLOOD. You cast the VERY FIRST VOTE on this site.",
+        "🎯 Site's first voter. You're foundational.",
+        "💼 First blood status. You started everything.",
+        "🔫 The very first vote ever. You're site history."
+      ],
+      "details": [
+        "First vote ever means you're part of the foundation. +{xp} XP",
+        "Every case needs someone to open it. That's you. +{xp} XP",
+        "First blood means you're historically significant. +{xp} XP"
+      ],
+      "buttons": [
+        "First Blood. 🩸",
+        "Founder. 🎯",
+        "Started It. 💼",
+        "History. 🔫"
+      ]
+    },
+    "tournament-first-blood": {
+      "messages": [
+        "🩸🏆 TOURNAMENT FIRST BLOOD. First vote of the ENTIRE tournament.",
+        "🎯 Tournament's opening vote. You start the battles.",
+        "💼 First blood of tournament. That's leadership.",
+        "🔫 First tournament vote. You opened the case."
+      ],
+      "details": [
+        "First vote of the entire tournament. Leadership confirmed. +{xp} XP",
+        "You don't wait — you initiate action. +{xp} XP",
+        "Tournament first blood is prestigious. +{xp} XP"
+      ],
+      "buttons": [
+        "Tournament Start. 🩸",
+        "First Vote. 🏆",
+        "Initiated. 🎯",
+        "Opened Case. 💼"
+      ]
+    },
+    "round-first-blood": {
+      "messages": [
+        "🩸⚡ ROUND FIRST BLOOD. First vote in a NEW ROUND.",
+        "🎯 Round opener. You kick off new battles.",
+        "💼 First blood in round. That's initiative.",
+        "🔫 New round's first vote. Always ready."
+      ],
+      "details": [
+        "First vote in a new round shows readiness. +{xp} XP",
+        "You're present when rounds begin. Professional. +{xp} XP",
+        "Round openers set the standard for everyone. +{xp} XP"
+      ],
+      "buttons": [
+        "Round Start. 🩸",
+        "First In. ⚡",
+        "Ready. 🎯",
+        "Initiated. 💼"
+      ]
+    },
+    "daily-session-kickoff": {
+      "messages": [
+        "🌅 DAILY KICKOFF. Your first vote of the DAY.",
+        "🎯 Day started properly. First vote logged.",
+        "💼 Daily session opened. Ready to work.",
+        "🔫 First vote today. Let's proceed."
+      ],
+      "details": [
+        "Starting your day with a vote shows dedication. +{xp} XP",
+        "First vote of the day sets the tone for everything. +{xp} XP",
+        "Daily kickoffs demonstrate consistent commitment. +{xp} XP"
+      ],
+      "buttons": [
+        "Daily Start. 🌅",
+        "First Today. 🎯",
+        "Day One. 💼",
+        "Begin Work. 🔫"
+      ]
+    },
+    "encore": {
+      "messages": [
+        "🎯 FIVE VOTES LOGGED. You're developing a pattern now.",
+        "💼 Five decisions made. You're beginning to understand the system.",
+        "🔫 Five shots fired. Your aim is becoming more consistent.",
+        "⚖️ Five votes cast. You're establishing yourself here."
+      ],
+      "details": [
+        "Five votes means you're taking this seriously. Good. +{xp} XP",
+        "You're building a track record now. +{xp} XP",
+        "Consistency is the foundation of excellence. +{xp} XP"
+      ],
+      "buttons": [
+        "Pattern Emerging. 🎯",
+        "Five Down. 💼",
+        "Keep Going. 🔫",
+        "To Ten. ⚖️"
+      ]
+    },
+    "world-tour": {
+      "messages": [
+        "🎯 TEN VOTES COMPLETED. You're becoming a regular presence here.",
+        "💼 Ten cases handled. Your judgment is being established.",
+        "🔫 Ten precise votes. You're no longer a novice.",
+        "⚖️ Ten decisions logged. You're building credibility."
+      ],
+      "details": [
+        "Ten votes means you're committed beyond casual participation. +{xp} XP",
+        "You're developing expertise with each decision. +{xp} XP",
+        "Double digits — this is when consistency becomes habit. +{xp} XP"
+      ],
+      "buttons": [
+        "Ten Strong. 🎯",
+        "Established. 💼",
+        "Keep Aiming. 🔫",
+        "Next Tier. ⚖️"
+      ]
+    },
+    "headliner": {
+      "messages": [
+        "🎯 TWENTY-FIVE VOTES. You're officially a headliner now.",
+        "💼 Quarter century of decisions. Your judgment carries weight.",
+        "🔫 Twenty-five shots, twenty-five decisions. Impressive consistency.",
+        "⚖️ Twenty-five votes logged. You're a veteran of this bracket."
+      ],
+      "details": [
+        "Twenty-five votes demonstrates serious commitment. +{xp} XP",
+        "You're no longer learning — you're executing. +{xp} XP",
+        "Quarter century milestone achieved with precision. +{xp} XP"
+      ],
+      "buttons": [
+        "Headliner Status. 🎯",
+        "25 Complete. 💼",
+        "Veteran. 🔫",
+        "To Fifty. ⚖️"
+      ]
+    },
+    "pentakill": {
+      "messages": [
+        "🎯 FIFTY VOTES ACHIEVED. Pentakill status confirmed.",
+        "💼 Fifty cases handled with consistency. You're excelling.",
+        "🔫 Fifty precise votes. Your reputation is growing.",
+        "⚖️ Half a hundred decisions. You're becoming legendary."
+      ],
+      "details": [
+        "Fifty votes is where casual voters become serious contenders. +{xp} XP",
+        "Your track record speaks for itself now. +{xp} XP",
+        "This level of dedication is rare and noteworthy. +{xp} XP"
+      ],
+      "buttons": [
+        "Pentakill. 🎯",
+        "Fifty Down. 💼",
+        "Excellence. 🔫",
+        "Century Next. ⚖️"
+      ]
+    },
+    "chart-topper": {
+      "messages": [
+        "🎯 ONE HUNDRED VOTES. Century club membership granted.",
+        "💼 A hundred decisions of consistent judgment. Remarkable.",
+        "🔫 Century achieved. Your dedication is extraordinary.",
+        "⚖️ One hundred votes logged. You're elite tier now."
+      ],
+      "details": [
+        "One hundred votes is where excellence becomes legendary. +{xp} XP",
+        "Century club members are the backbone of this bracket. +{xp} XP",
+        "This is the kind of commitment that defines champions. +{xp} XP"
+      ],
+      "buttons": [
+        "Century Club. 🎯",
+        "Elite Status. 💼",
+        "100 Strong. 🔫",
+        "Onward. ⚖️"
+      ]
+    },
+    "hall-of-fame": {
+      "messages": [
+        "🏆 TWO HUNDRED FIFTY VOTES. HALL OF FAME STATUS ACHIEVED.",
+        "🎯 Quarter thousand decisions. You're immortalized in this bracket.",
+        "💼 250 VOTES. Nobody questions your dedication now.",
+        "🔫 Hall of fame inducted. Two hundred fifty votes of pure consistency."
+      ],
+      "details": [
+        "Two hundred fifty votes. That's hall of fame territory. +{xp} XP",
+        "This is the kind of record that gets studied. +{xp} XP",
+        "You've achieved legendary status through sheer dedication. +{xp} XP"
+      ],
+      "buttons": [
+        "Hall of Fame. 🏆",
+        "Immortal. 🎯",
+        "Legendary. 💼",
+        "250 Down. 🔫"
+      ]
+    },
+    "on-fire": {
+      "messages": [
+        "🔥 THREE CONSECUTIVE DAYS. You're on fire now.",
+        "🎯 Three-day streak established. Consistency is key.",
+        "💼 Three days without missing. Professional dedication.",
+        "🔫 Three days running. You're building momentum."
+      ],
+      "details": [
+        "Three-day streaks are where discipline begins to show. +{xp} XP",
+        "Consistency over three days means you're serious. +{xp} XP",
+        "Every great streak starts with three. +{xp} XP"
+      ],
+      "buttons": [
+        "Three Days. 🔥",
+        "Keep Going. 🎯",
+        "Streak On. 💼",
+        "Day Four. 🔫"
+      ]
+    },
+    "hot-streak": {
+      "messages": [
+        "🎯 SEVEN STRAIGHT DAYS. Dedicated status confirmed.",
+        "💼 One full week unbroken. That's commitment.",
+        "🔫 Seven consecutive days. You're proving yourself.",
+        "⚖️ Week-long streak. Dedication acknowledged."
+      ],
+      "details": [
+        "Seven days straight is where casual becomes committed. +{xp} XP",
+        "A full week without missing shows real dedication. +{xp} XP",
+        "This is the kind of consistency enforcers are built on. +{xp} XP"
+      ],
+      "buttons": [
+        "One Week. 🎯",
+        "Dedicated. 💼",
+        "Keep Aiming. 🔫",
+        "Day Eight. ⚖️"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "⚡ FOURTEEN DAYS STRAIGHT. Unstoppable momentum.",
+        "🎯 Two full weeks unbroken. Extraordinary consistency.",
+        "💼 Fourteen consecutive days. You're a machine.",
+        "🔫 Two weeks without missing. Champion behavior."
+      ],
+      "details": [
+        "Fourteen days proves this isn't luck — it's discipline. +{xp} XP",
+        "Two weeks of perfect attendance is rare excellence. +{xp} XP",
+        "This is the kind of dedication that wins tournaments. +{xp} XP"
+      ],
+      "buttons": [
+        "Unstoppable. ⚡",
+        "Two Weeks. 🎯",
+        "Machine. 💼",
+        "Day 15. 🔫"
+      ]
+    },
+    "legendary-streak": {
+      "messages": [
+        "🏆 THIRTY DAYS UNBROKEN. LEGENDARY STREAK ACHIEVED.",
+        "🎯 ONE FULL MONTH without missing. That's historic.",
+        "💼 Thirty consecutive days. You're in the record books.",
+        "🔫 Month-long perfection. Legendary status confirmed."
+      ],
+      "details": [
+        "Thirty days straight is the kind of achievement that gets remembered. +{xp} XP",
+        "A full month of dedication? That's championship material. +{xp} XP",
+        "This streak will be analyzed for years to come. +{xp} XP"
+      ],
+      "buttons": [
+        "Legendary. 🏆",
+        "One Month. 🎯",
+        "Historic. 💼",
+        "Day 31. 🔫"
+      ]
+    },
+    "underdog-champion": {
+      "messages": [
+        "🐕 FIVE UNDERDOG PICKS. You see potential others miss.",
+        "🎯 Five times you backed the unlikely. Good instincts.",
+        "💼 Underdog champion status. You trust your analysis.",
+        "🔫 Five longshots supported. That takes conviction."
+      ],
+      "details": [
+        "Five underdog votes shows you think independently. +{xp} XP",
+        "You don't follow the crowd — you follow your judgment. +{xp} XP",
+        "Backing underdogs requires confidence in your analysis. +{xp} XP"
+      ],
+      "buttons": [
+        "Underdog Love. 🐕",
+        "Trust Analysis. 🎯",
+        "Independent. 💼",
+        "Next Pick. 🔫"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "🐴 FIFTEEN UNDERDOG VOTES. Dark horse specialist confirmed.",
+        "🎯 Fifteen longshots backed. You see what others don't.",
+        "💼 Dark horse status achieved. Your instincts are sharp.",
+        "🔫 Fifteen times you defied expectations. Impressive."
+      ],
+      "details": [
+        "Fifteen underdog picks proves you trust your judgment. +{xp} XP",
+        "You analyze independently — that's rare. +{xp} XP",
+        "Dark horse voters often see outcomes before they happen. +{xp} XP"
+      ],
+      "buttons": [
+        "Dark Horse. 🐴",
+        "Sharp Instinct. 🎯",
+        "Independent Mind. 💼",
+        "Keep Analyzing. 🔫"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "💢 THIRTY UNDERDOG PICKS. Rebel heart status earned.",
+        "🎯 Thirty times you went against the grain. Remarkable.",
+        "💼 Rebel heart confirmed. You trust yourself completely.",
+        "🔫 Thirty longshots. You don't need validation."
+      ],
+      "details": [
+        "Thirty underdog votes means you march to your own analysis. +{xp} XP",
+        "You don't follow trends — you identify opportunities. +{xp} XP",
+        "This level of independent thinking is extraordinary. +{xp} XP"
+      ],
+      "buttons": [
+        "Rebel Heart. 💢",
+        "Own Path. 🎯",
+        "Independent. 💼",
+        "Trust Self. 🔫"
+      ]
+    },
+    "early-bird": {
+      "messages": [
+        "🌅 FIRST TEN VOTERS — FIVE TIMES. Early bird status.",
+        "🎯 Five times among the first. You're punctual.",
+        "💼 Early bird confirmed. Five early arrivals logged.",
+        "🔫 First ten in five matches. Excellent timing."
+      ],
+      "details": [
+        "Early voters set the pace for everyone else. +{xp} XP",
+        "Being first five times shows dedication and timing. +{xp} XP",
+        "Punctuality is a virtue in enforcement. +{xp} XP"
+      ],
+      "buttons": [
+        "Early Bird. 🌅",
+        "Punctual. 🎯",
+        "First Five. 💼",
+        "Keep It Up. 🔫"
+      ]
+    },
+    "trendsetter": {
+      "messages": [
+        "⚡ FIRST TEN VOTERS — FIFTEEN TIMES. Trendsetter confirmed.",
+        "🎯 Fifteen early arrivals. You're a pace-setter.",
+        "💼 Trendsetter status achieved. Fifteen first-ten appearances.",
+        "🔫 First ten in fifteen matches. You lead, others follow."
+      ],
+      "details": [
+        "Fifteen early votes means you're not following — you're leading. +{xp} XP",
+        "Trendsetters establish standards for everyone else. +{xp} XP",
+        "This is leadership through consistent action. +{xp} XP"
+      ],
+      "buttons": [
+        "Trendsetter. ⚡",
+        "Leader. 🎯",
+        "First Fifteen. 💼",
+        "Keep Leading. 🔫"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "😰 TEN CLOSE MATCHES (within 5%). Nail-biter veteran.",
+        "🎯 Ten tight battles survived. You thrive under pressure.",
+        "💼 Nail-biter status earned. Ten close calls handled.",
+        "🔫 Ten matches within 5%. Every vote mattered."
+      ],
+      "details": [
+        "Ten close matches means you're drawn to high-stakes situations. +{xp} XP",
+        "Nail-biters separate good voters from great ones. +{xp} XP",
+        "You've proven you can handle pressure. +{xp} XP"
+      ],
+      "buttons": [
+        "Pressure Proof. 😰",
+        "Ten Close. 🎯",
+        "Thrives. 💼",
+        "High Stakes. 🔫"
+      ]
+    },
+    "deciding-vote": {
+      "messages": [
+        "⚡ TWENTY-FIVE CLOSE MATCHES. You're the deciding vote.",
+        "🎯 25 nail-biters participated in. Your impact is massive.",
+        "💼 Deciding vote status confirmed. 25 tight battles.",
+        "🔫 Twenty-five close calls. You show up when it matters."
+      ],
+      "details": [
+        "Twenty-five close matches means your vote is powerful. +{xp} XP",
+        "You're present for the moments that decide everything. +{xp} XP",
+        "This is clutch performance at the highest level. +{xp} XP"
+      ],
+      "buttons": [
+        "Deciding Vote. ⚡",
+        "25 Close. 🎯",
+        "Clutch. 💼",
+        "Critical. 🔫"
+      ]
+    },
+    "true-fan": {
+      "messages": [
+        "💙 TRUE FAN. Voted for the same song THREE times.",
+        "🎯 Three votes, one song. That's loyalty.",
+        "💼 True fan status. Three consistent votes logged.",
+        "🔫 Same song three times. You know what you like."
+      ],
+      "details": [
+        "Three votes for one song shows conviction. +{xp} XP",
+        "True fans don't waver when they find quality. +{xp} XP",
+        "This is dedicated support in action. +{xp} XP"
+      ],
+      "buttons": [
+        "True Fan. 💙",
+        "Loyal. 🎯",
+        "Three Times. 💼",
+        "Consistent. 🔫"
+      ]
+    },
+    "superfan": {
+      "messages": [
+        "💙🔥 SUPERFAN. FIVE votes for the same song.",
+        "🎯 Five times supporting one track. Superfan confirmed.",
+        "💼 Superfan status achieved. Five consistent votes.",
+        "🔫 Same song five times. That's dedication."
+      ],
+      "details": [
+        "Five votes for one song proves serious loyalty. +{xp} XP",
+        "Superfans are the foundation of every great bracket. +{xp} XP",
+        "This level of support is rare and valuable. +{xp} XP"
+      ],
+      "buttons": [
+        "Superfan. 💙",
+        "Five Strong. 🔥",
+        "Dedicated. 🎯",
+        "Ultimate. 💼"
+      ]
+    },
+    "ultimate-stan": {
+      "messages": [
+        "💙👑 ULTIMATE STAN. TEN VOTES FOR ONE SONG.",
+        "🎯 Ten times? That's ultimate dedication confirmed.",
+        "💼 Ultimate stan status achieved. Ten loyal votes.",
+        "🔫 Same song ten times. Nobody's more dedicated."
+      ],
+      "details": [
+        "Ten votes for one song is ultimate stan territory. +{xp} XP",
+        "This is your anthem and you've made it known. +{xp} XP",
+        "Ultimate loyalty deserves ultimate recognition. +{xp} XP"
+      ],
+      "buttons": [
+        "Ultimate Stan. 💙",
+        "Ten Forever. 👑",
+        "My Anthem. 🎯",
+        "Eternal. 💼"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "🏛️ FOUNDING MEMBER. Voted before 1,000 total votes.",
+        "🎯 Early adopter status. You were here from the beginning.",
+        "💼 Founding member confirmed. You built this.",
+        "🔫 OG voter. You helped establish this bracket."
+      ],
+      "details": [
+        "You were here before most people knew this existed. +{xp} XP",
+        "Founding members are the foundation. +{xp} XP",
+        "Early adopters make everything possible. +{xp} XP"
+      ],
+      "buttons": [
+        "Founder. 🏛️",
+        "OG Status. 🎯",
+        "Early. 💼",
+        "Built This. 🔫"
+      ]
+    },
+    "quarter-final-supporter": {
+      "messages": [
+        "🏆 QUARTER-FINALS. You voted in the elite eight.",
+        "🎯 Top eight supporter. That's high-stakes voting.",
+        "💼 Quarter-final battles handled. Elite level.",
+        "🔫 Elite eight participation confirmed."
+      ],
+      "details": [
+        "Quarter-finals are where champions begin to emerge. +{xp} XP",
+        "Elite eight battles require expert judgment. +{xp} XP",
+        "You're voting at the highest level now. +{xp} XP"
+      ],
+      "buttons": [
+        "Elite Eight. 🏆",
+        "Quarter-Finals. 🎯",
+        "High Stakes. 💼",
+        "To Semis. 🔫"
+      ]
+    },
+    "semi-final-believer": {
+      "messages": [
+        "🔥 SEMI-FINALS. Final four voting complete.",
+        "🎯 Semi-final believer confirmed. Four songs left.",
+        "💼 Final four supporter. Championship level.",
+        "🔫 Semi-finals handled. Only the best remain."
+      ],
+      "details": [
+        "Semi-finals decide who reaches the championship. +{xp} XP",
+        "Final four voting requires peak judgment. +{xp} XP",
+        "You're witnessing the highest level of competition. +{xp} XP"
+      ],
+      "buttons": [
+        "Final Four. 🔥",
+        "Semi-Finals. 🎯",
+        "Peak Level. 💼",
+        "To Finals. 🔫"
+      ]
+    },
+    "championship-supporter": {
+      "messages": [
+        "👑 CHAMPIONSHIP. You voted in the finals.",
+        "🏆 Finals voter confirmed. The ultimate battle witnessed.",
+        "🎯 Championship supporter. You were there for history.",
+        "💼 Finals complete. Champion crowned with your input."
+      ],
+      "details": [
+        "Championship voting means you witnessed the pinnacle. +{xp} XP",
+        "Finals are where legends are crowned. You participated. +{xp} XP",
+        "You voted in the most important match of all. +{xp} XP"
+      ],
+      "buttons": [
+        "Champion. 👑",
+        "Finals. 🏆",
+        "Witnessed. 🎯",
+        "History. 💼"
+      ]
+    },
+    "tournament-veteran": {
+      "messages": [
+        "🎖️ TOURNAMENT VETERAN. All six rounds completed.",
+        "🎯 Full tournament participation. Start to finish.",
+        "💼 Every round voted. Complete dedication shown.",
+        "🔫 Veteran status earned. Six rounds, zero misses."
+      ],
+      "details": [
+        "All six rounds means you saw the entire story. +{xp} XP",
+        "Tournament veterans are the backbone of competition. +{xp} XP",
+        "Start to finish — that's true commitment. +{xp} XP"
+      ],
+      "buttons": [
+        "Veteran. 🎖️",
+        "All Rounds. 🎯",
+        "Complete. 💼",
+        "Full Tour. 🔫"
+      ]
+    },
+    "completionist": {
+      "messages": [
+        "✅ COMPLETIONIST. Fifty unique matches voted.",
+        "🎯 50 different battles participated in. Comprehensive.",
+        "💼 Completionist status confirmed. Fifty unique votes.",
+        "🔫 Fifty different matches. You covered everything."
+      ],
+      "details": [
+        "Fifty unique matches shows thorough participation. +{xp} XP",
+        "Completionists don't miss opportunities. +{xp} XP",
+        "This is comprehensive coverage at its finest. +{xp} XP"
+      ],
+      "buttons": [
+        "50 Unique. ✅",
+        "Complete. 🎯",
+        "All Covered. 💼",
+        "Thorough. 🔫"
+      ]
+    },
+    "lightning-fast": {
+      "messages": [
+        "⚡ LIGHTNING-FAST. Voted within ONE MINUTE of match going live.",
+        "🎯 Under sixty seconds. Your reflexes are exceptional.",
+        "💼 Lightning-fast voter confirmed. Immediate response.",
+        "🔫 One-minute vote. That's speed and dedication."
+      ],
+      "details": [
+        "One minute or less shows incredible timing. +{xp} XP",
+        "Lightning reflexes separate good from great. +{xp} XP",
+        "Speed like this requires constant vigilance. +{xp} XP"
+      ],
+      "buttons": [
+        "Lightning. ⚡",
+        "Fast. 🎯",
+        "Instant. 💼",
+        "Quick Shot. 🔫"
+      ]
+    },
+    "prophet": {
+      "messages": [
+        "🔮 PROPHET. Voted for the tournament winner in ROUND ONE.",
+        "🎯 Called it from the start. That's exceptional foresight.",
+        "💼 Prophet status confirmed. Round one winner pick.",
+        "🔫 Predicted the champion in round one. Remarkable."
+      ],
+      "details": [
+        "Calling the winner from day one shows true vision. +{xp} XP",
+        "Prophetic judgment like this is rare. +{xp} XP",
+        "You saw the champion before anyone else. +{xp} XP"
+      ],
+      "buttons": [
+        "Prophet. 🔮",
+        "Called It. 🎯",
+        "Foresight. 💼",
+        "I Knew. 🔫"
+      ]
+    },
+    "taste-maker": {
+      "messages": [
+        "🎵 TASTE-MAKER. Voted for TEN DIFFERENT ARTISTS.",
+        "🎯 Ten artists supported. Your taste is diverse.",
+        "💼 Taste-maker status achieved. Ten different artists.",
+        "🔫 Ten artists voted for. You appreciate range."
+      ],
+      "details": [
+        "Ten different artists shows breadth of taste. +{xp} XP",
+        "You don't limit yourself to one genre or style. +{xp} XP",
+        "Diverse taste means you recognize quality everywhere. +{xp} XP"
+      ],
+      "buttons": [
+        "Taste-Maker. 🎵",
+        "Ten Artists. 🎯",
+        "Diverse. 💼",
+        "Broad Range. 🔫"
+      ]
+    },
+    "music-historian": {
+      "messages": [
+        "📚 MUSIC HISTORIAN. Songs from FIVE DIFFERENT YEARS.",
+        "🎵 Five years covered. You appreciate all eras.",
+        "🎯 Historian status confirmed. Five different years.",
+        "💼 Five years voted. You span decades."
+      ],
+      "details": [
+        "Five different years shows historical appreciation. +{xp} XP",
+        "You understand music across time periods. +{xp} XP",
+        "Historians see the full picture. +{xp} XP"
+      ],
+      "buttons": [
+        "Historian. 📚",
+        "Five Years. 🎵",
+        "All Eras. 🎯",
+        "Time Span. 💼"
+      ]
+    },
+    "triple-threat": {
+      "messages": [
+        "💥 TRIPLE THREAT. Three matches in ONE SESSION.",
+        "🎯 Three votes, one sitting. Efficient work.",
+        "💼 Triple threat status. Three fights handled.",
+        "🔫 Three in one session. Good momentum."
+      ],
+      "details": [
+        "Three matches in one session shows efficiency. +{xp} XP",
+        "You're accelerating your involvement. +{xp} XP",
+        "Triple threats maintain good pace. +{xp} XP"
+      ],
+      "buttons": [
+        "Triple. 💥",
+        "Three. 🎯",
+        "Efficient. 💼",
+        "Keep Going. 🔫"
+      ]
+    },
+    "vote-spree": {
+      "messages": [
+        "🔥 VOTE SPREE. FIVE matches in ONE SESSION.",
+        "🎯 Five in a row. You're on a roll.",
+        "💼 Vote spree confirmed. Five consecutive votes.",
+        "🔫 Five-vote session. Excellent momentum."
+      ],
+      "details": [
+        "Five matches in one session shows dedication. +{xp} XP",
+        "You're in the zone now. +{xp} XP",
+        "Sprees like this win tournaments. +{xp} XP"
+      ],
+      "buttons": [
+        "Spree. 🔥",
+        "Five. 🎯",
+        "Rolling. 💼",
+        "Continue. 🔫"
+      ]
+    },
+    "power-voter": {
+      "messages": [
+        "⚡ POWER VOTER. TEN matches in ONE SESSION.",
+        "🎯 Ten in one sitting. You're a machine.",
+        "💼 Power voter status achieved. Ten consecutive votes.",
+        "🔫 Ten-vote session. Absolute dedication."
+      ],
+      "details": [
+        "Ten matches in one session is power performance. +{xp} XP",
+        "You're not just voting — you're dominating. +{xp} XP",
+        "This is championship-level commitment. +{xp} XP"
+      ],
+      "buttons": [
+        "Power. ⚡",
+        "Ten. 🎯",
+        "Machine. 💼",
+        "Dominate. 🔫"
+      ]
+    },
+    "voting-marathon": {
+      "messages": [
+        "🏃 VOTING MARATHON. TWENTY matches in ONE SESSION.",
+        "🎯 Twenty votes straight. Extraordinary endurance.",
+        "💼 Marathon status confirmed. Twenty consecutive votes.",
+        "🔫 Twenty in one session. Legendary dedication."
+      ],
+      "details": [
+        "Twenty matches in one session is marathon-level commitment. +{xp} XP",
+        "You don't stop. Remarkable endurance. +{xp} XP",
+        "This is the kind of dedication that defines legends. +{xp} XP"
+      ],
+      "buttons": [
+        "Marathon. 🏃",
+        "Twenty. 🎯",
+        "Endurance. 💼",
+        "Unstoppable. 🔫"
+      ]
+    },
+    "daily-comeback": {
+      "messages": [
+        "🔄 DAILY COMEBACK. You returned after THREE DAYS.",
+        "🎯 Welcome back. Three days absence noted.",
+        "💼 Comeback status. Good to see you return.",
+        "🔫 Three days away, now back. Let's continue."
+      ],
+      "details": [
+        "Returning after three days shows commitment. +{xp} XP",
+        "Breaks happen. What matters is coming back. +{xp} XP",
+        "You stepped away and returned. Commendable. +{xp} XP"
+      ],
+      "buttons": [
+        "I'm Back. 🔄",
+        "Returned. 🎯",
+        "Resume. 💼",
+        "Continue. 🔫"
+      ]
+    },
+    "community-voice": {
+      "messages": [
+        "📢 COMMUNITY VOICE. FIVE social media shares.",
+        "🎯 Five shares logged. You're spreading awareness.",
+        "💼 Community voice status. Five shares completed.",
+        "🔫 Five shares. You're building the community."
+      ],
+      "details": [
+        "Five shares means you're recruiting others. +{xp} XP",
+        "Community voices strengthen the bracket. +{xp} XP",
+        "Sharing five times shows you believe in this. +{xp} XP"
+      ],
+      "buttons": [
+        "Five Shares. 📢",
+        "Spread Word. 🎯",
+        "Community. 💼",
+        "Keep Sharing. 🔫"
+      ]
+    },
+    "hype-master": {
+      "messages": [
+        "📢🔥 HYPE MASTER. FIFTEEN social media shares.",
+        "🎯 Fifteen shares. You're a recruitment specialist.",
+        "💼 Hype master status achieved. Fifteen shares logged.",
+        "🔫 Fifteen shares. The community grows because of you."
+      ],
+      "details": [
+        "Fifteen shares means you're a community builder. +{xp} XP",
+        "Hype masters grow the bracket exponentially. +{xp} XP",
+        "This level of promotion is invaluable. +{xp} XP"
+      ],
+      "buttons": [
+        "Hype Master. 📢",
+        "Fifteen. 🔥",
+        "Builder. 🎯",
+        "Grow It. 💼"
       ]
     }
   }
-},
-"achievements": {
-  "opening-act": {
-    "messages": [
-      "🎯 FIRST VOTE CAST. Welcome to the bracket — let's handle this professionally.",
-      "💼 Your opening vote is logged. Every case begins with a single decision.",
-      "🔫 First shot taken. Good start — now let's maintain that precision.",
-      "⚖️ Initial vote recorded. You've officially entered the competition."
-    ],
-    "details": [
-      "Every enforcer starts somewhere. This is your beginning. +{xp} XP",
-      "First vote means you're committed to seeing this through. +{xp} XP",
-      "The opening shot sets the tone for everything after. +{xp} XP"
-    ],
-    "buttons": [
-      "Case Opened. 🎯",
-      "First Vote. 💼",
-      "Begin Investigation. 🔫",
-      "Next. ⚖️"
-    ]
-  },
-  "night-owl": {
-  "messages": [
-    "🌙 NIGHT OWL STATUS. Voted between midnight and 5am.",
-    "🎯 Late-night voting logged. Dedication knows no hours.",
-    "💼 Night owl confirmed. You work when others sleep.",
-    "🔫 Midnight to 5am vote recorded. Impressive commitment."
-  ],
-  "details": [
-    "Night owls handle cases while others rest. +{xp} XP",
-    "Late-night dedication is a rare quality. +{xp} XP",
-    "Justice doesn't sleep, and apparently neither do you. +{xp} XP"
-  ],
-  "buttons": [
-    "Night Owl. 🌙",
-    "Late Night. 🎯",
-    "Always On. 💼",
-    "No Sleep. 🔫"
-  ]
-},
-
-"comeback-believer": {
-  "messages": [
-    "🔄 COMEBACK BELIEVER. Voted for 5 losing songs.",
-    "🎯 Five comeback votes logged. You see potential.",
-    "💼 Comeback believer status. You don't count anyone out.",
-    "🔫 Five underdog moments supported. That takes conviction."
-  ],
-  "details": [
-    "Five comeback votes shows you believe in turnarounds. +{xp} XP",
-    "You don't give up when the odds look bad. +{xp} XP",
-    "Believing in comebacks requires courage. +{xp} XP"
-  ],
-  "buttons": [
-    "Believer. 🔄",
-    "Never Quit. 🎯",
-    "Faith. 💼",
-    "Comebacks. 🔫"
-  ]
-},
-
-"match-won": {
-  "messages": [
-    "🎯 VICTORY. Your voted song won the match.",
-    "💼 Match won. Your judgment proved correct.",
-    "🔫 Your song prevailed. Well chosen.",
-    "⚖️ Victory achieved. Your vote contributed to success."
-  ],
-  "details": [
-    "Your vote contributed to a winning outcome. +{xp} XP",
-    "Victory validates good judgment. +{xp} XP",
-    "One more case successfully closed. +{xp} XP"
-  ],
-  "buttons": [
-    "Victory. 🎯",
-    "Won. 💼",
-    "Success. 🔫",
-    "Next Case. ⚖️"
-  ]
-},
-
-"match-lost": {
-  "messages": [
-    "⚖️ MATCH LOST. Your song didn't win this time.",
-    "🎯 Lost this one. Not every case closes favorably.",
-    "💼 Your song was eliminated. Part of competition.",
-    "🔫 Defeated this round. We learn from these outcomes."
-  ],
- "details": [
-  "Not every vote results in victory. That's acceptable. +{xp} XP",
-  "What matters is learning from these outcomes. +{xp} XP",
-  "Even the best enforcers face setbacks. +{xp} XP"
-],
-  "buttons": [
-    "Move On. ⚖️",
-    "Next Match. 🎯",
-    "Continue. 💼",
-    "Onward. 🔫"
-  ]
-},
-
-"match-tied": {
-  "messages": [
-    "⚖️ PERFECT TIE. The match ended 50-50.",
-    "🎯 Split decision logged. Perfectly even outcome.",
-    "💼 Match tied. A rare statistical occurrence.",
-    "🔫 Dead heat recorded. Both sides equal."
-  ],
-  "details": [
-    "Perfect ties are statistically rare. You witnessed one. +{xp} XP",
-    "When judgment is perfectly split, tiebreakers decide. +{xp} XP",
-    "Even matches like this prove how valuable every vote is. +{xp} XP"
-  ],
-  "buttons": [
-    "Perfect Tie. ⚖️",
-    "50-50. 🎯",
-    "Split. 💼",
-    "Rare. 🔫"
-  ]
-},
-
-"last-second-hero": {
-  "messages": [
-    "⚡ LAST-SECOND HERO. Your vote flipped the match at the final moment!",
-    "🎯 CLUTCH VOTE. You changed the outcome with seconds remaining!",
-    "💼 FINAL-MOMENT INTERVENTION. Your timing was perfect!",
-    "🔫 LAST-SECOND FLIP. That's what I call precision under pressure!"
-  ],
-  "details": [
-    "Your vote in the final 30 seconds changed everything. +{xp} XP",
-    "Clutch performance like this defines championships. +{xp} XP",
-    "That's the kind of timing that makes legends. +{xp} XP"
-  ],
-  "buttons": [
-    "Clutch Hero. ⚡",
-    "Perfect Timing. 🎯",
-    "Game Changer. 💼",
-    "Last Second. 🔫"
-  ]
-},
-
-"level-up": {
-  "messages": [
-    "⬆️ LEVEL UP. You reached a new level.",
-    "🎯 Leveled up. Your rank increases.",
-    "💼 New level achieved. Progressing nicely.",
-    "🔫 Level up confirmed. Keep advancing."
-  ],
-  "details": [
-    "New level reached. Your influence grows. +{xp} XP",
-    "Every level represents measurable growth. +{xp} XP",
-    "Leveling up means you're improving systematically. +{xp} XP"
-  ],
-  "buttons": [
-    "Level Up. ⬆️",
-    "Ranked Up. 🎯",
-    "Next Tier. 💼",
-    "Keep Going. 🔫"
-  ]
-},
-
-"first-blood": {
-  "messages": [
-    "🩸 FIRST BLOOD. You cast the VERY FIRST VOTE on this site.",
-    "🎯 Site's first voter. You're foundational.",
-    "💼 First blood status. You started everything.",
-    "🔫 The very first vote ever. You're site history."
-  ],
-  "details": [
-    "First vote ever means you're part of the foundation. +{xp} XP",
-    "Every case needs someone to open it. That's you. +{xp} XP",
-    "First blood means you're historically significant. +{xp} XP"
-  ],
-  "buttons": [
-    "First Blood. 🩸",
-    "Founder. 🎯",
-    "Started It. 💼",
-    "History. 🔫"
-  ]
-},
-
-"tournament-first-blood": {
-  "messages": [
-    "🩸🏆 TOURNAMENT FIRST BLOOD. First vote of the ENTIRE tournament.",
-    "🎯 Tournament's opening vote. You start the battles.",
-    "💼 First blood of tournament. That's leadership.",
-    "🔫 First tournament vote. You opened the case."
-  ],
-  "details": [
-    "First vote of the entire tournament. Leadership confirmed. +{xp} XP",
-    "You don't wait — you initiate action. +{xp} XP",
-    "Tournament first blood is prestigious. +{xp} XP"
-  ],
-  "buttons": [
-    "Tournament Start. 🩸",
-    "First Vote. 🏆",
-    "Initiated. 🎯",
-    "Opened Case. 💼"
-  ]
-},
-
-"round-first-blood": {
-  "messages": [
-    "🩸⚡ ROUND FIRST BLOOD. First vote in a NEW ROUND.",
-    "🎯 Round opener. You kick off new battles.",
-    "💼 First blood in round. That's initiative.",
-    "🔫 New round's first vote. Always ready."
-  ],
-  "details": [
-    "First vote in a new round shows readiness. +{xp} XP",
-    "You're present when rounds begin. Professional. +{xp} XP",
-    "Round openers set the standard for everyone. +{xp} XP"
-  ],
-  "buttons": [
-    "Round Start. 🩸",
-    "First In. ⚡",
-    "Ready. 🎯",
-    "Initiated. 💼"
-  ]
-},
-
-"daily-session-kickoff": {
-  "messages": [
-    "🌅 DAILY KICKOFF. Your first vote of the DAY.",
-    "🎯 Day started properly. First vote logged.",
-    "💼 Daily session opened. Ready to work.",
-    "🔫 First vote today. Let's proceed."
-  ],
-  "details": [
-    "Starting your day with a vote shows dedication. +{xp} XP",
-    "First vote of the day sets the tone for everything. +{xp} XP",
-    "Daily kickoffs demonstrate consistent commitment. +{xp} XP"
-  ],
-  "buttons": [
-    "Daily Start. 🌅",
-    "First Today. 🎯",
-    "Day One. 💼",
-    "Begin Work. 🔫"
-  ]
-},
-
-  "encore": {
-    "messages": [
-      "🎯 FIVE VOTES LOGGED. You're developing a pattern now.",
-      "💼 Five decisions made. You're beginning to understand the system.",
-      "🔫 Five shots fired. Your aim is becoming more consistent.",
-      "⚖️ Five votes cast. You're establishing yourself here."
-    ],
-    "details": [
-      "Five votes means you're taking this seriously. Good. +{xp} XP",
-      "You're building a track record now. +{xp} XP",
-      "Consistency is the foundation of excellence. +{xp} XP"
-    ],
-    "buttons": [
-      "Pattern Emerging. 🎯",
-      "Five Down. 💼",
-      "Keep Going. 🔫",
-      "To Ten. ⚖️"
-    ]
-  },
-
-  "world-tour": {
-    "messages": [
-      "🎯 TEN VOTES COMPLETED. You're becoming a regular presence here.",
-      "💼 Ten cases handled. Your judgment is being established.",
-      "🔫 Ten precise votes. You're no longer a novice.",
-      "⚖️ Ten decisions logged. You're building credibility."
-    ],
-    "details": [
-      "Ten votes means you're committed beyond casual participation. +{xp} XP",
-      "You're developing expertise with each decision. +{xp} XP",
-      "Double digits — this is when consistency becomes habit. +{xp} XP"
-    ],
-    "buttons": [
-      "Ten Strong. 🎯",
-      "Established. 💼",
-      "Keep Aiming. 🔫",
-      "Next Tier. ⚖️"
-    ]
-  },
-
-  "headliner": {
-    "messages": [
-      "🎯 TWENTY-FIVE VOTES. You're officially a headliner now.",
-      "💼 Quarter century of decisions. Your judgment carries weight.",
-      "🔫 Twenty-five shots, twenty-five decisions. Impressive consistency.",
-      "⚖️ Twenty-five votes logged. You're a veteran of this bracket."
-    ],
-    "details": [
-      "Twenty-five votes demonstrates serious commitment. +{xp} XP",
-      "You're no longer learning — you're executing. +{xp} XP",
-      "Quarter century milestone achieved with precision. +{xp} XP"
-    ],
-    "buttons": [
-      "Headliner Status. 🎯",
-      "25 Complete. 💼",
-      "Veteran. 🔫",
-      "To Fifty. ⚖️"
-    ]
-  },
-
-  "pentakill": {
-    "messages": [
-      "🎯 FIFTY VOTES ACHIEVED. Pentakill status confirmed.",
-      "💼 Fifty cases handled with consistency. You're excelling.",
-      "🔫 Fifty precise votes. Your reputation is growing.",
-      "⚖️ Half a hundred decisions. You're becoming legendary."
-    ],
-    "details": [
-      "Fifty votes is where casual voters become serious contenders. +{xp} XP",
-      "Your track record speaks for itself now. +{xp} XP",
-      "This level of dedication is rare and noteworthy. +{xp} XP"
-    ],
-    "buttons": [
-      "Pentakill. 🎯",
-      "Fifty Down. 💼",
-      "Excellence. 🔫",
-      "Century Next. ⚖️"
-    ]
-  },
-
-  "chart-topper": {
-    "messages": [
-      "🎯 ONE HUNDRED VOTES. Century club membership granted.",
-      "💼 A hundred decisions of consistent judgment. Remarkable.",
-      "🔫 Century achieved. Your dedication is extraordinary.",
-      "⚖️ One hundred votes logged. You're elite tier now."
-    ],
-    "details": [
-      "One hundred votes is where excellence becomes legendary. +{xp} XP",
-      "Century club members are the backbone of this bracket. +{xp} XP",
-      "This is the kind of commitment that defines champions. +{xp} XP"
-    ],
-    "buttons": [
-      "Century Club. 🎯",
-      "Elite Status. 💼",
-      "100 Strong. 🔫",
-      "Onward. ⚖️"
-    ]
-  },
-
-  "hall-of-fame": {
-    "messages": [
-      "🏆 TWO HUNDRED FIFTY VOTES. HALL OF FAME STATUS ACHIEVED.",
-      "🎯 Quarter thousand decisions. You're immortalized in this bracket.",
-      "💼 250 VOTES. Nobody questions your dedication now.",
-      "🔫 Hall of fame inducted. Two hundred fifty votes of pure consistency."
-    ],
-    "details": [
-      "Two hundred fifty votes. That's hall of fame territory. +{xp} XP",
-      "This is the kind of record that gets studied. +{xp} XP",
-      "You've achieved legendary status through sheer dedication. +{xp} XP"
-    ],
-    "buttons": [
-      "Hall of Fame. 🏆",
-      "Immortal. 🎯",
-      "Legendary. 💼",
-      "250 Down. 🔫"
-    ]
-  },
-
-  "on-fire": {
-    "messages": [
-      "🔥 THREE CONSECUTIVE DAYS. You're on fire now.",
-      "🎯 Three-day streak established. Consistency is key.",
-      "💼 Three days without missing. Professional dedication.",
-      "🔫 Three days running. You're building momentum."
-    ],
-    "details": [
-      "Three-day streaks are where discipline begins to show. +{xp} XP",
-      "Consistency over three days means you're serious. +{xp} XP",
-      "Every great streak starts with three. +{xp} XP"
-    ],
-    "buttons": [
-      "Three Days. 🔥",
-      "Keep Going. 🎯",
-      "Streak On. 💼",
-      "Day Four. 🔫"
-    ]
-  },
-
-  "hot-streak": {
-    "messages": [
-      "🎯 SEVEN STRAIGHT DAYS. Dedicated status confirmed.",
-      "💼 One full week unbroken. That's commitment.",
-      "🔫 Seven consecutive days. You're proving yourself.",
-      "⚖️ Week-long streak. Dedication acknowledged."
-    ],
-    "details": [
-      "Seven days straight is where casual becomes committed. +{xp} XP",
-      "A full week without missing shows real dedication. +{xp} XP",
-      "This is the kind of consistency enforcers are built on. +{xp} XP"
-    ],
-    "buttons": [
-      "One Week. 🎯",
-      "Dedicated. 💼",
-      "Keep Aiming. 🔫",
-      "Day Eight. ⚖️"
-    ]
-  },
-
-  "unstoppable": {
-    "messages": [
-      "⚡ FOURTEEN DAYS STRAIGHT. Unstoppable momentum.",
-      "🎯 Two full weeks unbroken. Extraordinary consistency.",
-      "💼 Fourteen consecutive days. You're a machine.",
-      "🔫 Two weeks without missing. Champion behavior."
-    ],
-    "details": [
-      "Fourteen days proves this isn't luck — it's discipline. +{xp} XP",
-      "Two weeks of perfect attendance is rare excellence. +{xp} XP",
-      "This is the kind of dedication that wins tournaments. +{xp} XP"
-    ],
-    "buttons": [
-      "Unstoppable. ⚡",
-      "Two Weeks. 🎯",
-      "Machine. 💼",
-      "Day 15. 🔫"
-    ]
-  },
-
-  "legendary-streak": {
-    "messages": [
-      "🏆 THIRTY DAYS UNBROKEN. LEGENDARY STREAK ACHIEVED.",
-      "🎯 ONE FULL MONTH without missing. That's historic.",
-      "💼 Thirty consecutive days. You're in the record books.",
-      "🔫 Month-long perfection. Legendary status confirmed."
-    ],
-    "details": [
-      "Thirty days straight is the kind of achievement that gets remembered. +{xp} XP",
-      "A full month of dedication? That's championship material. +{xp} XP",
-      "This streak will be analyzed for years to come. +{xp} XP"
-    ],
-    "buttons": [
-      "Legendary. 🏆",
-      "One Month. 🎯",
-      "Historic. 💼",
-      "Day 31. 🔫"
-    ]
-  },
-
-  "underdog-champion": {
-    "messages": [
-      "🐕 FIVE UNDERDOG PICKS. You see potential others miss.",
-      "🎯 Five times you backed the unlikely. Good instincts.",
-      "💼 Underdog champion status. You trust your analysis.",
-      "🔫 Five longshots supported. That takes conviction."
-    ],
-    "details": [
-      "Five underdog votes shows you think independently. +{xp} XP",
-      "You don't follow the crowd — you follow your judgment. +{xp} XP",
-      "Backing underdogs requires confidence in your analysis. +{xp} XP"
-    ],
-    "buttons": [
-      "Underdog Love. 🐕",
-      "Trust Analysis. 🎯",
-      "Independent. 💼",
-      "Next Pick. 🔫"
-    ]
-  },
-
-  "dark-horse": {
-    "messages": [
-      "🐴 FIFTEEN UNDERDOG VOTES. Dark horse specialist confirmed.",
-      "🎯 Fifteen longshots backed. You see what others don't.",
-      "💼 Dark horse status achieved. Your instincts are sharp.",
-      "🔫 Fifteen times you defied expectations. Impressive."
-    ],
-    "details": [
-      "Fifteen underdog picks proves you trust your judgment. +{xp} XP",
-      "You analyze independently — that's rare. +{xp} XP",
-      "Dark horse voters often see outcomes before they happen. +{xp} XP"
-    ],
-    "buttons": [
-      "Dark Horse. 🐴",
-      "Sharp Instinct. 🎯",
-      "Independent Mind. 💼",
-      "Keep Analyzing. 🔫"
-    ]
-  },
-
-  "rebel-heart": {
-    "messages": [
-      "💢 THIRTY UNDERDOG PICKS. Rebel heart status earned.",
-      "🎯 Thirty times you went against the grain. Remarkable.",
-      "💼 Rebel heart confirmed. You trust yourself completely.",
-      "🔫 Thirty longshots. You don't need validation."
-    ],
-    "details": [
-      "Thirty underdog votes means you march to your own analysis. +{xp} XP",
-      "You don't follow trends — you identify opportunities. +{xp} XP",
-      "This level of independent thinking is extraordinary. +{xp} XP"
-    ],
-    "buttons": [
-      "Rebel Heart. 💢",
-      "Own Path. 🎯",
-      "Independent. 💼",
-      "Trust Self. 🔫"
-    ]
-  },
-
-  "early-bird": {
-    "messages": [
-      "🌅 FIRST TEN VOTERS — FIVE TIMES. Early bird status.",
-      "🎯 Five times among the first. You're punctual.",
-      "💼 Early bird confirmed. Five early arrivals logged.",
-      "🔫 First ten in five matches. Excellent timing."
-    ],
-    "details": [
-      "Early voters set the pace for everyone else. +{xp} XP",
-      "Being first five times shows dedication and timing. +{xp} XP",
-      "Punctuality is a virtue in enforcement. +{xp} XP"
-    ],
-    "buttons": [
-      "Early Bird. 🌅",
-      "Punctual. 🎯",
-      "First Five. 💼",
-      "Keep It Up. 🔫"
-    ]
-  },
-
-  "trendsetter": {
-    "messages": [
-      "⚡ FIRST TEN VOTERS — FIFTEEN TIMES. Trendsetter confirmed.",
-      "🎯 Fifteen early arrivals. You're a pace-setter.",
-      "💼 Trendsetter status achieved. Fifteen first-ten appearances.",
-      "🔫 First ten in fifteen matches. You lead, others follow."
-    ],
-    "details": [
-      "Fifteen early votes means you're not following — you're leading. +{xp} XP",
-      "Trendsetters establish standards for everyone else. +{xp} XP",
-      "This is leadership through consistent action. +{xp} XP"
-    ],
-    "buttons": [
-      "Trendsetter. ⚡",
-      "Leader. 🎯",
-      "First Fifteen. 💼",
-      "Keep Leading. 🔫"
-    ]
-  },
-
-  "nail-biter": {
-    "messages": [
-      "😰 TEN CLOSE MATCHES (within 5%). Nail-biter veteran.",
-      "🎯 Ten tight battles survived. You thrive under pressure.",
-      "💼 Nail-biter status earned. Ten close calls handled.",
-      "🔫 Ten matches within 5%. Every vote mattered."
-    ],
-    "details": [
-      "Ten close matches means you're drawn to high-stakes situations. +{xp} XP",
-      "Nail-biters separate good voters from great ones. +{xp} XP",
-      "You've proven you can handle pressure. +{xp} XP"
-    ],
-    "buttons": [
-      "Pressure Proof. 😰",
-      "Ten Close. 🎯",
-      "Thrives. 💼",
-      "High Stakes. 🔫"
-    ]
-  },
-
-  "deciding-vote": {
-    "messages": [
-      "⚡ TWENTY-FIVE CLOSE MATCHES. You're the deciding vote.",
-      "🎯 25 nail-biters participated in. Your impact is massive.",
-      "💼 Deciding vote status confirmed. 25 tight battles.",
-      "🔫 Twenty-five close calls. You show up when it matters."
-    ],
-    "details": [
-      "Twenty-five close matches means your vote is powerful. +{xp} XP",
-      "You're present for the moments that decide everything. +{xp} XP",
-      "This is clutch performance at the highest level. +{xp} XP"
-    ],
-    "buttons": [
-      "Deciding Vote. ⚡",
-      "25 Close. 🎯",
-      "Clutch. 💼",
-      "Critical. 🔫"
-    ]
-  },
-
-  "true-fan": {
-    "messages": [
-      "💙 TRUE FAN. Voted for the same song THREE times.",
-      "🎯 Three votes, one song. That's loyalty.",
-      "💼 True fan status. Three consistent votes logged.",
-      "🔫 Same song three times. You know what you like."
-    ],
-    "details": [
-      "Three votes for one song shows conviction. +{xp} XP",
-      "True fans don't waver when they find quality. +{xp} XP",
-      "This is dedicated support in action. +{xp} XP"
-    ],
-    "buttons": [
-      "True Fan. 💙",
-      "Loyal. 🎯",
-      "Three Times. 💼",
-      "Consistent. 🔫"
-    ]
-  },
-
-  "superfan": {
-    "messages": [
-      "💙🔥 SUPERFAN. FIVE votes for the same song.",
-      "🎯 Five times supporting one track. Superfan confirmed.",
-      "💼 Superfan status achieved. Five consistent votes.",
-      "🔫 Same song five times. That's dedication."
-    ],
-    "details": [
-      "Five votes for one song proves serious loyalty. +{xp} XP",
-      "Superfans are the foundation of every great bracket. +{xp} XP",
-      "This level of support is rare and valuable. +{xp} XP"
-    ],
-    "buttons": [
-      "Superfan. 💙",
-      "Five Strong. 🔥",
-      "Dedicated. 🎯",
-      "Ultimate. 💼"
-    ]
-  },
-
-  "ultimate-stan": {
-    "messages": [
-      "💙👑 ULTIMATE STAN. TEN VOTES FOR ONE SONG.",
-      "🎯 Ten times? That's ultimate dedication confirmed.",
-      "💼 Ultimate stan status achieved. Ten loyal votes.",
-      "🔫 Same song ten times. Nobody's more dedicated."
-    ],
-    "details": [
-      "Ten votes for one song is ultimate stan territory. +{xp} XP",
-      "This is your anthem and you've made it known. +{xp} XP",
-      "Ultimate loyalty deserves ultimate recognition. +{xp} XP"
-    ],
-    "buttons": [
-      "Ultimate Stan. 💙",
-      "Ten Forever. 👑",
-      "My Anthem. 🎯",
-      "Eternal. 💼"
-    ]
-  },
-
-  "founding-member": {
-    "messages": [
-      "🏛️ FOUNDING MEMBER. Voted before 1,000 total votes.",
-      "🎯 Early adopter status. You were here from the beginning.",
-      "💼 Founding member confirmed. You built this.",
-      "🔫 OG voter. You helped establish this bracket."
-    ],
-    "details": [
-      "You were here before most people knew this existed. +{xp} XP",
-      "Founding members are the foundation. +{xp} XP",
-      "Early adopters make everything possible. +{xp} XP"
-    ],
-    "buttons": [
-      "Founder. 🏛️",
-      "OG Status. 🎯",
-      "Early. 💼",
-      "Built This. 🔫"
-    ]
-  },
-
-  "quarter-final-supporter": {
-    "messages": [
-      "🏆 QUARTER-FINALS. You voted in the elite eight.",
-      "🎯 Top eight supporter. That's high-stakes voting.",
-      "💼 Quarter-final battles handled. Elite level.",
-      "🔫 Elite eight participation confirmed."
-    ],
-    "details": [
-      "Quarter-finals are where champions begin to emerge. +{xp} XP",
-      "Elite eight battles require expert judgment. +{xp} XP",
-      "You're voting at the highest level now. +{xp} XP"
-    ],
-    "buttons": [
-      "Elite Eight. 🏆",
-      "Quarter-Finals. 🎯",
-      "High Stakes. 💼",
-      "To Semis. 🔫"
-    ]
-  },
-
-  "semi-final-believer": {
-    "messages": [
-      "🔥 SEMI-FINALS. Final four voting complete.",
-      "🎯 Semi-final believer confirmed. Four songs left.",
-      "💼 Final four supporter. Championship level.",
-      "🔫 Semi-finals handled. Only the best remain."
-    ],
-    "details": [
-      "Semi-finals decide who reaches the championship. +{xp} XP",
-      "Final four voting requires peak judgment. +{xp} XP",
-      "You're witnessing the highest level of competition. +{xp} XP"
-    ],
-    "buttons": [
-      "Final Four. 🔥",
-      "Semi-Finals. 🎯",
-      "Peak Level. 💼",
-      "To Finals. 🔫"
-    ]
-  },
-
-  "championship-supporter": {
-    "messages": [
-      "👑 CHAMPIONSHIP. You voted in the finals.",
-      "🏆 Finals voter confirmed. The ultimate battle witnessed.",
-      "🎯 Championship supporter. You were there for history.",
-      "💼 Finals complete. Champion crowned with your input."
-    ],
-    "details": [
-      "Championship voting means you witnessed the pinnacle. +{xp} XP",
-      "Finals are where legends are crowned. You participated. +{xp} XP",
-      "You voted in the most important match of all. +{xp} XP"
-    ],
-    "buttons": [
-      "Champion. 👑",
-      "Finals. 🏆",
-      "Witnessed. 🎯",
-      "History. 💼"
-    ]
-  },
-
-  "tournament-veteran": {
-    "messages": [
-      "🎖️ TOURNAMENT VETERAN. All six rounds completed.",
-      "🎯 Full tournament participation. Start to finish.",
-      "💼 Every round voted. Complete dedication shown.",
-      "🔫 Veteran status earned. Six rounds, zero misses."
-    ],
-    "details": [
-      "All six rounds means you saw the entire story. +{xp} XP",
-      "Tournament veterans are the backbone of competition. +{xp} XP",
-      "Start to finish — that's true commitment. +{xp} XP"
-    ],
-    "buttons": [
-      "Veteran. 🎖️",
-      "All Rounds. 🎯",
-      "Complete. 💼",
-      "Full Tour. 🔫"
-    ]
-  },
-
-  "completionist": {
-    "messages": [
-      "✅ COMPLETIONIST. Fifty unique matches voted.",
-      "🎯 50 different battles participated in. Comprehensive.",
-      "💼 Completionist status confirmed. Fifty unique votes.",
-      "🔫 Fifty different matches. You covered everything."
-    ],
-    "details": [
-      "Fifty unique matches shows thorough participation. +{xp} XP",
-      "Completionists don't miss opportunities. +{xp} XP",
-      "This is comprehensive coverage at its finest. +{xp} XP"
-    ],
-    "buttons": [
-      "50 Unique. ✅",
-      "Complete. 🎯",
-      "All Covered. 💼",
-      "Thorough. 🔫"
-    ]
-  },
-
-  "lightning-fast": {
-    "messages": [
-      "⚡ LIGHTNING-FAST. Voted within ONE MINUTE of match going live.",
-      "🎯 Under sixty seconds. Your reflexes are exceptional.",
-      "💼 Lightning-fast voter confirmed. Immediate response.",
-      "🔫 One-minute vote. That's speed and dedication."
-    ],
-    "details": [
-      "One minute or less shows incredible timing. +{xp} XP",
-      "Lightning reflexes separate good from great. +{xp} XP",
-      "Speed like this requires constant vigilance. +{xp} XP"
-    ],
-    "buttons": [
-      "Lightning. ⚡",
-      "Fast. 🎯",
-      "Instant. 💼",
-      "Quick Shot. 🔫"
-    ]
-  },
-
-  "prophet": {
-    "messages": [
-      "🔮 PROPHET. Voted for the tournament winner in ROUND ONE.",
-      "🎯 Called it from the start. That's exceptional foresight.",
-      "💼 Prophet status confirmed. Round one winner pick.",
-      "🔫 Predicted the champion in round one. Remarkable."
-    ],
-    "details": [
-      "Calling the winner from day one shows true vision. +{xp} XP",
-      "Prophetic judgment like this is rare. +{xp} XP",
-      "You saw the champion before anyone else. +{xp} XP"
-    ],
-    "buttons": [
-      "Prophet. 🔮",
-      "Called It. 🎯",
-      "Foresight. 💼",
-      "I Knew. 🔫"
-    ]
-  },
-
-  "taste-maker": {
-    "messages": [
-      "🎵 TASTE-MAKER. Voted for TEN DIFFERENT ARTISTS.",
-      "🎯 Ten artists supported. Your taste is diverse.",
-      "💼 Taste-maker status achieved. Ten different artists.",
-      "🔫 Ten artists voted for. You appreciate range."
-    ],
-    "details": [
-      "Ten different artists shows breadth of taste. +{xp} XP",
-      "You don't limit yourself to one genre or style. +{xp} XP",
-      "Diverse taste means you recognize quality everywhere. +{xp} XP"
-    ],
-    "buttons": [
-      "Taste-Maker. 🎵",
-      "Ten Artists. 🎯",
-      "Diverse. 💼",
-      "Broad Range. 🔫"
-    ]
-  },
-
-  "music-historian": {
-    "messages": [
-      "📚 MUSIC HISTORIAN. Songs from FIVE DIFFERENT YEARS.",
-      "🎵 Five years covered. You appreciate all eras.",
-      "🎯 Historian status confirmed. Five different years.",
-      "💼 Five years voted. You span decades."
-    ],
-    "details": [
-      "Five different years shows historical appreciation. +{xp} XP",
-      "You understand music across time periods. +{xp} XP",
-      "Historians see the full picture. +{xp} XP"
-    ],
-    "buttons": [
-      "Historian. 📚",
-      "Five Years. 🎵",
-      "All Eras. 🎯",
-      "Time Span. 💼"
-    ]
-  },
-
-  "triple-threat": {
-    "messages": [
-      "💥 TRIPLE THREAT. Three matches in ONE SESSION.",
-      "🎯 Three votes, one sitting. Efficient work.",
-      "💼 Triple threat status. Three fights handled.",
-      "🔫 Three in one session. Good momentum."
-    ],
-    "details": [
-      "Three matches in one session shows efficiency. +{xp} XP",
-      "You're accelerating your involvement. +{xp} XP",
-      "Triple threats maintain good pace. +{xp} XP"
-    ],
-    "buttons": [
-      "Triple. 💥",
-      "Three. 🎯",
-      "Efficient. 💼",
-      "Keep Going. 🔫"
-    ]
-  },
-
-  "vote-spree": {
-    "messages": [
-      "🔥 VOTE SPREE. FIVE matches in ONE SESSION.",
-      "🎯 Five in a row. You're on a roll.",
-      "💼 Vote spree confirmed. Five consecutive votes.",
-      "🔫 Five-vote session. Excellent momentum."
-    ],
-    "details": [
-      "Five matches in one session shows dedication. +{xp} XP",
-      "You're in the zone now. +{xp} XP",
-      "Sprees like this win tournaments. +{xp} XP"
-    ],
-    "buttons": [
-      "Spree. 🔥",
-      "Five. 🎯",
-      "Rolling. 💼",
-      "Continue. 🔫"
-    ]
-  },
-
-  "power-voter": {
-    "messages": [
-      "⚡ POWER VOTER. TEN matches in ONE SESSION.",
-      "🎯 Ten in one sitting. You're a machine.",
-      "💼 Power voter status achieved. Ten consecutive votes.",
-      "🔫 Ten-vote session. Absolute dedication."
-    ],
-    "details": [
-      "Ten matches in one session is power performance. +{xp} XP",
-      "You're not just voting — you're dominating. +{xp} XP",
-      "This is championship-level commitment. +{xp} XP"
-    ],
-    "buttons": [
-      "Power. ⚡",
-      "Ten. 🎯",
-      "Machine. 💼",
-      "Dominate. 🔫"
-    ]
-  },
-
-  "voting-marathon": {
-    "messages": [
-      "🏃 VOTING MARATHON. TWENTY matches in ONE SESSION.",
-      "🎯 Twenty votes straight. Extraordinary endurance.",
-      "💼 Marathon status confirmed. Twenty consecutive votes.",
-      "🔫 Twenty in one session. Legendary dedication."
-    ],
-    "details": [
-      "Twenty matches in one session is marathon-level commitment. +{xp} XP",
-      "You don't stop. Remarkable endurance. +{xp} XP",
-      "This is the kind of dedication that defines legends. +{xp} XP"
-    ],
-    "buttons": [
-      "Marathon. 🏃",
-      "Twenty. 🎯",
-      "Endurance. 💼",
-      "Unstoppable. 🔫"
-    ]
-  },
-
-
-
-"daily-comeback": {
-"messages": [
-"🔄 DAILY COMEBACK. You returned after THREE DAYS.",
-"🎯 Welcome back. Three days absence noted.",
-"💼 Comeback status. Good to see you return.",
-"🔫 Three days away, now back. Let's continue."
-],
-"details": [
-"Returning after three days shows commitment. +{xp} XP",
-"Breaks happen. What matters is coming back. +{xp} XP",
-"You stepped away and returned. Commendable. +{xp} XP"
-],
-"buttons": [
-"I'm Back. 🔄",
-"Returned. 🎯",
-"Resume. 💼",
-"Continue. 🔫"
-]
-},
-
-"community-voice": {
-"messages": [
-"📢 COMMUNITY VOICE. FIVE social media shares.",
-"🎯 Five shares logged. You're spreading awareness.",
-"💼 Community voice status. Five shares completed.",
-"🔫 Five shares. You're building the community."
-],
-"details": [
-"Five shares means you're recruiting others. +{xp} XP",
-"Community voices strengthen the bracket. +{xp} XP",
-"Sharing five times shows you believe in this. +{xp} XP"
-],
-"buttons": [
-"Five Shares. 📢",
-"Spread Word. 🎯",
-"Community. 💼",
-"Keep Sharing. 🔫"
-]
-},
-"hype-master": {
-"messages": [
-"📢🔥 HYPE MASTER. FIFTEEN social media shares.",
-"🎯 Fifteen shares. You're a recruitment specialist.",
-"💼 Hype master status achieved. Fifteen shares logged.",
-"🔫 Fifteen shares. The community grows because of you."
-],
-"details": [
-"Fifteen shares means you're a community builder. +{xp} XP",
-"Hype masters grow the bracket exponentially. +{xp} XP",
-"This level of promotion is invaluable. +{xp} XP"
-],
-"buttons": [
-"Hype Master. 📢",
-"Fifteen. 🔥",
-"Builder. 🎯",
-"Grow It. 💼"
-]
-}
-}
 }

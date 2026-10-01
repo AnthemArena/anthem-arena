@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Feed | Anthem Arena</title>
+<title>Community | Arcane Moments</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -38,8 +38,8 @@
         <div class="profile-content">
             <img id="sidebarAvatar" src="" alt="Avatar" class="sidebar-avatar">
             <h3 id="sidebarUsername" class="sidebar-username">Loading...</h3>
-            <p id="sidebarBio" class="sidebar-bio">Music Tournament Enthusiast</p>
-            
+<p id="sidebarBio" class="sidebar-bio">Arcane Moments Community Member</p>
+
             <div class="profile-stats">
                 <a href="/profile.html" class="stat-item">
                     <span class="stat-value" id="sidebarVotes">0</span>
@@ -66,7 +66,7 @@
     <!-- ✅ NEW: Featured Achievement Widget -->
     <div id="featuredAchievementWidget" class="sidebar-widget"></div>
     
-    <!-- ✅ NEW: Top Song Widget -->
+    <!-- ✅ NEW: Top Moments Widget -->
     <div id="topSongWidget" class="sidebar-widget"></div>
 
     <!-- Quick Nav -->
@@ -102,7 +102,7 @@
             type="text" 
             id="feedSearchInput" 
             class="feed-search-input" 
-            placeholder="Search posts, users, songs..."
+placeholder="Search posts, users, moments..."
             autocomplete="off"
         >
         <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">
@@ -113,12 +113,12 @@
                 
                 <!-- Filter Tabs -->
                 <div class="feed-filters">
-                    <button class="filter-btn active" data-filter="all">
-                        <i class="fa-solid fa-globe"></i> All Posts
-                    </button>
-                        <button class="filter-btn" data-filter="my-posts">
-        <i class="fa-solid fa-user"></i> My Posts
-    </button>
+                 <button class="filter-btn active" data-filter="all">
+    <i class="fa-solid fa-globe"></i> All Activity
+</button>
+<button class="filter-btn" data-filter="my-posts">
+    <i class="fa-solid fa-user"></i> My Activity
+</button>
                     <button class="filter-btn" data-filter="following">
                         <i class="fa-solid fa-user-group"></i> Following
                     </button>
@@ -157,8 +157,8 @@
                 
                 <div id="emptyState" class="empty-state" style="display: none;">
                     <i class="fa-solid fa-box-open"></i>
-                    <h3>No Posts Yet</h3>
-                    <p>Be the first to share your vote or start a conversation!</p>
+                   <h3>No Activity Yet</h3>
+<p>Be the first to cast a vote or start a conversation!</p>
                     <a href="/matches" class="cta-btn">
                         <i class="fa-solid fa-play"></i> Start Voting
                     </a>
