@@ -1,6 +1,6 @@
 // ========================================
 // FEED PAGE - UI CONTROLLER
-// League Music Tournament
+// Arcane Moments Community
 // ========================================
 import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
@@ -13,6 +13,8 @@ import {
     unfollowUser,
     isFollowing 
 } from './social-feed.js';
+
+import { getActivityFeed, getAllMatches } from './api-client.js';
 
 // ========================================
 // SONG DATA
@@ -185,18 +187,18 @@ async function loadAllUsers(forceRefresh = false) {
 
 function getRankTitle(level) {
     const ranks = {
-        1: 'New Voter',
-        2: 'Music Fan',
-        3: 'Enthusiast',
-        4: 'Dedicated Fan',
-        5: 'Tournament Regular',
-        6: 'Power Voter',
-        7: 'Super Fan',
-        8: 'Elite Voter',
-        9: 'Legend',
-        10: 'Arena Champion'
+        1: 'New Arrival',
+        2: 'Lanes Regular',
+        3: 'Rising Name',
+        4: 'Arcane Insider',
+        5: 'Streetwise',
+        6: 'Notorious',
+        7: 'Hextech Adept',
+        8: 'Power Player',
+        9: 'Underworld Legend',
+        10: 'Arcane Legend'
     };
-    return ranks[level] || 'New Voter';
+    return ranks[level] || 'New Arrival';
 }
 
 // ========================================
@@ -372,6 +374,90 @@ let currentFilter = 'all';
 let currentPosts = [];
 let lastLoadedIndex = 0;
 const POSTS_PER_PAGE = 20;
+
+function convertActivityToFeedPost(activity, matchMap) {
+    const match = matchMap.get(activity.matchId);
+
+    const firstMoment = match?.song1 || match?.competitor1;
+    const secondMoment = match?.song2 || match?.competitor2;
+
+    const getMomentName = (moment, fallback = 'Unknown Moment') => {
+        return (
+            moment?.shortTitle ||
+            moment?.title ||
+            moment?.name ||
+            fallback
+        );
+    };
+
+    // The vote record already tells us which side was chosen.
+    const votedMoment =
+        activity.choice === 'song1'
+            ? firstMoment
+            : secondMoment;
+
+    const opponentMoment =
+        activity.choice === 'song1'
+            ? secondMoment
+            : firstMoment;
+
+    const votedMomentName = getMomentName(
+        votedMoment,
+        activity.songTitle || 'Unknown Moment'
+    );
+
+    const opponentMomentName = getMomentName(
+        opponentMoment,
+        'Unknown Moment'
+    );
+
+    const votedVideoId =
+        votedMoment?.videoId ||
+        activity.songId ||
+        null;
+
+    const opponentVideoId =
+        opponentMoment?.videoId ||
+        null;
+
+    return {
+        postId: `activity_${activity.activityId || `${activity.userId}_${activity.matchId}`}`,
+
+        userId: activity.userId,
+        username: activity.username || 'Anonymous',
+        avatar: activity.avatar,
+
+        type: 'vote',
+
+        text: `chose ${votedMomentName} over ${opponentMomentName}`,
+
+        matchId: activity.matchId,
+
+        votedMomentName,
+        opponentMomentName,
+
+        // Keep old field names internally for compatibility.
+        votedSongName: votedMomentName,
+        opponentSongName: opponentMomentName,
+
+        votedMomentId: votedVideoId,
+        opponentMomentId: opponentVideoId,
+
+        votedSongId: votedVideoId,
+        opponentSongId: opponentVideoId,
+
+        choice: activity.choice,
+
+        round: activity.round || match?.round || 1,
+        tournamentId: activity.tournamentId,
+
+        timestamp: activity.timestamp || Date.now(),
+        privacy: 'public',
+
+        likeCount: 0,
+        commentCount: 0
+    };
+}
 
 // ========================================
 // INITIALIZATION
@@ -749,9 +835,43 @@ async function loadFeed() {
                 (post.likeCount || 0) + (post.commentCount || 0) > 0
             );
             
-        } else {
-            // ✅ ALL: Show all public posts (default)
-            currentPosts = await getFeed('all', 100);
+                } else {
+            // ========================================
+            // ALL ACTIVITY
+            // Combine:
+            // 1. Automatic vote activity
+            // 2. Genuine user-created posts
+            // ========================================
+
+            const [activities, matches, socialPosts] = await Promise.all([
+                getActivityFeed(100),
+                getAllMatches(),
+                getFeed('all', 100)
+            ]);
+
+            const matchMap = new Map(
+                matches.map(match => [match.matchId || match.id, match])
+            );
+
+            // Vote activity is represented by the activity collection.
+            // Remove old automatic vote-post duplicates from the social feed.
+            const userPosts = socialPosts.filter(
+                post => post.type !== 'vote'
+            );
+
+            const activityPosts = activities
+                .filter(activity => activity.isPublic !== false)
+                .map(activity =>
+                    convertActivityToFeedPost(activity, matchMap)
+                );
+
+            currentPosts = [...activityPosts, ...userPosts]
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                .slice(0, 100);
+
+            console.log(
+                `✅ Community activity loaded: ${activityPosts.length} vote activities + ${userPosts.length} user posts`
+            );
         }
         
         // Hide loading
@@ -842,94 +962,140 @@ function renderPosts(startIndex, count) {
     }
 }
 
-// ========================================
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
-        
-        // Get percentages (default to 50/50 if no matchState)
+        // Keep old database field names for compatibility,
+        // but present everything as Arcane moments.
+        const votedMomentName =
+            post.votedMomentName ||
+            post.votedSongName ||
+            post.songTitle ||
+            'Unknown Moment';
+
+        const opponentMomentName =
+            post.opponentMomentName ||
+            post.opponentSongName ||
+            'Unknown Moment';
+
         const userPct = post.matchState?.userPct ?? 50;
         const opponentPct = 100 - userPct;
-        
-        // Get thumbnails
-        const votedThumbnail = post.votedThumbnail || 
-            (post.votedSongId ? `https://img.youtube.com/vi/${post.votedSongId}/mqdefault.jpg` : '');
-        
-        const opponentThumbnail = post.opponentThumbnail || 
-            (post.opponentSongId ? `https://img.youtube.com/vi/${post.opponentSongId}/mqdefault.jpg` : '');
-        
-        // ✅ FIX: Determine which card is picked based on videoId match, not position
-        const leftSongIsPicked = post.votedSongId === post.votedSongId; // Always true for left (voted song)
-        const rightSongIsPicked = false; // Right is always opponent
-        
+
+        const votedThumbnail =
+            post.votedThumbnail ||
+            (post.votedMomentId || post.votedSongId
+                ? `https://img.youtube.com/vi/${post.votedMomentId || post.votedSongId}/mqdefault.jpg`
+                : '');
+
+        const opponentThumbnail =
+            post.opponentThumbnail ||
+            (post.opponentMomentId || post.opponentSongId
+                ? `https://img.youtube.com/vi/${post.opponentMomentId || post.opponentSongId}/mqdefault.jpg`
+                : '');
+
         return `
-            <p class="post-text vote-text">
-                <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
-            </p>
-            
+          <p class="post-text vote-text">
+    <i class="fa-solid fa-film"></i>
+    <span class="vote-text-copy">
+        chose <strong>${escapeHtml(votedMomentName)}</strong>
+        over ${escapeHtml(opponentMomentName)}
+    </span>
+</p>
+
             <div class="match-embed-card" data-match-id="${post.matchId}">
                 <div class="match-versus">
-                    <div class="match-song ${leftSongIsPicked ? 'picked' : ''}">
+
+                    <div class="match-song picked">
                         <div class="song-thumbnail">
-                            <img src="${votedThumbnail}" alt="${escapeHtml(post.votedSongName)}" loading="lazy">
+                            ${
+                                votedThumbnail
+                                    ? `<img
+                                        src="${votedThumbnail}"
+                                        alt="${escapeHtml(votedMomentName)}"
+                                        loading="lazy"
+                                    >`
+                                    : ''
+                            }
                         </div>
+
                         <div class="song-details">
-                            <span class="song-name">${escapeHtml(post.votedSongName || 'Song 1')}</span>
+                            <span class="song-name">
+                                ${escapeHtml(votedMomentName)}
+                            </span>
                             <span class="song-pct">${userPct}%</span>
                         </div>
                     </div>
-                    
+
                     <div class="vs-circle">VS</div>
-                    
-                    <div class="match-song ${rightSongIsPicked ? 'picked' : ''}">
+
+                    <div class="match-song">
                         <div class="song-thumbnail">
-                            <img src="${opponentThumbnail}" alt="${escapeHtml(post.opponentSongName)}" loading="lazy">
+                            ${
+                                opponentThumbnail
+                                    ? `<img
+                                        src="${opponentThumbnail}"
+                                        alt="${escapeHtml(opponentMomentName)}"
+                                        loading="lazy"
+                                    >`
+                                    : ''
+                            }
                         </div>
+
                         <div class="song-details">
-                            <span class="song-name">${escapeHtml(post.opponentSongName || 'Song 2')}</span>
+                            <span class="song-name">
+                                ${escapeHtml(opponentMomentName)}
+                            </span>
                             <span class="song-pct">${opponentPct}%</span>
                         </div>
                     </div>
+
                 </div>
-                
+
                 <div class="match-progress">
                     <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${userPct}%"></div>
+                        <div
+                            class="progress-bar-fill"
+                            style="width: ${userPct}%"
+                        ></div>
                     </div>
                 </div>
-                
-                <a href="/vote.html?id=${post.matchId}" class="match-view-btn">
+
+                <a
+                    href="/vote.html?id=${post.matchId}"
+                    class="match-view-btn"
+                >
                     View Match
                 </a>
             </div>
         `;
-     } else if (post.type === 'user_post' && post.content) {
+
+    } else if (post.type === 'user_post' && post.content) {
+
         let displayContent = post.content;
-        
-        // Remove YouTube URL from text if showing embed
+
+        // Remove YouTube URL from visible post text if an embed is present.
         if (post.youtubeVideoId) {
             displayContent = displayContent
-                .replace(/https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu.be\/|youtube\.com\/shorts\/)[^\s]+/gi, '')
+                .replace(
+                    /https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu.be\/|youtube\.com\/shorts\/)[^\s]+/gi,
+                    ''
+                )
                 .trim();
         }
-        
-        // Parse mentions and songs
-        const withSongs = parseSongMentions(displayContent);
-        const withMentions = parseMentionsHTML(withSongs);
-        
-        // Simple text display (no collapse needed - all posts ≤ 280 chars)
-        const textHtml = withMentions.trim() 
-            ? `<p class="post-text">${withMentions}</p>` 
+
+        const withMentions = parseMentionsHTML(displayContent);
+
+        const textHtml = withMentions.trim()
+            ? `<p class="post-text">${withMentions}</p>`
             : '';
-        
+
         return `
             ${textHtml}
             ${post.youtubeVideoId ? renderYouTubeEmbed(post) : ''}
         `;
     }
-    
+
     return '';
-}   
+}
 
 // ========================================
 // ✅ NEW: RENDER YOUTUBE EMBED
@@ -1052,7 +1218,7 @@ function setupMentionTooltips() {
             const userId = mention.dataset.userId;
             const username = mention.dataset.username;
             const level = mention.dataset.level || '1';
-            const rank = mention.dataset.rank || 'New Voter';
+            const rank = mention.dataset.rank || 'New Arrival';
             const votes = mention.dataset.votes || '0';
             
             // Get user from allUsers array

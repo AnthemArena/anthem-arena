@@ -8,35 +8,49 @@
 
 export const RANK_SYSTEM = {
     levels: [
-        { level: 1, xpNeeded: 0, title: '🎵 New Voter' },
-        { level: 2, xpNeeded: 100, title: '🎶 Music Fan' },
-        { level: 3, xpNeeded: 250, title: '🎧 Enthusiast' },
-        { level: 4, xpNeeded: 500, title: '🎸 Dedicated Fan' },          // ✅ Shortened
-        { level: 5, xpNeeded: 1000, title: '🎭 Tournament Regular' },
-        { level: 6, xpNeeded: 1750, title: '🔥 Power Voter' },
-        { level: 7, xpNeeded: 3000, title: '⭐ Super Fan' },
-        { level: 8, xpNeeded: 5000, title: '👑 Elite Voter' },
-        { level: 9, xpNeeded: 8000, title: '💎 Legend' },
-        { level: 10, xpNeeded: 12000, title: '🏆 Arena Champion' }       // ✅ Shortened
+     { level: 1, xpNeeded: 0, title: '✨ New Arrival' },
+{ level: 2, xpNeeded: 100, title: '🛤️ Lanes Regular' },
+{ level: 3, xpNeeded: 250, title: '🌟 Rising Name' },
+{ level: 4, xpNeeded: 500, title: '🔮 Arcane Insider' },
+{ level: 5, xpNeeded: 1000, title: '🥊 Streetwise' },
+{ level: 6, xpNeeded: 1750, title: '🔥 Notorious' },
+{ level: 7, xpNeeded: 3000, title: '⚡ Hextech Adept' },
+{ level: 8, xpNeeded: 5000, title: '💥 Power Player' },
+{ level: 9, xpNeeded: 8000, title: '👑 Underworld Legend' },
+{ level: 10, xpNeeded: 12000, title: '🌌 Arcane Legend' }
     ],
-    
+
     xpSources: {
         vote: 10,
-        firstVoteOfDay: 25,
-        votingStreakDaily: 15,
+        firstVoteOfDay: 20,
+        votingStreakDaily: 10,
         underdogPick: 5,
         closeMatch: 10,
         firstVoteInMatch: 5,
-            share: 5  // ✅ ADD THIS
-
+        share: 10
     },
-    
-    // ✅ NEW: Tier groupings
+
     tiers: {
-        BRONZE: { levels: [1, 2, 3], color: '#CD7F32', label: 'Bronze' },
-        SILVER: { levels: [4, 5, 6], color: '#C0C0C0', label: 'Silver' },
-        GOLD: { levels: [7, 8], color: '#FFD700', label: 'Gold' },
-        LEGEND: { levels: [9, 10], color: '#C8AA6E', label: 'Legendary' }
+        BRONZE: {
+            levels: [1, 2, 3],
+            color: '#CD7F32',
+            label: 'Bronze'
+        },
+        SILVER: {
+            levels: [4, 5, 6],
+            color: '#C0C0C0',
+            label: 'Silver'
+        },
+        GOLD: {
+            levels: [7, 8],
+            color: '#FFD700',
+            label: 'Gold'
+        },
+        LEGEND: {
+            levels: [9, 10],
+            color: '#C8AA6E',
+            label: 'Legendary'
+        }
     }
 };
 
@@ -205,9 +219,9 @@ export function addXP(xpToAdd, source = 'vote') {
         if (window.showBulletin) {
             window.showBulletin({
                 type: 'level-up',
-                message: `⬆️ Level Up! Level ${newLevel}`,
-                detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
-                cta: 'View Progress',
+              message: `⬆️ New Arcane Rank!`,
+detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
+cta: 'View Progress',
                 ctaAction: () => window.location.href = 'my-votes.html',
                 duration: 5000
             });

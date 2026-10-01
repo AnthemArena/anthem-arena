@@ -86,7 +86,7 @@ export async function submitVote(matchId, songId) {
     );
     
     try {
-        const matchRef = doc(db, `tournaments/2025-worlds-anthems/matches/${matchId}`);
+        const matchRef = doc(db, `tournaments/arcane-test-01/matches/${matchId}`);
         
         await updateDoc(matchRef, {
 [`${songId}.votes`]: increment(1),

@@ -1,43 +1,32 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "packs": [
     {
       "id": "jinx",
       "name": "Jinx",
-      "displayName": "Chaotic & Explosive 💥",
+      "displayName": "Jinx",
       "emoji": "💥",
       "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png",
-      "description": "Wild, unpredictable, and always ready to blow something up!",
+      "description": "Chaotic, unpredictable, and never short of something to say.",
       "enabled": true
-    },
-    {
-      "id": "default",
-      "name": "Standard",
-      "displayName": "Standard Notifications",
-      "emoji": "📢",
-      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
-      "description": "Professional, straightforward notifications",
-      "enabled": true
-    },
-    {
-      "id": "lux",
-      "name": "Lux",
-      "displayName": "Bright & Optimistic ✨",
-      "emoji": "✨",
-      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Lux.png",
-      "description": "Positive energy and magical encouragement!",
-      "enabled": true,
-      "comingSoon": false
     },
     {
       "id": "vi",
       "name": "Vi",
-      "displayName": "Punch First, Ask Later 👊",
+      "displayName": "Vi",
       "emoji": "👊",
       "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Vi.png",
-      "description": "Street-tough, no-nonsense, and ready to throw down. Your votes hit harder than her gauntlets!",
-      "enabled": true,
-      "comingSoon": false
+      "description": "Direct, tough, and ready to settle things with her fists.",
+      "enabled": true
+    },
+    {
+      "id": "caitlyn",
+      "name": "Caitlyn",
+      "displayName": "Caitlyn",
+      "emoji": "🎯",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Caitlyn.png",
+      "description": "Precise, observant, and calmly keeping you informed.",
+      "enabled": true
     }
   ]
 }

@@ -1,3 +1,8 @@
+import {
+    COMPANION_PACKS,
+    getCompanionPack
+} from './arcane-config.js';
+
 console.log('🎭 champion-loader.js loaded');
 
 // ========================================
@@ -28,18 +33,17 @@ async function loadChampionManifest() {
     } catch (error) {
         console.error('❌ Failed to load champion manifest:', error);
         // Return default-only manifest
-        return {
-            version: '1.0.0',
-            packs: [
-                {
-                    id: 'default',
-                    name: 'Standard',
-                    displayName: 'Standard Notifications',
-                    emoji: '📢',
-                    description: 'Professional, straightforward notifications'
-                }
-            ]
-        };
+       return {
+    version: '2.0.0',
+    packs: COMPANION_PACKS.map(pack => ({
+        id: pack.id,
+        name: pack.name,
+        displayName: pack.name,
+        emoji: '✨',
+        icon: `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${pack.championId}.png`,
+        description: `Your ${pack.name} Arcane companion`
+    }))
+};
     }
 }
 
@@ -57,6 +61,11 @@ async function loadChampionPack(championId = 'default') {
     
     try {
         console.log(`📦 Loading champion pack: ${championId}`);
+
+        // Keep "default" as an internal fallback, but validate real companions.
+if (championId !== 'default' && !getCompanionPack(championId)) {
+    throw new Error(`Unknown Arcane companion: ${championId}`);
+}
         
         const response = await fetch(`../champion-packs/${championId}.json`);
         
@@ -323,35 +332,51 @@ function replacePlaceholders(text, data) {
     
     let result = text;
     
-    // Song titles
-    if (data.songTitle) {
-        result = result.replace(/\{songTitle\}/g, data.songTitle);
+        // Arcane moment titles
+    const momentTitle = data.momentTitle || data.songTitle;
+    const opponentTitle = data.opponentTitle;
+    const moment1 = data.moment1 || data.song1;
+    const moment2 = data.moment2 || data.song2;
+    const yourMoment = data.yourMoment || data.yourSong;
+    const theirMoment = data.theirMoment || data.theirSong;
+
+    if (momentTitle) {
+        result = result.replace(/\{momentTitle\}/g, momentTitle);
+        result = result.replace(/\{songTitle\}/g, momentTitle);
     }
-    if (data.opponentTitle) {
-        result = result.replace(/\{opponentTitle\}/g, data.opponentTitle);
+
+    if (opponentTitle) {
+        result = result.replace(/\{opponentTitle\}/g, opponentTitle);
     }
+
     if (data.matchTitle) {
         result = result.replace(/\{matchTitle\}/g, data.matchTitle);
     }
-    if (data.song) {
-        result = result.replace(/\{song\}/g, data.song);
+
+    if (moment1) {
+        result = result.replace(/\{moment1\}/g, moment1);
+        result = result.replace(/\{song1\}/g, moment1);
     }
-    if (data.song1) {
-        result = result.replace(/\{song1\}/g, data.song1);
+
+    if (moment2) {
+        result = result.replace(/\{moment2\}/g, moment2);
+        result = result.replace(/\{song2\}/g, moment2);
     }
-    if (data.song2) {
-        result = result.replace(/\{song2\}/g, data.song2);
+
+    if (yourMoment) {
+        result = result.replace(/\{yourMoment\}/g, yourMoment);
+        result = result.replace(/\{yourSong\}/g, yourMoment);
     }
-    if (data.yourSong) {
-        result = result.replace(/\{yourSong\}/g, data.yourSong);
+
+    if (theirMoment) {
+        result = result.replace(/\{theirMoment\}/g, theirMoment);
+        result = result.replace(/\{theirSong\}/g, theirMoment);
     }
-    if (data.theirSong) {
-        result = result.replace(/\{theirSong\}/g, data.theirSong);
-    }
-        // ADD THESE TWO LINES
+
     if (data.winner) {
         result = result.replace(/\{winner\}/g, data.winner);
     }
+
     if (data.loser) {
         result = result.replace(/\{loser\}/g, data.loser);
     }
@@ -495,44 +520,59 @@ async function getAvailableChampionPacks() {
 // SET USER'S CHAMPION PREFERENCE
 // ========================================
 
-async function setUserChampionPack(championId) {
+async function setUserCompanionPack(companionId) {
     try {
-        await loadChampionPack(championId);
-        localStorage.setItem('championPack', championId);
-        console.log(`✅ User champion pack set to: ${championId}`);
+        if (!getCompanionPack(companionId)) {
+            throw new Error(`Invalid Arcane companion: ${companionId}`);
+        }
+
+        await loadChampionPack(companionId);
+
+        localStorage.setItem('companionId', companionId);
+
+        // Keep the old key for compatibility while other files are migrated.
+        localStorage.setItem('championPack', companionId);
+
+        console.log(`✅ Arcane companion set to: ${companionId}`);
         return true;
     } catch (error) {
-        console.error('Failed to set champion pack:', error);
+        console.error('Failed to set Arcane companion:', error);
         return false;
     }
 }
 
-// ========================================
-// GET USER'S CHAMPION PREFERENCE
-// ========================================
-
-function getUserChampionPack() {
-    return localStorage.getItem('championPack') || 'default';
+function getUserCompanionPack() {
+    return (
+        localStorage.getItem('companionId') ||
+        localStorage.getItem('championPack') ||
+        'jinx'
+    );
 }
+
+// Legacy compatibility wrappers.
+// Other existing modules can continue using these until migrated.
+const setUserChampionPack = setUserCompanionPack;
+const getUserChampionPack = getUserCompanionPack;
 
 // ========================================
 // INITIALIZE ON PAGE LOAD
 // ========================================
 
 async function initializeChampionPack() {
-    const userChoice = getUserChampionPack();
+    let userChoice = getUserCompanionPack();
 
-     // ✅ NEW: Set Jinx as default for new users
-    if (!userChoice) {
+    // New users start with Jinx as their default Arcane companion.
+    if (!localStorage.getItem('companionId')) {
         userChoice = 'jinx';
+        localStorage.setItem('companionId', 'jinx');
         localStorage.setItem('championPack', 'jinx');
-        console.log('🎪 First visit - setting Jinx as default!');
+        console.log('🎪 First visit - setting Jinx as default companion!');
     }
-    
-    console.log(`🎭 Initializing champion pack: ${userChoice}`);
-    
+
+    console.log(`🎭 Initializing Arcane companion: ${userChoice}`);
+
     await loadChampionPack(userChoice);
-    
+
     return currentChampionPack;
 }
 
@@ -547,8 +587,15 @@ window.championLoader = {
     getCustomMessage,
     checkUniqueAlerts,
     getAvailableChampionPacks,
+
+    // New Arcane terminology
+    setUserCompanionPack,
+    getUserCompanionPack,
+
+    // Legacy compatibility
     setUserChampionPack,
     getUserChampionPack,
+
     initializeChampionPack,
     getCurrentPack: () => currentChampionPack,
     getManifest: loadChampionManifest

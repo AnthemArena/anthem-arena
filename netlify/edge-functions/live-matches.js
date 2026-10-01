@@ -4,7 +4,7 @@
 // ========================================
 
 const CACHE_DURATION = 120; // 2 minutes
-const FIREBASE_PROJECT = "league-music-tournament";
+const FIREBASE_PROJECT = "arcane-moments";
 const TOURNAMENT = "2025-worlds-anthems";
 
 // Edge cache storage

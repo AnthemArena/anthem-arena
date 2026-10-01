@@ -326,6 +326,40 @@ localStorage.setItem('username', username);
 localStorage.setItem('tournamentUsername', username); // ✅ Keep in sync
 localStorage.setItem('isPublic', makePublic ? 'true' : 'false');
 localStorage.setItem('avatar', JSON.stringify(avatar));
+
+// Keep the Firebase profile in sync with the local identity.
+try {
+    const { db, auth } = await import('./firebase-config.js');
+    const {
+        doc,
+        setDoc
+    } = await import(
+        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+    );
+
+    const userId = auth.currentUser?.uid
+        || localStorage.getItem('tournamentUserId');
+
+    if (userId) {
+        await setDoc(
+            doc(db, 'profiles', userId),
+            {
+                userId,
+                username,
+                avatar,
+                isPublic: makePublic,
+                lastUpdated: Date.now()
+            },
+            { merge: true }
+        );
+
+        console.log('✅ Firebase profile updated with username:', username);
+    } else {
+        console.warn('⚠️ No Firebase user ID available while saving username');
+    }
+} catch (profileError) {
+    console.error('❌ Could not update Firebase profile:', profileError);
+}
     
     console.log(`✅ Username set: ${username} (public: ${makePublic})`);
     console.log(`✅ Avatar:`, avatar);

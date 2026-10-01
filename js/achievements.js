@@ -122,29 +122,30 @@ export async function getUnlockedAchievementsFromFirebase() {
 // ========================================
 
 export const ACHIEVEMENTS = {
-  
+
   // ========================================
-  // MILESTONE ACHIEVEMENTS (Voting Volume)
+  // MILESTONES
   // ========================================
-  'opening-act': {
-    id: 'opening-act',
-    name: 'Opening Act',
+
+  'first-choice': {
+    id: 'first-choice',
+    name: 'First Choice',
     description: 'Cast your first vote',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1001.png', // Boots of Speed
+    icon: '✨',
     xp: 25,
     category: 'milestones',
-    hidden: true,
+    hidden: false,
     tier: 'bronze',
     rarity: 'common',
     condition: (stats) => stats.totalVotes >= 1,
     progress: (stats) => ({ current: stats.totalVotes, target: 1 })
   },
-  
-  'encore': {
-    id: 'encore',
-    name: 'Encore',
+
+  'getting-started': {
+    id: 'getting-started',
+    name: 'Getting Started',
     description: 'Cast 5 votes',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1026.png', // Blasting Wand
+    icon: '🗳️',
     xp: 50,
     category: 'milestones',
     hidden: true,
@@ -153,26 +154,26 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.totalVotes >= 5,
     progress: (stats) => ({ current: stats.totalVotes, target: 5 })
   },
-  
-  'world-tour': {
-    id: 'world-tour',
-    name: 'World Tour',
+
+  'arcane-regular': {
+    id: 'arcane-regular',
+    name: 'Arcane Regular',
     description: 'Cast 10 votes',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3145.png', // Hextech Alternator
-    xp: 100,
+    icon: '🔮',
+    xp: 75,
     category: 'milestones',
     hidden: true,
-    tier: 'silver',
+    tier: 'bronze',
     rarity: 'uncommon',
     condition: (stats) => stats.totalVotes >= 10,
     progress: (stats) => ({ current: stats.totalVotes, target: 10 })
   },
-  
-  'headliner': {
-    id: 'headliner',
-    name: 'Headliner',
+
+  'crowd-voice': {
+    id: 'crowd-voice',
+    name: 'Crowd Voice',
     description: 'Cast 25 votes',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3108.png', // Fiendish Codex
+    icon: '📣',
     xp: 150,
     category: 'milestones',
     hidden: true,
@@ -181,13 +182,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.totalVotes >= 25,
     progress: (stats) => ({ current: stats.totalVotes, target: 25 })
   },
-  
-  'pentakill': {
-    id: 'pentakill',
-    name: 'Pentakill',
-    description: 'Cast 50 votes - Rock on like the legendary band!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3031.png', // Infinity Edge
-    xp: 300,
+
+  'deep-in-the-story': {
+    id: 'deep-in-the-story',
+    name: 'Deep in the Story',
+    description: 'Cast 50 votes',
+    icon: '📖',
+    xp: 250,
     category: 'milestones',
     hidden: true,
     tier: 'gold',
@@ -195,105 +196,73 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.totalVotes >= 50,
     progress: (stats) => ({ current: stats.totalVotes, target: 50 })
   },
-  
-  'chart-topper': {
-    id: 'chart-topper',
-    name: 'Chart Topper',
+
+  'arcane-legend': {
+    id: 'arcane-legend',
+    name: 'Arcane Legend',
     description: 'Cast 100 votes',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3089.png', // Rabadon's Deathcap
+    icon: '🌌',
     xp: 500,
     category: 'milestones',
     hidden: true,
-    tier: 'gold',
+    tier: 'legendary',
     rarity: 'epic',
     condition: (stats) => stats.totalVotes >= 100,
     progress: (stats) => ({ current: stats.totalVotes, target: 100 })
   },
 
-  'hall-of-fame': {
-    id: 'hall-of-fame',
-    name: 'Hall of Fame',
-    description: 'Cast 250 votes - You are a legend!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3040.png', // Seraph's Embrace
-    xp: 1000,
-    category: 'milestones',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.totalVotes >= 250,
-    progress: (stats) => ({ current: stats.totalVotes, target: 250 })
-  },
+  // ========================================
+  // STREAKS
+  // ========================================
 
-  // ========================================
-  // FOUNDING MEMBER ACHIEVEMENT (SPECIAL)
-  // ========================================
-  'founding-member': {
-    id: 'founding-member',
-    name: 'Founding Member',
-    description: 'Voted before the site reached 1,000 total votes',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3041.png', // Mejai's Soulstealer
-    xp: 500,
-    category: 'special',
-    hidden: false,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => {
-      const foundingMember = localStorage.getItem('foundingMember');
-      return foundingMember === 'true';
-    }
-  },
-
-  // ========================================
-  // STREAK ACHIEVEMENTS
-  // ========================================
-  'on-fire': {
-    id: 'on-fire',
-    name: 'On Fire',
-    description: 'Vote 3 days in a row',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3068.png', // Sunfire Aegis
-    xp: 75,
+  'spark': {
+    id: 'spark',
+    name: 'Spark',
+    description: 'Vote on 3 consecutive days',
+    icon: '🔥',
+    xp: 50,
     category: 'streaks',
     hidden: true,
     tier: 'bronze',
-    rarity: 'uncommon',
+    rarity: 'common',
     condition: (stats) => stats.votingStreak >= 3,
     progress: (stats) => ({ current: stats.votingStreak, target: 3 })
   },
-  
-  'hot-streak': {
-    id: 'hot-streak',
-    name: 'Hot Streak',
-    description: 'Vote 7 days in a row',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3075.png', // Thornmail
-    xp: 200,
+
+  'on-a-roll': {
+    id: 'on-a-roll',
+    name: 'On a Roll',
+    description: 'Vote on 7 consecutive days',
+    icon: '⚡',
+    xp: 125,
     category: 'streaks',
     hidden: true,
     tier: 'silver',
-    rarity: 'rare',
+    rarity: 'uncommon',
     condition: (stats) => stats.votingStreak >= 7,
     progress: (stats) => ({ current: stats.votingStreak, target: 7 })
   },
-  
+
   'unstoppable': {
     id: 'unstoppable',
     name: 'Unstoppable',
-    description: 'Vote 14 days in a row',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/6333.png', // Death's Dance
-    xp: 400,
+    description: 'Vote on 14 consecutive days',
+    icon: '💥',
+    xp: 250,
     category: 'streaks',
     hidden: true,
     tier: 'gold',
-    rarity: 'epic',
+    rarity: 'rare',
     condition: (stats) => stats.votingStreak >= 14,
     progress: (stats) => ({ current: stats.votingStreak, target: 14 })
   },
-  
-  'legendary-streak': {
-    id: 'legendary-streak',
-    name: 'Legendary',
-    description: 'Vote 30 days in a row - Unstoppable dedication!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3078.png', // Trinity Force
-    xp: 1000,
+
+  'arcane-dedication': {
+    id: 'arcane-dedication',
+    name: 'Arcane Dedication',
+    description: 'Vote on 30 consecutive days',
+    icon: '👑',
+    xp: 500,
     category: 'streaks',
     hidden: true,
     tier: 'legendary',
@@ -303,14 +272,15 @@ export const ACHIEVEMENTS = {
   },
 
   // ========================================
-  // UNDERDOG ACHIEVEMENTS
+  // UNDERDOG
   // ========================================
-  'underdog-champion': {
-    id: 'underdog-champion',
-    name: 'Underdog Champion',
+
+  'against-the-grain': {
+    id: 'against-the-grain',
+    name: 'Against the Grain',
     description: 'Vote for 5 underdogs',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3742.png', // Dead Man's Plate
-    xp: 100,
+    icon: '🃏',
+    xp: 75,
     category: 'underdog',
     hidden: true,
     tier: 'bronze',
@@ -318,13 +288,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.underdogVotes >= 5,
     progress: (stats) => ({ current: stats.underdogVotes, target: 5 })
   },
-  
-  'dark-horse': {
-    id: 'dark-horse',
-    name: 'Dark Horse',
+
+  'rebel-heart': {
+    id: 'rebel-heart',
+    name: 'Rebel Heart',
     description: 'Vote for 15 underdogs',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3748.png', // Titanic Hydra
-    xp: 250,
+    icon: '❤️‍🔥',
+    xp: 175,
     category: 'underdog',
     hidden: true,
     tier: 'silver',
@@ -332,13 +302,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.underdogVotes >= 15,
     progress: (stats) => ({ current: stats.underdogVotes, target: 15 })
   },
-  
-  'rebel-heart': {
-    id: 'rebel-heart',
-    name: 'Rebel Heart',
-    description: 'Vote for 30 underdogs - You love the unexpected!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3071.png', // Black Cleaver
-    xp: 500,
+
+  'dark-horse': {
+    id: 'dark-horse',
+    name: 'Dark Horse',
+    description: 'Vote for 30 underdogs',
+    icon: '🐴',
+    xp: 350,
     category: 'underdog',
     hidden: true,
     tier: 'gold',
@@ -348,45 +318,47 @@ export const ACHIEVEMENTS = {
   },
 
   // ========================================
-  // EARLY VOTER ACHIEVEMENTS
+  // EARLY VOTER
   // ========================================
-  'early-bird': {
-    id: 'early-bird',
-    name: 'Early Bird',
-    description: 'Be among first 10 voters in 5 matches',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3006.png', // Berserker's Greaves
-    xp: 150,
+
+  'first-on-the-scene': {
+    id: 'first-on-the-scene',
+    name: 'First on the Scene',
+    description: 'Be among the first 10 voters in 5 matches',
+    icon: '👀',
+    xp: 100,
     category: 'early',
     hidden: true,
     tier: 'silver',
-    rarity: 'rare',
+    rarity: 'uncommon',
     condition: (stats) => stats.earlyVotes >= 5,
     progress: (stats) => ({ current: stats.earlyVotes, target: 5 })
   },
-  
-  'trendsetter': {
-    id: 'trendsetter',
-    name: 'Trendsetter',
-    description: 'Be among first 10 voters in 15 matches',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3020.png', // Sorcerer's Shoes
-    xp: 300,
+
+  'ahead-of-the-curve': {
+    id: 'ahead-of-the-curve',
+    name: 'Ahead of the Curve',
+    description: 'Be among the first 10 voters in 15 matches',
+    icon: '🚀',
+    xp: 250,
     category: 'early',
     hidden: true,
     tier: 'gold',
-    rarity: 'epic',
+    rarity: 'rare',
     condition: (stats) => stats.earlyVotes >= 15,
     progress: (stats) => ({ current: stats.earlyVotes, target: 15 })
   },
 
   // ========================================
-  // CLOSE MATCH ACHIEVEMENTS
+  // CLOSE MATCHES
   // ========================================
+
   'nail-biter': {
     id: 'nail-biter',
     name: 'Nail-Biter',
-    description: 'Vote in 10 close matches (within 5%)',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3157.png', // Zhonya's Hourglass
-    xp: 150,
+    description: 'Vote in 10 close matches',
+    icon: '⚖️',
+    xp: 125,
     category: 'clutch',
     hidden: true,
     tier: 'silver',
@@ -394,13 +366,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.closeMatchVotes >= 10,
     progress: (stats) => ({ current: stats.closeMatchVotes, target: 10 })
   },
-  
-  'deciding-vote': {
-    id: 'deciding-vote',
-    name: 'Deciding Vote',
+
+  'deciding-voice': {
+    id: 'deciding-voice',
+    name: 'Deciding Voice',
     description: 'Vote in 25 close matches',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png', // Guardian Angel
-    xp: 350,
+    icon: '🎯',
+    xp: 300,
     category: 'clutch',
     hidden: true,
     tier: 'gold',
@@ -409,14 +381,29 @@ export const ACHIEVEMENTS = {
     progress: (stats) => ({ current: stats.closeMatchVotes, target: 25 })
   },
 
+  'comeback-believer': {
+    id: 'comeback-believer',
+    name: 'Comeback Believer',
+    description: 'Vote for 5 moments that were behind when you chose them',
+    icon: '🔄',
+    xp: 150,
+    category: 'clutch',
+    hidden: true,
+    tier: 'silver',
+    rarity: 'rare',
+    condition: (stats) => stats.comebackVotes >= 5,
+    progress: (stats) => ({ current: stats.comebackVotes, target: 5 })
+  },
+
   // ========================================
-  // SONG LOYALTY ACHIEVEMENTS
+  // MOMENT LOYALTY
   // ========================================
-  'true-fan': {
-    id: 'true-fan',
-    name: 'True Fan',
-    description: 'Vote for the same song 3 times',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3504.png', // Ardent Censer
+
+  'repeat-favourite': {
+    id: 'repeat-favourite',
+    name: 'Repeat Favourite',
+    description: 'Vote for the same moment 3 times',
+    icon: '💜',
     xp: 100,
     category: 'loyalty',
     hidden: true,
@@ -425,13 +412,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.maxSongVotes >= 3,
     progress: (stats) => ({ current: stats.maxSongVotes, target: 3 })
   },
-  
-  'superfan': {
-    id: 'superfan',
-    name: 'Superfan',
-    description: 'Vote for the same song 5 times',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3107.png', // Redemption
-    xp: 250,
+
+  'die-hard': {
+    id: 'die-hard',
+    name: 'Die-Hard Fan',
+    description: 'Vote for the same moment 5 times',
+    icon: '💗',
+    xp: 200,
     category: 'loyalty',
     hidden: true,
     tier: 'silver',
@@ -439,13 +426,13 @@ export const ACHIEVEMENTS = {
     condition: (stats) => stats.maxSongVotes >= 5,
     progress: (stats) => ({ current: stats.maxSongVotes, target: 5 })
   },
-  
-  'ultimate-stan': {
-    id: 'ultimate-stan',
-    name: 'Ultimate Stan',
-    description: 'Vote for the same song 10 times - True devotion!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3109.png', // Knight's Vow
-    xp: 500,
+
+  'obsession': {
+    id: 'obsession',
+    name: 'Obsession',
+    description: 'Vote for the same moment 10 times',
+    icon: '💥',
+    xp: 400,
     category: 'loyalty',
     hidden: true,
     tier: 'gold',
@@ -455,73 +442,89 @@ export const ACHIEVEMENTS = {
   },
 
   // ========================================
-  // JOURNEY ACHIEVEMENTS
+  // ARCANE JOURNEY
   // ========================================
-  'quarter-final-supporter': {
-    id: 'quarter-final-supporter',
-    name: 'Quarter-Final Supporter',
-    description: 'Support a song to the Quarterfinals',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3053.png', // Sterak's Gage
+
+  'two-round-journey': {
+    id: 'two-round-journey',
+    name: 'Keep Watching',
+    description: 'Vote in 2 different tournament rounds',
+    icon: '🛤️',
+    xp: 75,
+    category: 'journey',
+    hidden: true,
+    tier: 'bronze',
+    rarity: 'uncommon',
+    condition: (stats) => stats.roundsParticipated >= 2,
+    progress: (stats) => ({ current: stats.roundsParticipated, target: 2 })
+  },
+
+  'deep-into-the-bracket': {
+    id: 'deep-into-the-bracket',
+    name: 'Deep into the Bracket',
+    description: 'Vote in 4 different tournament rounds',
+    icon: '🌀',
     xp: 200,
     category: 'journey',
     hidden: true,
     tier: 'silver',
     rarity: 'rare',
-    condition: (stats) => stats.furthestRound >= 4,
-    progress: (stats) => ({ current: stats.furthestRound, target: 4 })
+    condition: (stats) => stats.roundsParticipated >= 4,
+    progress: (stats) => ({ current: stats.roundsParticipated, target: 4 })
   },
-  
-  'semi-final-believer': {
-    id: 'semi-final-believer',
-    name: 'Semi-Final Believer',
-    description: 'Support a song to the Semifinals',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3190.png', // Locket of the Iron Solari
+
+  'all-the-way': {
+    id: 'all-the-way',
+    name: 'All the Way',
+    description: 'Vote in 6 different tournament rounds',
+    icon: '🏆',
     xp: 400,
-    category: 'journey',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.furthestRound >= 5,
-    progress: (stats) => ({ current: stats.furthestRound, target: 5 })
-  },
-  
-  'championship-supporter': {
-    id: 'championship-supporter',
-    name: 'Championship Supporter',
-    description: 'Support a song to the Finals - Almost there!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3222.png', // Mikael's Blessing
-    xp: 800,
     category: 'journey',
     hidden: true,
     tier: 'legendary',
     rarity: 'legendary',
-    condition: (stats) => stats.furthestRound >= 6,
-    progress: (stats) => ({ current: stats.furthestRound, target: 6 })
-  },
-
-  // ========================================
-  // COMPLETIONIST ACHIEVEMENTS
-  // ========================================
-  'tournament-veteran': {
-    id: 'tournament-veteran',
-    name: 'Tournament Veteran',
-    description: 'Vote in all rounds (1-6)',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3152.png', // Hextech Rocketbelt
-    xp: 300,
-    category: 'completionist',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'rare',
     condition: (stats) => stats.roundsParticipated >= 6,
     progress: (stats) => ({ current: stats.roundsParticipated, target: 6 })
   },
-  
-  'completionist': {
-    id: 'completionist',
-    name: 'Completionist',
+
+  // ========================================
+  // EXPLORER / PARTICIPATION
+  // ========================================
+
+  'match-explorer': {
+    id: 'match-explorer',
+    name: 'Match Explorer',
+    description: 'Vote in 10 unique matches',
+    icon: '🗺️',
+    xp: 100,
+    category: 'completionist',
+    hidden: true,
+    tier: 'bronze',
+    rarity: 'uncommon',
+    condition: (stats) => stats.uniqueMatches >= 10,
+    progress: (stats) => ({ current: stats.uniqueMatches, target: 10 })
+  },
+
+  'every-corner': {
+    id: 'every-corner',
+    name: 'Every Corner',
+    description: 'Vote in 25 unique matches',
+    icon: '🧭',
+    xp: 200,
+    category: 'completionist',
+    hidden: true,
+    tier: 'silver',
+    rarity: 'rare',
+    condition: (stats) => stats.uniqueMatches >= 25,
+    progress: (stats) => ({ current: stats.uniqueMatches, target: 25 })
+  },
+
+  'bracket-veteran': {
+    id: 'bracket-veteran',
+    name: 'Bracket Veteran',
     description: 'Vote in 50 unique matches',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3116.png', // Rylai's Crystal Scepter
-    xp: 500,
+    icon: '🏅',
+    xp: 400,
     category: 'completionist',
     hidden: true,
     tier: 'gold',
@@ -531,429 +534,82 @@ export const ACHIEVEMENTS = {
   },
 
   // ========================================
-  // SPECIAL/HIDDEN ACHIEVEMENTS
+  // SESSION / SPECIAL
   // ========================================
-  'night-owl': {
-    id: 'night-owl',
-    name: 'Night Owl',
-    description: 'Vote between midnight and 5am',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3050.png', // Zeke's Convergence
-    xp: 50,
-    category: 'special',
-    hidden: true,
-    tier: 'bronze',
-    rarity: 'uncommon',
-    condition: (stats) => stats.lateNightVotes >= 1
-  },
-  
-  'lightning-fast': {
-    id: 'lightning-fast',
-    name: 'Lightning Fast',
-    description: 'Vote within 1 minute of match going live',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3009.png', // Boots of Swiftness
+
+  'long-session': {
+    id: 'long-session',
+    name: 'Long Session',
+    description: 'Vote in 5 matches during one session',
+    icon: '🔥',
     xp: 100,
     category: 'special',
     hidden: true,
-    tier: 'silver',
-    rarity: 'rare',
-    condition: (stats) => stats.instantVotes >= 1
-  },
-  
-  'prophet': {
-    id: 'prophet',
-    name: 'Prophet',
-    description: 'Vote for the tournament winner in Round 1',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3165.png', // Morellonomicon
-    xp: 1000,
-    category: 'special',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.prophesied === true
-  },
-
-  'taste-maker': {
-    id: 'taste-maker',
-    name: 'Taste Maker',
-    description: 'Vote for 10 different artists',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3011.png', // Chemtech Putrifier
-    xp: 200,
-    category: 'special',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'rare',
-    condition: (stats) => stats.uniqueArtists >= 10,
-    progress: (stats) => ({ current: stats.uniqueArtists, target: 10 })
-  },
-
-  'music-historian': {
-    id: 'music-historian',
-    name: 'Music Historian',
-    description: 'Vote for songs from 5 different years',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3050.png', // Zeke's Convergence
-    xp: 150,
-    category: 'special',
-    hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
-    condition: (stats) => stats.uniqueYears >= 5,
-    progress: (stats) => ({ current: stats.uniqueYears, target: 5 })
+    condition: (stats) => stats.votesInSession >= 5,
+    progress: (stats) => ({ current: stats.votesInSession, target: 5 })
   },
 
-  'comeback-believer': {
-    id: 'comeback-believer',
-    name: 'Comeback Believer',
-    description: 'Vote for 5 songs that were losing when you voted',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3091.png', // Wit's End
-    xp: 200,
+  'deep-dive': {
+    id: 'deep-dive',
+    name: 'Deep Dive',
+    description: 'Vote in 10 matches during one session',
+    icon: '🌊',
+    xp: 250,
     category: 'special',
     hidden: true,
-    tier: 'silver',
+    tier: 'gold',
     rarity: 'rare',
-    condition: (stats) => stats.comebackVotes >= 5,
-    progress: (stats) => ({ current: stats.comebackVotes, target: 5 })
+    condition: (stats) => stats.votesInSession >= 10,
+    progress: (stats) => ({ current: stats.votesInSession, target: 10 })
   },
 
-  // ========================================
-  // BATCH VOTING ACHIEVEMENTS
-  // ========================================
-  'triple-threat': {
-    id: 'triple-threat',
-    name: 'Triple Threat',
-    description: 'Vote in 3 matches in one session',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3133.png', // Caulfield's Warhammer
+  'night-owl': {
+    id: 'night-owl',
+    name: 'Night Owl',
+    description: 'Cast a vote between midnight and 5am',
+    icon: '🌙',
     xp: 75,
     category: 'special',
     hidden: true,
     tier: 'bronze',
     rarity: 'uncommon',
-    condition: (stats) => stats.votesInSession >= 3,
-    progress: (stats) => ({ current: stats.votesInSession, target: 3 })
-  },
-
-  'vote-spree': {
-    id: 'vote-spree',
-    name: 'Vote Spree',
-    description: 'Vote in 5 matches in one session',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3134.png', // Serrated Dirk
-    xp: 150,
-    category: 'special',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'rare',
-    condition: (stats) => stats.votesInSession >= 5,
-    progress: (stats) => ({ current: stats.votesInSession, target: 5 })
-  },
-
-  'power-voter': {
-    id: 'power-voter',
-    name: 'Power Voter',
-    description: 'Vote in 10 matches in one session',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3135.png', // Void Staff
-    xp: 300,
-    category: 'special',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.votesInSession >= 10,
-    progress: (stats) => ({ current: stats.votesInSession, target: 10 })
-  },
-
-  'voting-marathon': {
-    id: 'voting-marathon',
-    name: 'Voting Marathon',
-    description: 'Vote in 20 matches in one session - Unstoppable!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3124.png', // Guinsoo's Rageblade
-    xp: 500,
-    category: 'special',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.votesInSession >= 20,
-    progress: (stats) => ({ current: stats.votesInSession, target: 20 })
+    condition: (stats) => stats.lateNightVotes >= 1,
+    progress: (stats) => ({ current: stats.lateNightVotes, target: 1 })
   },
 
   // ========================================
-  // SPECIAL EVENT ACHIEVEMENTS
+  // SOCIAL
   // ========================================
-  'first-blood': {
-    id: 'first-blood',
-    name: 'First Blood',
-    description: 'You drew first blood - the very first vote ever on the site!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3142.png', // Youmuu's Ghostblade
-    xp: 500,
-    category: 'special',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => {
-      return localStorage.getItem('globalFirstVote') === 'true';
-    }
-  },
 
-  'tournament-first-blood': {
-    id: 'tournament-first-blood',
-    name: 'Tournament First Blood',
-    description: 'The first vote of the entire tournament!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3153.png', // Blade of the Ruined King
-    xp: 750,
-    category: 'special',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => {
-      return localStorage.getItem('tournamentFirstVote') === 'true';
-    }
-  },
-
-  'round-first-blood': {
-    id: 'round-first-blood',
-    name: 'Round First Blood',
-    description: 'First vote in a new round!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3155.png', // Hexdrinker
-    xp: 400,
-    category: 'special',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => {
-      const firstInRounds = JSON.parse(localStorage.getItem('firstInRounds') || '[]');
-      return firstInRounds.length > 0;
-    }
-  },
-
-  'daily-session-kickoff': {
-    id: 'daily-session-kickoff',
-    name: 'Daily Session Kickoff',
-    description: 'Your first vote of the day!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3364.png', // Oracle Lens
-    xp: 150,
-    category: 'special',
-    hidden: true,
-    tier: 'bronze',
-    rarity: 'uncommon',
-    condition: (stats) => {
-      const lastVoteDate = localStorage.getItem('lastVoteDate');
-      const today = new Date().toDateString();
-      return lastVoteDate !== today && stats.totalVotes >= 1;
-    }
-  },
-
-  'daily-comeback': {
-    id: 'daily-comeback',
-    name: 'Welcome Back',
-    description: 'Returned after being away for days!',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3193.png', // Gargoyle Stoneplate
-    xp: 300,
-    category: 'special',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'rare',
-    condition: (stats) => {
-      const lastVisit = localStorage.getItem('lastVisitDate');
-      if (!lastVisit) return false;
-      
-      const daysSince = Math.floor((Date.now() - new Date(lastVisit)) / (1000 * 60 * 60 * 24));
-      return daysSince >= 3;
-    }
-  },
-
-  // ========================================
-// MATCH OUTCOME ACHIEVEMENTS (FIXED)
-// ========================================
-'match-won': {
-  id: 'match-won',
-  name: 'Victory!',
-  description: 'Your voted song won the match!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3004.png',
-  xp: 200,
-  category: 'special',
-  hidden: true,
-  tier: 'silver',
-  rarity: 'uncommon',
-  condition: (stats) => stats.wonMatches >= 1,
-  progress: (stats) => ({ current: stats.wonMatches || 0, target: 1 })
-},
-
-'match-lost': {
-  id: 'match-lost',
-  name: 'Better Luck Next Time',
-  description: 'Your song lost, but you fought well!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1055.png',
-  xp: 50,
-  category: 'special',
-  hidden: true,
-  tier: 'bronze',
-  rarity: 'common',
-  condition: (stats) => stats.lostMatches >= 1,
-  progress: (stats) => ({ current: stats.lostMatches || 0, target: 1 })
-},
-
-  
-
-'last-second-hero': {
-  id: 'last-second-hero',
-  name: 'Clutch Hero',
-  description: 'Your vote tied or flipped a match at the last second!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/6676.png', // ✅ The Collector (already in your code earlier)
-  xp: 1000,
-  category: 'special',
-  hidden: true,
-  tier: 'legendary',
-  rarity: 'legendary',
-  condition: (stats) => {
-    return localStorage.getItem('lastSecondHero') === 'true';
-  }
-},
-
-'level-up': {
-  id: 'level-up',
-  name: 'Level Up!',
-  description: 'Reached a new level!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3124.png', // ✅ Guinsoo's Rageblade (progression item)
-  xp: 0, // XP already awarded by leveling system
-  category: 'special',
-  hidden: true,
-  tier: 'bronze',
-  rarity: 'common',
-  condition: (stats) => {
-    // This is awarded dynamically when level increases
-    return false; // Never shows as unlocked, triggered manually
-  }
-},
-
-'match-tied': {
-  id: 'match-tied',
-  name: 'Split Decision',
-  description: 'Your match ended in a perfect tie!',
-  icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png',
-  xp: 100,
-  category: 'special',
-  hidden: true,
-  tier: 'bronze',
-  rarity: 'uncommon',
-  condition: (stats) => stats.tiedMatches >= 1,
-  progress: (stats) => ({ current: stats.tiedMatches || 0, target: 1 })
-
-},
-
-
-  // ========================================
-  // SOCIAL ACHIEVEMENTS
-  // ========================================
-  'community-voice': {
-    id: 'community-voice',
-    name: 'Community Voice',
-    description: 'Share 5 matches on social media',
-    icon: '<i class="fa-solid fa-mobile-screen"></i>',
-    xp: 200,
+  'signal-boost': {
+    id: 'signal-boost',
+    name: 'Signal Boost',
+    description: 'Share 5 matches or moments',
+    icon: '📡',
+    xp: 100,
     category: 'social',
     hidden: true,
     tier: 'silver',
-    rarity: 'rare',
+    rarity: 'uncommon',
     condition: (stats) => stats.sharesCount >= 5,
     progress: (stats) => ({ current: stats.sharesCount, target: 5 })
   },
 
-  'hype-master': {
-    id: 'hype-master',
-    name: 'Hype Master',
-    description: 'Share 15 matches - Spread the word!',
-    icon: '<i class="fa-solid fa-bullhorn"></i>',
-    xp: 500,
+  'spreading-the-word': {
+    id: 'spreading-the-word',
+    name: 'Spreading the Word',
+    description: 'Share 15 matches or moments',
+    icon: '📣',
+    xp: 250,
     category: 'social',
     hidden: true,
     tier: 'gold',
-    rarity: 'epic',
+    rarity: 'rare',
     condition: (stats) => stats.sharesCount >= 15,
     progress: (stats) => ({ current: stats.sharesCount, target: 15 })
-  },
-
-  // ========================================
-  // BATTLESHIP (HEXTECH WARFARE) ACHIEVEMENTS
-  // ========================================
-  'battleship-first-game': {
-    id: 'battleship-first-game',
-    name: 'First Deployment',
-    description: 'Play your first Hextech Warfare match',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3068.png', // Sunfire
-    xp: 50,
-    category: 'battleship',
-    hidden: true,
-    tier: 'bronze',
-    rarity: 'common',
-    condition: (stats) => stats.battleship?.gamesPlayed >= 1,
-    progress: (stats) => ({ current: stats.battleship?.gamesPlayed || 0, target: 1 })
-  },
-  
-  'battleship-first-win': {
-    id: 'battleship-first-win',
-    name: 'First Blood',
-    description: 'Win your first Hextech Warfare match',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3142.png', // Youmuu's
-    xp: 100,
-    category: 'battleship',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'uncommon',
-    condition: (stats) => stats.battleship?.gamesWon >= 1,
-    progress: (stats) => ({ current: stats.battleship?.gamesWon || 0, target: 1 })
-  },
-  
-  'battleship-sharpshooter': {
-    id: 'battleship-sharpshooter',
-    name: 'Sharpshooter',
-    description: 'Win with 90%+ accuracy as Caitlyn',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3031.png', // IE
-    xp: 300,
-    category: 'battleship',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.battleship?.bestAccuracy >= 90 && stats.battleship?.caitlynWins >= 1
-  },
-  
-  'battleship-chaos-master': {
-    id: 'battleship-chaos-master',
-    name: 'Beautiful Chaos',
-    description: 'Win 10 games as Jinx',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3087.png', // Statikk Shiv
-    xp: 250,
-    category: 'battleship',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'rare',
-    condition: (stats) => stats.battleship?.jinxWins >= 10,
-    progress: (stats) => ({ current: stats.battleship?.jinxWins || 0, target: 10 })
-  },
-  
-  'battleship-flawless': {
-    id: 'battleship-flawless',
-    name: 'Flawless Victory',
-    description: 'Win without losing a single ship',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3026.png', // GA
-    xp: 500,
-    category: 'battleship',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.battleship?.flawlessVictories >= 1
-  },
-  
-  'battleship-veteran': {
-    id: 'battleship-veteran',
-    name: 'Hextech Veteran',
-    description: 'Play 50 Hextech Warfare matches',
-    icon: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3078.png', // Trinity Force
-    xp: 1000,
-    category: 'battleship',
-    hidden: true,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.battleship?.gamesPlayed >= 50,
-    progress: (stats) => ({ current: stats.battleship?.gamesPlayed || 0, target: 50 })
-  },
-
+  }
 };
 
 // ========================================
@@ -965,67 +621,70 @@ export const ACHIEVEMENT_CATEGORIES = {
     name: 'Milestones',
     icon: '<i class="fa-solid fa-bullseye"></i>',
     color: '#4a9eff',
-    description: 'Voting volume achievements'
+    description: 'Your Arcane Moments voting milestones'
   },
+
   streaks: {
     name: 'Streaks',
     icon: '<i class="fa-solid fa-fire"></i>',
     color: '#ff4444',
-    description: 'Consecutive daily voting'
+    description: 'Keep coming back day after day'
   },
+
   underdog: {
     name: 'Underdog',
     icon: '<i class="fa-solid fa-masks-theater"></i>',
     color: '#c84aff',
-    description: 'Supporting the underdogs'
+    description: 'Back the moments that are behind'
   },
+
   early: {
     name: 'Early Voter',
-    icon: '<i class="fa-solid fa-dove"></i>',
+    icon: '<i class="fa-solid fa-bolt"></i>',
     color: '#00c896',
-    description: 'Being first to vote'
+    description: 'Be there when a match begins'
   },
+
   clutch: {
     name: 'Close Calls',
     icon: '<i class="fa-solid fa-scale-balanced"></i>',
     color: '#ffaa00',
-    description: 'Close match participation'
+    description: 'Make your voice count when matches are tight'
   },
+
   loyalty: {
-    name: 'Loyalty',
+    name: 'Favourites',
     icon: '<i class="fa-solid fa-heart"></i>',
-    color: '#667eea',
-    description: 'Supporting favorite songs'
+    color: '#ff69b4',
+    description: 'Keep backing the moments you love'
   },
+
   journey: {
     name: 'Journey',
-    icon: '<i class="fa-solid fa-trophy"></i>',
+    icon: '<i class="fa-solid fa-road"></i>',
     color: '#c8aa6e',
-    description: 'Tournament progression'
+    description: 'Follow the tournament through its rounds'
   },
+
   completionist: {
-    name: 'Completionist',
-    icon: '<i class="fa-solid fa-circle-check"></i>',
+    name: 'Explorer',
+    icon: '<i class="fa-solid fa-compass"></i>',
     color: '#4aff4a',
-    description: 'Full participation'
+    description: 'Explore more of the tournament'
   },
+
   special: {
     name: 'Special',
     icon: '<i class="fa-solid fa-star"></i>',
     color: '#ffd700',
-    description: 'Hidden and rare achievements'
+    description: 'Unusual and memorable accomplishments'
   },
+
   social: {
     name: 'Social',
-    icon: '<i class="fa-solid fa-mobile-screen"></i>',
+    icon: '<i class="fa-solid fa-share-nodes"></i>',
     color: '#ff69b4',
-    description: 'Community engagement'
-  },
-  battleship: {
-    name: 'Hextech Warfare',
-    icon: '<i class="fa-solid fa-ship"></i>',
-    color: '#c8aa6e',
-    description: 'Battleship game achievements'
+    description: 'Help spread Arcane Moments'
   }
 };
 

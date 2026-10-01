@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Anthem Arena</title>
+    <title>Profile | Arcane Moments</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,7 @@
                         </div>
                         
                         <div class="profile-rank" id="profileRank">
-                            <i class="fas fa-star"></i> Level 1 - New Voter
+                            <i class="fas fa-star"></i> Level 1 - New Arrival
                         </div>
                         
                         <p class="profile-bio" id="profileBio">
@@ -171,17 +171,17 @@
                     <button class="tab-btn" data-tab="posts">
                         <i class="fas fa-pen"></i> Posts <span class="tab-count" id="postsCount">0</span>
                     </button>
-                    <button class="tab-btn" data-tab="participation">
-                        <i class="fas fa-chart-bar"></i> Participation
-                    </button>
-                    <button class="tab-btn" data-tab="achievements">
-                        <i class="fas fa-trophy"></i> Achievements <span class="tab-count" id="achievementsCount">0</span>
-                    </button>
-                    <button class="tab-btn" data-tab="songs">
-                        <i class="fas fa-music"></i> Top Songs
-                    </button>
-                    <button class="tab-btn" data-tab="battleship">
-    <i class="fas fa-ship"></i> Hextech Warfare <span class="tab-count" id="battleshipCount">0</span>
+                   <button class="tab-btn" data-tab="participation">
+    <i class="fas fa-chart-bar"></i> Journey
+</button>
+
+<button class="tab-btn" data-tab="achievements">
+    <i class="fas fa-trophy"></i> Achievements
+    <span class="tab-count" id="achievementsCount">0</span>
+</button>
+
+<button class="tab-btn" data-tab="songs">
+    <i class="fas fa-film"></i> Top Moments
 </button>
                 </div>
                 
@@ -229,13 +229,13 @@
                         
                         <!-- ✅ 4. FAVORITE SONGS - Music Taste -->
                         <div class="overview-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-music"></i> Most Supported Songs
-                            </h3>
+                           <h3 class="section-title">
+    <i class="fas fa-film"></i> Most Supported Moments
+</h3>
                             <div id="favoriteSongs" class="favorite-songs-list">
                                 <div class="no-content">
-                                    <i class="fas fa-music"></i>
-                                    <p>No votes yet</p>
+                                   <i class="fas fa-film"></i>
+<p>No moments voted for yet</p>
                                 </div>
                             </div>
                         </div>
@@ -252,12 +252,13 @@
                                 <button class="filter-btn active" data-filter="all">
                                     <i class="fas fa-list"></i> All
                                 </button>
-                                <button class="filter-btn" data-filter="won">
-                                    <i class="fas fa-check-circle"></i> Won
-                                </button>
-                                <button class="filter-btn" data-filter="lost">
-                                    <i class="fas fa-times-circle"></i> Lost
-                                </button>
+                               <button class="filter-btn" data-filter="won">
+    <i class="fas fa-check-circle"></i> Advanced
+</button>
+
+<button class="filter-btn" data-filter="lost">
+    <i class="fas fa-times-circle"></i> Eliminated
+</button>
                                 <button class="filter-btn" data-filter="live">
                                     <i class="fas fa-circle"></i> Live
                                 </button>
@@ -318,7 +319,7 @@
                                 <div class="participation-percentage" id="overallParticipation">0%</div>
                             </div>
                             <div class="participation-summary">
-                                <h3>Tournament Coverage</h3>
+<h3>Your Arcane Journey</h3>
                                 <p id="participationSummary">Loading...</p>
                             </div>
                         </div>
@@ -335,40 +336,7 @@
                         
                     </div>
 
-                    <!-- BATTLESHIP TAB -->
-<div class="tab-panel" id="tab-battleship">
-    <div class="battleship-stats-overview">
-        <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
-            <div class="stat-info">
-                <div class="stat-value" id="battleship-games-played">0</div>
-                <div class="stat-label">Games Played</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-            <div class="stat-info">
-                <div class="stat-value" id="battleship-win-rate">0%</div>
-                <div class="stat-label">Win Rate</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
-            <div class="stat-info">
-                <div class="stat-value" id="battleship-best-accuracy">0%</div>
-                <div class="stat-label">Best Accuracy</div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="battleshipMatchHistory" class="match-history-list">
-        <div class="no-content">
-            <i class="fas fa-ship"></i>
-            <p>No games played yet</p>
-            <a href="/battleship.html" class="btn-primary">Play Now</a>
-        </div>
-    </div>
-</div>
+                 
                     
                     <!-- ========================================
                          ACHIEVEMENTS TAB
@@ -382,15 +350,14 @@
                         </div>
                     </div>
                     
-                    <!-- ========================================
-                         TOP SONGS TAB
-                         ======================================== -->
+                    <!-- TOP MOMENTS TAB -->
+
                     <div class="tab-panel" id="tab-songs">
                         <div id="allFavoriteSongs" class="favorite-songs-list">
-                            <div class="no-content">
-                                <i class="fas fa-music"></i>
-                                <p>No votes yet</p>
-                            </div>
+                           <div class="no-content">
+    <i class="fas fa-film"></i>
+    <p>No moments voted for yet</p>
+</div>
                         </div>
                     </div>
                     

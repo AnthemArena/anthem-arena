@@ -6,23 +6,36 @@
 // Import Firebase (using CDN - no npm needed)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';  // ← ADD THIS LINE
-
+import {
+    getAuth,
+    signInAnonymously
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 // Your Firebase configuration (copied from Firebase Console)
 const firebaseConfig = {
-  apiKey: "AIzaSyAZQSdl61UVgKwDz6QlCf-a4hB_QVDvQqc",
-  authDomain: "league-music-tournament.firebaseapp.com",
-  projectId: "league-music-tournament",
-  storageBucket: "league-music-tournament.firebasestorage.app",
-  messagingSenderId: "234217265735",
-  appId: "1:234217265735:web:0be63d3829a251df57af62",
-  measurementId: "G-73LGE8D3QQ"
+  apiKey: "AIzaSyCApnc605mPNOEsAcVnKeXbBTokk7iZP5E",
+  authDomain: "arcane-moments.firebaseapp.com",
+  projectId: "arcane-moments",
+  storageBucket: "arcane-moments.firebasestorage.app",
+  messagingSenderId: "466299671653",
+  appId: "1:466299671653:web:8fff3cfed266c69b66228c",
+  measurementId: "G-P2EJRS5RJ0"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+// Sign visitors in anonymously so Firestore can securely identify them.
+signInAnonymously(auth)
+    .then(({ user }) => {
+        localStorage.setItem('tournamentUserId', user.uid);
+        localStorage.setItem('userId', user.uid);
+
+        console.log('✅ Anonymous Firebase user:', user.uid);
+    })
+    .catch(error => {
+        console.error('❌ Anonymous Firebase sign-in failed:', error);
+    });
 
 console.log('✅ Firebase connected!');
 

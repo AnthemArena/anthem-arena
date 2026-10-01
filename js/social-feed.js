@@ -487,17 +487,20 @@ export async function getFeed(feedType = 'following', limitCount = 50) {
             const snapshot = await getDocs(feedQuery);
             posts = snapshot.docs.map(doc => doc.data());
             
-        } else {
+               } else {
             // Get all public posts (global feed)
+            // Sort client-side to avoid requiring a composite Firestore index.
             const postsQuery = query(
                 collection(db, 'posts'),
                 where('privacy', '==', 'public'),
-                orderBy('timestamp', 'desc'),
                 limit(limitCount)
             );
-            
+
             const snapshot = await getDocs(postsQuery);
-            posts = snapshot.docs.map(doc => doc.data());
+
+            posts = snapshot.docs
+                .map(doc => doc.data())
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         }
         
         console.log(`📥 Loaded ${posts.length} posts (${feedType})`);

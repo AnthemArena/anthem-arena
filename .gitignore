@@ -148,3 +148,5 @@ auto-update-seeds.js
 # System files
 .DS_Store
 Thumbs.db
+# Local Netlify folder
+.netlify
