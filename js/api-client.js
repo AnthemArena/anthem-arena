@@ -1,3 +1,4 @@
+import { ARCANE_CONFIG } from './arcane-config.js';
 // ========================================
 // API CLIENT - USES NETLIFY EDGE CACHE
 // All Firebase reads go through this layer
@@ -86,7 +87,7 @@ export async function submitVote(matchId, songId) {
     );
     
     try {
-        const matchRef = doc(db, `tournaments/arcane-test-01/matches/${matchId}`);
+        const matchRef = doc(db, `tournaments/${ARCANE_CONFIG.tournamentId}/matches/${matchId}`);
         
         await updateDoc(matchRef, {
 [`${songId}.votes`]: increment(1),

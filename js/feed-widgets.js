@@ -3,6 +3,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
@@ -235,7 +236,7 @@ async function loadRoundProgress() {
         // Get all matches to see which rounds are actually open
         const { getAllMatches } = await import('./api-client.js');
         const allMatches = await getAllMatches();
-        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
+        const CURRENT_TOURNAMENT = ARCANE_CONFIG.tournamentId;
         const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
         
         // Find which rounds have live/active matches
@@ -352,7 +353,7 @@ async function loadRoundProgress() {
 // Helper: Calculate tournament participation (from profile.js)
 async function calculateTournamentParticipation(userId) {
     try {
-        const CURRENT_TOURNAMENT = '2025-worlds-anthems';
+        const CURRENT_TOURNAMENT = ARCANE_CONFIG.tournamentId;
         
         const TOTAL_MATCHES_BY_ROUND = {
             1: 29,
@@ -716,7 +717,7 @@ async function loadLiveMatches() {
 function transformToMatchCardFormat(apiMatch) {
     return {
         id: apiMatch.id || apiMatch.matchId,
-        tournament: apiMatch.tournament || '2025-worlds-anthems',
+        tournament: apiMatch.tournament || ARCANE_CONFIG.tournamentId,
         round: apiMatch.round,
         status: apiMatch.status,
         date: apiMatch.startDate,

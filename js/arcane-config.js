@@ -81,3 +81,7 @@ export function getChampionSplashUrl(championId, skinNumber = 0) {
 
     return `${ARCANE_CONFIG.dataDragonSplashCdn}${championId}_${skinNumber}.jpg`;
 }
+// Exposed for classic (non-module) scripts such as modal.js.
+if (typeof window !== 'undefined') {
+    window.ARCANE_TOURNAMENT_ID = ARCANE_CONFIG.tournamentId;
+}

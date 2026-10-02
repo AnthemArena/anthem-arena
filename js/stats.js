@@ -44,7 +44,8 @@ function hideLoadingSpinner() {
 }
 
 
-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+import { ARCANE_CONFIG } from './arcane-config.js';
+const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // State
 let allSongsData = [];

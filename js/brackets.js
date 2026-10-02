@@ -11,7 +11,8 @@ import { db } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ✅ ADD THIS LINE:
-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+import { ARCANE_CONFIG } from './arcane-config.js';
+const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // ========================================
 // HELPER: CHECK IF USER VOTED IN MATCH

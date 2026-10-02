@@ -23,7 +23,8 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https:/
 // TOURNAMENT CONFIG
 // ========================================
 
-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+import { ARCANE_CONFIG } from './arcane-config.js';
+const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // ========================================
 // AUTHENTICATION
