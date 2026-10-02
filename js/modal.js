@@ -102,7 +102,7 @@ function createModalHTML(match) {
         : '<span class="modal-badge upcoming">📅 Upcoming</span>';
     
     // Check if user voted (for context)
-    const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+    const ACTIVE_TOURNAMENT = window.ARCANE_TOURNAMENT_ID || match.tournament;
     const userVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${match.id}`);
     const hasVoted = !!userVote;
     

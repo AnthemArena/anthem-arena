@@ -222,7 +222,8 @@ function getTimeRemaining(endDate) {
 
 
     // ✅ ADD THIS LINE:
-const ACTIVE_TOURNAMENT = 'arcane-test-01';
+import { ARCANE_CONFIG } from './arcane-config.js';
+const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
     // Current match data
     let currentMatch = null;
@@ -770,7 +771,7 @@ try {
 
             return {
                 id: match.matchId || match.id,
-                tournament: match.tournament || '2025-worlds-anthems',
+                tournament: match.tournament || ACTIVE_TOURNAMENT,
                 round: match.round || 'round-1',
                 status: match.status || 'live',
                 date: match.date || new Date().toISOString(),

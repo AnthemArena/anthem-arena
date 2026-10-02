@@ -367,6 +367,7 @@ function getTimeUntilMatch(dateString) {
 
 function formatTournamentName(tournament) {
     const names = {
+        'arcane-test-01': 'Arcane Moments',
         'anthem-arena-championship': 'Anthem Arena Championship S1',
         '2025-worlds-anthems': 'Anthem Arena Championship S1',
         'Anthems Arena Championship': 'Anthem Arena Championship S1',

@@ -11,7 +11,7 @@ const SITE_CONFIG = {
   // Auto-updating row of the newest uploads (set to null to hide)
   latest: { title: "Latest Shorts", subtitle: "Fresh from the channel", handle: "theundercityedit", limit: 12 },
   playlists: [
-    { title: "Arcane Moments | Season 1", subtitle: "", id: "PLDWd0_FOU4I0" },
+    { title: "Arcane Moments | Season 1", subtitle: "", id: "PLDWd0_FOU4I0", numbered: true },
     { title: "Vi Moments | Arcane", subtitle: "", id: "PLRGGq2SYHtWc" },
     { title: "Powder & Jinx Moments", subtitle: "", id: "PLcbksQ4sGEAg" },
     { title: "Action Moments", subtitle: "", id: "PLCV9IPghewvY" }
@@ -34,6 +34,17 @@ const fmtDate = (v) => {
   const d = new Date(v);
   return v && !Number.isNaN(d.getTime())
     ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d) : "";
+};
+
+// "Powder's My Problem 💔 | Arcane Moments #10 | ..." -> "Powder's My Problem 💔"
+const cleanTitle = (t) => {
+  const head = String(t || "").split("|")[0].trim();
+  return head || String(t || "").trim() || "Arcane Moment";
+};
+// Moment number from the "#10" in the original title (null if none)
+const momentNumber = (t) => {
+  const m = /#\s*(\d+)/.exec(String(t || ""));
+  return m ? Number(m[1]) : null;
 };
 
 function applyConfiguredLinks() {
@@ -175,6 +186,11 @@ async function loadRow(playlist, section) {
   try {
     const data = await fetchPlaylist(playlist);
     if (!data.items.length) return section.remove();
+    data.items = data.items.map((v) => ({ ...v, rawTitle: v.title, title: cleanTitle(v.title), num: momentNumber(v.title) }));
+    if (playlist.numbered) {
+      // Numbered series read best in order; anything without a number goes last
+      data.items.sort((a, b) => (a.num ?? Infinity) - (b.num ?? Infinity));
+    }
     allRows.set(playlist.id || "latest", data.items);
     section.replaceWith(renderRow(playlist, data));
   } catch (err) {

@@ -4,6 +4,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 import { 
     collection, 
     doc, 
@@ -201,7 +202,7 @@ const post = {
         ? `https://img.youtube.com/vi/${voteData.opponentSongId}/mqdefault.jpg` 
         : null,  // ✅ ADD THIS LINE
     choice: voteData.choice,
-    tournamentId: voteData.tournamentId || '2025-worlds-anthems',
+    tournamentId: voteData.tournamentId || ARCANE_CONFIG.tournamentId,
     round: voteData.round || 1,
     matchState: matchState,
     timestamp: Date.now(),

@@ -1,10 +1,11 @@
 import { db } from './firebase-config.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 import {
     doc,
     setDoc
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-const TOURNAMENT_ID = 'arcane-test-01';
+const TOURNAMENT_ID = ARCANE_CONFIG.tournamentId;
 const TOURNAMENT_NAME = 'Arcane Moments — Test Tournament';
 
 async function loadMoments() {
