@@ -1,0 +1,1099 @@
+diff --git a/admin.html b/admin.html
+index 15df356..fb68067 100644
+--- a/admin.html
++++ b/admin.html
+@@ -50,7 +50,7 @@
+                 <h2>🚀 Tournament Setup</h2>
+                 <div class="button-group">
+                     <button id="initTournamentBtn" class="btn btn-primary">
+-                        Initialize New Tournament (63 Matches)
++                        Build Bracket from edits.json
+                     </button>
+                     <button id="scheduleDatesBtn" class="btn btn-info">
+                         📅 Schedule Match Dates
+diff --git a/js/admin.js b/js/admin.js
+index 93d7e85..2aece46 100644
+--- a/js/admin.js
++++ b/js/admin.js
+@@ -3,7 +3,7 @@
+ // ========================================
+ 
+ import { db, auth } from './firebase-config.js';
+-import { initializeCompleteTournament, assertInitializerMatchesActiveTournament } from './init-firebase.js';
++import { previewEditsTournament, writeEditsTournament, getStoredDrawSeed } from './init-edits-tournament.js';
+ 
+ // ✅ NEW: Import blog generation functions
+ import {
+@@ -771,23 +771,31 @@ document.addEventListener('DOMContentLoaded', () => {
+     console.log('🏆 Admin Panel Initializing...');
+     
+     document.getElementById('initTournamentBtn')?.addEventListener('click', async () => {
+-        if (!confirm('Create the tournament matches?\n\nOnly run this once!')) {
+-            return;
+-        }
+-        
+         try {
+-            assertInitializerMatchesActiveTournament();
+-            await initializeCompleteTournament();
+-            alert('✅ Tournament initialized! Refresh to see matches.');
++            const seedInput = prompt('Draw seed (leave blank to generate a new random one).\n\nThe seed is saved on the tournament and lets anyone re-run the draw to check it.', '');
++            if (seedInput === null) return;
++
++            // Builds in memory only. Errors (wrong number of edits, duplicate creator, status not ok...) stop here.
++            const built = await previewEditsTournament({ drawSeed: seedInput.trim() || null });
++
++            const ok = confirm(
++                `Build ${built.cupName}: ${built.size} edits, ${built.matches.length} matches.\n\n` +
++                `Draw seed: ${built.drawSeed}\n\n` +
++                `Round 1:\n${built.pairings.join('\n')}\n\nWrite this bracket? Only run this once.`
++            );
++            if (!ok) return;
++
++            await writeEditsTournament(built);
++            alert(`✅ ${built.cupName} created (${built.matches.length} matches).\n\nDraw seed: ${built.drawSeed}\nKeep a copy of this seed.\n\nRefresh to see the matches.`);
+             location.reload();
+         } catch (error) {
+-            alert('❌ Error: ' + error.message);
++            alert('❌ ' + error.message);
+             console.error(error);
+         }
+     });
+ 
+     document.getElementById('resetTournamentBtn')?.addEventListener('click', async () => {
+-        if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
++        if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone! The same draw seed is reused, so the draw stays the same. Votes are NOT deleted (use Clear Votes for testing).')) {
+             return;
+         }
+         
+@@ -802,7 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
+         }
+         
+         try {
+-            assertInitializerMatchesActiveTournament(); // must run BEFORE anything is deleted
++            // Build and check the new bracket BEFORE deleting anything, so a problem with the entries
++            // cannot leave the tournament empty. Reuses the saved draw seed so the draw does not change.
++            const built = await previewEditsTournament({ drawSeed: await getStoredDrawSeed(ACTIVE_TOURNAMENT) });
+             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+             const snapshot = await getDocs(matchesRef);
+             
+@@ -817,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
+             
+             alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
+             
+-            await initializeCompleteTournament();
++            await writeEditsTournament(built);
+             
+             alert('✅ Tournament reset complete! Refresh page.');
+             location.reload();
+diff --git a/js/bracket-builder.js b/js/bracket-builder.js
+new file mode 100644
+index 0000000..b649c20
+--- /dev/null
++++ b/js/bracket-builder.js
+@@ -0,0 +1,239 @@
++// ========================================
++// BRACKET BUILDER (pure logic, no Firebase)
++// ========================================
++// Turns the edits in data/edits.json into the match documents for one cup.
++// Runs in the browser (admin page) and in Node (tools/bracket-preview.mjs, tools/test-bracket-builder.mjs),
++// so keep this file free of imports and DOM / Firebase calls.
++//
++// Rules it enforces (see the plan):
++//   - bracket size is a power of two (8, 16, 32, 64)
++//   - every entry is a public, embeddable edit that has been checked (status "ok")
++//   - one entry per creator
++//   - random draw, reproducible from a published draw seed
++//   - match ids carry the cup id, so votes from one cup can never collide with another
++//     (votes are stored as {matchId}_{userId})
++
++export const PLACEHOLDER = {
++    id: 'TBD',
++    seed: null,
++    shortTitle: 'TBD',
++    title: 'To Be Determined',
++    artist: 'Pending',
++    videoId: 'dQw4w9WgXcQ',   // same placeholder the old builder used; brackets.js checks id === 'TBD'
++    year: null,
++    slug: 'tbd'
++};
++
++export function isPowerOfTwo(n) {
++    return Number.isInteger(n) && n >= 2 && (n & (n - 1)) === 0;
++}
++
++export function roundsForSize(size) {
++    return Math.log2(size);
++}
++
++// "jinx-cup-1" -> "Jinx Cup 1"
++export function cupDisplayName(cupId) {
++    return String(cupId).split('-').filter(Boolean)
++        .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
++}
++
++// ----------------------------------------
++// ENTRY SELECTION + CHECKS
++// ----------------------------------------
++// An edit enters a cup when its "tournaments" list contains the cup id (the importer's last line says the same).
++// Anything that is entered but not usable is reported as an error, never silently skipped,
++// because you chose to enter it on purpose.
++export function selectEntries(edits, cupId, size) {
++    const errors = [];
++    const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
++
++    if (!isPowerOfTwo(size)) {
++        errors.push(`Bracket size must be a power of two (8, 16, 32, 64). Got ${size}.`);
++    }
++
++    const label = e => `${e.shortTitle || e.title || e.videoId || '(no title)'} [${e.videoId || 'no id'}]`;
++
++    for (const e of entered) {
++        if (!e.videoId) errors.push(`${label(e)}: no videoId.`);
++        if (!e.title) errors.push(`${label(e)}: no title.`);
++        if (e.status !== 'ok') {
++            const why = (e.flags && e.flags.length) ? ` (${e.flags.join('; ')})` : '';
++            errors.push(`${label(e)}: status is "${e.status}", not "ok"${why}. Check it, then set status to "ok" in data/edits.json.`);
++        }
++        if (e.embedAllowed === false) errors.push(`${label(e)}: embedding is disabled, it cannot be played on the site.`);
++    }
++
++    const seenVideo = new Map();
++    const seenCreator = new Map();
++    for (const e of entered) {
++        if (seenVideo.has(e.videoId)) errors.push(`${label(e)}: listed twice.`);
++        seenVideo.set(e.videoId, true);
++
++        const creatorKey = e.channelId || (e.artist ? `name:${e.artist.toLowerCase()}` : null);
++        if (creatorKey) {
++            if (seenCreator.has(creatorKey)) {
++                errors.push(`One entry per creator: "${e.artist}" has ${label(seenCreator.get(creatorKey))} and ${label(e)}.`);
++            } else {
++                seenCreator.set(creatorKey, e);
++            }
++        }
++    }
++
++    if (isPowerOfTwo(size) && entered.length !== size) {
++        errors.push(`The ${cupId} entry list has ${entered.length} edits but the bracket needs exactly ${size}. ` +
++            `Add or remove "${cupId}" in the "tournaments" list of edits in data/edits.json.`);
++    }
++
++    return { entries: entered, errors };
++}
++
++// ----------------------------------------
++// SEEDED RANDOM DRAW
++// ----------------------------------------
++// Anyone can re-run this with the published draw seed and the same entries to check the draw.
++function xmur3(str) {
++    let h = 1779033703 ^ str.length;
++    for (let i = 0; i < str.length; i++) {
++        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
++        h = (h << 13) | (h >>> 19);
++    }
++    return () => {
++        h = Math.imul(h ^ (h >>> 16), 2246822507);
++        h = Math.imul(h ^ (h >>> 13), 3266489909);
++        return (h ^= h >>> 16) >>> 0;
++    };
++}
++
++function mulberry32(a) {
++    return () => {
++        a |= 0; a = (a + 0x6D2B79F5) | 0;
++        let t = Math.imul(a ^ (a >>> 15), 1 | a);
++        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
++        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
++    };
++}
++
++export function makeDrawSeed(cupId) {
++    const rand = Math.floor(Math.random() * 0xffffffff).toString(36);
++    return `${cupId}-${new Date().toISOString().slice(0, 10)}-${rand}`;
++}
++
++// Entries are sorted by videoId BEFORE shuffling, so the draw depends only on the seed and the set of entries,
++// not on the order they happen to sit in edits.json.
++export function drawEntries(entries, drawSeed) {
++    if (!drawSeed) throw new Error('A draw seed is required.');
++    const list = [...entries].sort((a, b) => a.videoId < b.videoId ? -1 : a.videoId > b.videoId ? 1 : 0);
++    const rand = mulberry32(xmur3(String(drawSeed))());
++    for (let i = list.length - 1; i > 0; i--) {
++        const j = Math.floor(rand() * (i + 1));
++        [list[i], list[j]] = [list[j], list[i]];
++    }
++    return list;
++}
++
++// ----------------------------------------
++// MATCH GENERATION
++// ----------------------------------------
++function toCompetitor(edit, drawPosition) {
++    return {
++        id: edit.id || edit.videoId,
++        seed: null,                       // no seeding: the draw is random (see drawPosition)
++        drawPosition,                     // 1-based slot in the draw, for auditing
++        shortTitle: edit.shortTitle || edit.title,
++        title: edit.title,
++        artist: edit.artist || '',        // creator name (the cards show "artist • year")
++        creatorUrl: edit.creatorUrl || null,
++        channelId: edit.channelId || null,
++        videoId: edit.videoId,
++        year: edit.year || null,
++        slug: edit.slug || edit.videoId,
++        votes: 0
++    };
++}
++
++export function matchIdFor(cupId, round, matchNumber, totalRounds) {
++    return round === totalRounds ? `${cupId}-finals` : `${cupId}-round-${round}-match-${matchNumber}`;
++}
++
++export function roundLabel(round, totalRounds) {
++    const fromEnd = totalRounds - round;
++    if (fromEnd === 0) return 'Final';
++    if (fromEnd === 1) return 'Semi-finals';
++    if (fromEnd === 2) return 'Quarter-finals';
++    return `Round ${round}`;
++}
++
++// Returns every match document for the cup (size - 1 of them), in round order.
++//   batchSize = how many matches open together in one batch (the admin opens and closes by round + batch)
++export function buildMatches({ cupId, cupName, entries, drawSeed, batchSize = 4 }) {
++    const size = entries.length;
++    if (!isPowerOfTwo(size)) throw new Error(`Cannot build a bracket of ${size}.`);
++
++    const drawn = drawEntries(entries, drawSeed);
++    const totalRounds = roundsForSize(size);
++    const matches = [];
++
++    const base = (round, matchNumber) => ({
++        matchId: matchIdFor(cupId, round, matchNumber, totalRounds),
++        tournament: cupId,
++        tournamentName: cupName,
++        round,
++        roundLabel: roundLabel(round, totalRounds),
++        matchNumber,
++        batch: Math.floor((matchNumber - 1) / batchSize) + 1,
++        status: 'upcoming',
++        totalVotes: 0,
++        winnerId: null
++    });
++
++    // Round 1: slots 1+2, 3+4, ...
++    for (let m = 1; m <= size / 2; m++) {
++        const a = (m - 1) * 2, b = a + 1;
++        matches.push({
++            ...base(1, m),
++            song1: toCompetitor(drawn[a], a + 1),
++            song2: toCompetitor(drawn[b], b + 1)
++        });
++    }
++
++    // Later rounds: match j is fed by matches 2j-1 and 2j of the round before.
++    // advanceWinnerToNextRound() in admin.js fills each slot by matching "sourceMatch".
++    for (let round = 2; round <= totalRounds; round++) {
++        const count = size / Math.pow(2, round);
++        for (let m = 1; m <= count; m++) {
++            matches.push({
++                ...base(round, m),
++                song1: { ...PLACEHOLDER, votes: 0, sourceMatch: matchIdFor(cupId, round - 1, 2 * m - 1, totalRounds) },
++                song2: { ...PLACEHOLDER, votes: 0, sourceMatch: matchIdFor(cupId, round - 1, 2 * m, totalRounds) }
++            });
++        }
++    }
++
++    return matches;
++}
++
++export function buildTournamentDoc({ cupId, cupName, size, drawSeed, entries }) {
++    const totalRounds = roundsForSize(size);
++    return {
++        id: cupId,
++        name: cupName,
++        status: 'active',
++        format: 'single-elimination',
++        bracketSize: size,
++        totalRounds,
++        totalMatches: size - 1,
++        totalCompetitors: size,
++        drawSeed,
++        drawMethod: 'Entries sorted by video id, then shuffled with a seeded PRNG (xmur3 + mulberry32). Re-run tools/bracket-preview.mjs with this seed to check the draw.',
++        entryVideoIds: entries.map(e => e.videoId).sort(),
++        description: `${cupName}: a ${size}-edit knockout. Ties are decided by the admin's vote.`,
++        createdAt: new Date().toISOString()
++    };
++}
++
++// Human-readable round 1 pairings, for the confirm box and the CLI preview.
++export function describePairings(matches) {
++    return matches.filter(m => m.round === 1)
++        .map(m => `${m.matchNumber}. ${m.song1.shortTitle} (${m.song1.artist})  vs  ${m.song2.shortTitle} (${m.song2.artist})`);
++}
+diff --git a/js/init-edits-tournament.js b/js/init-edits-tournament.js
+new file mode 100644
+index 0000000..af1dd3a
+--- /dev/null
++++ b/js/init-edits-tournament.js
+@@ -0,0 +1,95 @@
++// ========================================
++// EDITS TOURNAMENT BUILDER (admin page)
++// ========================================
++// Replaces the legacy music builder (init-firebase.js).
++//   1. loads data/edits.json
++//   2. takes the edits whose "tournaments" list contains the cup id
++//   3. checks them, draws the bracket from a published seed, builds size - 1 matches
++//   4. writes tournaments/<cupId> and tournaments/<cupId>/matches/* in ONE atomic batch
++// The cup id is the active tournament id from arcane-config.js. To build a different cup, change it there
++// (and in the two edge functions) first, as the plan describes: tournaments run one at a time.
++
++import { db } from './firebase-config.js';
++import { ARCANE_CONFIG } from './arcane-config.js';
++import {
++    collection, doc, getDoc, getDocs, writeBatch
++} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
++import {
++    selectEntries, buildMatches, buildTournamentDoc, makeDrawSeed, cupDisplayName, describePairings
++} from './bracket-builder.js';
++
++export const DEFAULT_BRACKET_SIZE = 16;
++
++async function loadEdits() {
++    const response = await fetch('/data/edits.json', { cache: 'no-store' });
++    if (!response.ok) {
++        throw new Error(`Could not load data/edits.json (${response.status}). Run the importer and commit the file first.`);
++    }
++    return response.json();
++}
++
++function assertCupIsActive(cupId) {
++    if (cupId !== ARCANE_CONFIG.tournamentId) {
++        throw new Error(
++            `Blocked: asked to build "${cupId}" but the active tournament is "${ARCANE_CONFIG.tournamentId}". ` +
++            `Set tournamentId in js/arcane-config.js (and the two edge functions) first. Nothing was changed.`
++        );
++    }
++}
++
++// The draw seed saved with the cup, so a reset can rebuild the SAME draw instead of reshuffling.
++export async function getStoredDrawSeed(cupId = ARCANE_CONFIG.tournamentId) {
++    const snap = await getDoc(doc(db, 'tournaments', cupId));
++    return snap.exists() ? (snap.data().drawSeed || null) : null;
++}
++
++// Builds everything in memory and returns it. Writes nothing.
++export async function previewEditsTournament({
++    cupId = ARCANE_CONFIG.tournamentId,
++    size = DEFAULT_BRACKET_SIZE,
++    drawSeed = null,
++    batchSize = 4
++} = {}) {
++    assertCupIsActive(cupId);
++
++    const edits = await loadEdits();
++    const { entries, errors } = selectEntries(edits, cupId, size);
++    if (errors.length) {
++        throw new Error(`Cannot build ${cupId}:\n\n- ${errors.join('\n- ')}`);
++    }
++
++    const seed = drawSeed || makeDrawSeed(cupId);
++    const cupName = cupDisplayName(cupId);
++    const matches = buildMatches({ cupId, cupName, entries, drawSeed: seed, batchSize });
++    const tournament = buildTournamentDoc({ cupId, cupName, size, drawSeed: seed, entries });
++
++    return { cupId, cupName, size, drawSeed: seed, tournament, matches, pairings: describePairings(matches) };
++}
++
++// Writes a previewed bracket. Refuses if the cup already has matches (use the admin Reset to clear them first).
++export async function writeEditsTournament(built) {
++    assertCupIsActive(built.cupId);
++
++    const matchesRef = collection(db, `tournaments/${built.cupId}/matches`);
++    const existing = await getDocs(matchesRef);
++    if (!existing.empty) {
++        throw new Error(
++            `${built.cupId} already has ${existing.size} matches. Nothing was changed. ` +
++            `Use "Reset & Regenerate" if you really mean to rebuild it.`
++        );
++    }
++
++    const batch = writeBatch(db);   // up to 500 writes, all-or-nothing: no half-built bracket
++    batch.set(doc(db, 'tournaments', built.cupId), built.tournament);
++    for (const match of built.matches) {
++        batch.set(doc(matchesRef, match.matchId), match);
++    }
++    await batch.commit();
++
++    console.log(`✅ ${built.cupName}: ${built.matches.length} matches written. Draw seed: ${built.drawSeed}`);
++    return built;
++}
++
++export async function initializeEditsTournament(options = {}) {
++    return writeEditsTournament(await previewEditsTournament(options));
++}
+diff --git a/js/init-firebase.js b/js/init-firebase.js
+deleted file mode 100644
+index 2b2b786..0000000
+--- a/js/init-firebase.js
++++ /dev/null
+@@ -1,488 +0,0 @@
+-// ========================================
+-// INITIALIZE COMPLETE TOURNAMENT
+-// Creates all 63 matches at once
+-// Supports multiple tournaments
+-// ========================================
+-
+-import { db } from './firebase-config.js';
+-import { ARCANE_CONFIG } from './arcane-config.js';
+-import { collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+-
+-// ========================================
+-// TOURNAMENT CONFIGURATION
+-// ========================================
+-
+-const TOURNAMENT_CONFIG = {
+-    id: '2025-worlds-anthems',           // ← Change for Tournament 2
+-    name: 'Anthem Area: Season 1',
+-    startDate: '2025-11-01',
+-    endDate: '2025-12-31',
+-    status: 'active',
+-    description: 'Vote for the greatest League music video of all time!'
+-};
+-
+-
+-// SAFETY: this builder is the LEGACY music-tournament builder (hard-coded id + music-videos.json).
+-// It must never run against the active Arcane / edits tournament. Replace it with the edits builder.
+-export function assertInitializerMatchesActiveTournament() {
+-    if (TOURNAMENT_CONFIG.id !== ARCANE_CONFIG.tournamentId) {
+-        throw new Error(
+-            `Blocked: this builder is for the legacy "${TOURNAMENT_CONFIG.id}" music tournament, ` +
+-            `but the active tournament is "${ARCANE_CONFIG.tournamentId}". Nothing was changed.`
+-        );
+-    }
+-}
+-
+-// ========================================
+-// LOAD SONGS FROM JSON
+-// ========================================
+-
+-async function loadSongs() {
+-    const response = await fetch('/data/music-videos.json');
+-    const songs = await response.json();
+-    return songs.sort((a, b) => a.seed - b.seed);
+-}
+-
+-// ========================================
+-// CREATE TOURNAMENT INFO
+-// ========================================
+-
+-async function createTournamentInfo() {
+-    const tournamentRef = doc(db, 'tournaments', TOURNAMENT_CONFIG.id);
+-    
+-    await setDoc(tournamentRef, {
+-        ...TOURNAMENT_CONFIG,
+-        createdAt: new Date().toISOString(),
+-        totalMatches: 63,
+-        totalSongs: 64
+-    });
+-    
+-    console.log(`✅ Tournament info created: ${TOURNAMENT_CONFIG.id}`);
+-}
+-
+-// ========================================
+-// GENERATE ALL 63 MATCHES
+-// ========================================
+-
+-// ========================================
+-// GENERATE ALL 63 MATCHES (with batch assignments)
+-// ========================================
+-
+-async function generateAllMatches(allSongs) {
+-    const allMatches = [];
+-    
+-    // ========================================
+-    // ROUND 1: 29 MATCHES (5 matches per batch = 6 batches)
+-    // ========================================
+-    
+-    console.log('🎯 Generating Round 1 (29 matches, 6 batches)...');
+-    
+-    for (let i = 0; i < 29; i++) {
+-        const topSeedIndex = i + 3;      // Seeds 4-32
+-        const bottomSeedIndex = 60 - i;  // Seeds 61-33
+-        
+-        const song1 = allSongs[topSeedIndex];
+-        const song2 = allSongs[bottomSeedIndex];
+-        
+-        if (!song1 || !song2) {
+-            console.error(`❌ Missing song for R1 Match ${i + 1}`);
+-            continue;
+-        }
+-        
+-        allMatches.push({
+-            matchId: `round-1-match-${i + 1}`,
+-            tournament: TOURNAMENT_CONFIG.id,
+-            tournamentName: TOURNAMENT_CONFIG.name,
+-            round: 1,
+-            matchNumber: i + 1,
+-            batch: Math.floor(i / 5) + 1,  // Batches 1-6 (5 per batch, last batch has 4)
+-            status: 'upcoming',
+-            totalVotes: 0,
+-            winnerId: null,
+-            
+-            song1: {
+-                id: song1.id,
+-                seed: song1.seed,
+-                shortTitle: song1.shortTitle,
+-                title: song1.title,
+-                artist: song1.artist,
+-                videoId: song1.videoId,
+-                year: song1.year || '2024',
+-                slug: song1.slug,
+-                votes: 0
+-            },
+-            
+-            song2: {
+-                id: song2.id,
+-                seed: song2.seed,
+-                shortTitle: song2.shortTitle,
+-                title: song2.title,
+-                artist: song2.artist,
+-                videoId: song2.videoId,
+-                year: song2.year || '2024',
+-                slug: song2.slug,
+-                votes: 0
+-            }
+-        });
+-    }
+-    
+-    console.log(`✅ Round 1: ${allMatches.length} matches in 6 batches`);
+-
+-    // ========================================
+-// ✅ DEFINE BYE SEEDS (Seeds 1, 2, 3)
+-// ========================================
+-
+-const byeSeeds = [allSongs[0], allSongs[1], allSongs[2]]; // Seeds 1, 2, 3
+-
+-console.log('✅ Bye seeds defined:', byeSeeds.map(s => `${s.seed}. ${s.shortTitle}`));
+-    
+-// ========================================
+-// ROUND 2: 16 MATCHES – FIXED & CORRECT (2025-worlds-anthems)
+-// ========================================
+-
+-console.log('Generating Round 2 (16 matches, 4 batches)...');
+-
+-const TBD = {
+-    id: 'TBD',
+-    seed: '?',
+-    shortTitle: 'TBD',
+-    title: 'To Be Determined',
+-    artist: 'Pending',
+-    videoId: 'dQw4w9WgXcQ',
+-    year: '2024',
+-    slug: 'tbd'
+-};
+-
+-// Re-define the helper just for Round 2 (safe & clean)
+-const addRound2Match = (matchNum, song1Data, song2Data) => {
+-    allMatches.push({
+-        matchId: `round-2-match-${matchNum}`,
+-        tournament: TOURNAMENT_CONFIG.id,
+-        tournamentName: TOURNAMENT_CONFIG.name,
+-        round: 2,
+-        matchNumber: matchNum,
+-        batch: Math.floor((matchNum - 1) / 4) + 1,
+-        status: 'upcoming',
+-        totalVotes: 0,
+-        winnerId: null,
+-        song1: { ...song1Data, votes: 0 },
+-        song2: { ...song2Data, votes: 0 }
+-    });
+-};
+-
+-// TOP QUARTER – Seed #1 Region
+-addRound2Match(1,  { ...byeSeeds[0], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-1' });
+-addRound2Match(2,  { ...TBD, sourceMatch: 'round-1-match-2' },                   { ...TBD, sourceMatch: 'round-1-match-3' });
+-addRound2Match(3,  { ...TBD, sourceMatch: 'round-1-match-4' },                   { ...TBD, sourceMatch: 'round-1-match-5' });
+-addRound2Match(4,  { ...TBD, sourceMatch: 'round-1-match-6' },                   { ...TBD, sourceMatch: 'round-1-match-7' });
+-
+-// UPPER-MIDDLE – Seed #3 Region
+-addRound2Match(5,  { ...byeSeeds[2], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-8' });
+-addRound2Match(6,  { ...TBD, sourceMatch: 'round-1-match-9' },                    { ...TBD, sourceMatch: 'round-1-match-10' });
+-addRound2Match(7,  { ...TBD, sourceMatch: 'round-1-match-11' },                   { ...TBD, sourceMatch: 'round-1-match-12' });
+-addRound2Match(8,  { ...TBD, sourceMatch: 'round-1-match-13' },                   { ...TBD, sourceMatch: 'round-1-match-14' });
+-
+-// LOWER-MIDDLE – No bye
+-addRound2Match(9,  { ...TBD, sourceMatch: 'round-1-match-15' },                   { ...TBD, sourceMatch: 'round-1-match-16' });
+-addRound2Match(10, { ...TBD, sourceMatch: 'round-1-match-17' },                   { ...TBD, sourceMatch: 'round-1-match-18' });
+-addRound2Match(11, { ...TBD, sourceMatch: 'round-1-match-19' },                   { ...TBD, sourceMatch: 'round-1-match-20' });
+-addRound2Match(12, { ...TBD, sourceMatch: 'round-1-match-21' },                   { ...TBD, sourceMatch: 'round-1-match-22' });
+-
+-// BOTTOM – Seed #2 Region
+-addRound2Match(13, { ...byeSeeds[1], hasBye: true },                              { ...TBD, sourceMatch: 'round-1-match-23' });
+-addRound2Match(14, { ...TBD, sourceMatch: 'round-1-match-24' },                   { ...TBD, sourceMatch: 'round-1-match-25' });
+-addRound2Match(15, { ...TBD, sourceMatch: 'round-1-match-26' },                   { ...TBD, sourceMatch: 'round-1-match-27' });
+-addRound2Match(16, { ...TBD, sourceMatch: 'round-1-match-28' },                   { ...TBD, sourceMatch: 'round-1-match-29' });
+-
+-console.log('Round 2: 16 matches correctly mapped – all 29 R1 winners now feed perfectly');
+- // ========================================
+-    // ROUND 3: 8 MATCHES (4 per batch = 2 batches)
+-    // ========================================
+-    
+-    console.log('🎯 Generating Round 3 (8 matches, 2 batches)...');
+-    
+-    for (let i = 1; i <= 8; i++) {
+-        const r2match1 = (i * 2) - 1;
+-        const r2match2 = i * 2;
+-        
+-        allMatches.push({
+-            matchId: `round-3-match-${i}`,
+-            tournament: TOURNAMENT_CONFIG.id,
+-            tournamentName: TOURNAMENT_CONFIG.name,
+-            round: 3,
+-            matchNumber: i,
+-            batch: Math.floor((i - 1) / 4) + 1,  // Batches 1-2 (4 per batch)
+-            status: 'upcoming',
+-            totalVotes: 0,
+-            winnerId: null,
+-            
+-            song1: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-2-match-${r2match1}`
+-            },
+-            
+-            song2: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-2-match-${r2match2}`
+-            }
+-        });
+-    }
+-    
+-    console.log(`✅ Round 3: 8 matches in 2 batches (${allMatches.length} total)`);
+-    
+-    // ========================================
+-    // ROUND 4: 4 MATCHES (all in 1 batch - Quarterfinals)
+-    // ========================================
+-    
+-    console.log('🎯 Generating Round 4 (4 matches, 1 batch)...');
+-    
+-    for (let i = 1; i <= 4; i++) {
+-        const r3match1 = (i * 2) - 1;
+-        const r3match2 = i * 2;
+-        
+-        allMatches.push({
+-            matchId: `round-4-match-${i}`,
+-            tournament: TOURNAMENT_CONFIG.id,
+-            tournamentName: TOURNAMENT_CONFIG.name,
+-            round: 4,
+-            matchNumber: i,
+-            batch: 1,  // All 4 QF matches in 1 batch
+-            status: 'upcoming',
+-            totalVotes: 0,
+-            winnerId: null,
+-            
+-            song1: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-3-match-${r3match1}`
+-            },
+-            
+-            song2: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-3-match-${r3match2}`
+-            }
+-        });
+-    }
+-    
+-    console.log(`✅ Round 4: 4 matches in 1 batch (${allMatches.length} total)`);
+-    
+-    // ========================================
+-    // ROUND 5: 2 MATCHES (all in 1 batch - Semifinals)
+-    // ========================================
+-    
+-    console.log('🎯 Generating Round 5 (2 matches, 1 batch)...');
+-    
+-    for (let i = 1; i <= 2; i++) {
+-        const r4match1 = (i * 2) - 1;
+-        const r4match2 = i * 2;
+-        
+-        allMatches.push({
+-            matchId: `round-5-match-${i}`,
+-            tournament: TOURNAMENT_CONFIG.id,
+-            tournamentName: TOURNAMENT_CONFIG.name,
+-            round: 5,
+-            matchNumber: i,
+-            batch: 1,  // Both semis in 1 batch
+-            status: 'upcoming',
+-            totalVotes: 0,
+-            winnerId: null,
+-            
+-            song1: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-4-match-${r4match1}`
+-            },
+-            
+-            song2: {
+-                id: 'TBD',
+-                seed: '?',
+-                shortTitle: 'TBD',
+-                title: 'To Be Determined',
+-                artist: 'Pending',
+-                videoId: 'dQw4w9WgXcQ',
+-                year: '2024',
+-                slug: 'tbd',
+-                votes: 0,
+-                sourceMatch: `round-4-match-${r4match2}`
+-            }
+-        });
+-    }
+-    
+-    console.log(`✅ Round 5: 2 matches in 1 batch (${allMatches.length} total)`);
+-    
+-    // ========================================
+-    // ROUND 6: FINALS (1 batch)
+-    // ========================================
+-    
+-    console.log('🎯 Generating Finals...');
+-    
+-    allMatches.push({
+-        matchId: 'finals',
+-        tournament: TOURNAMENT_CONFIG.id,
+-        tournamentName: TOURNAMENT_CONFIG.name,
+-        round: 6,
+-        matchNumber: 1,
+-        batch: 1,  // Finals obviously in 1 batch
+-        status: 'upcoming',
+-        totalVotes: 0,
+-        winnerId: null,
+-        
+-        song1: {
+-            id: 'TBD',
+-            seed: '?',
+-            shortTitle: 'TBD',
+-            title: 'To Be Determined',
+-            artist: 'Pending',
+-            videoId: 'dQw4w9WgXcQ',
+-            year: '2024',
+-            slug: 'tbd',
+-            votes: 0,
+-            sourceMatch: 'round-5-match-1'
+-        },
+-        
+-        song2: {
+-            id: 'TBD',
+-            seed: '?',
+-            shortTitle: 'TBD',
+-            title: 'To Be Determined',
+-            artist: 'Pending',
+-            videoId: 'dQw4w9WgXcQ',
+-            year: '2024',
+-            slug: 'tbd',
+-            votes: 0,
+-            sourceMatch: 'round-5-match-2'
+-        }
+-    });
+-    
+-    console.log(`✅ The Finals: 1 match (${allMatches.length} total)`);
+-    
+-    return allMatches;
+-}
+-
+-// ========================================
+-// WRITE TO FIREBASE
+-// ========================================
+-
+-async function writeMatchesToFirebase(allMatches) {
+-    console.log(`🔥 Writing ${allMatches.length} matches to Firebase...`);
+-    
+-    // Use tournament-namespaced path
+-    const tournamentId = TOURNAMENT_CONFIG.id;
+-    const matchesRef = collection(db, `tournaments/${tournamentId}/matches`);
+-    
+-    let successCount = 0;
+-    
+-    for (const match of allMatches) {
+-        try {
+-            await setDoc(doc(matchesRef, match.matchId), match);
+-            successCount++;
+-            
+-            if (successCount % 10 === 0) {
+-                console.log(`✅ Progress: ${successCount}/${allMatches.length}`);
+-            }
+-        } catch (error) {
+-            console.error(`❌ Failed: ${match.matchId}:`, error);
+-        }
+-    }
+-    
+-    console.log(`\n🎉 Complete! Created ${successCount}/${allMatches.length} matches`);
+-    return successCount;
+-}
+-
+-// ========================================
+-// MAIN INITIALIZATION
+-// ========================================
+-
+-async function initializeCompleteTournament() {
+-    try {
+-        console.log('🚀 Starting complete tournament initialization...\n');
+-        console.log(`Tournament: ${TOURNAMENT_CONFIG.name}`);
+-        console.log(`ID: ${TOURNAMENT_CONFIG.id}\n`);
+-        
+-        // Create tournament info
+-        await createTournamentInfo();
+-        
+-        // Load songs
+-        const allSongs = await loadSongs();
+-        console.log(`✅ Loaded ${allSongs.length} songs\n`);
+-        
+-        // Generate all matches
+-        const allMatches = await generateAllMatches(allSongs);
+-        console.log(`\n✅ Generated ${allMatches.length} total matches\n`);
+-        
+-        // Write to Firebase
+-        const successCount = await writeMatchesToFirebase(allMatches);
+-        
+-        alert(`
+-🎉 Tournament Initialized!
+-
+-✅ ${successCount}/63 matches created
+-📊 Tournament: ${TOURNAMENT_CONFIG.name}
+-🆔 ID: ${TOURNAMENT_CONFIG.id}
+-
+-Refresh brackets.html to view!
+-        `);
+-        
+-    } catch (error) {
+-        console.error('❌ Failed:', error);
+-        alert(`❌ Error: ${error.message}`);
+-    }
+-}
+-
+-// ========================================
+-// LEGACY: Keep old function for backward compatibility
+-// ========================================
+-
+-async function initializeRound1Matches() {
+-    console.warn('⚠️ initializeRound1Matches() is deprecated. Use initializeCompleteTournament() instead.');
+-    alert('This function only creates Round 1.\n\nUse initializeCompleteTournament() to create all 63 matches at once!');
+-}
+-
+-// ========================================
+-// EXPORTS
+-// ========================================
+-
+-export { initializeCompleteTournament, initializeRound1Matches };
+-
+-window.initializeCompleteTournament = initializeCompleteTournament;
+-window.initializeRound1Matches = initializeRound1Matches;
+-
+-console.log('💡 Ready! Run initializeCompleteTournament() to create entire tournament.');
+\ No newline at end of file
+diff --git a/tools/bracket-preview.mjs b/tools/bracket-preview.mjs
+new file mode 100644
+index 0000000..f9d68c2
+--- /dev/null
++++ b/tools/bracket-preview.mjs
+@@ -0,0 +1,23 @@
++#!/usr/bin/env node
++// Preview (or audit) a cup's draw without touching Firebase.
++//   node tools/bracket-preview.mjs jinx-cup-1                      (16, new random seed)
++//   node tools/bracket-preview.mjs jinx-cup-1 --seed my-seed       (re-run a published draw)
++//   node tools/bracket-preview.mjs jinx-cup-1 --size 32 --file data/edits.json
++import fs from 'node:fs';
++import { selectEntries, buildMatches, makeDrawSeed, cupDisplayName, describePairings, roundLabel } from '../js/bracket-builder.js';
++
++const args = process.argv.slice(2);
++const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
++const size = Number(take('--size') || 16), seedArg = take('--seed'), file = take('--file') || 'data/edits.json';
++const cupId = args[0];
++if (!cupId) { console.error('Usage: node tools/bracket-preview.mjs <cup-id> [--size 16] [--seed <draw seed>] [--file data/edits.json]'); process.exit(1); }
++
++const edits = JSON.parse(fs.readFileSync(file, 'utf8'));
++const { entries, errors } = selectEntries(edits, cupId, size);
++if (errors.length) { console.error(`\nCannot build ${cupId}:\n  - ${errors.join('\n  - ')}\n`); process.exit(1); }
++
++const drawSeed = seedArg || makeDrawSeed(cupId);
++const matches = buildMatches({ cupId, cupName: cupDisplayName(cupId), entries, drawSeed });
++const rounds = Math.max(...matches.map(m => m.round));
++console.log(`\n${cupDisplayName(cupId)}: ${size} edits, ${matches.length} matches, ${rounds} rounds\nDraw seed: ${drawSeed}\n\n${roundLabel(1, rounds)}:`);
++console.log(describePairings(matches).map(l => '  ' + l).join('\n') + '\n');
+diff --git a/tools/test-bracket-builder.mjs b/tools/test-bracket-builder.mjs
+new file mode 100644
+index 0000000..763c0a0
+--- /dev/null
++++ b/tools/test-bracket-builder.mjs
+@@ -0,0 +1,136 @@
++// Offline tests for js/bracket-builder.js.   Run:  node tools/test-bracket-builder.mjs
++import assert from 'node:assert/strict';
++import { selectEntries, buildMatches, buildTournamentDoc, drawEntries, isPowerOfTwo } from '../js/bracket-builder.js';
++
++const CUP = 'jinx-cup-1';
++const mk = (n, extra = {}) => ({
++    id: `vid${String(n).padStart(8, '0')}`, videoId: `vid${String(n).padStart(8, '0')}`,
++    title: `Jinx edit ${n}`, shortTitle: `Edit ${n}`, slug: `edit-${n}`,
++    artist: `Creator ${n}`, channelId: `chan${n}`, creatorUrl: `https://www.youtube.com/channel/chan${n}`,
++    year: 2026, status: 'ok', embedAllowed: true, flags: [], tournaments: [CUP], ...extra
++});
++const edits = size => Array.from({ length: size }, (_, i) => mk(i + 1));
++let passed = 0;
++const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
++
++test('16 valid edits -> 15 matches over 4 rounds (8/4/2/1)', () => {
++    const { entries, errors } = selectEntries(edits(16), CUP, 16);
++    assert.deepEqual(errors, []);
++    const m = buildMatches({ cupId: CUP, cupName: 'Jinx Cup 1', entries, drawSeed: 's1' });
++    assert.equal(m.length, 15);
++    const per = r => m.filter(x => x.round === r).length;
++    assert.deepEqual([1, 2, 3, 4].map(per), [8, 4, 2, 1]);
++});
++
++test('every entry appears exactly once in round 1; no entry meets itself', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const r1 = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's1' }).filter(x => x.round === 1);
++    const ids = r1.flatMap(x => [x.song1.id, x.song2.id]);
++    assert.equal(new Set(ids).size, 16);
++    assert.ok(r1.every(x => x.song1.id !== x.song2.id));
++});
++
++test('same seed + same entries = same draw, whatever the file order', () => {
++    const a = edits(16), b = [...a].reverse();
++    const da = drawEntries(a, 'seed-A').map(e => e.videoId), db = drawEntries(b, 'seed-A').map(e => e.videoId);
++    assert.deepEqual(da, db);
++});
++
++test('a different seed gives a different draw', () => {
++    const a = drawEntries(edits(16), 'seed-A').map(e => e.videoId).join();
++    const b = drawEntries(edits(16), 'seed-B').map(e => e.videoId).join();
++    assert.notEqual(a, b);
++});
++
++test('match ids are unique, carry the cup id, and the last round is <cup>-finals', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's' });
++    assert.equal(new Set(m.map(x => x.matchId)).size, 15);
++    assert.ok(m.every(x => x.matchId.startsWith(CUP + '-') && x.tournament === CUP));
++    assert.equal(m.filter(x => x.round === 4)[0].matchId, 'jinx-cup-1-finals');
++});
++
++test('competitors have seed null and a drawPosition; placeholders are TBD', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's' });
++    assert.ok(m.filter(x => x.round === 1).every(x => x.song1.seed === null && x.song2.seed === null && x.song1.drawPosition >= 1));
++    assert.ok(m.filter(x => x.round > 1).every(x => x.song1.id === 'TBD' && x.song2.id === 'TBD'));
++});
++
++test('batches: round 1 = 2 batches of 4; later rounds = 1 batch', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's' });
++    const b = r => [...new Set(m.filter(x => x.round === r).map(x => x.batch))];
++    assert.deepEqual([1, 2, 3, 4].map(b), [[1, 2], [1], [1], [1]]);
++});
++
++test('advancement: simulating the admin sourceMatch logic fills every slot and crowns one winner', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 'sim' });
++    const byId = new Map(m.map(x => [x.matchId, x]));
++    // every sourceMatch exists and is used exactly once
++    const sources = m.flatMap(x => [x.song1.sourceMatch, x.song2.sourceMatch]).filter(Boolean);
++    assert.equal(new Set(sources).size, sources.length);
++    assert.ok(sources.every(s => byId.has(s)));
++    // play it through the way admin.js advanceWinnerToNextRound does (song1 always wins)
++    let champion = null;
++    for (let r = 1; r <= 4; r++) {
++        for (const match of m.filter(x => x.round === r)) {
++            assert.notEqual(match.song1.id, 'TBD'); assert.notEqual(match.song2.id, 'TBD');
++            const winner = match.song1;
++            const next = m.find(x => x.round === r + 1 && (x.song1.sourceMatch === match.matchId || x.song2.sourceMatch === match.matchId));
++            if (!next) { champion = winner; continue; }
++            const slot = next.song1.sourceMatch === match.matchId ? 'song1' : 'song2';
++            next[slot] = { ...winner, votes: 0, sourceMatch: match.matchId };
++        }
++    }
++    assert.ok(champion && champion.id !== 'TBD');
++});
++
++test('size 32 -> 31 matches, 5 rounds; size 8 -> 7 matches, 3 rounds', () => {
++    for (const [size, rounds] of [[32, 5], [8, 3]]) {
++        const { entries, errors } = selectEntries(edits(size), CUP, size);
++        assert.deepEqual(errors, []);
++        const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's' });
++        assert.equal(m.length, size - 1);
++        assert.equal(Math.max(...m.map(x => x.round)), rounds);
++    }
++});
++
++test('tournament doc carries the draw seed and entry list', () => {
++    const { entries } = selectEntries(edits(16), CUP, 16);
++    const t = buildTournamentDoc({ cupId: CUP, cupName: 'Jinx Cup 1', size: 16, drawSeed: 'abc', entries });
++    assert.equal(t.drawSeed, 'abc'); assert.equal(t.totalMatches, 15); assert.equal(t.entryVideoIds.length, 16);
++});
++
++// ---- validation ----
++const errs = (list, size = 16) => selectEntries(list, CUP, size).errors.join('\n');
++
++test('15 entries are rejected with a clear count', () => assert.match(errs(edits(15)), /has 15 edits but the bracket needs exactly 16/));
++test('17 entries are rejected', () => assert.match(errs(edits(17)), /has 17 edits/));
++test('edits not entered in this cup are ignored', () => {
++    const l = [...edits(16), mk(99, { tournaments: ['vi-cup-1'] })];
++    assert.deepEqual(selectEntries(l, CUP, 16).errors, []);
++});
++test('one entry per creator is enforced', () => {
++    const l = edits(16); l[5] = mk(6, { channelId: 'chan1', artist: 'Creator 1' });
++    assert.match(errs(l), /One entry per creator/);
++});
++test('status "review" is blocked and the flags are shown', () => {
++    const l = edits(16); l[3] = mk(4, { status: 'review', flags: ['long: 4m10s'] });
++    assert.match(errs(l), /status is "review".*long: 4m10s/);
++});
++test('embedding disabled is blocked', () => {
++    const l = edits(16); l[2] = mk(3, { embedAllowed: false });
++    assert.match(errs(l), /embedding is disabled/);
++});
++test('the same video listed twice is blocked', () => {
++    const l = edits(16); l[7] = { ...l[0], channelId: 'other', artist: 'Other' };
++    assert.match(errs(l), /listed twice/);
++});
++test('non power-of-two size is rejected', () => {
++    assert.match(errs(edits(12), 12), /power of two/);
++    assert.ok(!isPowerOfTwo(12) && isPowerOfTwo(16));
++});
++
++console.log(`\n${passed} tests passed`);
