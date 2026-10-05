@@ -3,7 +3,7 @@
 // ========================================
 
 import { db, auth } from './firebase-config.js';
-import { initializeCompleteTournament } from './init-firebase.js';
+import { initializeCompleteTournament, assertInitializerMatchesActiveTournament } from './init-firebase.js';
 
 // ✅ NEW: Import blog generation functions
 import {
@@ -296,28 +296,17 @@ window.closeMatch = async function(matchId) {
         let winMethod;
         
         if (song1Votes > song2Votes) {
-            // Song 1 wins by votes
             winnerId = match.song1.id;
             winnerData = match.song1;
             winMethod = 'votes';
         } else if (song2Votes > song1Votes) {
-            // Song 2 wins by votes
             winnerId = match.song2.id;
             winnerData = match.song2;
             winMethod = 'votes';
         } else {
-            // ✅ TIE - Higher seed (lower number) wins
-            if (song1Seed < song2Seed) {
-                winnerId = match.song1.id;
-                winnerData = match.song1;
-                winMethod = 'tiebreaker-seed';
-                console.log(`⚖️ TIEBREAKER: Seed ${song1Seed} beats Seed ${song2Seed}`);
-            } else {
-                winnerId = match.song2.id;
-                winnerData = match.song2;
-                winMethod = 'tiebreaker-seed';
-                console.log(`⚖️ TIEBREAKER: Seed ${song2Seed} beats Seed ${song1Seed}`);
-            }
+            // TIE: do not decide it. Leave the match live; the admin casts the deciding vote, then closes again.
+            alert(`⚖️ ${matchId} is TIED ${song1Votes}-${song2Votes}.\n\nThe match is still live. Cast your deciding vote on it, then close it again.`);
+            return;
         }
         
         // ========================================
@@ -481,6 +470,7 @@ window.closeBatch = async function(roundNumber, batchNumber) {
         const snapshot = await getDocs(q);
         
         let closedCount = 0;
+        const tiedMatches = [];
         const results = [];
         const autoGenerate = document.getElementById('autoGenerateBlog');
         const shouldAutoGenerate = autoGenerate && autoGenerate.checked;
@@ -518,20 +508,9 @@ window.closeBatch = async function(roundNumber, batchNumber) {
                 loserData = match.song1;
                 winMethod = 'votes';
             } else {
-                // ✅ TIE - Higher seed (lower number) wins
-                if (song1Seed < song2Seed) {
-                    winnerId = match.song1.id;
-                    winnerData = match.song1;
-                    loserData = match.song2;
-                    winMethod = 'tiebreaker-seed';
-                    console.log(`⚖️ TIEBREAKER: Seed ${song1Seed} beats Seed ${song2Seed}`);
-                } else {
-                    winnerId = match.song2.id;
-                    winnerData = match.song2;
-                    loserData = match.song1;
-                    winMethod = 'tiebreaker-seed';
-                    console.log(`⚖️ TIEBREAKER: Seed ${song2Seed} beats Seed ${song1Seed}`);
-                }
+                // TIE: skip it and leave it live for the admin's deciding vote
+                tiedMatches.push(`${match.matchId} (${song1Votes}-${song2Votes})`);
+                continue;
             }
             
             // ========================================
@@ -631,7 +610,8 @@ window.closeBatch = async function(roundNumber, batchNumber) {
             logBlog(`📖 Round recap scheduled in ${Math.round(roundRecapDelay / 60)}h ${roundRecapDelay % 60}m (if round complete)`);
         }
         
-        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${closedCount} matches completed\n\n${shouldAutoGenerate ? `Blog posts scheduled:\n• ${upsets.length} upsets\n• ${nailbiters.length} thrillers\n• ${regularMatches.length} regular\n\nPublishing over next ${Math.round(delayMinutes / 60)}h ${delayMinutes % 60}m` : 'Auto-blog disabled'}\n\n${results.slice(0, 3).join('\n')}${results.length > 3 ? `\n...and ${results.length - 3} more` : ''}`);
+        const tiedNote = tiedMatches.length ? `⚖️ ${tiedMatches.length} TIED and left live. Cast your deciding vote, then close again:\n${tiedMatches.join('\n')}\n\n` : '';
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${tiedNote}${closedCount} matches completed\n\n${shouldAutoGenerate ? `Blog posts scheduled:\n• ${upsets.length} upsets\n• ${nailbiters.length} thrillers\n• ${regularMatches.length} regular\n\nPublishing over next ${Math.round(delayMinutes / 60)}h ${delayMinutes % 60}m` : 'Auto-blog disabled'}\n\n${results.slice(0, 3).join('\n')}${results.length > 3 ? `\n...and ${results.length - 3} more` : ''}`);
         
         loadMatches();
         
@@ -741,7 +721,8 @@ window.viewMatch = function(matchId) {
 
 window.clearAllVotesForTesting = async function() {
     const confirmation = prompt(
-        '⚠️ WARNING: This will DELETE ALL VOTES from ALL USERS!\n\n' +
+        `⚠️ WARNING: This will DELETE ALL VOTES for "${ACTIVE_TOURNAMENT}" from ALL USERS!\n\n` +
+        'Votes from other tournaments are not touched.\n\n' +
         'This action CANNOT be undone!\n\n' +
         'Type "DELETE ALL VOTES" to confirm:'
     );
@@ -755,7 +736,7 @@ window.clearAllVotesForTesting = async function() {
         console.log('🗑️ Clearing all votes...');
         
         const votesRef = collection(db, 'votes');
-        const votesSnapshot = await getDocs(votesRef);
+        const votesSnapshot = await getDocs(query(votesRef, where('tournament', '==', ACTIVE_TOURNAMENT)));
         
         const voteCount = votesSnapshot.size;
         console.log(`Found ${voteCount} votes to delete`);
@@ -790,11 +771,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
     
     document.getElementById('initTournamentBtn')?.addEventListener('click', async () => {
-        if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
+        if (!confirm('Create the tournament matches?\n\nOnly run this once!')) {
             return;
         }
         
         try {
+            assertInitializerMatchesActiveTournament();
             await initializeCompleteTournament();
             alert('✅ Tournament initialized! Refresh to see matches.');
             location.reload();
@@ -820,6 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
+            assertInitializerMatchesActiveTournament(); // must run BEFORE anything is deleted
             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const snapshot = await getDocs(matchesRef);
             
@@ -902,16 +885,10 @@ window.recountRound1 = async function() {
                 winnerData = match.song2;
                 winMethod = 'votes';
             } else {
-                if (match.song1.seed < match.song2.seed) {
-                    winnerId = match.song1.id;
-                    winnerData = match.song1;
-                    winMethod = 'tiebreaker-seed';
-                } else {
-                    winnerId = match.song2.id;
-                    winnerData = match.song2;
-                    winMethod = 'tiebreaker-seed';
-                }
-                console.log(`   ⚖️ TIE: ${winnerData.shortTitle} wins by seed`);
+                // TIE: leave it for the admin's deciding vote; do not guess a winner
+                console.log(`   ⚖️ TIED ${song1Votes}-${song2Votes}: skipped. Cast your deciding vote, then recount.`);
+                await updateDoc(matchDoc.ref, { 'song1.votes': song1Votes, 'song2.votes': song2Votes, totalVotes: song1Votes + song2Votes });
+                continue;
             }
             
             console.log(`   ✅ Winner: ${winnerData.shortTitle}`);

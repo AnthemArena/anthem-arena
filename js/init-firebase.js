@@ -5,6 +5,7 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 import { collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
@@ -19,6 +20,18 @@ const TOURNAMENT_CONFIG = {
     status: 'active',
     description: 'Vote for the greatest League music video of all time!'
 };
+
+
+// SAFETY: this builder is the LEGACY music-tournament builder (hard-coded id + music-videos.json).
+// It must never run against the active Arcane / edits tournament. Replace it with the edits builder.
+export function assertInitializerMatchesActiveTournament() {
+    if (TOURNAMENT_CONFIG.id !== ARCANE_CONFIG.tournamentId) {
+        throw new Error(
+            `Blocked: this builder is for the legacy "${TOURNAMENT_CONFIG.id}" music tournament, ` +
+            `but the active tournament is "${ARCANE_CONFIG.tournamentId}". Nothing was changed.`
+        );
+    }
+}
 
 // ========================================
 // LOAD SONGS FROM JSON
