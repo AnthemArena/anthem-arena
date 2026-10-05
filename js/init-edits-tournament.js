@@ -59,7 +59,9 @@ export async function getStoredDraw(cupId = ARCANE_CONFIG.tournamentId) {
     const snap = await getDoc(doc(db, 'tournaments', cupId));
     if (!snap.exists()) return { drawSeed: null, size: null };
     const t = snap.data();
-    return { drawSeed: t.drawSeed || null, size: t.bracketSize || null };
+    // Only trust the stored size for cups built by this builder (they carry a drawSeed). An older cup made by the
+    // legacy builder has a bracketSize for a different format, and must not block a rebuild at the new size.
+    return { drawSeed: t.drawSeed || null, size: t.drawSeed ? (t.bracketSize || null) : null };
 }
 
 // Builds everything in memory and returns it. Writes nothing.

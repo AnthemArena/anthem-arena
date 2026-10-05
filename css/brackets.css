@@ -1914,3 +1914,31 @@
         transform: translateX(-50%);
     }
 }
+
+/* ========================================
+   ANY-SIZE BRACKET LAYOUT
+   The bracket can have 1 to 7 rounds. Every round column stretches to the same height and spreads its
+   cards evenly (space-around), so each later-round match sits centred between the two matches that feed it,
+   whatever the number of rounds. This replaces the old fixed gap per column, which only suited 4 columns.
+======================================== */
+.bracket-container {
+    align-items: stretch;
+}
+
+.bracket-container .bracket-round .matchups-column {
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 1.5rem;                 /* minimum space between cards (round 1 uses exactly this) */
+    justify-content: space-around;
+}
+
+/* A slot that is still waiting for an earlier round */
+.competitor.tbd .song-title {
+    color: #777;
+    font-style: italic;
+}
+
+/* A one-match cup: don't stretch the single card across a tall empty column */
+.bracket-container .bracket-round.finals:only-child {
+    max-width: 520px;
+}
