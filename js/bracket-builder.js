@@ -6,7 +6,7 @@
 // so keep this file free of imports and DOM / Firebase calls.
 //
 // Rules it enforces (see the plan):
-//   - bracket size is a power of two (8, 16, 32, 64)
+//   - bracket size is a power of two from 2 to 128 (2, 4, 8, 16, 32, 64, 128)
 //   - every entry is a public, embeddable edit that has been checked (status "ok")
 //   - one entry per creator
 //   - random draw, reproducible from a published draw seed
@@ -24,8 +24,29 @@ export const PLACEHOLDER = {
     slug: 'tbd'
 };
 
+export const BRACKET_SIZES = [2, 4, 8, 16, 32, 64, 128];
+const MAX_SIZE = BRACKET_SIZES[BRACKET_SIZES.length - 1];
+
 export function isPowerOfTwo(n) {
     return Number.isInteger(n) && n >= 2 && (n & (n - 1)) === 0;
+}
+
+// The sizes a cup can actually be built at. 128 is the cap: 127 matches + the tournament doc fit well inside
+// one Firestore write batch (500 operations), so the "all or nothing" write still holds.
+export function isValidBracketSize(n) {
+    return isPowerOfTwo(n) && n <= MAX_SIZE;
+}
+
+// Says how far an entry count is from a valid bracket, e.g. "Add 4 to reach 16, or remove 8 to drop to 8."
+function sizeAdvice(count) {
+    if (count === 0) return 'No edits are entered yet.';
+    if (count > MAX_SIZE) return `That is more than the ${MAX_SIZE} maximum: remove ${count - MAX_SIZE}.`;
+    const up = BRACKET_SIZES.find(s => s > count);
+    const down = [...BRACKET_SIZES].reverse().find(s => s < count);
+    const parts = [];
+    if (up) parts.push(`add ${up - count} to reach ${up}`);
+    if (down) parts.push(`remove ${count - down} to drop to ${down}`);
+    return parts.length ? `You can ${parts.join(', or ')}.` : '';
 }
 
 export function roundsForSize(size) {
@@ -44,12 +65,22 @@ export function cupDisplayName(cupId) {
 // An edit enters a cup when its "tournaments" list contains the cup id (the importer's last line says the same).
 // Anything that is entered but not usable is reported as an error, never silently skipped,
 // because you chose to enter it on purpose.
-export function selectEntries(edits, cupId, size) {
+//
+// size is optional. Leave it out (null) and the bracket is as big as the entry list, which must then be
+// 2, 4, 8, 16, 32, 64 or 128. Pass a size to insist on one (a Reset does, so a rebuild can never quietly
+// become a different-sized bracket). Returns { entries, errors, size }; size is null when it cannot be built.
+export function selectEntries(edits, cupId, size = null) {
     const errors = [];
     const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
 
-    if (!isPowerOfTwo(size)) {
-        errors.push(`Bracket size must be a power of two (8, 16, 32, 64). Got ${size}.`);
+    const auto = size == null;
+    const target = auto ? entered.length : size;
+    const sizeOk = isValidBracketSize(target);
+
+    if (!sizeOk) {
+        errors.push(auto
+            ? `${cupId} has ${entered.length} edits entered. A bracket needs exactly ${BRACKET_SIZES.join(', ')}. ${sizeAdvice(entered.length)}`
+            : `Bracket size must be one of ${BRACKET_SIZES.join(', ')}. Got ${size}.`);
     }
 
     const label = e => `${e.shortTitle || e.title || e.videoId || '(no title)'} [${e.videoId || 'no id'}]`;
@@ -80,12 +111,12 @@ export function selectEntries(edits, cupId, size) {
         }
     }
 
-    if (isPowerOfTwo(size) && entered.length !== size) {
+    if (sizeOk && !auto && entered.length !== size) {
         errors.push(`The ${cupId} entry list has ${entered.length} edits but the bracket needs exactly ${size}. ` +
             `Add or remove "${cupId}" in the "tournaments" list of edits in data/edits.json.`);
     }
 
-    return { entries: entered, errors };
+    return { entries: entered, errors, size: sizeOk ? target : null };
 }
 
 // ----------------------------------------
@@ -161,14 +192,14 @@ export function roundLabel(round, totalRounds) {
     if (fromEnd === 0) return 'Final';
     if (fromEnd === 1) return 'Semi-finals';
     if (fromEnd === 2) return 'Quarter-finals';
-    return `Round ${round}`;
+    return `Round of ${2 ** (fromEnd + 1)}`;   // e.g. a 16-edit cup opens with "Round of 16"
 }
 
 // Returns every match document for the cup (size - 1 of them), in round order.
 //   batchSize = how many matches open together in one batch (the admin opens and closes by round + batch)
 export function buildMatches({ cupId, cupName, entries, drawSeed, batchSize = 4 }) {
     const size = entries.length;
-    if (!isPowerOfTwo(size)) throw new Error(`Cannot build a bracket of ${size}.`);
+    if (!isValidBracketSize(size)) throw new Error(`Cannot build a bracket of ${size}. Sizes: ${BRACKET_SIZES.join(', ')}.`);
 
     const drawn = drawEntries(entries, drawSeed);
     const totalRounds = roundsForSize(size);

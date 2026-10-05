@@ -1,0 +1,23 @@
+diff --git a/js/init-edits-tournament.js b/js/init-edits-tournament.js
+index af1dd3a..bc3afb9 100644
+--- a/js/init-edits-tournament.js
++++ b/js/init-edits-tournament.js
+@@ -25,7 +25,17 @@ async function loadEdits() {
+     if (!response.ok) {
+         throw new Error(`Could not load data/edits.json (${response.status}). Run the importer and commit the file first.`);
+     }
+-    return response.json();
++    // The site has a catch-all redirect (/* -> /index.html, status 200), so a missing file comes back as the
++    // homepage HTML with status 200. Read as text so we can say what actually went wrong.
++    const text = await response.text();
++    try {
++        return JSON.parse(text);
++    } catch {
++        throw new Error(
++            'data/edits.json came back as a web page, not JSON. The file is almost certainly not deployed yet: ' +
++            'run `node tools/edits-import.js --character Jinx`, commit data/edits.json, and make sure the site has redeployed. Nothing was changed.'
++        );
++    }
+ }
+ 
+ function assertCupIsActive(cupId) {
