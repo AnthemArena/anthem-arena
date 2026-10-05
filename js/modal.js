@@ -155,7 +155,7 @@ function createModalHTML(match) {
                     <!-- Competitor 1 -->
                     <div class="modal-competitor ${match.competitor1.winner ? 'winner' : ''} ${match.competitor1.percentage > match.competitor2.percentage && !isCompleted ? 'leading' : ''}">
                         <div class="competitor-header-modal">
-                            <span class="competitor-seed-modal">#${match.competitor1.seed} Seed</span>
+                            ${match.competitor1.seed != null ? `<span class="competitor-seed-modal">#${match.competitor1.seed} Seed</span>` : ''}
                             <h3 class="competitor-name-modal">${match.competitor1.name}</h3>
                             <p class="competitor-source-modal">${match.competitor1.source}</p>
                         </div>
@@ -209,7 +209,7 @@ function createModalHTML(match) {
                     <!-- Competitor 2 -->
                     <div class="modal-competitor ${match.competitor2.winner ? 'winner' : ''} ${match.competitor2.percentage > match.competitor1.percentage && !isCompleted ? 'leading' : ''}">
                         <div class="competitor-header-modal">
-                            <span class="competitor-seed-modal">#${match.competitor2.seed} Seed</span>
+                            ${match.competitor2.seed != null ? `<span class="competitor-seed-modal">#${match.competitor2.seed} Seed</span>` : ''}
                             <h3 class="competitor-name-modal">${match.competitor2.name}</h3>
                             <p class="competitor-source-modal">${match.competitor2.source}</p>
                         </div>

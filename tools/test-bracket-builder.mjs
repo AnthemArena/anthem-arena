@@ -1,6 +1,6 @@
 // Offline tests for js/bracket-builder.js.   Run:  node tools/test-bracket-builder.mjs
 import assert from 'node:assert/strict';
-import { selectEntries, buildMatches, buildTournamentDoc, drawEntries, isPowerOfTwo } from '../js/bracket-builder.js';
+import { selectEntries, buildMatches, buildTournamentDoc, drawEntries, isPowerOfTwo, isValidBracketSize, roundLabel, BRACKET_SIZES } from '../js/bracket-builder.js';
 
 const CUP = 'jinx-cup-1';
 const mk = (n, extra = {}) => ({
@@ -129,8 +129,99 @@ test('the same video listed twice is blocked', () => {
     assert.match(errs(l), /listed twice/);
 });
 test('non power-of-two size is rejected', () => {
-    assert.match(errs(edits(12), 12), /power of two/);
+    assert.match(errs(edits(12), 12), /Bracket size must be one of 2, 4, 8, 16, 32, 64, 128\. Got 12/);
     assert.ok(!isPowerOfTwo(12) && isPowerOfTwo(16));
+});
+
+// ---------- any size: 2, 4, 8, 16, 32, 64, 128 ----------
+const play = (matches, cup) => {   // song1 always wins; mirrors admin.js advanceWinnerToNextRound (round + 1, sourceMatch)
+    const byId = new Map(matches.map(m => [m.matchId, m]));
+    const maxRound = Math.max(...matches.map(m => m.round));
+    let champion = null;
+    for (let r = 1; r <= maxRound; r++) {
+        for (const m of matches.filter(x => x.round === r)) {
+            assert.notEqual(m.song1.id, 'TBD', `${m.matchId} song1 unfilled`);
+            assert.notEqual(m.song2.id, 'TBD', `${m.matchId} song2 unfilled`);
+            const winner = m.song1;
+            for (const n of matches.filter(x => x.round === r + 1)) {
+                if (n.song1.sourceMatch === m.matchId) n.song1 = { ...winner, sourceMatch: m.matchId };
+                if (n.song2.sourceMatch === m.matchId) n.song2 = { ...winner, sourceMatch: m.matchId };
+            }
+            if (r === maxRound) champion = winner;
+        }
+    }
+    return champion;
+};
+
+test('every supported size builds a correct bracket and can be played to a champion', () => {
+    for (const size of BRACKET_SIZES) {
+        const sel = selectEntries(edits(size), CUP);          // size inferred from the entry list
+        assert.deepEqual(sel.errors, [], `size ${size}`);
+        assert.equal(sel.size, size);
+        const m = buildMatches({ cupId: CUP, cupName: 'x', entries: sel.entries, drawSeed: 'seed' });
+        const rounds = Math.log2(size);
+        assert.equal(m.length, size - 1, `match count ${size}`);
+        assert.equal(Math.max(...m.map(x => x.round)), rounds);
+        assert.equal(new Set(m.map(x => x.matchId)).size, size - 1, `unique ids ${size}`);
+        assert.equal(m.filter(x => x.matchId === `${CUP}-finals`).length, 1);
+        assert.equal(m.find(x => x.round === rounds).matchId, `${CUP}-finals`);
+        for (let r = 1; r <= rounds; r++) assert.equal(m.filter(x => x.round === r).length, size / 2 ** r);
+        // round 1: every entry exactly once
+        const r1 = m.filter(x => x.round === 1).flatMap(x => [x.song1.id, x.song2.id]);
+        assert.equal(new Set(r1).size, size);
+        assert.ok(play(m, CUP) && true);
+    }
+});
+
+test('size 2 is a single match: the final, in batch 1', () => {
+    const { entries } = selectEntries(edits(2), CUP);
+    const m = buildMatches({ cupId: CUP, cupName: 'x', entries, drawSeed: 's' });
+    assert.equal(m.length, 1);
+    assert.equal(m[0].matchId, `${CUP}-finals`);
+    assert.equal(m[0].roundLabel, 'Final');
+    assert.equal(m[0].batch, 1);
+    assert.notEqual(m[0].song1.id, m[0].song2.id);
+});
+
+test('round labels: Final, Semi-finals, Quarter-finals, then Round of N', () => {
+    assert.deepEqual([1, 2, 3, 4].map(r => roundLabel(r, 4)), ['Round of 16', 'Quarter-finals', 'Semi-finals', 'Final']);
+    assert.deepEqual([1, 2, 3].map(r => roundLabel(r, 3)), ['Quarter-finals', 'Semi-finals', 'Final']);
+    assert.deepEqual([1, 2].map(r => roundLabel(r, 2)), ['Semi-finals', 'Final']);
+    assert.equal(roundLabel(1, 7), 'Round of 128');
+    assert.equal(roundLabel(2, 7), 'Round of 64');
+});
+
+test('every size fits one atomic Firestore batch (500 ops max)', () => {
+    for (const size of BRACKET_SIZES) assert.ok(size - 1 + 1 <= 500);
+});
+
+test('size is inferred from the entry count; the same draw comes back for the same seed at every size', () => {
+    for (const size of [4, 32, 128]) {
+        const a = buildMatches({ cupId: CUP, cupName: 'x', entries: selectEntries(edits(size), CUP).entries, drawSeed: 'z' });
+        const b = buildMatches({ cupId: CUP, cupName: 'x', entries: selectEntries([...edits(size)].reverse(), CUP).entries, drawSeed: 'z' });
+        assert.deepEqual(a.filter(x => x.round === 1).map(x => x.song1.id), b.filter(x => x.round === 1).map(x => x.song1.id));
+    }
+});
+
+test('a bad entry count says how many to add or remove', () => {
+    assert.match(errs(edits(12), null), /12 edits entered.*add 4 to reach 16, or remove 4 to drop to 8/);
+    assert.match(errs(edits(3), null), /add 1 to reach 4, or remove 1 to drop to 2/);
+    assert.match(errs(edits(1), null), /add 1 to reach 2/);
+    assert.match(errs(edits(129), null), /more than the 128 maximum: remove 1/);
+    assert.match(errs([], null), /No edits are entered yet/);
+    assert.equal(selectEntries(edits(12), CUP).size, null);
+});
+
+test('sizes outside 2-128 are rejected even when explicit', () => {
+    assert.ok(!isValidBracketSize(1) && !isValidBracketSize(256) && !isValidBracketSize(0) && isValidBracketSize(128) && isValidBracketSize(2));
+    assert.match(errs(edits(2), 256), /Got 256/);
+});
+
+test('a reset at the stored size refuses a changed entry list instead of rebuilding a different cup', () => {
+    // cup was built at 16; the list now has 17 -> an explicit size 16 must fail
+    assert.match(errs(edits(17), 16), /has 17 edits but the bracket needs exactly 16/);
+    // and with the right 16 it passes
+    assert.deepEqual(selectEntries(edits(16), CUP, 16).errors, []);
 });
 
 console.log(`\n${passed} tests passed`);

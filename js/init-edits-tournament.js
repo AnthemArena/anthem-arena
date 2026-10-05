@@ -18,14 +18,24 @@ import {
     selectEntries, buildMatches, buildTournamentDoc, makeDrawSeed, cupDisplayName, describePairings
 } from './bracket-builder.js';
 
-export const DEFAULT_BRACKET_SIZE = 16;
+// Bracket size is not configured anywhere: it is the number of edits entered in the cup (2, 4, 8, 16, 32, 64 or 128).
 
 async function loadEdits() {
     const response = await fetch('/data/edits.json', { cache: 'no-store' });
     if (!response.ok) {
         throw new Error(`Could not load data/edits.json (${response.status}). Run the importer and commit the file first.`);
     }
-    return response.json();
+    // The site has a catch-all redirect (/* -> /index.html, status 200), so a missing file comes back as the
+    // homepage HTML with status 200. Read as text so we can say what actually went wrong.
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        throw new Error(
+            'data/edits.json came back as a web page, not JSON. The file is almost certainly not deployed yet: ' +
+            'run `node tools/edits-import.js --character Jinx`, commit data/edits.json, and make sure the site has redeployed. Nothing was changed.'
+        );
+    }
 }
 
 function assertCupIsActive(cupId) {
@@ -43,20 +53,33 @@ export async function getStoredDrawSeed(cupId = ARCANE_CONFIG.tournamentId) {
     return snap.exists() ? (snap.data().drawSeed || null) : null;
 }
 
+// Seed AND size of the cup as it was first built. A reset passes both, so it rebuilds the same draw
+// and refuses (rather than reshuffling into a different-sized bracket) if the entry list has changed.
+export async function getStoredDraw(cupId = ARCANE_CONFIG.tournamentId) {
+    const snap = await getDoc(doc(db, 'tournaments', cupId));
+    if (!snap.exists()) return { drawSeed: null, size: null };
+    const t = snap.data();
+    // Only trust the stored size for cups built by this builder (they carry a drawSeed). An older cup made by the
+    // legacy builder has a bracketSize for a different format, and must not block a rebuild at the new size.
+    return { drawSeed: t.drawSeed || null, size: t.drawSeed ? (t.bracketSize || null) : null };
+}
+
 // Builds everything in memory and returns it. Writes nothing.
 export async function previewEditsTournament({
     cupId = ARCANE_CONFIG.tournamentId,
-    size = DEFAULT_BRACKET_SIZE,
+    size = null,            // null = as many edits as are entered in the cup
     drawSeed = null,
     batchSize = 4
 } = {}) {
     assertCupIsActive(cupId);
 
     const edits = await loadEdits();
-    const { entries, errors } = selectEntries(edits, cupId, size);
+    const selected = selectEntries(edits, cupId, size);
+    const { entries, errors } = selected;
     if (errors.length) {
         throw new Error(`Cannot build ${cupId}:\n\n- ${errors.join('\n- ')}`);
     }
+    size = selected.size;
 
     const seed = drawSeed || makeDrawSeed(cupId);
     const cupName = cupDisplayName(cupId);

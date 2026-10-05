@@ -3,7 +3,7 @@
 // ========================================
 
 import { db, auth } from './firebase-config.js';
-import { previewEditsTournament, writeEditsTournament, getStoredDrawSeed } from './init-edits-tournament.js';
+import { previewEditsTournament, writeEditsTournament, getStoredDraw } from './init-edits-tournament.js';
 
 // ✅ NEW: Import blog generation functions
 import {
@@ -778,10 +778,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Builds in memory only. Errors (wrong number of edits, duplicate creator, status not ok...) stop here.
             const built = await previewEditsTournament({ drawSeed: seedInput.trim() || null });
 
+            // A confirm box cannot show 64 pairings, so show the first few; the rest is in the preview tool.
+            const SHOW = 8;
+            const shown = built.pairings.slice(0, SHOW).join('\n');
+            const more = built.pairings.length > SHOW
+                ? `\n...and ${built.pairings.length - SHOW} more (full draw: node tools/bracket-preview.mjs ${built.cupId} --seed ${built.drawSeed})`
+                : '';
             const ok = confirm(
                 `Build ${built.cupName}: ${built.size} edits, ${built.matches.length} matches.\n\n` +
                 `Draw seed: ${built.drawSeed}\n\n` +
-                `Round 1:\n${built.pairings.join('\n')}\n\nWrite this bracket? Only run this once.`
+                `Round 1:\n${shown}${more}\n\nWrite this bracket? Only run this once.`
             );
             if (!ok) return;
 
@@ -812,7 +818,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Build and check the new bracket BEFORE deleting anything, so a problem with the entries
             // cannot leave the tournament empty. Reuses the saved draw seed so the draw does not change.
-            const built = await previewEditsTournament({ drawSeed: await getStoredDrawSeed(ACTIVE_TOURNAMENT) });
+            const stored = await getStoredDraw(ACTIVE_TOURNAMENT);
+            const built = await previewEditsTournament({ drawSeed: stored.drawSeed, size: stored.size });
             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const snapshot = await getDocs(matchesRef);
             
