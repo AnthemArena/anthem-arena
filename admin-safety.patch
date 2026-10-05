@@ -1,0 +1,111 @@
+diff --git a/admin.html b/admin.html
+index 0abed20..15df356 100644
+--- a/admin.html
++++ b/admin.html
+@@ -2,7 +2,7 @@
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+-    <title>Tournament Admin - League Music</title>
++    <title>Tournament Admin - Arcane Edits</title>
+     <link rel="stylesheet" href="/css/admin.css">
+ </head>
+ <body>
+@@ -66,10 +66,10 @@
+                 <h2>⚠️ Development Tools</h2>
+                 <div class="warning-box">
+                     <button onclick="clearAllVotesForTesting()" class="btn-danger">
+-                        🗑️ Clear All Votes (Testing Only)
++                        🗑️ Clear Votes for Active Tournament (Testing Only)
+                     </button>
+                     <p class="warning-text">
+-                        ⚠️ This will permanently delete ALL votes from ALL users. Only use during development/testing!
++                        ⚠️ This permanently deletes all votes for the active tournament only. Only use during development/testing!
+                     </p>
+                 </div>
+             </section>
+diff --git a/js/admin.js b/js/admin.js
+index f7b7846..0d590af 100644
+--- a/js/admin.js
++++ b/js/admin.js
+@@ -3,7 +3,7 @@
+ // ========================================
+ 
+ import { db, auth } from './firebase-config.js';
+-import { initializeCompleteTournament } from './init-firebase.js';
++import { initializeCompleteTournament, assertInitializerMatchesActiveTournament } from './init-firebase.js';
+ 
+ // ✅ NEW: Import blog generation functions
+ import {
+@@ -741,7 +741,8 @@ window.viewMatch = function(matchId) {
+ 
+ window.clearAllVotesForTesting = async function() {
+     const confirmation = prompt(
+-        '⚠️ WARNING: This will DELETE ALL VOTES from ALL USERS!\n\n' +
++        `⚠️ WARNING: This will DELETE ALL VOTES for "${ACTIVE_TOURNAMENT}" from ALL USERS!\n\n` +
++        'Votes from other tournaments are not touched.\n\n' +
+         'This action CANNOT be undone!\n\n' +
+         'Type "DELETE ALL VOTES" to confirm:'
+     );
+@@ -755,7 +756,7 @@ window.clearAllVotesForTesting = async function() {
+         console.log('🗑️ Clearing all votes...');
+         
+         const votesRef = collection(db, 'votes');
+-        const votesSnapshot = await getDocs(votesRef);
++        const votesSnapshot = await getDocs(query(votesRef, where('tournament', '==', ACTIVE_TOURNAMENT)));
+         
+         const voteCount = votesSnapshot.size;
+         console.log(`Found ${voteCount} votes to delete`);
+@@ -790,11 +791,12 @@ document.addEventListener('DOMContentLoaded', () => {
+     console.log('🏆 Admin Panel Initializing...');
+     
+     document.getElementById('initTournamentBtn')?.addEventListener('click', async () => {
+-        if (!confirm('Create all 63 tournament matches?\n\nOnly run this once!')) {
++        if (!confirm('Create the tournament matches?\n\nOnly run this once!')) {
+             return;
+         }
+         
+         try {
++            assertInitializerMatchesActiveTournament();
+             await initializeCompleteTournament();
+             alert('✅ Tournament initialized! Refresh to see matches.');
+             location.reload();
+@@ -820,6 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
+         }
+         
+         try {
++            assertInitializerMatchesActiveTournament(); // must run BEFORE anything is deleted
+             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
+             const snapshot = await getDocs(matchesRef);
+             
+diff --git a/js/init-firebase.js b/js/init-firebase.js
+index 50d0568..2b2b786 100644
+--- a/js/init-firebase.js
++++ b/js/init-firebase.js
+@@ -5,6 +5,7 @@
+ // ========================================
+ 
+ import { db } from './firebase-config.js';
++import { ARCANE_CONFIG } from './arcane-config.js';
+ import { collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ 
+ // ========================================
+@@ -20,6 +21,18 @@ const TOURNAMENT_CONFIG = {
+     description: 'Vote for the greatest League music video of all time!'
+ };
+ 
++
++// SAFETY: this builder is the LEGACY music-tournament builder (hard-coded id + music-videos.json).
++// It must never run against the active Arcane / edits tournament. Replace it with the edits builder.
++export function assertInitializerMatchesActiveTournament() {
++    if (TOURNAMENT_CONFIG.id !== ARCANE_CONFIG.tournamentId) {
++        throw new Error(
++            `Blocked: this builder is for the legacy "${TOURNAMENT_CONFIG.id}" music tournament, ` +
++            `but the active tournament is "${ARCANE_CONFIG.tournamentId}". Nothing was changed.`
++        );
++    }
++}
++
+ // ========================================
+ // LOAD SONGS FROM JSON
+ // ========================================

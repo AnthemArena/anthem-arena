@@ -1,0 +1,5 @@
+# One link per line. Any YouTube link format works (watch, youtu.be, shorts, embed).
+# Optional tags after a pipe, separated by commas.
+https://www.youtube.com/watch?v=NfW-abR4334
+https://www.youtube.com/shorts/ae-02YSlobE
+not a link
