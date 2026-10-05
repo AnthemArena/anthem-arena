@@ -3,7 +3,7 @@
 // ========================================
 
 import { db, auth } from './firebase-config.js';
-import { initializeCompleteTournament, assertInitializerMatchesActiveTournament } from './init-firebase.js';
+import { previewEditsTournament, writeEditsTournament, getStoredDrawSeed } from './init-edits-tournament.js';
 
 // ✅ NEW: Import blog generation functions
 import {
@@ -771,23 +771,31 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
     
     document.getElementById('initTournamentBtn')?.addEventListener('click', async () => {
-        if (!confirm('Create the tournament matches?\n\nOnly run this once!')) {
-            return;
-        }
-        
         try {
-            assertInitializerMatchesActiveTournament();
-            await initializeCompleteTournament();
-            alert('✅ Tournament initialized! Refresh to see matches.');
+            const seedInput = prompt('Draw seed (leave blank to generate a new random one).\n\nThe seed is saved on the tournament and lets anyone re-run the draw to check it.', '');
+            if (seedInput === null) return;
+
+            // Builds in memory only. Errors (wrong number of edits, duplicate creator, status not ok...) stop here.
+            const built = await previewEditsTournament({ drawSeed: seedInput.trim() || null });
+
+            const ok = confirm(
+                `Build ${built.cupName}: ${built.size} edits, ${built.matches.length} matches.\n\n` +
+                `Draw seed: ${built.drawSeed}\n\n` +
+                `Round 1:\n${built.pairings.join('\n')}\n\nWrite this bracket? Only run this once.`
+            );
+            if (!ok) return;
+
+            await writeEditsTournament(built);
+            alert(`✅ ${built.cupName} created (${built.matches.length} matches).\n\nDraw seed: ${built.drawSeed}\nKeep a copy of this seed.\n\nRefresh to see the matches.`);
             location.reload();
         } catch (error) {
-            alert('❌ Error: ' + error.message);
+            alert('❌ ' + error.message);
             console.error(error);
         }
     });
 
     document.getElementById('resetTournamentBtn')?.addEventListener('click', async () => {
-        if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone!')) {
+        if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone! The same draw seed is reused, so the draw stays the same. Votes are NOT deleted (use Clear Votes for testing).')) {
             return;
         }
         
@@ -802,7 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
-            assertInitializerMatchesActiveTournament(); // must run BEFORE anything is deleted
+            // Build and check the new bracket BEFORE deleting anything, so a problem with the entries
+            // cannot leave the tournament empty. Reuses the saved draw seed so the draw does not change.
+            const built = await previewEditsTournament({ drawSeed: await getStoredDrawSeed(ACTIVE_TOURNAMENT) });
             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const snapshot = await getDocs(matchesRef);
             
@@ -817,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
             
-            await initializeCompleteTournament();
+            await writeEditsTournament(built);
             
             alert('✅ Tournament reset complete! Refresh page.');
             location.reload();
