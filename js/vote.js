@@ -222,6 +222,12 @@ function getTimeRemaining(endDate) {
 
     // ✅ ADD THIS LINE:
 import { ARCANE_CONFIG } from './arcane-config.js';
+
+// Titles come from YouTube, so never splice them into HTML or inline handlers unescaped.
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
     // Current match data
@@ -618,6 +624,8 @@ await trackMatchView(matchData.id || matchId);
 currentMatch = {
     id: matchData.id || matchData.matchId,
     round: matchData.round || 1,
+    roundLabel: matchData.roundLabel || null,          // e.g. "Final", "Semi-finals", "Round of 16" (set by the bracket builder)
+    tournamentName: matchData.tournamentName || null,  // e.g. "Arcane Test 01"
     status: matchData.status,
     totalVotes: matchData.totalVotes || 0,
         endDate: matchData.endDate || null,  // ✅ Make sure this line exists!
@@ -921,7 +929,7 @@ async function checkVoteStatus() {
             <div style="font-size: 1.5rem;"><i class="fa-solid fa-check"></i></div>
                 <div>
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Vote Recorded</div>
-                    <div style="opacity: 0.9;">You voted for <strong>${songName}</strong></div>
+                    <div style="opacity: 0.9;">You voted for <strong>${escapeHtml(songName)}</strong></div>
                 </div>
             </div>
         `;
@@ -1086,7 +1094,7 @@ function generateUsername() {
         const tournamentBadge = document.getElementById('tournament-badge');
         if (tournamentBadge) {
             const roundName = getRoundName(currentMatch.round || 1);
-            tournamentBadge.innerHTML = `🏆 Anthem Arena Championship - ${roundName}`;
+            tournamentBadge.innerHTML = `🏆 ${escapeHtml(currentMatch.tournamentName || 'Tournament')} - ${escapeHtml(roundName)}`;
         }
 
        // Update time remaining with countdown support
@@ -1118,11 +1126,13 @@ if (timeRemaining) {
                 // Fallback
                 timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
                 timeRemaining.style.color = '#ff4444';
+                timeRemaining.classList.add('is-live');
             }
         } else {
             // No endDate available, show generic live status
             timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
             timeRemaining.style.color = '#ff4444';
+            timeRemaining.classList.add('is-live');
         }
     } else {
         timeRemaining.innerHTML = '<i class="fa-solid fa-clock"></i> Vote Now'; // ✅ Changed
@@ -1292,6 +1302,9 @@ const description = `Cast your vote between ${song1} and ${song2} in Arcane Mome
     // ========================================
 
     function getRoundName(roundNumber) {
+        // Cups made by the bracket builder store the round's name on the match, so use it. This works for any bracket size.
+        if (currentMatch?.roundLabel && roundNumber === currentMatch.round) return currentMatch.roundLabel;
+        // Older cups (64-bracket) fall back to the old table.
         const roundNames = {
             1: 'Round 1',
             2: 'Round 2',
@@ -1496,7 +1509,7 @@ function hideLoadingSpinner() {
             <div class="urgency-content">
             <span class="urgency-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 <div class="urgency-text">
-                    <strong>${losingSong.name}</strong> is being eliminated!
+                    <strong>${escapeHtml(losingSong.name)}</strong> is being eliminated!
                     <span class="vote-diff">Trailing by ${voteDiff.toLocaleString()} votes</span>
                 </div>
                 <button class="urgency-cta" onclick="scrollToVoteButton(${loserSide})">
@@ -2390,7 +2403,7 @@ function showNotification(message, type = 'success') {
     thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
     // ✅ NEW: Add descriptive alt text
-    thumbnail.alt = `${songName} by ${artist} - League of Legends Music Video Thumbnail`;
+    thumbnail.alt = `${songName} by ${artist} - Arcane Moments edit thumbnail`;
 
     // ✅ NEW: Add loading="lazy" for performance
     thumbnail.loading = 'lazy';
@@ -2493,7 +2506,7 @@ if (isEarlyVoting) {
     modalTitle = 'Early Voter!';
     successMessage = `
         <p class="modal-message early">
-            You voted for <strong>"${songName}"</strong><br>
+            You voted for <strong>"${escapeHtml(songName)}"</strong><br>
             <span class="stakes-text">Only ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} so far — this match needs more voters!</span>
         </p>
     `;
@@ -2508,10 +2521,10 @@ if (isEarlyVoting) {
                 This match just started! Help shape the results from the beginning.
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">
@@ -2529,7 +2542,7 @@ else if (voteDiff === 0) {
     successMessage = `
         <p class="modal-message special">
             You just broke the deadlock!<br>
-            <span class="stakes-text">"${songName}" and "${opponentName}" were exactly ${userVotes}-${opponentVotes}</span>
+            <span class="stakes-text">"${escapeHtml(songName)}" and "${escapeHtml(opponentName)}" were exactly ${userVotes}-${opponentVotes}</span>
         </p>
     `;
     shareContext = 'tied';
@@ -2552,10 +2565,10 @@ else if (voteDiff === 0) {
                 ${tiedMessage}
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'tied')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'tied')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">
@@ -2572,7 +2585,7 @@ else if (voteDiff <= 2) {
     modalTitle = 'Nail-Biter!';
     successMessage = `
         <p class="modal-message special">
-            You voted for <strong>"${songName}"</strong><br>
+            You voted for <strong>"${escapeHtml(songName)}"</strong><br>
             <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
         </p>
     `;
@@ -2596,10 +2609,10 @@ else if (voteDiff <= 2) {
                 ${nailbiterMessage}
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'nailbiter')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'nailbiter')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">
@@ -2616,7 +2629,7 @@ else if (userPct < opponentPct && voteDiff <= 5) {
     modalTitle = 'Fighting for It!';
     successMessage = `
         <p class="modal-message special">
-            You're fighting for <strong>"${songName}"</strong>!<br>
+            You're fighting for <strong>"${escapeHtml(songName)}"</strong>!<br>
             <span class="stakes-text">Behind by just ${voteDiff} votes (${userPct}% vs ${opponentPct}%)</span>
         </p>
     `;
@@ -2627,8 +2640,8 @@ else if (userPct < opponentPct && voteDiff <= 5) {
         ? 'FINAL HOURS - Comeback Time!'
         : 'Comeback Time!';
     const comebackMessage = isFinalHours
-        ? `"${songName}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
-        : `"${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
+        ? `"${escapeHtml(songName)}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
+        : `"${escapeHtml(songName)}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
 
     shareMessage = `
         <div class="share-cta urgent">
@@ -2640,10 +2653,10 @@ else if (userPct < opponentPct && voteDiff <= 5) {
                 ${comebackMessage}
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">
@@ -2660,7 +2673,7 @@ else if (userPct < opponentPct) {
     modalTitle = 'Save It!';
     successMessage = `
         <p class="modal-message special">
-            You voted to save <strong>"${songName}"</strong>!<br>
+            You voted to save <strong>"${escapeHtml(songName)}"</strong>!<br>
             <span class="stakes-text">But it's losing ${userPct}% to ${opponentPct}% — it needs a miracle!</span>
         </p>
     `;
@@ -2704,7 +2717,7 @@ else if (pctDiff <= 10) {
     modalTitle = 'Leading!';
     successMessage = `
         <p class="modal-message">
-            Great choice! <strong>"${songName}"</strong> is leading!<br>
+            Great choice! <strong>"${escapeHtml(songName)}"</strong> is leading!<br>
             <span class="stakes-text">Currently ${userPct}% to ${opponentPct}% — but it's still competitive!</span>
         </p>
     `;
@@ -2763,10 +2776,10 @@ else {
                 "${songName}" is dominating! Share the tournament with the community:
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'dominating')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'dominating')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">

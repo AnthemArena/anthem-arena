@@ -1,0 +1,1694 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index ec3aee8..dade3f1 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -304,3 +304,239 @@ body.theme-arcane .matchup-card.upcoming { opacity: .85; border-color: var(--lin
+ body.theme-arcane .matchup-card.finals-match { border-width: 1px; border-color: rgba(255, 79, 180, .45); background: var(--card); }
+ body.theme-arcane .live-indicator { color: var(--pink-bright); }
+ body.theme-arcane .competitor.leading { background: var(--pink-soft); border: 1px solid rgba(255, 79, 180, .35); }
++
++
++/* ========================================
++   VOTE PAGE (vote.html)
++   ======================================== */
++
++/* ---------- header: breadcrumb, title, badges ---------- */
++body.theme-arcane .vote-header,
++body.theme-arcane .voting-arena,
++body.theme-arcane .after-voting-section,
++body.theme-arcane .other-matches-section,
++body.theme-arcane .share-section,
++body.theme-arcane .rules-section { background: transparent; }
++body.theme-arcane .vote-header { border-bottom: 1px solid var(--line); }
++body.theme-arcane .after-voting-section,
++body.theme-arcane .share-section { border-top: 1px solid var(--line); }
++
++body.theme-arcane .breadcrumb-link,
++body.theme-arcane .breadcrumb a { color: var(--muted); }
++body.theme-arcane .breadcrumb-link:hover,
++body.theme-arcane .breadcrumb a:hover { color: var(--pink-bright); }
++body.theme-arcane .breadcrumb-separator { color: var(--text-faint); }
++body.theme-arcane .breadcrumb-current { color: var(--pink-bright); font-weight: 700; }
++
++body.theme-arcane .match-title {
++    font-family: var(--font);
++    font-weight: 800;
++    font-size: clamp(2rem, 5vw, 3.4rem);
++    letter-spacing: -.05em;
++    line-height: 1.05;
++    text-transform: none;
++    text-shadow: none;
++    color: var(--text);
++}
++body.theme-arcane .info-badge,
++body.theme-arcane #tournament-badge,
++body.theme-arcane #time-remaining {
++    font-family: var(--font);
++    font-weight: 700;
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 999px;
++    color: var(--text);
++    backdrop-filter: blur(12px);
++    -webkit-backdrop-filter: blur(12px);
++}
++/* the script colours the live badge red inline, so this needs !important */
++body.theme-arcane #time-remaining.is-live {
++    color: var(--pink-bright) !important;
++    background: var(--pink-soft);
++}
++body.theme-arcane #time-remaining.is-live i { color: var(--pink); filter: drop-shadow(0 0 6px rgba(255, 79, 180, .8)); }
++body.theme-arcane .vote-stats {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 999px;
++    color: var(--muted);
++    font-family: var(--font);
++    backdrop-filter: blur(12px);
++    -webkit-backdrop-filter: blur(12px);
++}
++
++/* the "Vote Recorded" banner is styled inline by the script, so this needs !important */
++body.theme-arcane .voted-indicator {
++    background: var(--pink-soft) !important;
++    border: 1px solid var(--border) !important;
++    border-radius: 16px !important;
++    color: var(--text) !important;
++    font-family: var(--font);
++}
++body.theme-arcane .voted-indicator i,
++body.theme-arcane .voted-indicator strong { color: var(--pink-bright); }
++
++/* ---------- the two competitors ---------- */
++body.theme-arcane .competitor-name {
++    font-family: var(--font);
++    font-weight: 800;
++    letter-spacing: -.035em;
++    text-transform: none;
++    text-shadow: none;
++    color: var(--text);
++    overflow-wrap: anywhere;
++}
++body.theme-arcane .competitor-source { font-family: var(--font); color: var(--muted); letter-spacing: .02em; }
++body.theme-arcane .video-wrapper,
++body.theme-arcane .vote-section {
++    background: var(--card);
++    border: 1px solid var(--border);
++    border-radius: 18px;
++    box-shadow: var(--shadow);
++}
++body.theme-arcane .video-container { border-radius: 12px; }
++
++body.theme-arcane .vs-circle {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    box-shadow: 0 0 40px rgba(255, 79, 180, .25);
++}
++body.theme-arcane .vs-text { font-family: var(--font); font-weight: 800; letter-spacing: .08em; color: var(--pink-bright); text-shadow: none; }
++
++body.theme-arcane .control-btn,
++body.theme-arcane .replay-btn,
++body.theme-arcane .fullscreen-btn {
++    font-family: var(--font);
++    font-weight: 700;
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid rgba(255, 255, 255, .12);
++    border-radius: 999px;
++    color: var(--text);
++    transition: border-color 160ms ease, background 160ms ease;
++}
++body.theme-arcane .control-btn:hover,
++body.theme-arcane .replay-btn:hover,
++body.theme-arcane .fullscreen-btn:hover { background: var(--pink-soft); border-color: var(--border); color: var(--text); }
++
++/* ---------- percentage + vote button ---------- */
++body.theme-arcane .percentage-number,
++body.theme-arcane .vote-percentage { font-family: var(--font); font-weight: 800; letter-spacing: -.04em; color: var(--text); text-shadow: none; }
++body.theme-arcane .vote-count { color: var(--muted); font-family: var(--font); }
++
++body.theme-arcane .vote-btn {
++    font-family: var(--font);
++    font-weight: 800;
++    letter-spacing: .06em;
++    text-transform: uppercase;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border: 0;
++    border-radius: 999px;
++    box-shadow: 0 12px 30px rgba(255, 79, 180, .24);
++    transition: transform 180ms ease, box-shadow 180ms ease;
++}
++body.theme-arcane .vote-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(255, 79, 180, .34); }
++/* "you voted for this": the old CSS forces a teal gradient with !important */
++body.theme-arcane .vote-btn.voted {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink)) !important;
++    color: #160814 !important;
++    border: 0 !important;
++    box-shadow: 0 0 34px rgba(255, 79, 180, .45) !important;
++}
++body.theme-arcane .vote-btn[disabled]:not(.voted) {
++    background: rgba(255, 255, 255, .05);
++    color: var(--text-faint);
++    border: 1px solid var(--line);
++    box-shadow: none;
++    opacity: .75;
++    filter: none;
++}
++
++/* ---------- "About this edit" ---------- */
++body.theme-arcane .details-title,
++body.theme-arcane .share-title {
++    font-family: var(--font);
++    font-size: .8rem;
++    font-weight: 800;
++    letter-spacing: .18em;
++    text-transform: uppercase;
++    color: var(--pink-bright);
++}
++body.theme-arcane .share-title { text-align: center; }
++body.theme-arcane .about-text,
++body.theme-arcane .accomplishments-text { font-family: var(--font); font-style: normal; color: var(--muted); line-height: 1.6; }
++body.theme-arcane .about-song-section,
++body.theme-arcane .accomplishments-section,
++body.theme-arcane .moment-details { background: var(--card); border: 1px solid var(--line); border-radius: 18px; }
++body.theme-arcane .meta-item {
++    font-family: var(--font);
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid var(--line);
++    border-radius: 999px;
++}
++body.theme-arcane .meta-item.debut { background: var(--pink-soft); border-color: var(--border); }
++body.theme-arcane .meta-item.debut i { color: var(--pink-bright); }
++
++/* ---------- share + "what's next" ---------- */
++body.theme-arcane .share-btn {
++    font-family: var(--font);
++    font-weight: 700;
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid rgba(255, 255, 255, .12);
++    border-radius: 999px;
++    color: var(--text);
++}
++body.theme-arcane .share-btn:hover { background: var(--pink-soft); border-color: var(--border); }
++body.theme-arcane .after-voting-card {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 18px;
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++    transition: transform 180ms ease, border-color 180ms ease;
++}
++body.theme-arcane .after-voting-card:hover { transform: translateY(-3px); border-color: rgba(255, 79, 180, .5); background: var(--panel); }
++body.theme-arcane .after-voting-card h3 { font-family: var(--font); font-weight: 800; letter-spacing: -.02em; color: var(--text); text-transform: none; }
++body.theme-arcane .after-voting-card p { color: var(--muted); }
++body.theme-arcane .after-voting-section .card-icon,
++body.theme-arcane .after-voting-section .card-icon i,
++body.theme-arcane .card-arrow { color: var(--pink-bright); }
++
++/* ---------- post-vote modal ---------- */
++body.theme-arcane .post-vote-content {
++    background: rgba(11, 13, 24, .97);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    box-shadow: var(--shadow), 0 0 60px rgba(255, 79, 180, .14);
++    font-family: var(--font);
++}
++
++/* ---------- footer share band (footer.js; shared by every page) ---------- */
++body.theme-arcane .footer-cta-banner {
++    background: var(--bg-veil);
++    border-top: 1px solid var(--line);
++    border-bottom: 1px solid var(--line);
++}
++body.theme-arcane .btn-secondary {
++    display: inline-flex;
++    align-items: center;
++    gap: 8px;
++    font-family: var(--font);
++    font-weight: 700;
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid rgba(255, 255, 255, .12);
++    border-radius: 999px;
++    color: var(--text);
++}
++body.theme-arcane .btn-secondary:hover { background: var(--pink-soft); border-color: var(--border); color: var(--text); }
++body.theme-arcane .btn-support {
++    font-family: var(--font);
++    font-weight: 800;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border: 0;
++    border-radius: 999px;
++}
++body.theme-arcane .btn-support:hover { color: #160814; }
+diff --git a/css/arcane-theme.generated.css b/css/arcane-theme.generated.css
+index af160c8..dbe7814 100644
+--- a/css/arcane-theme.generated.css
++++ b/css/arcane-theme.generated.css
+@@ -1,6 +1,6 @@
+ /* GENERATED by tools/build-arcane-theme.mjs: do not edit by hand.
+    The old gold styling re-coloured for Arcane. Only applies under <body class="theme-arcane">.
+-   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css */
++   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css, css/activity.css, css/vote.css */
+ 
+ /* ===== css/main.css ===== */
+ body.theme-arcane {
+@@ -21,6 +21,9 @@ body.theme-arcane .cta-button:hover {
+ body.theme-arcane .spinner-ring {
+     border-top-color: var(--pink-bright)
+ }
++body.theme-arcane .spinner-ring:nth-child(2) {
++    border-top-color: rgb(176, 45, 120)
++}
+ body.theme-arcane .spinner-ring:nth-child(3) {
+     border-top-color: rgba(255, 79, 180, 0.3)
+ }
+@@ -73,7 +76,7 @@ body.theme-arcane .rank-level-number {
+     font-family: var(--font)
+ }
+ body.theme-arcane .rank-mini-bar {
+-    background: linear-gradient(90deg, var(--pink-bright) 0%, #E8D4A0 100%);
++    background: linear-gradient(90deg, var(--pink-bright) 0%, var(--pink-bright) 100%);
+     box-shadow: 0 0 8px rgba(255, 79, 180, 0.6)
+ }
+ body.theme-arcane .hamburger, body.theme-arcane .hamburger::before, body.theme-arcane .hamburger::after {
+@@ -326,12 +329,12 @@ body.theme-arcane .notification-item-cta:hover {
+     background: linear-gradient(135deg, #ff9bd6 0%, var(--pink-bright) 100%)
+ }
+ body.theme-arcane .profile-claim-state {
+-    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(180, 150, 90, 0.2));
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.2));
+     border: 2px solid rgba(255, 79, 180, 0.5);
+     animation: claimGlow-arcane 2s ease-in-out infinite
+ }
+ body.theme-arcane .profile-claim-state:hover {
+-    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(180, 150, 90, 0.3));
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(255, 79, 180, 0.3));
+     border-color: rgba(255, 79, 180, 0.8);
+     box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
+ }
+@@ -347,6 +350,9 @@ body.theme-arcane .claim-title {
+     color: var(--pink-bright);
+     text-shadow: 0 0 10px rgba(255, 79, 180, 0.3)
+ }
++body.theme-arcane .claim-subtitle {
++    color: var(--pink-bright)
++}
+ body.theme-arcane .claim-arrow {
+     color: var(--pink-bright)
+ }
+@@ -526,7 +532,7 @@ body.theme-arcane .footer-legal-links a {
+     color: var(--pink-bright)
+ }
+ body.theme-arcane .newsletter {
+-    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1), rgba(180, 154, 94, 0.05));
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1), rgba(255, 79, 180, 0.05));
+     border-top: 1px solid rgba(255, 79, 180, 0.2);
+     border-bottom: 1px solid rgba(255, 79, 180, 0.2)
+ }
+@@ -541,7 +547,7 @@ body.theme-arcane .newsletter-description {
+     font-family: var(--font)
+ }
+ body.theme-arcane .newsletter-btn {
+-    background: linear-gradient(135deg, var(--pink-bright), #B49A5E);
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
+     color: var(--bg);
+     font-family: var(--font);
+     box-shadow: 0 4px 15px rgba(255, 79, 180, 0.3)
+@@ -551,7 +557,7 @@ body.theme-arcane .newsletter-btn:hover:not(:disabled) {
+     box-shadow: 0 6px 20px rgba(255, 79, 180, 0.4)
+ }
+ body.theme-arcane .newsletter-btn.notifications-disabled {
+-    background: linear-gradient(135deg, var(--pink-bright), #B49A5E);
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
+     color: var(--bg)
+ }
+ body.theme-arcane .newsletter-btn.notifications-disabled:hover {
+@@ -605,10 +611,20 @@ body.theme-arcane .cta-actions .btn-secondary:hover {
+     border-color: var(--pink-bright)
+ }
+ body.theme-arcane .copy-success-toast {
+-    background: linear-gradient(135deg, rgba(255, 79, 180, 0.95), rgba(180, 150, 90, 0.95));
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.95), rgba(255, 79, 180, 0.95));
+     color: var(--bg);
+     font-family: var(--font)
+ }
++body.theme-arcane .support-text h4 {
++    color: var(--pink)
++}
++body.theme-arcane .btn-support {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .btn-support:hover {
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.5)
++}
+ 
+ /* ===== css/brackets.css ===== */
+ body.theme-arcane .brackets-header {
+@@ -665,6 +681,10 @@ body.theme-arcane .matchup-card.completed {
+ body.theme-arcane .matchup-card.upcoming {
+     border-color: rgba(255, 79, 180, 0.2)
+ }
++body.theme-arcane .matchup-card.finals-match {
++    border-color: rgba(255, 79, 180, 0.6);
++    background: rgba(255, 79, 180, 0.05)
++}
+ body.theme-arcane .matchup-number {
+     font-family: var(--font)
+ }
+@@ -723,8 +743,13 @@ body.theme-arcane .stat-detail {
+ body.theme-arcane .champion-spotlight {
+     background: linear-gradient(135deg, #1a1a1a 0%, var(--bg-veil) 100%)
+ }
++body.theme-arcane .spotlight-badge {
++    background: rgba(255, 79, 180, 0.15);
++    border: 2px solid rgba(255, 79, 180, 0.4)
++}
+ body.theme-arcane .badge-text {
+-    font-family: var(--font)
++    font-family: var(--font);
++    color: var(--pink)
+ }
+ body.theme-arcane .spotlight-title {
+     font-family: var(--font)
+@@ -800,7 +825,7 @@ body.theme-arcane .bye-badge {
+     color: var(--bg)
+ }
+ body.theme-arcane .status-badge.completed {
+-    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(180, 135, 40, 0.3));
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(176, 45, 120, 0.3));
+     color: var(--pink-bright);
+     border: 1px solid rgba(255, 79, 180, 0.5)
+ }
+@@ -808,7 +833,7 @@ body.theme-arcane .matchup-card:not(:has(.competitor.tbd)):hover {
+     box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
+ }
+ body.theme-arcane .newsletter-btn.notifications-disabled {
+-    background: linear-gradient(135deg, var(--pink-bright), #B49A5E);
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
+     color: var(--bg)
+ }
+ body.theme-arcane .newsletter-btn.notifications-disabled:hover {
+@@ -862,11 +887,12 @@ body.theme-arcane .inline-link:hover {
+     border-bottom-color: var(--pink-bright)
+ }
+ body.theme-arcane .view-details-btn {
+-    background: linear-gradient(135deg, var(--pink-bright), #785a28);
++    background: linear-gradient(135deg, var(--pink-bright), rgb(176, 45, 120));
+     box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
+ }
+ body.theme-arcane .view-details-btn:hover {
+-    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.5)
++    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.5);
++    background: linear-gradient(135deg, var(--pink-bright), rgb(176, 45, 120))
+ }
+ body.theme-arcane .explore-more-bracket .section-title {
+     color: var(--pink-bright);
+@@ -884,6 +910,21 @@ body.theme-arcane .stat-icon i {
+     color: var(--pink-bright);
+     filter: drop-shadow(0 0 8px rgba(255, 79, 180, 0.3))
+ }
++body.theme-arcane .badge-icon i {
++    color: var(--pink);
++    filter: drop-shadow(0 0 12px rgba(255, 79, 180, 0.5));
++    animation: pulse-crown-arcane 2s ease-in-out infinite
++}
++@keyframes pulse-crown-arcane {
++    0%, 100% {
++        transform: scale(1);
++        filter: drop-shadow(0 0 12px rgba(255, 79, 180, 0.5))
++    }
++    50% {
++        transform: scale(1.1);
++        filter: drop-shadow(0 0 20px rgba(255, 79, 180, 0.7))
++    }
++}
+ body.theme-arcane .card-icon i {
+     color: var(--pink-bright)
+ }
+@@ -894,6 +935,9 @@ body.theme-arcane .explore-card-bracket:hover .card-icon i {
+ body.theme-arcane .info-value i {
+     color: var(--pink-bright)
+ }
++body.theme-arcane .stat-card:nth-child(3) .stat-icon i {
++    color: var(--pink)
++}
+ body.theme-arcane .stat-card:nth-child(4) .stat-icon i {
+     color: var(--pink-bright)
+ }
+@@ -1014,6 +1058,7 @@ body.theme-arcane .modal-vote-btn.primary {
+     box-shadow: 0 4px 15px rgba(255, 79, 180, 0.4)
+ }
+ body.theme-arcane .modal-vote-btn.primary:hover {
++    background: linear-gradient(135deg, var(--pink), rgb(176, 45, 120));
+     box-shadow: 0 6px 20px rgba(255, 79, 180, 0.6)
+ }
+ body.theme-arcane .modal-btn.secondary {
+@@ -1026,7 +1071,7 @@ body.theme-arcane .modal-actions {
+     border-top: 1px solid rgba(255, 79, 180, 0.2)
+ }
+ body.theme-arcane .result-bar {
+-    background: linear-gradient(90deg, var(--pink-bright), #d4a747)
++    background: linear-gradient(90deg, var(--pink-bright), var(--pink))
+ }
+ body.theme-arcane .modal-competitor.leading {
+     border: 2px solid rgba(255, 79, 180, 0.6)
+@@ -1104,7 +1149,7 @@ body.theme-arcane ::-webkit-scrollbar-thumb:hover {
+     box-shadow: 0 0 10px rgba(255, 79, 180, 0.4)
+ }
+ body.theme-arcane ::-webkit-scrollbar-thumb:active {
+-    background: linear-gradient(180deg, #E0C490, #ff9bd6)
++    background: linear-gradient(180deg, var(--pink-bright), #ff9bd6)
+ }
+ 
+ /* ===== css/settings.css ===== */
+@@ -1224,6 +1269,9 @@ body.theme-arcane .settings-form textarea {
+ body.theme-arcane .settings-form textarea:focus {
+     border-color: var(--pink-bright)
+ }
++body.theme-arcane .settings-form textarea::placeholder {
++    color: rgba(255, 112, 195, 0.4)
++}
+ body.theme-arcane #bioCharCount {
+     color: var(--pink-bright)
+ }
+@@ -1236,6 +1284,9 @@ body.theme-arcane .banner-preview:hover {
+ body.theme-arcane .banner-preview-overlay {
+     color: var(--text)
+ }
++body.theme-arcane .setting-hint {
++    color: rgba(255, 112, 195, 0.5)
++}
+ body.theme-arcane .social-input-row {
+     border: 2px solid rgba(255, 79, 180, 0.3)
+ }
+@@ -1249,6 +1300,9 @@ body.theme-arcane .social-input-row input {
+     color: var(--text);
+     font-family: var(--font)
+ }
++body.theme-arcane .social-input-row input::placeholder {
++    color: rgba(255, 112, 195, 0.4)
++}
+ body.theme-arcane .champion-pack-card {
+     border: 2px solid rgba(255, 79, 180, 0.3)
+ }
+@@ -1314,3 +1368,725 @@ body.theme-arcane .champion-preview-btn:hover {
+     background: rgba(255, 79, 180, 0.2)
+ }
+ 
++/* ===== css/activity.css ===== */
++body.theme-arcane .page-header h1 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .stat-card {
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .stat-card:hover {
++    border-color: rgba(255, 79, 180, 0.5);
++    box-shadow: 0 4px 16px rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .stat-value {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .filter-btn {
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font)
++}
++body.theme-arcane .filter-btn:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .filter-btn.active {
++    background: linear-gradient(135deg, var(--pink-bright) 0%, #e85aae 100%);
++    border-color: var(--pink-bright);
++    color: var(--bg);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vote-card {
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vote-card:hover {
++    border-color: rgba(255, 79, 180, 0.6);
++    box-shadow: 0 4px 20px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vote-thumbnail {
++    border: 2px solid rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .vote-card:hover .vote-thumbnail {
++    border-color: rgba(255, 79, 180, 0.7);
++    box-shadow: 0 0 12px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .user-avatar {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(255, 79, 180, 0.1));
++    border: 2px solid rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .username {
++    color: var(--pink-bright)
++}
++body.theme-arcane .song-title {
++    font-family: var(--font)
++}
++body.theme-arcane .voted-song {
++    color: var(--pink-bright) !important
++}
++body.theme-arcane .vote-card:hover .voted-song {
++    color: #ff9bd6 !important
++}
++body.theme-arcane .match-badge {
++    background: rgba(255, 79, 180, 0.15);
++    color: var(--pink-bright);
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .view-match-btn {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.1));
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink-bright)
++}
++body.theme-arcane .view-match-btn:hover {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(255, 79, 180, 0.2));
++    border-color: rgba(255, 79, 180, 0.6);
++    color: #ff9bd6
++}
++body.theme-arcane .no-activity {
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .no-activity h3 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .btn-primary {
++    background: linear-gradient(135deg, var(--pink-bright) 0%, #e85aae 100%);
++    color: var(--bg);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .btn-primary:hover {
++    background: linear-gradient(135deg, #ff9bd6 0%, var(--pink-bright) 100%);
++    box-shadow: 0 6px 16px rgba(255, 79, 180, 0.5)
++}
++@media (max-width: 768px) {
++    body.theme-arcane .vote-song {
++        border-top: 1px solid rgba(255, 79, 180, 0.2)
++    }
++}
++body.theme-arcane .username-link .username {
++    color: var(--pink-bright)
++}
++body.theme-arcane .username-link:hover .username {
++    color: #ff9bd6
++}
++
++/* ===== css/vote.css ===== */
++body.theme-arcane .vote-header {
++    background: linear-gradient(135deg, var(--bg-veil) 0%, #1a1a1a 100%);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .breadcrumb {
++    font-family: var(--font)
++}
++body.theme-arcane .breadcrumb a {
++    color: var(--pink-bright)
++}
++body.theme-arcane .match-title {
++    font-family: var(--font)
++}
++body.theme-arcane .info-badge {
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .info-badge.tournament {
++    border-color: rgba(255, 79, 180, 0.5);
++    background: rgba(255, 79, 180, 0.1)
++}
++body.theme-arcane .info-badge.time {
++    border-color: rgba(255, 79, 180, 0.5);
++    background: rgba(255, 79, 180, 0.1);
++    color: var(--pink)
++}
++body.theme-arcane .voting-arena {
++    background: var(--bg-veil)
++}
++body.theme-arcane .seed-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .competitor-name {
++    font-family: var(--font)
++}
++body.theme-arcane .competitor-source {
++    font-family: var(--font)
++}
++body.theme-arcane .video-container {
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .video-container:hover {
++    border-color: rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .control-btn {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .control-btn:hover {
++    background: rgba(255, 79, 180, 0.2);
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .vote-section {
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vote-percentage {
++    font-family: var(--font)
++}
++body.theme-arcane .vote-percentage .percentage-number {
++    color: var(--pink-bright)
++}
++body.theme-arcane .vote-btn {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.1));
++    border: 2px solid var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .vote-btn:hover {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(255, 79, 180, 0.2));
++    box-shadow: 0 8px 20px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vote-btn.voted {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink))
++}
++body.theme-arcane .vote-count {
++    font-family: var(--font)
++}
++body.theme-arcane .competitor-column[data-leading="true"] .vote-section {
++    border-color: rgba(255, 79, 180, 0.6);
++    background: rgba(255, 79, 180, 0.05);
++    animation: pulse-vote-section-arcane 2s infinite
++}
++@keyframes pulse-vote-section-arcane {
++    0%, 100% {
++        border-color: rgba(255, 79, 180, 0.6);
++        box-shadow: 0 0 0 0 rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        border-color: rgba(255, 79, 180, 0.8);
++        box-shadow: 0 0 0 10px rgba(255, 79, 180, 0)
++    }
++}
++body.theme-arcane .competitor-column[data-leading="true"] .vote-percentage .percentage-number {
++    color: var(--pink)
++}
++body.theme-arcane .vs-circle {
++    border: 3px solid var(--pink-bright);
++    box-shadow: 0 0 20px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .vs-text {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .moment-details {
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .details-title {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .details-description {
++    font-family: var(--font)
++}
++body.theme-arcane .details-meta {
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .meta-item {
++    font-family: var(--font)
++}
++body.theme-arcane .share-section {
++    border-top: 1px solid rgba(255, 79, 180, 0.2);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .share-title {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .share-btn {
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .share-btn:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .share-btn.copy:hover {
++    border-color: var(--pink);
++    color: var(--pink)
++}
++body.theme-arcane .rules-section {
++    background: var(--bg-veil)
++}
++body.theme-arcane .rules-card {
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .rules-title {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .rules-list li {
++    font-family: var(--font)
++}
++body.theme-arcane .modal-content {
++    border: 2px solid var(--pink-bright)
++}
++body.theme-arcane .modal-icon {
++    background: rgba(255, 79, 180, 0.2);
++    border: 3px solid var(--pink);
++    color: var(--pink)
++}
++body.theme-arcane .modal-title {
++    font-family: var(--font)
++}
++body.theme-arcane .modal-message {
++    font-family: var(--font)
++}
++body.theme-arcane .modal-message strong {
++    color: var(--pink-bright)
++}
++body.theme-arcane .modal-btn {
++    font-family: var(--font)
++}
++body.theme-arcane .modal-btn.primary {
++    background: var(--pink-bright);
++    border: 2px solid var(--pink-bright);
++    color: var(--bg)
++}
++body.theme-arcane .modal-btn.primary:hover {
++    background: var(--pink);
++    border-color: var(--pink)
++}
++body.theme-arcane .modal-btn.secondary {
++    border: 2px solid rgba(255, 79, 180, 0.5);
++    color: var(--pink-bright)
++}
++body.theme-arcane .modal-btn.secondary:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .modal-note {
++    font-family: var(--font)
++}
++body.theme-arcane .meta-item.winning {
++    color: var(--pink)
++}
++body.theme-arcane .vote-btn.voted {
++    background: linear-gradient(135deg, rgb(176, 45, 120), rgb(176, 45, 120)) !important;
++    box-shadow: 0 0 20px rgba(176, 45, 120, 0.4) !important;
++    border: 2px solid rgb(176, 45, 120) !important
++}
++body.theme-arcane .vote-btn.voted:hover {
++    box-shadow: 0 0 25px rgba(176, 45, 120, 0.5) !important
++}
++body.theme-arcane .meta-item.champion {
++    background: linear-gradient(135deg, var(--pink), var(--pink-bright));
++    color: var(--bg)
++}
++body.theme-arcane .meta-item.finalist {
++    color: var(--bg)
++}
++body.theme-arcane .meta-row.basic-info {
++    border-bottom: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .meta-item {
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .meta-item:hover {
++    border-color: rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .meta-item i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .meta-item.seed .meta-value {
++    color: var(--pink-bright)
++}
++body.theme-arcane .meta-item.winrate.winning .meta-value {
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .meta-item.accolade.champion {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.15), rgba(255, 79, 180, 0.05));
++    border-color: var(--pink)
++}
++body.theme-arcane .meta-item.accolade.champion i {
++    color: var(--pink)
++}
++body.theme-arcane .meta-item.accolade.champion .meta-value {
++    color: var(--pink)
++}
++body.theme-arcane .post-vote-content {
++    border: 2px solid rgb(176, 45, 120);
++    box-shadow: 0 20px 60px rgba(176, 45, 120, 0.3)
++}
++body.theme-arcane .modal-success-icon {
++    background: linear-gradient(135deg, rgb(176, 45, 120), rgb(176, 45, 120))
++}
++body.theme-arcane .modal-title {
++    font-family: var(--font);
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .modal-book-recommendation {
++    border: 1px solid rgba(176, 45, 120, 0.3)
++}
++body.theme-arcane .modal-book-title {
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .modal-book-cta {
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .modal-btn.primary {
++    background: linear-gradient(135deg, rgb(176, 45, 120), rgb(176, 45, 120))
++}
++body.theme-arcane .modal-btn.primary:hover {
++    box-shadow: 0 6px 20px rgba(176, 45, 120, 0.4)
++}
++body.theme-arcane .competitor-card.winning {
++    border-color: rgb(176, 45, 120);
++    box-shadow: 0 0 20px rgba(176, 45, 120, 0.2)
++}
++body.theme-arcane .competitor-card.tied {
++    border-color: var(--pink);
++    box-shadow: 0 0 20px rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .competitor-percentage.updated {
++    animation: percentagePop-arcane 0.5s ease
++}
++@keyframes percentagePop-arcane {
++    0%, 100% {
++        transform: scale(1)
++    }
++    50% {
++        transform: scale(1.1);
++        color: rgb(176, 45, 120)
++    }
++}
++body.theme-arcane .newsletter-btn.notifications-enabled {
++    background: linear-gradient(135deg, var(--pink), rgb(176, 45, 120))
++}
++body.theme-arcane .newsletter-btn.notifications-enabled:hover {
++    background: linear-gradient(135deg, rgb(176, 45, 120), rgb(176, 45, 120))
++}
++body.theme-arcane .newsletter-btn.notifications-disabled {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    color: var(--bg)
++}
++body.theme-arcane .newsletter-btn.notifications-disabled:hover {
++    background: linear-gradient(135deg, #ff9bd6, var(--pink-bright))
++}
++body.theme-arcane .voted-badge {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%);
++    box-shadow: 0 2px 8px rgba(176, 45, 120, 0.3);
++    animation: pulse-subtle-arcane 2s ease-in-out infinite
++}
++@keyframes pulse-subtle-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(176, 45, 120, 0.3)
++    }
++    50% {
++        box-shadow: 0 4px 12px rgba(176, 45, 120, 0.5)
++    }
++}
++body.theme-arcane .xp-earned-section {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1) 0%, rgba(255, 79, 180, 0.05) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .xp-amount {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .xp-base {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .xp-bonus {
++    background: linear-gradient(135deg, rgba(176, 45, 120, 0.2), rgba(176, 45, 120, 0.2));
++    border: 1px solid rgba(176, 45, 120, 0.3);
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .xp-progress-container {
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .xp-level-badge {
++    color: var(--pink-bright)
++}
++body.theme-arcane .xp-bar {
++    background: linear-gradient(90deg, var(--pink-bright) 0%, var(--pink-bright) 100%);
++    box-shadow: 0 0 10px rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .xp-max-level {
++    color: var(--pink-bright)
++}
++body.theme-arcane .other-matches-section {
++    border-top: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .other-matches-section .section-title {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .other-matches-grid .match-card {
++    border: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .other-matches-grid .match-card:hover {
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .other-matches-section {
++    border-top: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .other-matches-section .section-title {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .other-matches-section .section-subtitle {
++    font-family: var(--font)
++}
++body.theme-arcane .match-card {
++    border: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .match-card:hover {
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .match-card.live {
++    border-color: rgba(255, 79, 180, 0.6);
++    background: rgba(255, 79, 180, 0.05);
++    animation: pulse-card-arcane 2s infinite
++}
++@keyframes pulse-card-arcane {
++    0%, 100% {
++        border-color: rgba(255, 79, 180, 0.6);
++        box-shadow: 0 0 0 0 rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        border-color: rgba(255, 79, 180, 0.8);
++        box-shadow: 0 0 0 10px rgba(255, 79, 180, 0)
++    }
++}
++body.theme-arcane .match-card .match-header {
++    border-bottom: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .match-card .match-tournament {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .match-card .match-round {
++    border-left: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .match-card .live-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink)
++}
++body.theme-arcane .match-card .competitor.leading {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .match-card .competitor-title {
++    font-family: var(--font)
++}
++body.theme-arcane .match-card .competitor-source {
++    font-family: var(--font)
++}
++body.theme-arcane .match-card .vote-percentage {
++    font-family: var(--font)
++}
++body.theme-arcane .match-card .competitor.leading .vote-percentage {
++    color: var(--pink-bright)
++}
++body.theme-arcane .match-card .leading-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink)
++}
++body.theme-arcane .match-card .vs-divider {
++    font-family: var(--font)
++}
++body.theme-arcane .match-card .match-footer {
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .match-card .view-results-btn {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%);
++    font-family: var(--font);
++    box-shadow: 0 4px 12px rgba(176, 45, 120, 0.25)
++}
++body.theme-arcane .match-card .view-results-btn:hover {
++    box-shadow: 0 8px 20px rgba(176, 45, 120, 0.4)
++}
++body.theme-arcane .match-card .voted-badge {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%);
++    box-shadow: 0 2px 8px rgba(176, 45, 120, 0.3)
++}
++body.theme-arcane .match-card.user-voted {
++    border: 2px solid rgba(176, 45, 120, 0.4);
++    background: linear-gradient(135deg, rgba(176, 45, 120, 0.05) 0%, rgba(176, 45, 120, 0.02) 100%)
++}
++body.theme-arcane .match-card .vote-now-btn {
++    background: linear-gradient(135deg, var(--pink-bright) 0%, #e85aae 100%);
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.25)
++}
++body.theme-arcane .match-card .vote-now-btn:hover {
++    box-shadow: 0 8px 20px rgba(255, 79, 180, 0.4);
++    border-color: rgba(255, 79, 180, 0.5);
++    background: linear-gradient(135deg, #ff9bd6 0%, var(--pink-bright) 100%)
++}
++body.theme-arcane .match-card .vote-now-btn:active {
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++@keyframes xp-glow-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        box-shadow: 0 4px 16px rgba(255, 79, 180, 0.7)
++    }
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++@keyframes xp-glow-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        box-shadow: 0 4px 16px rgba(255, 79, 180, 0.7)
++    }
++}
++body.theme-arcane .xp-reward-badge {
++    background: rgba(255, 79, 180, 0.15);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink)
++}
++body.theme-arcane .breadcrumb-link:hover {
++    color: var(--pink-bright)
++}
++body.theme-arcane .breadcrumb-current {
++    color: var(--pink-bright)
++}
++body.theme-arcane .modal-quick-link:hover {
++    background: rgba(255, 79, 180, 0.15);
++    border-color: var(--pink-bright);
++    color: var(--pink-bright)
++}
++body.theme-arcane .inline-subtitle-link {
++    color: var(--pink-bright);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .inline-subtitle-link:hover {
++    color: var(--text);
++    border-bottom-color: var(--pink-bright)
++}
++body.theme-arcane .after-voting-section {
++    border-top: 2px solid rgba(255, 79, 180, 0.15)
++}
++body.theme-arcane .after-voting-section .section-title {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .after-voting-card::before {
++    background: linear-gradient(90deg, var(--pink-bright), rgb(176, 45, 120))
++}
++body.theme-arcane .after-voting-card:hover {
++    background: rgba(255, 79, 180, 0.12);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .after-voting-card h3 {
++    color: var(--text);
++    font-family: var(--font)
++}
++body.theme-arcane .card-arrow {
++    color: var(--pink-bright)
++}
++body.theme-arcane .xp-earned-section {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1), rgba(255, 79, 180, 0.05));
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .xp-amount {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .xp-bonus {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.3), rgba(255, 79, 180, 0.3));
++    border: 1px solid rgba(255, 79, 180, 0.5);
++    color: var(--pink-bright)
++}
++body.theme-arcane .bonus-reveal {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.2));
++    border: 1px dashed rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .xp-level-badge {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .xp-bar-wrapper {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .xp-bar {
++    background: linear-gradient(90deg, var(--pink-bright), var(--pink-bright), var(--pink-bright))
++}
++body.theme-arcane .xp-max-level {
++    color: var(--pink);
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.2))
++}
++body.theme-arcane .info-badge i, body.theme-arcane .vote-icon i, body.theme-arcane .control-btn i, body.theme-arcane .meta-item i, body.theme-arcane .title-icon i, body.theme-arcane .card-icon i, body.theme-arcane .modal-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .vote-btn:hover .vote-icon i {
++    color: var(--text)
++}
++body.theme-arcane .modal-icon i {
++    color: var(--pink)
++}
++body.theme-arcane .bmc-support-section {
++    background: linear-gradient(135deg, #1a1a1a 0%, var(--bg-veil) 100%);
++    border: 2px solid var(--pink)
++}
++body.theme-arcane .bmc-text strong {
++    color: var(--pink)
++}
++body.theme-arcane .bmc-button {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .bmc-button:hover {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .accomplishments-section {
++    border-bottom: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .accomplishments-text {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .about-text {
++    font-family: var(--font)
++}
++body.theme-arcane .details-title {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .profile-tip {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.95), rgba(255, 79, 180, 0.95));
++    color: var(--bg);
++    font-family: var(--font)
++}
++body.theme-arcane .tip-close {
++    color: var(--bg)
++}
++
+diff --git a/js/vote.js b/js/vote.js
+index fd72163..79ff242 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -222,6 +222,12 @@ function getTimeRemaining(endDate) {
+ 
+     // ✅ ADD THIS LINE:
+ import { ARCANE_CONFIG } from './arcane-config.js';
++
++// Titles come from YouTube, so never splice them into HTML or inline handlers unescaped.
++function escapeHtml(value) {
++    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++}
++
+ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+ 
+     // Current match data
+@@ -618,6 +624,8 @@ await trackMatchView(matchData.id || matchId);
+ currentMatch = {
+     id: matchData.id || matchData.matchId,
+     round: matchData.round || 1,
++    roundLabel: matchData.roundLabel || null,          // e.g. "Final", "Semi-finals", "Round of 16" (set by the bracket builder)
++    tournamentName: matchData.tournamentName || null,  // e.g. "Arcane Test 01"
+     status: matchData.status,
+     totalVotes: matchData.totalVotes || 0,
+         endDate: matchData.endDate || null,  // ✅ Make sure this line exists!
+@@ -921,7 +929,7 @@ async function checkVoteStatus() {
+             <div style="font-size: 1.5rem;"><i class="fa-solid fa-check"></i></div>
+                 <div>
+                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Vote Recorded</div>
+-                    <div style="opacity: 0.9;">You voted for <strong>${songName}</strong></div>
++                    <div style="opacity: 0.9;">You voted for <strong>${escapeHtml(songName)}</strong></div>
+                 </div>
+             </div>
+         `;
+@@ -1086,7 +1094,7 @@ function generateUsername() {
+         const tournamentBadge = document.getElementById('tournament-badge');
+         if (tournamentBadge) {
+             const roundName = getRoundName(currentMatch.round || 1);
+-            tournamentBadge.innerHTML = `🏆 Anthem Arena Championship - ${roundName}`;
++            tournamentBadge.innerHTML = `🏆 ${escapeHtml(currentMatch.tournamentName || 'Tournament')} - ${escapeHtml(roundName)}`;
+         }
+ 
+        // Update time remaining with countdown support
+@@ -1118,11 +1126,13 @@ if (timeRemaining) {
+                 // Fallback
+                 timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
+                 timeRemaining.style.color = '#ff4444';
++                timeRemaining.classList.add('is-live');
+             }
+         } else {
+             // No endDate available, show generic live status
+             timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed
+             timeRemaining.style.color = '#ff4444';
++            timeRemaining.classList.add('is-live');
+         }
+     } else {
+         timeRemaining.innerHTML = '<i class="fa-solid fa-clock"></i> Vote Now'; // ✅ Changed
+@@ -1292,6 +1302,9 @@ const description = `Cast your vote between ${song1} and ${song2} in Arcane Mome
+     // ========================================
+ 
+     function getRoundName(roundNumber) {
++        // Cups made by the bracket builder store the round's name on the match, so use it. This works for any bracket size.
++        if (currentMatch?.roundLabel && roundNumber === currentMatch.round) return currentMatch.roundLabel;
++        // Older cups (64-bracket) fall back to the old table.
+         const roundNames = {
+             1: 'Round 1',
+             2: 'Round 2',
+@@ -1496,7 +1509,7 @@ function hideLoadingSpinner() {
+             <div class="urgency-content">
+             <span class="urgency-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                 <div class="urgency-text">
+-                    <strong>${losingSong.name}</strong> is being eliminated!
++                    <strong>${escapeHtml(losingSong.name)}</strong> is being eliminated!
+                     <span class="vote-diff">Trailing by ${voteDiff.toLocaleString()} votes</span>
+                 </div>
+                 <button class="urgency-cta" onclick="scrollToVoteButton(${loserSide})">
+@@ -2390,7 +2403,7 @@ function showNotification(message, type = 'success') {
+     thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+ 
+     // ✅ NEW: Add descriptive alt text
+-    thumbnail.alt = `${songName} by ${artist} - League of Legends Music Video Thumbnail`;
++    thumbnail.alt = `${songName} by ${artist} - Arcane Moments edit thumbnail`;
+ 
+     // ✅ NEW: Add loading="lazy" for performance
+     thumbnail.loading = 'lazy';
+@@ -2493,7 +2506,7 @@ if (isEarlyVoting) {
+     modalTitle = 'Early Voter!';
+     successMessage = `
+         <p class="modal-message early">
+-            You voted for <strong>"${songName}"</strong><br>
++            You voted for <strong>"${escapeHtml(songName)}"</strong><br>
+             <span class="stakes-text">Only ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} so far — this match needs more voters!</span>
+         </p>
+     `;
+@@ -2508,10 +2521,10 @@ if (isEarlyVoting) {
+                 This match just started! Help shape the results from the beginning.
+             </p>
+             <div class="share-buttons">
+-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
++                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
+         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                 </button>
+-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
++                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
+         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                 </button>
+                 <button class="share-btn copy" onclick="copyMatchLink()">
+@@ -2529,7 +2542,7 @@ else if (voteDiff === 0) {
+     successMessage = `
+         <p class="modal-message special">
+             You just broke the deadlock!<br>
+-            <span class="stakes-text">"${songName}" and "${opponentName}" were exactly ${userVotes}-${opponentVotes}</span>
++            <span class="stakes-text">"${escapeHtml(songName)}" and "${escapeHtml(opponentName)}" were exactly ${userVotes}-${opponentVotes}</span>
+         </p>
+     `;
+     shareContext = 'tied';
+@@ -2552,10 +2565,10 @@ else if (voteDiff === 0) {
+                 ${tiedMessage}
+             </p>
+             <div class="share-buttons">
+-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'tied')">
++                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'tied')">
+         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                 </button>
+-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'tied')">
++                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'tied')">
+         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                 </button>
+                 <button class="share-btn copy" onclick="copyMatchLink()">
+@@ -2572,7 +2585,7 @@ else if (voteDiff <= 2) {
+     modalTitle = 'Nail-Biter!';
+     successMessage = `
+         <p class="modal-message special">
+-            You voted for <strong>"${songName}"</strong><br>
++            You voted for <strong>"${escapeHtml(songName)}"</strong><br>
+             <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
+         </p>
+     `;
+@@ -2596,10 +2609,10 @@ else if (voteDiff <= 2) {
+                 ${nailbiterMessage}
+             </p>
+             <div class="share-buttons">
+-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'nailbiter')">
++                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'nailbiter')">
+         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                 </button>
+-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'nailbiter')">
++                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'nailbiter')">
+         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                 </button>
+                 <button class="share-btn copy" onclick="copyMatchLink()">
+@@ -2616,7 +2629,7 @@ else if (userPct < opponentPct && voteDiff <= 5) {
+     modalTitle = 'Fighting for It!';
+     successMessage = `
+         <p class="modal-message special">
+-            You're fighting for <strong>"${songName}"</strong>!<br>
++            You're fighting for <strong>"${escapeHtml(songName)}"</strong>!<br>
+             <span class="stakes-text">Behind by just ${voteDiff} votes (${userPct}% vs ${opponentPct}%)</span>
+         </p>
+     `;
+@@ -2627,8 +2640,8 @@ else if (userPct < opponentPct && voteDiff <= 5) {
+         ? 'FINAL HOURS - Comeback Time!'
+         : 'Comeback Time!';
+     const comebackMessage = isFinalHours
+-        ? `"${songName}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
+-        : `"${songName}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
++        ? `"${escapeHtml(songName)}" is behind by ${voteDiff} votes in the FINAL HOURS! A comeback is still possible!`
++        : `"${escapeHtml(songName)}" is behind by just ${voteDiff} votes! A comeback is totally possible — rally support!`;
+ 
+     shareMessage = `
+         <div class="share-cta urgent">
+@@ -2640,10 +2653,10 @@ else if (userPct < opponentPct && voteDiff <= 5) {
+                 ${comebackMessage}
+             </p>
+             <div class="share-buttons">
+-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'early')">
++                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
+         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                 </button>
+-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'early')">
++                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
+         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                 </button>
+                 <button class="share-btn copy" onclick="copyMatchLink()">
+@@ -2660,7 +2673,7 @@ else if (userPct < opponentPct) {
+     modalTitle = 'Save It!';
+     successMessage = `
+         <p class="modal-message special">
+-            You voted to save <strong>"${songName}"</strong>!<br>
++            You voted to save <strong>"${escapeHtml(songName)}"</strong>!<br>
+             <span class="stakes-text">But it's losing ${userPct}% to ${opponentPct}% — it needs a miracle!</span>
+         </p>
+     `;
+@@ -2704,7 +2717,7 @@ else if (pctDiff <= 10) {
+     modalTitle = 'Leading!';
+     successMessage = `
+         <p class="modal-message">
+-            Great choice! <strong>"${songName}"</strong> is leading!<br>
++            Great choice! <strong>"${escapeHtml(songName)}"</strong> is leading!<br>
+             <span class="stakes-text">Currently ${userPct}% to ${opponentPct}% — but it's still competitive!</span>
+         </p>
+     `;
+@@ -2763,10 +2776,10 @@ else {
+                 "${songName}" is dominating! Share the tournament with the community:
+             </p>
+             <div class="share-buttons">
+-                <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'dominating')">
++                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'dominating')">
+         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+                 </button>
+-                <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'dominating')">
++                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'dominating')">
+         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
+                 </button>
+                 <button class="share-btn copy" onclick="copyMatchLink()">
+diff --git a/tools/build-arcane-theme.mjs b/tools/build-arcane-theme.mjs
+index 549a1f3..7d5db3c 100644
+--- a/tools/build-arcane-theme.mjs
++++ b/tools/build-arcane-theme.mjs
+@@ -20,10 +20,14 @@
+ import fs from 'node:fs';
+ import postcss from 'postcss';
+ 
++// A source is a path, or { file, greens: true }. greens also turns green/teal into pink, for pages whose
++// "voted / success" state is green (vote.css). It is off by default because green is also used for real success
++// messages elsewhere.
+ const SOURCES = [
+     'css/main.css', 'css/navigation.css', 'css/footer.css', 'css/brackets.css',
+-    'css/modal.css', 'css/scrollbar.css', 'css/settings.css'
+-];
++    'css/modal.css', 'css/scrollbar.css', 'css/settings.css',
++    'css/activity.css', { file: 'css/vote.css', greens: true }
++].map(s => typeof s === 'string' ? { file: s } : s);
+ const OUT = 'css/arcane-theme.generated.css';
+ const SCOPE = 'body.theme-arcane';
+ 
+@@ -39,11 +43,42 @@ const COLOUR_MAP = [
+ ];
+ const GOLD_TEST = /#c8aa6e\b|#c89b3c\b|#f0e6d2\b|#d4b87[6a]\b|#b89a5e\b|#8b6914\b|#a88a4d\b|rgba\(\s*200\s*,\s*(?:170\s*,\s*110|155\s*,\s*60)\s*,|rgba\(\s*139\s*,\s*105\s*,\s*20\s*,/i;
+ const OLD_FONT = /cinzel|lora|bebas neue/i;
++
++// Anything gold / yellow / amber that the table above does not name is mapped by hue, so a new shade cannot slip through.
++const COLOUR_TOKEN = /#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})\b|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[\d.]+\s*)?\)/gi;
++function parseColour(tok) {
++    if (tok[0] === '#') {
++        let h = tok.slice(1);
++        if (h.length === 3) h = [...h].map(c => c + c).join('');
++        return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16), h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : null];
++    }
++    const n = tok.match(/[\d.]+/g).map(Number);
++    return [n[0], n[1], n[2], n.length > 3 ? n[3] : null];
++}
++function hsl(r, g, b) {
++    r /= 255; g /= 255; b /= 255;
++    const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
++    if (d === 0) return [0, 0, l];
++    const sat = l > .5 ? d / (2 - max - min) : d / (max + min);
++    const hue = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
++    return [hue * 60, sat, l];
++}
++function hueMap(tok, opts) {
++    const [r, g, b, a] = parseColour(tok);
++    const [h, sat, l] = hsl(r, g, b);
++    const warm = h >= 30 && h <= 62 && sat >= .2;                       // gold, amber, yellow
++    const green = opts.greens && h >= 95 && h <= 190 && sat >= .3;      // green, teal
++    if (!warm && !green) return tok;
++    const base = l < .28 ? [122, 31, 85] : l < .45 ? [176, 45, 120] : l < .62 ? [255, 79, 180] : [255, 112, 195];
++    if (a != null) return `rgba(${base.join(', ')}, ${+a.toFixed(2)})`;
++    return base[0] === 255 && base[1] === 79 ? 'var(--pink)' : base[0] === 255 ? 'var(--pink-bright)' : `rgb(${base.join(', ')})`;
++}
+ const DARK_BG = /#0a0a0a\b/gi;
+ 
+-function recolour(prop, value) {
++function recolour(prop, value, opts = {}) {
+     let out = value;
+     for (const [re, to] of COLOUR_MAP) out = out.replace(re, to);
++    out = out.replace(COLOUR_TOKEN, tok => hueMap(tok, opts));
+     if (/^background(-color)?$/i.test(prop)) out = out.replace(DARK_BG, 'var(--bg-veil)');   // let the cover image show through
+     else out = out.replace(DARK_BG, 'var(--bg)');
+     if (/^font-family$/i.test(prop) && OLD_FONT.test(out)) out = 'var(--font)';
+@@ -62,8 +97,12 @@ const stats = { rules: 0, decls: 0, keyframes: [], sourceGoldDecls: 0 };
+ 
+ // @keyframes that use gold are copied as <name>-arcane (recoloured); scoped rules that run them are pointed at the copy.
+ const GOLD_KEYFRAMES = new Set();
+-function collectGoldKeyframes(root) {
+-    root.walkAtRules(/^(-\w+-)?keyframes$/i, at => { if (GOLD_TEST.test(at.toString())) GOLD_KEYFRAMES.add(at.params); });
++function collectGoldKeyframes(root, opts) {
++    root.walkAtRules(/^(-\w+-)?keyframes$/i, at => {
++        let changes = false;
++        at.walkDecls(d => { if (recolour(d.prop, d.value, opts) !== d.value) changes = true; });
++        if (changes) GOLD_KEYFRAMES.add(at.params);
++    });
+ }
+ function renameAnimations(prop, value) {
+     if (!/^animation(-name)?$/i.test(prop)) return value;
+@@ -72,7 +111,7 @@ function renameAnimations(prop, value) {
+     return out;
+ }
+ 
+-function transform(container, target) {
++function transform(container, target, opts) {
+     container.each(node => {
+         if (node.type === 'rule') {
+             const changed = [];
+@@ -80,7 +119,7 @@ function transform(container, target) {
+                 if (d.type !== 'decl') return;
+                 const isGold = GOLD_TEST.test(d.value);
+                 if (isGold) stats.sourceGoldDecls++;
+-                const next = renameAnimations(d.prop, recolour(d.prop, d.value));
++                const next = renameAnimations(d.prop, recolour(d.prop, d.value, opts));
+                 if (next !== d.value) changed.push({ prop: d.prop, value: next, important: d.important });
+             });
+             if (!changed.length) return;
+@@ -92,11 +131,11 @@ function transform(container, target) {
+             stats.rules++; stats.decls += changed.length;
+         } else if (node.type === 'atrule') {
+             if (/^(-\w+-)?keyframes$/i.test(node.name)) {
+-                if (GOLD_TEST.test(node.toString())) {
++                if (GOLD_KEYFRAMES.has(node.params)) {
+                     const copy = postcss.atRule({ name: node.name, params: `${node.params}-arcane` });
+                     node.walkRules(step => {
+                         const r = postcss.rule({ selector: step.selector });
+-                        step.each(d => { if (d.type === 'decl') r.append(postcss.decl({ prop: d.prop, value: recolour(d.prop, d.value) })); });
++                        step.each(d => { if (d.type === 'decl') r.append(postcss.decl({ prop: d.prop, value: recolour(d.prop, d.value, opts) })); });
+                         copy.append(r);
+                     });
+                     target.append(copy);
+@@ -104,7 +143,7 @@ function transform(container, target) {
+                 }
+             } else if (/^(media|supports|layer)$/i.test(node.name)) {
+                 const shell = postcss.atRule({ name: node.name, params: node.params });
+-                transform(node, shell);
++                transform(node, shell, opts);
+                 if (shell.nodes && shell.nodes.length) target.append(shell);
+             }
+         }
+@@ -113,13 +152,14 @@ function transform(container, target) {
+ 
+ let css = `/* GENERATED by tools/build-arcane-theme.mjs: do not edit by hand.
+    The old gold styling re-coloured for Arcane. Only applies under <body class="theme-arcane">.
+-   Sources: ${SOURCES.join(', ')} */\n\n`;
++   Sources: ${SOURCES.map(s => s.file).join(', ')} */\n\n`;
+ 
+-for (const file of SOURCES) {
++for (const src of SOURCES) {
++    const { file } = src;
+     const root = postcss.parse(fs.readFileSync(file, 'utf8'), { from: file });
+-    collectGoldKeyframes(root);
++    collectGoldKeyframes(root, src);
+     const out = postcss.root();
+-    transform(root, out);
++    transform(root, out, src);
+     css += `/* ===== ${file} ===== */\n${out.toString()}\n\n`;
+ }
+ 
+diff --git a/vote.html b/vote.html
+index 602a6cf..1eb132f 100644
+--- a/vote.html
++++ b/vote.html
+@@ -5,8 +5,8 @@
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     
+     <!-- SEO Meta Tags - DYNAMIC (will be updated by JavaScript) -->
+-    <title>Vote Now | League of Legends Music Tournament | Anthem Arena</title>
+-    <meta name="description" content="Cast your vote in the League of Legends music tournament! Watch and vote between competing songs. Active matches updated daily.">
++    <title>Vote Now | Arcane Moments</title>
++    <meta name="description" content="Cast your vote in the Arcane Moments tournament! Watch the edits head to head and pick your favourite.">
+     <link rel="canonical" href="https://anthemarena.com/vote">
+     
+     <!-- Favicon -->
+@@ -18,8 +18,8 @@
+     <!-- Open Graph - DYNAMIC (updated by JavaScript per match) -->
+     <meta property="og:type" content="website">
+     <meta property="og:url" content="https://anthemarena.com/vote">
+-    <meta property="og:title" content="Vote Now | League of Legends Music Tournament">
+-    <meta property="og:description" content="Cast your vote in the epic League of Legends music battle!">
++    <meta property="og:title" content="Vote Now | Arcane Moments">
++    <meta property="og:description" content="Cast your vote in the Arcane Moments tournament!">
+     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+     <meta property="og:image:alt" content="Anthem Arena - Vote Now">
+     <meta property="og:image:width" content="1200">
+@@ -27,13 +27,13 @@
+     
+     <!-- Twitter Card - DYNAMIC (updated by JavaScript per match) -->
+     <meta name="twitter:card" content="summary_large_image">
+-    <meta name="twitter:title" content="Vote Now | Anthem Arena">
+-    <meta name="twitter:description" content="Cast your vote in the LoL music tournament!">
++    <meta name="twitter:title" content="Vote Now | Arcane Moments">
++    <meta name="twitter:description" content="Cast your vote in the Arcane Moments tournament!">
+     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+     <meta name="twitter:image:alt" content="Vote in the League Music Tournament">
+     
+     <!-- Fonts -->
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+     
+     <!-- Stylesheets -->
+     <link rel="stylesheet" href="/css/main.css">
+@@ -43,6 +43,9 @@
+     <link rel="stylesheet" href="/css/settings.css">
+     <link rel="stylesheet" href="/css/activity.css">
+         <link rel="stylesheet" href="/css/vote.css">
++    <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     
+     <!-- Schema.org Structured Data - VoteAction -->
+@@ -71,7 +74,7 @@
+ 
+     <script type="module" src="/js/global-notifications.js"></script>
+ 
+-<body>
++<body class="theme-arcane">
+ 
+     <div id="nav-placeholder"></div>
+ <script type="module" src="/js/navigation.js"></script>
+@@ -175,7 +178,7 @@
+     id="vote-btn-competitor1"
+     data-competitor="song1">
+     <span class="vote-icon"><i class="fa-solid fa-music"></i></span>
+-    <span class="vote-text">Vote for <span id="vote-song1-name">This Music Video</span></span>
++    <span class="vote-text">Vote for <span id="vote-song1-name">This Edit</span></span>
+ </button>
+ </div>
+ 
+@@ -189,7 +192,7 @@
+                     
+                     <!-- ✅ NEW: About This Song Section -->
+                     <div class="about-song-section" id="competitor1-about">
+-                        <h3 class="details-title">About This Music Video</h3>
++                        <h3 class="details-title">About This Edit</h3>
+                         <p class="about-text" id="competitor1-about-text">Loading...</p>
+                     </div>
+                     
+@@ -270,7 +273,7 @@
+     id="vote-btn-competitor2"
+     data-competitor="song2">
+     <span class="vote-icon"><i class="fa-solid fa-fire"></i></span>
+-    <span class="vote-text">Vote for <span id="vote-song2-name">This Music Video</span></span>
++    <span class="vote-text">Vote for <span id="vote-song2-name">This Edit</span></span>
+ </button>
+ </div>
+ 
+@@ -284,7 +287,7 @@
+                     
+                     <!-- ✅ NEW: About This Song Section -->
+                     <div class="about-song-section" id="competitor2-about">
+-                        <h3 class="details-title">About This Music Video</h3>
++                        <h3 class="details-title">About This Edit</h3>
+                         <p class="about-text" id="competitor2-about-text">Loading...</p>
+                     </div>
+                     
+@@ -400,7 +403,7 @@
+                 <a href="/brackets.html" class="after-voting-card">
+                     <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
+                     <h3>Tournament Bracket</h3>
+-                    <p>See the full bracket and track song progression</p>
++                    <p>See the full bracket and follow every edit's progress</p>
+                     <span class="card-arrow">→</span>
+                 </a>
+                 
+@@ -414,7 +417,7 @@
+                 <a href="/music-gallery.html" class="after-voting-card">
+                     <div class="card-icon"><i class="fa-solid fa-music"></i></div>
+                     <h3>Music Gallery</h3>
+-                    <p>Browse all 64 competing League music videos</p>
++                    <p>Browse every competing edit</p>
+                     <span class="card-arrow">→</span>
+                 </a>
+             </div>

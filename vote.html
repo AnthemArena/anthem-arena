@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags - DYNAMIC (will be updated by JavaScript) -->
-    <title>Vote Now | League of Legends Music Tournament | Anthem Arena</title>
-    <meta name="description" content="Cast your vote in the League of Legends music tournament! Watch and vote between competing songs. Active matches updated daily.">
+    <title>Vote Now | Arcane Moments</title>
+    <meta name="description" content="Cast your vote in the Arcane Moments tournament! Watch the edits head to head and pick your favourite.">
     <link rel="canonical" href="https://anthemarena.com/vote">
     
     <!-- Favicon -->
@@ -18,8 +18,8 @@
     <!-- Open Graph - DYNAMIC (updated by JavaScript per match) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://anthemarena.com/vote">
-    <meta property="og:title" content="Vote Now | League of Legends Music Tournament">
-    <meta property="og:description" content="Cast your vote in the epic League of Legends music battle!">
+    <meta property="og:title" content="Vote Now | Arcane Moments">
+    <meta property="og:description" content="Cast your vote in the Arcane Moments tournament!">
     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
     <meta property="og:image:alt" content="Anthem Arena - Vote Now">
     <meta property="og:image:width" content="1200">
@@ -27,13 +27,13 @@
     
     <!-- Twitter Card - DYNAMIC (updated by JavaScript per match) -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Vote Now | Anthem Arena">
-    <meta name="twitter:description" content="Cast your vote in the LoL music tournament!">
+    <meta name="twitter:title" content="Vote Now | Arcane Moments">
+    <meta name="twitter:description" content="Cast your vote in the Arcane Moments tournament!">
     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
     <meta name="twitter:image:alt" content="Vote in the League Music Tournament">
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/main.css">
@@ -43,6 +43,9 @@
     <link rel="stylesheet" href="/css/settings.css">
     <link rel="stylesheet" href="/css/activity.css">
         <link rel="stylesheet" href="/css/vote.css">
+    <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Schema.org Structured Data - VoteAction -->
@@ -71,7 +74,7 @@
 
     <script type="module" src="/js/global-notifications.js"></script>
 
-<body>
+<body class="theme-arcane">
 
     <div id="nav-placeholder"></div>
 <script type="module" src="/js/navigation.js"></script>
@@ -175,7 +178,7 @@
     id="vote-btn-competitor1"
     data-competitor="song1">
     <span class="vote-icon"><i class="fa-solid fa-music"></i></span>
-    <span class="vote-text">Vote for <span id="vote-song1-name">This Music Video</span></span>
+    <span class="vote-text">Vote for <span id="vote-song1-name">This Edit</span></span>
 </button>
 </div>
 
@@ -189,7 +192,7 @@
                     
                     <!-- ✅ NEW: About This Song Section -->
                     <div class="about-song-section" id="competitor1-about">
-                        <h3 class="details-title">About This Music Video</h3>
+                        <h3 class="details-title">About This Edit</h3>
                         <p class="about-text" id="competitor1-about-text">Loading...</p>
                     </div>
                     
@@ -270,7 +273,7 @@
     id="vote-btn-competitor2"
     data-competitor="song2">
     <span class="vote-icon"><i class="fa-solid fa-fire"></i></span>
-    <span class="vote-text">Vote for <span id="vote-song2-name">This Music Video</span></span>
+    <span class="vote-text">Vote for <span id="vote-song2-name">This Edit</span></span>
 </button>
 </div>
 
@@ -284,7 +287,7 @@
                     
                     <!-- ✅ NEW: About This Song Section -->
                     <div class="about-song-section" id="competitor2-about">
-                        <h3 class="details-title">About This Music Video</h3>
+                        <h3 class="details-title">About This Edit</h3>
                         <p class="about-text" id="competitor2-about-text">Loading...</p>
                     </div>
                     
@@ -400,7 +403,7 @@
                 <a href="/brackets.html" class="after-voting-card">
                     <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
                     <h3>Tournament Bracket</h3>
-                    <p>See the full bracket and track song progression</p>
+                    <p>See the full bracket and follow every edit's progress</p>
                     <span class="card-arrow">→</span>
                 </a>
                 
@@ -414,7 +417,7 @@
                 <a href="/music-gallery.html" class="after-voting-card">
                     <div class="card-icon"><i class="fa-solid fa-music"></i></div>
                     <h3>Music Gallery</h3>
-                    <p>Browse all 64 competing League music videos</p>
+                    <p>Browse every competing edit</p>
                     <span class="card-arrow">→</span>
                 </a>
             </div>

@@ -297,7 +297,7 @@ async function updateTournamentInfo(allMatches) {
             const liveRound = Math.max(...liveMatches.map(m => m.round));
             const roundName = getRoundName(liveRound);
             
-            statusText = `🔴 ${roundName} - ${liveMatches.length} Live ${liveMatches.length === 1 ? 'Match' : 'Matches'}`;
+            statusText = `<span class="live-dot"></span>${roundName} - ${liveMatches.length} Live ${liveMatches.length === 1 ? 'Match' : 'Matches'}`;
             statusClass = 'status-live';
             
         } else if (upcomingMatches > 0) {
@@ -455,7 +455,7 @@ function createMatchCardFromFirebase(match, byId = new Map()) {
                     ${userHasVoted ? `
                         <span class="status-badge voted">✓ View Match</span>
                     ` : `
-                        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
+                        <span class="status-badge active"><span class="live-dot"></span>LIVE - Vote Now!</span>
                     `}
                 `}
             </div>
@@ -519,11 +519,7 @@ function generateTournamentStats(allMatches) {
     
     try {
         const completedMatches = allMatches.filter(m => m.status === 'completed');
-        
-        if (completedMatches.length === 0) {
-            console.log('⚠️ No completed matches yet');
-            return;
-        }
+        // With no completed matches yet the loops below find nothing, so only the "Current Round" card is filled in.
         
         // Check if finals are complete
         const finalsMatch = allMatches.find(m => m.round === bracketInfo.totalRounds && m.status === 'completed');
@@ -601,7 +597,7 @@ function updateStatsDisplay(stats) {
         if (stats.finalsWinner) {
             // Tournament complete - show champion
             leaderCard.innerHTML = `
-                <div class="stat-icon">👑</div>
+                <div class="stat-icon"><i class="fa-solid fa-crown"></i></div>
                 <div class="stat-value">${esc(stats.finalsWinner.shortTitle)}</div>
                 <div class="stat-label">Tournament Champion</div>
                 <div class="stat-detail">${esc(stats.finalsWinner.artist)}${stats.finalsWinner.year ? ' • ' + esc(stats.finalsWinner.year) : ''}</div>
@@ -610,7 +606,7 @@ function updateStatsDisplay(stats) {
             // Tournament in progress - show current round
             const roundName = getRoundName(stats.activeRound);
             leaderCard.innerHTML = `
-                <div class="stat-icon">🎯</div>
+                <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
                 <div class="stat-value">${roundName}</div>
                 <div class="stat-label">Current Round</div>
                 <div class="stat-detail">${stats.totalCompleted} of ${stats.totalMatches} completed</div>
@@ -623,10 +619,10 @@ function updateStatsDisplay(stats) {
     if (closestCard && stats.closestMatch) {
         const song1IsTBD = stats.closestMatch.song1.id === 'TBD';
         const song2IsTBD = stats.closestMatch.song2.id === 'TBD';
-        const matchName = `${song1IsTBD ? 'TBD' : stats.closestMatch.song1.shortTitle} vs ${song2IsTBD ? 'TBD' : stats.closestMatch.song2.shortTitle}`;
+        const matchName = esc(`${song1IsTBD ? 'TBD' : stats.closestMatch.song1.shortTitle} vs ${song2IsTBD ? 'TBD' : stats.closestMatch.song2.shortTitle}`);
         
         closestCard.innerHTML = `
-            <div class="stat-icon">🔥</div>
+            <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
             <div class="stat-value">${Math.round(50 + stats.closestMargin/2)}%</div>
             <div class="stat-label">Closest Match</div>
             <div class="stat-detail">${matchName}</div>
@@ -646,10 +642,10 @@ function updateStatsDisplay(stats) {
         const loserIsTBD = loser.id === 'TBD';
         
         dominantCard.innerHTML = `
-            <div class="stat-icon">⚡</div>
+            <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
             <div class="stat-value">${Math.round(50 + stats.highestMargin/2)}%</div>
             <div class="stat-label">Most Dominant Win</div>
-            <div class="stat-detail">${winner.shortTitle} over ${loserIsTBD ? 'TBD' : loser.shortTitle}</div>
+            <div class="stat-detail">${esc(winner.shortTitle)} over ${esc(loserIsTBD ? 'TBD' : loser.shortTitle)}</div>
         `;
     }
     
@@ -659,10 +655,10 @@ function updateStatsDisplay(stats) {
         const roundName = getRoundName(stats.mostVoted.round);
         const song1IsTBD = stats.mostVoted.song1.id === 'TBD';
         const song2IsTBD = stats.mostVoted.song2.id === 'TBD';
-        const matchName = `${song1IsTBD ? 'TBD' : stats.mostVoted.song1.shortTitle} vs ${song2IsTBD ? 'TBD' : stats.mostVoted.song2.shortTitle}`;
+        const matchName = esc(`${song1IsTBD ? 'TBD' : stats.mostVoted.song1.shortTitle} vs ${song2IsTBD ? 'TBD' : stats.mostVoted.song2.shortTitle}`);
         
         votedCard.innerHTML = `
-            <div class="stat-icon">📊</div>
+            <div class="stat-icon"><i class="fa-solid fa-chart-column"></i></div>
             <div class="stat-value">${stats.highestVotes.toLocaleString()}</div>
             <div class="stat-label">Most Voted Match</div>
             <div class="stat-detail">${matchName} (${roundName})</div>
