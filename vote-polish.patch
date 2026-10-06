@@ -1,0 +1,64 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index dade3f1..0b79031 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -356,15 +356,19 @@ body.theme-arcane #time-remaining.is-live {
+     background: var(--pink-soft);
+ }
+ body.theme-arcane #time-remaining.is-live i { color: var(--pink); filter: drop-shadow(0 0 6px rgba(255, 79, 180, .8)); }
++/* .vote-stats is only a wrapper (the header total AND each edit's percentage use it), so it gets no box.
++   The pill is the .info-badge inside it. */
+ body.theme-arcane .vote-stats {
+-    background: var(--panel);
+-    border: 1px solid var(--border);
+-    border-radius: 999px;
++    background: none;
++    border: 0;
++    border-radius: 0;
++    box-shadow: none;
++    backdrop-filter: none;
++    -webkit-backdrop-filter: none;
+     color: var(--muted);
+     font-family: var(--font);
+-    backdrop-filter: blur(12px);
+-    -webkit-backdrop-filter: blur(12px);
+ }
++body.theme-arcane .vote-header .vote-stats { text-align: center; }
+ 
+ /* the "Vote Recorded" banner is styled inline by the script, so this needs !important */
+ body.theme-arcane .voted-indicator {
+@@ -446,10 +450,10 @@ body.theme-arcane .vote-btn.voted {
+ }
+ body.theme-arcane .vote-btn[disabled]:not(.voted) {
+     background: rgba(255, 255, 255, .05);
+-    color: var(--text-faint);
+-    border: 1px solid var(--line);
++    color: var(--muted);
++    border: 1px solid rgba(255, 255, 255, .14);
+     box-shadow: none;
+-    opacity: .75;
++    opacity: 1;
+     filter: none;
+ }
+ 
+@@ -466,9 +470,10 @@ body.theme-arcane .share-title {
+ body.theme-arcane .share-title { text-align: center; }
+ body.theme-arcane .about-text,
+ body.theme-arcane .accomplishments-text { font-family: var(--font); font-style: normal; color: var(--muted); line-height: 1.6; }
+-body.theme-arcane .about-song-section,
+-body.theme-arcane .accomplishments-section,
+ body.theme-arcane .moment-details { background: var(--card); border: 1px solid var(--line); border-radius: 18px; }
++/* these sit inside .moment-details, so they must not draw a second box */
++body.theme-arcane .about-song-section { background: none; border: 0; border-radius: 0; }
++body.theme-arcane .accomplishments-section { background: none; border-width: 0 0 1px; border-radius: 0; }
+ body.theme-arcane .meta-item {
+     font-family: var(--font);
+     background: rgba(255, 255, 255, .04);
+@@ -498,6 +503,7 @@ body.theme-arcane .after-voting-card {
+     transition: transform 180ms ease, border-color 180ms ease;
+ }
+ body.theme-arcane .after-voting-card:hover { transform: translateY(-3px); border-color: rgba(255, 79, 180, .5); background: var(--panel); }
++body.theme-arcane .after-voting-section .section-title { color: var(--text); }
+ body.theme-arcane .after-voting-card h3 { font-family: var(--font); font-weight: 800; letter-spacing: -.02em; color: var(--text); text-transform: none; }
+ body.theme-arcane .after-voting-card p { color: var(--muted); }
+ body.theme-arcane .after-voting-section .card-icon,

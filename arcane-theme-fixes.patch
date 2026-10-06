@@ -1,0 +1,216 @@
+diff --git a/brackets.html b/brackets.html
+index fa49c9b..bea66d7 100644
+--- a/brackets.html
++++ b/brackets.html
+@@ -5,8 +5,8 @@
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     
+     <!-- SEO Meta Tags -->
+-    <title>Tournament Bracket | League of Legends Music Battle | Anthem Arena</title>
+-    <meta name="description" content="Explore the complete tournament bracket showing all League of Legends music matchups. Track your favorite songs' path to victory from Round 1 to the finals.">
++    <title>Tournament Bracket | Arcane Moments</title>
++    <meta name="description" content="Explore the full Arcane Moments tournament bracket: every matchup, from the first round to the champion.">
+     <link rel="canonical" href="https://anthemarena.com/brackets">
+     
+     <!-- Favicon -->
+@@ -18,8 +18,8 @@
+     <!-- Open Graph -->
+     <meta property="og:type" content="website">
+     <meta property="og:url" content="https://anthemarena.com/brackets">
+-    <meta property="og:title" content="Tournament Bracket | Anthem Arena">
+-    <meta property="og:description" content="View the complete League of Legends music tournament bracket. Track matchups, results, and the path to championship glory.">
++    <meta property="og:title" content="Tournament Bracket | Arcane Moments">
++    <meta property="og:description" content="View the full Arcane Moments tournament bracket. Track matchups, results and the road to the champion.">
+     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+     <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Tournament Bracket">
+     <meta property="og:image:width" content="1200">
+@@ -27,8 +27,8 @@
+     
+     <!-- Twitter Card -->
+     <meta name="twitter:card" content="summary_large_image">
+-    <meta name="twitter:title" content="Tournament Bracket | Anthem Arena">
+-    <meta name="twitter:description" content="View the complete LoL music tournament bracket and track your favorite songs.">
++    <meta name="twitter:title" content="Tournament Bracket | Arcane Moments">
++    <meta name="twitter:description" content="View the full Arcane Moments tournament bracket and follow your favourite edits.">
+     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+     <meta name="twitter:image:alt" content="Anthem Arena Tournament Bracket">
+     
+@@ -259,7 +259,7 @@
+                 <a href="/matches.html" class="explore-card-bracket">
+                     <div class="card-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+                     <h3>Vote in Active Matches</h3>
+-                    <p>Cast your vote and influence which songs advance to the next round</p>
++                    <p>Cast your vote and influence which edits advance to the next round</p>
+                 </a>
+                 <a href="/matches.html" class="explore-card-bracket">
+                     <div class="card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+@@ -268,13 +268,13 @@
+                 </a>
+                 <a href="/music-gallery.html" class="explore-card-bracket">
+                     <div class="card-icon"><i class="fa-solid fa-music"></i></div>
+-                    <h3>Browse All Songs</h3>
+-                    <p>Explore the complete collection of 64 League music videos in the tournament</p>
++                    <h3>Browse All Edits</h3>
++                    <p>Preview every edit competing in the tournament</p>
+                 </a>
+                 <a href="/my-votes.html" class="explore-card-bracket">
+                     <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
+                     <h3>Your Voting History</h3>
+-                    <p>Track your predictions and see how your favorite songs are performing</p>
++                    <p>Track your votes and see how your favourite edits are performing</p>
+                 </a>
+             </div>
+         </div>
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 7b7c73f..2953098 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -29,32 +29,45 @@
+     --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+ }
+ 
+-/* ---------- page background: cover image + pink glow (as on the homepage) ---------- */
++/* ---------- page background: cover image + pink glow (as on the homepage) ----------
++   The background lives on <body> itself, with fixed layers. main.css gives <html> its own background, which stops
++   <body>'s background reaching the screen edges and hides anything placed behind it with a negative z-index,
++   so the older "pseudo-element behind the page" approach cannot work on these pages. */
++html:has(body.theme-arcane) { background: var(--bg); }
+ body.theme-arcane {
+-    background: var(--bg);                 /* must stay opaque: it is the canvas colour */
++    min-height: 100vh;
+     color: var(--text);
+     font-family: var(--font);
+-}
+-body.theme-arcane::before {
+-    content: "";
+-    position: fixed;
+-    inset: 0;
+-    z-index: -4;
+-    pointer-events: none;
+-    background: linear-gradient(180deg, rgba(5, 6, 14, .57), rgba(5, 6, 14, .92)), url("/cover.png") center / cover no-repeat;
+-}
+-body.theme-arcane::after {
+-    content: "";
+-    position: fixed;
+-    inset: 0;
+-    z-index: -3;
+-    pointer-events: none;
+-    background:
++    background-color: var(--bg);
++    background-image:
+         radial-gradient(circle at 50% 15%, rgba(255, 79, 180, .11), transparent 42%),
+         radial-gradient(420px 420px at -2% 40%, rgba(255, 79, 180, .15), transparent 70%),
+-        radial-gradient(420px 420px at 102% 70%, rgba(255, 79, 180, .13), transparent 70%);
++        radial-gradient(420px 420px at 102% 70%, rgba(255, 79, 180, .13), transparent 70%),
++        linear-gradient(180deg, rgba(5, 6, 14, .57), rgba(5, 6, 14, .92)),
++        url("/cover.png");
++    background-repeat: no-repeat;
++    background-size: auto, auto, auto, cover, cover;
++    background-position: 0 0, 0 0, 0 0, center, center;
++    background-attachment: fixed;
+ }
+ 
++/* every full-width section must be see-through, or it paints over the cover */
++body.theme-arcane .brackets-header,
++body.theme-arcane .bracket-loading-state,
++body.theme-arcane .bracket-section,
++body.theme-arcane .tournament-stats,
++body.theme-arcane .champion-spotlight,
++body.theme-arcane .explore-more-bracket {
++    background: transparent;
++}
++body.theme-arcane .page-intro {
++    background: rgba(6, 7, 14, .45);
++    backdrop-filter: blur(6px);
++    -webkit-backdrop-filter: blur(6px);
++    border-bottom: 1px solid var(--line);
++}
++body.theme-arcane .explore-more-bracket { border-top: 1px solid var(--line); }
++
+ /* ---------- headings: bold Inter, tight tracking; small pink "eyebrow" labels ---------- */
+ body.theme-arcane .page-title,
+ body.theme-arcane .section-title {
+@@ -231,3 +244,61 @@ body.theme-arcane .stat-detail { color: var(--text-faint); }
+ body.theme-arcane .page-intro a,
+ body.theme-arcane .inline-link { color: var(--pink-bright); }
+ body.theme-arcane .page-intro p { color: var(--muted); }
++
++
++/* ---------- explore cards (homepage: panel cards that lift and glow pink on hover) ---------- */
++body.theme-arcane .explore-more-bracket .section-title { color: var(--text); text-align: center; }
++body.theme-arcane .explore-card-bracket {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 18px;
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
++}
++body.theme-arcane .explore-card-bracket:hover {
++    background: var(--panel);
++    border-color: rgba(255, 79, 180, .5);
++    transform: translateY(-3px);
++    box-shadow: 0 20px 44px rgba(0, 0, 0, .38), 0 0 0 1px rgba(255, 79, 180, .2);
++}
++body.theme-arcane .explore-card-bracket h3 { font-family: var(--font); font-weight: 800; letter-spacing: -.02em; color: var(--text); }
++body.theme-arcane .explore-card-bracket p { color: var(--muted); }
++body.theme-arcane .card-icon i { color: var(--pink-bright); }
++
++/* ---------- status colours: the old CSS sets red / blue / green with !important, so these must too ---------- */
++body.theme-arcane .info-value.status-live      { color: var(--pink-bright) !important; animation: none; }
++body.theme-arcane .info-value.status-upcoming  { color: var(--muted) !important; }
++body.theme-arcane .info-value.status-completed { color: var(--pink-bright) !important; }
++body.theme-arcane .live-dot {
++    display: inline-block;
++    width: .6em;
++    height: .6em;
++    margin-right: .5em;
++    border-radius: 50%;
++    background: var(--pink);
++    box-shadow: 0 0 12px rgba(255, 79, 180, .7);
++    animation: arcane-dot 1.1s infinite ease-in-out;
++    vertical-align: .08em;
++}
++@keyframes arcane-dot { 0%, 100% { transform: scale(.72); opacity: .5; } 50% { transform: scale(1); opacity: 1; } }
++body.theme-arcane .status-badge .live-dot { background: #160814; box-shadow: none; }
++
++/* stat icons: one colour, not blue / red / orange / gold */
++body.theme-arcane .stat-card .stat-icon i { color: var(--pink-bright); }
++
++/* ---------- live + "you voted" states: pink instead of green ---------- */
++@keyframes arcane-ring {
++    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 79, 180, .4), 0 14px 40px rgba(255, 79, 180, .14); }
++    50%      { box-shadow: 0 0 0 10px rgba(255, 79, 180, 0), 0 14px 40px rgba(255, 79, 180, .14); }
++}
++body.theme-arcane .matchup-card.live {
++    background: var(--card);
++    border-color: rgba(255, 79, 180, .55);
++    animation: arcane-ring 2s infinite;
++}
++body.theme-arcane .matchup-card.upcoming { opacity: .85; border-color: var(--line); }
++body.theme-arcane .matchup-card.finals-match { border-width: 1px; border-color: rgba(255, 79, 180, .45); background: var(--card); }
++body.theme-arcane .live-indicator { color: var(--pink-bright); }
++body.theme-arcane .competitor.leading { background: var(--pink-soft); border: 1px solid rgba(255, 79, 180, .35); }
+diff --git a/js/brackets.js b/js/brackets.js
+index bc1afd6..dc206bb 100644
+--- a/js/brackets.js
++++ b/js/brackets.js
+@@ -297,7 +297,7 @@ async function updateTournamentInfo(allMatches) {
+             const liveRound = Math.max(...liveMatches.map(m => m.round));
+             const roundName = getRoundName(liveRound);
+             
+-            statusText = `🔴 ${roundName} - ${liveMatches.length} Live ${liveMatches.length === 1 ? 'Match' : 'Matches'}`;
++            statusText = `<span class="live-dot"></span>${roundName} - ${liveMatches.length} Live ${liveMatches.length === 1 ? 'Match' : 'Matches'}`;
+             statusClass = 'status-live';
+             
+         } else if (upcomingMatches > 0) {
+@@ -455,7 +455,7 @@ function createMatchCardFromFirebase(match, byId = new Map()) {
+                     ${userHasVoted ? `
+                         <span class="status-badge voted">✓ View Match</span>
+                     ` : `
+-                        <span class="status-badge active">🔴 LIVE - Vote Now!</span>
++                        <span class="status-badge active"><span class="live-dot"></span>LIVE - Vote Now!</span>
+                     `}
+                 `}
+             </div>

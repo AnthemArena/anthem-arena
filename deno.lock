@@ -11,7 +11,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@netlify/blobs@7"
+        "npm:@netlify/blobs@7",
+        "npm:postcss@^8.4.0"
       ]
     }
   }
