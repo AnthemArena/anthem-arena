@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>Match Results & Schedule | LoL Music Tournament | Anthem Arena</title>
-    <meta name="description" content="View all League of Legends music tournament matches, results, and schedules. See which songs are winning and track upcoming battles in the bracket.">
+    <title>Match Archive | Arcane Moments</title>
+    <meta name="description" content="View every Arcane Moments match, result and schedule. See which edits are winning and cast your vote.">
     <link rel="canonical" href="https://anthemarena.com/matches">
     
     <!-- Favicon -->
@@ -19,22 +19,22 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://anthemarena.com/matches">
-    <meta property="og:title" content="Match Results & Schedule | Anthem Arena">
-    <meta property="og:description" content="Browse all League of Legends music tournament matchups, live results, and voting history. Track your favorite songs' performance.">
+    <meta property="og:title" content="Match Archive | Arcane Moments">
+    <meta property="og:description" content="Browse every Arcane Moments matchup, live results and voting history.">
     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-    <meta property="og:image:alt" content="Anthem Arena - LoL Music Tournament Match Archive">
+    <meta property="og:image:alt" content="Arcane Moments match archive">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Match Results & Schedule | Anthem Arena">
-    <meta name="twitter:description" content="View all LoL music tournament matches and results.">
+    <meta name="twitter:title" content="Match Archive | Arcane Moments">
+    <meta name="twitter:description" content="View every Arcane Moments match and result.">
     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
-    <meta name="twitter:image:alt" content="Anthem Arena Match Archive">
+    <meta name="twitter:image:alt" content="Arcane Moments match archive">
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Stylesheets -->
@@ -44,6 +44,9 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+    <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 
     
     <!-- Schema.org Structured Data - ItemList -->
@@ -66,7 +69,7 @@
 
     <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body>
+<body class="theme-arcane">
 
     <div id="nav-placeholder"></div>
 <script type="module" src="/js/navigation.js"></script>
@@ -75,8 +78,8 @@
     <section class="matches-header">
         <div class="container">
             <div class="header-content">
-                <h1 class="page-title">Anthem Arena Match Archive</h1>
-                <p class="page-subtitle">Browse every epic showdown in tournament history</p>
+                <h1 class="page-title">Match Archive</h1>
+                <p class="page-subtitle">Every matchup, live or finished</p>
             </div>
 
            <!-- Stats Overview -->
@@ -95,7 +98,7 @@
     </div>
     <div class="stat-item">
         <span class="stat-number" id="unique-videos">0</span>
-        <span class="stat-label">Unique Videos</span>
+        <span class="stat-label">Unique Edits</span>
     </div>
 </div>
         </div>
@@ -107,12 +110,12 @@
     <section class="page-intro">
         <div class="container">
             <p>
-                Browse all League of Legends music tournament matches from Anthem Arena. 
-                Click any active match to cast your vote and influence the results. 
+                Browse every Arcane Moments matchup. 
+                Click any live match to cast your vote and influence the results. 
                 View the <a href="/brackets.html">full tournament bracket</a> to see progression 
-                through each round, explore the <a href="/music-gallery.html">complete music gallery</a> 
-                to preview all 64 competing songs, or check <a href="/stats.html">detailed statistics</a> 
-                for voting trends and song performance. Track your personal voting history on the 
+                through each round, explore the <a href="/music-gallery.html">gallery</a> 
+                to preview every competing edit, or check <a href="/stats.html">detailed statistics</a> 
+                for voting trends and edit performance. Track your personal voting history on the 
                 <a href="/my-votes.html">my votes page</a>.
             </p>
         </div>
@@ -131,7 +134,7 @@
                         type="text" 
                         id="search-input" 
                         class="search-input" 
-                        placeholder="Search music videos, artists, categories..."
+                        placeholder="Search edits or creators..."
                         onkeyup="filterMatches()"
                     >
                     <button class="search-button">
@@ -146,7 +149,6 @@
                     <label class="filter-label">Tournament:</label>
                     <select id="tournament-filter" class="filter-select" onchange="filterMatches()">
                         <option value="all">All Tournaments</option>
-                        <option value="worlds-anthems-2025">Anthem Arena Championship S1</option>
                  
                     </select>
                 </div>
@@ -155,10 +157,6 @@
                     <label class="filter-label">Round:</label>
                     <select id="round-filter" class="filter-select" onchange="filterMatches()">
                         <option value="all">All Rounds</option>
-                        <option value="finals">Finals</option>
-                        <option value="semifinals">Semifinals</option>
-                        <option value="quarterfinals">Quarterfinals</option>
-                        <option value="round-1">Round 1</option>
                     </select>
                 </div>
 
@@ -228,19 +226,19 @@
                 <a href="/brackets.html" class="quick-link-card">
                     <div class="link-icon"><i class="fa-solid fa-chart-column"></i></div>
                     <h3>Tournament Bracket</h3>
-                    <p>Visualize the complete bracket structure and see how songs advance through each round</p>
+                    <p>Visualize the complete bracket and see how edits advance through each round</p>
                     <span class="link-arrow">→</span>
                 </a>
                 <a href="/stats.html" class="quick-link-card">
                     <div class="link-icon"><i class="fa-solid fa-chart-line"></i></div>
                     <h3>Statistics Dashboard</h3>
-                    <p>Analyze voting patterns, upsets, participation rates, and song performance metrics</p>
+                    <p>Analyze voting patterns, upsets, participation rates and edit performance</p>
                     <span class="link-arrow">→</span>
                 </a>
                 <a href="/music-gallery.html" class="quick-link-card">
                     <div class="link-icon"><i class="fa-solid fa-music"></i></div>
-                    <h3>Music Gallery</h3>
-                    <p>Browse all 64 League music videos organized by virtual band and release year</p>
+                    <h3>Gallery</h3>
+                    <p>Preview every edit competing in the tournament</p>
                     <span class="link-arrow">→</span>
                 </a>
                 <a href="/my-votes.html" class="quick-link-card">

@@ -7,6 +7,9 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
+// Bell icon: inline SVG so it takes the theme colour (the old 🔔 emoji was always yellow)
+const BELL_ICON = '<svg class="nav-bell-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22zm7-6v-5a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></svg>';
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Navigation DOMContentLoaded fired');
     
@@ -14,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 <nav class="main-nav">
     <div class="nav-container">
         <a href="/index.html" class="logo-link">
-            <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
+            <img src="/logo.png" alt="Arcane Moments" class="site-logo">
         </a>
         
         <ul class="nav-links">
@@ -64,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 
                 <!-- ✅ Notification Bell INSIDE profile card -->
                 <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: none;">
-                    <span style="font-size: 20px;">🔔</span>
+                    ${BELL_ICON}
                     <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
                 </div>
                 
@@ -302,7 +305,7 @@ async function updateNavProfile() {
          style="position: relative; margin: 0 12px; display: block;">
         <div class="notification-bell" id="notificationBell" 
              style="position: relative; cursor: pointer; display: block;">
-            <span style="font-size: 20px;">🔔</span>
+            ${BELL_ICON}
             <span class="notification-badge" id="notificationBadge" 
                   style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
         </div>
@@ -354,7 +357,7 @@ async function updateNavProfile() {
          style="position: relative; margin: 0 12px; display: block;">
         <div class="notification-bell" id="notificationBell" 
              style="position: relative; cursor: pointer; display: block;">
-            <span style="font-size: 20px;">🔔</span>
+            ${BELL_ICON}
             <span class="notification-badge" id="notificationBadge" 
                   style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
         </div>

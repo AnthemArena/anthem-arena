@@ -1,0 +1,1000 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 8ec090c..7b59906 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -809,3 +809,138 @@ body.theme-arcane .quick-link-card .link-icon,
+ body.theme-arcane .quick-link-card .link-icon i,
+ body.theme-arcane .quick-link-card .link-arrow { color: var(--pink-bright); }
+ body.theme-arcane .quick-links-section .section-title { color: var(--text); text-align: center; }
++
++
++/* ========================================
++   LIVE PAGE (live.html + js/live.js)
++   ======================================== */
++body.theme-arcane .social-container { background: transparent; }
++
++/* round banner (text and countdown now come from the live matches) */
++body.theme-arcane .countdown-banner {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++}
++body.theme-arcane .countdown-content { font-family: var(--font); font-weight: 700; color: var(--text); }
++body.theme-arcane .countdown-content strong { color: var(--pink-bright); }
++body.theme-arcane #countdownTimer { font-family: var(--font); color: var(--pink-bright); font-variant-numeric: tabular-nums; }
++
++/* header + follow bar */
++body.theme-arcane .hero-header { background: transparent; }
++body.theme-arcane .hero-header h1 {
++    font-family: var(--font);
++    font-weight: 800;
++    letter-spacing: -.045em;
++    text-transform: none;
++    font-variant: normal;
++    text-shadow: none;
++    color: var(--text);
++}
++body.theme-arcane .hero-header h1 i { color: var(--pink-bright); }
++body.theme-arcane .hero-header p { font-family: var(--font); color: var(--muted); }
++body.theme-arcane .social-follow-bar { background: var(--card); border: 1px solid var(--line); border-radius: 999px; font-family: var(--font); }
++body.theme-arcane .follow-label { font-family: var(--font); font-weight: 700; color: var(--muted); }
++body.theme-arcane .social-icon { border: 1px solid var(--border); background: rgba(255, 255, 255, .03); color: var(--pink-bright); }
++body.theme-arcane .social-icon:hover { background: var(--pink-soft); border-color: var(--pink-bright); color: var(--text); }
++
++/* ticker + community activity */
++body.theme-arcane .activity-ticker,
++body.theme-arcane .mini-activity-feed { background: var(--card); border: 1px solid var(--line); border-radius: 16px; font-family: var(--font); }
++body.theme-arcane .mini-activity-card { background: rgba(255, 255, 255, .03); border: 1px solid var(--line); border-radius: 12px; }
++body.theme-arcane .feed-header { font-family: var(--font); font-weight: 800; letter-spacing: -.02em; color: var(--text); }
++body.theme-arcane .feed-header i,
++body.theme-arcane .see-all { color: var(--pink-bright); }
++body.theme-arcane .activity-ticker .highlight { color: var(--pink-bright); }
++body.theme-arcane .mini-user { font-family: var(--font); font-weight: 700; }
++body.theme-arcane .mini-song,
++body.theme-arcane .mini-time { font-family: var(--font); color: var(--muted); }
++
++/* section headings: white, with pink icons */
++body.theme-arcane .unvoted-header,
++body.theme-arcane .voted-header h2,
++body.theme-arcane .completion-banner h3,
++body.theme-arcane .no-matches h2 {
++    font-family: var(--font);
++    font-weight: 800;
++    letter-spacing: -.03em;
++    font-variant: normal;
++    text-transform: none;
++    color: var(--text);
++}
++body.theme-arcane .header-icon,
++body.theme-arcane .voted-header i,
++body.theme-arcane .completion-banner i { color: var(--pink-bright); }
++
++/* progress bar */
++body.theme-arcane .progress-bar { background: rgba(255, 255, 255, .08); border-radius: 999px; }
++body.theme-arcane .progress-fill { background: linear-gradient(90deg, var(--pink), var(--pink-bright)); border-radius: 999px; box-shadow: 0 0 14px rgba(255, 79, 180, .45); }
++body.theme-arcane .progress-text { font-family: var(--font); color: var(--muted); }
++
++/* completion banner */
++body.theme-arcane .completion-banner {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++}
++body.theme-arcane .completion-banner p { font-family: var(--font); color: var(--muted); }
++
++/* match cards */
++body.theme-arcane .social-match-card {
++    background: var(--card);
++    border: 1px solid var(--line);
++    border-radius: 18px;
++    box-shadow: 0 14px 34px rgba(0, 0, 0, .24);
++    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
++}
++body.theme-arcane .social-match-card:hover { transform: translateY(-3px); border-color: rgba(255, 79, 180, .4); box-shadow: 0 20px 44px rgba(0, 0, 0, .38); }
++body.theme-arcane .social-match-card.voted { border-color: rgba(255, 79, 180, .5); }
++body.theme-arcane .social-thumbnails img { border-radius: 10px; }
++body.theme-arcane .social-thumbnails img.user-pick { border-color: var(--pink-bright); box-shadow: 0 0 20px rgba(255, 79, 180, .45); }
++body.theme-arcane .social-vs { font-family: var(--font); font-weight: 800; letter-spacing: .12em; color: var(--pink-bright); text-shadow: none; }
++body.theme-arcane .song-details h3 {
++    font-family: var(--font);
++    font-weight: 700;
++    line-height: 1.3;
++    overflow-wrap: anywhere;
++    display: -webkit-box;
++    -webkit-line-clamp: 2;
++    -webkit-box-orient: vertical;
++    overflow: hidden;
++    color: var(--text);
++}
++body.theme-arcane .song-details p { font-family: var(--font); color: var(--muted); }
++body.theme-arcane .social-info .vs-divider { font-family: var(--font); color: var(--text-faint); }
++body.theme-arcane .social-stats { font-family: var(--font); font-weight: 700; background: var(--pink-soft); border-top: 1px solid var(--border); color: var(--pink-bright); }
++
++/* no-matches state + footer link tiles + action buttons */
++body.theme-arcane .no-matches { background: transparent; }
++body.theme-arcane .no-matches p { font-family: var(--font); color: var(--muted); }
++body.theme-arcane .no-matches-icon { color: var(--pink-bright); }
++body.theme-arcane .action-btn.primary {
++    font-family: var(--font);
++    font-weight: 800;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border: 0;
++    border-radius: 999px;
++}
++body.theme-arcane .action-btn.secondary {
++    font-family: var(--font);
++    font-weight: 700;
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid rgba(255, 255, 255, .13);
++    border-radius: 999px;
++    color: var(--text);
++}
++body.theme-arcane .action-btn.secondary:hover { background: var(--pink-soft); border-color: var(--border); }
++body.theme-arcane .landing-footer { background: transparent; border-top: 1px solid var(--line); }
++body.theme-arcane .footer-link-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; font-family: var(--font); color: var(--text); }
++body.theme-arcane .footer-link-card:hover { border-color: rgba(255, 79, 180, .5); transform: translateY(-3px); }
++body.theme-arcane .footer-link-card .link-icon { color: var(--pink-bright); }
++body.theme-arcane .inline-link { color: var(--pink-bright); }
+diff --git a/css/arcane-theme.generated.css b/css/arcane-theme.generated.css
+index ce181c6..ddd0fde 100644
+--- a/css/arcane-theme.generated.css
++++ b/css/arcane-theme.generated.css
+@@ -1,6 +1,6 @@
+ /* GENERATED by tools/build-arcane-theme.mjs: do not edit by hand.
+    The old gold styling re-coloured for Arcane. Only applies under <body class="theme-arcane">.
+-   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css, css/activity.css, css/vote.css, css/matches.css */
++   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css, css/activity.css, css/vote.css, css/matches.css, css/live.css */
+ 
+ /* ===== css/main.css ===== */
+ body.theme-arcane {
+@@ -2475,3 +2475,510 @@ body.theme-arcane .quick-link-card:nth-child(4) .link-icon i {
+     color: var(--pink-bright)
+ }
+ 
++/* ===== css/live.css ===== */
++body.theme-arcane {
++    font-family: var(--font)
++}
++body.theme-arcane .loading-spinner {
++    border: 4px solid rgba(255, 79, 180, 0.2);
++    border-top-color: var(--pink-bright)
++}
++body.theme-arcane .error-state h2 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .retry-button {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    font-family: var(--font)
++}
++body.theme-arcane .retry-button:hover {
++    box-shadow: 0 4px 20px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .landing-hero::before {
++    background: radial-gradient(circle, rgba(255, 79, 180, 0.1) 0%, transparent 70%)
++}
++body.theme-arcane .landing-hero h1 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .social-match-card {
++    border: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .social-match-card:hover {
++    box-shadow: 0 12px 40px rgba(255, 79, 180, 0.3);
++    border-color: rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .social-match-card.voted {
++    border-color: rgba(255, 79, 180, 0.7)
++}
++body.theme-arcane .social-match-card.voted::before {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    box-shadow: 0 2px 10px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .social-thumbnails img.user-pick {
++    border-color: var(--pink-bright);
++    box-shadow: 0 0 20px rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .social-vs {
++    font-family: var(--font);
++    color: var(--pink-bright);
++    text-shadow: 0 0 20px rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .song-details h3 {
++    font-family: var(--font)
++}
++body.theme-arcane .social-stats {
++    background: rgba(255, 79, 180, 0.12);
++    font-family: var(--font);
++    color: var(--pink-bright);
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .trending-badge {
++    background: linear-gradient(135deg, var(--pink), rgb(176, 45, 120));
++    box-shadow: 0 2px 10px rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .voted-header {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1), rgba(255, 79, 180, 0.05));
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .voted-header:hover {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.15), rgba(255, 79, 180, 0.08))
++}
++body.theme-arcane .voted-header h2 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .toggle-btn {
++    color: var(--pink-bright)
++}
++body.theme-arcane .voted-grid .social-match-card {
++    border-color: rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .voted-grid .social-match-card:hover {
++    box-shadow: 0 8px 25px rgba(255, 79, 180, 0.25)
++}
++body.theme-arcane .no-matches h2 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .home-button {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    font-family: var(--font)
++}
++body.theme-arcane .home-button:hover {
++    box-shadow: 0 4px 20px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .footer-link {
++    color: var(--pink-bright)
++}
++body.theme-arcane .footer-link:hover {
++    color: var(--pink-bright)
++}
++body.theme-arcane .bmc-container {
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .bmc-button {
++    background: linear-gradient(135deg, var(--pink), var(--pink));
++    font-family: var(--font);
++    box-shadow: 0 4px 15px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .bmc-button:hover {
++    box-shadow: 0 6px 25px rgba(255, 79, 180, 0.5);
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink))
++}
++body.theme-arcane .progress-bar {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .progress-fill {
++    background: linear-gradient(90deg, var(--pink-bright), var(--pink-bright))
++}
++body.theme-arcane .progress-text span {
++    color: var(--pink-bright)
++}
++body.theme-arcane .progress-fill.complete {
++    background: linear-gradient(90deg, var(--pink), var(--pink))
++}
++body.theme-arcane .nav-home:hover {
++    color: var(--pink-bright)
++}
++body.theme-arcane .nav-links a:hover {
++    color: var(--pink-bright)
++}
++body.theme-arcane .landing-footer {
++    border-top: 2px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .footer-main h3 {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .footer-link-card {
++    color: var(--text)
++}
++body.theme-arcane .footer-link-card:hover {
++    background: rgba(255, 79, 180, 0.15);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .action-btn.primary {
++    background: linear-gradient(135deg, var(--pink-bright), rgb(176, 45, 120));
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .action-btn.primary:hover {
++    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .action-btn.secondary {
++    color: var(--text);
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .action-btn.secondary:hover {
++    background: rgba(255, 79, 180, 0.2);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .inline-link {
++    color: var(--pink-bright);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .inline-link:hover {
++    color: var(--text);
++    border-bottom-color: var(--pink-bright)
++}
++body.theme-arcane .completion-banner {
++    background: linear-gradient(135deg, 
++        rgba(255, 79, 180, 0.15) 0%, 
++        rgba(255, 79, 180, 0.15) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .completion-content h3 {
++    color: var(--pink);
++    font-family: var(--font)
++}
++body.theme-arcane .completion-links a {
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright)
++}
++body.theme-arcane .completion-links a:hover {
++    background: rgba(255, 79, 180, 0.2);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .progress-text .milestone-highlight {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.15), rgba(255, 79, 180, 0.08));
++    color: var(--pink-bright);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    animation: milestoneGlow-arcane 2s ease-in-out infinite
++}
++@keyframes milestoneGlow-arcane {
++    0%, 100% {
++        box-shadow: 0 0 10px rgba(255, 79, 180, 0.2)
++    }
++    50% {
++        box-shadow: 0 0 20px rgba(255, 79, 180, 0.4)
++    }
++}
++body.theme-arcane .countdown-banner {
++    border: 2px solid var(--pink-bright);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.2);
++    animation: pulse-border-arcane 2s ease-in-out infinite
++}
++body.theme-arcane .countdown-content {
++    font-family: var(--font)
++}
++body.theme-arcane .countdown-content strong {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++@keyframes pulse-border-arcane {
++    0%, 100% {
++        border-color: var(--pink-bright);
++        box-shadow: 0 4px 12px rgba(255, 79, 180, 0.2)
++    }
++    50% {
++        border-color: var(--pink-bright);
++        box-shadow: 0 4px 20px rgba(255, 79, 180, 0.4)
++    }
++}
++body.theme-arcane .founding-member-banner {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.15) 0%, rgba(255, 79, 180, 0.08) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.4);
++    box-shadow: 0 4px 20px rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .founding-header h2 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .founding-description strong {
++    color: var(--pink-bright)
++}
++body.theme-arcane .progress-bar-founding {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .progress-fill-founding {
++    background: linear-gradient(90deg, var(--pink-bright), var(--pink-bright), var(--pink-bright))
++}
++body.theme-arcane .progress-text-founding strong {
++    color: var(--pink-bright)
++}
++body.theme-arcane .founding-prompt {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.95), rgba(255, 79, 180, 0.95));
++    box-shadow: 0 2px 10px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .how-it-works h2 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .step:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .step-number {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .sticky-founding-progress {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.98), rgba(255, 79, 180, 0.98))
++}
++body.theme-arcane .sticky-founding-progress .progress-text strong {
++    color: var(--bg)
++}
++body.theme-arcane .social-match-card.voted::before {
++    background: linear-gradient(135deg, var(--pink), rgb(176, 45, 120));
++    box-shadow: 0 2px 10px rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .completion-banner {
++    background: linear-gradient(135deg, 
++        rgba(255, 79, 180, 0.2) 0%, 
++        rgba(255, 79, 180, 0.2) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .completion-content h3 {
++    color: var(--pink);
++    font-family: var(--font)
++}
++body.theme-arcane .completion-links a {
++    border: 2px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink-bright)
++}
++body.theme-arcane .completion-links a:hover {
++    background: rgba(255, 79, 180, 0.25);
++    border-color: var(--pink-bright);
++    box-shadow: 0 6px 15px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .founding-member-banner.milestone-reached {
++    border-color: var(--pink);
++    background: linear-gradient(135deg, 
++        rgba(255, 79, 180, 0.2) 0%, 
++        rgba(255, 79, 180, 0.15) 100%)
++}
++@keyframes urgentPulse-arcane {
++    0%, 100% {
++        box-shadow: 0 4px 20px rgba(255, 79, 180, 0.2)
++    }
++    50% {
++        box-shadow: 0 4px 30px rgba(255, 79, 180, 0.5)
++    }
++}
++body.theme-arcane .founding-member-banner.urgent {
++    animation: urgentPulse-arcane 1.5s ease-in-out infinite
++}
++body.theme-arcane .benefit {
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .benefit:hover {
++    background: rgba(255, 79, 180, 0.12);
++    border-color: rgba(255, 79, 180, 0.4);
++    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .benefit-title {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .progression-teaser {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.15) 0%, rgba(255, 79, 180, 0.05) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .teaser-text strong {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .stat-number {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .teaser-cta {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    box-shadow: 0 4px 15px rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .teaser-cta:hover {
++    box-shadow: 0 6px 20px rgba(255, 79, 180, 0.5);
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink-bright))
++}
++body.theme-arcane .xp-bonuses-callout {
++    background: rgba(255, 79, 180, 0.08);
++    border: 1px solid rgba(255, 79, 180, 0.25)
++}
++body.theme-arcane .bonus-label {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .unvoted-header {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .hero-header {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.1) 0%, rgba(255, 79, 180, 0.05) 100%);
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .hero-header h1 {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .hero-header p {
++    font-family: var(--font)
++}
++body.theme-arcane .hero-header h1 i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .header-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .voted-header h2 i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .no-matches-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .no-matches-tip i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .link-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .footer-link-card:hover .link-icon i {
++    color: var(--text);
++    filter: drop-shadow(0 0 10px rgba(255, 79, 180, 0.5))
++}
++body.theme-arcane .footer-link-card:nth-child(1) .link-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .footer-link-card:nth-child(4) .link-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .bmc-text i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .bmc-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .social-follow-bar {
++    background: rgba(255, 79, 180, 0.08);
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .social-icon {
++    background: rgba(255, 79, 180, 0.15);
++    color: var(--pink-bright);
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .social-icon.tiktok:hover {
++    background: linear-gradient(135deg, var(--pink) 0%, #ff0050 100%)
++}
++body.theme-arcane .social-icon.instagram:hover {
++    background: linear-gradient(135deg, var(--pink) 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)
++}
++body.theme-arcane .activity-ticker {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.08), rgba(255, 79, 180, 0.12));
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .ticker-content {
++    color: var(--pink-bright)
++}
++body.theme-arcane .ticker-content .pulse {
++    color: var(--pink)
++}
++body.theme-arcane .refresh-btn {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright)
++}
++body.theme-arcane .refresh-btn:hover {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .mini-activity-feed {
++    background: rgba(255, 79, 180, 0.05);
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .header-left h3 {
++    color: var(--pink-bright)
++}
++body.theme-arcane .feed-header .see-all {
++    color: var(--pink-bright)
++}
++body.theme-arcane .mini-activity-card {
++    border: 1px solid rgba(255, 79, 180, 0.15)
++}
++body.theme-arcane .mini-activity-card:hover {
++    border-color: rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .mini-user {
++    color: var(--pink-bright)
++}
++body.theme-arcane .empty-feed i {
++    color: rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .start-voting-btn {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright)
++}
++body.theme-arcane .start-voting-btn:hover {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .activity-ticker {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.08), rgba(255, 79, 180, 0.12));
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .ticker-content {
++    color: var(--pink-bright)
++}
++body.theme-arcane .ticker-content .pulse {
++    color: var(--pink)
++}
++body.theme-arcane .refresh-btn {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright)
++}
++body.theme-arcane .refresh-btn:hover {
++    background: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .mini-activity-feed {
++    background: rgba(255, 79, 180, 0.05);
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .header-left h3 {
++    color: var(--pink-bright)
++}
++body.theme-arcane .feed-header .see-all {
++    color: var(--pink-bright)
++}
++body.theme-arcane .mini-activity-card {
++    border: 1px solid rgba(255, 79, 180, 0.15)
++}
++body.theme-arcane .mini-activity-card:hover {
++    border-color: rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .mini-thumbnail {
++    border: 1px solid rgba(255, 79, 180, 0.1)
++}
++body.theme-arcane .mini-user {
++    color: var(--pink-bright)
++}
++body.theme-arcane .empty-feed i {
++    color: rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .start-voting-btn {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright)
++}
++body.theme-arcane .start-voting-btn:hover {
++    background: rgba(255, 79, 180, 0.2)
++}
++
+diff --git a/js/live.js b/js/live.js
+index eadf5d4..fc44a3f 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -14,14 +14,10 @@ import { getAllMatches } from './api-client.js';
+ // ========================================
+ let allLiveMatches = [];
+ 
+-// ========================================
+-// ROUND COUNTDOWN CONFIGURATION
+-// ========================================
+-const ROUND_CONFIG = {
+-    roundName: "ROUND 2",
+-    roundDescription: "Single Elimination • 16 Matches",
+-    endDate: new Date('2025-11-24T19:00:00Z')
+-};
++// Names come from YouTube and from users, so never splice them into HTML or attributes unescaped.
++function escapeHtml(value) {
++    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++}
+ 
+ // ========================================
+ // LIVE ACTIVITY TICKER (using edge cache)
+@@ -125,8 +121,8 @@ function displayActivityInTicker(activity) {
+     const songName = activity.votedForName || activity.songTitle || 'a song';
+     
+     tickerText.innerHTML = `
+-        <strong>${username}</strong> voted for 
+-        <span class="highlight">${songName}</span> 
++        <strong>${escapeHtml(username)}</strong> voted for 
++        <span class="highlight">${escapeHtml(songName)}</span> 
+         <span class="time-ago">${timeAgo}</span>
+     `;
+ }
+@@ -205,10 +201,10 @@ async function loadMiniFeed() {
+             
+             return `
+                 <div class="mini-activity-card" style="animation-delay: ${index * 0.1}s">
+-                    <img src="${thumbnail}" alt="${songName}" class="mini-thumbnail" loading="lazy">
++                    <img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(songName)}" class="mini-thumbnail" loading="lazy">
+                     <div class="mini-info">
+-                        <div class="mini-user">${username}</div>
+-                        <div class="mini-song">${songName}</div>
++                        <div class="mini-user">${escapeHtml(username)}</div>
++                        <div class="mini-song">${escapeHtml(songName)}</div>
+                     </div>
+                     <div class="mini-time">${timeAgo}</div>
+                 </div>
+@@ -373,63 +369,74 @@ function resetSocialBanner() {
+ window.resetSocialBanner = resetSocialBanner;
+ 
+ // ========================================
+-// DISPLAY COUNTDOWN BANNER
++// ROUND BANNER
++// Worked out from the live matches themselves: which round is live, how many matches, and (only if the
++// matches have an end date) a real countdown. Nothing here is hard-coded to a round or a date.
+ // ========================================
++let roundCountdownTimer = null;
++
+ function displayRoundCountdown() {
+     const container = document.querySelector('.social-container');
+-    if (!container) return;
+-    
++    if (!container || container.querySelector('.countdown-banner')) return;
++
++    // Created up front (the activity ticker attaches itself to it) and filled in once the matches are known
+     const banner = document.createElement('div');
+     banner.className = 'countdown-banner';
+-    banner.innerHTML = `
+-        <div class="countdown-content">
+-            <i class="fa-solid fa-trophy"></i> <strong>${ROUND_CONFIG.roundName} NOW LIVE!</strong> • ${ROUND_CONFIG.roundDescription} • Ends in <span id="countdownTimer">...</span>
+-        </div>
+-    `;
+-    
++    banner.style.display = 'none';
++    banner.innerHTML = '<div class="countdown-content"></div>';
+     container.insertBefore(banner, container.firstChild);
+-    
+-    // Start countdown
+-    updateCountdown();
+-    setInterval(updateCountdown, 1000); // Update every second
+ }
+ 
+-// ========================================
+-// UPDATE COUNTDOWN TIMER
+-// ========================================
+-function updateCountdown() {
+-    const countdownEl = document.getElementById('countdownTimer');
+-    if (!countdownEl) return;
++function describeLiveRound() {
++    if (allLiveMatches.length === 0) return null;
++    const firstRound = Math.min(...allLiveMatches.map(m => m.round || 1));
++    const inRound = allLiveMatches.filter(m => (m.round || 1) === firstRound);
++    const ends = inRound.map(m => (m.endDate ? new Date(m.endDate) : null)).filter(d => d && !isNaN(d));
++    return {
++        label: inRound[0].roundLabel || `Round ${firstRound}`,     // e.g. "Final", "Semi-finals", "Round of 16"
++        count: inRound.length,
++        endDate: ends.length ? new Date(Math.min(...ends)) : null  // the earliest deadline, or none
++    };
++}
+ 
+-    // Set the target time to exactly 7 days from NOW
+-    const targetDate = new Date();
+-    targetDate.setDate(targetDate.getDate() + 7);
+-    targetDate.setHours(0, 0, 0, 0); // optional: reset to midnight, remove if you want exact 7×24h
++function updateRoundBanner() {
++    const banner = document.querySelector('.countdown-banner');
++    if (!banner) return;
++    clearInterval(roundCountdownTimer);
+ 
+-    const now = new Date();
+-    const diff = targetDate - now;
++    const info = describeLiveRound();
++    if (!info) { banner.style.display = 'none'; return; }
+ 
+-    if (diff <= 0) {
+-        countdownEl.textContent = '0d 0h 0m';
+-        countdownEl.parentElement.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> <strong>Round Ended!</strong> • Check back soon for the next one!`;
+-        clearInterval(countdownInterval); // optional: stop the timer completely
+-        return;
++    const matchWord = info.count === 1 ? 'match' : 'matches';
++    banner.querySelector('.countdown-content').innerHTML = `
++        <i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong> • ${info.count} ${matchWord}${
++            info.endDate ? ' • Ends in <span id="countdownTimer">...</span>' : ' • Voting is open'}
++    `;
++    banner.style.display = '';
++
++    if (info.endDate) {
++        const tick = () => updateCountdown(info.endDate);
++        tick();
++        roundCountdownTimer = setInterval(tick, 1000);
+     }
++}
+ 
+-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+-    const seconds = Math.floor((diff % (1000 * 60)) / 1000); // optional: add seconds for more precision
++function updateCountdown(endDate) {
++    const countdownEl = document.getElementById('countdownTimer');
++    if (!countdownEl) return;
+ 
+-    // Choose one of the formats below:
++    const diff = endDate - new Date();
++    if (diff <= 0) {
++        clearInterval(roundCountdownTimer);
++        countdownEl.parentElement.innerHTML = '<i class="fa-solid fa-champagne-glasses"></i> <strong>Voting has ended for this round.</strong> Check back soon for the next one!';
++        return;
++    }
++    const days = Math.floor(diff / 86400000);
++    const hours = Math.floor((diff % 86400000) / 3600000);
++    const minutes = Math.floor((diff % 3600000) / 60000);
+     countdownEl.textContent = `${days}d ${hours}h ${minutes}m`;
+-    // countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`; // with seconds
+ }
+ 
+-// Run immediately and then every second
+-updateCountdown();
+-const countdownInterval = setInterval(updateCountdown, 1000);
+-
+ // ========================================
+ // LOAD LIVE MATCHES
+ // ========================================
+@@ -451,6 +458,7 @@ async function loadLiveMatches() {
+         });
+         
+         console.log(`✅ Found ${allLiveMatches.length} live matches`);
++        updateRoundBanner();
+         
+         if (allLiveMatches.length === 0) {
+             showNoMatches();
+@@ -607,7 +615,7 @@ function showCompletionMessage() {
+         banner.className = 'completion-banner';
+         banner.innerHTML = `
+             <div class="completion-content">
+-                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Round 2 Matches!</h3>
++                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
+                 <p>Check out these pages while waiting for new matchups:</p>
+                 <div class="completion-links">
+                     <a href="/my-votes.html">View Your Progress</a>
+@@ -632,30 +640,30 @@ function createMatchCard(match, index, isVoted) {
+     
+     card.innerHTML = `
+         <div class="social-thumbnails">
+-            <img src="https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg" 
+-                 alt="${match.song1.shortTitle || match.song1.title}"
++            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/mqdefault.jpg" 
++                 alt="${escapeHtml(match.song1.shortTitle || match.song1.title)}"
+                  class="${userVotedSongId === 'song1' ? 'user-pick' : ''}"
+                  loading="lazy">
+             
+             <div class="social-vs">VS</div>
+             
+-            <img src="https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg"
+-                 alt="${match.song2.shortTitle || match.song2.title}"
++            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/mqdefault.jpg"
++                 alt="${escapeHtml(match.song2.shortTitle || match.song2.title)}"
+                  class="${userVotedSongId === 'song2' ? 'user-pick' : ''}"
+                  loading="lazy">
+         </div>
+         
+         <div class="social-info">
+             <div class="song-details">
+-                <h3>${match.song1.shortTitle || match.song1.title}</h3>
+-                <p>${match.song1.artist} • ${match.song1.year || '2025'}</p>
++                <h3>${escapeHtml(match.song1.shortTitle || match.song1.title)}</h3>
++                <p>${escapeHtml(match.song1.artist)}${match.song1.year ? ' • ' + escapeHtml(match.song1.year) : ''}</p>
+             </div>
+             
+             <div class="vs-divider">vs</div>
+             
+             <div class="song-details">
+-                <h3>${match.song2.shortTitle || match.song2.title}</h3>
+-                <p>${match.song2.artist} • ${match.song2.year || '2025'}</p>
++                <h3>${escapeHtml(match.song2.shortTitle || match.song2.title)}</h3>
++                <p>${escapeHtml(match.song2.artist)}${match.song2.year ? ' • ' + escapeHtml(match.song2.year) : ''}</p>
+             </div>
+         </div>
+         
+@@ -796,7 +804,7 @@ function trackMatchClick(matchId, position, hasVoted) {
+ // CONSOLE BRANDING
+ // ========================================
+ console.log(
+-    '%c🎵 Anthems Arena %c- Social Landing',
++    '%c🎬 Arcane Moments %c- Social Landing',
+     'color: #C8AA6E; font-size: 20px; font-weight: bold; font-family: Cinzel, serif;',
+     'color: #888; font-size: 14px; font-family: Lora, serif;'
+ );
+\ No newline at end of file
+diff --git a/live.html b/live.html
+index 89ff0cb..b8c9e05 100644
+--- a/live.html
++++ b/live.html
+@@ -1,7 +1,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Vote Now - League Music Tournament</title>
++    <title>Live Matches | Arcane Moments</title>
+     
+     <!-- Fonts -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+@@ -20,13 +20,17 @@
+     
+     <!-- Page-specific CSS -->
+     <link rel="stylesheet" href="/css/live.css">
++    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++    <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+     
+     <!-- Favicon -->
+     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+     
+     <!-- Meta Tags -->
+-    <meta property="og:title" content="Vote Now - League Music Tournament">
+-    <meta property="og:description" content="Vote in League music matchups and help decide the ultimate anthem!">
++    <meta property="og:title" content="Live Matches | Arcane Moments">
++    <meta property="og:description" content="Vote in the live Arcane Moments matchups and help crown the best edit!">
+     <meta property="og:image" content="https://anthemarena.com/og-image.jpg">
+     <meta name="twitter:card" content="summary_large_image">
+     
+@@ -38,7 +42,7 @@
+     <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+ 
+-<body>
++<body class="theme-arcane">
+     <!-- ✅ REPLACE custom nav with site-wide navigation -->
+     <div id="nav-placeholder"></div>
+     <script type="module" src="/js/navigation.js"></script>
+@@ -62,8 +66,8 @@
+         
+         <!-- Hero Header -->
+         <div class="hero-header">
+-            <h1><i class="fa-solid fa-music"></i> Vote for Your Favorite League of Legends Songs</h1>
+-            <p>Help decide the ultimate League anthem in this head-to-head tournament</p>
++            <h1><i class="fa-solid fa-film"></i> Vote for Your Favourite Arcane Edits</h1>
++            <p>Help decide the best Arcane moment in this head-to-head tournament</p>
+             
+             <!-- Social follow bar -->
+             <div class="social-follow-bar">
+@@ -72,7 +76,7 @@
+                     <a href="https://x.com/anthemarena" target="_blank" rel="noopener" class="social-icon x-twitter" aria-label="Follow on X" title="Follow on X">
+                         <i class="fa-brands fa-x-twitter"></i>
+                     </a>
+-                    <a href="https://youtube.com/@anthemarena" target="_blank" rel="noopener" class="social-icon youtube" aria-label="Subscribe on YouTube" title="Subscribe on YouTube">
++                    <a href="https://www.youtube.com/@theundercityedit" target="_blank" rel="noopener" class="social-icon youtube" aria-label="Subscribe on YouTube" title="Subscribe on YouTube">
+                         <i class="fa-brands fa-youtube"></i>
+                     </a>
+                     <a href="https://tiktok.com/@anthemarena" target="_blank" rel="noopener" class="social-icon tiktok" aria-label="Follow on TikTok" title="Follow on TikTok">
+@@ -129,7 +133,7 @@
+         
+         <!-- No Matches State -->
+         <div id="noMatches" class="no-matches" style="display: none;">
+-            <div class="no-matches-icon"><i class="fa-solid fa-music"></i></div>
++            <div class="no-matches-icon"><i class="fa-solid fa-film"></i></div>
+             <h2>No Live Matches Right Now</h2>
+             <p>Check back soon for new matchups!</p>
+             
+@@ -147,7 +151,7 @@
+             
+             <p class="no-matches-tip">
+                 <i class="fa-solid fa-lightbulb"></i> Check your <a href="/my-votes.html" class="inline-link">progress</a> 
+-                or explore the <a href="/music-gallery.html" class="inline-link">music gallery</a>
++                or explore the <a href="/music-gallery.html" class="inline-link">gallery</a>
+             </p>
+         </div>
+         
+@@ -171,8 +175,8 @@
+                             <span>My Progress</span>
+                         </a>
+                         <a href="/music-gallery.html" class="footer-link-card">
+-                            <span class="link-icon"><i class="fa-solid fa-music"></i></span>
+-                            <span>Music Gallery</span>
++                            <span class="link-icon"><i class="fa-solid fa-film"></i></span>
++                            <span>Gallery</span>
+                         </a>
+                     </div>
+                 </div>
+diff --git a/tools/build-arcane-theme.mjs b/tools/build-arcane-theme.mjs
+index 14bfb6d..0c431eb 100644
+--- a/tools/build-arcane-theme.mjs
++++ b/tools/build-arcane-theme.mjs
+@@ -27,7 +27,8 @@ const SOURCES = [
+     'css/main.css', 'css/navigation.css', 'css/footer.css', 'css/brackets.css',
+     'css/modal.css', 'css/scrollbar.css', 'css/settings.css',
+     'css/activity.css', { file: 'css/vote.css', greens: true },
+-    { file: 'css/matches.css', greens: true }
++    { file: 'css/matches.css', greens: true },
++    { file: 'css/live.css', greens: true }
+ ].map(s => typeof s === 'string' ? { file: s } : s);
+ const OUT = 'css/arcane-theme.generated.css';
+ const SCOPE = 'body.theme-arcane';

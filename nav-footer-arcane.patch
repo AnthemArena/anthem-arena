@@ -1,0 +1,291 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 0b79031..3289467 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -546,3 +546,108 @@ body.theme-arcane .btn-support {
+     border-radius: 999px;
+ }
+ body.theme-arcane .btn-support:hover { color: #160814; }
++
++
++/* ========================================
++   NAVIGATION + FOOTER (js/navigation.js, js/footer.js; shared by every page)
++   ======================================== */
++
++/* ---------- navigation: glass bar over the cover, logo as a rounded badge ---------- */
++body.theme-arcane .main-nav {
++    background: rgba(6, 7, 14, .62);
++    border-bottom: 1px solid var(--line);
++    backdrop-filter: blur(18px) saturate(1.2);
++    -webkit-backdrop-filter: blur(18px) saturate(1.2);
++}
++/* logo.png is an opaque square tile with its own pink frame, so show it as a badge (as on the homepage) */
++body.theme-arcane .site-logo {
++    height: 54px;
++    width: 54px;
++    object-fit: cover;
++    border-radius: 14px;
++    border: 1px solid var(--border);
++    box-shadow: 0 0 22px rgba(255, 79, 180, .28);
++    transition: transform 180ms ease, box-shadow 180ms ease;
++}
++body.theme-arcane .site-logo:hover { transform: scale(1.06); filter: none; box-shadow: 0 0 32px rgba(255, 79, 180, .48); }
++
++body.theme-arcane .nav-links a {
++    font-family: var(--font);
++    font-weight: 700;
++    font-size: .82rem;
++    letter-spacing: .14em;
++    color: var(--muted);
++}
++body.theme-arcane .nav-links a:hover,
++body.theme-arcane .nav-links a.active { color: var(--text); }
++
++body.theme-arcane .nav-profile-card {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 16px;
++    backdrop-filter: blur(12px);
++    -webkit-backdrop-filter: blur(12px);
++}
++body.theme-arcane .notification-bell { color: var(--pink-bright); border-radius: 12px; }
++body.theme-arcane .notification-bell:hover { background: var(--pink-soft); }
++body.theme-arcane .nav-bell-icon { display: block; filter: drop-shadow(0 0 6px rgba(255, 79, 180, .5)); }
++/* the badge is styled inline (red) by navigation.js, so this needs !important */
++body.theme-arcane .notification-badge {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink)) !important;
++    color: #160814 !important;
++    border: 2px solid var(--bg) !important;
++    box-shadow: 0 2px 10px rgba(255, 79, 180, .45) !important;
++}
++
++/* ---------- footer ---------- */
++body.theme-arcane .main-footer {
++    background: rgba(6, 7, 14, .78);
++    border-top: 1px solid var(--border);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++}
++body.theme-arcane .footer-logo {
++    height: 68px;
++    width: 68px;
++    object-fit: cover;
++    border-radius: 16px;
++    border: 1px solid var(--border);
++    box-shadow: 0 0 26px rgba(255, 79, 180, .25);
++    filter: none;
++}
++body.theme-arcane .footer-heading {
++    font-family: var(--font);
++    font-size: .78rem;
++    font-weight: 800;
++    letter-spacing: .18em;
++    color: var(--pink-bright);
++}
++body.theme-arcane .footer-text { font-family: var(--font); color: var(--muted); line-height: 1.65; }
++body.theme-arcane .footer-links a { font-family: var(--font); color: var(--muted); }
++body.theme-arcane .footer-links a:hover { color: var(--pink-bright); }
++body.theme-arcane .footer-email-link { color: var(--muted); }
++body.theme-arcane .footer-email-link:hover { color: var(--pink-bright); }
++
++body.theme-arcane .social-link {
++    border: 1px solid var(--border);
++    border-radius: 50%;
++    background: rgba(255, 255, 255, .03);
++    color: var(--pink-bright);
++}
++body.theme-arcane .social-link:hover { background: var(--pink-soft); border-color: var(--pink-bright); color: var(--text); }
++
++body.theme-arcane .footer-bottom { border-top: 1px solid var(--line); }
++body.theme-arcane .footer-copyright,
++body.theme-arcane .footer-disclaimer,
++body.theme-arcane .footer-legal-links a,
++body.theme-arcane .footer-legal-links .separator { font-family: var(--font); color: var(--text-faint); }
++body.theme-arcane .footer-legal-links a:hover { color: var(--pink-bright); }
++
++body.theme-arcane .copy-success-toast {
++    font-family: var(--font);
++    font-weight: 800;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border-radius: 999px;
++    box-shadow: 0 12px 30px rgba(255, 79, 180, .35);
++}
+diff --git a/js/footer.js b/js/footer.js
+index df4bddd..53dfe3b 100644
+--- a/js/footer.js
++++ b/js/footer.js
+@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
+                 <span class="support-icon">☕</span>
+                 <div class="support-text">
+                     <h4>Enjoying the tournament?</h4>
+-                    <p>Help keep Anthem Arena running!</p>
++                    <p>Help keep Arcane Moments running!</p>
+                 </div>
+                 <a href="https://buymeacoffee.com/anthemarena" 
+                    target="_blank" 
+@@ -68,10 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
+             <!-- About Column with Logo -->
+             <div class="footer-column">
+                 <a href="/" class="footer-logo-link">
+-                    <img src="/images/logo-header.png" alt="Anthem Arena" class="footer-logo">
++                    <img src="/logo.png" alt="Arcane Moments" class="footer-logo">
+                 </a>
+                 <p class="footer-text">
+-                    Vote for the most iconic League of Legends music videos. From legendary Worlds anthems to virtual pop sensations, help crown the ultimate League music video in our community-driven tournament.
++                    The scenes, lines and reveals that make Arcane unforgettable, one Short at a time. Vote for your favourite fan edits and help crown the best Arcane moment.
+                 </p>
+             </div>
+             
+@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
+                 <ul class="footer-links">
+                     <li><a href="/">Home</a></li>
+                     <li><a href="/brackets">Brackets</a></li>
+-                    <li><a href="/music-gallery">Music Gallery</a></li>
++                    <li><a href="/music-gallery">Gallery</a></li>
+                     <li><a href="/matches">Matches</a></li>
+                     <li><a href="/stats">Stats</a></li>
+                     <li><a href="/about">About</a></li>
+@@ -91,11 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
+             
+             <!-- Current Tournament Column -->
+             <div class="footer-column">
+-                <h4 class="footer-heading">Anthems Arena Championship</h4>
++                <h4 class="footer-heading">The Tournament</h4>
+                 <ul class="footer-links">
+                     <li><a href="/matches?status=completed">View Results</a></li>
+                     <li><a href="/brackets">Full Bracket</a></li>
+-                    <li><a href="/matches?tournament=worlds-anthems-2025">Cast Your Votes</a></li>
++                    <li><a href="/matches">Cast Your Votes</a></li>
+                     <li><a href="/stats">Tournament Statistics</a></li>
+                 </ul>
+             </div>
+@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
+             <div class="footer-column">
+                 <h4 class="footer-heading">Community</h4>
+                 <p class="footer-text footer-small">
+-                    Join fellow League fans in celebrating the most memorable music videos. Follow us for tournament updates and share your favorite anthems.
++                    Join fellow Arcane fans in celebrating the most memorable moments. Follow us for tournament updates and share your favourite edits.
+                 </p>
+ 
+ </div>
+@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
+                         </svg>
+                     </a>
+                     
+-                    <a href="https://youtube.com/@anthemarena" class="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
++                    <a href="https://www.youtube.com/@theundercityedit" class="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                         </svg>
+@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
+         
+         <div class="footer-bottom">
+             <p class="footer-copyright">
+-                    © 2025 Anthems Arena. All rights reserved.
++                    © ${new Date().getFullYear()} Arcane Moments. All rights reserved.
+             </p>
+             <div class="footer-legal-links">
+                 <a href="/about">About</a>
+@@ -220,13 +220,13 @@ document.addEventListener('DOMContentLoaded', function() {
+     
+     // Share to Twitter
+     document.getElementById('shareTwitterBtn')?.addEventListener('click', function() {
+-        const tweetText = `🎵 Just voted in the League Music Tournament!
++        const tweetText = `🎬 Just voted in the Arcane Moments tournament!
+ 
+-Which anthem reigns supreme? Cast your vote:
++Which edit is the best? Cast your vote:
+ 
+-anthemarena.com
++${window.location.origin}
+ 
+-#LeagueOfLegends #Worlds`;
++#Arcane #ArcaneMoments`;
+         
+         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+         window.open(twitterUrl, '_blank', 'width=550,height=420');
+@@ -236,7 +236,7 @@ anthemarena.com
+     
+     // Share to Reddit
+     document.getElementById('shareRedditBtn')?.addEventListener('click', function() {
+-        const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent('https://anthemarena.com')}&title=${encodeURIComponent('🎵 League Music Tournament - Vote for the Ultimate Anthem!')}`;
++        const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent('🎬 Arcane Moments: vote for the best Arcane edit')}`;
+         window.open(redditUrl, '_blank', 'width=800,height=600');
+         
+         console.log('🔴 Reddit share opened');
+@@ -244,12 +244,11 @@ anthemarena.com
+     
+     // Share to Discord
+     document.getElementById('shareDiscordBtn')?.addEventListener('click', function() {
+-        const discordMessage = `🎵 **League Music Tournament**
++        const discordMessage = `🎬 **Arcane Moments**
+ 
+-Vote for the most iconic League anthem!
+-🎮 GODS vs RISE - Who wins?
++Vote for the best Arcane fan edit!
+ 
+-Cast your vote: https://anthemarena.com`;
++Cast your vote: ${window.location.origin}`;
+         
+         navigator.clipboard.writeText(discordMessage).then(() => {
+             showCopySuccessToast('Discord message copied! Paste it in your server 💬');
+@@ -261,7 +260,7 @@ Cast your vote: https://anthemarena.com`;
+     
+     // Copy Link
+     document.getElementById('copyLinkBtn')?.addEventListener('click', function() {
+-        const shareUrl = 'https://anthemarena.com';
++        const shareUrl = window.location.origin;
+         
+         navigator.clipboard.writeText(shareUrl).then(() => {
+             showCopySuccessToast('✅ Link copied to clipboard!');
+diff --git a/js/navigation.js b/js/navigation.js
+index 02fc7fb..038716e 100644
+--- a/js/navigation.js
++++ b/js/navigation.js
+@@ -7,6 +7,9 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+ import { ARCANE_CONFIG } from './arcane-config.js';
+ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+ 
++// Bell icon: inline SVG so it takes the theme colour (the old 🔔 emoji was always yellow)
++const BELL_ICON = '<svg class="nav-bell-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22zm7-6v-5a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></svg>';
++
+ document.addEventListener('DOMContentLoaded', async function() {
+     console.log('Navigation DOMContentLoaded fired');
+     
+@@ -14,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async function() {
+ <nav class="main-nav">
+     <div class="nav-container">
+         <a href="/index.html" class="logo-link">
+-            <img src="/images/logo-header.png" alt="Anthem Arena" class="site-logo">
++            <img src="/logo.png" alt="Arcane Moments" class="site-logo">
+         </a>
+         
+         <ul class="nav-links">
+@@ -64,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async function() {
+                 
+                 <!-- ✅ Notification Bell INSIDE profile card -->
+                 <div class="notification-bell" id="notificationBell" style="position: relative; cursor: pointer; margin: 0 12px; display: none;">
+-                    <span style="font-size: 20px;">🔔</span>
++                    ${BELL_ICON}
+                     <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                 </div>
+                 
+@@ -302,7 +305,7 @@ async function updateNavProfile() {
+          style="position: relative; margin: 0 12px; display: block;">
+         <div class="notification-bell" id="notificationBell" 
+              style="position: relative; cursor: pointer; display: block;">
+-            <span style="font-size: 20px;">🔔</span>
++            ${BELL_ICON}
+             <span class="notification-badge" id="notificationBadge" 
+                   style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+         </div>
+@@ -354,7 +357,7 @@ async function updateNavProfile() {
+          style="position: relative; margin: 0 12px; display: block;">
+         <div class="notification-bell" id="notificationBell" 
+              style="position: relative; cursor: pointer; display: block;">
+-            <span style="font-size: 20px;">🔔</span>
++            ${BELL_ICON}
+             <span class="notification-badge" id="notificationBadge" 
+                   style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+         </div>
