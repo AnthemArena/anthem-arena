@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="support-icon">☕</span>
                 <div class="support-text">
                     <h4>Enjoying the tournament?</h4>
-                    <p>Help keep Anthem Arena running!</p>
+                    <p>Help keep Arcane Moments running!</p>
                 </div>
                 <a href="https://buymeacoffee.com/anthemarena" 
                    target="_blank" 
@@ -68,10 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- About Column with Logo -->
             <div class="footer-column">
                 <a href="/" class="footer-logo-link">
-                    <img src="/images/logo-header.png" alt="Anthem Arena" class="footer-logo">
+                    <img src="/logo.png" alt="Arcane Moments" class="footer-logo">
                 </a>
                 <p class="footer-text">
-                    Vote for the most iconic League of Legends music videos. From legendary Worlds anthems to virtual pop sensations, help crown the ultimate League music video in our community-driven tournament.
+                    The scenes, lines and reveals that make Arcane unforgettable, one Short at a time. Vote for your favourite fan edits and help crown the best Arcane moment.
                 </p>
             </div>
             
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <ul class="footer-links">
                     <li><a href="/">Home</a></li>
                     <li><a href="/brackets">Brackets</a></li>
-                    <li><a href="/music-gallery">Music Gallery</a></li>
+                    <li><a href="/music-gallery">Gallery</a></li>
                     <li><a href="/matches">Matches</a></li>
                     <li><a href="/stats">Stats</a></li>
                     <li><a href="/about">About</a></li>
@@ -91,11 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <!-- Current Tournament Column -->
             <div class="footer-column">
-                <h4 class="footer-heading">Anthems Arena Championship</h4>
+                <h4 class="footer-heading">The Tournament</h4>
                 <ul class="footer-links">
                     <li><a href="/matches?status=completed">View Results</a></li>
                     <li><a href="/brackets">Full Bracket</a></li>
-                    <li><a href="/matches?tournament=worlds-anthems-2025">Cast Your Votes</a></li>
+                    <li><a href="/matches">Cast Your Votes</a></li>
                     <li><a href="/stats">Tournament Statistics</a></li>
                 </ul>
             </div>
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="footer-column">
                 <h4 class="footer-heading">Community</h4>
                 <p class="footer-text footer-small">
-                    Join fellow League fans in celebrating the most memorable music videos. Follow us for tournament updates and share your favorite anthems.
+                    Join fellow Arcane fans in celebrating the most memorable moments. Follow us for tournament updates and share your favourite edits.
                 </p>
 
 </div>
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                     </a>
                     
-                    <a href="https://youtube.com/@anthemarena" class="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.youtube.com/@theundercityedit" class="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                         </svg>
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         <div class="footer-bottom">
             <p class="footer-copyright">
-                    © 2025 Anthems Arena. All rights reserved.
+                    © ${new Date().getFullYear()} Arcane Moments. All rights reserved.
             </p>
             <div class="footer-legal-links">
                 <a href="/about">About</a>
@@ -220,13 +220,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Share to Twitter
     document.getElementById('shareTwitterBtn')?.addEventListener('click', function() {
-        const tweetText = `🎵 Just voted in the League Music Tournament!
+        const tweetText = `🎬 Just voted in the Arcane Moments tournament!
 
-Which anthem reigns supreme? Cast your vote:
+Which edit is the best? Cast your vote:
 
-anthemarena.com
+${window.location.origin}
 
-#LeagueOfLegends #Worlds`;
+#Arcane #ArcaneMoments`;
         
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank', 'width=550,height=420');
@@ -236,7 +236,7 @@ anthemarena.com
     
     // Share to Reddit
     document.getElementById('shareRedditBtn')?.addEventListener('click', function() {
-        const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent('https://anthemarena.com')}&title=${encodeURIComponent('🎵 League Music Tournament - Vote for the Ultimate Anthem!')}`;
+        const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent('🎬 Arcane Moments: vote for the best Arcane edit')}`;
         window.open(redditUrl, '_blank', 'width=800,height=600');
         
         console.log('🔴 Reddit share opened');
@@ -244,12 +244,11 @@ anthemarena.com
     
     // Share to Discord
     document.getElementById('shareDiscordBtn')?.addEventListener('click', function() {
-        const discordMessage = `🎵 **League Music Tournament**
+        const discordMessage = `🎬 **Arcane Moments**
 
-Vote for the most iconic League anthem!
-🎮 GODS vs RISE - Who wins?
+Vote for the best Arcane fan edit!
 
-Cast your vote: https://anthemarena.com`;
+Cast your vote: ${window.location.origin}`;
         
         navigator.clipboard.writeText(discordMessage).then(() => {
             showCopySuccessToast('Discord message copied! Paste it in your server 💬');
@@ -261,7 +260,7 @@ Cast your vote: https://anthemarena.com`;
     
     // Copy Link
     document.getElementById('copyLinkBtn')?.addEventListener('click', function() {
-        const shareUrl = 'https://anthemarena.com';
+        const shareUrl = window.location.origin;
         
         navigator.clipboard.writeText(shareUrl).then(() => {
             showCopySuccessToast('✅ Link copied to clipboard!');

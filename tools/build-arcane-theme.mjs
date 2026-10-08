@@ -26,7 +26,9 @@ import postcss from 'postcss';
 const SOURCES = [
     'css/main.css', 'css/navigation.css', 'css/footer.css', 'css/brackets.css',
     'css/modal.css', 'css/scrollbar.css', 'css/settings.css',
-    'css/activity.css', { file: 'css/vote.css', greens: true }
+    'css/activity.css', { file: 'css/vote.css', greens: true },
+    { file: 'css/matches.css', greens: true },
+    { file: 'css/live.css', greens: true }
 ].map(s => typeof s === 'string' ? { file: s } : s);
 const OUT = 'css/arcane-theme.generated.css';
 const SCOPE = 'body.theme-arcane';

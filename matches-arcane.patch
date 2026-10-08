@@ -1,0 +1,965 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 3289467..8ec090c 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -651,3 +651,161 @@ body.theme-arcane .copy-success-toast {
+     border-radius: 999px;
+     box-shadow: 0 12px 30px rgba(255, 79, 180, .35);
+ }
++
++
++/* ========================================
++   MATCHES PAGE (matches.html + js/match-card-renderer.js)
++   ======================================== */
++body.theme-arcane .matches-header,
++body.theme-arcane .filters-section,
++body.theme-arcane .matches-section,
++body.theme-arcane .quick-links-section { background: transparent; }
++body.theme-arcane .matches-header { border-bottom: 1px solid var(--line); }
++body.theme-arcane .filters-section { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
++
++/* stats panel */
++body.theme-arcane .archive-stats {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++}
++body.theme-arcane .stat-number { font-family: var(--font); font-weight: 800; letter-spacing: -.04em; color: var(--text); text-shadow: none; }
++
++/* filters: the same pills as the Brackets dropdown */
++body.theme-arcane .filter-label { font-family: var(--font); font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--pink-bright); }
++body.theme-arcane .filter-select,
++body.theme-arcane .search-input {
++    font-family: var(--font);
++    font-weight: 600;
++    background: rgba(9, 10, 19, .58);
++    border: 1px solid rgba(255, 255, 255, .13);
++    border-radius: 999px;
++    color: var(--text);
++    backdrop-filter: blur(8px);
++}
++body.theme-arcane .filter-select:hover,
++body.theme-arcane .search-input:hover { border-color: var(--border); }
++body.theme-arcane .filter-select:focus,
++body.theme-arcane .search-input:focus { border-color: var(--pink-bright); box-shadow: 0 0 0 3px var(--pink-soft); outline: none; }
++body.theme-arcane .filter-select option { background: #0d0f1b; color: var(--text); }
++body.theme-arcane .search-input::placeholder { color: var(--text-faint); }
++body.theme-arcane .search-button { color: var(--pink-bright); }
++body.theme-arcane .clear-filters-btn {
++    font-family: var(--font);
++    font-weight: 700;
++    letter-spacing: .08em;
++    background: rgba(255, 255, 255, .04);
++    border: 1px solid rgba(255, 255, 255, .13);
++    border-radius: 999px;
++    color: var(--text);
++}
++body.theme-arcane .clear-filters-btn:hover { background: var(--pink-soft); border-color: var(--border); color: var(--text); }
++body.theme-arcane .results-info,
++body.theme-arcane .filter-tip { font-family: var(--font); font-style: normal; color: var(--text-faint); }
++body.theme-arcane .load-more-btn {
++    font-family: var(--font);
++    font-weight: 800;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border: 0;
++    border-radius: 999px;
++    box-shadow: 0 12px 30px rgba(255, 79, 180, .24);
++}
++
++/* ---------- match cards ---------- */
++body.theme-arcane .match-card {
++    background: var(--card);
++    border: 1px solid var(--line);
++    border-radius: 18px;
++    box-shadow: 0 14px 34px rgba(0, 0, 0, .24);
++    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
++}
++body.theme-arcane .match-card:hover { transform: translateY(-3px); border-color: rgba(255, 79, 180, .34); box-shadow: 0 20px 44px rgba(0, 0, 0, .38); }
++body.theme-arcane .match-card.live { background: var(--card); border-color: rgba(255, 79, 180, .5); animation: none; box-shadow: 0 0 0 1px rgba(255, 79, 180, .2), 0 14px 40px rgba(255, 79, 180, .14); }
++body.theme-arcane .match-card.user-voted { border-color: rgba(255, 79, 180, .55); }
++body.theme-arcane .match-header { border-bottom: 1px solid var(--line); }
++body.theme-arcane .match-tournament { font-family: var(--font); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--pink-bright); }
++body.theme-arcane .match-round { font-family: var(--font); color: var(--muted); }
++
++body.theme-arcane .live-badge,
++body.theme-arcane .voted-badge,
++body.theme-arcane .upcoming-badge,
++body.theme-arcane .finished-badge,
++body.theme-arcane .winner-badge,
++body.theme-arcane .starting-soon-badge {
++    font-family: var(--font);
++    font-weight: 800;
++    letter-spacing: .06em;
++    border-radius: 999px;
++}
++body.theme-arcane .live-badge,
++body.theme-arcane .voted-badge { background: var(--pink-soft); border: 1px solid var(--border); color: var(--pink-bright); box-shadow: none; }
++body.theme-arcane .upcoming-badge,
++body.theme-arcane .finished-badge,
++body.theme-arcane .starting-soon-badge { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); color: var(--muted); }
++body.theme-arcane .winner-badge { background: linear-gradient(135deg, var(--pink-bright), var(--pink)); color: #160814; border: 0; }
++
++body.theme-arcane .match-competitors .competitor { background: rgba(255, 255, 255, .03); border: 1px solid transparent; border-radius: 12px; min-width: 0; }
++body.theme-arcane .match-competitors .competitor.winner,
++body.theme-arcane .match-competitors .competitor.leading { background: var(--pink-soft); border-color: rgba(255, 79, 180, .4); }
++body.theme-arcane .competitor-thumbnail { border-radius: 10px; }
++body.theme-arcane .competitor-rank { border-radius: 999px; background: var(--pink-soft); border: 1px solid rgba(255, 79, 180, .25); color: var(--pink-bright); font-family: var(--font); font-weight: 800; }
++body.theme-arcane .competitor-title {
++    font-family: var(--font);
++    font-weight: 700;
++    line-height: 1.3;
++    overflow-wrap: anywhere;
++    display: -webkit-box;
++    -webkit-line-clamp: 2;
++    -webkit-box-orient: vertical;
++    overflow: hidden;
++    color: var(--text);
++}
++body.theme-arcane .competitor-source { font-family: var(--font); color: var(--muted); }
++body.theme-arcane .vote-percentage { font-family: var(--font); font-weight: 800; color: var(--pink-bright); }
++body.theme-arcane .vs-divider { font-family: var(--font); font-weight: 800; letter-spacing: .16em; color: var(--text-faint); }
++body.theme-arcane .match-footer { border-top: 1px solid var(--line); }
++body.theme-arcane .match-stats .stat { font-family: var(--font); color: var(--muted); }
++
++body.theme-arcane .vote-now-btn,
++body.theme-arcane .match-card .view-details-btn {
++    font-family: var(--font);
++    font-weight: 800;
++    color: #160814;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    border: 0;
++    border-radius: 999px;
++    box-shadow: 0 10px 24px rgba(255, 79, 180, .24);
++}
++body.theme-arcane .view-results-btn,
++body.theme-arcane .view-results-btn.voted {
++    font-family: var(--font);
++    font-weight: 800;
++    background: var(--pink-soft);
++    border: 1px solid var(--border);
++    border-radius: 999px;
++    color: var(--pink-bright);
++    box-shadow: none;
++}
++body.theme-arcane .view-results-btn:hover { background: rgba(255, 79, 180, .25); color: var(--text); }
++
++/* ---------- explore tiles (same panel as the Brackets / Vote pages) ---------- */
++body.theme-arcane .quick-link-card {
++    background: var(--panel);
++    border: 1px solid var(--border);
++    border-radius: 18px;
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++    transition: transform 180ms ease, border-color 180ms ease;
++}
++body.theme-arcane .quick-link-card:hover { background: var(--panel); transform: translateY(-3px); border-color: rgba(255, 79, 180, .5); }
++body.theme-arcane .quick-link-card h3 { font-family: var(--font); font-weight: 800; letter-spacing: -.02em; color: var(--text); text-transform: none; }
++body.theme-arcane .quick-link-card p { color: var(--muted); }
++body.theme-arcane .quick-link-card .link-icon,
++body.theme-arcane .quick-link-card .link-icon i,
++body.theme-arcane .quick-link-card .link-arrow { color: var(--pink-bright); }
++body.theme-arcane .quick-links-section .section-title { color: var(--text); text-align: center; }
+diff --git a/css/arcane-theme.generated.css b/css/arcane-theme.generated.css
+index dbe7814..ce181c6 100644
+--- a/css/arcane-theme.generated.css
++++ b/css/arcane-theme.generated.css
+@@ -1,6 +1,6 @@
+ /* GENERATED by tools/build-arcane-theme.mjs: do not edit by hand.
+    The old gold styling re-coloured for Arcane. Only applies under <body class="theme-arcane">.
+-   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css, css/activity.css, css/vote.css */
++   Sources: css/main.css, css/navigation.css, css/footer.css, css/brackets.css, css/modal.css, css/scrollbar.css, css/settings.css, css/activity.css, css/vote.css, css/matches.css */
+ 
+ /* ===== css/main.css ===== */
+ body.theme-arcane {
+@@ -2090,3 +2090,388 @@ body.theme-arcane .tip-close {
+     color: var(--bg)
+ }
+ 
++/* ===== css/matches.css ===== */
++body.theme-arcane .matches-header {
++    background: linear-gradient(135deg, var(--bg-veil) 0%, #1a1a1a 100%);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .page-title {
++    font-family: var(--font)
++}
++body.theme-arcane .page-subtitle {
++    font-family: var(--font)
++}
++body.theme-arcane .archive-stats {
++    border: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .stat-number {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .filters-section {
++    background: var(--bg-veil)
++}
++body.theme-arcane .search-input {
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font)
++}
++body.theme-arcane .search-input:focus {
++    border-color: var(--pink-bright);
++    box-shadow: 0 0 0 3px rgba(255, 79, 180, 0.1)
++}
++body.theme-arcane .search-button {
++    color: var(--pink-bright)
++}
++body.theme-arcane .filter-label {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .filter-select {
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font)
++}
++body.theme-arcane .filter-select:hover {
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .filter-select:focus {
++    border-color: var(--pink-bright);
++    box-shadow: 0 0 0 3px rgba(255, 79, 180, 0.1)
++}
++body.theme-arcane .clear-filters-btn {
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .clear-filters-btn:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .results-info {
++    font-family: var(--font)
++}
++body.theme-arcane .matches-section {
++    background: var(--bg-veil)
++}
++body.theme-arcane .match-card {
++    border: 2px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .match-card:hover {
++    border-color: rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .match-card.live {
++    border-color: rgba(255, 79, 180, 0.6);
++    background: rgba(255, 79, 180, 0.05);
++    animation: pulse-card-arcane 2s infinite
++}
++@keyframes pulse-card-arcane {
++    0%, 100% {
++        border-color: rgba(255, 79, 180, 0.6);
++        box-shadow: 0 0 0 0 rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        border-color: rgba(255, 79, 180, 0.8);
++        box-shadow: 0 0 0 10px rgba(255, 79, 180, 0)
++    }
++}
++body.theme-arcane .match-card.upcoming {
++    border-color: rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .match-header {
++    border-bottom: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .match-tournament {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .match-round {
++    border-left: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .live-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink)
++}
++body.theme-arcane .upcoming-badge {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .competitor.winner {
++    background: rgba(255, 79, 180, 0.15);
++    border: 1px solid rgba(255, 79, 180, 0.4)
++}
++body.theme-arcane .competitor.leading {
++    background: rgba(255, 79, 180, 0.1);
++    border: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .competitor-rank {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .competitor.winner .competitor-rank {
++    background: rgba(255, 79, 180, 0.3);
++    border-color: rgba(255, 79, 180, 0.6)
++}
++body.theme-arcane .competitor-title {
++    font-family: var(--font)
++}
++body.theme-arcane .competitor-source {
++    font-family: var(--font)
++}
++body.theme-arcane .vote-percentage {
++    font-family: var(--font)
++}
++body.theme-arcane .competitor.winner .vote-percentage, body.theme-arcane .competitor.leading .vote-percentage {
++    color: var(--pink-bright)
++}
++body.theme-arcane .winner-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink-bright)
++}
++body.theme-arcane .leading-badge {
++    background: rgba(255, 79, 180, 0.2);
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink)
++}
++body.theme-arcane .vs-divider {
++    font-family: var(--font)
++}
++body.theme-arcane .match-footer {
++    border-top: 1px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .view-details-btn, body.theme-arcane .vote-now-btn, body.theme-arcane .remind-btn {
++    border: 2px solid rgba(255, 79, 180, 0.4);
++    font-family: var(--font)
++}
++body.theme-arcane .view-details-btn {
++    color: var(--pink-bright)
++}
++body.theme-arcane .view-details-btn:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .vote-now-btn {
++    background: rgba(255, 79, 180, 0.2);
++    border-color: rgba(255, 79, 180, 0.4);
++    color: var(--pink)
++}
++body.theme-arcane .vote-now-btn:hover {
++    background: rgba(255, 79, 180, 0.3);
++    border-color: var(--pink)
++}
++body.theme-arcane .remind-btn {
++    border-color: rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .remind-btn:hover {
++    background: rgba(255, 79, 180, 0.1);
++    border-color: rgba(255, 79, 180, 0.5);
++    color: var(--pink-bright)
++}
++body.theme-arcane .load-more-btn {
++    border: 2px solid var(--pink-bright);
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .load-more-btn:hover {
++    background: var(--pink-bright);
++    color: var(--bg)
++}
++body.theme-arcane .load-info {
++    font-family: var(--font)
++}
++@media (max-width: 480px) {
++    body.theme-arcane .match-round {
++        border-top: 1px solid rgba(255, 79, 180, 0.3)
++    }
++}
++body.theme-arcane .no-results-title {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .no-results-text {
++    font-family: var(--font)
++}
++body.theme-arcane .matches-grid.loading::after {
++    border: 4px solid rgba(255, 79, 180, 0.2);
++    border-top-color: var(--pink-bright)
++}
++body.theme-arcane .remind-btn.active {
++    background: linear-gradient(135deg, rgba(176, 45, 120, 0.2), rgba(176, 45, 120, 0.1));
++    border-color: rgb(176, 45, 120);
++    color: rgb(176, 45, 120)
++}
++body.theme-arcane .loading-spinner {
++    border: 4px solid rgba(255, 79, 180, 0.2)
++}
++body.theme-arcane .starting-soon-badge {
++    background: rgba(255, 79, 180, 0.15);
++    color: var(--pink-bright);
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font)
++}
++body.theme-arcane .newsletter-btn.notifications-enabled {
++    background: linear-gradient(135deg, var(--pink), rgb(176, 45, 120))
++}
++body.theme-arcane .newsletter-btn.notifications-enabled:hover {
++    background: linear-gradient(135deg, rgb(176, 45, 120), rgb(176, 45, 120))
++}
++body.theme-arcane .newsletter-btn.notifications-disabled {
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink));
++    color: var(--bg)
++}
++body.theme-arcane .newsletter-btn.notifications-disabled:hover {
++    background: linear-gradient(135deg, #ff9bd6, var(--pink-bright))
++}
++body.theme-arcane .starting-soon-badge.countdown {
++    background: linear-gradient(135deg, rgba(255, 79, 180, 0.2), rgba(255, 79, 180, 0.1));
++    border: 1px solid rgba(255, 79, 180, 0.4);
++    color: var(--pink-bright)
++}
++body.theme-arcane .loader {
++    border: 5px solid rgba(255, 79, 180, 0.2);
++    border-top-color: var(--pink-bright)
++}
++body.theme-arcane .loading-text {
++    font-family: var(--font);
++    color: var(--pink-bright)
++}
++body.theme-arcane .loading-subtext {
++    font-family: var(--font)
++}
++body.theme-arcane .view-results-btn {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%);
++    font-family: var(--font);
++    box-shadow: 0 4px 12px rgba(176, 45, 120, 0.25)
++}
++body.theme-arcane .view-results-btn.voted {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%)
++}
++body.theme-arcane .view-results-btn:hover {
++    box-shadow: 0 8px 20px rgba(176, 45, 120, 0.4)
++}
++body.theme-arcane .view-results-btn:active {
++    box-shadow: 0 4px 12px rgba(176, 45, 120, 0.3)
++}
++body.theme-arcane .vote-now-btn {
++    background: linear-gradient(135deg, var(--pink-bright) 0%, rgb(176, 45, 120) 100%);
++    border: 2px solid rgba(255, 79, 180, 0.3);
++    font-family: var(--font);
++    box-shadow: 0 4px 12px rgba(255, 79, 180, 0.25)
++}
++body.theme-arcane .vote-now-btn:hover {
++    box-shadow: 0 8px 20px rgba(255, 79, 180, 0.4);
++    border-color: rgba(255, 79, 180, 0.5)
++}
++body.theme-arcane .match-card.user-voted {
++    border: 2px solid rgba(176, 45, 120, 0.4);
++    background: linear-gradient(135deg, rgba(176, 45, 120, 0.05) 0%, rgba(176, 45, 120, 0.02) 100%);
++    box-shadow: 0 4px 20px rgba(176, 45, 120, 0.15)
++}
++body.theme-arcane .match-card.user-voted:hover {
++    border-color: rgba(176, 45, 120, 0.6);
++    box-shadow: 0 6px 25px rgba(176, 45, 120, 0.25)
++}
++body.theme-arcane .voted-badge {
++    background: linear-gradient(135deg, rgb(176, 45, 120) 0%, rgb(176, 45, 120) 100%);
++    box-shadow: 0 2px 8px rgba(176, 45, 120, 0.3);
++    animation: pulse-subtle-arcane 2s ease-in-out infinite
++}
++@keyframes pulse-subtle-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(176, 45, 120, 0.3)
++    }
++    50% {
++        box-shadow: 0 4px 12px rgba(176, 45, 120, 0.5)
++    }
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++@keyframes xp-glow-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        box-shadow: 0 4px 16px rgba(255, 79, 180, 0.7)
++    }
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++body.theme-arcane .xp-reward-badge {
++    background: linear-gradient(135deg, var(--pink) 0%, var(--pink) 100%);
++    color: var(--bg);
++    box-shadow: 0 2px 8px rgba(255, 79, 180, 0.5);
++    animation: xp-glow-arcane 2s ease-in-out infinite
++}
++@keyframes xp-glow-arcane {
++    0%, 100% {
++        box-shadow: 0 2px 8px rgba(255, 79, 180, 0.4)
++    }
++    50% {
++        box-shadow: 0 4px 16px rgba(255, 79, 180, 0.7)
++    }
++}
++body.theme-arcane .xp-reward-badge {
++    background: rgba(255, 79, 180, 0.15);
++    border: 1px solid rgba(255, 79, 180, 0.3);
++    color: var(--pink)
++}
++body.theme-arcane .page-intro a {
++    color: var(--pink-bright)
++}
++body.theme-arcane .page-intro a:hover {
++    color: var(--text);
++    border-bottom-color: var(--pink-bright)
++}
++body.theme-arcane .inline-link {
++    color: var(--pink-bright);
++    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
++}
++body.theme-arcane .inline-link:hover {
++    color: var(--text);
++    border-bottom-color: var(--pink-bright)
++}
++body.theme-arcane .quick-links-section .section-title {
++    color: var(--pink-bright);
++    font-family: var(--font)
++}
++body.theme-arcane .quick-link-card::before {
++    background: linear-gradient(90deg, var(--pink-bright), rgb(176, 45, 120))
++}
++body.theme-arcane .quick-link-card:hover {
++    background: rgba(255, 79, 180, 0.12);
++    border-color: var(--pink-bright)
++}
++body.theme-arcane .quick-link-card h3 {
++    color: var(--text);
++    font-family: var(--font)
++}
++body.theme-arcane .link-arrow {
++    color: var(--pink-bright)
++}
++body.theme-arcane .filter-tip i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .link-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .quick-link-card:hover .link-icon i {
++    color: var(--text);
++    filter: drop-shadow(0 0 15px rgba(255, 79, 180, 0.6))
++}
++body.theme-arcane .quick-link-card:nth-child(3) .link-icon i {
++    color: var(--pink-bright)
++}
++body.theme-arcane .quick-link-card:nth-child(4) .link-icon i {
++    color: var(--pink-bright)
++}
++
+diff --git a/js/match-card-renderer.js b/js/match-card-renderer.js
+index 9667f49..963261d 100644
+--- a/js/match-card-renderer.js
++++ b/js/match-card-renderer.js
+@@ -3,6 +3,17 @@
+ // Used by: homepage.js, matches.js
+ // ========================================
+ 
++// Titles come from YouTube, so never splice them into HTML or attributes unescaped.
++function escapeHtml(value) {
++    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++}
++
++// "1 vote", "2 votes"
++function voteLabel(count) {
++    const n = Number(count) || 0;
++    return `${n.toLocaleString()} ${n === 1 ? 'vote' : 'votes'}`;
++}
++
+ // ========================================
+ // COUNTDOWN TIMER HELPER
+ // ========================================
+@@ -115,10 +126,10 @@ export function createMatchCard(match) {
+     
+     // Generate thumbnail URLs
+     const comp1Thumbnail = match.competitor1.videoId 
+-        ? `https://img.youtube.com/vi/${match.competitor1.videoId}/mqdefault.jpg`
++        ? `https://img.youtube.com/vi/${encodeURIComponent(match.competitor1.videoId)}/mqdefault.jpg`
+         : '';
+     const comp2Thumbnail = match.competitor2.videoId 
+-        ? `https://img.youtube.com/vi/${match.competitor2.videoId}/mqdefault.jpg`
++        ? `https://img.youtube.com/vi/${encodeURIComponent(match.competitor2.videoId)}/mqdefault.jpg`
+         : '';
+     
+     // ✅ Extract artist names for better alt text
+@@ -128,18 +139,18 @@ export function createMatchCard(match) {
+ 
+ 
+ const cardHTML = `
+-    <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
+-         data-tournament="${match.tournament}" 
+-         data-round="${match.round}" 
+-         data-status="${match.status}"
+-         data-match-id="${match.id}"
++    <div class="match-card ${escapeHtml(statusClass)} ${match.hasVoted ? 'user-voted' : ''}" 
++         data-tournament="${escapeHtml(match.tournament)}" 
++         data-round="${escapeHtml(match.round)}" 
++         data-status="${escapeHtml(match.status)}"
++         data-match-id="${escapeHtml(match.id)}"
+          data-date="${match.date || ''}"
+-         data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
++         data-match-title="${escapeHtml(`${match.competitor1.name} vs ${match.competitor2.name}`)}"
+          style="cursor: pointer;">
+         
+     <div class="match-header">
+-        <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
+-        <span class="match-round">${formatRoundName(match.round)}</span>
++        <span class="match-tournament">${escapeHtml(formatTournamentName(match.tournament))}</span>
++        <span class="match-round">${escapeHtml(match.roundLabel || formatRoundName(match.round))}</span>
+         ${match.hasVoted && match.status === 'live' 
+             ? '<span class="voted-badge"><i class="fa-solid fa-check"></i> Voted</span>' 
+             : statusBadge
+@@ -150,16 +161,16 @@ const cardHTML = `
+                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">
+                     ${comp1Thumbnail ? `
+                         <img src="${comp1Thumbnail}" 
+-                             alt="${match.competitor1.name} by ${artist1} - League of Legends Music Video Thumbnail" 
++                             alt="${escapeHtml(match.competitor1.name)} by ${escapeHtml(artist1)} - Arcane Moments edit thumbnail" 
+                              class="competitor-thumbnail"
+                              loading="lazy"
+                              width="320"
+                              height="180">
+                     ` : ''}
+-                    <div class="competitor-rank">#${match.competitor1.seed}</div>
++                    ${match.competitor1.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor1.seed)}</div>` : ''}
+                     <div class="competitor-details">
+-                        <h3 class="competitor-title">${match.competitor1.name}</h3>
+-                        <p class="competitor-source">${match.competitor1.source}</p>
++                        <h3 class="competitor-title">${escapeHtml(match.competitor1.name)}</h3>
++                        <p class="competitor-source">${escapeHtml(match.competitor1.source)}</p>
+                     </div>
+                     <div class="competitor-result">
+                         ${showPercentages ? `
+@@ -176,16 +187,16 @@ const cardHTML = `
+                 <div class="competitor ${getCompetitorClass(match.competitor2, match.status)}">
+                     ${comp2Thumbnail ? `
+                         <img src="${comp2Thumbnail}" 
+-                             alt="${match.competitor2.name} by ${artist2} - League of Legends Music Video Thumbnail" 
++                             alt="${escapeHtml(match.competitor2.name)} by ${escapeHtml(artist2)} - Arcane Moments edit thumbnail" 
+                              class="competitor-thumbnail"
+                              loading="lazy"
+                              width="320"
+                              height="180">
+                     ` : ''}
+-                    <div class="competitor-rank">#${match.competitor2.seed}</div>
++                    ${match.competitor2.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor2.seed)}</div>` : ''}
+                     <div class="competitor-details">
+-                        <h3 class="competitor-title">${match.competitor2.name}</h3>
+-                        <p class="competitor-source">${match.competitor2.source}</p>
++                        <h3 class="competitor-title">${escapeHtml(match.competitor2.name)}</h3>
++                        <p class="competitor-source">${escapeHtml(match.competitor2.source)}</p>
+                     </div>
+                     <div class="competitor-result">
+                         ${showPercentages ? `
+@@ -278,7 +289,7 @@ function getFooterContent(match) {
+     
+     if (match.status === 'completed') {
+         statsHtml += `
+-            <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
++            <span class="stat"><i class="fas fa-chart-bar"></i> ${voteLabel(match.totalVotes)}</span>
+             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
+         `;
+     } else if (match.status === 'live') {
+@@ -288,7 +299,7 @@ function getFooterContent(match) {
+         // Only show vote count if user already voted
+         if (showVoteData) {
+             statsHtml += `
+-                <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
++                <span class="stat"><i class="fas fa-chart-bar"></i> ${voteLabel(match.totalVotes)}</span>
+             `;
+         }
+         
+@@ -366,14 +377,7 @@ function getTimeUntilMatch(dateString) {
+ }
+ 
+ function formatTournamentName(tournament) {
+-    const names = {
+-        'arcane-test-01': 'Arcane Moments',
+-        'anthem-arena-championship': 'Anthem Arena Championship S1',
+-        '2025-worlds-anthems': 'Anthem Arena Championship S1',
+-        'Anthems Arena Championship': 'Anthem Arena Championship S1',
+-        'Anthem Arena Championship': 'Anthem Arena Championship S1'
+-    };
+-    return names[tournament] || tournament;
++    return tournament || 'Tournament';
+ }
+ 
+ function formatRoundName(round) {
+diff --git a/js/matches.js b/js/matches.js
+index 5c83457..1d9a96c 100644
+--- a/js/matches.js
++++ b/js/matches.js
+@@ -1,5 +1,5 @@
+ // ========================================
+-// MATCHES PAGE FUNCTIONALITY - LEAGUE MUSIC TOURNAMENT
++// MATCHES PAGE FUNCTIONALITY
+ // ========================================
+ 
+ // Import API Client (uses Netlify Edge cache)
+@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
+     // ✅ FIXED: Show full-page spinner
+     showLoadingSpinner('Loading matches...');
+     
+-    console.log('League Music Tournament matches page loaded successfully');
++    console.log('Matches page loaded successfully');
+     
+     try {
+         // ❌ REMOVE: showMatchesLoading();
+@@ -213,7 +213,7 @@ async function loadMatchesFromFirebase() {
+             }
+             
+             // ✨ FIX ROUND NAMES
+-            const roundName = getRoundName(match.round);
++            const roundName = getRoundName(match.round, match);
+             
+             // Calculate percentages
+       // Calculate percentages
+@@ -225,7 +225,8 @@ const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) *
+ const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+ 
+ // 🔧 NORMALIZE TOURNAMENT NAME
+-const tournamentName = match.tournament || 'Anthem Arena Championship S1';
++// The cup's own name is stored on the match by the bracket builder
++const tournamentName = match.tournamentName || match.tournament || 'Tournament';
+ 
+ // Inside the forEach loop where you push to allMatches:
+ 
+@@ -236,9 +237,11 @@ const userVotedSongId = hasVoted ? getUserVotedSongId(match.matchId) : null;
+ allMatches.push({
+     id: match.matchId,
+     tournament: tournamentName,
+-    round: roundName,
++    round: roundName,                       // filter value, e.g. "round-1"
++    roundNumber: match.round,               // for ordering the round filter
++    roundLabel: match.roundLabel || null,   // the round's own name, e.g. "Final", "Semi-finals", "Round of 16"
+     status: match.status || 'upcoming',
+-    date: match.date || '2025-11-01',
++    date: match.date || null,
+         endDate: match.endDate || null,  // ✅ ADD THIS LINE
+ 
+     totalVotes: totalVotes,
+@@ -285,7 +288,10 @@ allMatches.push({
+ }
+ 
+ // ✨ ADD THIS HELPER FUNCTION
+-function getRoundName(roundNumber) {
++function getRoundName(roundNumber, match) {
++    // Cups made by the bracket builder name their own rounds, so every round is simply "round-N"
++    if (match && match.roundLabel) return `round-${roundNumber}`;
++    // Older 64-bracket matches keep the old names
+     const roundNames = {
+         1: 'round-1',
+         2: 'round-2',
+@@ -396,13 +402,10 @@ function populateRoundFilter() {
+     // Get unique rounds from matches
+     const rounds = [...new Set(allMatches.map(m => m.round))];
+     
+-    // Sort rounds in proper order
+-    const roundOrder = ['round-1', 'round-2', 'round-3', 'quarterfinals', 'semifinals', 'finals'];
+-    rounds.sort((a, b) => {
+-        const indexA = roundOrder.indexOf(a);
+-        const indexB = roundOrder.indexOf(b);
+-        return indexA - indexB;
+-    });
++    // Order by round number (works for any bracket size) and name each round from the match data
++    const numberOf = slug => allMatches.find(m => m.round === slug)?.roundNumber ?? 0;
++    const labelOf = slug => allMatches.find(m => m.round === slug)?.roundLabel || formatRoundNameForDisplay(slug);
++    rounds.sort((a, b) => numberOf(a) - numberOf(b));
+     
+     console.log('📋 Available rounds:', rounds);
+     
+@@ -414,7 +417,7 @@ function populateRoundFilter() {
+         if (round) {
+             const option = document.createElement('option');
+             option.value = round;
+-            option.textContent = formatRoundNameForDisplay(round);
++            option.textContent = labelOf(round);
+             roundFilter.appendChild(option);
+         }
+     });
+diff --git a/matches.html b/matches.html
+index dd5ffbc..4a5b1bd 100644
+--- a/matches.html
++++ b/matches.html
+@@ -6,8 +6,8 @@
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     
+     <!-- SEO Meta Tags -->
+-    <title>Match Results & Schedule | LoL Music Tournament | Anthem Arena</title>
+-    <meta name="description" content="View all League of Legends music tournament matches, results, and schedules. See which songs are winning and track upcoming battles in the bracket.">
++    <title>Match Archive | Arcane Moments</title>
++    <meta name="description" content="View every Arcane Moments match, result and schedule. See which edits are winning and cast your vote.">
+     <link rel="canonical" href="https://anthemarena.com/matches">
+     
+     <!-- Favicon -->
+@@ -19,22 +19,22 @@
+     <!-- Open Graph -->
+     <meta property="og:type" content="website">
+     <meta property="og:url" content="https://anthemarena.com/matches">
+-    <meta property="og:title" content="Match Results & Schedule | Anthem Arena">
+-    <meta property="og:description" content="Browse all League of Legends music tournament matchups, live results, and voting history. Track your favorite songs' performance.">
++    <meta property="og:title" content="Match Archive | Arcane Moments">
++    <meta property="og:description" content="Browse every Arcane Moments matchup, live results and voting history.">
+     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta property="og:image:alt" content="Anthem Arena - LoL Music Tournament Match Archive">
++    <meta property="og:image:alt" content="Arcane Moments match archive">
+     <meta property="og:image:width" content="1200">
+     <meta property="og:image:height" content="630">
+     
+     <!-- Twitter Card -->
+     <meta name="twitter:card" content="summary_large_image">
+-    <meta name="twitter:title" content="Match Results & Schedule | Anthem Arena">
+-    <meta name="twitter:description" content="View all LoL music tournament matches and results.">
++    <meta name="twitter:title" content="Match Archive | Arcane Moments">
++    <meta name="twitter:description" content="View every Arcane Moments match and result.">
+     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta name="twitter:image:alt" content="Anthem Arena Match Archive">
++    <meta name="twitter:image:alt" content="Arcane Moments match archive">
+     
+     <!-- Fonts -->
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+     
+     <!-- Stylesheets -->
+@@ -44,6 +44,9 @@
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+     <link rel="stylesheet" href="/css/settings.css">
++    <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+ 
+     
+     <!-- Schema.org Structured Data - ItemList -->
+@@ -66,7 +69,7 @@
+ 
+     <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
++<body class="theme-arcane">
+ 
+     <div id="nav-placeholder"></div>
+ <script type="module" src="/js/navigation.js"></script>
+@@ -75,8 +78,8 @@
+     <section class="matches-header">
+         <div class="container">
+             <div class="header-content">
+-                <h1 class="page-title">Anthem Arena Match Archive</h1>
+-                <p class="page-subtitle">Browse every epic showdown in tournament history</p>
++                <h1 class="page-title">Match Archive</h1>
++                <p class="page-subtitle">Every matchup, live or finished</p>
+             </div>
+ 
+            <!-- Stats Overview -->
+@@ -95,7 +98,7 @@
+     </div>
+     <div class="stat-item">
+         <span class="stat-number" id="unique-videos">0</span>
+-        <span class="stat-label">Unique Videos</span>
++        <span class="stat-label">Unique Edits</span>
+     </div>
+ </div>
+         </div>
+@@ -107,12 +110,12 @@
+     <section class="page-intro">
+         <div class="container">
+             <p>
+-                Browse all League of Legends music tournament matches from Anthem Arena. 
+-                Click any active match to cast your vote and influence the results. 
++                Browse every Arcane Moments matchup. 
++                Click any live match to cast your vote and influence the results. 
+                 View the <a href="/brackets.html">full tournament bracket</a> to see progression 
+-                through each round, explore the <a href="/music-gallery.html">complete music gallery</a> 
+-                to preview all 64 competing songs, or check <a href="/stats.html">detailed statistics</a> 
+-                for voting trends and song performance. Track your personal voting history on the 
++                through each round, explore the <a href="/music-gallery.html">gallery</a> 
++                to preview every competing edit, or check <a href="/stats.html">detailed statistics</a> 
++                for voting trends and edit performance. Track your personal voting history on the 
+                 <a href="/my-votes.html">my votes page</a>.
+             </p>
+         </div>
+@@ -131,7 +134,7 @@
+                         type="text" 
+                         id="search-input" 
+                         class="search-input" 
+-                        placeholder="Search music videos, artists, categories..."
++                        placeholder="Search edits or creators..."
+                         onkeyup="filterMatches()"
+                     >
+                     <button class="search-button">
+@@ -146,7 +149,6 @@
+                     <label class="filter-label">Tournament:</label>
+                     <select id="tournament-filter" class="filter-select" onchange="filterMatches()">
+                         <option value="all">All Tournaments</option>
+-                        <option value="worlds-anthems-2025">Anthem Arena Championship S1</option>
+                  
+                     </select>
+                 </div>
+@@ -155,10 +157,6 @@
+                     <label class="filter-label">Round:</label>
+                     <select id="round-filter" class="filter-select" onchange="filterMatches()">
+                         <option value="all">All Rounds</option>
+-                        <option value="finals">Finals</option>
+-                        <option value="semifinals">Semifinals</option>
+-                        <option value="quarterfinals">Quarterfinals</option>
+-                        <option value="round-1">Round 1</option>
+                     </select>
+                 </div>
+ 
+@@ -228,19 +226,19 @@
+                 <a href="/brackets.html" class="quick-link-card">
+                     <div class="link-icon"><i class="fa-solid fa-chart-column"></i></div>
+                     <h3>Tournament Bracket</h3>
+-                    <p>Visualize the complete bracket structure and see how songs advance through each round</p>
++                    <p>Visualize the complete bracket and see how edits advance through each round</p>
+                     <span class="link-arrow">→</span>
+                 </a>
+                 <a href="/stats.html" class="quick-link-card">
+                     <div class="link-icon"><i class="fa-solid fa-chart-line"></i></div>
+                     <h3>Statistics Dashboard</h3>
+-                    <p>Analyze voting patterns, upsets, participation rates, and song performance metrics</p>
++                    <p>Analyze voting patterns, upsets, participation rates and edit performance</p>
+                     <span class="link-arrow">→</span>
+                 </a>
+                 <a href="/music-gallery.html" class="quick-link-card">
+                     <div class="link-icon"><i class="fa-solid fa-music"></i></div>
+-                    <h3>Music Gallery</h3>
+-                    <p>Browse all 64 League music videos organized by virtual band and release year</p>
++                    <h3>Gallery</h3>
++                    <p>Preview every edit competing in the tournament</p>
+                     <span class="link-arrow">→</span>
+                 </a>
+                 <a href="/my-votes.html" class="quick-link-card">
+diff --git a/tools/build-arcane-theme.mjs b/tools/build-arcane-theme.mjs
+index 7d5db3c..14bfb6d 100644
+--- a/tools/build-arcane-theme.mjs
++++ b/tools/build-arcane-theme.mjs
+@@ -26,7 +26,8 @@ import postcss from 'postcss';
+ const SOURCES = [
+     'css/main.css', 'css/navigation.css', 'css/footer.css', 'css/brackets.css',
+     'css/modal.css', 'css/scrollbar.css', 'css/settings.css',
+-    'css/activity.css', { file: 'css/vote.css', greens: true }
++    'css/activity.css', { file: 'css/vote.css', greens: true },
++    { file: 'css/matches.css', greens: true }
+ ].map(s => typeof s === 'string' ? { file: s } : s);
+ const OUT = 'css/arcane-theme.generated.css';
+ const SCOPE = 'body.theme-arcane';

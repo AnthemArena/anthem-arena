@@ -1,5 +1,5 @@
 // ========================================
-// MATCHES PAGE FUNCTIONALITY - LEAGUE MUSIC TOURNAMENT
+// MATCHES PAGE FUNCTIONALITY
 // ========================================
 
 // Import API Client (uses Netlify Edge cache)
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ✅ FIXED: Show full-page spinner
     showLoadingSpinner('Loading matches...');
     
-    console.log('League Music Tournament matches page loaded successfully');
+    console.log('Matches page loaded successfully');
     
     try {
         // ❌ REMOVE: showMatchesLoading();
@@ -213,7 +213,7 @@ async function loadMatchesFromFirebase() {
             }
             
             // ✨ FIX ROUND NAMES
-            const roundName = getRoundName(match.round);
+            const roundName = getRoundName(match.round, match);
             
             // Calculate percentages
       // Calculate percentages
@@ -225,7 +225,8 @@ const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 
 const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
 
 // 🔧 NORMALIZE TOURNAMENT NAME
-const tournamentName = match.tournament || 'Anthem Arena Championship S1';
+// The cup's own name is stored on the match by the bracket builder
+const tournamentName = match.tournamentName || match.tournament || 'Tournament';
 
 // Inside the forEach loop where you push to allMatches:
 
@@ -236,9 +237,11 @@ const userVotedSongId = hasVoted ? getUserVotedSongId(match.matchId) : null;
 allMatches.push({
     id: match.matchId,
     tournament: tournamentName,
-    round: roundName,
+    round: roundName,                       // filter value, e.g. "round-1"
+    roundNumber: match.round,               // for ordering the round filter
+    roundLabel: match.roundLabel || null,   // the round's own name, e.g. "Final", "Semi-finals", "Round of 16"
     status: match.status || 'upcoming',
-    date: match.date || '2025-11-01',
+    date: match.date || null,
         endDate: match.endDate || null,  // ✅ ADD THIS LINE
 
     totalVotes: totalVotes,
@@ -285,7 +288,10 @@ allMatches.push({
 }
 
 // ✨ ADD THIS HELPER FUNCTION
-function getRoundName(roundNumber) {
+function getRoundName(roundNumber, match) {
+    // Cups made by the bracket builder name their own rounds, so every round is simply "round-N"
+    if (match && match.roundLabel) return `round-${roundNumber}`;
+    // Older 64-bracket matches keep the old names
     const roundNames = {
         1: 'round-1',
         2: 'round-2',
@@ -396,13 +402,10 @@ function populateRoundFilter() {
     // Get unique rounds from matches
     const rounds = [...new Set(allMatches.map(m => m.round))];
     
-    // Sort rounds in proper order
-    const roundOrder = ['round-1', 'round-2', 'round-3', 'quarterfinals', 'semifinals', 'finals'];
-    rounds.sort((a, b) => {
-        const indexA = roundOrder.indexOf(a);
-        const indexB = roundOrder.indexOf(b);
-        return indexA - indexB;
-    });
+    // Order by round number (works for any bracket size) and name each round from the match data
+    const numberOf = slug => allMatches.find(m => m.round === slug)?.roundNumber ?? 0;
+    const labelOf = slug => allMatches.find(m => m.round === slug)?.roundLabel || formatRoundNameForDisplay(slug);
+    rounds.sort((a, b) => numberOf(a) - numberOf(b));
     
     console.log('📋 Available rounds:', rounds);
     
@@ -414,7 +417,7 @@ function populateRoundFilter() {
         if (round) {
             const option = document.createElement('option');
             option.value = round;
-            option.textContent = formatRoundNameForDisplay(round);
+            option.textContent = labelOf(round);
             roundFilter.appendChild(option);
         }
     });

@@ -3,6 +3,17 @@
 // Used by: homepage.js, matches.js
 // ========================================
 
+// Titles come from YouTube, so never splice them into HTML or attributes unescaped.
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// "1 vote", "2 votes"
+function voteLabel(count) {
+    const n = Number(count) || 0;
+    return `${n.toLocaleString()} ${n === 1 ? 'vote' : 'votes'}`;
+}
+
 // ========================================
 // COUNTDOWN TIMER HELPER
 // ========================================
@@ -115,10 +126,10 @@ export function createMatchCard(match) {
     
     // Generate thumbnail URLs
     const comp1Thumbnail = match.competitor1.videoId 
-        ? `https://img.youtube.com/vi/${match.competitor1.videoId}/mqdefault.jpg`
+        ? `https://img.youtube.com/vi/${encodeURIComponent(match.competitor1.videoId)}/mqdefault.jpg`
         : '';
     const comp2Thumbnail = match.competitor2.videoId 
-        ? `https://img.youtube.com/vi/${match.competitor2.videoId}/mqdefault.jpg`
+        ? `https://img.youtube.com/vi/${encodeURIComponent(match.competitor2.videoId)}/mqdefault.jpg`
         : '';
     
     // ✅ Extract artist names for better alt text
@@ -128,18 +139,18 @@ export function createMatchCard(match) {
 
 
 const cardHTML = `
-    <div class="match-card ${statusClass} ${match.hasVoted ? 'user-voted' : ''}" 
-         data-tournament="${match.tournament}" 
-         data-round="${match.round}" 
-         data-status="${match.status}"
-         data-match-id="${match.id}"
+    <div class="match-card ${escapeHtml(statusClass)} ${match.hasVoted ? 'user-voted' : ''}" 
+         data-tournament="${escapeHtml(match.tournament)}" 
+         data-round="${escapeHtml(match.round)}" 
+         data-status="${escapeHtml(match.status)}"
+         data-match-id="${escapeHtml(match.id)}"
          data-date="${match.date || ''}"
-         data-match-title="${match.competitor1.name} vs ${match.competitor2.name}"
+         data-match-title="${escapeHtml(`${match.competitor1.name} vs ${match.competitor2.name}`)}"
          style="cursor: pointer;">
         
     <div class="match-header">
-        <span class="match-tournament">${formatTournamentName(match.tournament)}</span>
-        <span class="match-round">${formatRoundName(match.round)}</span>
+        <span class="match-tournament">${escapeHtml(formatTournamentName(match.tournament))}</span>
+        <span class="match-round">${escapeHtml(match.roundLabel || formatRoundName(match.round))}</span>
         ${match.hasVoted && match.status === 'live' 
             ? '<span class="voted-badge"><i class="fa-solid fa-check"></i> Voted</span>' 
             : statusBadge
@@ -150,16 +161,16 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">
                     ${comp1Thumbnail ? `
                         <img src="${comp1Thumbnail}" 
-                             alt="${match.competitor1.name} by ${artist1} - League of Legends Music Video Thumbnail" 
+                             alt="${escapeHtml(match.competitor1.name)} by ${escapeHtml(artist1)} - Arcane Moments edit thumbnail" 
                              class="competitor-thumbnail"
                              loading="lazy"
                              width="320"
                              height="180">
                     ` : ''}
-                    <div class="competitor-rank">#${match.competitor1.seed}</div>
+                    ${match.competitor1.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor1.seed)}</div>` : ''}
                     <div class="competitor-details">
-                        <h3 class="competitor-title">${match.competitor1.name}</h3>
-                        <p class="competitor-source">${match.competitor1.source}</p>
+                        <h3 class="competitor-title">${escapeHtml(match.competitor1.name)}</h3>
+                        <p class="competitor-source">${escapeHtml(match.competitor1.source)}</p>
                     </div>
                     <div class="competitor-result">
                         ${showPercentages ? `
@@ -176,16 +187,16 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor2, match.status)}">
                     ${comp2Thumbnail ? `
                         <img src="${comp2Thumbnail}" 
-                             alt="${match.competitor2.name} by ${artist2} - League of Legends Music Video Thumbnail" 
+                             alt="${escapeHtml(match.competitor2.name)} by ${escapeHtml(artist2)} - Arcane Moments edit thumbnail" 
                              class="competitor-thumbnail"
                              loading="lazy"
                              width="320"
                              height="180">
                     ` : ''}
-                    <div class="competitor-rank">#${match.competitor2.seed}</div>
+                    ${match.competitor2.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor2.seed)}</div>` : ''}
                     <div class="competitor-details">
-                        <h3 class="competitor-title">${match.competitor2.name}</h3>
-                        <p class="competitor-source">${match.competitor2.source}</p>
+                        <h3 class="competitor-title">${escapeHtml(match.competitor2.name)}</h3>
+                        <p class="competitor-source">${escapeHtml(match.competitor2.source)}</p>
                     </div>
                     <div class="competitor-result">
                         ${showPercentages ? `
@@ -278,7 +289,7 @@ function getFooterContent(match) {
     
     if (match.status === 'completed') {
         statsHtml += `
-            <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
+            <span class="stat"><i class="fas fa-chart-bar"></i> ${voteLabel(match.totalVotes)}</span>
             <span class="stat"><i class="far fa-calendar"></i> ${formatDate(match.date)}</span>
         `;
     } else if (match.status === 'live') {
@@ -288,7 +299,7 @@ function getFooterContent(match) {
         // Only show vote count if user already voted
         if (showVoteData) {
             statsHtml += `
-                <span class="stat"><i class="fas fa-chart-bar"></i> ${match.totalVotes.toLocaleString()} votes</span>
+                <span class="stat"><i class="fas fa-chart-bar"></i> ${voteLabel(match.totalVotes)}</span>
             `;
         }
         
@@ -366,14 +377,7 @@ function getTimeUntilMatch(dateString) {
 }
 
 function formatTournamentName(tournament) {
-    const names = {
-        'arcane-test-01': 'Arcane Moments',
-        'anthem-arena-championship': 'Anthem Arena Championship S1',
-        '2025-worlds-anthems': 'Anthem Arena Championship S1',
-        'Anthems Arena Championship': 'Anthem Arena Championship S1',
-        'Anthem Arena Championship': 'Anthem Arena Championship S1'
-    };
-    return names[tournament] || tournament;
+    return tournament || 'Tournament';
 }
 
 function formatRoundName(round) {

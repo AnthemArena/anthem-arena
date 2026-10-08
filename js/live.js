@@ -14,14 +14,10 @@ import { getAllMatches } from './api-client.js';
 // ========================================
 let allLiveMatches = [];
 
-// ========================================
-// ROUND COUNTDOWN CONFIGURATION
-// ========================================
-const ROUND_CONFIG = {
-    roundName: "ROUND 2",
-    roundDescription: "Single Elimination • 16 Matches",
-    endDate: new Date('2025-11-24T19:00:00Z')
-};
+// Names come from YouTube and from users, so never splice them into HTML or attributes unescaped.
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 // ========================================
 // LIVE ACTIVITY TICKER (using edge cache)
@@ -125,8 +121,8 @@ function displayActivityInTicker(activity) {
     const songName = activity.votedForName || activity.songTitle || 'a song';
     
     tickerText.innerHTML = `
-        <strong>${username}</strong> voted for 
-        <span class="highlight">${songName}</span> 
+        <strong>${escapeHtml(username)}</strong> voted for 
+        <span class="highlight">${escapeHtml(songName)}</span> 
         <span class="time-ago">${timeAgo}</span>
     `;
 }
@@ -205,10 +201,10 @@ async function loadMiniFeed() {
             
             return `
                 <div class="mini-activity-card" style="animation-delay: ${index * 0.1}s">
-                    <img src="${thumbnail}" alt="${songName}" class="mini-thumbnail" loading="lazy">
+                    <img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(songName)}" class="mini-thumbnail" loading="lazy">
                     <div class="mini-info">
-                        <div class="mini-user">${username}</div>
-                        <div class="mini-song">${songName}</div>
+                        <div class="mini-user">${escapeHtml(username)}</div>
+                        <div class="mini-song">${escapeHtml(songName)}</div>
                     </div>
                     <div class="mini-time">${timeAgo}</div>
                 </div>
@@ -373,62 +369,73 @@ function resetSocialBanner() {
 window.resetSocialBanner = resetSocialBanner;
 
 // ========================================
-// DISPLAY COUNTDOWN BANNER
+// ROUND BANNER
+// Worked out from the live matches themselves: which round is live, how many matches, and (only if the
+// matches have an end date) a real countdown. Nothing here is hard-coded to a round or a date.
 // ========================================
+let roundCountdownTimer = null;
+
 function displayRoundCountdown() {
     const container = document.querySelector('.social-container');
-    if (!container) return;
-    
+    if (!container || container.querySelector('.countdown-banner')) return;
+
+    // Created up front (the activity ticker attaches itself to it) and filled in once the matches are known
     const banner = document.createElement('div');
     banner.className = 'countdown-banner';
-    banner.innerHTML = `
-        <div class="countdown-content">
-            <i class="fa-solid fa-trophy"></i> <strong>${ROUND_CONFIG.roundName} NOW LIVE!</strong> • ${ROUND_CONFIG.roundDescription} • Ends in <span id="countdownTimer">...</span>
-        </div>
-    `;
-    
+    banner.style.display = 'none';
+    banner.innerHTML = '<div class="countdown-content"></div>';
     container.insertBefore(banner, container.firstChild);
-    
-    // Start countdown
-    updateCountdown();
-    setInterval(updateCountdown, 1000); // Update every second
 }
 
-// ========================================
-// UPDATE COUNTDOWN TIMER
-// ========================================
-function updateCountdown() {
+function describeLiveRound() {
+    if (allLiveMatches.length === 0) return null;
+    const firstRound = Math.min(...allLiveMatches.map(m => m.round || 1));
+    const inRound = allLiveMatches.filter(m => (m.round || 1) === firstRound);
+    const ends = inRound.map(m => (m.endDate ? new Date(m.endDate) : null)).filter(d => d && !isNaN(d));
+    return {
+        label: inRound[0].roundLabel || `Round ${firstRound}`,     // e.g. "Final", "Semi-finals", "Round of 16"
+        count: inRound.length,
+        endDate: ends.length ? new Date(Math.min(...ends)) : null  // the earliest deadline, or none
+    };
+}
+
+function updateRoundBanner() {
+    const banner = document.querySelector('.countdown-banner');
+    if (!banner) return;
+    clearInterval(roundCountdownTimer);
+
+    const info = describeLiveRound();
+    if (!info) { banner.style.display = 'none'; return; }
+
+    const matchWord = info.count === 1 ? 'match' : 'matches';
+    banner.querySelector('.countdown-content').innerHTML = `
+        <i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong> • ${info.count} ${matchWord}${
+            info.endDate ? ' • Ends in <span id="countdownTimer">...</span>' : ' • Voting is open'}
+    `;
+    banner.style.display = '';
+
+    if (info.endDate) {
+        const tick = () => updateCountdown(info.endDate);
+        tick();
+        roundCountdownTimer = setInterval(tick, 1000);
+    }
+}
+
+function updateCountdown(endDate) {
     const countdownEl = document.getElementById('countdownTimer');
     if (!countdownEl) return;
 
-    // Set the target time to exactly 7 days from NOW
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 7);
-    targetDate.setHours(0, 0, 0, 0); // optional: reset to midnight, remove if you want exact 7×24h
-
-    const now = new Date();
-    const diff = targetDate - now;
-
+    const diff = endDate - new Date();
     if (diff <= 0) {
-        countdownEl.textContent = '0d 0h 0m';
-        countdownEl.parentElement.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> <strong>Round Ended!</strong> • Check back soon for the next one!`;
-        clearInterval(countdownInterval); // optional: stop the timer completely
+        clearInterval(roundCountdownTimer);
+        countdownEl.parentElement.innerHTML = '<i class="fa-solid fa-champagne-glasses"></i> <strong>Voting has ended for this round.</strong> Check back soon for the next one!';
         return;
     }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000); // optional: add seconds for more precision
-
-    // Choose one of the formats below:
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
     countdownEl.textContent = `${days}d ${hours}h ${minutes}m`;
-    // countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`; // with seconds
 }
-
-// Run immediately and then every second
-updateCountdown();
-const countdownInterval = setInterval(updateCountdown, 1000);
 
 // ========================================
 // LOAD LIVE MATCHES
@@ -451,6 +458,7 @@ async function loadLiveMatches() {
         });
         
         console.log(`✅ Found ${allLiveMatches.length} live matches`);
+        updateRoundBanner();
         
         if (allLiveMatches.length === 0) {
             showNoMatches();
@@ -607,7 +615,7 @@ function showCompletionMessage() {
         banner.className = 'completion-banner';
         banner.innerHTML = `
             <div class="completion-content">
-                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Round 2 Matches!</h3>
+                <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
                 <p>Check out these pages while waiting for new matchups:</p>
                 <div class="completion-links">
                     <a href="/my-votes.html">View Your Progress</a>
@@ -632,30 +640,30 @@ function createMatchCard(match, index, isVoted) {
     
     card.innerHTML = `
         <div class="social-thumbnails">
-            <img src="https://img.youtube.com/vi/${match.song1.videoId}/mqdefault.jpg" 
-                 alt="${match.song1.shortTitle || match.song1.title}"
+            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/mqdefault.jpg" 
+                 alt="${escapeHtml(match.song1.shortTitle || match.song1.title)}"
                  class="${userVotedSongId === 'song1' ? 'user-pick' : ''}"
                  loading="lazy">
             
             <div class="social-vs">VS</div>
             
-            <img src="https://img.youtube.com/vi/${match.song2.videoId}/mqdefault.jpg"
-                 alt="${match.song2.shortTitle || match.song2.title}"
+            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/mqdefault.jpg"
+                 alt="${escapeHtml(match.song2.shortTitle || match.song2.title)}"
                  class="${userVotedSongId === 'song2' ? 'user-pick' : ''}"
                  loading="lazy">
         </div>
         
         <div class="social-info">
             <div class="song-details">
-                <h3>${match.song1.shortTitle || match.song1.title}</h3>
-                <p>${match.song1.artist} • ${match.song1.year || '2025'}</p>
+                <h3>${escapeHtml(match.song1.shortTitle || match.song1.title)}</h3>
+                <p>${escapeHtml(match.song1.artist)}${match.song1.year ? ' • ' + escapeHtml(match.song1.year) : ''}</p>
             </div>
             
             <div class="vs-divider">vs</div>
             
             <div class="song-details">
-                <h3>${match.song2.shortTitle || match.song2.title}</h3>
-                <p>${match.song2.artist} • ${match.song2.year || '2025'}</p>
+                <h3>${escapeHtml(match.song2.shortTitle || match.song2.title)}</h3>
+                <p>${escapeHtml(match.song2.artist)}${match.song2.year ? ' • ' + escapeHtml(match.song2.year) : ''}</p>
             </div>
         </div>
         
@@ -796,7 +804,7 @@ function trackMatchClick(matchId, position, hasVoted) {
 // CONSOLE BRANDING
 // ========================================
 console.log(
-    '%c🎵 Anthems Arena %c- Social Landing',
+    '%c🎬 Arcane Moments %c- Social Landing',
     'color: #C8AA6E; font-size: 20px; font-weight: bold; font-family: Cinzel, serif;',
     'color: #888; font-size: 14px; font-family: Lora, serif;'
 );
