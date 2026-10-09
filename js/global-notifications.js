@@ -3389,6 +3389,10 @@ function showQuickToast(message, duration = 2000) {
     }, duration);
 }
 
+// profile-page.js (message sent, follow, unfollow) calls window.showQuickToast,
+// which was never exposed, so those confirmations never appeared.
+window.showQuickToast = showQuickToast;
+
 // ========================================
 // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
 // ========================================
