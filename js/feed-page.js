@@ -9,6 +9,8 @@ import {
     likePost, 
     unlikePost, 
     hasLikedPost,
+    isActivityPostId,
+    getActivityEngagementCounts,
     followUser,
     unfollowUser,
     isFollowing 
@@ -864,6 +866,19 @@ async function loadFeed() {
                 .map(activity =>
                     convertActivityToFeedPost(activity, matchMap)
                 );
+
+            // Vote activity has no post document, so read its like and
+            // comment counts from the likes / comments collections.
+            const engagement = await getActivityEngagementCounts(
+                activityPosts.map(post => post.postId)
+            );
+            activityPosts.forEach(post => {
+                const counts = engagement.get(post.postId);
+                if (counts) {
+                    post.likeCount = counts.likeCount;
+                    post.commentCount = counts.commentCount;
+                }
+            });
 
             currentPosts = [...activityPosts, ...userPosts]
                 .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
@@ -1823,11 +1838,13 @@ async function postReply(postId, parentCommentId, inputElement) {
         comment.createdAt = Timestamp.now();
         await setDoc(doc(db, 'comments', commentId), comment);
         
-        // Update post comment count
-        const postRef = doc(db, 'posts', postId);
-        await updateDoc(postRef, {
-            commentCount: increment(1)
-        });
+        // Update post comment count (vote-activity items have no post document)
+        if (!isActivityPostId(postId)) {
+            const postRef = doc(db, 'posts', postId);
+            await updateDoc(postRef, {
+                commentCount: increment(1)
+            });
+        }
         
         console.log('✅ Reply posted');
         
@@ -1993,11 +2010,13 @@ async function postComment(postId, inputElement) {
         comment.createdAt = Timestamp.now();
         await setDoc(doc(db, 'comments', commentId), comment);
         
-        // Update post comment count
-        const postRef = doc(db, 'posts', postId);
-        await updateDoc(postRef, {
-            commentCount: increment(1)
-        });
+        // Update post comment count (vote-activity items have no post document)
+        if (!isActivityPostId(postId)) {
+            const postRef = doc(db, 'posts', postId);
+            await updateDoc(postRef, {
+                commentCount: increment(1)
+            });
+        }
         
         console.log('✅ Comment posted');
         
@@ -2082,11 +2101,13 @@ async function deleteComment(commentId, postId, commentElement) {
         
         await deleteDoc(doc(db, 'comments', commentId));
         
-        // Decrement post comment count
-        const postRef = doc(db, 'posts', postId);
-        await updateDoc(postRef, {
-            commentCount: increment(-1)
-        });
+        // Decrement post comment count (vote-activity items have no post document)
+        if (!isActivityPostId(postId)) {
+            const postRef = doc(db, 'posts', postId);
+            await updateDoc(postRef, {
+                commentCount: increment(-1)
+            });
+        }
         
         console.log('✅ Comment deleted');
         
