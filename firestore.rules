@@ -1,0 +1,191 @@
+rules_version = '2';
+
+// ============================================================================
+// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1)
+//
+// Paste into Firebase console > Firestore Database > Rules, or deploy with
+// the Firebase CLI. NOT yet reviewed against a live project: test every case
+// in the Rules Playground before publishing (see docs in the handoff file).
+//
+// How visitors are identified: every visitor is signed in anonymously by
+// js/firebase-config.js, and their user id (localStorage "userId") is their
+// Firebase uid. The admin signs in on admin.html with an email + password
+// account.
+//
+// The Netlify edge functions call Firestore's REST API with NO sign-in, so
+// everything they read (matches, votes, activity, profiles) must stay
+// publicly readable.
+//
+// STAGE 1 covers: votes, tournaments/matches, activity, profiles, posts.
+// STAGE 2 (still locked, as today): user-notifications, user-reactions,
+// follows, feeds, comments, likes, messages, users, blog.
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // The tournament id currently open for voting. Change this one line
+    // (and ARCANE_CONFIG.tournamentId in js/arcane-config.js) when the
+    // entries are reset under a new id.
+    function activeTournament() {
+      return 'arcane-test-01';
+    }
+
+    // TODO: replace with the admin account's UID
+    // (Firebase console > Authentication > Users > "User UID").
+    function isAdmin() {
+      return signedIn() && request.auth.uid in ['REPLACE_WITH_ADMIN_UID'];
+    }
+
+    // A vote is recorded in two steps by js/vote.js: first the vote document
+    // is created, then the match counters are incremented. This allows the
+    // second step only: exactly +1 on the one edit the voter chose, on a live
+    // match, by someone who has a vote document for that match.
+    //
+    // Known gap (closed in stage 1b by batching both writes): a voter who
+    // already has a vote document could repeat this increment.
+    function isVoteIncrement(tournamentId, matchId) {
+      let votePath = /databases/$(database)/documents/votes/$(matchId + '_' + request.auth.uid);
+      let before = resource.data;
+      let after = request.resource.data;
+      return signedIn()
+        && tournamentId == activeTournament()
+        && before.status == 'live'
+        && after.diff(before).affectedKeys().hasOnly(['song1', 'song2', 'totalVotes'])
+        && after.totalVotes == before.totalVotes + 1
+        && exists(votePath)
+        && get(votePath).data.matchId == matchId
+        && (
+          (get(votePath).data.choice == 'song1'
+            && after.song1.votes == before.song1.votes + 1
+            && after.song1.diff(before.song1).affectedKeys().hasOnly(['votes'])
+            && after.song2 == before.song2)
+          ||
+          (get(votePath).data.choice == 'song2'
+            && after.song2.votes == before.song2.votes + 1
+            && after.song2.diff(before.song2).affectedKeys().hasOnly(['votes'])
+            && after.song1 == before.song1)
+        );
+    }
+
+    // ---------------------------------------------------------------------
+    // Tournaments and matches
+    // Public to read. Only the admin can create, edit or delete them; a
+    // signed-in voter may only add a single vote (see isVoteIncrement).
+    // ---------------------------------------------------------------------
+
+    match /tournaments/{tournamentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /matches/{matchId} {
+        allow read: if true;
+        allow create, delete: if isAdmin();
+        allow update: if isAdmin() || isVoteIncrement(tournamentId, matchId);
+      }
+    }
+
+    // ---------------------------------------------------------------------
+    // Votes
+    // Document id is "<matchId>_<uid>", so a user can only ever have one vote
+    // per match, and a create cannot overwrite an existing vote.
+    // ---------------------------------------------------------------------
+
+    match /votes/{voteId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.matchId is string
+        && voteId == request.resource.data.matchId + '_' + request.auth.uid
+        && request.resource.data.tournament == activeTournament()
+        && request.resource.data.choice in ['song1', 'song2']
+        && request.resource.data.keys().hasAll(['userId', 'matchId', 'tournament', 'choice'])
+        && request.resource.data.keys().hasOnly([
+             'tournament', 'matchId', 'userId', 'username', 'avatar', 'championId',
+             'choice', 'timestamp', 'round', 'votedForSeed', 'votedForName'
+           ])
+        && get(/databases/$(database)/documents/tournaments/$(activeTournament())/matches/$(request.resource.data.matchId)).data.status == 'live';
+
+      // The owner may refresh display details and outcome flags, never the
+      // choice, match, user or time of a vote.
+      allow update: if isAdmin()
+        || (isOwner(resource.data.userId)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                 'username', 'avatar', 'championId', 'championPackId', 'isPublic',
+                 'updatedAt', 'backfilledAt', 'outcome', 'matchCompleted', 'completedAt'
+               ]));
+
+      allow delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Activity feed
+    // ---------------------------------------------------------------------
+
+    match /activity/{activityId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      // Lets a username/avatar change refresh the user's old activity rows
+      // (settings-modal.js already tries this; it was being rejected).
+      allow update: if isAdmin()
+        || (isOwner(resource.data.userId)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                 'username', 'avatar', 'championId', 'championPackId', 'isPublic',
+                 'updatedAt', 'backfilledAt'
+               ]));
+
+      allow delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Profiles (unchanged, plus admin)
+    // Known gap: a user can edit their own xp / level / achievements. Fine
+    // for now; revisit if rankings or rewards ever matter.
+    // ---------------------------------------------------------------------
+
+    match /profiles/{userId} {
+      allow read: if true;
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Posts (unchanged)
+    // Reads must filter on privacy == 'public' (profile-page.js does).
+    // ---------------------------------------------------------------------
+
+    match /posts/{postId} {
+      allow read: if resource.data.privacy == 'public';
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.privacy == 'public';
+
+      allow update, delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // ---------------------------------------------------------------------
+    // Everything else stays locked until stage 2.
+    // ---------------------------------------------------------------------
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

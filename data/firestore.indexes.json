@@ -10,15 +10,6 @@
     },
     {
       "collectionGroup": "posts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "privacy", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "posts",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "timestamp", "order": "DESCENDING" }
