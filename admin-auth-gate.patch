@@ -1,0 +1,30 @@
+diff --git a/js/admin.js b/js/admin.js
+index bba9974..8e7d256 100644
+--- a/js/admin.js
++++ b/js/admin.js
+@@ -31,8 +31,10 @@ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+ // ========================================
+ 
+ onAuthStateChanged(auth, (user) => {
+-    if (user) {
+-        console.log('✅ Authenticated as:', user.email);
++    // Every visitor is signed in anonymously by firebase-config.js, so a user
++    // object alone does not mean admin. Only a real (non-anonymous) account counts.
++    if (user && !user.isAnonymous) {
++        console.log('✅ Authenticated as:', user.email, '| uid:', user.uid);
+         document.getElementById('login-container').style.display = 'none';
+         document.getElementById('admin-content').style.display = 'block';
+         loadMatches();
+diff --git a/js/blog-generator.js b/js/blog-generator.js
+index 05ed2f6..9b0ab8b 100644
+--- a/js/blog-generator.js
++++ b/js/blog-generator.js
+@@ -5,7 +5,7 @@
+ import { getCrossTournamentH2H, analyzeMatchContext } from './firebase-stats.js';
+ import { getAllMatches } from './api-client.js';
+ import { db } from './firebase-config.js';
+-import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
++import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ 
+ // Load songs data
+ let songsData = [];
