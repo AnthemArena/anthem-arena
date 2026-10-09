@@ -96,7 +96,7 @@ export async function awardFoundingMemberBadge(userId) {
           detail: 'You\'re part of the first 1,000 voters - this badge is yours forever! +500 XP',
           cta: 'View Badge',
           action: 'navigate',
-          targetUrl: '/my-votes.html#achievements'
+          targetUrl: '/profile#achievements'
         });
       }, 1500);
     }

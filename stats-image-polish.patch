@@ -1,0 +1,61 @@
+diff --git a/js/stats-image-generator.js b/js/stats-image-generator.js
+index 776e3ab..f132486 100644
+--- a/js/stats-image-generator.js
++++ b/js/stats-image-generator.js
+@@ -6,10 +6,15 @@
+ 
+ console.log('🎨 Stats Image Generator loaded');
+ 
+-// Public site address shown on the card and used by "copy link".
+-// TODO: update when the Arcane Moments domain is live.
+-const SITE_HOST = 'anthemarena.com';
+-const SITE_URL = `https://${SITE_HOST}`;
++// Site address shown on the card and used by "copy link".
++// Taken from the page itself so it follows the real domain automatically
++// (on a dev preview it shows the preview address).
++const SITE_HOST = window.location.host;
++const SITE_URL = window.location.origin;
++
++// "1 Vote" / "2 Votes"
++const countLabel = (n, singular, plural = `${singular}s`) =>
++    `${n} ${Number(n) === 1 ? singular : plural}`;
+ 
+ // ========================================
+ // GENERATE STATS IMAGE
+@@ -105,12 +110,12 @@ async function generateStatsImage(statsData) {
+     ctx.font = 'bold 52px Arial, sans-serif';
+     ctx.textAlign = 'center';
+     const profileText = `${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}`;
+-    ctx.fillText(profileText, 600, 180);
++    ctx.fillText(profileText, 600, 172);
+     
+     // Taste profile description
+     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+     ctx.font = '22px Arial, sans-serif';
+-    ctx.fillText(statsData.tasteProfile.description, 600, 205);
++    ctx.fillText(statsData.tasteProfile.description, 600, 206);
+     
+     // ========================================
+     // STATS GRID (3 COLUMNS)
+@@ -125,9 +130,9 @@ async function generateStatsImage(statsData) {
+     
+     // Left column stats
+     const leftStats = [
+-        { emoji: '🗳️', label: `${statsData.totalVotes} Votes Cast`, color: '#ffffff' },
+-        { emoji: '🎭', label: `${statsData.underdogPicks} Underdog Picks`, color: '#ff6b9d' },
+-        { emoji: '✓', label: `${statsData.songsStillAlive} Edits Still Alive`, color: '#4ade80' }
++        { emoji: '🗳️', label: `${countLabel(statsData.totalVotes, 'Vote')} Cast`, color: '#ffffff' },
++        { emoji: '🎭', label: countLabel(statsData.underdogPicks, 'Underdog Pick'), color: '#ff6b9d' },
++        { emoji: '✅', label: `${countLabel(statsData.songsStillAlive, 'Edit')} Still Alive`, color: '#4ade80' }
+     ];
+     
+     leftStats.forEach((stat, index) => {
+@@ -153,7 +158,7 @@ async function generateStatsImage(statsData) {
+     const centerStats = [
+         { emoji: '🎯', label: `${statsData.mainstreamPicks} Mainstream`, color: '#60a5fa' },
+         { emoji: '🔥', label: `${statsData.votingStreak} Day Streak`, color: '#fb923c' },
+-        { emoji: '📊', label: `${statsData.roundsParticipated} Rounds`, color: '#a78bfa' }
++        { emoji: '📊', label: countLabel(statsData.roundsParticipated, 'Round'), color: '#a78bfa' }
+     ];
+     
+     centerStats.forEach((stat, index) => {

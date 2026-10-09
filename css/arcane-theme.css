@@ -944,3 +944,25 @@ body.theme-arcane .footer-link-card { background: var(--panel); border: 1px soli
 body.theme-arcane .footer-link-card:hover { border-color: rgba(255, 79, 180, .5); transform: translateY(-3px); }
 body.theme-arcane .footer-link-card .link-icon { color: var(--pink-bright); }
 body.theme-arcane .inline-link { color: var(--pink-bright); }
+
+
+/* ========================================
+   PROFILE PAGE (<body class="theme-arcane page-profile">)
+   Colours and fonts come from arcane-theme.generated.css (built from css/profile.css, scoped to page-profile).
+   Only what the generator cannot reach lives here.
+   ======================================== */
+
+/* participation ring: colours are SVG presentation attributes in profile.html */
+body.theme-arcane.page-profile #participationCircle {
+    stroke: var(--pink-bright);
+    filter: drop-shadow(0 0 8px rgba(255, 79, 180, .45));
+}
+body.theme-arcane.page-profile .participation-circle svg circle:first-child {
+    stroke: rgba(255, 79, 180, .12);
+}
+
+/* the page itself must stay see-through so the cover image and glow show */
+body.theme-arcane.page-profile .profile-page,
+body.theme-arcane.page-profile .tab-panel {
+    background: transparent;
+}

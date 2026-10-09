@@ -20,7 +20,7 @@
 import fs from 'node:fs';
 import postcss from 'postcss';
 
-// A source is a path, or { file, greens: true }. greens also turns green/teal into pink, for pages whose
+// A source is a path, or { file, greens: true, scope: '...' }. `scope` narrows that file's rules to one page (see profile.css below). greens also turns green/teal into pink, for pages whose
 // "voted / success" state is green (vote.css). It is off by default because green is also used for real success
 // messages elsewhere.
 const SOURCES = [
@@ -28,7 +28,10 @@ const SOURCES = [
     'css/modal.css', 'css/scrollbar.css', 'css/settings.css',
     'css/activity.css', { file: 'css/vote.css', greens: true },
     { file: 'css/matches.css', greens: true },
-    { file: 'css/live.css', greens: true }
+    { file: 'css/live.css', greens: true },
+    // profile.css reuses generic class names (.section-title, .stat-label...) that other themed pages also use,
+    // so its rules only apply when <body> also has class="page-profile".
+    { file: 'css/profile.css', scope: 'body.theme-arcane.page-profile' }
 ].map(s => typeof s === 'string' ? { file: s } : s);
 const OUT = 'css/arcane-theme.generated.css';
 const SCOPE = 'body.theme-arcane';
@@ -87,12 +90,12 @@ function recolour(prop, value, opts = {}) {
     return out;
 }
 
-function scopeSelector(sel) {
+function scopeSelector(sel, scope = SCOPE) {
     sel = sel.trim();
     if (!sel || /^html\b/i.test(sel)) return null;                 // cannot be scoped under body
-    if (sel === ':root') return SCOPE;
-    if (/^body\b/i.test(sel)) return sel.replace(/^body/i, SCOPE);
-    return `${SCOPE} ${sel}`;
+    if (sel === ':root') return scope;
+    if (/^body\b/i.test(sel)) return sel.replace(/^body/i, scope);
+    return `${scope} ${sel}`;
 }
 
 const stats = { rules: 0, decls: 0, keyframes: [], sourceGoldDecls: 0 };
@@ -125,7 +128,7 @@ function transform(container, target, opts) {
                 if (next !== d.value) changed.push({ prop: d.prop, value: next, important: d.important });
             });
             if (!changed.length) return;
-            const selectors = node.selectors.map(scopeSelector).filter(Boolean);
+            const selectors = node.selectors.map(sel => scopeSelector(sel, opts.scope)).filter(Boolean);
             if (!selectors.length) return;
             const rule = postcss.rule({ selectors });
             for (const c of changed) rule.append(postcss.decl({ prop: c.prop, value: c.value, important: c.important }));

@@ -618,7 +618,7 @@ function showCompletionMessage() {
                 <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
                 <p>Check out these pages while waiting for new matchups:</p>
                 <div class="completion-links">
-                    <a href="/my-votes.html">View Your Progress</a>
+                    <a href="/profile#journey">View Your Progress</a>
                     <a href="/brackets.html">See Bracket</a>
                     <a href="/stats.html">View Stats</a>
                 </div>

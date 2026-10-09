@@ -1,0 +1,126 @@
+/* ========================================
+   PROFILE INSIGHTS (owner-only "Your Voting Style")
+   Uses --pink when the Arcane theme is loaded, gold otherwise.
+   ======================================== */
+
+.owner-insights {
+    --insight-accent: var(--pink, #c8aa6e);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--insight-accent) 35%, transparent);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.owner-insights[hidden] {
+    display: none;
+}
+
+.insights-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.insights-header .section-title {
+    margin: 0;
+}
+
+.insights-subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+.insights-taste {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--insight-accent) 12%, transparent);
+}
+
+.insights-taste-icon {
+    font-size: 1.75rem;
+    color: var(--insight-accent);
+}
+
+.insights-taste-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.insights-taste-desc {
+    font-size: 0.9rem;
+    opacity: 0.75;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.insight-tile {
+    padding: 1rem;
+    text-align: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.insight-tile i {
+    color: var(--insight-accent);
+    font-size: 1.1rem;
+}
+
+.insight-value {
+    margin-top: 0.4rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.insight-label {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.owner-insights .share-stats-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    border: 0;
+    border-radius: 10px;
+    background: var(--insight-accent);
+    color: #0a0a0a;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.owner-insights .share-stats-btn:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.owner-insights .share-stats-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* Shown above vote lists when some votes belong to a previous round */
+.hidden-votes-note {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.65;
+}
+
+.hidden-votes-note[hidden] {
+    display: none;
+}

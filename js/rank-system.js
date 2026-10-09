@@ -9,7 +9,7 @@
 export const RANK_SYSTEM = {
     levels: [
      { level: 1, xpNeeded: 0, title: '✨ New Arrival' },
-{ level: 2, xpNeeded: 100, title: '🛤️ Lanes Regular' },
+{ level: 2, xpNeeded: 100, title: '🛤️ Undercity Regular' },
 { level: 3, xpNeeded: 250, title: '🌟 Rising Name' },
 { level: 4, xpNeeded: 500, title: '🔮 Arcane Insider' },
 { level: 5, xpNeeded: 1000, title: '🥊 Streetwise' },
@@ -222,7 +222,7 @@ export function addXP(xpToAdd, source = 'vote') {
               message: `⬆️ New Arcane Rank!`,
 detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
 cta: 'View Progress',
-                ctaAction: () => window.location.href = 'my-votes.html',
+                ctaAction: () => window.location.href = '/profile#votes',
                 duration: 5000
             });
         }

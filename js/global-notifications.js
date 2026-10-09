@@ -2626,7 +2626,6 @@ function initBulletinSystem() {
     // ✅ WHITELIST: Only enable on specific pages
     const allowedPages = [
         'vote.html',
-        'my-votes.html',      // ✅ ADDED (you probably want alerts here)
         'matches.html',
         'feed.html',
         'activity.html',

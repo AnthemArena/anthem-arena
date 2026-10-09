@@ -188,7 +188,7 @@ async function loadAllUsers(forceRefresh = false) {
 function getRankTitle(level) {
     const ranks = {
         1: 'New Arrival',
-        2: 'Lanes Regular',
+        2: 'Undercity Regular',
         3: 'Rising Name',
         4: 'Arcane Insider',
         5: 'Streetwise',

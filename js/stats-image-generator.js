@@ -6,6 +6,16 @@
 
 console.log('🎨 Stats Image Generator loaded');
 
+// Site address shown on the card and used by "copy link".
+// Taken from the page itself so it follows the real domain automatically
+// (on a dev preview it shows the preview address).
+const SITE_HOST = window.location.host;
+const SITE_URL = window.location.origin;
+
+// "1 Vote" / "2 Votes"
+const countLabel = (n, singular, plural = `${singular}s`) =>
+    `${n} ${Number(n) === 1 ? singular : plural}`;
+
 // ========================================
 // GENERATE STATS IMAGE
 // ========================================
@@ -31,7 +41,7 @@ async function generateStatsImage(statsData) {
     ctx.fillRect(0, 0, 1200, 630);
     
     // Decorative corner accents
-    ctx.fillStyle = 'rgba(200, 170, 110, 0.1)';
+    ctx.fillStyle = 'rgba(255, 79, 180, 0.1)';
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(150, 0);
@@ -47,12 +57,12 @@ async function generateStatsImage(statsData) {
     ctx.fill();
     
     // Gold border
-    ctx.strokeStyle = '#C8AA6E';
+    ctx.strokeStyle = '#ff4fb4';
     ctx.lineWidth = 8;
     ctx.strokeRect(20, 20, 1160, 590);
     
     // Inner shadow effect
-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 79, 180, 0.3)';
     ctx.lineWidth = 2;
     ctx.strokeRect(30, 30, 1140, 570);
     
@@ -61,13 +71,13 @@ async function generateStatsImage(statsData) {
     // ========================================
     
     // Title
-    ctx.fillStyle = '#C8AA6E';
+    ctx.fillStyle = '#ff4fb4';
     ctx.font = 'bold 48px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('MY ANTHEM ARENA PROFILE', 600, 85);
+    ctx.fillText('MY ARCANE MOMENTS PROFILE', 600, 85);
     
     // Subtitle line
-    ctx.strokeStyle = '#C8AA6E';
+    ctx.strokeStyle = '#ff4fb4';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(350, 100);
@@ -80,9 +90,9 @@ async function generateStatsImage(statsData) {
     
     // Badge background
     const badgeGradient = ctx.createLinearGradient(250, 120, 950, 220);
-    badgeGradient.addColorStop(0, 'rgba(200, 170, 110, 0.2)');
-    badgeGradient.addColorStop(0.5, 'rgba(200, 170, 110, 0.3)');
-    badgeGradient.addColorStop(1, 'rgba(200, 170, 110, 0.2)');
+    badgeGradient.addColorStop(0, 'rgba(255, 79, 180, 0.2)');
+    badgeGradient.addColorStop(0.5, 'rgba(255, 79, 180, 0.3)');
+    badgeGradient.addColorStop(1, 'rgba(255, 79, 180, 0.2)');
     ctx.fillStyle = badgeGradient;
     
     // Rounded rectangle for badge
@@ -90,22 +100,22 @@ async function generateStatsImage(statsData) {
     ctx.fill();
     
     // Badge border
-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.6)';
+    ctx.strokeStyle = 'rgba(255, 79, 180, 0.6)';
     ctx.lineWidth = 3;
     roundRect(ctx, 250, 120, 700, 100, 15);
     ctx.stroke();
     
     // Taste profile icon and title
-    ctx.fillStyle = '#C8AA6E';
+    ctx.fillStyle = '#ff4fb4';
     ctx.font = 'bold 52px Arial, sans-serif';
     ctx.textAlign = 'center';
     const profileText = `${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}`;
-    ctx.fillText(profileText, 600, 180);
+    ctx.fillText(profileText, 600, 172);
     
     // Taste profile description
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.font = '22px Arial, sans-serif';
-    ctx.fillText(statsData.tasteProfile.description, 600, 205);
+    ctx.fillText(statsData.tasteProfile.description, 600, 206);
     
     // ========================================
     // STATS GRID (3 COLUMNS)
@@ -120,9 +130,9 @@ async function generateStatsImage(statsData) {
     
     // Left column stats
     const leftStats = [
-        { emoji: '🗳️', label: `${statsData.totalVotes} Votes Cast`, color: '#ffffff' },
-        { emoji: '🎭', label: `${statsData.underdogPicks} Underdog Picks`, color: '#ff6b9d' },
-        { emoji: '✓', label: `${statsData.songsStillAlive} Songs Still Alive`, color: '#4ade80' }
+        { emoji: '🗳️', label: `${countLabel(statsData.totalVotes, 'Vote')} Cast`, color: '#ffffff' },
+        { emoji: '🎭', label: countLabel(statsData.underdogPicks, 'Underdog Pick'), color: '#ff6b9d' },
+        { emoji: '✅', label: `${countLabel(statsData.songsStillAlive, 'Edit')} Still Alive`, color: '#4ade80' }
     ];
     
     leftStats.forEach((stat, index) => {
@@ -148,7 +158,7 @@ async function generateStatsImage(statsData) {
     const centerStats = [
         { emoji: '🎯', label: `${statsData.mainstreamPicks} Mainstream`, color: '#60a5fa' },
         { emoji: '🔥', label: `${statsData.votingStreak} Day Streak`, color: '#fb923c' },
-        { emoji: '📊', label: `${statsData.roundsParticipated} Rounds`, color: '#a78bfa' }
+        { emoji: '📊', label: countLabel(statsData.roundsParticipated, 'Round'), color: '#a78bfa' }
     ];
     
     centerStats.forEach((stat, index) => {
@@ -176,23 +186,23 @@ async function generateStatsImage(statsData) {
         
         // Song card background
         const songGradient = ctx.createLinearGradient(rightCol - 10, songCardY, rightCol + 400, songCardY + 240);
-        songGradient.addColorStop(0, 'rgba(200, 170, 110, 0.15)');
-        songGradient.addColorStop(1, 'rgba(200, 170, 110, 0.05)');
+        songGradient.addColorStop(0, 'rgba(255, 79, 180, 0.15)');
+        songGradient.addColorStop(1, 'rgba(255, 79, 180, 0.05)');
         ctx.fillStyle = songGradient;
         roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
         ctx.fill();
         
         // Song card border
-        ctx.strokeStyle = 'rgba(200, 170, 110, 0.5)';
+        ctx.strokeStyle = 'rgba(255, 79, 180, 0.5)';
         ctx.lineWidth = 3;
         roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
         ctx.stroke();
         
         // Section title
-        ctx.fillStyle = '#C8AA6E';
+        ctx.fillStyle = '#ff4fb4';
         ctx.font = 'bold 22px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('🎵 MOST SUPPORTED', rightCol + 180, songCardY + 35);
+        ctx.fillText('🎬 MOST SUPPORTED', rightCol + 180, songCardY + 35);
         
         // Load and draw thumbnail
         try {
@@ -211,7 +221,7 @@ async function generateStatsImage(statsData) {
             ctx.restore();
             
             // Thumbnail border
-            ctx.strokeStyle = 'rgba(200, 170, 110, 0.4)';
+            ctx.strokeStyle = 'rgba(255, 79, 180, 0.4)';
             ctx.lineWidth = 2;
             roundRect(ctx, thumbX, thumbY, thumbWidth, thumbHeight, 8);
             ctx.stroke();
@@ -229,7 +239,7 @@ async function generateStatsImage(statsData) {
             ctx.fillText(songName, rightCol + 180, songCardY + 180);
             
             // Vote count with icon
-            ctx.fillStyle = '#C8AA6E';
+            ctx.fillStyle = '#ff4fb4';
             ctx.font = 'bold 18px Arial, sans-serif';
             const voteText = `${statsData.favoriteSong.voteCount} ${statsData.favoriteSong.voteCount === 1 ? 'vote' : 'votes'}`;
             ctx.fillText(`💗 ${voteText}`, rightCol + 180, songCardY + 210);
@@ -248,7 +258,7 @@ async function generateStatsImage(statsData) {
             }
             ctx.fillText(songName, rightCol + 180, songCardY + 130);
             
-            ctx.fillStyle = '#C8AA6E';
+            ctx.fillStyle = '#ff4fb4';
             ctx.font = 'bold 18px Arial, sans-serif';
             ctx.fillText(`${statsData.favoriteSong.voteCount} votes`, rightCol + 180, songCardY + 160);
         }
@@ -259,7 +269,7 @@ async function generateStatsImage(statsData) {
     // ========================================
     
     // Footer line
-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 79, 180, 0.3)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(100, 565);
@@ -270,7 +280,7 @@ async function generateStatsImage(statsData) {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.font = '20px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 595);
+    ctx.fillText(`Vote for your favorite Arcane edits at ${SITE_HOST}`, 600, 595);
     
     console.log('✅ Stats image generated');
     
@@ -313,7 +323,7 @@ function loadImage(url) {
 // DOWNLOAD IMAGE
 // ========================================
 
-function downloadCanvas(canvas, filename = 'anthem-arena-stats.png') {
+function downloadCanvas(canvas, filename = 'arcane-moments-stats.png') {
     canvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -374,7 +384,7 @@ function showShareToast(statsData, canvas) {
         padding: 1.5rem;
         border-radius: 16px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        border: 2px solid rgba(200, 170, 110, 0.3);
+        border: 2px solid rgba(255, 79, 180, 0.3);
         z-index: 10001;
         min-width: 380px;
         animation: slideInUp 0.4s ease;
@@ -427,7 +437,7 @@ window.downloadStatsImage = function() {
 // ========================================
 
 window.copyShareLink = function() {
-    const siteUrl = 'https://anthemarena.com';
+    const siteUrl = SITE_URL;
     
     navigator.clipboard.writeText(siteUrl).then(() => {
         // Show confirmation
@@ -450,7 +460,7 @@ window.copyShareLink = function() {
         document.body.appendChild(confirmToast);
         setTimeout(() => confirmToast.remove(), 3000);
     }).catch(err => {
-        alert('Failed to copy link. Please try manually: https://anthemarena.com');
+        alert('Failed to copy link. Please try manually: ' + SITE_URL);
         console.error('Copy failed:', err);
     });
 };
@@ -503,7 +513,7 @@ function showLoadingToast(message) {
         padding: 1rem 1.5rem;
         border-radius: 12px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        border: 2px solid rgba(200, 170, 110, 0.3);
+        border: 2px solid rgba(255, 79, 180, 0.3);
         z-index: 10000;
         display: flex;
         align-items: center;
@@ -521,8 +531,8 @@ function showLoadingToast(message) {
             .loading-spinner {
                 width: 20px;
                 height: 20px;
-                border: 3px solid rgba(200, 170, 110, 0.3);
-                border-top-color: #C8AA6E;
+                border: 3px solid rgba(255, 79, 180, 0.3);
+                border-top-color: #ff4fb4;
                 border-radius: 50%;
                 animation: spin 1s linear infinite;
             }
@@ -579,7 +589,7 @@ function showLoadingToast(message) {
                 display: block;
                 font-family: 'Cinzel', serif;
                 font-size: 1.1rem;
-                color: #C8AA6E;
+                color: #ff4fb4;
                 margin-bottom: 0.25rem;
             }
             
@@ -607,25 +617,25 @@ function showLoadingToast(message) {
             }
             
             .download-btn {
-                background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                background: linear-gradient(135deg, #ff4fb4, #e0399b);
                 color: #0a0a0a;
                 font-weight: 700;
             }
             
             .download-btn:hover {
-                background: linear-gradient(135deg, #D4B876, #C8AA6E);
+                background: linear-gradient(135deg, #ff70c3, #ff4fb4);
                 transform: translateY(-1px);
             }
             
             .copy-link-btn {
                 background: rgba(255, 255, 255, 0.1);
                 color: white;
-                border: 1px solid rgba(200, 170, 110, 0.3);
+                border: 1px solid rgba(255, 79, 180, 0.3);
             }
             
             .copy-link-btn:hover {
                 background: rgba(255, 255, 255, 0.15);
-                border-color: rgba(200, 170, 110, 0.5);
+                border-color: rgba(255, 79, 180, 0.5);
             }
             
             .toast-hint {
