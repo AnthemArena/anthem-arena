@@ -1,0 +1,19 @@
+diff --git a/js/profile-page.js b/js/profile-page.js
+index 382ad51..ae8c7f4 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -2271,7 +2271,13 @@ async function loadOwnerInsights(userId) {
+     const container = document.getElementById('ownerInsights');
+     if (!container) return;
+ 
+-    if (!isOwnProfile) {
++    // Decide ownership by user id, the same way renderProfile() does.
++    // (The module-level isOwnProfile is computed from a never-assigned
++    // currentUsername in loadProfile(), so it is always false.)
++    const signedInUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
++    const viewingOwnProfile = Boolean(userId) && userId === signedInUserId;
++
++    if (!viewingOwnProfile) {
+         container.hidden = true;
+         container.innerHTML = '';
+         return;

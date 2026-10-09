@@ -1,5 +1,5 @@
 // ========================================
-// PROFILE PAGE - ANTHEM ARENA
+// PROFILE PAGE - ARCANE MOMENTS
 // ========================================
 
 import { db } from './firebase-config.js';
@@ -17,6 +17,7 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
+import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
@@ -103,7 +104,7 @@ function getYoutubeThumbnail(songId) {
     }
     
     // Fallback
-    return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
+    return 'https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=No+Image';
 }
 
 // ========================================
@@ -199,6 +200,10 @@ async function loadProfile(username) {
                 hideLoadingSpinner(); // ✅ Hide spinner when done
 
         showProfileContent();
+
+        // Owner-only voting style + share image, then honour #votes etc.
+        await loadOwnerInsights(profile.userId);
+        openTabFromHash();
         
     } catch (error) {
         console.error('❌ Error loading profile:', error);
@@ -210,39 +215,46 @@ async function loadProfile(username) {
 
 // ✅ NEW FUNCTION: Preload tab counts
 async function preloadTabCounts(userId) {
+    const counts = { votes: 0, posts: 0, achievements: 0 };
+
+    // Each count is fetched on its own, so one failing query can no longer
+    // leave the later badges stuck on their default 0.
+
+    // Votes (only votes whose match still exists)
     try {
-        // Get vote count
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId)
-        );
-        const votesSnapshot = await getDocs(votesQuery);
-        document.getElementById('votesCount').textContent = votesSnapshot.size;
-        
-        // ✅ Get posts count
-        const postsQuery = query(
-            collection(db, 'posts'),
-            where('userId', '==', userId)
-        );
-        const postsSnapshot = await getDocs(postsQuery);
-        document.getElementById('postsCount').textContent = postsSnapshot.size;
-        
-        // Get achievements count
-        const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        const achievementsCount = profileDoc.exists() 
-            ? (profileDoc.data().unlockedAchievements || []).length 
-            : 0;
-        document.getElementById('achievementsCount').textContent = achievementsCount;
-        
-        console.log('✅ Tab counts preloaded:', {
-            votes: votesSnapshot.size,
-            posts: postsSnapshot.size,
-            achievements: achievementsCount
-        });
-        
+        const { votes: visibleVotes } = await fetchUserVotes(userId);
+        counts.votes = visibleVotes.length;
+        document.getElementById('votesCount').textContent = counts.votes;
     } catch (error) {
-        console.error('❌ Error preloading counts:', error);
+        console.error('❌ Error preloading vote count:', error);
     }
+
+    // Posts. The Firestore rules only allow reading posts whose privacy is
+    // 'public', so the query has to say so or it is rejected outright.
+    try {
+        const postsSnapshot = await getDocs(query(
+            collection(db, 'posts'),
+            where('userId', '==', userId),
+            where('privacy', '==', 'public')
+        ));
+        counts.posts = postsSnapshot.size;
+        document.getElementById('postsCount').textContent = counts.posts;
+    } catch (error) {
+        console.error('❌ Error preloading post count:', error);
+    }
+
+    // Achievements
+    try {
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        counts.achievements = profileDoc.exists()
+            ? (profileDoc.data().unlockedAchievements || []).length
+            : 0;
+        document.getElementById('achievementsCount').textContent = counts.achievements;
+    } catch (error) {
+        console.error('❌ Error preloading achievement count:', error);
+    }
+
+    console.log('✅ Tab counts preloaded:', counts);
 }
 
 // ========================================
@@ -460,8 +472,8 @@ async function renderProfile(profile) {
     if (profile.isFallback) {
         const bioEl = document.getElementById('profileBio');
         bioEl.innerHTML = `
-            <div style="padding: 1rem; background: rgba(200, 170, 110, 0.1); border-radius: 8px; border: 1px solid rgba(200, 170, 110, 0.3);">
-                <p style="margin: 0; color: rgba(240, 230, 210, 0.7); font-size: 0.9rem;">
+            <div style="padding: 1rem; background: color-mix(in srgb, var(--pink, #c8aa6e) 10%, transparent); border-radius: 8px; border: 1px solid color-mix(in srgb, var(--pink, #c8aa6e) 30%, transparent);">
+                <p style="margin: 0; color: color-mix(in srgb, var(--text, #f0e6d2) 70%, transparent); font-size: 0.9rem;">
                     <i class="fas fa-info-circle"></i> This user hasn't set up their profile yet. Their activity and votes are still tracked!
                 </p>
             </div>
@@ -504,7 +516,7 @@ function applyProfileBanner(profile) {
         // Default gold gradient
         bannerEl.style.background = `
             linear-gradient(135deg, 
-                rgba(200, 170, 110, 0.9) 0%, 
+                color-mix(in srgb, var(--pink, #c8aa6e) 90%, transparent) 0%, 
                 rgba(26, 26, 46, 0.95) 50%,
                 rgba(10, 10, 10, 0.98) 100%
             )
@@ -544,7 +556,7 @@ function applyProfileBanner(profile) {
             // Fallback to gold gradient for emoji avatars
             bannerEl.style.background = `
                 linear-gradient(135deg, 
-                    rgba(200, 170, 110, 0.9) 0%, 
+                    color-mix(in srgb, var(--pink, #c8aa6e) 90%, transparent) 0%, 
                     rgba(26, 26, 46, 0.95) 50%,
                     rgba(10, 10, 10, 0.98) 100%
                 )
@@ -802,7 +814,7 @@ function showProfileMessageComposer(toUserId, toUsername) {
     composer.innerHTML = `
         <div style="
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid rgba(200, 170, 110, 0.3);
+            border: 2px solid color-mix(in srgb, var(--pink, #c8aa6e) 30%, transparent);
             border-radius: 12px;
             padding: 24px;
             max-width: 500px;
@@ -810,7 +822,7 @@ function showProfileMessageComposer(toUserId, toUsername) {
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         ">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="margin: 0; color: #C8AA6E; font-size: 1.2rem;">
+                <h3 style="margin: 0; color: var(--pink-bright, #c8aa6e); font-size: 1.2rem;">
                     💬 Message ${toUsername}
                 </h3>
                 <button id="closeComposer" style="
@@ -829,7 +841,7 @@ function showProfileMessageComposer(toUserId, toUsername) {
                     width: 100%;
                     height: 120px;
                     background: rgba(0, 0, 0, 0.3);
-                    border: 2px solid rgba(200, 170, 110, 0.3);
+                    border: 2px solid color-mix(in srgb, var(--pink, #c8aa6e) 30%, transparent);
                     border-radius: 8px;
                     padding: 12px;
                     color: #fff;
@@ -853,7 +865,7 @@ function showProfileMessageComposer(toUserId, toUsername) {
                         cursor: pointer;
                     ">Cancel</button>
                     <button id="sendMessage" style="
-                        background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                        background: linear-gradient(135deg, var(--pink-bright, #C8AA6E), var(--pink, #B89A5E));
                         border: none;
                         color: #1a1a2e;
                         padding: 10px 24px;
@@ -1060,7 +1072,8 @@ else {
         }
         
         // Update stats display
-        document.getElementById('statTotalVotes').textContent = votesCount;
+        const { votes: visibleVotesForStats } = await fetchUserVotes(userId);
+        document.getElementById('statTotalVotes').textContent = visibleVotesForStats.length;
         document.getElementById('statAchievements').textContent = achievementsCount;
         
         // ✅ UPDATE ACTIVITY LEVEL WITH RANK
@@ -1069,8 +1082,8 @@ else {
             const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
             
             activityLevelEl.innerHTML = `
-                <span style="font-size: 1.5rem; font-weight: 700; color: #c8aa6e; display: block;">Lv. ${rank.currentLevel.level}</span>
-                <span style="font-size: 1rem; font-weight: 600; color: rgba(240, 230, 210, 0.8); display: block; margin-top: 4px;">${cleanTitle}</span>
+                <span style="font-size: 1.5rem; font-weight: 700; color: var(--pink-bright, #c8aa6e); display: block;">Lv. ${rank.currentLevel.level}</span>
+                <span style="font-size: 1rem; font-weight: 600; color: color-mix(in srgb, var(--text, #f0e6d2) 80%, transparent); display: block; margin-top: 4px;">${cleanTitle}</span>
             `;
         }
         
@@ -1307,14 +1320,14 @@ async function loadFavoriteSongs(userId) {
                     alt="${song.name}"
                     class="song-thumbnail"
                     loading="lazy"
-                    onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎵'"
+                    onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=🎬'"
                 />
                 <div class="song-details">
                     <div class="song-title">${song.name}</div>
                     <div class="song-meta">
                         <span>${song.artist}</span>
-                        <span class="song-meta-separator">•</span>
-                        <span>Seed #${song.seed}</span>
+                        ${hasSeed(song.seed) ? `<span class="song-meta-separator">•</span>
+                        <span>Seed #${song.seed}</span>` : ''}
                         <span class="song-meta-separator">•</span>
                         <span class="song-vote-count">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
                     </div>
@@ -1407,7 +1420,7 @@ async function loadAllFavoriteSongs(userId) {
         alt="${song.name}"
         class="song-thumbnail"
         loading="lazy"
-        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=🎬'"
+        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=🎬'"
     />
 
     <div class="song-details">
@@ -1606,6 +1619,7 @@ async function loadRecentPosts(userId) {
         const postsQuery = query(
             collection(db, 'posts'),
             where('userId', '==', userId),
+            where('privacy', '==', 'public'),
             orderBy('timestamp', 'desc'),
             limit(3)
         );
@@ -1638,6 +1652,7 @@ async function loadAllPosts(userId) {
         const postsQuery = query(
             collection(db, 'posts'),
             where('userId', '==', userId),
+            where('privacy', '==', 'public'),
             orderBy('timestamp', 'desc')
         );
         
@@ -1731,17 +1746,12 @@ async function loadAllAchievements(userId) {
 async function loadRecentVotes(userId, limitCount = 5) {
     try {
         console.log(`📥 Loading recent ${limitCount} votes for user:`, userId);
-        
-       const votesQuery = query(
-    collection(db, 'votes'),
-    where('userId', '==', userId)
-);
-        
-        const snapshot = await getDocs(votesQuery);
-        
+
+        const { votes, orphanedCount } = await fetchUserVotes(userId);
+        showHiddenVotesNote(orphanedCount);
         const recentVotesContainer = document.getElementById('recentVotes');
-        
-        if (snapshot.empty) {
+
+        if (votes.length === 0) {
             recentVotesContainer.innerHTML = `
                 <div class="no-content">
                     <i class="fas fa-vote-yea"></i>
@@ -1750,25 +1760,18 @@ async function loadRecentVotes(userId, limitCount = 5) {
             `;
             return;
         }
-        
-        // Get all matches for lookup
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
-        
-      const recentVotes = snapshot.docs
-    .map(doc => doc.data())
-    .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
-    .slice(0, limitCount);
 
-const votesHTML = recentVotes
-    .map(vote => renderVoteCard(vote, matchMap))
-    .join('');
-        
+        const matchMap = new Map(votes.map(v => [v.matchId, v.match]));
+
+        const votesHTML = votes
+            .slice(0, limitCount)
+            .map(({ match, ...voteData }) => renderVoteCard(voteData, matchMap))
+            .join('');
+
         recentVotesContainer.innerHTML = votesHTML;
-        
-        console.log(`✅ Loaded ${snapshot.size} recent votes`);
-        
+
+        console.log(`✅ Loaded ${Math.min(votes.length, limitCount)} recent votes`);
+
     } catch (error) {
         console.error('❌ Error loading recent votes:', error);
         document.getElementById('recentVotes').innerHTML = `
@@ -1790,18 +1793,14 @@ let allUserVotes = [];
 async function loadAllVotes(userId) {
     try {
         console.log(`📥 Loading all votes for user:`, userId);
-        
-       const votesQuery = query(
-    collection(db, 'votes'),
-    where('userId', '==', userId)
-);
-        
-        const snapshot = await getDocs(votesQuery);
-        
+
+        const { votes, orphanedCount } = await fetchUserVotes(userId);
+        showHiddenVotesNote(orphanedCount);
+
         // Update count badge
-        document.getElementById('votesCount').textContent = snapshot.size;
-        
-        if (snapshot.empty) {
+        document.getElementById('votesCount').textContent = votes.length;
+
+        if (votes.length === 0) {
             document.getElementById('allVotes').innerHTML = `
                 <div class="no-content">
                     <i class="fas fa-vote-yea"></i>
@@ -1810,28 +1809,15 @@ async function loadAllVotes(userId) {
             `;
             return;
         }
-        
-        // Get all matches for lookup
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
-        
-       allUserVotes = snapshot.docs
-    .map(doc => ({
-        voteData: doc.data(),
-        match: matchMap.get(doc.data().matchId)
-    }))
-    .sort(
-        (a, b) =>
-            Number(b.voteData.timestamp || 0) -
-            Number(a.voteData.timestamp || 0)
-    );
-        
+
+        // fetchUserVotes already sorts newest first
+        allUserVotes = votes.map(({ match, ...voteData }) => ({ voteData, match }));
+
         // Render with current filter
         renderFilteredVotes(currentVoteFilter);
-        
-        console.log(`✅ Loaded ${snapshot.size} total votes`);
-        
+
+        console.log(`✅ Loaded ${votes.length} total votes`);
+
     } catch (error) {
         console.error('❌ Error loading all votes:', error);
         document.getElementById('allVotes').innerHTML = `
@@ -1915,7 +1901,7 @@ function renderVoteCard(vote, matchMap) {
 
     const getThumbnail = (moment) => {
         if (!moment) {
-            return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
+            return 'https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=No+Image';
         }
 
         if (moment.videoId) {
@@ -1926,7 +1912,7 @@ function renderVoteCard(vote, matchMap) {
             return moment.thumbnail;
         }
 
-        return 'https://via.placeholder.com/160x90/0a0a0a/C8AA6E?text=No+Image';
+        return 'https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=No+Image';
     };
 
     const status = getVoteStatus(vote, match);
@@ -2185,52 +2171,93 @@ function renderPostCard(post) {
 }
 
 
+// ========================================
+// SHARED VOTE LOOKUP
+// One fetch per page load. Only votes whose match still exists in the
+// current match list are returned, so the header, tab badge, stats card,
+// Recent Votes and Votes tab always agree. Votes pointing at a deleted
+// or old-tournament match are skipped and counted in `orphanedCount`.
+// ========================================
+
+const userVotesCache = new Map();
+
+// Muted line shown above vote lists when some votes point at matches that
+// no longer exist (e.g. cast in an earlier round of the test tournament).
+function showHiddenVotesNote(orphanedCount) {
+    const text = orphanedCount === 1
+        ? "1 earlier vote from a previous round isn't shown."
+        : `${orphanedCount} earlier votes from a previous round aren't shown.`;
+
+    document.querySelectorAll('.hidden-votes-note').forEach(el => {
+        el.textContent = text;
+        el.hidden = !orphanedCount;
+    });
+}
+
+function fetchUserVotes(userId) {
+    if (!userVotesCache.has(userId)) {
+        const request = (async () => {
+            const snapshot = await getDocs(query(
+                collection(db, 'votes'),
+                where('userId', '==', userId)
+            ));
+
+            const rawVotes = snapshot.docs.map(d => d.data());
+
+            let matches = [];
+            try {
+                const { getAllMatches } = await import('./api-client.js');
+                matches = await getAllMatches();
+            } catch (error) {
+                console.warn('⚠️ Could not load matches:', error);
+            }
+
+            // If the match list is unavailable we can't tell which votes are
+            // orphaned, so show everything instead of hiding it all.
+            const matchesKnown = Array.isArray(matches) && matches.length > 0;
+            const matchMap = new Map((matches || []).map(m => [m.matchId || m.id, m]));
+
+            const withMatch = rawVotes.map(vote => ({
+                ...vote,
+                match: matchMap.get(vote.matchId)
+            }));
+
+            const votes = (matchesKnown ? withMatch.filter(v => v.match) : withMatch)
+                .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+
+            const orphanedCount = matchesKnown ? withMatch.length - votes.length : 0;
+            if (orphanedCount > 0) {
+                console.warn(`⚠️ ${orphanedCount} vote(s) point at matches that no longer exist and are hidden`);
+            }
+
+            return { votes, orphanedCount, matchesKnown };
+        })();
+
+        request.catch(() => userVotesCache.delete(userId));
+        userVotesCache.set(userId, request);
+    }
+    return userVotesCache.get(userId);
+}
+
 async function getVoteCountForUser(userId) {
     try {
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId)
-        );
-        
-        const snapshot = await getDocs(votesQuery);
-        return snapshot.size;
+        const { votes } = await fetchUserVotes(userId);
+        return votes.length;
     } catch (error) {
         console.error('❌ Error getting vote count:', error);
         return 0;
     }
 }
 
-
-
 async function getVotesForUser(userId) {
     try {
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId)
-        );
-        
-        const snapshot = await getDocs(votesQuery);
-        
-        if (snapshot.empty) return [];
-        
-        // Get match data for each vote
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
-        
-        return snapshot.docs.map(doc => {
-            const voteData = doc.data();
-            return {
-                ...voteData,
-                match: matchMap.get(voteData.matchId)
-            };
-        });
+        const { votes } = await fetchUserVotes(userId);
+        return votes;
     } catch (error) {
         console.error('❌ Error fetching votes:', error);
         return [];
     }
 }
-
 
 function formatJoinDate(date) {
     const now = new Date();
@@ -2263,6 +2290,57 @@ function getTimeAgo(date) {
 // ========================================
 // SETUP TABS
 // ========================================
+
+// ========================================
+// OWNER-ONLY INSIGHTS (replaces the old My Votes page)
+// ========================================
+
+async function loadOwnerInsights(userId) {
+    const container = document.getElementById('ownerInsights');
+    if (!container) return;
+
+    // Decide ownership by user id, the same way renderProfile() does.
+    // (The module-level isOwnProfile is computed from a never-assigned
+    // currentUsername in loadProfile(), so it is always false.)
+    const signedInUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+    const viewingOwnProfile = Boolean(userId) && userId === signedInUserId;
+
+    if (!viewingOwnProfile) {
+        container.hidden = true;
+        container.innerHTML = '';
+        return;
+    }
+
+    try {
+        const { votes } = await fetchUserVotes(userId);
+        renderOwnerInsights(container, votes);
+    } catch (error) {
+        console.error('❌ Error loading voting insights:', error);
+        container.hidden = true;
+    }
+}
+
+// ========================================
+// DEEP LINKS: /profile#votes, #achievements, #journey, #posts, #moments
+// ========================================
+
+const TAB_HASHES = {
+    overview: 'overview',
+    votes: 'votes',
+    posts: 'posts',
+    journey: 'participation',
+    achievements: 'achievements',
+    moments: 'songs'
+};
+
+function openTabFromHash() {
+    const key = window.location.hash.replace('#', '').toLowerCase();
+    const tab = TAB_HASHES[key];
+    if (!tab) return;
+
+    const button = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (button && !button.classList.contains('active')) button.click();
+}
 
 function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -2669,7 +2747,7 @@ function renderParticipationTab() {
     const summary = document.getElementById('participationSummary');
     summary.innerHTML = `
         <div style="margin-bottom: 1rem;">
-<strong style="color: #c8aa6e; font-size: 1.1rem;">
+<strong style="color: var(--pink-bright, #c8aa6e); font-size: 1.1rem;">
     🎬 ${participation.tournamentName}
 </strong>
         </div>
@@ -2706,7 +2784,8 @@ async function loadUserPosts(userId, limitCount = null) {
     try {
         const postsQuery = query(
             collection(db, 'posts'),
-            where('userId', '==', userId)
+            where('userId', '==', userId),
+            where('privacy', '==', 'public')
         );
 
         const snapshot = await getDocs(postsQuery);
@@ -2854,7 +2933,7 @@ function renderProfilePostCard(post, isFeatured = false) {
     
     let avatarUrl, displayUsername;
     
-    if (isOwnPost && window.location.pathname.includes('profile.html')) {
+    if (isOwnPost && /\/profile(\.html)?\/?$/.test(window.location.pathname)) {
         const currentAvatar = JSON.parse(localStorage.getItem('avatar') || '{}');
         const currentUsername = localStorage.getItem('username');
         
@@ -3516,7 +3595,7 @@ function getAvatarUrl(avatar) {
 function createEmojiAvatar(emoji) {
     return `data:image/svg+xml,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
-            <rect width="50" height="50" fill="#C8AA6E"/>
+            <rect width="50" height="50" fill="#ff4fb4"/>
             <text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text>
         </svg>
     `)}`;

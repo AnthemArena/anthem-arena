@@ -416,7 +416,7 @@ export function showAchievementUnlock(achievement) {
             detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP • ${achievement.rarity}`,
             cta: championMessage?.cta || 'View Achievements',
             action: 'navigate',
-            targetUrl: '/my-votes.html#achievements',
+            targetUrl: '/profile#achievements',
                         rarity: achievement.rarity, // ✅ NEW: Pass rarity for styling
 
             // ✅ NEW: Add rarity styling

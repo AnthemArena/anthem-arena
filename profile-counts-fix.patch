@@ -1,0 +1,119 @@
+diff --git a/data/firestore.indexes.json b/data/firestore.indexes.json
+index c25d8bf..a0cb243 100644
+--- a/data/firestore.indexes.json
++++ b/data/firestore.indexes.json
+@@ -8,6 +8,15 @@
+         { "fieldPath": "timestamp", "order": "DESCENDING" }
+       ]
+     },
++    {
++      "collectionGroup": "posts",
++      "queryScope": "COLLECTION",
++      "fields": [
++        { "fieldPath": "userId", "order": "ASCENDING" },
++        { "fieldPath": "privacy", "order": "ASCENDING" },
++        { "fieldPath": "timestamp", "order": "DESCENDING" }
++      ]
++    },
+     {
+       "collectionGroup": "posts",
+       "queryScope": "COLLECTION_GROUP",
+diff --git a/js/profile-page.js b/js/profile-page.js
+index f29c41b..5e7a052 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -215,35 +215,46 @@ async function loadProfile(username) {
+ 
+ // ✅ NEW FUNCTION: Preload tab counts
+ async function preloadTabCounts(userId) {
++    const counts = { votes: 0, posts: 0, achievements: 0 };
++
++    // Each count is fetched on its own, so one failing query can no longer
++    // leave the later badges stuck on their default 0.
++
++    // Votes (only votes whose match still exists)
+     try {
+-        // Get vote count (only votes whose match still exists)
+         const { votes: visibleVotes } = await fetchUserVotes(userId);
+-        document.getElementById('votesCount').textContent = visibleVotes.length;
+-        
+-        // ✅ Get posts count
+-        const postsQuery = query(
++        counts.votes = visibleVotes.length;
++        document.getElementById('votesCount').textContent = counts.votes;
++    } catch (error) {
++        console.error('❌ Error preloading vote count:', error);
++    }
++
++    // Posts. The Firestore rules only allow reading posts whose privacy is
++    // 'public', so the query has to say so or it is rejected outright.
++    try {
++        const postsSnapshot = await getDocs(query(
+             collection(db, 'posts'),
+-            where('userId', '==', userId)
+-        );
+-        const postsSnapshot = await getDocs(postsQuery);
+-        document.getElementById('postsCount').textContent = postsSnapshot.size;
+-        
+-        // Get achievements count
++            where('userId', '==', userId),
++            where('privacy', '==', 'public')
++        ));
++        counts.posts = postsSnapshot.size;
++        document.getElementById('postsCount').textContent = counts.posts;
++    } catch (error) {
++        console.error('❌ Error preloading post count:', error);
++    }
++
++    // Achievements
++    try {
+         const profileDoc = await getDoc(doc(db, 'profiles', userId));
+-        const achievementsCount = profileDoc.exists() 
+-            ? (profileDoc.data().unlockedAchievements || []).length 
++        counts.achievements = profileDoc.exists()
++            ? (profileDoc.data().unlockedAchievements || []).length
+             : 0;
+-        document.getElementById('achievementsCount').textContent = achievementsCount;
+-        
+-        console.log('✅ Tab counts preloaded:', {
+-            votes: visibleVotes.length,
+-            posts: postsSnapshot.size,
+-            achievements: achievementsCount
+-        });
+-        
++        document.getElementById('achievementsCount').textContent = counts.achievements;
+     } catch (error) {
+-        console.error('❌ Error preloading counts:', error);
++        console.error('❌ Error preloading achievement count:', error);
+     }
++
++    console.log('✅ Tab counts preloaded:', counts);
+ }
+ 
+ // ========================================
+@@ -1608,6 +1619,7 @@ async function loadRecentPosts(userId) {
+         const postsQuery = query(
+             collection(db, 'posts'),
+             where('userId', '==', userId),
++            where('privacy', '==', 'public'),
+             orderBy('timestamp', 'desc'),
+             limit(3)
+         );
+@@ -1640,6 +1652,7 @@ async function loadAllPosts(userId) {
+         const postsQuery = query(
+             collection(db, 'posts'),
+             where('userId', '==', userId),
++            where('privacy', '==', 'public'),
+             orderBy('timestamp', 'desc')
+         );
+         
+@@ -2771,7 +2784,8 @@ async function loadUserPosts(userId, limitCount = null) {
+     try {
+         const postsQuery = query(
+             collection(db, 'posts'),
+-            where('userId', '==', userId)
++            where('userId', '==', userId),
++            where('privacy', '==', 'public')
+         );
+ 
+         const snapshot = await getDocs(postsQuery);

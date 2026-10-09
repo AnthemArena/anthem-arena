@@ -124,10 +124,16 @@
   to = "/about.html"
   status = 200
 
+# My Votes was folded into the profile page
 [[redirects]]
   from = "/my-votes"
-  to = "/my-votes.html"
-  status = 200
+  to = "/profile"
+  status = 301
+
+[[redirects]]
+  from = "/my-votes.html"
+  to = "/profile"
+  status = 301
 
 [[redirects]]
   from = "/profile"

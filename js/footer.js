@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="footer-cta-banner">
     <div class="container">
         <div class="cta-content">
-            <span class="cta-icon">🎤</span>
+            <span class="cta-icon">🎬</span>
             <div class="cta-text">
                 <h3>Think your friends will agree with your picks?</h3>
                 <p>Share your favorite matches and see if they vote the same way!</p>

@@ -1,0 +1,1758 @@
+diff --git a/blog-post.html b/blog-post.html
+index 6d4f06f..3f5d839 100644
+--- a/blog-post.html
++++ b/blog-post.html
+@@ -132,7 +132,7 @@
+             <span>Browse every battle</span>
+         </div>
+     </a>
+-    <a href="/my-votes.html" class="sidebar-link">
++    <a href="/profile#votes" class="sidebar-link">
+         <span class="link-icon"><i class="fas fa-poll-h"></i></span>
+         <div class="link-content">
+             <strong>My Votes</strong>
+diff --git a/brackets.html b/brackets.html
+index bea66d7..0a19919 100644
+--- a/brackets.html
++++ b/brackets.html
+@@ -271,7 +271,7 @@
+                     <h3>Browse All Edits</h3>
+                     <p>Preview every edit competing in the tournament</p>
+                 </a>
+-                <a href="/my-votes.html" class="explore-card-bracket">
++                <a href="/profile#votes" class="explore-card-bracket">
+                     <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
+                     <h3>Your Voting History</h3>
+                     <p>Track your votes and see how your favourite edits are performing</p>
+diff --git a/css/profile-insights.css b/css/profile-insights.css
+new file mode 100644
+index 0000000..d8353af
+--- /dev/null
++++ b/css/profile-insights.css
+@@ -0,0 +1,114 @@
++/* ========================================
++   PROFILE INSIGHTS (owner-only "Your Voting Style")
++   Uses --pink when the Arcane theme is loaded, gold otherwise.
++   ======================================== */
++
++.owner-insights {
++    --insight-accent: var(--pink, #c8aa6e);
++    margin-bottom: 2rem;
++    padding: 1.5rem;
++    border: 1px solid color-mix(in srgb, var(--insight-accent) 35%, transparent);
++    border-radius: 16px;
++    background: rgba(255, 255, 255, 0.03);
++}
++
++.owner-insights[hidden] {
++    display: none;
++}
++
++.insights-header {
++    display: flex;
++    align-items: flex-start;
++    justify-content: space-between;
++    gap: 1rem;
++    flex-wrap: wrap;
++    margin-bottom: 1.25rem;
++}
++
++.insights-header .section-title {
++    margin: 0;
++}
++
++.insights-subtitle {
++    margin: 0.25rem 0 0;
++    font-size: 0.85rem;
++    opacity: 0.6;
++}
++
++.insights-taste {
++    display: flex;
++    align-items: center;
++    gap: 1rem;
++    padding: 1rem 1.25rem;
++    margin-bottom: 1.25rem;
++    border-radius: 12px;
++    background: color-mix(in srgb, var(--insight-accent) 12%, transparent);
++}
++
++.insights-taste-icon {
++    font-size: 1.75rem;
++    color: var(--insight-accent);
++}
++
++.insights-taste-title {
++    font-weight: 700;
++    font-size: 1.1rem;
++}
++
++.insights-taste-desc {
++    font-size: 0.9rem;
++    opacity: 0.75;
++}
++
++.insights-grid {
++    display: grid;
++    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
++    gap: 0.75rem;
++}
++
++.insight-tile {
++    padding: 1rem;
++    text-align: center;
++    border-radius: 12px;
++    background: rgba(255, 255, 255, 0.04);
++}
++
++.insight-tile i {
++    color: var(--insight-accent);
++    font-size: 1.1rem;
++}
++
++.insight-value {
++    margin-top: 0.4rem;
++    font-size: 1.6rem;
++    font-weight: 700;
++    line-height: 1;
++}
++
++.insight-label {
++    margin-top: 0.35rem;
++    font-size: 0.8rem;
++    opacity: 0.7;
++}
++
++.owner-insights .share-stats-btn {
++    display: inline-flex;
++    align-items: center;
++    gap: 0.5rem;
++    padding: 0.7rem 1.2rem;
++    border: 0;
++    border-radius: 10px;
++    background: var(--insight-accent);
++    color: #0a0a0a;
++    font-weight: 700;
++    cursor: pointer;
++}
++
++.owner-insights .share-stats-btn:hover:not(:disabled) {
++    filter: brightness(1.1);
++}
++
++.owner-insights .share-stats-btn:disabled {
++    opacity: 0.7;
++    cursor: wait;
++}
+diff --git a/js/achievement-tracker.js b/js/achievement-tracker.js
+index 5a7fce2..e6af5da 100644
+--- a/js/achievement-tracker.js
++++ b/js/achievement-tracker.js
+@@ -416,7 +416,7 @@ export function showAchievementUnlock(achievement) {
+             detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP • ${achievement.rarity}`,
+             cta: championMessage?.cta || 'View Achievements',
+             action: 'navigate',
+-            targetUrl: '/my-votes.html#achievements',
++            targetUrl: '/profile#achievements',
+                         rarity: achievement.rarity, // ✅ NEW: Pass rarity for styling
+ 
+             // ✅ NEW: Add rarity styling
+diff --git a/js/founding-member-tracker.js b/js/founding-member-tracker.js
+index ebe9afe..27e2148 100644
+--- a/js/founding-member-tracker.js
++++ b/js/founding-member-tracker.js
+@@ -96,7 +96,7 @@ export async function awardFoundingMemberBadge(userId) {
+           detail: 'You\'re part of the first 1,000 voters - this badge is yours forever! +500 XP',
+           cta: 'View Badge',
+           action: 'navigate',
+-          targetUrl: '/my-votes.html#achievements'
++          targetUrl: '/profile#achievements'
+         });
+       }, 1500);
+     }
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index 80e8d9e..79471d8 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -2626,7 +2626,6 @@ function initBulletinSystem() {
+     // ✅ WHITELIST: Only enable on specific pages
+     const allowedPages = [
+         'vote.html',
+-        'my-votes.html',      // ✅ ADDED (you probably want alerts here)
+         'matches.html',
+         'feed.html',
+         'activity.html',
+diff --git a/js/live.js b/js/live.js
+index fc44a3f..9ed38e0 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -618,7 +618,7 @@ function showCompletionMessage() {
+                 <h3><i class="fa-solid fa-trophy"></i> You've Voted on All Live Matches!</h3>
+                 <p>Check out these pages while waiting for new matchups:</p>
+                 <div class="completion-links">
+-                    <a href="/my-votes.html">View Your Progress</a>
++                    <a href="/profile#journey">View Your Progress</a>
+                     <a href="/brackets.html">See Bracket</a>
+                     <a href="/stats.html">View Stats</a>
+                 </div>
+diff --git a/js/profile-insights.js b/js/profile-insights.js
+new file mode 100644
+index 0000000..7d67ed0
+--- /dev/null
++++ b/js/profile-insights.js
+@@ -0,0 +1,343 @@
++// ========================================
++// PROFILE INSIGHTS (owner-only)
++// Voting-style stats + shareable stats image.
++// Ported from the retired My Votes page. Every helper takes the vote
++// list as an argument instead of reading page-level state.
++// ========================================
++
++// ----------------------------------------
++// HELPERS
++// ----------------------------------------
++
++/** True only for a real numeric seed (random-draw cups use null). */
++export function hasSeed(seed) {
++    return seed !== null && seed !== undefined && seed !== '' && Number.isFinite(Number(seed));
++}
++
++function toMs(timestamp) {
++    if (!timestamp) return null;
++    if (typeof timestamp === 'object' && typeof timestamp.toMillis === 'function') {
++        return timestamp.toMillis();
++    }
++    if (typeof timestamp === 'object' && typeof timestamp.seconds === 'number') {
++        return timestamp.seconds * 1000;
++    }
++    const n = Number(timestamp);
++    if (Number.isFinite(n) && n > 0) return n;
++    const parsed = new Date(timestamp).getTime();
++    return Number.isFinite(parsed) ? parsed : null;
++}
++
++function toRoundNumber(round) {
++    return parseInt(String(round ?? 1).replace(/\D/g, ''), 10) || 1;
++}
++
++function dayNumber(ms) {
++    const d = new Date(ms);
++    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
++}
++
++// ----------------------------------------
++// ENRICH
++// votes: [{ choice, matchId, timestamp, match }]  (match already looked up)
++// ----------------------------------------
++
++export function enrichVotes(votes) {
++    return votes
++        .filter(v => v.match && v.match.song1 && v.match.song2)
++        .map(v => {
++            const m = v.match;
++            const chosen = v.choice === 'song1' ? m.song1 : m.song2;
++            const opponent = v.choice === 'song1' ? m.song2 : m.song1;
++
++            const s1 = Number(m.song1.votes) || 0;
++            const s2 = Number(m.song2.votes) || 0;
++            const total = s1 + s2;
++            const chosenVotes = v.choice === 'song1' ? s1 : s2;
++            const pct = total > 0 ? Math.round((chosenVotes / total) * 100) : 50;
++
++            let voteType = 'closeCall';
++            if (pct < 40) voteType = 'underdog';
++            else if (pct > 60) voteType = 'mainstream';
++
++            const isCompleted = m.status === 'completed' || !!m.winnerId;
++
++            let editStatus = 'active';
++            if (isCompleted && m.winnerId) {
++                editStatus = m.winnerId === chosen.id ? 'advanced' : 'eliminated';
++            }
++
++            return {
++                matchId: v.matchId,
++                timestamp: toMs(v.timestamp),
++                round: toRoundNumber(m.round),
++                editId: chosen.id,
++                editName: chosen.shortTitle || chosen.title || 'Unknown edit',
++                videoId: chosen.videoId,
++                opponentName: opponent.shortTitle || opponent.title || 'Unknown edit',
++                pct,
++                voteType,
++                isCompleted,
++                editStatus,
++                marginPct: total > 0 ? (Math.abs(s1 - s2) / total) * 100 : null
++            };
++        });
++}
++
++// ----------------------------------------
++// STATS
++// ----------------------------------------
++
++/** Current streak: consecutive days with a vote, ending today or yesterday. */
++export function calculateVotingStreak(enriched) {
++    const days = [...new Set(
++        enriched.filter(v => v.timestamp).map(v => dayNumber(v.timestamp))
++    )].sort((a, b) => b - a);
++
++    if (days.length === 0) return 0;
++
++    const today = dayNumber(Date.now());
++    if (days[0] < today - 1) return 0; // streak has lapsed
++
++    let streak = 1;
++    for (let i = 0; i < days.length - 1; i++) {
++        if (days[i] - days[i + 1] === 1) streak++;
++        else break;
++    }
++    return streak;
++}
++
++export function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
++    if (totalVotes < 5) {
++        return {
++            icon: '<i class="fa-solid fa-clapperboard"></i>',
++            emoji: '🎬',
++            title: 'New Voter',
++            description: 'Just getting started - vote more to unlock your taste profile!'
++        };
++    }
++
++    const underdogPercentage = Math.round((underdogPicks / totalVotes) * 100);
++
++    if (underdogPercentage >= 40) {
++        return {
++            icon: '<i class="fa-solid fa-mask"></i>',
++            emoji: '🎭',
++            title: 'Rebel Voter',
++            description: `You champion the underdog ${underdogPercentage}% of the time!`
++        };
++    }
++    if (majorityAlignment >= 70) {
++        return {
++            icon: '<i class="fa-solid fa-bullseye"></i>',
++            emoji: '🎯',
++            title: 'Mainstream Maven',
++            description: `Your taste aligns with the crowd ${majorityAlignment}% of the time`
++        };
++    }
++    if (majorityAlignment >= 55) {
++        return {
++            icon: '<i class="fa-solid fa-scale-balanced"></i>',
++            emoji: '⚖️',
++            title: 'Balanced Critic',
++            description: 'You have your own taste but appreciate popular picks too'
++        };
++    }
++    if (underdogPercentage >= 25) {
++        return {
++            icon: '<i class="fa-solid fa-compass"></i>',
++            emoji: '🧭',
++            title: 'Independent Voter',
++            description: 'You march to the beat of your own drum'
++        };
++    }
++    return {
++        icon: '<i class="fa-solid fa-film"></i>',
++        emoji: '🎞️',
++        title: 'Arcane Enthusiast',
++        description: 'You appreciate all kinds of Arcane edits'
++    };
++}
++
++export function computeInsights(enriched) {
++    const totalVotes = enriched.length;
++    const underdogPicks = enriched.filter(v => v.voteType === 'underdog').length;
++    const mainstreamPicks = enriched.filter(v => v.voteType === 'mainstream').length;
++    const closeCalls = enriched.filter(v => v.pct >= 45 && v.pct <= 55).length;
++    const influentialVotes = enriched.filter(
++        v => v.isCompleted && v.marginPct !== null && v.marginPct <= 5
++    ).length;
++
++    // Per-edit journey: one entry per edit the voter has backed
++    const edits = new Map();
++    enriched.forEach(v => {
++        if (!edits.has(v.editId)) {
++            edits.set(v.editId, {
++                id: v.editId,
++                name: v.editName,
++                videoId: v.videoId,
++                count: 0,
++                status: 'active'
++            });
++        }
++        const e = edits.get(v.editId);
++        e.count++;
++        if (v.editStatus === 'eliminated') e.status = 'eliminated';
++        else if (v.editStatus === 'advanced' && e.status !== 'eliminated') e.status = 'advanced';
++    });
++
++    const editList = [...edits.values()];
++    const editsStillAlive = editList.filter(e => e.status !== 'eliminated').length;
++    const editsAdvanced = editList.filter(e => e.status === 'advanced').length;
++    const favoriteEdit = [...editList].sort((a, b) => b.count - a.count)[0] || null;
++
++    const roundsParticipated = new Set(enriched.map(v => v.round)).size;
++    const furthestRound = enriched.length ? Math.max(...enriched.map(v => v.round)) : 0;
++
++    const majorityAlignment = totalVotes > 0
++        ? Math.round((mainstreamPicks / totalVotes) * 100)
++        : 0;
++
++    return {
++        totalVotes,
++        underdogPicks,
++        mainstreamPicks,
++        closeCalls,
++        influentialVotes,
++        votingStreak: calculateVotingStreak(enriched),
++        editsStillAlive,
++        editsAdvanced,
++        roundsParticipated,
++        furthestRound,
++        favoriteEdit,
++        tasteProfile: getTasteProfile(majorityAlignment, totalVotes, underdogPicks)
++    };
++}
++
++// ----------------------------------------
++// SHARE IMAGE
++// ----------------------------------------
++
++let generatorPromise = null;
++
++function loadStatsImageGenerator() {
++    if (window.generateAndShareStats) return Promise.resolve();
++    if (!generatorPromise) {
++        generatorPromise = new Promise((resolve, reject) => {
++            const script = document.createElement('script');
++            script.src = '/js/stats-image-generator.js';
++            script.onload = resolve;
++            script.onerror = () => {
++                generatorPromise = null;
++                reject(new Error('Could not load stats image generator'));
++            };
++            document.head.appendChild(script);
++        });
++    }
++    return generatorPromise;
++}
++
++async function shareStatsImage(insights) {
++    // Shape expected by generateAndShareStats() in stats-image-generator.js
++    const statsData = {
++        totalVotes: insights.totalVotes,
++        underdogPicks: insights.underdogPicks,
++        mainstreamPicks: insights.mainstreamPicks,
++        songsStillAlive: insights.editsStillAlive, // key name kept for the generator
++        votingStreak: insights.votingStreak,
++        roundsParticipated: insights.roundsParticipated,
++        tasteProfile: {
++            icon: insights.tasteProfile.emoji, // canvas can't draw Font Awesome
++            title: insights.tasteProfile.title,
++            description: insights.tasteProfile.description
++        },
++        favoriteSong: insights.favoriteEdit ? {
++            name: insights.favoriteEdit.name,
++            thumbnailUrl: `https://img.youtube.com/vi/${insights.favoriteEdit.videoId}/mqdefault.jpg`,
++            voteCount: insights.favoriteEdit.count
++        } : null
++    };
++
++    await loadStatsImageGenerator();
++    await window.generateAndShareStats(statsData);
++}
++
++// ----------------------------------------
++// RENDER
++// ----------------------------------------
++
++function statTile(icon, value, label) {
++    return `
++        <div class="insight-tile">
++            <i class="fas ${icon}"></i>
++            <div class="insight-value">${value}</div>
++            <div class="insight-label">${label}</div>
++        </div>
++    `;
++}
++
++/**
++ * Renders the owner-only "Your Voting Style" panel into `container`.
++ * votes: [{ choice, matchId, timestamp, match }]
++ */
++export function renderOwnerInsights(container, votes) {
++    if (!container) return;
++
++    const enriched = enrichVotes(votes);
++
++    if (enriched.length === 0) {
++        container.hidden = true;
++        container.innerHTML = '';
++        return;
++    }
++
++    const insights = computeInsights(enriched);
++
++    container.innerHTML = `
++        <div class="insights-header">
++            <div class="insights-title">
++                <h3 class="section-title"><i class="fas fa-chart-pie"></i> Your Voting Style</h3>
++                <p class="insights-subtitle">Only you can see this section.</p>
++            </div>
++            <button type="button" class="share-stats-btn" id="shareStatsBtn">
++                <i class="fas fa-share-alt"></i> Generate Stats Image
++            </button>
++        </div>
++
++        <div class="insights-taste">
++            <span class="insights-taste-icon">${insights.tasteProfile.icon}</span>
++            <div>
++                <div class="insights-taste-title">${insights.tasteProfile.title}</div>
++                <div class="insights-taste-desc">${insights.tasteProfile.description}</div>
++            </div>
++        </div>
++
++        <div class="insights-grid">
++            ${statTile('fa-mask', insights.underdogPicks, 'Underdog picks')}
++            ${statTile('fa-bullseye', insights.mainstreamPicks, 'Mainstream picks')}
++            ${statTile('fa-hand-holding-heart', insights.closeCalls, 'Close calls')}
++            ${statTile('fa-bolt', insights.influentialVotes, 'Influential votes')}
++            ${statTile('fa-fire', insights.votingStreak, 'Day streak')}
++            ${statTile('fa-circle-check', insights.editsStillAlive, 'Edits still alive')}
++            ${statTile('fa-arrow-up', insights.editsAdvanced, 'Edits advanced')}
++            ${statTile('fa-layer-group', insights.furthestRound, 'Furthest round')}
++        </div>
++    `;
++    container.hidden = false;
++
++    const btn = container.querySelector('#shareStatsBtn');
++    btn.addEventListener('click', async () => {
++        const original = btn.innerHTML;
++        btn.disabled = true;
++        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
++        try {
++            await shareStatsImage(insights);
++        } catch (error) {
++            console.error('❌ Stats image failed:', error);
++            alert('Could not generate the stats image. Please refresh and try again.');
++        } finally {
++            btn.disabled = false;
++            btn.innerHTML = original;
++        }
++    });
++}
+diff --git a/js/profile-page.js b/js/profile-page.js
+index 6bd53dd..382ad51 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -1,5 +1,5 @@
+ // ========================================
+-// PROFILE PAGE - ANTHEM ARENA
++// PROFILE PAGE - ARCANE MOMENTS
+ // ========================================
+ 
+ import { db } from './firebase-config.js';
+@@ -17,6 +17,7 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+ import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
+ import { ACHIEVEMENTS } from './achievements.js';
+ import { ARCANE_CONFIG } from './arcane-config.js';
++import { hasSeed, renderOwnerInsights } from './profile-insights.js';
+ 
+ // ========================================
+ // HELPER FUNCTIONS - Loading Spinner
+@@ -199,6 +200,10 @@ async function loadProfile(username) {
+                 hideLoadingSpinner(); // ✅ Hide spinner when done
+ 
+         showProfileContent();
++
++        // Owner-only voting style + share image, then honour #votes etc.
++        await loadOwnerInsights(profile.userId);
++        openTabFromHash();
+         
+     } catch (error) {
+         console.error('❌ Error loading profile:', error);
+@@ -211,13 +216,9 @@ async function loadProfile(username) {
+ // ✅ NEW FUNCTION: Preload tab counts
+ async function preloadTabCounts(userId) {
+     try {
+-        // Get vote count
+-        const votesQuery = query(
+-            collection(db, 'votes'),
+-            where('userId', '==', userId)
+-        );
+-        const votesSnapshot = await getDocs(votesQuery);
+-        document.getElementById('votesCount').textContent = votesSnapshot.size;
++        // Get vote count (only votes whose match still exists)
++        const { votes: visibleVotes } = await fetchUserVotes(userId);
++        document.getElementById('votesCount').textContent = visibleVotes.length;
+         
+         // ✅ Get posts count
+         const postsQuery = query(
+@@ -235,7 +236,7 @@ async function preloadTabCounts(userId) {
+         document.getElementById('achievementsCount').textContent = achievementsCount;
+         
+         console.log('✅ Tab counts preloaded:', {
+-            votes: votesSnapshot.size,
++            votes: visibleVotes.length,
+             posts: postsSnapshot.size,
+             achievements: achievementsCount
+         });
+@@ -1060,7 +1061,8 @@ else {
+         }
+         
+         // Update stats display
+-        document.getElementById('statTotalVotes').textContent = votesCount;
++        const { votes: visibleVotesForStats } = await fetchUserVotes(userId);
++        document.getElementById('statTotalVotes').textContent = visibleVotesForStats.length;
+         document.getElementById('statAchievements').textContent = achievementsCount;
+         
+         // ✅ UPDATE ACTIVITY LEVEL WITH RANK
+@@ -1313,8 +1315,8 @@ async function loadFavoriteSongs(userId) {
+                     <div class="song-title">${song.name}</div>
+                     <div class="song-meta">
+                         <span>${song.artist}</span>
+-                        <span class="song-meta-separator">•</span>
+-                        <span>Seed #${song.seed}</span>
++                        ${hasSeed(song.seed) ? `<span class="song-meta-separator">•</span>
++                        <span>Seed #${song.seed}</span>` : ''}
+                         <span class="song-meta-separator">•</span>
+                         <span class="song-vote-count">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
+                     </div>
+@@ -1731,17 +1733,11 @@ async function loadAllAchievements(userId) {
+ async function loadRecentVotes(userId, limitCount = 5) {
+     try {
+         console.log(`📥 Loading recent ${limitCount} votes for user:`, userId);
+-        
+-       const votesQuery = query(
+-    collection(db, 'votes'),
+-    where('userId', '==', userId)
+-);
+-        
+-        const snapshot = await getDocs(votesQuery);
+-        
++
++        const { votes } = await fetchUserVotes(userId);
+         const recentVotesContainer = document.getElementById('recentVotes');
+-        
+-        if (snapshot.empty) {
++
++        if (votes.length === 0) {
+             recentVotesContainer.innerHTML = `
+                 <div class="no-content">
+                     <i class="fas fa-vote-yea"></i>
+@@ -1750,25 +1746,18 @@ async function loadRecentVotes(userId, limitCount = 5) {
+             `;
+             return;
+         }
+-        
+-        // Get all matches for lookup
+-        const { getAllMatches } = await import('./api-client.js');
+-        const allMatches = await getAllMatches();
+-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+-        
+-      const recentVotes = snapshot.docs
+-    .map(doc => doc.data())
+-    .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
+-    .slice(0, limitCount);
+ 
+-const votesHTML = recentVotes
+-    .map(vote => renderVoteCard(vote, matchMap))
+-    .join('');
+-        
++        const matchMap = new Map(votes.map(v => [v.matchId, v.match]));
++
++        const votesHTML = votes
++            .slice(0, limitCount)
++            .map(({ match, ...voteData }) => renderVoteCard(voteData, matchMap))
++            .join('');
++
+         recentVotesContainer.innerHTML = votesHTML;
+-        
+-        console.log(`✅ Loaded ${snapshot.size} recent votes`);
+-        
++
++        console.log(`✅ Loaded ${Math.min(votes.length, limitCount)} recent votes`);
++
+     } catch (error) {
+         console.error('❌ Error loading recent votes:', error);
+         document.getElementById('recentVotes').innerHTML = `
+@@ -1790,18 +1779,13 @@ let allUserVotes = [];
+ async function loadAllVotes(userId) {
+     try {
+         console.log(`📥 Loading all votes for user:`, userId);
+-        
+-       const votesQuery = query(
+-    collection(db, 'votes'),
+-    where('userId', '==', userId)
+-);
+-        
+-        const snapshot = await getDocs(votesQuery);
+-        
++
++        const { votes } = await fetchUserVotes(userId);
++
+         // Update count badge
+-        document.getElementById('votesCount').textContent = snapshot.size;
+-        
+-        if (snapshot.empty) {
++        document.getElementById('votesCount').textContent = votes.length;
++
++        if (votes.length === 0) {
+             document.getElementById('allVotes').innerHTML = `
+                 <div class="no-content">
+                     <i class="fas fa-vote-yea"></i>
+@@ -1810,28 +1794,15 @@ async function loadAllVotes(userId) {
+             `;
+             return;
+         }
+-        
+-        // Get all matches for lookup
+-        const { getAllMatches } = await import('./api-client.js');
+-        const allMatches = await getAllMatches();
+-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+-        
+-       allUserVotes = snapshot.docs
+-    .map(doc => ({
+-        voteData: doc.data(),
+-        match: matchMap.get(doc.data().matchId)
+-    }))
+-    .sort(
+-        (a, b) =>
+-            Number(b.voteData.timestamp || 0) -
+-            Number(a.voteData.timestamp || 0)
+-    );
+-        
++
++        // fetchUserVotes already sorts newest first
++        allUserVotes = votes.map(({ match, ...voteData }) => ({ voteData, match }));
++
+         // Render with current filter
+         renderFilteredVotes(currentVoteFilter);
+-        
+-        console.log(`✅ Loaded ${snapshot.size} total votes`);
+-        
++
++        console.log(`✅ Loaded ${votes.length} total votes`);
++
+     } catch (error) {
+         console.error('❌ Error loading all votes:', error);
+         document.getElementById('allVotes').innerHTML = `
+@@ -2185,53 +2156,81 @@ function renderPostCard(post) {
+ }
+ 
+ 
++// ========================================
++// SHARED VOTE LOOKUP
++// One fetch per page load. Only votes whose match still exists in the
++// current match list are returned, so the header, tab badge, stats card,
++// Recent Votes and Votes tab always agree. Votes pointing at a deleted
++// or old-tournament match are skipped and counted in `orphanedCount`.
++// ========================================
++
++const userVotesCache = new Map();
++
++function fetchUserVotes(userId) {
++    if (!userVotesCache.has(userId)) {
++        const request = (async () => {
++            const snapshot = await getDocs(query(
++                collection(db, 'votes'),
++                where('userId', '==', userId)
++            ));
++
++            const rawVotes = snapshot.docs.map(d => d.data());
++
++            let matches = [];
++            try {
++                const { getAllMatches } = await import('./api-client.js');
++                matches = await getAllMatches();
++            } catch (error) {
++                console.warn('⚠️ Could not load matches:', error);
++            }
++
++            // If the match list is unavailable we can't tell which votes are
++            // orphaned, so show everything instead of hiding it all.
++            const matchesKnown = Array.isArray(matches) && matches.length > 0;
++            const matchMap = new Map((matches || []).map(m => [m.matchId || m.id, m]));
++
++            const withMatch = rawVotes.map(vote => ({
++                ...vote,
++                match: matchMap.get(vote.matchId)
++            }));
++
++            const votes = (matchesKnown ? withMatch.filter(v => v.match) : withMatch)
++                .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
++
++            const orphanedCount = matchesKnown ? withMatch.length - votes.length : 0;
++            if (orphanedCount > 0) {
++                console.warn(`⚠️ ${orphanedCount} vote(s) point at matches that no longer exist and are hidden`);
++            }
++
++            return { votes, orphanedCount, matchesKnown };
++        })();
++
++        request.catch(() => userVotesCache.delete(userId));
++        userVotesCache.set(userId, request);
++    }
++    return userVotesCache.get(userId);
++}
++
+ async function getVoteCountForUser(userId) {
+     try {
+-        const votesQuery = query(
+-            collection(db, 'votes'),
+-            where('userId', '==', userId)
+-        );
+-        
+-        const snapshot = await getDocs(votesQuery);
+-        return snapshot.size;
++        const { votes } = await fetchUserVotes(userId);
++        return votes.length;
+     } catch (error) {
+         console.error('❌ Error getting vote count:', error);
+         return 0;
+     }
+ }
+ 
+-
+-
+ async function getVotesForUser(userId) {
+     try {
+-        const votesQuery = query(
+-            collection(db, 'votes'),
+-            where('userId', '==', userId)
+-        );
+-        
+-        const snapshot = await getDocs(votesQuery);
+-        
+-        if (snapshot.empty) return [];
+-        
+-        // Get match data for each vote
+-        const { getAllMatches } = await import('./api-client.js');
+-        const allMatches = await getAllMatches();
+-        const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
+-        
+-        return snapshot.docs.map(doc => {
+-            const voteData = doc.data();
+-            return {
+-                ...voteData,
+-                match: matchMap.get(voteData.matchId)
+-            };
+-        });
++        const { votes } = await fetchUserVotes(userId);
++        return votes;
+     } catch (error) {
+         console.error('❌ Error fetching votes:', error);
+         return [];
+     }
+ }
+ 
+-
+ function formatJoinDate(date) {
+     const now = new Date();
+     const diffTime = Math.abs(now - date);
+@@ -2264,6 +2263,51 @@ function getTimeAgo(date) {
+ // SETUP TABS
+ // ========================================
+ 
++// ========================================
++// OWNER-ONLY INSIGHTS (replaces the old My Votes page)
++// ========================================
++
++async function loadOwnerInsights(userId) {
++    const container = document.getElementById('ownerInsights');
++    if (!container) return;
++
++    if (!isOwnProfile) {
++        container.hidden = true;
++        container.innerHTML = '';
++        return;
++    }
++
++    try {
++        const { votes } = await fetchUserVotes(userId);
++        renderOwnerInsights(container, votes);
++    } catch (error) {
++        console.error('❌ Error loading voting insights:', error);
++        container.hidden = true;
++    }
++}
++
++// ========================================
++// DEEP LINKS: /profile#votes, #achievements, #journey, #posts, #moments
++// ========================================
++
++const TAB_HASHES = {
++    overview: 'overview',
++    votes: 'votes',
++    posts: 'posts',
++    journey: 'participation',
++    achievements: 'achievements',
++    moments: 'songs'
++};
++
++function openTabFromHash() {
++    const key = window.location.hash.replace('#', '').toLowerCase();
++    const tab = TAB_HASHES[key];
++    if (!tab) return;
++
++    const button = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
++    if (button && !button.classList.contains('active')) button.click();
++}
++
+ function setupTabs() {
+     const tabButtons = document.querySelectorAll('.tab-btn');
+     const tabPanels = document.querySelectorAll('.tab-panel');
+@@ -2854,7 +2898,7 @@ function renderProfilePostCard(post, isFeatured = false) {
+     
+     let avatarUrl, displayUsername;
+     
+-    if (isOwnPost && window.location.pathname.includes('profile.html')) {
++    if (isOwnPost && /\/profile(\.html)?\/?$/.test(window.location.pathname)) {
+         const currentAvatar = JSON.parse(localStorage.getItem('avatar') || '{}');
+         const currentUsername = localStorage.getItem('username');
+         
+diff --git a/js/rank-system.js b/js/rank-system.js
+index ccd4def..03915f3 100644
+--- a/js/rank-system.js
++++ b/js/rank-system.js
+@@ -222,7 +222,7 @@ export function addXP(xpToAdd, source = 'vote') {
+               message: `⬆️ New Arcane Rank!`,
+ detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
+ cta: 'View Progress',
+-                ctaAction: () => window.location.href = 'my-votes.html',
++                ctaAction: () => window.location.href = '/profile#votes',
+                 duration: 5000
+             });
+         }
+diff --git a/js/stats-image-generator.js b/js/stats-image-generator.js
+index a049043..776e3ab 100644
+--- a/js/stats-image-generator.js
++++ b/js/stats-image-generator.js
+@@ -6,6 +6,11 @@
+ 
+ console.log('🎨 Stats Image Generator loaded');
+ 
++// Public site address shown on the card and used by "copy link".
++// TODO: update when the Arcane Moments domain is live.
++const SITE_HOST = 'anthemarena.com';
++const SITE_URL = `https://${SITE_HOST}`;
++
+ // ========================================
+ // GENERATE STATS IMAGE
+ // ========================================
+@@ -31,7 +36,7 @@ async function generateStatsImage(statsData) {
+     ctx.fillRect(0, 0, 1200, 630);
+     
+     // Decorative corner accents
+-    ctx.fillStyle = 'rgba(200, 170, 110, 0.1)';
++    ctx.fillStyle = 'rgba(255, 79, 180, 0.1)';
+     ctx.beginPath();
+     ctx.moveTo(0, 0);
+     ctx.lineTo(150, 0);
+@@ -47,12 +52,12 @@ async function generateStatsImage(statsData) {
+     ctx.fill();
+     
+     // Gold border
+-    ctx.strokeStyle = '#C8AA6E';
++    ctx.strokeStyle = '#ff4fb4';
+     ctx.lineWidth = 8;
+     ctx.strokeRect(20, 20, 1160, 590);
+     
+     // Inner shadow effect
+-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
++    ctx.strokeStyle = 'rgba(255, 79, 180, 0.3)';
+     ctx.lineWidth = 2;
+     ctx.strokeRect(30, 30, 1140, 570);
+     
+@@ -61,13 +66,13 @@ async function generateStatsImage(statsData) {
+     // ========================================
+     
+     // Title
+-    ctx.fillStyle = '#C8AA6E';
++    ctx.fillStyle = '#ff4fb4';
+     ctx.font = 'bold 48px Arial, sans-serif';
+     ctx.textAlign = 'center';
+-    ctx.fillText('MY ANTHEM ARENA PROFILE', 600, 85);
++    ctx.fillText('MY ARCANE MOMENTS PROFILE', 600, 85);
+     
+     // Subtitle line
+-    ctx.strokeStyle = '#C8AA6E';
++    ctx.strokeStyle = '#ff4fb4';
+     ctx.lineWidth = 2;
+     ctx.beginPath();
+     ctx.moveTo(350, 100);
+@@ -80,9 +85,9 @@ async function generateStatsImage(statsData) {
+     
+     // Badge background
+     const badgeGradient = ctx.createLinearGradient(250, 120, 950, 220);
+-    badgeGradient.addColorStop(0, 'rgba(200, 170, 110, 0.2)');
+-    badgeGradient.addColorStop(0.5, 'rgba(200, 170, 110, 0.3)');
+-    badgeGradient.addColorStop(1, 'rgba(200, 170, 110, 0.2)');
++    badgeGradient.addColorStop(0, 'rgba(255, 79, 180, 0.2)');
++    badgeGradient.addColorStop(0.5, 'rgba(255, 79, 180, 0.3)');
++    badgeGradient.addColorStop(1, 'rgba(255, 79, 180, 0.2)');
+     ctx.fillStyle = badgeGradient;
+     
+     // Rounded rectangle for badge
+@@ -90,13 +95,13 @@ async function generateStatsImage(statsData) {
+     ctx.fill();
+     
+     // Badge border
+-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.6)';
++    ctx.strokeStyle = 'rgba(255, 79, 180, 0.6)';
+     ctx.lineWidth = 3;
+     roundRect(ctx, 250, 120, 700, 100, 15);
+     ctx.stroke();
+     
+     // Taste profile icon and title
+-    ctx.fillStyle = '#C8AA6E';
++    ctx.fillStyle = '#ff4fb4';
+     ctx.font = 'bold 52px Arial, sans-serif';
+     ctx.textAlign = 'center';
+     const profileText = `${statsData.tasteProfile.icon} ${statsData.tasteProfile.title}`;
+@@ -122,7 +127,7 @@ async function generateStatsImage(statsData) {
+     const leftStats = [
+         { emoji: '🗳️', label: `${statsData.totalVotes} Votes Cast`, color: '#ffffff' },
+         { emoji: '🎭', label: `${statsData.underdogPicks} Underdog Picks`, color: '#ff6b9d' },
+-        { emoji: '✓', label: `${statsData.songsStillAlive} Songs Still Alive`, color: '#4ade80' }
++        { emoji: '✓', label: `${statsData.songsStillAlive} Edits Still Alive`, color: '#4ade80' }
+     ];
+     
+     leftStats.forEach((stat, index) => {
+@@ -176,23 +181,23 @@ async function generateStatsImage(statsData) {
+         
+         // Song card background
+         const songGradient = ctx.createLinearGradient(rightCol - 10, songCardY, rightCol + 400, songCardY + 240);
+-        songGradient.addColorStop(0, 'rgba(200, 170, 110, 0.15)');
+-        songGradient.addColorStop(1, 'rgba(200, 170, 110, 0.05)');
++        songGradient.addColorStop(0, 'rgba(255, 79, 180, 0.15)');
++        songGradient.addColorStop(1, 'rgba(255, 79, 180, 0.05)');
+         ctx.fillStyle = songGradient;
+         roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
+         ctx.fill();
+         
+         // Song card border
+-        ctx.strokeStyle = 'rgba(200, 170, 110, 0.5)';
++        ctx.strokeStyle = 'rgba(255, 79, 180, 0.5)';
+         ctx.lineWidth = 3;
+         roundRect(ctx, rightCol - 10, songCardY, 380, 240, 12);
+         ctx.stroke();
+         
+         // Section title
+-        ctx.fillStyle = '#C8AA6E';
++        ctx.fillStyle = '#ff4fb4';
+         ctx.font = 'bold 22px Arial, sans-serif';
+         ctx.textAlign = 'center';
+-        ctx.fillText('🎵 MOST SUPPORTED', rightCol + 180, songCardY + 35);
++        ctx.fillText('🎬 MOST SUPPORTED', rightCol + 180, songCardY + 35);
+         
+         // Load and draw thumbnail
+         try {
+@@ -211,7 +216,7 @@ async function generateStatsImage(statsData) {
+             ctx.restore();
+             
+             // Thumbnail border
+-            ctx.strokeStyle = 'rgba(200, 170, 110, 0.4)';
++            ctx.strokeStyle = 'rgba(255, 79, 180, 0.4)';
+             ctx.lineWidth = 2;
+             roundRect(ctx, thumbX, thumbY, thumbWidth, thumbHeight, 8);
+             ctx.stroke();
+@@ -229,7 +234,7 @@ async function generateStatsImage(statsData) {
+             ctx.fillText(songName, rightCol + 180, songCardY + 180);
+             
+             // Vote count with icon
+-            ctx.fillStyle = '#C8AA6E';
++            ctx.fillStyle = '#ff4fb4';
+             ctx.font = 'bold 18px Arial, sans-serif';
+             const voteText = `${statsData.favoriteSong.voteCount} ${statsData.favoriteSong.voteCount === 1 ? 'vote' : 'votes'}`;
+             ctx.fillText(`💗 ${voteText}`, rightCol + 180, songCardY + 210);
+@@ -248,7 +253,7 @@ async function generateStatsImage(statsData) {
+             }
+             ctx.fillText(songName, rightCol + 180, songCardY + 130);
+             
+-            ctx.fillStyle = '#C8AA6E';
++            ctx.fillStyle = '#ff4fb4';
+             ctx.font = 'bold 18px Arial, sans-serif';
+             ctx.fillText(`${statsData.favoriteSong.voteCount} votes`, rightCol + 180, songCardY + 160);
+         }
+@@ -259,7 +264,7 @@ async function generateStatsImage(statsData) {
+     // ========================================
+     
+     // Footer line
+-    ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
++    ctx.strokeStyle = 'rgba(255, 79, 180, 0.3)';
+     ctx.lineWidth = 1;
+     ctx.beginPath();
+     ctx.moveTo(100, 565);
+@@ -270,7 +275,7 @@ async function generateStatsImage(statsData) {
+     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+     ctx.font = '20px Arial, sans-serif';
+     ctx.textAlign = 'center';
+-    ctx.fillText('Vote for your favorite League anthems at anthemarena.com', 600, 595);
++    ctx.fillText(`Vote for your favorite Arcane edits at ${SITE_HOST}`, 600, 595);
+     
+     console.log('✅ Stats image generated');
+     
+@@ -313,7 +318,7 @@ function loadImage(url) {
+ // DOWNLOAD IMAGE
+ // ========================================
+ 
+-function downloadCanvas(canvas, filename = 'anthem-arena-stats.png') {
++function downloadCanvas(canvas, filename = 'arcane-moments-stats.png') {
+     canvas.toBlob(blob => {
+         const url = URL.createObjectURL(blob);
+         const a = document.createElement('a');
+@@ -374,7 +379,7 @@ function showShareToast(statsData, canvas) {
+         padding: 1.5rem;
+         border-radius: 16px;
+         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+-        border: 2px solid rgba(200, 170, 110, 0.3);
++        border: 2px solid rgba(255, 79, 180, 0.3);
+         z-index: 10001;
+         min-width: 380px;
+         animation: slideInUp 0.4s ease;
+@@ -427,7 +432,7 @@ window.downloadStatsImage = function() {
+ // ========================================
+ 
+ window.copyShareLink = function() {
+-    const siteUrl = 'https://anthemarena.com';
++    const siteUrl = SITE_URL;
+     
+     navigator.clipboard.writeText(siteUrl).then(() => {
+         // Show confirmation
+@@ -450,7 +455,7 @@ window.copyShareLink = function() {
+         document.body.appendChild(confirmToast);
+         setTimeout(() => confirmToast.remove(), 3000);
+     }).catch(err => {
+-        alert('Failed to copy link. Please try manually: https://anthemarena.com');
++        alert('Failed to copy link. Please try manually: ' + SITE_URL);
+         console.error('Copy failed:', err);
+     });
+ };
+@@ -503,7 +508,7 @@ function showLoadingToast(message) {
+         padding: 1rem 1.5rem;
+         border-radius: 12px;
+         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+-        border: 2px solid rgba(200, 170, 110, 0.3);
++        border: 2px solid rgba(255, 79, 180, 0.3);
+         z-index: 10000;
+         display: flex;
+         align-items: center;
+@@ -521,8 +526,8 @@ function showLoadingToast(message) {
+             .loading-spinner {
+                 width: 20px;
+                 height: 20px;
+-                border: 3px solid rgba(200, 170, 110, 0.3);
+-                border-top-color: #C8AA6E;
++                border: 3px solid rgba(255, 79, 180, 0.3);
++                border-top-color: #ff4fb4;
+                 border-radius: 50%;
+                 animation: spin 1s linear infinite;
+             }
+@@ -579,7 +584,7 @@ function showLoadingToast(message) {
+                 display: block;
+                 font-family: 'Cinzel', serif;
+                 font-size: 1.1rem;
+-                color: #C8AA6E;
++                color: #ff4fb4;
+                 margin-bottom: 0.25rem;
+             }
+             
+@@ -607,25 +612,25 @@ function showLoadingToast(message) {
+             }
+             
+             .download-btn {
+-                background: linear-gradient(135deg, #C8AA6E, #B89A5E);
++                background: linear-gradient(135deg, #ff4fb4, #e0399b);
+                 color: #0a0a0a;
+                 font-weight: 700;
+             }
+             
+             .download-btn:hover {
+-                background: linear-gradient(135deg, #D4B876, #C8AA6E);
++                background: linear-gradient(135deg, #ff70c3, #ff4fb4);
+                 transform: translateY(-1px);
+             }
+             
+             .copy-link-btn {
+                 background: rgba(255, 255, 255, 0.1);
+                 color: white;
+-                border: 1px solid rgba(200, 170, 110, 0.3);
++                border: 1px solid rgba(255, 79, 180, 0.3);
+             }
+             
+             .copy-link-btn:hover {
+                 background: rgba(255, 255, 255, 0.15);
+-                border-color: rgba(200, 170, 110, 0.5);
++                border-color: rgba(255, 79, 180, 0.5);
+             }
+             
+             .toast-hint {
+diff --git a/js/vote.js b/js/vote.js
+index 79ff242..ad2d1cb 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -2112,7 +2112,7 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
+                             message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
+                             detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
+                             cta: 'View All Achievements',
+-                            ctaAction: () => window.location.href = 'my-votes.html',
++                            ctaAction: () => window.location.href = '/profile#votes',
+                             duration: 4000
+                         });
+                     }
+diff --git a/live.html b/live.html
+index b8c9e05..4ef4d3f 100644
+--- a/live.html
++++ b/live.html
+@@ -144,13 +144,13 @@
+                 <a href="/brackets.html" class="action-btn secondary">
+                     <i class="fas fa-sitemap"></i> View Bracket
+                 </a>
+-                <a href="/my-votes.html" class="action-btn secondary">
++                <a href="/profile#votes" class="action-btn secondary">
+                     <i class="fas fa-chart-bar"></i> My Progress
+                 </a>
+             </div>
+             
+             <p class="no-matches-tip">
+-                <i class="fa-solid fa-lightbulb"></i> Check your <a href="/my-votes.html" class="inline-link">progress</a> 
++                <i class="fa-solid fa-lightbulb"></i> Check your <a href="/profile#journey" class="inline-link">progress</a> 
+                 or explore the <a href="/music-gallery.html" class="inline-link">gallery</a>
+             </p>
+         </div>
+@@ -170,7 +170,7 @@
+                             <span class="link-icon"><i class="fa-solid fa-chart-column"></i></span>
+                             <span>Statistics</span>
+                         </a>
+-                        <a href="/my-votes.html" class="footer-link-card">
++                        <a href="/profile#votes" class="footer-link-card">
+                             <span class="link-icon"><i class="fa-solid fa-gamepad"></i></span>
+                             <span>My Progress</span>
+                         </a>
+diff --git a/matches.html b/matches.html
+index 4a5b1bd..3d89fa8 100644
+--- a/matches.html
++++ b/matches.html
+@@ -116,7 +116,7 @@
+                 through each round, explore the <a href="/music-gallery.html">gallery</a> 
+                 to preview every competing edit, or check <a href="/stats.html">detailed statistics</a> 
+                 for voting trends and edit performance. Track your personal voting history on the 
+-                <a href="/my-votes.html">my votes page</a>.
++                <a href="/profile#votes">my votes page</a>.
+             </p>
+         </div>
+     </section>
+@@ -241,7 +241,7 @@
+                     <p>Preview every edit competing in the tournament</p>
+                     <span class="link-arrow">→</span>
+                 </a>
+-                <a href="/my-votes.html" class="quick-link-card">
++                <a href="/profile#votes" class="quick-link-card">
+                     <div class="link-icon"><i class="fa-solid fa-circle-check"></i></div>
+                     <h3>Your Voting History</h3>
+                     <p>Review all your votes, track predictions, and monitor your achievement progress</p>
+diff --git a/music-gallery.html b/music-gallery.html
+index 87152e2..d33e7d8 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -318,7 +318,7 @@
+                     <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
+                     <span class="action-cta">View Stats Dashboard →</span>
+                 </a>
+-                <a href="/my-votes.html" class="action-card">
++                <a href="/profile#votes" class="action-card">
+ <div class="action-icon"><i class="fa-solid fa-chart-line"></i></div>
+                     <h3>Track Your Votes</h3>
+                     <p>Review your voting history, track predictions, and earn achievements for participation</p>
+diff --git a/my-votes.html b/my-votes.html
+index 8cb2616..269aa73 100644
+--- a/my-votes.html
++++ b/my-votes.html
+@@ -2,380 +2,19 @@
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
++    <title>Redirecting to your profile | Arcane Moments</title>
++    <meta name="robots" content="noindex">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    
+-    <!-- SEO Meta Tags -->
+-    <title>My Voting History | Anthem Arena</title>
+-    <meta name="description" content="View your League of Legends music tournament voting history, stats, and achievements. Track your predictions and favorite songs.">
+-    <link rel="canonical" href="https://anthemarena.com/my-votes">
+-    
+-    <!-- ❌ BLOCK FROM INDEXING - User-Specific Page -->
+-    <meta name="robots" content="noindex, nofollow">
+-    
+-    <!-- Favicon -->
+-    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+-    
+-    <!-- NO Open Graph / Twitter Cards needed for private pages -->
+-    
+-    <!-- Fonts -->
+-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+-    
+-    <!-- Stylesheets -->
+-    <link rel="stylesheet" href="/css/main.css">
+-    <link rel="stylesheet" href="/css/navigation.css">
+-    <link rel="stylesheet" href="/css/matches.css">
+-    <link rel="stylesheet" href="/css/my-votes.css">
+-    <link rel="stylesheet" href="/css/footer.css">
+-    <link rel="stylesheet" href="/css/scrollbar.css">
+-    <link rel="stylesheet" href="/css/settings.css">
+-
+-    
+-    <!-- Font Awesome for icons -->
+-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <!-- My Votes now lives on the profile page. Keeps the #hash (e.g. #achievements). -->
++    <meta http-equiv="refresh" content="0; url=/profile">
++    <script>
++        (function () {
++            var hash = window.location.hash || '#votes';
++            window.location.replace('/profile' + hash);
++        })();
++    </script>
+ </head>
+-<body>
+-
+-    <div id="nav-placeholder"></div>
+-    <script type="module" src="/js/navigation.js"></script>
+-
+-    <!-- ========================================
+-         HEADER SECTION
+-         ======================================== -->
+-    <section class="page-header">
+-        <div class="container">
+-            <div class="header-content">
+-                <div class="breadcrumb">
+-                    <a href="/">Home</a>
+-                    <span class="separator">›</span>
+-                    <span class="current">My Votes</span>
+-                </div>
+-                <h1 class="page-title">My Vote History</h1>
+-                <p class="page-subtitle">Track your predictions and voting stats</p>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- PAGE INTRO WITH INTERNAL LINKS -->
+-    <section class="page-intro">
+-        <div class="container">
+-            <p>
+-                Track your complete voting history across the Anthem Arena tournament. 
+-                Review which League of Legends songs you've supported, see how your picks 
+-                are performing in the <a href="/brackets.html">tournament bracket</a>, 
+-                and earn achievements as you participate. Explore detailed 
+-                <a href="/stats.html">tournament statistics</a> to compare your preferences 
+-                with community trends, browse the <a href="/music-gallery.html">complete music gallery</a> 
+-                to discover new songs, or head to <a href="/matches.html">active matches</a> 
+-                to continue voting and influence the results.
+-            </p>
+-        </div>
+-    </section>
+-
+-    <!-- STATS HERO SECTION (COMBINED) -->
+-
+-    <!-- ========================================
+-     STATS HERO SECTION (COMBINED)
+-     ======================================== -->
+-<section class="stats-hero-section" id="statsHeroSection" style="display: none;">
+-    <div class="container">
+-        
+-        <!-- Top Row: Profile Badge + Share CTA -->
+-        <div class="hero-top-row">
+-            <div class="hero-profile-badge">
+-                <span class="profile-icon" id="heroProfileIcon"><i class="fa-solid fa-music"></i></span>
+-                <div class="profile-text">
+-                    <h2 class="profile-title" id="heroProfileTitle">New Arrival</h2>
+-                    <p class="profile-description" id="heroProfileDescription">Loading your profile...</p>
+-                </div>
+-            </div>
+-            
+-            <div class="hero-share-cta">
+-                <h3 class="share-title">Share Your Music Profile</h3>
+-                <p class="share-subtitle">Generate a beautiful stats card for social media</p>
+-                <button onclick="shareStats()" class="hero-share-btn">
+-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+-                        <polyline points="16 6 12 2 8 6"></polyline>
+-                        <line x1="12" y1="2" x2="12" y2="15"></line>
+-                    </svg>
+-                    Generate Stats Image
+-                </button>
+-                <p class="share-hint"><i class="fa-solid fa-lightbulb"></i> Creates a 1200x630px image perfect for Twitter, Facebook, and Discord</p>
+-            </div>
+-        </div>
+-
+-           <!-- Stats Navigation Tip -->
+-        <div class="hero-navigation-tip">
+-            <i class="fas fa-lightbulb"></i>
+-            Want deeper insights? Check 
+-            <a href="/stats.html" class="hero-inline-link">tournament statistics</a> 
+-            or view the <a href="/brackets.html" class="hero-inline-link">full bracket</a>
+-        </div>
+-        
+-        <!-- Stats Grid -->
+-        <div class="hero-stats-grid">
+-            <div class="hero-stat-card primary">
+-                <div class="stat-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroTotalVotes">0</span>
+-                    <span class="stat-label">Total Votes</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card underdog">
+-                <div class="stat-icon"><i class="fa-solid fa-masks-theater"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroUnderdogPicks">0</span>
+-                    <span class="stat-label">Underdog Picks</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card mainstream">
+-                <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroMainstreamPicks">0</span>
+-                    <span class="stat-label">Mainstream Picks</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card fire">
+-                <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroVotingStreak">0</span>
+-                    <span class="stat-label">Day Streak</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card journey">
+-                <div class="stat-icon"><i class="fa-solid fa-music"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroSongsAlive">0</span>
+-                    <span class="stat-label">Songs Still Alive</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card success">
+-                <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroSongsAdvanced">0</span>
+-                    <span class="stat-label">Songs Advanced</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card coverage">
+-                <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroFurthestRound">-</span>
+-                    <span class="stat-label">Furthest Round</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card impact">
+-                <div class="stat-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroCloseCalls">0</span>
+-                    <span class="stat-label">Close Calls</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card accent">
+-                <div class="stat-icon"><i class="fa-solid fa-chart-column"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroRoundsParticipated">0</span>
+-                    <span class="stat-label">Rounds Voted</span>
+-                </div>
+-            </div>
+-
+-            <div class="hero-stat-card influence">
+-                <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+-                <div class="stat-content">
+-                    <span class="stat-value" id="heroVoteInfluence">0</span>
+-                    <span class="stat-label">Influential Votes</span>
+-                </div>
+-            </div>
+-        </div>
+-</section> <!-- ✅ This closes stats-hero-section -->
+-
+-        <!-- ========================================
+-     ACHIEVEMENTS SECTION
+-======================================== -->
+-
+-<section class="achievements-section" id="achievementsSection" style="display: none;">
+-    <div class="container">
+-        <div class="section-header">
+-            <h2 class="section-title">
+-                <span class="title-icon"><i class="fa-solid fa-trophy"></i></span>
+-                Achievements
+-            </h2>
+-          <div class="achievement-completion">
+-    <span id="achievementCompletion">0 Unlocked</span>
+-</div>
+-        </div>
+-        
+-        <!-- Achievement Categories -->
+-<div id="achievementsGrid" class="achievements-grid">
+-    <!-- Will be populated by JavaScript -->
+-</div>
+-    </div>
+-</section>
+-        
+-        <!-- Favorite Songs Section -->
+-        <div class="favorite-songs-section" id="favoriteSongsSection" style="display: none;">
+-            <!-- Populated by JavaScript -->
+-        </div>
+-        
+-        <!-- Song Journeys Section -->
+-        <div class="song-journeys-section" id="songJourneysSection" style="display: none;">
+-            <!-- Populated by JavaScript -->
+-        </div>
+-        
+-        <!-- Tournament Coverage Section -->
+-        <div class="tournament-coverage-section" id="tournamentCoverageSection" style="display: none;">
+-            <!-- Populated by JavaScript -->
+-        </div>
+-        
+-        <!-- Upcoming Reminders Section -->
+-        <div class="upcoming-reminders-section" id="upcomingRemindersSection" style="display: none;">
+-            <!-- Populated by JavaScript -->
+-        </div>
+-        
+-    </div>
+-</section>
+-
+-<!-- DELETE the old stats-overview section completely -->
+-<!-- DELETE the old stats-hero-card section completely -->
+-
+-<!-- ========================================
+-     FILTERS
+-     ======================================== -->
+-<section class="filters-section" id="filtersSection" style="display: none;">
+-    <div class="container">
+-
+-         <!-- Tournament Selector -->
+-        <div class="tournament-filter">
+-            <label for="tournament-select">Tournament:</label>
+-            <select id="tournament-select" onchange="filterByTournament()">
+-                <option value="all">All Tournaments</option>
+-                <option value="2025-worlds-anthems" selected>Anthem Arena S1</option>
+-                <!-- Add more as needed -->
+-            </select>
+-        </div>
+-
+-        <div class="filters">
+-            <button class="filter-btn active" data-filter="all">
+-                All Votes <span class="filter-count" id="countAll">0</span>
+-            </button>
+-            <button class="filter-btn" data-filter="underdog">
+-                <i class="fa-solid fa-masks-theater"></i> Underdog <span class="filter-count" id="countUnderdog">0</span>
+-            </button>
+-            <button class="filter-btn" data-filter="mainstream">
+-                <i class="fa-solid fa-bullseye"></i> Mainstream <span class="filter-count" id="countMainstream">0</span>
+-            </button>
+-            <button class="filter-btn" data-filter="live">
+-                <i class="fa-solid fa-hourglass-half"></i> Live <span class="filter-count" id="countLive">0</span>
+-            </button>
+-        </div>
+-    </div>
+-</section>
+-
+-    <!-- ========================================
+-         VOTE HISTORY
+-         ======================================== -->
+-    <section class="votes-section">
+-        <div class="container">
+-            <div class="section-header">
+-                <h2 class="section-title">Your Votes</h2>
+-                <button class="share-stats-btn" onclick="shareStats()">
+-                    <i class="fas fa-share-alt"></i> Share Stats
+-                </button>
+-            </div>
+-
+-            <!-- Loading State -->
+-            <div class="loading-state" id="loadingState">
+-                <div class="loader"></div>
+-                <p>Loading your vote history...</p>
+-            </div>
+-
+-           <!-- No Votes State -->
+-            <div class="no-votes-state" id="noVotesState" style="display: none;">
+-                <div class="no-votes-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+-                <h3>No Votes Yet</h3>
+-                <p>Start voting in matches to build your history and unlock achievements!</p>
+-                <div class="no-votes-actions">
+-                    <a href="/matches.html" class="btn-primary">
+-                        <i class="fas fa-vote-yea"></i> View Active Matches
+-                    </a>
+-                    <a href="/music-gallery.html" class="btn-secondary">
+-                        <i class="fas fa-music"></i> Browse All Songs
+-                    </a>
+-                </div>
+-                <p class="no-votes-tip">
+-                    <i class="fa-solid fa-lightbulb"></i> New to the tournament? Check the 
+-                    <a href="/brackets.html" class="inline-link">bracket overview</a> 
+-                    or explore <a href="/stats.html" class="inline-link">tournament statistics</a>
+-                </p>
+-            </div>
+-
+-            <!-- Votes Grid -->
+-            <div class="votes-grid" id="votesGrid">
+-                <!-- Populated by JavaScript -->
+-            </div>
+-        </div>
+-    </section>
+-
+-
+-    <!-- CONTINUE EXPLORING SECTION -->
+-    <section class="continue-exploring">
+-        <div class="container">
+-            <h2 class="section-title">Continue Your Journey</h2>
+-            <p class="section-subtitle">Explore more tournament features</p>
+-            
+-            <div class="explore-votes-grid">
+-                <a href="/matches.html" class="explore-votes-card primary">
+-                    <div class="votes-card-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+-                    <h3>Vote in Active Matches</h3>
+-                    <p>Cast more votes and influence which songs advance to the next round</p>
+-                    <span class="votes-card-cta">View Matches →</span>
+-                </a>
+-                
+-                <a href="/brackets.html" class="explore-votes-card">
+-                    <div class="votes-card-icon"><i class="fa-solid fa-trophy"></i></div>
+-                    <h3>Tournament Bracket</h3>
+-                    <p>See how your favorite songs are progressing through the tournament</p>
+-                    <span class="votes-card-cta">View Bracket →</span>
+-                </a>
+-                
+-                <a href="/stats.html" class="explore-votes-card">
+-                    <div class="votes-card-icon"><i class="fa-solid fa-chart-line"></i></div>
+-                    <h3>Tournament Statistics</h3>
+-                    <p>Compare your voting patterns with community trends and insights</p>
+-                    <span class="votes-card-cta">View Stats →</span>
+-                </a>
+-                
+-                <a href="/music-gallery.html" class="explore-votes-card">
+-                    <div class="votes-card-icon"><i class="fa-solid fa-music"></i></div>
+-                    <h3>Music Gallery</h3>
+-                    <p>Discover all 64 competing League music videos organized by band</p>
+-                    <span class="votes-card-cta">Browse Gallery →</span>
+-                </a>
+-            </div>
+-        </div>
+-    </section>
+-
+-
+-    <div id="footer-placeholder"></div>
+-    <script src="/js/footer.js"></script>
+-    <script type="module" src="js/notification-storage.js"></script>
+-<script type="module" src="js/notification-center.js"></script>
+-    <script type="module" src="/js/global-notifications.js"></script>
+-
+-     <!-- ✅ ADD THIS LINE -->
+-<script src="/js/stats-image-generator.js"></script>
+-
+-    <script type="module" src="/js/my-votes.js"></script>
+-    <script type="module" src="/js/settings-modal.js"></script>
++<body style="background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:4rem 1rem;">
++    <p>My Votes has moved. <a href="/profile#votes" style="color:#ff4fb4;">Go to your profile</a></p>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/netlify.toml b/netlify.toml
+index aa436de..a4dc27c 100644
+--- a/netlify.toml
++++ b/netlify.toml
+@@ -124,10 +124,16 @@
+   to = "/about.html"
+   status = 200
+ 
++# My Votes was folded into the profile page
+ [[redirects]]
+   from = "/my-votes"
+-  to = "/my-votes.html"
+-  status = 200
++  to = "/profile"
++  status = 301
++
++[[redirects]]
++  from = "/my-votes.html"
++  to = "/profile"
++  status = 301
+ 
+ [[redirects]]
+   from = "/profile"
+diff --git a/profile.html b/profile.html
+index ac52769..aa19ef0 100644
+--- a/profile.html
++++ b/profile.html
+@@ -17,6 +17,7 @@
+     <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+     <link rel="stylesheet" href="/css/profile.css">
++    <link rel="stylesheet" href="/css/profile-insights.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+     <link rel="stylesheet" href="/css/settings.css">
+@@ -306,6 +307,9 @@
+                          PARTICIPATION TAB
+                          ======================================== -->
+                     <div class="tab-panel" id="tab-participation">
++
++                        <!-- Owner-only: voting style + share image (filled by profile-insights.js) -->
++                        <div id="ownerInsights" class="owner-insights" hidden></div>
+                         
+                         <!-- Overall Participation -->
+                         <div class="participation-overview">
+diff --git a/stats.html b/stats.html
+index bb2d0c7..ab8ddd6 100644
+--- a/stats.html
++++ b/stats.html
+@@ -117,7 +117,7 @@
+                 track participation trends. See the 
+                 <a href="/brackets.html">tournament bracket</a> for visual progression through rounds, 
+                 browse the <a href="/music-gallery.html">complete music gallery</a> to preview all 64 
+-                competing songs, or check <a href="/my-votes.html">your voting history</a> to see 
++                competing songs, or check <a href="/profile#votes">your voting history</a> to see 
+                 your predictions and achievements.
+             </p>
+         </div>
+@@ -386,7 +386,7 @@
+                     <span class="stats-card-arrow">→</span>
+                 </a>
+                 
+-                <a href="/my-votes.html" class="explore-stats-card">
++                <a href="/profile#votes" class="explore-stats-card">
+                     <div class="stats-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                     <h3>Your Votes</h3>
+                     <p>Track your voting history, predictions, and unlock achievements</p>
+diff --git a/vote.html b/vote.html
+index 1eb132f..06db854 100644
+--- a/vote.html
++++ b/vote.html
+@@ -379,7 +379,7 @@
+                 <a href="/stats.html" class="modal-quick-link">
+                     <i class="fas fa-chart-bar"></i> Statistics
+                 </a>
+-                <a href="/my-votes.html" class="modal-quick-link">
++                <a href="/profile#votes" class="modal-quick-link">
+                     <i class="fas fa-history"></i> My Votes
+                 </a>
+             </div>
+@@ -393,7 +393,7 @@
+             <p class="section-subtitle">Continue exploring the tournament</p>
+             
+             <div class="after-voting-grid">
+-                <a href="/my-votes.html" class="after-voting-card">
++                <a href="/profile#votes" class="after-voting-card">
+                     <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                     <h3>View Your Votes</h3>
+                     <p>Track all your predictions and unlock achievements</p>
