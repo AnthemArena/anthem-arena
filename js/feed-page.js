@@ -1277,8 +1277,9 @@ function setupMentionTooltips() {
         // Click to go to profile
         mention.addEventListener('click', (e) => {
             e.preventDefault();
-            const userId = mention.dataset.userId;
-            window.location.href = `/profile.html?user=${userId}`;
+            // profile.html looks users up by username, not by user id
+            const profileKey = mention.dataset.username || mention.dataset.userId;
+            window.location.href = `/profile.html?user=${encodeURIComponent(profileKey)}`;
         });
     });
 }
@@ -1304,8 +1305,9 @@ async function setupPostInteractions(postElement, post) {
             // Go to own profile
             window.location.href = '/profile.html';
         } else {
-            // Go to other user's profile
-            window.location.href = `/profile.html?user=${targetUserId}`;
+            // Go to other user's profile (profile.html looks users up by username)
+            const profileKey = post.username || targetUserId;
+            window.location.href = `/profile.html?user=${encodeURIComponent(profileKey)}`;
         }
     };
     
@@ -1566,7 +1568,9 @@ function createCommentElement(comment, isReply = false) {
         if (comment.userId === currentUserId) {
             window.location.href = '/profile.html';
         } else {
-            window.location.href = `/profile.html?user=${comment.userId}`;
+            // profile.html looks users up by username, not by user id
+            const profileKey = comment.username || comment.userId;
+            window.location.href = `/profile.html?user=${encodeURIComponent(profileKey)}`;
         }
     };
     
