@@ -46,7 +46,7 @@ service cloud.firestore {
     // TODO: replace with the admin account's UID
     // (Firebase console > Authentication > Users > "User UID").
     function isAdmin() {
-      return signedIn() && request.auth.uid in ['REPLACE_WITH_ADMIN_UID'];
+      return signedIn() && request.auth.uid in ['T3tYzd29FseCMWwBSBzH3IHURej2'];
     }
 
     // A vote is recorded in two steps by js/vote.js: first the vote document

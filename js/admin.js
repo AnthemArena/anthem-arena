@@ -31,8 +31,10 @@ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 // ========================================
 
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('✅ Authenticated as:', user.email);
+    // Every visitor is signed in anonymously by firebase-config.js, so a user
+    // object alone does not mean admin. Only a real (non-anonymous) account counts.
+    if (user && !user.isAnonymous) {
+        console.log('✅ Authenticated as:', user.email, '| uid:', user.uid);
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
         loadMatches();

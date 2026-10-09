@@ -5,7 +5,7 @@
 import { getCrossTournamentH2H, analyzeMatchContext } from './firebase-stats.js';
 import { getAllMatches } from './api-client.js';
 import { db } from './firebase-config.js';
-import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Load songs data
 let songsData = [];
