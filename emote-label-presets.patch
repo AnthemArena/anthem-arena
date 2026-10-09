@@ -1,0 +1,41 @@
+diff --git a/js/emote-system.js b/js/emote-system.js
+index 347d75e..7a1aad7 100644
+--- a/js/emote-system.js
++++ b/js/emote-system.js
+@@ -23,10 +23,10 @@ export async function sendEmoteReaction(targetUsername, targetUserId, type, matc
+     
+     // Preset messages based on type
+     const presetMessages = {
+-        'thanks': ['Great taste! 🎵', 'Thanks for the backup! 🤝', 'Let\'s go! 🔥'],
++        'thanks': ['Great pick! 🎬', 'Thanks for the backup! 🤝', 'Let\'s go! 🔥'],
+         'props': ['Nice pick! 👊', 'Respect! 💯', 'We got this! 💪'],
+-        'rivalry': ['May the best song win! ⚔️', 'Game on! 🎮', 'Challenge accepted! ⚡'],
+-        'hype': ['This match is fire! 🔥', 'Epic battle! ⚡', 'What a matchup! 🎵']
++        'rivalry': ['May the best edit win! ⚔️', 'Game on! 🎮', 'Challenge accepted! ⚡'],
++        'hype': ['This match is fire! 🔥', 'Epic battle! ⚡', 'What a matchup! 🎬']
+     };
+     
+     const message = customMessage || presetMessages[type][Math.floor(Math.random() * presetMessages[type].length)];
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index b49b1e8..db5408f 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -1122,7 +1122,8 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
+     });
+     message = championMessage.message;
+     detail = championMessage.detail;
+-    cta = championMessage.cta;
++    // Lead with the real action: pack button labels are playful ("Glitter Bomb!!") but vague.
++    cta = `Say thanks: ${championMessage.cta}`;
+         icon = '🤝';
+         ctaAction = 'send-emote';
+         ctaData = {
+@@ -3204,7 +3205,7 @@ window.testBulletin = function(type = 'winning') {
+             message: allyMsg?.message || '🤝 TestAlly also voted for "GODS"!',
+             detail: allyMsg?.detail || 'Standing with you in GODS vs RISE',
+             icon: '🤝',
+-            cta: allyMsg?.cta || 'Send Thanks! 🤝',
++            cta: allyMsg?.cta ? `Say thanks: ${allyMsg.cta}` : 'Send Thanks! 🤝',
+             ctaAction: 'send-emote',
+             ctaData: {
+                 targetUsername: 'TestAlly',

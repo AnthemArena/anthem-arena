@@ -23,10 +23,10 @@ export async function sendEmoteReaction(targetUsername, targetUserId, type, matc
     
     // Preset messages based on type
     const presetMessages = {
-        'thanks': ['Great taste! 🎵', 'Thanks for the backup! 🤝', 'Let\'s go! 🔥'],
+        'thanks': ['Great pick! 🎬', 'Thanks for the backup! 🤝', 'Let\'s go! 🔥'],
         'props': ['Nice pick! 👊', 'Respect! 💯', 'We got this! 💪'],
-        'rivalry': ['May the best song win! ⚔️', 'Game on! 🎮', 'Challenge accepted! ⚡'],
-        'hype': ['This match is fire! 🔥', 'Epic battle! ⚡', 'What a matchup! 🎵']
+        'rivalry': ['May the best edit win! ⚔️', 'Game on! 🎮', 'Challenge accepted! ⚡'],
+        'hype': ['This match is fire! 🔥', 'Epic battle! ⚡', 'What a matchup! 🎬']
     };
     
     const message = customMessage || presetMessages[type][Math.floor(Math.random() * presetMessages[type].length)];
