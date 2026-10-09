@@ -1,0 +1,61 @@
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index 0c17346..0cb674e 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -2571,6 +2571,15 @@ window.handleBulletinCTA = function() {
+         return;
+     }
+     
++    // ✅ PRIORITY 2a: Ally bulletins ("X also voted for Y") carry ctaAction + ctaData.
++    // Send the emote instead of navigating. handleEmoteClick shows "Sending...",
++    // "Sent!" on the button and hides the bulletin itself, so don't hide here.
++    if (currentBulletin.ctaAction === 'send-emote' && currentBulletin.ctaData) {
++        const d = currentBulletin.ctaData;
++        window.handleEmoteClick(d.targetUsername, d.targetUserId, d.emoteType, d.matchData);
++        return;
++    }
++    
+     // ✅ PRIORITY 2: Handle emote sending (NEW!)
+     if (currentBulletin.action === 'send-emote' && currentBulletin.emoteData) {
+         window.handleEmoteClick(
+@@ -3147,7 +3156,7 @@ window.testBulletin = function(type = 'winning') {
+         'rival': {
+             priority: 7,
+             type: 'live-activity',
+-            matchId: 'round-1-match-1',
++            matchId: 'arcane-test-01-finals',
+             matchTitle: 'GODS vs RISE',
+             username: 'TestRival',
+             triggerUserId: 'test-rival-123',
+@@ -3160,14 +3169,14 @@ window.testBulletin = function(type = 'winning') {
+             icon: '⚔️',
+             cta: rivalMsg?.cta || 'View Battle 👀',
+             ctaAction: 'navigate',
+-            targetUrl: '/vote.html?match=round-1-match-1',
++            targetUrl: '/vote.html?match=arcane-test-01-finals',
+             relationship: 'opponent'
+         },
+         
+         'ally': {
+             priority: 7,
+             type: 'live-activity',
+-            matchId: 'round-1-match-1',
++            matchId: 'arcane-test-01-finals',
+             matchTitle: 'GODS vs RISE',
+             username: 'TestAlly',
+             triggerUserId: 'test-ally-123',
+@@ -3185,12 +3194,12 @@ window.testBulletin = function(type = 'winning') {
+                 targetUserId: 'test-ally-123',
+                 emoteType: 'thanks',
+                 matchData: {
+-                    matchId: 'round-1-match-1',
++                    matchId: 'arcane-test-01-finals',
+                     matchTitle: 'GODS vs RISE',
+                     songTitle: 'GODS'
+                 }
+             },
+-            targetUrl: '/vote.html?match=round-1-match-1',
++            targetUrl: '/vote.html?match=arcane-test-01-finals',
+             relationship: 'ally'
+         },
+         
