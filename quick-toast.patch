@@ -1,0 +1,15 @@
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index 79471d8..0c17346 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -3389,6 +3389,10 @@ function showQuickToast(message, duration = 2000) {
+     }, duration);
+ }
+ 
++// profile-page.js (message sent, follow, unfollow) calls window.showQuickToast,
++// which was never exposed, so those confirmations never appeared.
++window.showQuickToast = showQuickToast;
++
+ // ========================================
+ // CHECK FOR MISSED NOTIFICATIONS ON PAGE LOAD
+ // ========================================
