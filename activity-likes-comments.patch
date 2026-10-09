@@ -1,0 +1,474 @@
+diff --git a/firestore.rules b/firestore.rules
+index d61f67b..79f9cd4 100644
+--- a/firestore.rules
++++ b/firestore.rules
+@@ -1,7 +1,7 @@
+ rules_version = '2';
+ 
+ // ============================================================================
+-// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1)
++// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1 + stage 2)
+ //
+ // Paste into Firebase console > Firestore Database > Rules, or deploy with
+ // the Firebase CLI. NOT yet reviewed against a live project: test every case
+@@ -17,8 +17,9 @@ rules_version = '2';
+ // publicly readable.
+ //
+ // STAGE 1 covers: votes, tournaments/matches, activity, profiles, posts.
+-// STAGE 2 (still locked, as today): user-notifications, user-reactions,
+-// follows, feeds, comments, likes, messages, users, blog.
++// STAGE 2 covers: user-notifications, user-reactions, follows, comments,
++// likes, messages, feeds, users, blog, plus like/comment counters on posts.
++// Still locked on purpose: matchViews, battleship_matches (see notes below).
+ // ============================================================================
+ 
+ service cloud.firestore {
+@@ -49,6 +50,19 @@ service cloud.firestore {
+       return signedIn() && request.auth.uid in ['T3tYzd29FseCMWwBSBzH3IHURej2'];
+     }
+ 
++    // A counter field on a post moves by exactly +1 or -1 and nothing else
++    // changes. Used for likeCount / commentCount on other people's posts.
++    function isCounterBump(field) {
++      let before = resource.data.get(field, 0);
++      let changed = request.resource.data.diff(resource.data).affectedKeys();
++      return signedIn()
++        && changed.hasOnly([field])
++        && request.resource.data[field] is int
++        && request.resource.data[field] >= 0
++        && (request.resource.data[field] == before + 1
++            || request.resource.data[field] == before - 1);
++    }
++
+     // A vote is recorded in two steps by js/vote.js: first the vote document
+     // is created, then the match counters are incremented. This allows the
+     // second step only: exactly +1 on the one edit the voter chose, on a live
+@@ -176,12 +190,246 @@ service cloud.firestore {
+         && request.resource.data.userId == request.auth.uid
+         && request.resource.data.privacy == 'public';
+ 
+-      allow update, delete: if signedIn()
+-        && resource.data.userId == request.auth.uid;
++      // The author may edit or delete their post. Anyone signed in may move
++      // likeCount or commentCount by exactly one (liking / commenting on
++      // someone else's post), and nothing else.
++      allow update: if (signedIn() && resource.data.userId == request.auth.uid)
++        || isCounterBump('likeCount')
++        || isCounterBump('commentCount');
++
++      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // =====================================================================
++    // STAGE 2
++    // =====================================================================
++
++    // ---------------------------------------------------------------------
++    // Notifications (js/notification-storage.js)
++    // Private to the recipient. Anyone signed in may create one, but only
++    // for themselves, or as themselves (triggerUserId is their own uid), which
++    // is how follow / reply / like / message alerts reach other people.
++    // The recipient may only flip the read / dismissed / toast flags.
++    // ---------------------------------------------------------------------
++
++    match /user-notifications/{notificationId} {
++      allow read: if signedIn() && resource.data.userId == request.auth.uid;
++
++      allow create: if signedIn()
++        && request.resource.data.userId is string
++        && (request.resource.data.userId == request.auth.uid
++            || request.resource.data.triggerUserId == request.auth.uid)
++        && request.resource.data.type is string
++        && request.resource.data.message is string
++        && request.resource.data.message.size() <= 500
++        && request.resource.data.read == false
++        && request.resource.data.keys().hasAll(['userId', 'type', 'message'])
++        && request.resource.data.keys().hasOnly([
++             'userId', 'type', 'priority', 'message', 'detail', 'icon',
++             'matchId', 'matchTitle', 'triggerUsername', 'triggerUserId',
++             'eventType', 'relationship', 'ctaText', 'ctaAction', 'ctaData',
++             'targetUrl', 'timestamp', 'read', 'dismissed', 'shownAsToast',
++             'expiresAt'
++           ]);
++
++      allow update: if signedIn()
++        && resource.data.userId == request.auth.uid
++        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
++             'read', 'readAt', 'dismissed', 'dismissedAt', 'shownAsToast'
++           ]);
++
++      // cleanupExpiredNotifications() deletes the user's own old rows.
++      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Emote reactions (js/emote-system.js, listener in global-notifications.js)
++    // Readable by the sender and the recipient. Only the recipient can mark
++    // one as seen.
++    // ---------------------------------------------------------------------
++
++    match /user-reactions/{reactionId} {
++      allow read: if signedIn()
++        && (resource.data.toUserId == request.auth.uid
++            || resource.data.fromUserId == request.auth.uid);
++
++      allow create: if signedIn()
++        && request.resource.data.fromUserId == request.auth.uid
++        && request.resource.data.toUserId is string
++        && request.resource.data.toUserId != request.auth.uid
++        && request.resource.data.type is string
++        && request.resource.data.type.size() <= 30
++        && request.resource.data.message is string
++        && request.resource.data.message.size() <= 200
++        && request.resource.data.seen == false
++        && request.resource.data.keys().hasAll(['fromUserId', 'toUserId', 'type'])
++        && request.resource.data.keys().hasOnly([
++             'fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'type',
++             'matchId', 'matchTitle', 'songTitle', 'message', 'timestamp', 'seen'
++           ]);
++
++      allow update: if signedIn()
++        && resource.data.toUserId == request.auth.uid
++        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seen']);
++
++      allow delete: if isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Follows (js/follow-system.js). Document id is "<followerId>_<followingId>".
++    // Public to read: follower / following counts show on every profile.
++    // Only the follower can create or remove their own follow.
++    // ---------------------------------------------------------------------
++
++    match /follows/{followId} {
++      allow read: if true;
++
++      allow create: if signedIn()
++        && request.resource.data.followerId == request.auth.uid
++        && request.resource.data.followingId is string
++        && request.resource.data.followingId != request.auth.uid
++        && followId == request.auth.uid + '_' + request.resource.data.followingId
++        && request.resource.data.keys().hasOnly([
++             'followerId', 'followerUsername', 'followingId',
++             'followingUsername', 'timestamp'
++           ]);
++
++      // Re-following an existing row rewrites it. The pair itself can't change.
++      allow update: if signedIn()
++        && resource.data.followerId == request.auth.uid
++        && request.resource.data.followerId == resource.data.followerId
++        && request.resource.data.followingId == resource.data.followingId;
++
++      allow delete: if (signedIn() && resource.data.followerId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Comments (js/feed-page.js). Public to read; the author creates and
++    // deletes their own. There is no edit feature, so no update.
++    // ---------------------------------------------------------------------
++
++    match /comments/{commentId} {
++      allow read: if true;
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid
++        && request.resource.data.commentId == commentId
++        && request.resource.data.postId is string
++        && request.resource.data.content is string
++        && request.resource.data.content.size() > 0
++        && request.resource.data.content.size() <= 2000
++        && request.resource.data.keys().hasAll(['commentId', 'postId', 'userId', 'content'])
++        && request.resource.data.keys().hasOnly([
++             'commentId', 'postId', 'parentId', 'userId', 'username',
++             'avatar', 'content', 'timestamp', 'createdAt'
++           ]);
++
++      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Likes (js/social-feed.js). Document id is "<postId>_<uid>", so one like
++    // per person per post.
++    // ---------------------------------------------------------------------
++
++    match /likes/{likeId} {
++      allow read: if true;
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid
++        && request.resource.data.postId is string
++        && likeId == request.resource.data.postId + '_' + request.auth.uid
++        && request.resource.data.keys().hasOnly([
++             'likeId', 'postId', 'userId', 'username', 'timestamp'
++           ]);
++
++      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Direct messages (js/message-system.js). Only the two people involved
++    // can read. The sender creates; the recipient can mark as read.
++    // ---------------------------------------------------------------------
++
++    match /messages/{messageId} {
++      allow read: if signedIn()
++        && (resource.data.fromUserId == request.auth.uid
++            || resource.data.toUserId == request.auth.uid);
++
++      allow create: if signedIn()
++        && request.resource.data.fromUserId == request.auth.uid
++        && request.resource.data.toUserId is string
++        && request.resource.data.toUserId != request.auth.uid
++        && request.resource.data.message is string
++        && request.resource.data.message.size() > 0
++        && request.resource.data.message.size() <= 300
++        && request.resource.data.read == false
++        && request.resource.data.keys().hasOnly([
++             'fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'message',
++             'timestamp', 'read', 'matchId', 'matchTitle', 'parentNotificationId'
++           ]);
++
++      allow update: if signedIn()
++        && resource.data.toUserId == request.auth.uid
++        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
++
++      allow delete: if isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Feed fan-out (js/social-feed.js). feeds/<followerId>/posts/<postId>.
++    // Only the feed's owner reads it. The post's author writes copies into
++    // their followers' feeds.
++    // ---------------------------------------------------------------------
++
++    match /feeds/{feedOwnerId}/posts/{postId} {
++      allow read: if isOwner(feedOwnerId);
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid;
++
++      allow update: if signedIn()
++        && resource.data.userId == request.auth.uid
++        && request.resource.data.userId == request.auth.uid;
++
++      allow delete: if isOwner(feedOwnerId)
++        || (signedIn() && resource.data.userId == request.auth.uid)
++        || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // users/<uid> (follower / following id lists used by the fan-out).
++    // Owner only. The fan-out reads the poster's own doc; a missing doc
++    // just means "no followers", which clears the old permission error.
++    // ---------------------------------------------------------------------
++
++    match /users/{userId} {
++      allow read, write: if isOwner(userId) || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Blog (js/blog*.js). Public to read, admin to write.
++    // NOTE: kept public rather than "published == true" only, because
++    // js/blog-generator.js saves posts with status: 'published' but the
++    // readers query published == true, so no post would ever match. Fix that
++    // in the code, then this can be tightened.
++    // ---------------------------------------------------------------------
++
++    match /blog/{postId} {
++      allow read: if true;
++      allow write: if isAdmin();
+     }
+ 
+     // ---------------------------------------------------------------------
+-    // Everything else stays locked until stage 2.
++    // Everything else stays locked, on purpose:
++    //  - matchViews: written by the Netlify edge function with no sign-in.
++    //    Opening it would let anyone write to it. Needs a different design.
++    //  - battleship_matches: dead code, slated for removal.
+     // ---------------------------------------------------------------------
+ 
+     match /{document=**} {
+diff --git a/js/feed-page.js b/js/feed-page.js
+index 2106c7b..b442fab 100644
+--- a/js/feed-page.js
++++ b/js/feed-page.js
+@@ -9,6 +9,8 @@ import {
+     likePost, 
+     unlikePost, 
+     hasLikedPost,
++    isActivityPostId,
++    getActivityEngagementCounts,
+     followUser,
+     unfollowUser,
+     isFollowing 
+@@ -865,6 +867,19 @@ async function loadFeed() {
+                     convertActivityToFeedPost(activity, matchMap)
+                 );
+ 
++            // Vote activity has no post document, so read its like and
++            // comment counts from the likes / comments collections.
++            const engagement = await getActivityEngagementCounts(
++                activityPosts.map(post => post.postId)
++            );
++            activityPosts.forEach(post => {
++                const counts = engagement.get(post.postId);
++                if (counts) {
++                    post.likeCount = counts.likeCount;
++                    post.commentCount = counts.commentCount;
++                }
++            });
++
+             currentPosts = [...activityPosts, ...userPosts]
+                 .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                 .slice(0, 100);
+@@ -1823,11 +1838,13 @@ async function postReply(postId, parentCommentId, inputElement) {
+         comment.createdAt = Timestamp.now();
+         await setDoc(doc(db, 'comments', commentId), comment);
+         
+-        // Update post comment count
+-        const postRef = doc(db, 'posts', postId);
+-        await updateDoc(postRef, {
+-            commentCount: increment(1)
+-        });
++        // Update post comment count (vote-activity items have no post document)
++        if (!isActivityPostId(postId)) {
++            const postRef = doc(db, 'posts', postId);
++            await updateDoc(postRef, {
++                commentCount: increment(1)
++            });
++        }
+         
+         console.log('✅ Reply posted');
+         
+@@ -1993,11 +2010,13 @@ async function postComment(postId, inputElement) {
+         comment.createdAt = Timestamp.now();
+         await setDoc(doc(db, 'comments', commentId), comment);
+         
+-        // Update post comment count
+-        const postRef = doc(db, 'posts', postId);
+-        await updateDoc(postRef, {
+-            commentCount: increment(1)
+-        });
++        // Update post comment count (vote-activity items have no post document)
++        if (!isActivityPostId(postId)) {
++            const postRef = doc(db, 'posts', postId);
++            await updateDoc(postRef, {
++                commentCount: increment(1)
++            });
++        }
+         
+         console.log('✅ Comment posted');
+         
+@@ -2082,11 +2101,13 @@ async function deleteComment(commentId, postId, commentElement) {
+         
+         await deleteDoc(doc(db, 'comments', commentId));
+         
+-        // Decrement post comment count
+-        const postRef = doc(db, 'posts', postId);
+-        await updateDoc(postRef, {
+-            commentCount: increment(-1)
+-        });
++        // Decrement post comment count (vote-activity items have no post document)
++        if (!isActivityPostId(postId)) {
++            const postRef = doc(db, 'posts', postId);
++            await updateDoc(postRef, {
++                commentCount: increment(-1)
++            });
++        }
+         
+         console.log('✅ Comment deleted');
+         
+diff --git a/js/social-feed.js b/js/social-feed.js
+index 2c7454e..d01e3e5 100644
+--- a/js/social-feed.js
++++ b/js/social-feed.js
+@@ -19,6 +19,7 @@ import {
+     increment,
+     arrayUnion,
+     arrayRemove,
++    getCountFromServer,
+     Timestamp
+ } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ 
+@@ -368,6 +369,42 @@ export async function isFollowing(targetUserId) {
+ // LIKE SYSTEM
+ // ========================================
+ 
++// ========================================
++// VOTE-ACTIVITY POSTS
++// ========================================
++// Vote activity shown on the feed has no document in `posts`: its postId is
++// "activity_<activityId>". Likes and comments on it are still saved in the
++// `likes` and `comments` collections, but there is no post to hold a counter,
++// so counts are read from those collections instead.
++
++export function isActivityPostId(postId) {
++    return typeof postId === 'string' && postId.startsWith('activity_');
++}
++
++/**
++ * Live like and comment counts for a list of activity post ids.
++ * Returns a Map: postId -> { likeCount, commentCount }. A failed count is
++ * left out so the caller keeps its default of 0.
++ */
++export async function getActivityEngagementCounts(postIds) {
++    const counts = new Map();
++    await Promise.all(postIds.map(async (postId) => {
++        try {
++            const [likes, comments] = await Promise.all([
++                getCountFromServer(query(collection(db, 'likes'), where('postId', '==', postId))),
++                getCountFromServer(query(collection(db, 'comments'), where('postId', '==', postId)))
++            ]);
++            counts.set(postId, {
++                likeCount: likes.data().count,
++                commentCount: comments.data().count
++            });
++        } catch (error) {
++            console.warn('⚠️ Could not count engagement for', postId, error.code || error.message);
++        }
++    }));
++    return counts;
++}
++
+ /**
+  * Like a post
+  */
+@@ -398,10 +435,12 @@ export async function likePost(postId) {
+             timestamp: Date.now()
+         });
+         
+-        // Increment post like count
+-        await updateDoc(doc(db, 'posts', postId), {
+-            likeCount: increment(1)
+-        });
++        // Increment post like count (vote-activity items have no post document)
++        if (!isActivityPostId(postId)) {
++            await updateDoc(doc(db, 'posts', postId), {
++                likeCount: increment(1)
++            });
++        }
+         
+         console.log('❤️ Post liked');
+         
+@@ -430,10 +469,12 @@ export async function unlikePost(postId) {
+         const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+         await deleteDoc(doc(db, 'likes', likeId));
+         
+-        // Decrement post like count
+-        await updateDoc(doc(db, 'posts', postId), {
+-            likeCount: increment(-1)
+-        });
++        // Decrement post like count (vote-activity items have no post document)
++        if (!isActivityPostId(postId)) {
++            await updateDoc(doc(db, 'posts', postId), {
++                likeCount: increment(-1)
++            });
++        }
+         
+         console.log('💔 Post unliked');
+         

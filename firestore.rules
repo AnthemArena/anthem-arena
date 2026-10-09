@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // ============================================================================
-// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1)
+// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1 + stage 2)
 //
 // Paste into Firebase console > Firestore Database > Rules, or deploy with
 // the Firebase CLI. NOT yet reviewed against a live project: test every case
@@ -17,8 +17,9 @@ rules_version = '2';
 // publicly readable.
 //
 // STAGE 1 covers: votes, tournaments/matches, activity, profiles, posts.
-// STAGE 2 (still locked, as today): user-notifications, user-reactions,
-// follows, feeds, comments, likes, messages, users, blog.
+// STAGE 2 covers: user-notifications, user-reactions, follows, comments,
+// likes, messages, feeds, users, blog, plus like/comment counters on posts.
+// Still locked on purpose: matchViews, battleship_matches (see notes below).
 // ============================================================================
 
 service cloud.firestore {
@@ -47,6 +48,19 @@ service cloud.firestore {
     // (Firebase console > Authentication > Users > "User UID").
     function isAdmin() {
       return signedIn() && request.auth.uid in ['T3tYzd29FseCMWwBSBzH3IHURej2'];
+    }
+
+    // A counter field on a post moves by exactly +1 or -1 and nothing else
+    // changes. Used for likeCount / commentCount on other people's posts.
+    function isCounterBump(field) {
+      let before = resource.data.get(field, 0);
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return signedIn()
+        && changed.hasOnly([field])
+        && request.resource.data[field] is int
+        && request.resource.data[field] >= 0
+        && (request.resource.data[field] == before + 1
+            || request.resource.data[field] == before - 1);
     }
 
     // A vote is recorded in two steps by js/vote.js: first the vote document
@@ -176,12 +190,246 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.privacy == 'public';
 
-      allow update, delete: if signedIn()
-        && resource.data.userId == request.auth.uid;
+      // The author may edit or delete their post. Anyone signed in may move
+      // likeCount or commentCount by exactly one (liking / commenting on
+      // someone else's post), and nothing else.
+      allow update: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isCounterBump('likeCount')
+        || isCounterBump('commentCount');
+
+      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // =====================================================================
+    // STAGE 2
+    // =====================================================================
+
+    // ---------------------------------------------------------------------
+    // Notifications (js/notification-storage.js)
+    // Private to the recipient. Anyone signed in may create one, but only
+    // for themselves, or as themselves (triggerUserId is their own uid), which
+    // is how follow / reply / like / message alerts reach other people.
+    // The recipient may only flip the read / dismissed / toast flags.
+    // ---------------------------------------------------------------------
+
+    match /user-notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.userId is string
+        && (request.resource.data.userId == request.auth.uid
+            || request.resource.data.triggerUserId == request.auth.uid)
+        && request.resource.data.type is string
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 500
+        && request.resource.data.read == false
+        && request.resource.data.keys().hasAll(['userId', 'type', 'message'])
+        && request.resource.data.keys().hasOnly([
+             'userId', 'type', 'priority', 'message', 'detail', 'icon',
+             'matchId', 'matchTitle', 'triggerUsername', 'triggerUserId',
+             'eventType', 'relationship', 'ctaText', 'ctaAction', 'ctaData',
+             'targetUrl', 'timestamp', 'read', 'dismissed', 'shownAsToast',
+             'expiresAt'
+           ]);
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+             'read', 'readAt', 'dismissed', 'dismissedAt', 'shownAsToast'
+           ]);
+
+      // cleanupExpiredNotifications() deletes the user's own old rows.
+      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin();
     }
 
     // ---------------------------------------------------------------------
-    // Everything else stays locked until stage 2.
+    // Emote reactions (js/emote-system.js, listener in global-notifications.js)
+    // Readable by the sender and the recipient. Only the recipient can mark
+    // one as seen.
+    // ---------------------------------------------------------------------
+
+    match /user-reactions/{reactionId} {
+      allow read: if signedIn()
+        && (resource.data.toUserId == request.auth.uid
+            || resource.data.fromUserId == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.fromUserId == request.auth.uid
+        && request.resource.data.toUserId is string
+        && request.resource.data.toUserId != request.auth.uid
+        && request.resource.data.type is string
+        && request.resource.data.type.size() <= 30
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 200
+        && request.resource.data.seen == false
+        && request.resource.data.keys().hasAll(['fromUserId', 'toUserId', 'type'])
+        && request.resource.data.keys().hasOnly([
+             'fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'type',
+             'matchId', 'matchTitle', 'songTitle', 'message', 'timestamp', 'seen'
+           ]);
+
+      allow update: if signedIn()
+        && resource.data.toUserId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seen']);
+
+      allow delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Follows (js/follow-system.js). Document id is "<followerId>_<followingId>".
+    // Public to read: follower / following counts show on every profile.
+    // Only the follower can create or remove their own follow.
+    // ---------------------------------------------------------------------
+
+    match /follows/{followId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.followerId == request.auth.uid
+        && request.resource.data.followingId is string
+        && request.resource.data.followingId != request.auth.uid
+        && followId == request.auth.uid + '_' + request.resource.data.followingId
+        && request.resource.data.keys().hasOnly([
+             'followerId', 'followerUsername', 'followingId',
+             'followingUsername', 'timestamp'
+           ]);
+
+      // Re-following an existing row rewrites it. The pair itself can't change.
+      allow update: if signedIn()
+        && resource.data.followerId == request.auth.uid
+        && request.resource.data.followerId == resource.data.followerId
+        && request.resource.data.followingId == resource.data.followingId;
+
+      allow delete: if (signedIn() && resource.data.followerId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Comments (js/feed-page.js). Public to read; the author creates and
+    // deletes their own. There is no edit feature, so no update.
+    // ---------------------------------------------------------------------
+
+    match /comments/{commentId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.commentId == commentId
+        && request.resource.data.postId is string
+        && request.resource.data.content is string
+        && request.resource.data.content.size() > 0
+        && request.resource.data.content.size() <= 2000
+        && request.resource.data.keys().hasAll(['commentId', 'postId', 'userId', 'content'])
+        && request.resource.data.keys().hasOnly([
+             'commentId', 'postId', 'parentId', 'userId', 'username',
+             'avatar', 'content', 'timestamp', 'createdAt'
+           ]);
+
+      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Likes (js/social-feed.js). Document id is "<postId>_<uid>", so one like
+    // per person per post.
+    // ---------------------------------------------------------------------
+
+    match /likes/{likeId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.postId is string
+        && likeId == request.resource.data.postId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly([
+             'likeId', 'postId', 'userId', 'username', 'timestamp'
+           ]);
+
+      allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Direct messages (js/message-system.js). Only the two people involved
+    // can read. The sender creates; the recipient can mark as read.
+    // ---------------------------------------------------------------------
+
+    match /messages/{messageId} {
+      allow read: if signedIn()
+        && (resource.data.fromUserId == request.auth.uid
+            || resource.data.toUserId == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.fromUserId == request.auth.uid
+        && request.resource.data.toUserId is string
+        && request.resource.data.toUserId != request.auth.uid
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.read == false
+        && request.resource.data.keys().hasOnly([
+             'fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'message',
+             'timestamp', 'read', 'matchId', 'matchTitle', 'parentNotificationId'
+           ]);
+
+      allow update: if signedIn()
+        && resource.data.toUserId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+
+      allow delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Feed fan-out (js/social-feed.js). feeds/<followerId>/posts/<postId>.
+    // Only the feed's owner reads it. The post's author writes copies into
+    // their followers' feeds.
+    // ---------------------------------------------------------------------
+
+    match /feeds/{feedOwnerId}/posts/{postId} {
+      allow read: if isOwner(feedOwnerId);
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+
+      allow delete: if isOwner(feedOwnerId)
+        || (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // users/<uid> (follower / following id lists used by the fan-out).
+    // Owner only. The fan-out reads the poster's own doc; a missing doc
+    // just means "no followers", which clears the old permission error.
+    // ---------------------------------------------------------------------
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Blog (js/blog*.js). Public to read, admin to write.
+    // NOTE: kept public rather than "published == true" only, because
+    // js/blog-generator.js saves posts with status: 'published' but the
+    // readers query published == true, so no post would ever match. Fix that
+    // in the code, then this can be tightened.
+    // ---------------------------------------------------------------------
+
+    match /blog/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Everything else stays locked, on purpose:
+    //  - matchViews: written by the Netlify edge function with no sign-in.
+    //    Opening it would let anyone write to it. Needs a different design.
+    //  - battleship_matches: dead code, slated for removal.
     // ---------------------------------------------------------------------
 
     match /{document=**} {

@@ -19,6 +19,7 @@ import {
     increment,
     arrayUnion,
     arrayRemove,
+    getCountFromServer,
     Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -368,6 +369,42 @@ export async function isFollowing(targetUserId) {
 // LIKE SYSTEM
 // ========================================
 
+// ========================================
+// VOTE-ACTIVITY POSTS
+// ========================================
+// Vote activity shown on the feed has no document in `posts`: its postId is
+// "activity_<activityId>". Likes and comments on it are still saved in the
+// `likes` and `comments` collections, but there is no post to hold a counter,
+// so counts are read from those collections instead.
+
+export function isActivityPostId(postId) {
+    return typeof postId === 'string' && postId.startsWith('activity_');
+}
+
+/**
+ * Live like and comment counts for a list of activity post ids.
+ * Returns a Map: postId -> { likeCount, commentCount }. A failed count is
+ * left out so the caller keeps its default of 0.
+ */
+export async function getActivityEngagementCounts(postIds) {
+    const counts = new Map();
+    await Promise.all(postIds.map(async (postId) => {
+        try {
+            const [likes, comments] = await Promise.all([
+                getCountFromServer(query(collection(db, 'likes'), where('postId', '==', postId))),
+                getCountFromServer(query(collection(db, 'comments'), where('postId', '==', postId)))
+            ]);
+            counts.set(postId, {
+                likeCount: likes.data().count,
+                commentCount: comments.data().count
+            });
+        } catch (error) {
+            console.warn('⚠️ Could not count engagement for', postId, error.code || error.message);
+        }
+    }));
+    return counts;
+}
+
 /**
  * Like a post
  */
@@ -398,10 +435,12 @@ export async function likePost(postId) {
             timestamp: Date.now()
         });
         
-        // Increment post like count
-        await updateDoc(doc(db, 'posts', postId), {
-            likeCount: increment(1)
-        });
+        // Increment post like count (vote-activity items have no post document)
+        if (!isActivityPostId(postId)) {
+            await updateDoc(doc(db, 'posts', postId), {
+                likeCount: increment(1)
+            });
+        }
         
         console.log('❤️ Post liked');
         
@@ -430,10 +469,12 @@ export async function unlikePost(postId) {
         const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         await deleteDoc(doc(db, 'likes', likeId));
         
-        // Decrement post like count
-        await updateDoc(doc(db, 'posts', postId), {
-            likeCount: increment(-1)
-        });
+        // Decrement post like count (vote-activity items have no post document)
+        if (!isActivityPostId(postId)) {
+            await updateDoc(doc(db, 'posts', postId), {
+                likeCount: increment(-1)
+            });
+        }
         
         console.log('💔 Post unliked');
         
