@@ -1,0 +1,272 @@
+diff --git a/data/firestore.indexes.json b/data/firestore.indexes.json
+index a0cb243..c25d8bf 100644
+--- a/data/firestore.indexes.json
++++ b/data/firestore.indexes.json
+@@ -8,15 +8,6 @@
+         { "fieldPath": "timestamp", "order": "DESCENDING" }
+       ]
+     },
+-    {
+-      "collectionGroup": "posts",
+-      "queryScope": "COLLECTION",
+-      "fields": [
+-        { "fieldPath": "userId", "order": "ASCENDING" },
+-        { "fieldPath": "privacy", "order": "ASCENDING" },
+-        { "fieldPath": "timestamp", "order": "DESCENDING" }
+-      ]
+-    },
+     {
+       "collectionGroup": "posts",
+       "queryScope": "COLLECTION_GROUP",
+diff --git a/firestore.rules b/firestore.rules
+new file mode 100644
+index 0000000..e5bd6f8
+--- /dev/null
++++ b/firestore.rules
+@@ -0,0 +1,191 @@
++rules_version = '2';
++
++// ============================================================================
++// ARCANE MOMENTS - FIRESTORE SECURITY RULES  (stage 1)
++//
++// Paste into Firebase console > Firestore Database > Rules, or deploy with
++// the Firebase CLI. NOT yet reviewed against a live project: test every case
++// in the Rules Playground before publishing (see docs in the handoff file).
++//
++// How visitors are identified: every visitor is signed in anonymously by
++// js/firebase-config.js, and their user id (localStorage "userId") is their
++// Firebase uid. The admin signs in on admin.html with an email + password
++// account.
++//
++// The Netlify edge functions call Firestore's REST API with NO sign-in, so
++// everything they read (matches, votes, activity, profiles) must stay
++// publicly readable.
++//
++// STAGE 1 covers: votes, tournaments/matches, activity, profiles, posts.
++// STAGE 2 (still locked, as today): user-notifications, user-reactions,
++// follows, feeds, comments, likes, messages, users, blog.
++// ============================================================================
++
++service cloud.firestore {
++  match /databases/{database}/documents {
++
++    // ---------------------------------------------------------------------
++    // Helpers
++    // ---------------------------------------------------------------------
++
++    function signedIn() {
++      return request.auth != null;
++    }
++
++    function isOwner(uid) {
++      return signedIn() && request.auth.uid == uid;
++    }
++
++    // The tournament id currently open for voting. Change this one line
++    // (and ARCANE_CONFIG.tournamentId in js/arcane-config.js) when the
++    // entries are reset under a new id.
++    function activeTournament() {
++      return 'arcane-test-01';
++    }
++
++    // TODO: replace with the admin account's UID
++    // (Firebase console > Authentication > Users > "User UID").
++    function isAdmin() {
++      return signedIn() && request.auth.uid in ['REPLACE_WITH_ADMIN_UID'];
++    }
++
++    // A vote is recorded in two steps by js/vote.js: first the vote document
++    // is created, then the match counters are incremented. This allows the
++    // second step only: exactly +1 on the one edit the voter chose, on a live
++    // match, by someone who has a vote document for that match.
++    //
++    // Known gap (closed in stage 1b by batching both writes): a voter who
++    // already has a vote document could repeat this increment.
++    function isVoteIncrement(tournamentId, matchId) {
++      let votePath = /databases/$(database)/documents/votes/$(matchId + '_' + request.auth.uid);
++      let before = resource.data;
++      let after = request.resource.data;
++      return signedIn()
++        && tournamentId == activeTournament()
++        && before.status == 'live'
++        && after.diff(before).affectedKeys().hasOnly(['song1', 'song2', 'totalVotes'])
++        && after.totalVotes == before.totalVotes + 1
++        && exists(votePath)
++        && get(votePath).data.matchId == matchId
++        && (
++          (get(votePath).data.choice == 'song1'
++            && after.song1.votes == before.song1.votes + 1
++            && after.song1.diff(before.song1).affectedKeys().hasOnly(['votes'])
++            && after.song2 == before.song2)
++          ||
++          (get(votePath).data.choice == 'song2'
++            && after.song2.votes == before.song2.votes + 1
++            && after.song2.diff(before.song2).affectedKeys().hasOnly(['votes'])
++            && after.song1 == before.song1)
++        );
++    }
++
++    // ---------------------------------------------------------------------
++    // Tournaments and matches
++    // Public to read. Only the admin can create, edit or delete them; a
++    // signed-in voter may only add a single vote (see isVoteIncrement).
++    // ---------------------------------------------------------------------
++
++    match /tournaments/{tournamentId} {
++      allow read: if true;
++      allow write: if isAdmin();
++
++      match /matches/{matchId} {
++        allow read: if true;
++        allow create, delete: if isAdmin();
++        allow update: if isAdmin() || isVoteIncrement(tournamentId, matchId);
++      }
++    }
++
++    // ---------------------------------------------------------------------
++    // Votes
++    // Document id is "<matchId>_<uid>", so a user can only ever have one vote
++    // per match, and a create cannot overwrite an existing vote.
++    // ---------------------------------------------------------------------
++
++    match /votes/{voteId} {
++      allow read: if true;
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid
++        && request.resource.data.matchId is string
++        && voteId == request.resource.data.matchId + '_' + request.auth.uid
++        && request.resource.data.tournament == activeTournament()
++        && request.resource.data.choice in ['song1', 'song2']
++        && request.resource.data.keys().hasAll(['userId', 'matchId', 'tournament', 'choice'])
++        && request.resource.data.keys().hasOnly([
++             'tournament', 'matchId', 'userId', 'username', 'avatar', 'championId',
++             'choice', 'timestamp', 'round', 'votedForSeed', 'votedForName'
++           ])
++        && get(/databases/$(database)/documents/tournaments/$(activeTournament())/matches/$(request.resource.data.matchId)).data.status == 'live';
++
++      // The owner may refresh display details and outcome flags, never the
++      // choice, match, user or time of a vote.
++      allow update: if isAdmin()
++        || (isOwner(resource.data.userId)
++            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
++                 'username', 'avatar', 'championId', 'championPackId', 'isPublic',
++                 'updatedAt', 'backfilledAt', 'outcome', 'matchCompleted', 'completedAt'
++               ]));
++
++      allow delete: if isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Activity feed
++    // ---------------------------------------------------------------------
++
++    match /activity/{activityId} {
++      allow read: if true;
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid;
++
++      // Lets a username/avatar change refresh the user's old activity rows
++      // (settings-modal.js already tries this; it was being rejected).
++      allow update: if isAdmin()
++        || (isOwner(resource.data.userId)
++            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
++                 'username', 'avatar', 'championId', 'championPackId', 'isPublic',
++                 'updatedAt', 'backfilledAt'
++               ]));
++
++      allow delete: if isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Profiles (unchanged, plus admin)
++    // Known gap: a user can edit their own xp / level / achievements. Fine
++    // for now; revisit if rankings or rewards ever matter.
++    // ---------------------------------------------------------------------
++
++    match /profiles/{userId} {
++      allow read: if true;
++      allow write: if isOwner(userId) || isAdmin();
++    }
++
++    // ---------------------------------------------------------------------
++    // Posts (unchanged)
++    // Reads must filter on privacy == 'public' (profile-page.js does).
++    // ---------------------------------------------------------------------
++
++    match /posts/{postId} {
++      allow read: if resource.data.privacy == 'public';
++
++      allow create: if signedIn()
++        && request.resource.data.userId == request.auth.uid
++        && request.resource.data.privacy == 'public';
++
++      allow update, delete: if signedIn()
++        && resource.data.userId == request.auth.uid;
++    }
++
++    // ---------------------------------------------------------------------
++    // Everything else stays locked until stage 2.
++    // ---------------------------------------------------------------------
++
++    match /{document=**} {
++      allow read, write: if false;
++    }
++  }
++}
+diff --git a/js/firebase-config.js b/js/firebase-config.js
+index c37b506..1337782 100644
+--- a/js/firebase-config.js
++++ b/js/firebase-config.js
+@@ -8,7 +8,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
+ import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ import {
+     getAuth,
+-    signInAnonymously
++    signInAnonymously,
++    onAuthStateChanged
+ } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+ // Your Firebase configuration (copied from Firebase Console)
+ const firebaseConfig = {
+@@ -26,16 +27,32 @@ const app = initializeApp(firebaseConfig);
+ const db = getFirestore(app);
+ const auth = getAuth(app);
+ // Sign visitors in anonymously so Firestore can securely identify them.
+-signInAnonymously(auth)
+-    .then(({ user }) => {
+-        localStorage.setItem('tournamentUserId', user.uid);
+-        localStorage.setItem('userId', user.uid);
+-
+-        console.log('✅ Anonymous Firebase user:', user.uid);
+-    })
+-    .catch(error => {
++// Only when nobody is signed in: calling signInAnonymously() while a real
++// account (the admin's email login) is active would silently replace it.
++let anonymousSignInStarted = false;
++
++onAuthStateChanged(auth, user => {
++    if (user) {
++        anonymousSignInStarted = false;
++
++        // Visitors only. The admin's uid must never become a voter identity.
++        if (user.isAnonymous) {
++            localStorage.setItem('tournamentUserId', user.uid);
++            localStorage.setItem('userId', user.uid);
++
++            console.log('✅ Anonymous Firebase user:', user.uid);
++        }
++        return;
++    }
++
++    if (anonymousSignInStarted) return;
++    anonymousSignInStarted = true;
++
++    signInAnonymously(auth).catch(error => {
++        anonymousSignInStarted = false;
+         console.error('❌ Anonymous Firebase sign-in failed:', error);
+     });
++});
+ 
+ console.log('✅ Firebase connected!');
+ 

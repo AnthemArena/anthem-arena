@@ -8,7 +8,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import {
     getAuth,
-    signInAnonymously
+    signInAnonymously,
+    onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 // Your Firebase configuration (copied from Firebase Console)
 const firebaseConfig = {
@@ -26,16 +27,32 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 // Sign visitors in anonymously so Firestore can securely identify them.
-signInAnonymously(auth)
-    .then(({ user }) => {
-        localStorage.setItem('tournamentUserId', user.uid);
-        localStorage.setItem('userId', user.uid);
+// Only when nobody is signed in: calling signInAnonymously() while a real
+// account (the admin's email login) is active would silently replace it.
+let anonymousSignInStarted = false;
 
-        console.log('✅ Anonymous Firebase user:', user.uid);
-    })
-    .catch(error => {
+onAuthStateChanged(auth, user => {
+    if (user) {
+        anonymousSignInStarted = false;
+
+        // Visitors only. The admin's uid must never become a voter identity.
+        if (user.isAnonymous) {
+            localStorage.setItem('tournamentUserId', user.uid);
+            localStorage.setItem('userId', user.uid);
+
+            console.log('✅ Anonymous Firebase user:', user.uid);
+        }
+        return;
+    }
+
+    if (anonymousSignInStarted) return;
+    anonymousSignInStarted = true;
+
+    signInAnonymously(auth).catch(error => {
+        anonymousSignInStarted = false;
         console.error('❌ Anonymous Firebase sign-in failed:', error);
     });
+});
 
 console.log('✅ Firebase connected!');
 
