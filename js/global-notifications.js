@@ -138,9 +138,19 @@ const COOLDOWN_MINUTES = {
 // ACTIVITY TRACKING
 // ========================================
 
+let currentPollMs = null;   // interval (ms) the poll timer is currently armed with
+
 function updateActivity() {
-    lastActivity = Date.now();
-    adjustPollingRate();
+    const now = Date.now();
+    // Only re-evaluate the poll rate when the user comes back from idle (or no
+    // timer exists yet). mousemove/scroll fire dozens of times a second, and
+    // re-arming the timer on every one both flooded the console and kept
+    // resetting the countdown so the poll rarely ran while the user was active.
+    const wasIdle = now - lastActivity > POLL_CONFIG.INACTIVE_THRESHOLD;
+    lastActivity = now;
+    if (wasIdle || !pollInterval) {
+        adjustPollingRate();
+    }
 }
 
 function adjustPollingRate() {
@@ -151,23 +161,30 @@ function adjustPollingRate() {
     const hasActiveVotes = userId && localStorage.getItem('userVotes');
     
     let interval;
+    let label;
     
     if (!hasActiveVotes) {
         interval = 300000;
-        console.log('🐌 Polling: 5min (no active votes)');
+        label = '🐌 Polling: 5min (no active votes)';
     } else if (isActive) {
         interval = POLL_CONFIG.ACTIVE_INTERVAL;
-        console.log(`⚡ Polling: ${interval/1000}s (active user)`); // ✅ FIXED
+        label = `⚡ Polling: ${interval/1000}s (active user)`;
     } else {
         interval = POLL_CONFIG.BASE_INTERVAL;
-        console.log(`💤 Polling: ${interval/60000}min (inactive user)`); // ✅ FIXED
+        label = `💤 Polling: ${interval/60000}min (inactive user)`;
     }
+    
+    // Timer already running at this rate: leave it alone so its countdown isn't reset.
+    if (pollInterval && interval === currentPollMs) return;
+    
+    console.log(label);
     
     if (pollInterval) {
         clearInterval(pollInterval);
     }
     
     pollInterval = setInterval(checkAndShowBulletin, interval);
+    currentPollMs = interval;
 }
 
 // Track user activity
@@ -1105,7 +1122,8 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     });
     message = championMessage.message;
     detail = championMessage.detail;
-    cta = championMessage.cta;
+    // Lead with the real action: pack button labels are playful ("Glitter Bomb!!") but vague.
+    cta = `Say thanks: ${championMessage.cta}`;
         icon = '🤝';
         ctaAction = 'send-emote';
         ctaData = {
@@ -3187,7 +3205,7 @@ window.testBulletin = function(type = 'winning') {
             message: allyMsg?.message || '🤝 TestAlly also voted for "GODS"!',
             detail: allyMsg?.detail || 'Standing with you in GODS vs RISE',
             icon: '🤝',
-            cta: allyMsg?.cta || 'Send Thanks! 🤝',
+            cta: allyMsg?.cta ? `Say thanks: ${allyMsg.cta}` : 'Send Thanks! 🤝',
             ctaAction: 'send-emote',
             ctaData: {
                 targetUsername: 'TestAlly',

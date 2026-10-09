@@ -1,0 +1,60 @@
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index 0c17346..2edd6cc 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -138,9 +138,19 @@ const COOLDOWN_MINUTES = {
+ // ACTIVITY TRACKING
+ // ========================================
+ 
++let currentPollMs = null;   // interval (ms) the poll timer is currently armed with
++
+ function updateActivity() {
+-    lastActivity = Date.now();
+-    adjustPollingRate();
++    const now = Date.now();
++    // Only re-evaluate the poll rate when the user comes back from idle (or no
++    // timer exists yet). mousemove/scroll fire dozens of times a second, and
++    // re-arming the timer on every one both flooded the console and kept
++    // resetting the countdown so the poll rarely ran while the user was active.
++    const wasIdle = now - lastActivity > POLL_CONFIG.INACTIVE_THRESHOLD;
++    lastActivity = now;
++    if (wasIdle || !pollInterval) {
++        adjustPollingRate();
++    }
+ }
+ 
+ function adjustPollingRate() {
+@@ -151,23 +161,30 @@ function adjustPollingRate() {
+     const hasActiveVotes = userId && localStorage.getItem('userVotes');
+     
+     let interval;
++    let label;
+     
+     if (!hasActiveVotes) {
+         interval = 300000;
+-        console.log('🐌 Polling: 5min (no active votes)');
++        label = '🐌 Polling: 5min (no active votes)';
+     } else if (isActive) {
+         interval = POLL_CONFIG.ACTIVE_INTERVAL;
+-        console.log(`⚡ Polling: ${interval/1000}s (active user)`); // ✅ FIXED
++        label = `⚡ Polling: ${interval/1000}s (active user)`;
+     } else {
+         interval = POLL_CONFIG.BASE_INTERVAL;
+-        console.log(`💤 Polling: ${interval/60000}min (inactive user)`); // ✅ FIXED
++        label = `💤 Polling: ${interval/60000}min (inactive user)`;
+     }
+     
++    // Timer already running at this rate: leave it alone so its countdown isn't reset.
++    if (pollInterval && interval === currentPollMs) return;
++    
++    console.log(label);
++    
+     if (pollInterval) {
+         clearInterval(pollInterval);
+     }
+     
+     pollInterval = setInterval(checkAndShowBulletin, interval);
++    currentPollMs = interval;
+ }
+ 
+ // Track user activity
