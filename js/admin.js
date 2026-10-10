@@ -248,19 +248,81 @@ async function processGenerationQueue() {
 }
 
 // ========================================
+// ROUND DEADLINES
+// ========================================
+// Matches opened from here get an end time so countdowns and "closing soon"
+// alerts work. Default: the first 20:00 UTC (8pm GMT) that is at least 48 hours
+// away, so a round is never shorter than 48 hours. Closing stays manual.
+const ROUND_MIN_HOURS = 48;
+const CLOSE_HOUR_UTC = 20;
+
+function defaultDeadline(from = new Date()) {
+    const earliest = new Date(from.getTime() + ROUND_MIN_HOURS * 60 * 60 * 1000);
+    const d = new Date(earliest);
+    d.setUTCHours(CLOSE_HOUR_UTC, 0, 0, 0);
+    if (d < earliest) d.setUTCDate(d.getUTCDate() + 1);
+    return d;
+}
+
+function formatDeadlineUTC(date) {
+    return date.toISOString().slice(0, 16).replace('T', ' ');
+}
+
+function formatDeadlineUK(date) {
+    return date.toLocaleString('en-GB', {
+        timeZone: 'Europe/London', weekday: 'short', day: 'numeric',
+        month: 'short', hour: '2-digit', minute: '2-digit'
+    });
+}
+
+// Returns { endISO } (endISO is null for "no deadline"), or null if cancelled.
+function askDeadline(question) {
+    const def = defaultDeadline();
+    const answer = prompt(
+        `${question}\n\n` +
+        `Voting closes at (UTC, YYYY-MM-DD HH:mm).\n` +
+        `Default = ${formatDeadlineUK(def)} UK time.\n` +
+        `Edit it, clear it for NO deadline, or Cancel to stop.`,
+        formatDeadlineUTC(def)
+    );
+    if (answer === null) return null;
+    
+    const text = answer.trim();
+    if (text === '') return { endISO: null };
+    
+    if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(text)) {
+        alert('Deadline must look like 2026-10-12 20:00 (UTC). Nothing was opened.');
+        return null;
+    }
+    const end = new Date(text.replace(' ', 'T') + ':00Z');
+    if (isNaN(end.getTime()) || end <= new Date()) {
+        alert('Deadline must be a valid time in the future. Nothing was opened.');
+        return null;
+    }
+    return { endISO: end.toISOString() };
+}
+
+function deadlineFields(endISO) {
+    // endDate is read by live/matches/homepage, endTime by alerts/modal/my-votes
+    return endISO ? { endDate: endISO, endTime: endISO } : {};
+}
+
+// ========================================
 // MATCH OPERATIONS
 // ========================================
 
 window.openMatch = async function(matchId) {
-    if (!confirm(`Open match ${matchId} for voting?`)) return;
+    const deadline = askDeadline(`Open match ${matchId} for voting?`);
+    if (!deadline) return;
     
     try {
         await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId), {
-            status: 'live'
+            status: 'live',
+            ...deadlineFields(deadline.endISO)
         });
         
-        console.log(`✅ Opened match: ${matchId}`);
-        alert(`✅ Match ${matchId} is now LIVE!`);
+        console.log(`✅ Opened match: ${matchId}`, deadline.endISO || '(no deadline)');
+        alert(`✅ Match ${matchId} is now LIVE!` + (deadline.endISO ? `\nCloses ${formatDeadlineUK(new Date(deadline.endISO))} UK time.` : ''));
         
         loadMatches();
         
@@ -407,7 +469,8 @@ async function advanceWinnerToNextRound(completedMatch, winner) {
 // ========================================
 
 window.openBatch = async function(roundNumber, batchNumber) {
-    if (!confirm(`Open Round ${roundNumber}, Batch ${batchNumber} for voting?`)) return;
+    const deadline = askDeadline(`Open Round ${roundNumber}, Batch ${batchNumber} for voting?`);
+    if (!deadline) return;
     
     try {
         console.log(`🚀 Opening Round ${roundNumber}, Batch ${batchNumber}...`);
@@ -425,7 +488,8 @@ window.openBatch = async function(roundNumber, batchNumber) {
         
         for (const matchDoc of snapshot.docs) {
             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
-                status: 'live'
+                status: 'live',
+                ...deadlineFields(deadline.endISO)
             });
             matchList.push(matchDoc.data().matchId);
             updateCount++;

@@ -120,6 +120,7 @@ const COOLDOWN_MINUTES = {
     comeback: 10,        // 🔽 Reduce from 15 - exciting news!
     winning: 20,         // 🔽 Reduce from 30 - users like wins
     lowvotes: 15,        // ✅ Keep - moderate urgency
+    closing: 60,         // each step (24h / 3h / final) also has its own key
     welcome: 720,        // ✅ Keep - 12 hours is right
     encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
     achievement: 0,      // ✅ Keep - one-time
@@ -242,38 +243,112 @@ function getThumbnailUrl(input) {
 // ========================================
 // HELPER: CALCULATE HOURS UNTIL CLOSE
 // ========================================
-function getHoursUntilClose(match) {
+// Milliseconds until the match closes (negative once past the deadline),
+// or null when the match has no usable end time.
+function getMsUntilClose(match, quiet = false) {
     // ✅ Support both endTime (Firestore Timestamp) and endDate (ISO string)
     const endTimeValue = match.endTime || match.endDate;
     
     if (!endTimeValue) {
-        // ✅ FIXED: Use match.matchId instead of undefined matchId variable
-        console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
+        if (!quiet) console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
         return null;
     }
     
-    const now = Date.now();
-    
-    // Handle Firestore Timestamp object
+    let endMs;
     if (endTimeValue.toMillis && typeof endTimeValue.toMillis === 'function') {
-        const msLeft = endTimeValue.toMillis() - now;
-        if (msLeft <= 0) return 0;
-        return Math.floor(msLeft / (1000 * 60 * 60));
+        endMs = endTimeValue.toMillis();   // Firestore Timestamp
+    } else {
+        endMs = new Date(endTimeValue).getTime();   // ISO string or Date
     }
     
-    // Handle ISO string or Date object
-    const endDate = new Date(endTimeValue);
-    
-    if (isNaN(endDate.getTime())) {
-        console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue, 'for match:', match.matchId || match.id);
+    if (isNaN(endMs)) {
+        if (!quiet) console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue, 'for match:', match.matchId || match.id);
         return null;
     }
     
-    const msLeft = endDate.getTime() - now;
+    return endMs - Date.now();
+}
+
+function getHoursUntilClose(match) {
+    const msLeft = getMsUntilClose(match);
+    if (msLeft === null) return null;
+    if (msLeft <= 0) return 0;   // deadline passed
+    // Never return 0 while the match is still open: callers treat 0 as "ended",
+    // which used to silence every closing alert during the final hour.
+    return Math.max(1, Math.floor(msLeft / (1000 * 60 * 60)));
+}
+
+function formatTimeLeft(msLeft) {
+    const mins = Math.max(1, Math.floor(msLeft / 60000));
+    const days = Math.floor(mins / 1440);
+    const hours = Math.floor((mins % 1440) / 60);
+    const m = mins % 60;
+    if (days >= 1) return `${days}d ${hours}h`;
+    if (hours >= 1) return `${hours}h ${m}m`;
+    return `${m}m`;
+}
+
+// Which "closing soon" step a match is in: 24h, 3h or the last 30 minutes.
+function getClosingTier(msLeft) {
+    if (msLeft <= 0) return null;
+    if (msLeft <= 30 * 60 * 1000) return 'final';
+    if (msLeft <= 3 * 60 * 60 * 1000) return '3h';
+    if (msLeft <= 24 * 60 * 60 * 1000) return '24h';
+    return null;
+}
+
+// Champion-voiced lines for an alert type, or null when the active pack has none
+// (getChampionMessage would otherwise return a "not configured" placeholder).
+function getPackVoice(alertType, data) {
+    try {
+        const pack = window.championLoader?.getCurrentPack?.();
+        if (!pack?.alerts?.[alertType]) return null;
+        const voice = window.championLoader.getChampionMessage(alertType, data);
+        return voice && voice.message ? voice : null;
+    } catch (error) {
+        console.warn(`⚠️ Could not load champion lines for "${alertType}":`, error);
+        return null;
+    }
+}
+
+// One "closing soon" bulletin. items = [{ match, matchId, msLeft, tier }] sorted soonest first.
+// Headline and button come from the champion pack (closing-24h / -3h / -final for one
+// match, closing-multi for several); the detail line stays plain, factual time left.
+function buildClosingNotification(items) {
+    const next = items[0];
+    const count = items.length;
+    const timeLeft = formatTimeLeft(next.msLeft);
+    const s1 = next.match.song1?.shortTitle || next.match.song1?.title || 'Edit 1';
+    const s2 = next.match.song2?.shortTitle || next.match.song2?.title || 'Edit 2';
+    const title = `${s1} vs ${s2}`;
     
-    if (msLeft <= 0) return 0;
+    const voice = getPackVoice(count === 1 ? `closing-${next.tier}` : 'closing-multi', {
+        matchTitle: title, moment1: s1, moment2: s2,
+        timeLeft, matchCount: count,
+        hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000))
+    });
     
-    return Math.floor(msLeft / (1000 * 60 * 60));
+    const plainHeadlines = {
+        final: count === 1 ? '🔥 Final minutes to vote!' : `🔥 ${count} matches you haven't voted in are about to close!`,
+        '3h': count === 1 ? "⏰ Closing soon: you haven't voted here yet" : `⏰ ${count} matches you haven't voted in close within 3 hours`,
+        '24h': count === 1 ? "⏳ Voting closes within 24 hours: you haven't voted here yet" : `⏳ ${count} matches you haven't voted in close within 24 hours`
+    };
+    
+    return {
+        priority: 2,
+        type: 'closing',
+        severityTier: next.tier,
+        matchId: next.matchId,
+        song: next.match.song1?.shortTitle || next.match.song1?.title,
+        opponent: next.match.song2?.shortTitle || next.match.song2?.title,
+        thumbnailUrl: getThumbnailUrl(next.match.song1?.youtubeUrl) || getThumbnailUrl(next.match.song2?.youtubeUrl),
+        hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000)),
+        message: voice?.message || plainHeadlines[next.tier],
+        detail: count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`,
+        cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
+        action: 'navigate',
+        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'
+    };
 }
 
 // ========================================
@@ -757,6 +832,12 @@ async function checkAndShowBulletin() {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
+                    const noVotesVoice = getPackVoice('novotes', {
+                        matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
+                        moment1: match.song1?.shortTitle || match.song1?.title,
+                        moment2: match.song2?.shortTitle || match.song2?.title,
+                        hoursLeft
+                    });
                     notifications.push({
                         priority: 1,
                         type: 'novotes',
@@ -765,9 +846,9 @@ async function checkAndShowBulletin() {
                         opponent: match.song2?.title,
                         thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
                         hoursLeft: hoursLeft,
-                        message: `🚨 URGENT: Match has ZERO votes!`,
+                        message: noVotesVoice?.message || `🚨 URGENT: Match has ZERO votes!`,
                         detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
-                        cta: 'Cast First Vote!',
+                        cta: noVotesVoice?.cta || 'Cast First Vote!',
                         action: 'navigate',
                         targetUrl: `/vote.html?match=${matchId}`
                     });
@@ -789,6 +870,11 @@ async function checkAndShowBulletin() {
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
                 if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
+                    const lowVotesVoice = getPackVoice('lowvotes', {
+                        matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
+                        totalVotes,
+                        hoursLeft
+                    });
                     notifications.push({
                         priority: 6,
                         type: 'lowvotes',
@@ -798,9 +884,9 @@ async function checkAndShowBulletin() {
                         thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
                         totalVotes: totalVotes,
                         hoursLeft: hoursLeft,
-                        message: `⚠️ Match needs more votes!`,
+                        message: lowVotesVoice?.message || `⚠️ Match needs more votes!`,
                         detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
-                        cta: 'Vote Now!',
+                        cta: lowVotesVoice?.cta || 'Vote Now!',
                         action: 'navigate',
                         targetUrl: `/vote.html?match=${matchId}`
                     });
@@ -809,6 +895,35 @@ async function checkAndShowBulletin() {
                     break;
                 }
             }
+        }
+        
+        // ========================================
+        // PRIORITY 3b: CLOSING SOON (matches the user has NOT voted in)
+        // ========================================
+        // Steps: within 24h, within 3h, final 30 minutes. Each step has its own
+        // dismiss/cooldown key (severityTier), so every step is shown once.
+        
+        try {
+            const closingSoon = [];
+            for (const match of liveMatches) {
+                const matchId = getMatchId(match);
+                if (userVotes[matchId]) continue;
+                
+                const msLeft = getMsUntilClose(match, true);
+                if (msLeft === null) continue;
+                
+                const tier = getClosingTier(msLeft);
+                if (!tier) continue;
+                
+                closingSoon.push({ match, matchId, msLeft, tier });
+            }
+            
+            if (closingSoon.length > 0) {
+                closingSoon.sort((x, y) => x.msLeft - y.msLeft);
+                notifications.push(buildClosingNotification(closingSoon));
+            }
+        } catch (error) {
+            console.error('⚠️ Error checking closing-soon matches:', error);
         }
         
         // ========================================
@@ -1684,7 +1799,7 @@ async function checkForClosingMatches() {
         // Check if any match closes in next 6 hours
         const closingSoon = liveMatches.some(match => {
             const hoursLeft = getHoursUntilClose(match);
-            return hoursLeft !== null && hoursLeft <= 6;
+            return hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 6;
         });
         
         return closingSoon;
@@ -2273,6 +2388,7 @@ if (championPack && championPack.theme) {
         winning: '🎯',
         comeback: '🎉',
         lowvotes: '⚠️',
+        closing: '⏳',
         'close-match': '🔥',
         'new-match': '🆕',
         'low-turnout': '📊',
@@ -3104,6 +3220,11 @@ window.testBulletin = function(type = 'winning') {
         voteDiff: 44
     });
     
+    const testClosingMatch = {
+        song1: { shortTitle: 'GODS', youtubeUrl: 'https://youtu.be/aR-KAldshAE' },
+        song2: { shortTitle: 'RISE' }
+    };
+    
     const allyMsg = window.championLoader?.getChampionMessage('ally', {
         username: 'TestAlly',
         songTitle: 'GODS'
@@ -3278,6 +3399,15 @@ window.testBulletin = function(type = 'winning') {
             action: 'navigate',
             targetUrl: '/vote.html?match=test-match'
         },
+        // Closing-soon previews: closing, closing24, closingfinal (one match), closingmulti (several)
+        closing: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 160 * 60000, tier: '3h' }]),
+        closing24: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 20 * 3600000, tier: '24h' }]),
+        closingfinal: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 12 * 60000, tier: 'final' }]),
+        closingmulti: buildClosingNotification([
+            { match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 95 * 60000, tier: '3h' },
+            { match: testClosingMatch, matchId: 'arcane-test-01-semi', msLeft: 5 * 3600000, tier: '24h' },
+            { match: testClosingMatch, matchId: 'arcane-test-01-semi-2', msLeft: 9 * 3600000, tier: '24h' }
+        ]),
         encouragement: {
             priority: 5,
             type: 'encouragement',

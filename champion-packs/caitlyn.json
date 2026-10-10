@@ -363,6 +363,49 @@
         "To Infinity. 🎯"
       ]
     },
+    "closing-24h": {
+      "messages": [
+        "🎯 \"{matchTitle}\" closes in {timeLeft}. Your vote is the one missing from the record.",
+        "💼 {timeLeft} left on \"{matchTitle}\". Best to file your vote while there's time.",
+        "⚖️ {timeLeft} until \"{matchTitle}\" is decided — and you haven't weighed in."
+      ],
+      "buttons": [
+        "File Your Vote. 💼",
+        "Take the Shot. 🎯"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "🎯 Only {timeLeft} left on \"{matchTitle}\". Your vote is still outstanding.",
+        "🔫 The window on \"{matchTitle}\" is narrowing: {timeLeft}. Take your shot.",
+        "💼 {timeLeft} to the deadline on \"{matchTitle}\". Don't leave it unsigned."
+      ],
+      "buttons": [
+        "Vote Now. 🎯",
+        "Close the Case. 🔫"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "🚨 Final minutes on \"{matchTitle}\": {timeLeft}. This is your last clear shot.",
+        "🎯 {timeLeft} remaining. Vote on \"{matchTitle}\" before the case is closed.",
+        "⏱️ The deadline is imminent — {timeLeft} on \"{matchTitle}\". Act now."
+      ],
+      "buttons": [
+        "Last Chance. 🚨",
+        "Act Now. 🎯"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "💼 {matchCount} matches await your vote. The soonest closes in {timeLeft}.",
+        "🎯 {matchCount} open cases without your vote — first deadline in {timeLeft}."
+      ],
+      "buttons": [
+        "Review the Cases. 💼",
+        "See Open Matches. 🎯"
+      ]
+    },
     "novotes": {
       "messages": [
         "🎯 No votes cast yet on \"{moment1}\" vs \"{moment2}\". An untouched case, if you will.",

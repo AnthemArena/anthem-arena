@@ -363,6 +363,49 @@
         "To Infinity!! 🔥"
       ]
     },
+    "closing-24h": {
+      "messages": [
+        "👊 {timeLeft} left on \"{matchTitle}\" and you haven't thrown your punch yet!!",
+        "⏳ Clock's ticking on \"{matchTitle}\" — {timeLeft} left. Step up and vote!!",
+        "🥊 \"{matchTitle}\" closes in {timeLeft}. Don't sit this round out!!"
+      ],
+      "buttons": [
+        "Throw Your Punch!! 👊",
+        "Get In There!! 🥊"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "⏰ Only {timeLeft} left on \"{matchTitle}\"!! Get in there and vote!!",
+        "💪 {timeLeft} to go and you haven't voted on \"{matchTitle}\"?! Move it!!",
+        "👊 Last stretch on \"{matchTitle}\" — {timeLeft} left. Make it count!!"
+      ],
+      "buttons": [
+        "Vote Now!! 💪",
+        "Hit It!! 👊"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "🔥 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft} — VOTE NOW!!",
+        "💥 Last chance to land your punch on \"{matchTitle}\"!! {timeLeft} left!!",
+        "🥊 Bell's about to ring!! {timeLeft} to vote on \"{matchTitle}\"!!"
+      ],
+      "buttons": [
+        "LAST CHANCE!! 🔥",
+        "PUNCH IN!! 💥"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "👊 {matchCount} matches you haven't voted in are closing!! Soonest: {timeLeft}!!",
+        "⏰ {matchCount} fights waiting on your vote!! First bell in {timeLeft}!!"
+      ],
+      "buttons": [
+        "See the Fights!! 🥊",
+        "Pick Your Fights!! 👊"
+      ]
+    },
     "novotes": {
       "messages": [
         "👊 Zero votes?! This match hasn't even started yet!! Time to throw the first punch!!",
