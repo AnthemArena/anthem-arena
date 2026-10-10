@@ -1106,3 +1106,104 @@ body.theme-arcane.page-feed .widget-match-card .vote-now-btn {
     gap: 6px;
 }
 body.theme-arcane.page-feed .widget-match-card .view-results-btn i { display: none; }
+
+/* ========================================
+   FEED PAGE: RESPONSIVE
+   feed.css restates the 3-column grid AFTER its own breakpoints, so the grid won on phones: the
+   hidden sidebars still reserved their tracks and the feed was squeezed into the 250px first one.
+   The breakpoints are restated here, after it.
+   ======================================== */
+@media (max-width: 1200px) {
+    body.theme-arcane.page-feed .feed-page-layout { grid-template-columns: 250px minmax(0, 1fr); column-gap: 24px; }
+}
+@media (max-width: 900px) {
+    body.theme-arcane.page-feed .feed-page-layout { grid-template-columns: minmax(0, 1fr); margin-top: 70px; padding: 0 14px; }
+    body.theme-arcane.page-feed .feed-center { max-width: 100%; padding: 0; }
+}
+
+/* centred rows lose their left end when they overflow; "safe" falls back to the start */
+body.theme-arcane.page-feed .feed-filters { justify-content: safe center; }
+
+@media (max-width: 600px) {
+    body.theme-arcane.page-feed .feed-title { font-size: 1.6rem; }
+    body.theme-arcane.page-feed .feed-title i { font-size: 1.2rem; margin-right: 6px; }
+
+    body.theme-arcane.page-feed .feed-filters { justify-content: flex-start; scroll-snap-type: x proximity; }
+    body.theme-arcane.page-feed .filter-btn { padding: 8px 12px; font-size: .8rem; gap: 6px; scroll-snap-align: start; }
+
+    body.theme-arcane.page-feed .feed-post,
+    body.theme-arcane.page-feed .create-post-box { padding: 14px; }
+    body.theme-arcane.page-feed .create-post-box textarea { min-width: 0; }
+
+    body.theme-arcane.page-feed .post-header { gap: 10px; }
+    body.theme-arcane.page-feed .post-meta { min-width: 0; }
+    body.theme-arcane.page-feed .post-meta .username {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    body.theme-arcane.page-feed .follow-btn {
+        flex-shrink: 0;
+        padding: 5px 10px;
+        font-size: .75rem;
+        white-space: nowrap;
+    }
+    body.theme-arcane.page-feed .follow-btn i { margin-right: 4px; }
+}
+
+/* ==========================================================================
+   BRACKETS ON PHONES
+   Root cause: .song-title is nowrap and .bracket-container is min-width: max-content, so each round
+   column grew to the width of its LONGEST edit title (704px on a 393px screen with a 70-character
+   name). Cards were wider than the screen and you only ever saw the middle of them. Same for every
+   cup size; a bigger cup only adds more columns to scroll through.
+   Fix: every column gets one phone-sized width, titles wrap (2 lines, then an ellipsis), the row
+   snaps column by column, and the next round peeks in at the right edge as the "scroll" hint.
+   ========================================================================== */
+@media (max-width: 768px) {
+    body.theme-arcane .bracket-section {
+        padding: 1.5rem 0 2rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        scroll-padding-inline: 1rem;
+        overscroll-behavior-x: contain;
+    }
+    body.theme-arcane .bracket-container {
+        gap: 1rem;
+        padding: .5rem 1rem 1.5rem;
+        justify-content: flex-start;
+    }
+    body.theme-arcane .bracket-container .bracket-round {
+        flex: 0 0 min(86vw, 360px);
+        width: min(86vw, 360px);
+        min-width: 0;
+        scroll-snap-align: start;
+    }
+    /* a one-match cup keeps its single column but never exceeds the screen */
+    body.theme-arcane .bracket-container .bracket-round.finals:only-child {
+        flex-basis: min(92vw, 420px);
+        width: min(92vw, 420px);
+        max-width: none;
+    }
+    body.theme-arcane .bracket-round .matchup-card {
+        min-width: 0;
+        box-sizing: border-box;
+        transform: none;          /* the 1.02 to 1.1 "later rounds are bigger" scale pushed cards past the column */
+    }
+    body.theme-arcane .bracket-round .matchup-card:hover { transform: none; }
+    body.theme-arcane .bracket-round .song-title {
+        white-space: normal;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        line-height: 1.3;
+        text-align: left;
+    }
+    body.theme-arcane .bracket-round .competitor-info { min-width: 0; }
+    body.theme-arcane .bracket-round .competitor { min-width: 0; }
+    body.theme-arcane .bracket-round .round-header { text-align: left; padding-inline: .25rem; }
+}
