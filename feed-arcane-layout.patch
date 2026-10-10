@@ -1,0 +1,361 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 855f453..5f3c59c 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -966,3 +966,116 @@ body.theme-arcane.page-profile .profile-page,
+ body.theme-arcane.page-profile .tab-panel {
+     background: transparent;
+ }
++
++/* ========================================
++   FEED PAGE (<body class="theme-arcane page-feed">)
++   Colours and fonts come from arcane-theme.generated.css (built from css/feed.css, scoped to page-feed).
++   Layout and shape changes the generator cannot make live here.
++   ======================================== */
++
++body.theme-arcane.page-feed .feed-title { font-size: clamp(1.9rem, 4vw, 2.7rem); margin-bottom: 16px; }
++
++/* left card: the global eyebrow label style is too wide for three labels side by side */
++body.theme-arcane.page-feed .profile-stats .stat-label { font-size: .66rem; letter-spacing: .08em; }
++
++/* the rank / XP block now sits inside the profile card instead of being a second card */
++body.theme-arcane.page-feed #personalRankWidget {
++    margin-top: 14px;
++    padding-top: 14px;
++    border-top: 1px solid rgba(255, 79, 180, .2);
++}
++body.theme-arcane.page-feed #personalRankWidget .personal-rank-card {
++    background: none;
++    border: 0;
++    box-shadow: none;
++    padding: 0;
++    transform: none;
++}
++body.theme-arcane.page-feed #personalRankWidget .rank-header { justify-content: center; margin-bottom: 10px; }
++body.theme-arcane.page-feed #personalRankWidget .rank-info { flex: 0 1 auto; }
++body.theme-arcane.page-feed #personalRankWidget .rank-level { justify-content: center; }
++
++/* filter chips stay on one row */
++body.theme-arcane.page-feed .feed-filters {
++    flex-wrap: nowrap;
++    gap: 8px;
++    overflow-x: auto;
++    scrollbar-width: none;
++}
++body.theme-arcane.page-feed .feed-filters::-webkit-scrollbar { display: none; }
++body.theme-arcane.page-feed .filter-btn {
++    flex: 0 0 auto;
++    padding: 10px 16px;
++    font-size: .9rem;
++    white-space: nowrap;
++}
++body.theme-arcane.page-feed .filter-btn i { color: currentColor; }
++
++/* Follow stays out of the way until you hover a post (always visible on touch screens) */
++@media (hover: hover) {
++    body.theme-arcane.page-feed .feed-post .follow-btn:not(.following) { opacity: 0; transition: opacity .2s ease; }
++    body.theme-arcane.page-feed .feed-post:hover .follow-btn,
++    body.theme-arcane.page-feed .feed-post .follow-btn:focus-visible { opacity: 1; }
++}
++body.theme-arcane.page-feed .post-header { margin-bottom: 8px; }
++
++/* vote posts: a compact match strip instead of a tall card */
++body.theme-arcane.page-feed .vote-text { margin-bottom: 10px; font-size: 1rem; }
++body.theme-arcane.page-feed .match-embed-card { padding: 12px; }
++body.theme-arcane.page-feed .match-versus { gap: 10px; margin-bottom: 10px; }
++body.theme-arcane.page-feed .match-song {
++    flex-direction: row;
++    align-items: center;
++    gap: 10px;
++    padding: 8px;
++    min-width: 0;
++    text-align: left;
++}
++body.theme-arcane.page-feed .song-thumbnail { width: 64px; height: 36px; flex-shrink: 0; }
++body.theme-arcane.page-feed .song-details { text-align: left; min-width: 0; }
++body.theme-arcane.page-feed .song-name { max-width: 100%; font-size: .78rem; }
++body.theme-arcane.page-feed .song-pct { font-size: .95rem; }
++body.theme-arcane.page-feed .vs-circle { width: 28px; height: 28px; font-size: .6rem; }
++body.theme-arcane.page-feed .match-progress { margin-bottom: 10px; }
++body.theme-arcane.page-feed .match-foot {
++    display: flex;
++    align-items: center;
++    justify-content: space-between;
++    gap: 12px;
++}
++body.theme-arcane.page-feed .match-view-btn {
++    display: inline-block;
++    width: auto;
++    padding: 7px 18px;
++    font-size: .8rem;
++}
++body.theme-arcane.page-feed .match-status-chip {
++    display: inline-flex;
++    align-items: center;
++    gap: 6px;
++    padding: 4px 10px;
++    border-radius: 999px;
++    font-size: .68rem;
++    font-weight: 800;
++    letter-spacing: .12em;
++    text-transform: uppercase;
++    color: var(--text-faint, rgba(255, 255, 255, .55));
++    border: 1px solid rgba(255, 255, 255, .15);
++}
++body.theme-arcane.page-feed .match-status-chip.is-live {
++    color: var(--pink-bright);
++    border-color: rgba(255, 79, 180, .45);
++    background: rgba(255, 79, 180, .08);
++}
++body.theme-arcane.page-feed .match-status-chip .chip-dot {
++    width: 7px;
++    height: 7px;
++    border-radius: 50%;
++    background: var(--pink-bright);
++    box-shadow: 0 0 8px rgba(255, 79, 180, .8);
++}
++@media (max-width: 560px) {
++    body.theme-arcane.page-feed .match-versus { flex-direction: column; }
++    body.theme-arcane.page-feed .match-song { width: 100%; box-sizing: border-box; }
++    body.theme-arcane.page-feed .match-foot { flex-wrap: wrap; }
++}
+diff --git a/feed.html b/feed.html
+index 79a502d..acfb0a3 100644
+--- a/feed.html
++++ b/feed.html
+@@ -59,11 +59,11 @@
+                     <span class="stat-label">Followers</span>
+                 </a>
+             </div>
++
++            <!-- Level, rank title, XP bar (filled by feed-widgets.js; lives inside this card) -->
++            <div id="personalRankWidget"></div>
+         </div>
+     </div>
+-
+-    <!-- ✅ NEW: Personal Rank Card Widget -->
+-    <div id="personalRankWidget" class="sidebar-widget"></div>
+     
+     <!-- ✅ NEW: Round Progress Widget -->
+     <div id="roundProgressWidget" class="sidebar-widget"></div>
+@@ -74,23 +74,6 @@
+     <!-- ✅ NEW: Top Moments Widget -->
+     <div id="topSongWidget" class="sidebar-widget"></div>
+ 
+-    <!-- Quick Nav -->
+-    <nav class="sidebar-nav">
+-        <a href="/profile.html" class="nav-item">
+-            <i class="fa-solid fa-user"></i>
+-            <span>My Profile</span>
+-        </a>
+-        
+-        <a href="/matches.html" class="nav-item">
+-            <i class="fa-solid fa-trophy"></i>
+-            <span>Matches</span>
+-        </a>
+-        
+-        <a href="/activity.html" class="nav-item">
+-            <i class="fa-solid fa-chart-line"></i>
+-            <span>Activity</span>
+-        </a>
+-    </nav>
+     
+ </aside>
+ 
+diff --git a/js/feed-page.js b/js/feed-page.js
+index c86b597..994ad15 100644
+--- a/js/feed-page.js
++++ b/js/feed-page.js
+@@ -422,6 +422,15 @@ function convertActivityToFeedPost(activity, matchMap) {
+         opponentMoment?.videoId ||
+         null;
+ 
++    // Current state of the match, so the post shows today's split and whether it is still open
++    const votedVotes = (activity.choice === 'song1' ? match?.song1?.votes : match?.song2?.votes) || 0;
++    const matchTotal = match?.totalVotes || 0;
++    const matchState = match ? {
++        userPct: matchTotal > 0 ? Math.round((votedVotes / matchTotal) * 100) : 50,
++        status: match.status || null,
++        roundLabel: match.roundLabel || null
++    } : null;
++
+     return {
+         postId: `activity_${activity.activityId || `${activity.userId}_${activity.matchId}`}`,
+ 
+@@ -452,6 +461,7 @@ function convertActivityToFeedPost(activity, matchMap) {
+ 
+         round: activity.round || match?.round || 1,
+         tournamentId: activity.tournamentId,
++        matchState,
+ 
+         timestamp: activity.timestamp || Date.now(),
+         privacy: 'public',
+@@ -861,8 +871,18 @@ async function loadFeed() {
+                 post => post.type !== 'vote'
+             );
+ 
++            // Votes whose match no longer exists (old test rounds) are hidden, as on profiles.
++            // Fail open: if the match list is empty (request failed) hide nothing, and keep very
++            // recent votes in case the cached match list has not caught up yet.
++            const RECENT_MS = 10 * 60 * 1000;
++            const matchStillExists = activity =>
++                matchMap.size === 0 ||
++                matchMap.has(activity.matchId) ||
++                (Date.now() - (activity.timestamp || 0)) < RECENT_MS;
++
+             const activityPosts = activities
+                 .filter(activity => activity.isPublic !== false)
++                .filter(matchStillExists)
+                 .map(activity =>
+                     convertActivityToFeedPost(activity, matchMap)
+                 );
+@@ -1007,11 +1027,30 @@ function renderPostContent(post) {
+                 ? `https://img.youtube.com/vi/${post.opponentMomentId || post.opponentSongId}/mqdefault.jpg`
+                 : '');
+ 
++        // Where the match stands now decides the tag and the button wording
++        const matchState = post.matchState || {};
++        const matchStatus = matchState.status || null;
++        const roundPrefix = matchState.roundLabel ? `${escapeHtml(matchState.roundLabel)} · ` : '';
++        const youVoted = post.tournamentId
++            ? !!localStorage.getItem(`vote_${post.tournamentId}_${post.matchId}`)
++            : false;
++
++        let statusChip = '';
++        let ctaLabel = 'View match';
++        if (matchStatus === 'live') {
++            statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>${roundPrefix}Live</span>`;
++            ctaLabel = youVoted ? 'View match' : 'Vote now';
++        } else if (matchStatus === 'completed') {
++            statusChip = `<span class="match-status-chip is-final">${roundPrefix}Final result</span>`;
++            ctaLabel = 'See result';
++        } else if (matchStatus === 'upcoming') {
++            statusChip = `<span class="match-status-chip">${roundPrefix}Upcoming</span>`;
++        }
++
+         return `
+           <p class="post-text vote-text">
+-    <i class="fa-solid fa-film"></i>
+     <span class="vote-text-copy">
+-        chose <strong>${escapeHtml(votedMomentName)}</strong>
++        voted for <strong>${escapeHtml(votedMomentName)}</strong>
+         over ${escapeHtml(opponentMomentName)}
+     </span>
+ </p>
+@@ -1074,12 +1113,15 @@ function renderPostContent(post) {
+                     </div>
+                 </div>
+ 
+-                <a
+-                    href="/vote.html?id=${post.matchId}"
+-                    class="match-view-btn"
+-                >
+-                    View Match
+-                </a>
++                <div class="match-foot">
++                    ${statusChip}
++                    <a
++                        href="/vote.html?id=${post.matchId}"
++                        class="match-view-btn"
++                    >
++                        ${ctaLabel}
++                    </a>
++                </div>
+             </div>
+         `;
+ 
+diff --git a/js/feed-widgets.js b/js/feed-widgets.js
+index d0defe4..d43945f 100644
+--- a/js/feed-widgets.js
++++ b/js/feed-widgets.js
+@@ -5,6 +5,7 @@
+ import { db } from './firebase-config.js';
+ import { ARCANE_CONFIG } from './arcane-config.js';
+ import { createMatchCard } from './match-card-renderer.js';
++import { getAllMatches } from './api-client.js';
+ import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ import { getFollowerCount, getFollowingCount } from './follow-system.js';
+ 
+@@ -104,8 +105,10 @@ async function loadUserProfile() {
+         const unreadCount = await getUnreadCount(userId);
+         if (unreadCount > 0) {
+             const badge = document.getElementById('sidebarNotifBadge');
+-            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+-            badge.style.display = 'inline-block';
++            if (badge) {
++                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
++                badge.style.display = 'inline-block';
++            }
+         }
+         
+         console.log('✅ User profile loaded');
+@@ -164,9 +167,7 @@ async function loadPersonalRankCard() {
+         container.innerHTML = `
+             <div class="personal-rank-card" onclick="window.location.href='/profile.html'">
+                 <div class="rank-header">
+-                    <img src="${avatarUrl}" alt="${username}" class="rank-avatar">
+                     <div class="rank-info">
+-                        <div class="rank-username">${username}</div>
+                         <div class="rank-level">
+                             <span class="level-badge">Lv. ${rank.currentLevel.level}</span>
+                             <span class="rank-title">${cleanTitle}</span>
+@@ -669,10 +670,9 @@ async function loadLiveMatches() {
+     const container = document.getElementById('liveMatchesWidget');
+     
+     try {
+-        // Fetch from live-matches edge function
+-        const response = await fetch('/api/live-matches');
+-        const data = await response.json();
+-        const liveMatches = data.matches || [];
++        // Match documents carry the real vote counts (see note above), so read them via /api/matches
++        const allMatches = await getAllMatches();
++        const liveMatches = allMatches.filter(m => m.status === 'live');
+         
+         if (liveMatches.length === 0) {
+             container.innerHTML = '<p class="widget-loading">No live matches right now</p>';
+@@ -713,17 +713,24 @@ async function loadLiveMatches() {
+     }
+ }
+ 
+-// Transform live-matches API format to match card format
++function pctOf(votes, total) {
++    return total > 0 ? Math.round(((votes || 0) / total) * 100) : 50;
++}
++
++// Transform a match document (from /api/matches) to match card format
+ function transformToMatchCardFormat(apiMatch) {
+     return {
+         id: apiMatch.id || apiMatch.matchId,
+-        tournament: apiMatch.tournament || ARCANE_CONFIG.tournamentId,
++        // show the readable name ("Arcane Test 01") and round name ("Final"), not the raw id and round number
++        tournament: apiMatch.tournamentName || apiMatch.tournament || ARCANE_CONFIG.tournamentId,
+         round: apiMatch.round,
++        roundLabel: apiMatch.roundLabel || null,
+         status: apiMatch.status,
+         date: apiMatch.startDate,
+         endDate: apiMatch.endDate,
+         totalVotes: apiMatch.totalVotes || 0,
+-        hasVoted: false,  // Widget shows all matches regardless
++        // vote.js remembers each vote locally under this key
++        hasVoted: !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${apiMatch.id || apiMatch.matchId}`),
+         
+         competitor1: {
+             seed: apiMatch.song1?.seed || 1,
+@@ -731,7 +738,7 @@ function transformToMatchCardFormat(apiMatch) {
+             source: apiMatch.song1?.artist || 'Artist',
+             videoId: apiMatch.song1?.videoId,
+             votes: apiMatch.song1?.votes || 0,
+-            percentage: apiMatch.song1?.percentage || 0,
++            percentage: pctOf(apiMatch.song1?.votes, apiMatch.totalVotes),
+             leading: (apiMatch.song1?.votes || 0) > (apiMatch.song2?.votes || 0)
+         },
+         
+@@ -741,7 +748,7 @@ function transformToMatchCardFormat(apiMatch) {
+             source: apiMatch.song2?.artist || 'Artist',
+             videoId: apiMatch.song2?.videoId,
+             votes: apiMatch.song2?.votes || 0,
+-            percentage: apiMatch.song2?.percentage || 0,
++            percentage: pctOf(apiMatch.song2?.votes, apiMatch.totalVotes),
+             leading: (apiMatch.song2?.votes || 0) > (apiMatch.song1?.votes || 0)
+         }
+     };

@@ -31,7 +31,9 @@ const SOURCES = [
     { file: 'css/live.css', greens: true },
     // profile.css reuses generic class names (.section-title, .stat-label...) that other themed pages also use,
     // so its rules only apply when <body> also has class="page-profile".
-    { file: 'css/profile.css', scope: 'body.theme-arcane.page-profile' }
+    { file: 'css/profile.css', scope: 'body.theme-arcane.page-profile' },
+    // feed.css also reuses generic names (.stat-value, .sidebar-widget...), so it only applies on <body class="theme-arcane page-feed">.
+    { file: 'css/feed.css', greens: true, scope: 'body.theme-arcane.page-feed' }
 ].map(s => typeof s === 'string' ? { file: s } : s);
 const OUT = 'css/arcane-theme.generated.css';
 const SCOPE = 'body.theme-arcane';

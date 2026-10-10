@@ -288,6 +288,22 @@ function formatTimeLeft(msLeft) {
     return `${m}m`;
 }
 
+// The clock time a match closes, in the viewer's own timezone ("today at 8:00 PM",
+// "tomorrow at 8:00 PM", "Mon 12 Oct at 8:00 PM"; always 12-hour with am/pm so a
+// UK "11:43" can't be misread). Used on the detail line of a
+// champion-voiced closing alert, because the voiced headline already says how
+// long is left and which match it is.
+function formatCloseClock(msLeft, now = Date.now()) {
+    const closeAt = new Date(now + msLeft);
+    const time = closeAt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+    const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const dayDiff = Math.round((startOfDay(closeAt) - startOfDay(new Date(now))) / 86400000);
+    if (dayDiff === 0) return `today at ${time}`;
+    if (dayDiff === 1) return `tomorrow at ${time}`;
+    const day = closeAt.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} at ${time}`;
+}
+
 // Which "closing soon" step a match is in: 24h, 3h or the last 30 minutes.
 function getClosingTier(msLeft) {
     if (msLeft <= 0) return null;
@@ -313,7 +329,8 @@ function getPackVoice(alertType, data) {
 
 // One "closing soon" bulletin. items = [{ match, matchId, msLeft, tier }] sorted soonest first.
 // Headline and button come from the champion pack (closing-24h / -3h / -final for one
-// match, closing-multi for several); the detail line stays plain, factual time left.
+// match, closing-multi for several). The detail line is plain and factual: the close
+// clock time when the headline is voiced, match name + time left when it is not.
 function buildClosingNotification(items) {
     const next = items[0];
     const count = items.length;
@@ -344,7 +361,12 @@ function buildClosingNotification(items) {
         thumbnailUrl: getThumbnailUrl(next.match.song1?.youtubeUrl) || getThumbnailUrl(next.match.song2?.youtubeUrl),
         hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000)),
         message: voice?.message || plainHeadlines[next.tier],
-        detail: count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`,
+        // Voiced headline already names the match and the time left, so the detail line
+        // gives the closing clock time instead. The plain headline has neither, so it
+        // keeps the match name and time left.
+        detail: voice
+            ? (count === 1 ? `Closes ${formatCloseClock(next.msLeft)}` : `Soonest closes ${formatCloseClock(next.msLeft)}`)
+            : (count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`),
         cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
         action: 'navigate',
         targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'

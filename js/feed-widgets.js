@@ -5,6 +5,7 @@
 import { db } from './firebase-config.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { createMatchCard } from './match-card-renderer.js';
+import { getAllMatches } from './api-client.js';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
 
@@ -104,8 +105,10 @@ async function loadUserProfile() {
         const unreadCount = await getUnreadCount(userId);
         if (unreadCount > 0) {
             const badge = document.getElementById('sidebarNotifBadge');
-            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-            badge.style.display = 'inline-block';
+            if (badge) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = 'inline-block';
+            }
         }
         
         console.log('✅ User profile loaded');
@@ -164,9 +167,7 @@ async function loadPersonalRankCard() {
         container.innerHTML = `
             <div class="personal-rank-card" onclick="window.location.href='/profile.html'">
                 <div class="rank-header">
-                    <img src="${avatarUrl}" alt="${username}" class="rank-avatar">
                     <div class="rank-info">
-                        <div class="rank-username">${username}</div>
                         <div class="rank-level">
                             <span class="level-badge">Lv. ${rank.currentLevel.level}</span>
                             <span class="rank-title">${cleanTitle}</span>
@@ -288,11 +289,11 @@ async function loadRoundProgress() {
                     <div class="progress-circle-mini">
                         <svg width="60" height="60">
                             <circle cx="30" cy="30" r="25" 
-                                stroke="rgba(200, 170, 110, 0.2)" 
+                                stroke="rgba(255, 79, 180, 0.2)" 
                                 stroke-width="4" 
                                 fill="none"/>
                             <circle cx="30" cy="30" r="25" 
-                                stroke="#C8AA6E" 
+                                stroke="#ff4fb4" 
                                 stroke-width="4" 
                                 fill="none"
                                 stroke-dasharray="157"
@@ -669,10 +670,9 @@ async function loadLiveMatches() {
     const container = document.getElementById('liveMatchesWidget');
     
     try {
-        // Fetch from live-matches edge function
-        const response = await fetch('/api/live-matches');
-        const data = await response.json();
-        const liveMatches = data.matches || [];
+        // Match documents carry the real vote counts (see note above), so read them via /api/matches
+        const allMatches = await getAllMatches();
+        const liveMatches = allMatches.filter(m => m.status === 'live');
         
         if (liveMatches.length === 0) {
             container.innerHTML = '<p class="widget-loading">No live matches right now</p>';
@@ -713,17 +713,24 @@ async function loadLiveMatches() {
     }
 }
 
-// Transform live-matches API format to match card format
+function pctOf(votes, total) {
+    return total > 0 ? Math.round(((votes || 0) / total) * 100) : 50;
+}
+
+// Transform a match document (from /api/matches) to match card format
 function transformToMatchCardFormat(apiMatch) {
     return {
         id: apiMatch.id || apiMatch.matchId,
-        tournament: apiMatch.tournament || ARCANE_CONFIG.tournamentId,
+        // show the readable name ("Arcane Test 01") and round name ("Final"), not the raw id and round number
+        tournament: apiMatch.tournamentName || apiMatch.tournament || ARCANE_CONFIG.tournamentId,
         round: apiMatch.round,
+        roundLabel: apiMatch.roundLabel || null,
         status: apiMatch.status,
         date: apiMatch.startDate,
         endDate: apiMatch.endDate,
         totalVotes: apiMatch.totalVotes || 0,
-        hasVoted: false,  // Widget shows all matches regardless
+        // vote.js remembers each vote locally under this key
+        hasVoted: !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${apiMatch.id || apiMatch.matchId}`),
         
         competitor1: {
             seed: apiMatch.song1?.seed || 1,
@@ -731,7 +738,7 @@ function transformToMatchCardFormat(apiMatch) {
             source: apiMatch.song1?.artist || 'Artist',
             videoId: apiMatch.song1?.videoId,
             votes: apiMatch.song1?.votes || 0,
-            percentage: apiMatch.song1?.percentage || 0,
+            percentage: pctOf(apiMatch.song1?.votes, apiMatch.totalVotes),
             leading: (apiMatch.song1?.votes || 0) > (apiMatch.song2?.votes || 0)
         },
         
@@ -741,7 +748,7 @@ function transformToMatchCardFormat(apiMatch) {
             source: apiMatch.song2?.artist || 'Artist',
             videoId: apiMatch.song2?.videoId,
             votes: apiMatch.song2?.votes || 0,
-            percentage: apiMatch.song2?.percentage || 0,
+            percentage: pctOf(apiMatch.song2?.votes, apiMatch.totalVotes),
             leading: (apiMatch.song2?.votes || 0) > (apiMatch.song1?.votes || 0)
         }
     };
@@ -871,7 +878,7 @@ export function setupSidebarInteractions() {
         
         profileCard.addEventListener('mouseenter', () => {
             profileCard.style.transform = 'translateY(-2px)';
-            profileCard.style.boxShadow = '0 6px 16px rgba(200, 170, 110, 0.15)';
+            profileCard.style.boxShadow = '0 6px 16px rgba(255, 79, 180, 0.15)';
         });
         
         profileCard.addEventListener('mouseleave', () => {
@@ -966,7 +973,7 @@ function getAvatarUrl(avatar) {
 function createEmojiAvatar(emoji) {
     return `data:image/svg+xml,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
-            <rect width="50" height="50" fill="#C8AA6E"/>
+            <rect width="50" height="50" fill="#ff4fb4"/>
             <text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text>
         </svg>
     `)}`;

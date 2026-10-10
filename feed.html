@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community | Arcane Moments</title>
+    <!-- Fonts (Arcane look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -12,6 +14,9 @@
         <link rel="stylesheet" href="/css/matches.css">  <!-- ✅ ADD THIS -->
 
     <link rel="stylesheet" href="/css/feed.css">
+    <!-- Arcane look (opt-in via <body class="theme-arcane page-feed">): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script type="module" src="/js/firebase-config.js"></script>
@@ -22,7 +27,7 @@
     <script type="module" src="/js/global-notifications.js"></script>
 
 </head>
-<body>
+<body class="theme-arcane page-feed">
     <div id="nav-placeholder"></div>
     <script type="module" src="/js/navigation.js"></script>
 
@@ -54,11 +59,11 @@
                     <span class="stat-label">Followers</span>
                 </a>
             </div>
+
+            <!-- Level, rank title, XP bar (filled by feed-widgets.js; lives inside this card) -->
+            <div id="personalRankWidget"></div>
         </div>
     </div>
-
-    <!-- ✅ NEW: Personal Rank Card Widget -->
-    <div id="personalRankWidget" class="sidebar-widget"></div>
     
     <!-- ✅ NEW: Round Progress Widget -->
     <div id="roundProgressWidget" class="sidebar-widget"></div>
@@ -69,23 +74,6 @@
     <!-- ✅ NEW: Top Moments Widget -->
     <div id="topSongWidget" class="sidebar-widget"></div>
 
-    <!-- Quick Nav -->
-    <nav class="sidebar-nav">
-        <a href="/profile.html" class="nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>My Profile</span>
-        </a>
-        
-        <a href="/matches.html" class="nav-item">
-            <i class="fa-solid fa-trophy"></i>
-            <span>Matches</span>
-        </a>
-        
-        <a href="/activity.html" class="nav-item">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Activity</span>
-        </a>
-    </nav>
     
 </aside>
 
