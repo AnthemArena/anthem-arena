@@ -966,3 +966,143 @@ body.theme-arcane.page-profile .profile-page,
 body.theme-arcane.page-profile .tab-panel {
     background: transparent;
 }
+
+/* ========================================
+   FEED PAGE (<body class="theme-arcane page-feed">)
+   Colours and fonts come from arcane-theme.generated.css (built from css/feed.css, scoped to page-feed).
+   Layout and shape changes the generator cannot make live here.
+   ======================================== */
+
+body.theme-arcane.page-feed .feed-title { font-size: clamp(1.9rem, 4vw, 2.7rem); margin-bottom: 16px; }
+
+/* left card: the global eyebrow label style is too wide for three labels side by side */
+body.theme-arcane.page-feed .profile-stats .stat-label { font-size: .66rem; letter-spacing: .08em; }
+
+/* the rank / XP block now sits inside the profile card instead of being a second card */
+body.theme-arcane.page-feed #personalRankWidget {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 79, 180, .2);
+}
+body.theme-arcane.page-feed #personalRankWidget .personal-rank-card {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    transform: none;
+}
+body.theme-arcane.page-feed #personalRankWidget .rank-header { justify-content: center; margin-bottom: 10px; }
+body.theme-arcane.page-feed #personalRankWidget .rank-info { flex: 0 1 auto; }
+body.theme-arcane.page-feed #personalRankWidget .rank-level { justify-content: center; }
+
+/* filter chips stay on one row */
+body.theme-arcane.page-feed .feed-filters {
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+body.theme-arcane.page-feed .feed-filters::-webkit-scrollbar { display: none; }
+body.theme-arcane.page-feed .filter-btn {
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    font-size: .9rem;
+    white-space: nowrap;
+}
+body.theme-arcane.page-feed .filter-btn i { color: currentColor; }
+
+/* Follow stays out of the way until you hover a post (always visible on touch screens) */
+@media (hover: hover) {
+    body.theme-arcane.page-feed .feed-post .follow-btn:not(.following) { opacity: 0; transition: opacity .2s ease; }
+    body.theme-arcane.page-feed .feed-post:hover .follow-btn,
+    body.theme-arcane.page-feed .feed-post .follow-btn:focus-visible { opacity: 1; }
+}
+body.theme-arcane.page-feed .post-header { margin-bottom: 8px; }
+
+/* vote posts: a compact match strip instead of a tall card */
+body.theme-arcane.page-feed .vote-text { margin-bottom: 10px; font-size: 1rem; }
+body.theme-arcane.page-feed .match-embed-card { padding: 12px; }
+body.theme-arcane.page-feed .match-versus { gap: 10px; margin-bottom: 10px; }
+body.theme-arcane.page-feed .match-song {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    min-width: 0;
+    text-align: left;
+}
+body.theme-arcane.page-feed .song-thumbnail { width: 64px; height: 36px; flex-shrink: 0; }
+body.theme-arcane.page-feed .song-details { text-align: left; min-width: 0; }
+body.theme-arcane.page-feed .song-name { max-width: 100%; font-size: .78rem; }
+body.theme-arcane.page-feed .song-pct { font-size: .95rem; }
+body.theme-arcane.page-feed .vs-circle { width: 28px; height: 28px; font-size: .6rem; }
+body.theme-arcane.page-feed .match-progress { margin-bottom: 10px; }
+body.theme-arcane.page-feed .match-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+body.theme-arcane.page-feed .match-view-btn {
+    display: inline-block;
+    width: auto;
+    padding: 7px 18px;
+    font-size: .8rem;
+}
+body.theme-arcane.page-feed .match-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-faint, rgba(255, 255, 255, .55));
+    border: 1px solid rgba(255, 255, 255, .15);
+}
+body.theme-arcane.page-feed .match-status-chip.is-live {
+    color: var(--pink-bright);
+    border-color: rgba(255, 79, 180, .45);
+    background: rgba(255, 79, 180, .08);
+}
+body.theme-arcane.page-feed .match-status-chip .chip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pink-bright);
+    box-shadow: 0 0 8px rgba(255, 79, 180, .8);
+}
+@media (max-width: 560px) {
+    body.theme-arcane.page-feed .match-versus { flex-direction: column; }
+    body.theme-arcane.page-feed .match-song { width: 100%; box-sizing: border-box; }
+    body.theme-arcane.page-feed .match-foot { flex-wrap: wrap; }
+}
+
+/* live match cards in the right column: once you have voted the percentages appear, and the
+   seed circle plus the percentage were squeezing the names down to two letters */
+body.theme-arcane.page-feed .widget-match-card .competitor { gap: 10px; }
+body.theme-arcane.page-feed .widget-match-card .competitor-rank { display: none; }
+body.theme-arcane.page-feed .widget-match-card .competitor-details { flex: 1 1 auto; min-width: 0; }
+body.theme-arcane.page-feed .widget-match-card .competitor-result { flex: 0 0 auto; }
+body.theme-arcane.page-feed .widget-match-card .vote-percentage { font-size: 1.05rem; }
+body.theme-arcane.page-feed .widget-match-card .view-results-btn,
+body.theme-arcane.page-feed .widget-match-card .vote-now-btn { white-space: nowrap; }
+
+/* "voted for X over Y": normal wrapping (the base post-text style preserves whitespace), the pick
+   stands out and the opponent is quieter */
+body.theme-arcane.page-feed .vote-text { white-space: normal; font-size: .98rem; font-weight: 500; line-height: 1.45; }
+body.theme-arcane.page-feed .vote-text-copy strong { font-weight: 700; }
+body.theme-arcane.page-feed .vote-opponent { color: var(--text-faint, rgba(255, 255, 255, .6)); }
+
+/* "View Results" pill in the live card: compact, no clipping, drops under the vote count if tight */
+body.theme-arcane.page-feed .widget-match-card .match-footer { flex-wrap: wrap; gap: 8px 12px; padding-top: 12px; }
+body.theme-arcane.page-feed .widget-match-card .view-results-btn,
+body.theme-arcane.page-feed .widget-match-card .vote-now-btn {
+    margin-left: auto;
+    padding: 7px 14px;
+    font-size: .78rem;
+    gap: 6px;
+}
+body.theme-arcane.page-feed .widget-match-card .view-results-btn i { display: none; }

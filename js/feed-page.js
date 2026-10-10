@@ -10,11 +10,12 @@ import {
     unlikePost, 
     hasLikedPost,
     isActivityPostId,
-    getActivityEngagementCounts,
-    followUser,
-    unfollowUser,
-    isFollowing 
+    getActivityEngagementCounts
 } from './social-feed.js';
+
+// Follow buttons use follow-system.js: it writes the `follows` collection that the Firestore rules,
+// the profile page and the sidebar counts all use (the version in social-feed.js is the old one).
+import { followUser, unfollowUser, isFollowing } from './follow-system.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
@@ -422,6 +423,15 @@ function convertActivityToFeedPost(activity, matchMap) {
         opponentMoment?.videoId ||
         null;
 
+    // Current state of the match, so the post shows today's split and whether it is still open
+    const votedVotes = (activity.choice === 'song1' ? match?.song1?.votes : match?.song2?.votes) || 0;
+    const matchTotal = match?.totalVotes || 0;
+    const matchState = match ? {
+        userPct: matchTotal > 0 ? Math.round((votedVotes / matchTotal) * 100) : 50,
+        status: match.status || null,
+        roundLabel: match.roundLabel || null
+    } : null;
+
     return {
         postId: `activity_${activity.activityId || `${activity.userId}_${activity.matchId}`}`,
 
@@ -452,6 +462,7 @@ function convertActivityToFeedPost(activity, matchMap) {
 
         round: activity.round || match?.round || 1,
         tournamentId: activity.tournamentId,
+        matchState,
 
         timestamp: activity.timestamp || Date.now(),
         privacy: 'public',
@@ -861,8 +872,18 @@ async function loadFeed() {
                 post => post.type !== 'vote'
             );
 
+            // Votes whose match no longer exists (old test rounds) are hidden, as on profiles.
+            // Fail open: if the match list is empty (request failed) hide nothing, and keep very
+            // recent votes in case the cached match list has not caught up yet.
+            const RECENT_MS = 10 * 60 * 1000;
+            const matchStillExists = activity =>
+                matchMap.size === 0 ||
+                matchMap.has(activity.matchId) ||
+                (Date.now() - (activity.timestamp || 0)) < RECENT_MS;
+
             const activityPosts = activities
                 .filter(activity => activity.isPublic !== false)
+                .filter(matchStillExists)
                 .map(activity =>
                     convertActivityToFeedPost(activity, matchMap)
                 );
@@ -1007,13 +1028,29 @@ function renderPostContent(post) {
                 ? `https://img.youtube.com/vi/${post.opponentMomentId || post.opponentSongId}/mqdefault.jpg`
                 : '');
 
+        // Where the match stands now decides the tag and the button wording
+        const matchState = post.matchState || {};
+        const matchStatus = matchState.status || null;
+        const roundSuffix = matchState.roundLabel ? ` · ${escapeHtml(matchState.roundLabel)}` : '';
+        const youVoted = post.tournamentId
+            ? !!localStorage.getItem(`vote_${post.tournamentId}_${post.matchId}`)
+            : false;
+
+        let statusChip = '';
+        let ctaLabel = 'View match';
+        if (matchStatus === 'live') {
+            statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>Live${roundSuffix}</span>`;
+            ctaLabel = youVoted ? 'View match' : 'Vote now';
+        } else if (matchStatus === 'completed') {
+            statusChip = `<span class="match-status-chip is-final">Ended${roundSuffix}</span>`;
+            ctaLabel = 'See result';
+        } else if (matchStatus === 'upcoming') {
+            statusChip = `<span class="match-status-chip">Upcoming${roundSuffix}</span>`;
+        }
+
         return `
           <p class="post-text vote-text">
-    <i class="fa-solid fa-film"></i>
-    <span class="vote-text-copy">
-        chose <strong>${escapeHtml(votedMomentName)}</strong>
-        over ${escapeHtml(opponentMomentName)}
-    </span>
+    <span class="vote-text-copy">voted for <strong>${escapeHtml(votedMomentName)}</strong> over <span class="vote-opponent">${escapeHtml(opponentMomentName)}</span></span>
 </p>
 
             <div class="match-embed-card" data-match-id="${post.matchId}">
@@ -1074,12 +1111,15 @@ function renderPostContent(post) {
                     </div>
                 </div>
 
-                <a
-                    href="/vote.html?id=${post.matchId}"
-                    class="match-view-btn"
-                >
-                    View Match
-                </a>
+                <div class="match-foot">
+                    ${statusChip}
+                    <a
+                        href="/vote.html?id=${post.matchId}"
+                        class="match-view-btn"
+                    >
+                        ${ctaLabel}
+                    </a>
+                </div>
             </div>
         `;
 
@@ -1377,23 +1417,33 @@ async function setupPostInteractions(postElement, post) {
         }
         
         followBtn.addEventListener('click', async () => {
+            if (followBtn.disabled) return;
             const targetUsername = followBtn.dataset.username;
             const isFollowingNow = followBtn.classList.contains('following');
-            
-            if (isFollowingNow) {
-                // Unfollow
-                const success = await unfollowUser(targetUserId, targetUsername);
-                if (success) {
+            const restingHtml = followBtn.innerHTML;
+
+            followBtn.disabled = true;
+            const result = isFollowingNow
+                ? await unfollowUser(targetUserId)
+                : await followUser(targetUserId, targetUsername);
+
+            if (result && result.success) {
+                if (isFollowingNow) {
                     followBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
                     followBtn.classList.remove('following');
-                }
-            } else {
-                // Follow
-                const success = await followUser(targetUserId, targetUsername);
-                if (success) {
+                } else {
                     followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
                     followBtn.classList.add('following');
                 }
+                followBtn.disabled = false;
+            } else {
+                // Say so instead of silently doing nothing
+                followBtn.title = (result && result.reason) || 'Something went wrong';
+                followBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Try again';
+                setTimeout(() => {
+                    followBtn.innerHTML = restingHtml;
+                    followBtn.disabled = false;
+                }, 2000);
             }
         });
     }
@@ -2266,7 +2316,7 @@ async function updateFeedHeaderBanner() {
             // Gold gradient
             headerBg.style.background = `
                 linear-gradient(135deg, 
-                    rgba(200, 170, 110, 0.9) 0%, 
+                    rgba(255, 79, 180, 0.9) 0%, 
                     rgba(26, 26, 46, 0.95) 50%,
                     rgba(10, 10, 10, 0.98) 100%
                 )
@@ -2305,7 +2355,7 @@ async function updateFeedHeaderBanner() {
                 // Fallback to gradient for emoji avatars
                 headerBg.style.background = `
                     linear-gradient(135deg, 
-                        rgba(200, 170, 110, 0.9) 0%, 
+                        rgba(255, 79, 180, 0.9) 0%, 
                         rgba(26, 26, 46, 0.95) 50%,
                         rgba(10, 10, 10, 0.98) 100%
                     )
@@ -3053,7 +3103,7 @@ function getTimeAgo(timestamp) {
 
 function getAvatarUrl(avatar) {
     if (!avatar) {
-        return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect fill="%23C8AA6E"/><text x="25" y="35" text-anchor="middle" fill="black" font-size="30">🎵</text></svg>';
+        return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect fill="%23ff4fb4"/><text x="25" y="35" text-anchor="middle" fill="black" font-size="30">🎵</text></svg>';
     }
     
     if (avatar.type === 'url') {
@@ -3065,7 +3115,7 @@ function getAvatarUrl(avatar) {
 }
 
 function createEmojiAvatar(emoji) {
-    return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%23C8AA6E"/><text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
+    return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%23ff4fb4"/><text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
 }
 
 function escapeHtml(text) {

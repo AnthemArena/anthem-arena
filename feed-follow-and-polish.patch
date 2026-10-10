@@ -1,0 +1,103 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index fc61199..09f6cbc 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -1089,3 +1089,20 @@ body.theme-arcane.page-feed .widget-match-card .competitor-result { flex: 0 0 au
+ body.theme-arcane.page-feed .widget-match-card .vote-percentage { font-size: 1.05rem; }
+ body.theme-arcane.page-feed .widget-match-card .view-results-btn,
+ body.theme-arcane.page-feed .widget-match-card .vote-now-btn { white-space: nowrap; }
++
++/* "voted for X over Y": normal wrapping (the base post-text style preserves whitespace), the pick
++   stands out and the opponent is quieter */
++body.theme-arcane.page-feed .vote-text { white-space: normal; font-size: .98rem; font-weight: 500; line-height: 1.45; }
++body.theme-arcane.page-feed .vote-text-copy strong { font-weight: 700; }
++body.theme-arcane.page-feed .vote-opponent { color: var(--text-faint, rgba(255, 255, 255, .6)); }
++
++/* "View Results" pill in the live card: compact, no clipping, drops under the vote count if tight */
++body.theme-arcane.page-feed .widget-match-card .match-footer { flex-wrap: wrap; gap: 8px 12px; padding-top: 12px; }
++body.theme-arcane.page-feed .widget-match-card .view-results-btn,
++body.theme-arcane.page-feed .widget-match-card .vote-now-btn {
++    margin-left: auto;
++    padding: 7px 14px;
++    font-size: .78rem;
++    gap: 6px;
++}
++body.theme-arcane.page-feed .widget-match-card .view-results-btn i { display: none; }
+diff --git a/js/feed-page.js b/js/feed-page.js
+index 3505ef3..d544bcd 100644
+--- a/js/feed-page.js
++++ b/js/feed-page.js
+@@ -10,12 +10,13 @@ import {
+     unlikePost, 
+     hasLikedPost,
+     isActivityPostId,
+-    getActivityEngagementCounts,
+-    followUser,
+-    unfollowUser,
+-    isFollowing 
++    getActivityEngagementCounts
+ } from './social-feed.js';
+ 
++// Follow buttons use follow-system.js: it writes the `follows` collection that the Firestore rules,
++// the profile page and the sidebar counts all use (the version in social-feed.js is the old one).
++import { followUser, unfollowUser, isFollowing } from './follow-system.js';
++
+ import { getActivityFeed, getAllMatches } from './api-client.js';
+ 
+ // ========================================
+@@ -1049,10 +1050,7 @@ function renderPostContent(post) {
+ 
+         return `
+           <p class="post-text vote-text">
+-    <span class="vote-text-copy">
+-        voted for <strong>${escapeHtml(votedMomentName)}</strong>
+-        over ${escapeHtml(opponentMomentName)}
+-    </span>
++    <span class="vote-text-copy">voted for <strong>${escapeHtml(votedMomentName)}</strong> over <span class="vote-opponent">${escapeHtml(opponentMomentName)}</span></span>
+ </p>
+ 
+             <div class="match-embed-card" data-match-id="${post.matchId}">
+@@ -1419,23 +1417,33 @@ async function setupPostInteractions(postElement, post) {
+         }
+         
+         followBtn.addEventListener('click', async () => {
++            if (followBtn.disabled) return;
+             const targetUsername = followBtn.dataset.username;
+             const isFollowingNow = followBtn.classList.contains('following');
+-            
+-            if (isFollowingNow) {
+-                // Unfollow
+-                const success = await unfollowUser(targetUserId, targetUsername);
+-                if (success) {
++            const restingHtml = followBtn.innerHTML;
++
++            followBtn.disabled = true;
++            const result = isFollowingNow
++                ? await unfollowUser(targetUserId)
++                : await followUser(targetUserId, targetUsername);
++
++            if (result && result.success) {
++                if (isFollowingNow) {
+                     followBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                     followBtn.classList.remove('following');
+-                }
+-            } else {
+-                // Follow
+-                const success = await followUser(targetUserId, targetUsername);
+-                if (success) {
++                } else {
+                     followBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
+                     followBtn.classList.add('following');
+                 }
++                followBtn.disabled = false;
++            } else {
++                // Say so instead of silently doing nothing
++                followBtn.title = (result && result.reason) || 'Something went wrong';
++                followBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Try again';
++                setTimeout(() => {
++                    followBtn.innerHTML = restingHtml;
++                    followBtn.disabled = false;
++                }, 2000);
+             }
+         });
+     }

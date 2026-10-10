@@ -1,0 +1,48 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index 5f3c59c..fc61199 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -1079,3 +1079,13 @@ body.theme-arcane.page-feed .match-status-chip .chip-dot {
+     body.theme-arcane.page-feed .match-song { width: 100%; box-sizing: border-box; }
+     body.theme-arcane.page-feed .match-foot { flex-wrap: wrap; }
+ }
++
++/* live match cards in the right column: once you have voted the percentages appear, and the
++   seed circle plus the percentage were squeezing the names down to two letters */
++body.theme-arcane.page-feed .widget-match-card .competitor { gap: 10px; }
++body.theme-arcane.page-feed .widget-match-card .competitor-rank { display: none; }
++body.theme-arcane.page-feed .widget-match-card .competitor-details { flex: 1 1 auto; min-width: 0; }
++body.theme-arcane.page-feed .widget-match-card .competitor-result { flex: 0 0 auto; }
++body.theme-arcane.page-feed .widget-match-card .vote-percentage { font-size: 1.05rem; }
++body.theme-arcane.page-feed .widget-match-card .view-results-btn,
++body.theme-arcane.page-feed .widget-match-card .vote-now-btn { white-space: nowrap; }
+diff --git a/js/feed-page.js b/js/feed-page.js
+index 994ad15..3505ef3 100644
+--- a/js/feed-page.js
++++ b/js/feed-page.js
+@@ -1030,7 +1030,7 @@ function renderPostContent(post) {
+         // Where the match stands now decides the tag and the button wording
+         const matchState = post.matchState || {};
+         const matchStatus = matchState.status || null;
+-        const roundPrefix = matchState.roundLabel ? `${escapeHtml(matchState.roundLabel)} · ` : '';
++        const roundSuffix = matchState.roundLabel ? ` · ${escapeHtml(matchState.roundLabel)}` : '';
+         const youVoted = post.tournamentId
+             ? !!localStorage.getItem(`vote_${post.tournamentId}_${post.matchId}`)
+             : false;
+@@ -1038,13 +1038,13 @@ function renderPostContent(post) {
+         let statusChip = '';
+         let ctaLabel = 'View match';
+         if (matchStatus === 'live') {
+-            statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>${roundPrefix}Live</span>`;
++            statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>Live${roundSuffix}</span>`;
+             ctaLabel = youVoted ? 'View match' : 'Vote now';
+         } else if (matchStatus === 'completed') {
+-            statusChip = `<span class="match-status-chip is-final">${roundPrefix}Final result</span>`;
++            statusChip = `<span class="match-status-chip is-final">Ended${roundSuffix}</span>`;
+             ctaLabel = 'See result';
+         } else if (matchStatus === 'upcoming') {
+-            statusChip = `<span class="match-status-chip">${roundPrefix}Upcoming</span>`;
++            statusChip = `<span class="match-status-chip">Upcoming${roundSuffix}</span>`;
+         }
+ 
+         return `
