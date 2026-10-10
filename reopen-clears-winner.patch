@@ -1,0 +1,77 @@
+diff --git a/js/admin.js b/js/admin.js
+index 2ceb66c..d2c7e1b 100644
+--- a/js/admin.js
++++ b/js/admin.js
+@@ -16,7 +16,7 @@ import {
+     autoGenerateRoundRecap
+ } from './blog-generator.js';
+ 
+-import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
++import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, deleteField, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+ 
+ // ========================================
+@@ -307,6 +307,17 @@ function deadlineFields(endISO) {
+     return endISO ? { endDate: endISO, endTime: endISO } : {};
+ }
+ 
++// Fields written when a match is closed. Opening (or re-opening) a match must clear
++// them, otherwise a re-opened match keeps its old winner and pages that look at
++// winnerId (profile badges, match cards, brackets) show a result for a live match.
++function clearResultFields() {
++    return {
++        winnerId: deleteField(),
++        winMethod: deleteField(),
++        finalScore: deleteField()
++    };
++}
++
+ // ========================================
+ // MATCH OPERATIONS
+ // ========================================
+@@ -318,6 +329,7 @@ window.openMatch = async function(matchId) {
+     try {
+         await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId), {
+             status: 'live',
++            ...clearResultFields(),
+             ...deadlineFields(deadline.endISO)
+         });
+         
+@@ -489,6 +501,7 @@ window.openBatch = async function(roundNumber, batchNumber) {
+         for (const matchDoc of snapshot.docs) {
+             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
+                 status: 'live',
++                ...clearResultFields(),
+                 ...deadlineFields(deadline.endISO)
+             });
+             matchList.push(matchDoc.data().matchId);
+diff --git a/js/profile-insights.js b/js/profile-insights.js
+index 7d67ed0..11b3e8b 100644
+--- a/js/profile-insights.js
++++ b/js/profile-insights.js
+@@ -60,7 +60,7 @@ export function enrichVotes(votes) {
+             if (pct < 40) voteType = 'underdog';
+             else if (pct > 60) voteType = 'mainstream';
+ 
+-            const isCompleted = m.status === 'completed' || !!m.winnerId;
++            const isCompleted = m.status ? m.status === 'completed' : !!m.winnerId;   // a re-opened match may keep an old winnerId
+ 
+             let editStatus = 'active';
+             if (isCompleted && m.winnerId) {
+diff --git a/js/profile-page.js b/js/profile-page.js
+index 5e7a052..eb0daba 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -2035,8 +2035,10 @@ function getVoteStatus(vote, match) {
+         return 'live';
+     }
+     
+-    // ✅ Check if match is completed
+-    if (match.status !== 'completed' && !match.winnerId) {
++    // ✅ Check if match is completed. Trust `status` when it is set: a re-opened match can
++    // still carry an old winnerId. Only fall back to winnerId for old docs with no status.
++    const isFinished = match.status ? match.status === 'completed' : !!match.winnerId;
++    if (!isFinished) {
+         return 'live';
+     }
+     
