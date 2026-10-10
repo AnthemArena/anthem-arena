@@ -740,7 +740,7 @@ function hideLoading() {
 function showMainContent() {
     const mainContent = document.getElementById('mainContent');
     if (mainContent) {
-        mainContent.style.display = 'block';
+        mainContent.style.display = '';
     }
 }
 
@@ -753,7 +753,7 @@ function showNoMatches() {
     const landingFooter = document.querySelector('.landing-footer');
     const votedSection = document.getElementById('votedSection');
     
-    if (mainContent) mainContent.style.display = 'block';
+    if (mainContent) mainContent.style.display = '';
     if (noMatches) noMatches.style.display = 'block';
     if (socialGrid) socialGrid.style.display = 'none';
     if (landingFooter) landingFooter.style.display = 'none';

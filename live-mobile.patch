@@ -1,0 +1,55 @@
+diff --git a/js/live.js b/js/live.js
+index 9ed38e0..7f3a239 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -740,7 +740,7 @@ function hideLoading() {
+ function showMainContent() {
+     const mainContent = document.getElementById('mainContent');
+     if (mainContent) {
+-        mainContent.style.display = 'block';
++        mainContent.style.display = '';
+     }
+ }
+ 
+@@ -753,7 +753,7 @@ function showNoMatches() {
+     const landingFooter = document.querySelector('.landing-footer');
+     const votedSection = document.getElementById('votedSection');
+     
+-    if (mainContent) mainContent.style.display = 'block';
++    if (mainContent) mainContent.style.display = '';
+     if (noMatches) noMatches.style.display = 'block';
+     if (socialGrid) socialGrid.style.display = 'none';
+     if (landingFooter) landingFooter.style.display = 'none';
+diff --git a/live.html b/live.html
+index 4ef4d3f..92f2116 100644
+--- a/live.html
++++ b/live.html
+@@ -180,18 +180,6 @@
+                         </a>
+                     </div>
+                 </div>
+-                
+-                <!-- Buy Me a Coffee -->
+-                <div class="bmc-container">
+-                    <p class="bmc-text">Enjoying the tournament? <i class="fa-solid fa-mug-hot"></i></p>
+-                    <a href="https://buymeacoffee.com/anthemarena" 
+-                       target="_blank" 
+-                       rel="noopener noreferrer"
+-                       class="bmc-button">
+-                        <span class="bmc-icon"><i class="fa-solid fa-mug-hot"></i></span>
+-                        <span>Buy Me a Coffee</span>
+-                    </a>
+-                </div>
+             </div>
+         </div>
+     </div>
+@@ -204,8 +192,5 @@
+     <script type="module" src="/js/rank-system.js"></script>
+     <script type="module" src="/js/live.js"></script>
+     <script type="module" src="/js/settings-modal.js"></script>
+-    
+-    <!-- Buy Me a Coffee Widget -->
+-    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="anthemarena" data-description="Support me on Buy me a coffee!" data-message="Thanks for visiting! Support the tournament?" data-color="#d4af37" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+ </body>
+ </html>
+\ No newline at end of file

@@ -1,0 +1,35 @@
+diff --git a/activity.html b/activity.html
+index 918f5df..a4b406a 100644
+--- a/activity.html
++++ b/activity.html
+@@ -3,14 +3,19 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Community Activity | Anthem Arena</title>
+- <!-- Stylesheets -->
++    <title>Community Activity | Arcane Moments</title>
++    <!-- Fonts (Arcane look) -->
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++    <!-- Stylesheets -->
+     <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+     <link rel="stylesheet" href="/css/settings.css">
+     <link rel="stylesheet" href="/css/activity.css">
++    <!-- Arcane look (opt-in via <body class="theme-arcane page-activity">): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ 
+        
+@@ -30,7 +35,7 @@
+     </script>
+ 
+ </head>
+-<body>
++<body class="theme-arcane page-activity">
+ 
+ 
+   <div id="nav-placeholder"></div>
