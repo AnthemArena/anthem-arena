@@ -1106,3 +1106,47 @@ body.theme-arcane.page-feed .widget-match-card .vote-now-btn {
     gap: 6px;
 }
 body.theme-arcane.page-feed .widget-match-card .view-results-btn i { display: none; }
+
+/* ========================================
+   FEED PAGE: RESPONSIVE
+   feed.css restates the 3-column grid AFTER its own breakpoints, so the grid won on phones: the
+   hidden sidebars still reserved their tracks and the feed was squeezed into the 250px first one.
+   The breakpoints are restated here, after it.
+   ======================================== */
+@media (max-width: 1200px) {
+    body.theme-arcane.page-feed .feed-page-layout { grid-template-columns: 250px minmax(0, 1fr); column-gap: 24px; }
+}
+@media (max-width: 900px) {
+    body.theme-arcane.page-feed .feed-page-layout { grid-template-columns: minmax(0, 1fr); margin-top: 70px; padding: 0 14px; }
+    body.theme-arcane.page-feed .feed-center { max-width: 100%; padding: 0; }
+}
+
+/* centred rows lose their left end when they overflow; "safe" falls back to the start */
+body.theme-arcane.page-feed .feed-filters { justify-content: safe center; }
+
+@media (max-width: 600px) {
+    body.theme-arcane.page-feed .feed-title { font-size: 1.6rem; }
+    body.theme-arcane.page-feed .feed-title i { font-size: 1.2rem; margin-right: 6px; }
+
+    body.theme-arcane.page-feed .feed-filters { justify-content: flex-start; scroll-snap-type: x proximity; }
+    body.theme-arcane.page-feed .filter-btn { padding: 8px 12px; font-size: .8rem; gap: 6px; scroll-snap-align: start; }
+
+    body.theme-arcane.page-feed .feed-post,
+    body.theme-arcane.page-feed .create-post-box { padding: 14px; }
+    body.theme-arcane.page-feed .create-post-box textarea { min-width: 0; }
+
+    body.theme-arcane.page-feed .post-header { gap: 10px; }
+    body.theme-arcane.page-feed .post-meta { min-width: 0; }
+    body.theme-arcane.page-feed .post-meta .username {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    body.theme-arcane.page-feed .follow-btn {
+        flex-shrink: 0;
+        padding: 5px 10px;
+        font-size: .75rem;
+        white-space: nowrap;
+    }
+    body.theme-arcane.page-feed .follow-btn i { margin-right: 4px; }
+}
