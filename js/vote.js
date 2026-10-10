@@ -2855,11 +2855,11 @@ let bmcSection = `
             <span class="bmc-icon">☕</span>
             <div class="bmc-text">
                 <strong>Enjoying the tournament?</strong>
-                <p>Help keep it running with a coffee!</p>
+                <p>Help keep it running!</p>
             </div>
         </div>
-        <a href="https://buymeacoffee.com/anthemarena" target="_blank" class="bmc-button">
-            Buy Me a Coffee
+        <a href="https://ko-fi.com/arcanemoments" target="_blank" rel="noopener noreferrer" class="bmc-button">
+            Support on Ko-fi
         </a>
     </div>
 `;
