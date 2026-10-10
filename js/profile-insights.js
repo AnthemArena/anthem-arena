@@ -60,7 +60,7 @@ export function enrichVotes(votes) {
             if (pct < 40) voteType = 'underdog';
             else if (pct > 60) voteType = 'mainstream';
 
-            const isCompleted = m.status === 'completed' || !!m.winnerId;
+            const isCompleted = m.status ? m.status === 'completed' : !!m.winnerId;   // a re-opened match may keep an old winnerId
 
             let editStatus = 'active';
             if (isCompleted && m.winnerId) {

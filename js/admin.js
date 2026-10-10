@@ -16,7 +16,7 @@ import {
     autoGenerateRoundRecap
 } from './blog-generator.js';
 
-import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, deleteField, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // ========================================
@@ -307,6 +307,17 @@ function deadlineFields(endISO) {
     return endISO ? { endDate: endISO, endTime: endISO } : {};
 }
 
+// Fields written when a match is closed. Opening (or re-opening) a match must clear
+// them, otherwise a re-opened match keeps its old winner and pages that look at
+// winnerId (profile badges, match cards, brackets) show a result for a live match.
+function clearResultFields() {
+    return {
+        winnerId: deleteField(),
+        winMethod: deleteField(),
+        finalScore: deleteField()
+    };
+}
+
 // ========================================
 // MATCH OPERATIONS
 // ========================================
@@ -318,6 +329,7 @@ window.openMatch = async function(matchId) {
     try {
         await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchId), {
             status: 'live',
+            ...clearResultFields(),
             ...deadlineFields(deadline.endISO)
         });
         
@@ -489,6 +501,7 @@ window.openBatch = async function(roundNumber, batchNumber) {
         for (const matchDoc of snapshot.docs) {
             await updateDoc(doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`, matchDoc.id), {
                 status: 'live',
+                ...clearResultFields(),
                 ...deadlineFields(deadline.endISO)
             });
             matchList.push(matchDoc.data().matchId);

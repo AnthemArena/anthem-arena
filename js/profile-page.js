@@ -2035,8 +2035,10 @@ function getVoteStatus(vote, match) {
         return 'live';
     }
     
-    // ✅ Check if match is completed
-    if (match.status !== 'completed' && !match.winnerId) {
+    // ✅ Check if match is completed. Trust `status` when it is set: a re-opened match can
+    // still carry an old winnerId. Only fall back to winnerId for old docs with no status.
+    const isFinished = match.status ? match.status === 'completed' : !!match.winnerId;
+    if (!isFinished) {
         return 'live';
     }
     
