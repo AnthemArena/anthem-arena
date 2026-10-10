@@ -1,0 +1,113 @@
+diff --git a/firestore.rules b/firestore.rules
+index 79f9cd4..46ecc60 100644
+--- a/firestore.rules
++++ b/firestore.rules
+@@ -63,13 +63,14 @@ service cloud.firestore {
+             || request.resource.data[field] == before - 1);
+     }
+ 
+-    // A vote is recorded in two steps by js/vote.js: first the vote document
+-    // is created, then the match counters are incremented. This allows the
+-    // second step only: exactly +1 on the one edit the voter chose, on a live
+-    // match, by someone who has a vote document for that match.
++    // A vote is recorded by js/vote.js as ONE batched write: create the vote
++    // document AND add +1 to the match counters. This allows the match update
++    // only when that same batch creates the voter's vote document (stage 1b):
++    // exactly +1 on the one edit the voter chose, on a live match.
+     //
+-    // Known gap (closed in stage 1b by batching both writes): a voter who
+-    // already has a vote document could repeat this increment.
++    // exists()/get() read the database BEFORE the batch; existsAfter()/getAfter()
++    // read it AFTER. "Missing before, present after" means this batch creates
++    // the vote, so a voter who already has a vote document cannot repeat the +1.
+     function isVoteIncrement(tournamentId, matchId) {
+       let votePath = /databases/$(database)/documents/votes/$(matchId + '_' + request.auth.uid);
+       let before = resource.data;
+@@ -79,15 +80,16 @@ service cloud.firestore {
+         && before.status == 'live'
+         && after.diff(before).affectedKeys().hasOnly(['song1', 'song2', 'totalVotes'])
+         && after.totalVotes == before.totalVotes + 1
+-        && exists(votePath)
+-        && get(votePath).data.matchId == matchId
++        && !exists(votePath)
++        && existsAfter(votePath)
++        && getAfter(votePath).data.matchId == matchId
+         && (
+-          (get(votePath).data.choice == 'song1'
++          (getAfter(votePath).data.choice == 'song1'
+             && after.song1.votes == before.song1.votes + 1
+             && after.song1.diff(before.song1).affectedKeys().hasOnly(['votes'])
+             && after.song2 == before.song2)
+           ||
+-          (get(votePath).data.choice == 'song2'
++          (getAfter(votePath).data.choice == 'song2'
+             && after.song2.votes == before.song2.votes + 1
+             && after.song2.diff(before.song2).affectedKeys().hasOnly(['votes'])
+             && after.song1 == before.song1)
+diff --git a/js/api-client.js b/js/api-client.js
+index 4e2c4d1..431fd6a 100644
+--- a/js/api-client.js
++++ b/js/api-client.js
+@@ -78,6 +78,10 @@ export async function getMatch(matchId, bypassCache = false) {
+ /**
+  * Submit vote (direct to Firebase - no cache)
+  * This still uses Firebase SDK for writes
++ *
++ * NOTE: js/vote.js no longer calls this. Since firestore.rules stage 1b the
++ * counter +1 is only allowed in the same batch that creates the vote document
++ * (see submitVote() in js/vote.js), so calling this on its own is denied.
+  */
+ export async function submitVote(matchId, songId) {
+     // Import Firebase for direct write
+diff --git a/js/vote.js b/js/vote.js
+index ad2d1cb..aa4ecda 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -6,11 +6,11 @@
+ // ========================================
+ 
+ // API Client (uses Netlify Edge cache for reads)
+-import { getMatch, submitVote as submitVoteToAPI, getAllMatches } from './api-client.js';
++import { getMatch, getAllMatches } from './api-client.js';
+ 
+ // Firebase
+ import { db } from './firebase-config.js';
+-import { doc, getDoc, setDoc, updateDoc  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
++import { doc, getDoc, setDoc, updateDoc, writeBatch, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ 
+ // Features & Systems
+ import { getAllTournamentStats } from './music-gallery.js';
+@@ -1672,8 +1672,11 @@ async function submitVote(songId) {
+             return;
+         }
+ 
+- // Save vote to Firebase with username and avatar
+-await setDoc(voteRef, {
++ // Save vote to Firebase with username and avatar.
++// The vote document and the match counters are written in ONE batch:
++// firestore.rules only allows the +1 when the same batch creates the vote doc.
++const voteBatch = writeBatch(db);
++voteBatch.set(voteRef, {
+     tournament: ACTIVE_TOURNAMENT,
+     matchId: currentMatch.id,
+     userId: userId,
+@@ -1688,11 +1691,15 @@ await setDoc(voteRef, {
+     votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+ });
+ 
+-        console.log('✅ CHECKPOINT 1: Vote record created in Firebase');
++        // Counter increment for the edit that was voted for (same batch as the vote doc)
++        const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches/${currentMatch.id}`);
++        voteBatch.update(matchRef, {
++            [`${songId}.votes`]: increment(1),
++            totalVotes: increment(1)
++        });
+ 
+-        // ✅ Use API client to submit vote (updates match counts)
+-        await submitVoteToAPI(currentMatch.id, songId);
+-        console.log('✅ CHECKPOINT 2: Vote submitted via API client');
++        await voteBatch.commit();
++        console.log('✅ CHECKPOINT 1+2: Vote record and match counts written in one batch');
+ 
+         // Save vote locally as backup
+         localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
