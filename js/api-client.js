@@ -78,6 +78,10 @@ export async function getMatch(matchId, bypassCache = false) {
 /**
  * Submit vote (direct to Firebase - no cache)
  * This still uses Firebase SDK for writes
+ *
+ * NOTE: js/vote.js no longer calls this. Since firestore.rules stage 1b the
+ * counter +1 is only allowed in the same batch that creates the vote document
+ * (see submitVote() in js/vote.js), so calling this on its own is denied.
  */
 export async function submitVote(matchId, songId) {
     // Import Firebase for direct write

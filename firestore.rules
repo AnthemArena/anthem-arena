@@ -63,13 +63,14 @@ service cloud.firestore {
             || request.resource.data[field] == before - 1);
     }
 
-    // A vote is recorded in two steps by js/vote.js: first the vote document
-    // is created, then the match counters are incremented. This allows the
-    // second step only: exactly +1 on the one edit the voter chose, on a live
-    // match, by someone who has a vote document for that match.
+    // A vote is recorded by js/vote.js as ONE batched write: create the vote
+    // document AND add +1 to the match counters. This allows the match update
+    // only when that same batch creates the voter's vote document (stage 1b):
+    // exactly +1 on the one edit the voter chose, on a live match.
     //
-    // Known gap (closed in stage 1b by batching both writes): a voter who
-    // already has a vote document could repeat this increment.
+    // exists()/get() read the database BEFORE the batch; existsAfter()/getAfter()
+    // read it AFTER. "Missing before, present after" means this batch creates
+    // the vote, so a voter who already has a vote document cannot repeat the +1.
     function isVoteIncrement(tournamentId, matchId) {
       let votePath = /databases/$(database)/documents/votes/$(matchId + '_' + request.auth.uid);
       let before = resource.data;
@@ -79,15 +80,16 @@ service cloud.firestore {
         && before.status == 'live'
         && after.diff(before).affectedKeys().hasOnly(['song1', 'song2', 'totalVotes'])
         && after.totalVotes == before.totalVotes + 1
-        && exists(votePath)
-        && get(votePath).data.matchId == matchId
+        && !exists(votePath)
+        && existsAfter(votePath)
+        && getAfter(votePath).data.matchId == matchId
         && (
-          (get(votePath).data.choice == 'song1'
+          (getAfter(votePath).data.choice == 'song1'
             && after.song1.votes == before.song1.votes + 1
             && after.song1.diff(before.song1).affectedKeys().hasOnly(['votes'])
             && after.song2 == before.song2)
           ||
-          (get(votePath).data.choice == 'song2'
+          (getAfter(votePath).data.choice == 'song2'
             && after.song2.votes == before.song2.votes + 1
             && after.song2.diff(before.song2).affectedKeys().hasOnly(['votes'])
             && after.song1 == before.song1)

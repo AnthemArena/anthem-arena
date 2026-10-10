@@ -6,11 +6,11 @@
 // ========================================
 
 // API Client (uses Netlify Edge cache for reads)
-import { getMatch, submitVote as submitVoteToAPI, getAllMatches } from './api-client.js';
+import { getMatch, getAllMatches } from './api-client.js';
 
 // Firebase
 import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc, updateDoc  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { doc, getDoc, setDoc, updateDoc, writeBatch, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Features & Systems
 import { getAllTournamentStats } from './music-gallery.js';
@@ -1672,8 +1672,11 @@ async function submitVote(songId) {
             return;
         }
 
- // Save vote to Firebase with username and avatar
-await setDoc(voteRef, {
+ // Save vote to Firebase with username and avatar.
+// The vote document and the match counters are written in ONE batch:
+// firestore.rules only allows the +1 when the same batch creates the vote doc.
+const voteBatch = writeBatch(db);
+voteBatch.set(voteRef, {
     tournament: ACTIVE_TOURNAMENT,
     matchId: currentMatch.id,
     userId: userId,
@@ -1688,11 +1691,15 @@ await setDoc(voteRef, {
     votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
 });
 
-        console.log('✅ CHECKPOINT 1: Vote record created in Firebase');
+        // Counter increment for the edit that was voted for (same batch as the vote doc)
+        const matchRef = doc(db, `tournaments/${ACTIVE_TOURNAMENT}/matches/${currentMatch.id}`);
+        voteBatch.update(matchRef, {
+            [`${songId}.votes`]: increment(1),
+            totalVotes: increment(1)
+        });
 
-        // ✅ Use API client to submit vote (updates match counts)
-        await submitVoteToAPI(currentMatch.id, songId);
-        console.log('✅ CHECKPOINT 2: Vote submitted via API client');
+        await voteBatch.commit();
+        console.log('✅ CHECKPOINT 1+2: Vote record and match counts written in one batch');
 
         // Save vote locally as backup
         localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
