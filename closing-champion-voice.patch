@@ -1,0 +1,484 @@
+diff --git a/champion-packs/caitlyn.json b/champion-packs/caitlyn.json
+index 25559e9..ee89896 100644
+--- a/champion-packs/caitlyn.json
++++ b/champion-packs/caitlyn.json
+@@ -363,6 +363,49 @@
+         "To Infinity. 🎯"
+       ]
+     },
++    "closing-24h": {
++      "messages": [
++        "🎯 \"{matchTitle}\" closes in {timeLeft}. Your vote is the one missing from the record.",
++        "💼 {timeLeft} left on \"{matchTitle}\". Best to file your vote while there's time.",
++        "⚖️ {timeLeft} until \"{matchTitle}\" is decided — and you haven't weighed in."
++      ],
++      "buttons": [
++        "File Your Vote. 💼",
++        "Take the Shot. 🎯"
++      ]
++    },
++    "closing-3h": {
++      "messages": [
++        "🎯 Only {timeLeft} left on \"{matchTitle}\". Your vote is still outstanding.",
++        "🔫 The window on \"{matchTitle}\" is narrowing: {timeLeft}. Take your shot.",
++        "💼 {timeLeft} to the deadline on \"{matchTitle}\". Don't leave it unsigned."
++      ],
++      "buttons": [
++        "Vote Now. 🎯",
++        "Close the Case. 🔫"
++      ]
++    },
++    "closing-final": {
++      "messages": [
++        "🚨 Final minutes on \"{matchTitle}\": {timeLeft}. This is your last clear shot.",
++        "🎯 {timeLeft} remaining. Vote on \"{matchTitle}\" before the case is closed.",
++        "⏱️ The deadline is imminent — {timeLeft} on \"{matchTitle}\". Act now."
++      ],
++      "buttons": [
++        "Last Chance. 🚨",
++        "Act Now. 🎯"
++      ]
++    },
++    "closing-multi": {
++      "messages": [
++        "💼 {matchCount} matches await your vote. The soonest closes in {timeLeft}.",
++        "🎯 {matchCount} open cases without your vote — first deadline in {timeLeft}."
++      ],
++      "buttons": [
++        "Review the Cases. 💼",
++        "See Open Matches. 🎯"
++      ]
++    },
+     "novotes": {
+       "messages": [
+         "🎯 No votes cast yet on \"{moment1}\" vs \"{moment2}\". An untouched case, if you will.",
+diff --git a/champion-packs/default.json b/champion-packs/default.json
+index 74e1bc6..fa543d2 100644
+--- a/champion-packs/default.json
++++ b/champion-packs/default.json
+@@ -98,6 +98,38 @@
+       "buttons": ["View Profile"]
+     },
+ 
++    "closing-24h": {
++      "messages": [
++        "\"{matchTitle}\" closes in {timeLeft}. You haven't voted yet."
++      ],
++      "buttons": [
++        "Cast Your Vote"
++      ]
++    },
++    "closing-3h": {
++      "messages": [
++        "Closing soon: \"{matchTitle}\" ends in {timeLeft}. You haven't voted yet."
++      ],
++      "buttons": [
++        "Cast Your Vote"
++      ]
++    },
++    "closing-final": {
++      "messages": [
++        "Final minutes to vote on \"{matchTitle}\" — {timeLeft} left."
++      ],
++      "buttons": [
++        "Vote Now"
++      ]
++    },
++    "closing-multi": {
++      "messages": [
++        "{matchCount} matches you haven't voted in are closing soon. Soonest: {timeLeft}."
++      ],
++      "buttons": [
++        "See Live Matches"
++      ]
++    },
+     "novotes": {
+       "messages": ["This match has zero votes yet!"],
+       "details": ["\"{song1}\" vs \"{song2}\""],
+diff --git a/champion-packs/jinx.json b/champion-packs/jinx.json
+index 2ece96c..dd89eb9 100644
+--- a/champion-packs/jinx.json
++++ b/champion-packs/jinx.json
+@@ -311,6 +311,49 @@
+         "NEVER SURRENDER!! 🔥"
+       ]
+     },
++    "closing-24h": {
++      "messages": [
++        "⏳ Psst… \"{matchTitle}\" blows up in {timeLeft} and you haven't voted!! Fix that!!",
++        "💣 Tick-tock, trinket!! {timeLeft} left on \"{matchTitle}\" and your vote's MISSING!!",
++        "🎆 \"{matchTitle}\" goes BOOM in {timeLeft}!! Don't miss the fireworks — vote!!"
++      ],
++      "buttons": [
++        "Beat the Clock!! ⏰",
++        "Vote Before It Blows!! 💥"
++      ]
++    },
++    "closing-3h": {
++      "messages": [
++        "🧨 Only {timeLeft} left on \"{matchTitle}\"!! You haven't voted, trinket!!",
++        "⏰ BOOM O'CLOCK is {timeLeft} away!! \"{matchTitle}\" still needs YOUR vote!!",
++        "😈 Hehe~ {timeLeft} till \"{matchTitle}\" closes… and your vote's still missing!!"
++      ],
++      "buttons": [
++        "Vote NOW!! 💣",
++        "Don't Let It Go Boom!! 🧨"
++      ]
++    },
++    "closing-final": {
++      "messages": [
++        "🚨 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft}!! VOTE VOTE VOTE!!",
++        "💥 It's now or NEVER!! {timeLeft} left on \"{matchTitle}\"!!",
++        "🔥 Fuse is almost OUT!! {timeLeft} to vote on \"{matchTitle}\"!!"
++      ],
++      "buttons": [
++        "LAST CHANCE!! 🚨",
++        "VOTE VOTE VOTE!! 💥"
++      ]
++    },
++    "closing-multi": {
++      "messages": [
++        "💣 {matchCount} matches you haven't voted in are about to blow!! Soonest: {timeLeft}!!",
++        "⏰ Tick-tock!! {matchCount} unvoted matches closing — soonest in {timeLeft}!!"
++      ],
++      "buttons": [
++        "Show Me the Matches!! 💣",
++        "See the Chaos!! 🎪"
++      ]
++    },
+     "novotes": {
+       "messages": [
+         "🆘 ZERO VOTES on \"{matchTitle}\"?! THIS MATCH IS DEAD AND EMPTY!!",
+@@ -327,7 +370,7 @@
+     },
+     "lowvotes": {
+       "messages": [
+-        "⚠️ This match is practically empty! Like... THREE votes? That's sad!",
++        "⚠️ This match is practically empty! Like... {totalVotes} vote{votesPlural}? That's sad!",
+         "😬 Only a handful of votes here! Let's blow that number up!",
+         "🎯 Low turnout alert! Time to pump those numbers up!",
+         "👀 Barely anyone's voted here! Let's fix that, yeah?"
+diff --git a/champion-packs/lux.json b/champion-packs/lux.json
+index f78b223..9f8cfc6 100644
+--- a/champion-packs/lux.json
++++ b/champion-packs/lux.json
+@@ -307,6 +307,49 @@
+       ]
+     },
+ 
++    "closing-24h": {
++      "messages": [
++        "✨ \"{matchTitle}\" closes in {timeLeft} — add your light before it's gone!!",
++        "🌟 {timeLeft} left on \"{matchTitle}\"!! Your vote would shine so bright!!",
++        "💫 {timeLeft} until \"{matchTitle}\" wraps up — don't miss your moment!!"
++      ],
++      "buttons": [
++        "Add Your Light!! ✨",
++        "Shine On!! 🌟"
++      ]
++    },
++    "closing-3h": {
++      "messages": [
++        "🌟 Only {timeLeft} left on \"{matchTitle}\"!! Let your vote shine!!",
++        "⭐ {timeLeft} to go!! \"{matchTitle}\" is waiting for your spark!!",
++        "✨ The sun's setting on \"{matchTitle}\" in {timeLeft} — cast your light!!"
++      ],
++      "buttons": [
++        "Cast Your Light!! 🌟",
++        "Vote Now!! ✨"
++      ]
++    },
++    "closing-final": {
++      "messages": [
++        "💥 Final minutes!! \"{matchTitle}\" closes in {timeLeft} — time for a burst of light!!",
++        "🌟 Last chance to sparkle!! {timeLeft} left on \"{matchTitle}\"!!",
++        "✨ Almost out of time!! {timeLeft} to vote on \"{matchTitle}\"!!"
++      ],
++      "buttons": [
++        "Last Sparkle!! 💥",
++        "Shine Now!! ⭐"
++      ]
++    },
++    "closing-multi": {
++      "messages": [
++        "🌟 {matchCount} matches you haven't voted in are closing!! Soonest in {timeLeft}!!",
++        "✨ {matchCount} matches are waiting for your light!! First closes in {timeLeft}!!"
++      ],
++      "buttons": [
++        "See the Matches!! ✨",
++        "Light Them Up!! 🌟"
++      ]
++    },
+     "novotes": {
+       "messages": [
+         "🌟 This match is shrouded in darkness… zero votes?! Unacceptable!!",
+diff --git a/champion-packs/vi.json b/champion-packs/vi.json
+index 392ea61..fb866f0 100644
+--- a/champion-packs/vi.json
++++ b/champion-packs/vi.json
+@@ -363,6 +363,49 @@
+         "To Infinity!! 🔥"
+       ]
+     },
++    "closing-24h": {
++      "messages": [
++        "👊 {timeLeft} left on \"{matchTitle}\" and you haven't thrown your punch yet!!",
++        "⏳ Clock's ticking on \"{matchTitle}\" — {timeLeft} left. Step up and vote!!",
++        "🥊 \"{matchTitle}\" closes in {timeLeft}. Don't sit this round out!!"
++      ],
++      "buttons": [
++        "Throw Your Punch!! 👊",
++        "Get In There!! 🥊"
++      ]
++    },
++    "closing-3h": {
++      "messages": [
++        "⏰ Only {timeLeft} left on \"{matchTitle}\"!! Get in there and vote!!",
++        "💪 {timeLeft} to go and you haven't voted on \"{matchTitle}\"?! Move it!!",
++        "👊 Last stretch on \"{matchTitle}\" — {timeLeft} left. Make it count!!"
++      ],
++      "buttons": [
++        "Vote Now!! 💪",
++        "Hit It!! 👊"
++      ]
++    },
++    "closing-final": {
++      "messages": [
++        "🔥 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft} — VOTE NOW!!",
++        "💥 Last chance to land your punch on \"{matchTitle}\"!! {timeLeft} left!!",
++        "🥊 Bell's about to ring!! {timeLeft} to vote on \"{matchTitle}\"!!"
++      ],
++      "buttons": [
++        "LAST CHANCE!! 🔥",
++        "PUNCH IN!! 💥"
++      ]
++    },
++    "closing-multi": {
++      "messages": [
++        "👊 {matchCount} matches you haven't voted in are closing!! Soonest: {timeLeft}!!",
++        "⏰ {matchCount} fights waiting on your vote!! First bell in {timeLeft}!!"
++      ],
++      "buttons": [
++        "See the Fights!! 🥊",
++        "Pick Your Fights!! 👊"
++      ]
++    },
+     "novotes": {
+       "messages": [
+         "👊 Zero votes?! This match hasn't even started yet!! Time to throw the first punch!!",
+diff --git a/js/champion-loader.js b/js/champion-loader.js
+index 071d349..6b9449e 100644
+--- a/js/champion-loader.js
++++ b/js/champion-loader.js
+@@ -204,7 +204,7 @@ function getChampionMessage(alertType, data) {
+     // ✅ EXISTING: Handle random arrays (ally, rival, etc.)
+     const message = getRandomItem(alert.messages);
+     const detail = getRandomItem(alert.details);
+-    const button = getRandomItem(alert.buttons);
++    const button = getRandomItem(alert.buttons || alert.ctas);   // some packs (lowvotes) name them `ctas`
+     
+     return {
+         message: replacePlaceholders(message, data),
+@@ -420,6 +420,9 @@ function replacePlaceholders(text, data) {
+     if (data.matchCount !== undefined) {
+         result = result.replace(/\{matchCount\}/g, data.matchCount);
+     }
++    if (data.timeLeft !== undefined) {
++        result = result.replace(/\{timeLeft\}/g, data.timeLeft);
++    }
+     
+     return result;
+ }
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index 30875a7..38a0727 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -297,6 +297,60 @@ function getClosingTier(msLeft) {
+     return null;
+ }
+ 
++// Champion-voiced lines for an alert type, or null when the active pack has none
++// (getChampionMessage would otherwise return a "not configured" placeholder).
++function getPackVoice(alertType, data) {
++    try {
++        const pack = window.championLoader?.getCurrentPack?.();
++        if (!pack?.alerts?.[alertType]) return null;
++        const voice = window.championLoader.getChampionMessage(alertType, data);
++        return voice && voice.message ? voice : null;
++    } catch (error) {
++        console.warn(`⚠️ Could not load champion lines for "${alertType}":`, error);
++        return null;
++    }
++}
++
++// One "closing soon" bulletin. items = [{ match, matchId, msLeft, tier }] sorted soonest first.
++// Headline and button come from the champion pack (closing-24h / -3h / -final for one
++// match, closing-multi for several); the detail line stays plain, factual time left.
++function buildClosingNotification(items) {
++    const next = items[0];
++    const count = items.length;
++    const timeLeft = formatTimeLeft(next.msLeft);
++    const s1 = next.match.song1?.shortTitle || next.match.song1?.title || 'Edit 1';
++    const s2 = next.match.song2?.shortTitle || next.match.song2?.title || 'Edit 2';
++    const title = `${s1} vs ${s2}`;
++    
++    const voice = getPackVoice(count === 1 ? `closing-${next.tier}` : 'closing-multi', {
++        matchTitle: title, moment1: s1, moment2: s2,
++        timeLeft, matchCount: count,
++        hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000))
++    });
++    
++    const plainHeadlines = {
++        final: count === 1 ? '🔥 Final minutes to vote!' : `🔥 ${count} matches you haven't voted in are about to close!`,
++        '3h': count === 1 ? "⏰ Closing soon: you haven't voted here yet" : `⏰ ${count} matches you haven't voted in close within 3 hours`,
++        '24h': count === 1 ? "⏳ Voting closes within 24 hours: you haven't voted here yet" : `⏳ ${count} matches you haven't voted in close within 24 hours`
++    };
++    
++    return {
++        priority: 2,
++        type: 'closing',
++        severityTier: next.tier,
++        matchId: next.matchId,
++        song: next.match.song1?.shortTitle || next.match.song1?.title,
++        opponent: next.match.song2?.shortTitle || next.match.song2?.title,
++        thumbnailUrl: getThumbnailUrl(next.match.song1?.youtubeUrl) || getThumbnailUrl(next.match.song2?.youtubeUrl),
++        hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000)),
++        message: voice?.message || plainHeadlines[next.tier],
++        detail: count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`,
++        cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
++        action: 'navigate',
++        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'
++    };
++}
++
+ // ========================================
+ // FIRESTORE DATA FETCHING
+ // ========================================
+@@ -778,6 +832,12 @@ async function checkAndShowBulletin() {
+                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
+                 
+                 if (hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'novotes').length === 0) {
++                    const noVotesVoice = getPackVoice('novotes', {
++                        matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
++                        moment1: match.song1?.shortTitle || match.song1?.title,
++                        moment2: match.song2?.shortTitle || match.song2?.title,
++                        hoursLeft
++                    });
+                     notifications.push({
+                         priority: 1,
+                         type: 'novotes',
+@@ -786,9 +846,9 @@ async function checkAndShowBulletin() {
+                         opponent: match.song2?.title,
+                         thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                         hoursLeft: hoursLeft,
+-                        message: `🚨 URGENT: Match has ZERO votes!`,
++                        message: noVotesVoice?.message || `🚨 URGENT: Match has ZERO votes!`,
+                         detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} • Closes in ${hoursLeft}h`,
+-                        cta: 'Cast First Vote!',
++                        cta: noVotesVoice?.cta || 'Cast First Vote!',
+                         action: 'navigate',
+                         targetUrl: `/vote.html?match=${matchId}`
+                     });
+@@ -810,6 +870,11 @@ async function checkAndShowBulletin() {
+                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
+                 
+                 if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
++                    const lowVotesVoice = getPackVoice('lowvotes', {
++                        matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
++                        totalVotes,
++                        hoursLeft
++                    });
+                     notifications.push({
+                         priority: 6,
+                         type: 'lowvotes',
+@@ -819,9 +884,9 @@ async function checkAndShowBulletin() {
+                         thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl) || getThumbnailUrl(match.song2?.youtubeUrl),
+                         totalVotes: totalVotes,
+                         hoursLeft: hoursLeft,
+-                        message: `⚠️ Match needs more votes!`,
++                        message: lowVotesVoice?.message || `⚠️ Match needs more votes!`,
+                         detail: `Only ${totalVotes} vote${totalVotes === 1 ? '' : 's'} • Closes in ${hoursLeft}h`,
+-                        cta: 'Vote Now!',
++                        cta: lowVotesVoice?.cta || 'Vote Now!',
+                         action: 'navigate',
+                         targetUrl: `/vote.html?match=${matchId}`
+                     });
+@@ -854,33 +919,8 @@ async function checkAndShowBulletin() {
+             }
+             
+             if (closingSoon.length > 0) {
+-                closingSoon.sort((a, b) => a.msLeft - b.msLeft);
+-                const next = closingSoon[0];
+-                const count = closingSoon.length;
+-                const timeLeft = formatTimeLeft(next.msLeft);
+-                const title = `${next.match.song1?.shortTitle || next.match.song1?.title || 'Edit 1'} vs ${next.match.song2?.shortTitle || next.match.song2?.title || 'Edit 2'}`;
+-                
+-                const headlines = {
+-                    final: count === 1 ? '🔥 Final minutes to vote!' : `🔥 ${count} matches you haven't voted in are about to close!`,
+-                    '3h': count === 1 ? "⏰ Closing soon: you haven't voted here yet" : `⏰ ${count} matches you haven't voted in close within 3 hours`,
+-                    '24h': count === 1 ? "⏳ Voting closes within 24 hours: you haven't voted here yet" : `⏳ ${count} matches you haven't voted in close within 24 hours`
+-                };
+-                
+-                notifications.push({
+-                    priority: 2,
+-                    type: 'closing',
+-                    severityTier: next.tier,
+-                    matchId: next.matchId,
+-                    song: next.match.song1?.shortTitle || next.match.song1?.title,
+-                    opponent: next.match.song2?.shortTitle || next.match.song2?.title,
+-                    thumbnailUrl: getThumbnailUrl(next.match.song1?.youtubeUrl) || getThumbnailUrl(next.match.song2?.youtubeUrl),
+-                    hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000)),
+-                    message: headlines[next.tier],
+-                    detail: count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`,
+-                    cta: count === 1 ? 'Cast Your Vote' : 'See Live Matches',
+-                    action: 'navigate',
+-                    targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'
+-                });
++                closingSoon.sort((x, y) => x.msLeft - y.msLeft);
++                notifications.push(buildClosingNotification(closingSoon));
+             }
+         } catch (error) {
+             console.error('⚠️ Error checking closing-soon matches:', error);
+@@ -3180,6 +3220,11 @@ window.testBulletin = function(type = 'winning') {
+         voteDiff: 44
+     });
+     
++    const testClosingMatch = {
++        song1: { shortTitle: 'GODS', youtubeUrl: 'https://youtu.be/aR-KAldshAE' },
++        song2: { shortTitle: 'RISE' }
++    };
++    
+     const allyMsg = window.championLoader?.getChampionMessage('ally', {
+         username: 'TestAlly',
+         songTitle: 'GODS'
+@@ -3354,21 +3399,15 @@ window.testBulletin = function(type = 'winning') {
+             action: 'navigate',
+             targetUrl: '/vote.html?match=test-match'
+         },
+-        closing: {
+-            priority: 2,
+-            type: 'closing',
+-            severityTier: '3h',
+-            matchId: 'arcane-test-01-finals',
+-            song: 'GODS',
+-            opponent: 'RISE',
+-            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
+-            hoursLeft: 2,
+-            message: "⏰ Closing soon: you haven't voted here yet",
+-            detail: 'GODS vs RISE • Closes in 2h 40m',
+-            cta: 'Cast Your Vote',
+-            action: 'navigate',
+-            targetUrl: '/vote.html?match=arcane-test-01-finals'
+-        },
++        // Closing-soon previews: closing, closing24, closingfinal (one match), closingmulti (several)
++        closing: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 160 * 60000, tier: '3h' }]),
++        closing24: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 20 * 3600000, tier: '24h' }]),
++        closingfinal: buildClosingNotification([{ match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 12 * 60000, tier: 'final' }]),
++        closingmulti: buildClosingNotification([
++            { match: testClosingMatch, matchId: 'arcane-test-01-finals', msLeft: 95 * 60000, tier: '3h' },
++            { match: testClosingMatch, matchId: 'arcane-test-01-semi', msLeft: 5 * 3600000, tier: '24h' },
++            { match: testClosingMatch, matchId: 'arcane-test-01-semi-2', msLeft: 9 * 3600000, tier: '24h' }
++        ]),
+         encouragement: {
+             priority: 5,
+             type: 'encouragement',

@@ -204,7 +204,7 @@ function getChampionMessage(alertType, data) {
     // ✅ EXISTING: Handle random arrays (ally, rival, etc.)
     const message = getRandomItem(alert.messages);
     const detail = getRandomItem(alert.details);
-    const button = getRandomItem(alert.buttons);
+    const button = getRandomItem(alert.buttons || alert.ctas);   // some packs (lowvotes) name them `ctas`
     
     return {
         message: replacePlaceholders(message, data),
@@ -419,6 +419,9 @@ function replacePlaceholders(text, data) {
     }
     if (data.matchCount !== undefined) {
         result = result.replace(/\{matchCount\}/g, data.matchCount);
+    }
+    if (data.timeLeft !== undefined) {
+        result = result.replace(/\{timeLeft\}/g, data.timeLeft);
     }
     
     return result;

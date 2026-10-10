@@ -311,6 +311,49 @@
         "NEVER SURRENDER!! 🔥"
       ]
     },
+    "closing-24h": {
+      "messages": [
+        "⏳ Psst… \"{matchTitle}\" blows up in {timeLeft} and you haven't voted!! Fix that!!",
+        "💣 Tick-tock, trinket!! {timeLeft} left on \"{matchTitle}\" and your vote's MISSING!!",
+        "🎆 \"{matchTitle}\" goes BOOM in {timeLeft}!! Don't miss the fireworks — vote!!"
+      ],
+      "buttons": [
+        "Beat the Clock!! ⏰",
+        "Vote Before It Blows!! 💥"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "🧨 Only {timeLeft} left on \"{matchTitle}\"!! You haven't voted, trinket!!",
+        "⏰ BOOM O'CLOCK is {timeLeft} away!! \"{matchTitle}\" still needs YOUR vote!!",
+        "😈 Hehe~ {timeLeft} till \"{matchTitle}\" closes… and your vote's still missing!!"
+      ],
+      "buttons": [
+        "Vote NOW!! 💣",
+        "Don't Let It Go Boom!! 🧨"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "🚨 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft}!! VOTE VOTE VOTE!!",
+        "💥 It's now or NEVER!! {timeLeft} left on \"{matchTitle}\"!!",
+        "🔥 Fuse is almost OUT!! {timeLeft} to vote on \"{matchTitle}\"!!"
+      ],
+      "buttons": [
+        "LAST CHANCE!! 🚨",
+        "VOTE VOTE VOTE!! 💥"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "💣 {matchCount} matches you haven't voted in are about to blow!! Soonest: {timeLeft}!!",
+        "⏰ Tick-tock!! {matchCount} unvoted matches closing — soonest in {timeLeft}!!"
+      ],
+      "buttons": [
+        "Show Me the Matches!! 💣",
+        "See the Chaos!! 🎪"
+      ]
+    },
     "novotes": {
       "messages": [
         "🆘 ZERO VOTES on \"{matchTitle}\"?! THIS MATCH IS DEAD AND EMPTY!!",
@@ -327,7 +370,7 @@
     },
     "lowvotes": {
       "messages": [
-        "⚠️ This match is practically empty! Like... THREE votes? That's sad!",
+        "⚠️ This match is practically empty! Like... {totalVotes} vote{votesPlural}? That's sad!",
         "😬 Only a handful of votes here! Let's blow that number up!",
         "🎯 Low turnout alert! Time to pump those numbers up!",
         "👀 Barely anyone's voted here! Let's fix that, yeah?"

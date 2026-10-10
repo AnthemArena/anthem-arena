@@ -1,0 +1,190 @@
+diff --git a/js/global-notifications.js b/js/global-notifications.js
+index db5408f..30875a7 100644
+--- a/js/global-notifications.js
++++ b/js/global-notifications.js
+@@ -120,6 +120,7 @@ const COOLDOWN_MINUTES = {
+     comeback: 10,        // 🔽 Reduce from 15 - exciting news!
+     winning: 20,         // 🔽 Reduce from 30 - users like wins
+     lowvotes: 15,        // ✅ Keep - moderate urgency
++    closing: 60,         // each step (24h / 3h / final) also has its own key
+     welcome: 720,        // ✅ Keep - 12 hours is right
+     encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
+     achievement: 0,      // ✅ Keep - one-time
+@@ -242,38 +243,58 @@ function getThumbnailUrl(input) {
+ // ========================================
+ // HELPER: CALCULATE HOURS UNTIL CLOSE
+ // ========================================
+-function getHoursUntilClose(match) {
++// Milliseconds until the match closes (negative once past the deadline),
++// or null when the match has no usable end time.
++function getMsUntilClose(match, quiet = false) {
+     // ✅ Support both endTime (Firestore Timestamp) and endDate (ISO string)
+     const endTimeValue = match.endTime || match.endDate;
+     
+     if (!endTimeValue) {
+-        // ✅ FIXED: Use match.matchId instead of undefined matchId variable
+-        console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
++        if (!quiet) console.warn('⚠️ Match has no endTime or endDate:', match.matchId || match.id || 'unknown');
+         return null;
+     }
+     
+-    const now = Date.now();
+-    
+-    // Handle Firestore Timestamp object
++    let endMs;
+     if (endTimeValue.toMillis && typeof endTimeValue.toMillis === 'function') {
+-        const msLeft = endTimeValue.toMillis() - now;
+-        if (msLeft <= 0) return 0;
+-        return Math.floor(msLeft / (1000 * 60 * 60));
++        endMs = endTimeValue.toMillis();   // Firestore Timestamp
++    } else {
++        endMs = new Date(endTimeValue).getTime();   // ISO string or Date
+     }
+     
+-    // Handle ISO string or Date object
+-    const endDate = new Date(endTimeValue);
+-    
+-    if (isNaN(endDate.getTime())) {
+-        console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue, 'for match:', match.matchId || match.id);
++    if (isNaN(endMs)) {
++        if (!quiet) console.warn('⚠️ Invalid endTime/endDate format:', endTimeValue, 'for match:', match.matchId || match.id);
+         return null;
+     }
+     
+-    const msLeft = endDate.getTime() - now;
+-    
+-    if (msLeft <= 0) return 0;
+-    
+-    return Math.floor(msLeft / (1000 * 60 * 60));
++    return endMs - Date.now();
++}
++
++function getHoursUntilClose(match) {
++    const msLeft = getMsUntilClose(match);
++    if (msLeft === null) return null;
++    if (msLeft <= 0) return 0;   // deadline passed
++    // Never return 0 while the match is still open: callers treat 0 as "ended",
++    // which used to silence every closing alert during the final hour.
++    return Math.max(1, Math.floor(msLeft / (1000 * 60 * 60)));
++}
++
++function formatTimeLeft(msLeft) {
++    const mins = Math.max(1, Math.floor(msLeft / 60000));
++    const days = Math.floor(mins / 1440);
++    const hours = Math.floor((mins % 1440) / 60);
++    const m = mins % 60;
++    if (days >= 1) return `${days}d ${hours}h`;
++    if (hours >= 1) return `${hours}h ${m}m`;
++    return `${m}m`;
++}
++
++// Which "closing soon" step a match is in: 24h, 3h or the last 30 minutes.
++function getClosingTier(msLeft) {
++    if (msLeft <= 0) return null;
++    if (msLeft <= 30 * 60 * 1000) return 'final';
++    if (msLeft <= 3 * 60 * 60 * 1000) return '3h';
++    if (msLeft <= 24 * 60 * 60 * 1000) return '24h';
++    return null;
+ }
+ 
+ // ========================================
+@@ -811,6 +832,60 @@ async function checkAndShowBulletin() {
+             }
+         }
+         
++        // ========================================
++        // PRIORITY 3b: CLOSING SOON (matches the user has NOT voted in)
++        // ========================================
++        // Steps: within 24h, within 3h, final 30 minutes. Each step has its own
++        // dismiss/cooldown key (severityTier), so every step is shown once.
++        
++        try {
++            const closingSoon = [];
++            for (const match of liveMatches) {
++                const matchId = getMatchId(match);
++                if (userVotes[matchId]) continue;
++                
++                const msLeft = getMsUntilClose(match, true);
++                if (msLeft === null) continue;
++                
++                const tier = getClosingTier(msLeft);
++                if (!tier) continue;
++                
++                closingSoon.push({ match, matchId, msLeft, tier });
++            }
++            
++            if (closingSoon.length > 0) {
++                closingSoon.sort((a, b) => a.msLeft - b.msLeft);
++                const next = closingSoon[0];
++                const count = closingSoon.length;
++                const timeLeft = formatTimeLeft(next.msLeft);
++                const title = `${next.match.song1?.shortTitle || next.match.song1?.title || 'Edit 1'} vs ${next.match.song2?.shortTitle || next.match.song2?.title || 'Edit 2'}`;
++                
++                const headlines = {
++                    final: count === 1 ? '🔥 Final minutes to vote!' : `🔥 ${count} matches you haven't voted in are about to close!`,
++                    '3h': count === 1 ? "⏰ Closing soon: you haven't voted here yet" : `⏰ ${count} matches you haven't voted in close within 3 hours`,
++                    '24h': count === 1 ? "⏳ Voting closes within 24 hours: you haven't voted here yet" : `⏳ ${count} matches you haven't voted in close within 24 hours`
++                };
++                
++                notifications.push({
++                    priority: 2,
++                    type: 'closing',
++                    severityTier: next.tier,
++                    matchId: next.matchId,
++                    song: next.match.song1?.shortTitle || next.match.song1?.title,
++                    opponent: next.match.song2?.shortTitle || next.match.song2?.title,
++                    thumbnailUrl: getThumbnailUrl(next.match.song1?.youtubeUrl) || getThumbnailUrl(next.match.song2?.youtubeUrl),
++                    hoursLeft: Math.max(1, Math.floor(next.msLeft / 3600000)),
++                    message: headlines[next.tier],
++                    detail: count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`,
++                    cta: count === 1 ? 'Cast Your Vote' : 'See Live Matches',
++                    action: 'navigate',
++                    targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'
++                });
++            }
++        } catch (error) {
++            console.error('⚠️ Error checking closing-soon matches:', error);
++        }
++        
+         // ========================================
+         // PRIORITY 4: CHECK FOR TRENDING/ENGAGING MATCHES
+         // ========================================
+@@ -1684,7 +1759,7 @@ async function checkForClosingMatches() {
+         // Check if any match closes in next 6 hours
+         const closingSoon = liveMatches.some(match => {
+             const hoursLeft = getHoursUntilClose(match);
+-            return hoursLeft !== null && hoursLeft <= 6;
++            return hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 6;
+         });
+         
+         return closingSoon;
+@@ -2273,6 +2348,7 @@ if (championPack && championPack.theme) {
+         winning: '🎯',
+         comeback: '🎉',
+         lowvotes: '⚠️',
++        closing: '⏳',
+         'close-match': '🔥',
+         'new-match': '🆕',
+         'low-turnout': '📊',
+@@ -3278,6 +3354,21 @@ window.testBulletin = function(type = 'winning') {
+             action: 'navigate',
+             targetUrl: '/vote.html?match=test-match'
+         },
++        closing: {
++            priority: 2,
++            type: 'closing',
++            severityTier: '3h',
++            matchId: 'arcane-test-01-finals',
++            song: 'GODS',
++            opponent: 'RISE',
++            thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
++            hoursLeft: 2,
++            message: "⏰ Closing soon: you haven't voted here yet",
++            detail: 'GODS vs RISE • Closes in 2h 40m',
++            cta: 'Cast Your Vote',
++            action: 'navigate',
++            targetUrl: '/vote.html?match=arcane-test-01-finals'
++        },
+         encouragement: {
+             priority: 5,
+             type: 'encouragement',

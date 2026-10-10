@@ -98,6 +98,38 @@
       "buttons": ["View Profile"]
     },
 
+    "closing-24h": {
+      "messages": [
+        "\"{matchTitle}\" closes in {timeLeft}. You haven't voted yet."
+      ],
+      "buttons": [
+        "Cast Your Vote"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "Closing soon: \"{matchTitle}\" ends in {timeLeft}. You haven't voted yet."
+      ],
+      "buttons": [
+        "Cast Your Vote"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "Final minutes to vote on \"{matchTitle}\" — {timeLeft} left."
+      ],
+      "buttons": [
+        "Vote Now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches you haven't voted in are closing soon. Soonest: {timeLeft}."
+      ],
+      "buttons": [
+        "See Live Matches"
+      ]
+    },
     "novotes": {
       "messages": ["This match has zero votes yet!"],
       "details": ["\"{song1}\" vs \"{song2}\""],

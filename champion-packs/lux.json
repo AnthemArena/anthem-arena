@@ -307,6 +307,49 @@
       ]
     },
 
+    "closing-24h": {
+      "messages": [
+        "✨ \"{matchTitle}\" closes in {timeLeft} — add your light before it's gone!!",
+        "🌟 {timeLeft} left on \"{matchTitle}\"!! Your vote would shine so bright!!",
+        "💫 {timeLeft} until \"{matchTitle}\" wraps up — don't miss your moment!!"
+      ],
+      "buttons": [
+        "Add Your Light!! ✨",
+        "Shine On!! 🌟"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "🌟 Only {timeLeft} left on \"{matchTitle}\"!! Let your vote shine!!",
+        "⭐ {timeLeft} to go!! \"{matchTitle}\" is waiting for your spark!!",
+        "✨ The sun's setting on \"{matchTitle}\" in {timeLeft} — cast your light!!"
+      ],
+      "buttons": [
+        "Cast Your Light!! 🌟",
+        "Vote Now!! ✨"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "💥 Final minutes!! \"{matchTitle}\" closes in {timeLeft} — time for a burst of light!!",
+        "🌟 Last chance to sparkle!! {timeLeft} left on \"{matchTitle}\"!!",
+        "✨ Almost out of time!! {timeLeft} to vote on \"{matchTitle}\"!!"
+      ],
+      "buttons": [
+        "Last Sparkle!! 💥",
+        "Shine Now!! ⭐"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "🌟 {matchCount} matches you haven't voted in are closing!! Soonest in {timeLeft}!!",
+        "✨ {matchCount} matches are waiting for your light!! First closes in {timeLeft}!!"
+      ],
+      "buttons": [
+        "See the Matches!! ✨",
+        "Light Them Up!! 🌟"
+      ]
+    },
     "novotes": {
       "messages": [
         "🌟 This match is shrouded in darkness… zero votes?! Unacceptable!!",
