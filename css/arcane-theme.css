@@ -1407,3 +1407,100 @@ body.theme-arcane .social-follow-bar { border-radius: 16px; }
     body.theme-arcane .mini-activity-feed { margin: 1rem 0; }
     body.theme-arcane .landing-footer { margin-top: 1rem; }
 }
+/* ========================================
+   LIVE PAGE: CENTRED MATCH CARDS (live.html)
+   ======================================== */
+
+/* edit names and credits centred, matching the centred thumbnails and VS */
+body.theme-arcane .social-match-card .song-details { text-align: center; }
+body.theme-arcane .social-match-card .song-details h3,
+body.theme-arcane .social-match-card .song-details p { text-align: center; overflow-wrap: anywhere; }
+
+/* desktop: a handful of cards sit in the middle at a readable width instead of the left edge */
+@media (min-width: 769px) {
+    body.theme-arcane .social-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 440px));
+        justify-content: center;
+    }
+}
+
+/* equal-height cards in a row: the "Watch & Vote" bar always sits at the bottom edge */
+body.theme-arcane .social-match-card { display: flex; flex-direction: column; }
+body.theme-arcane .social-match-card .social-info { flex: 1; }
+body.theme-arcane .social-match-card .social-stats { margin-top: auto; }
+
+/* ========================================
+   NAV: MOBILE MENU (js/navigation.js, shared by every page)
+   ======================================== */
+@media (max-width: 768px) {
+    /* the dropdown was rgba(10,10,10,.98) over a blurred page, so headings and cards showed through the rows */
+    body.theme-arcane .nav-links {
+        background: linear-gradient(180deg, #0f0814 0%, #08060e 100%);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        padding: .5rem 0 .75rem;
+        box-shadow: 0 28px 48px rgba(0, 0, 0, .7);
+    }
+    body.theme-arcane .nav-links.active {
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+    }
+    body.theme-arcane .nav-links a { font-size: .9rem; padding: 1.1rem 2rem; }
+    /* only Feed and Live had icons, so the list looked uneven */
+    body.theme-arcane .nav-links a i { display: none; }
+    body.theme-arcane .nav-links a.active { color: var(--pink-bright); }
+}
+/* ========================================
+   NAV: BELL PANEL + SETTINGS MODAL (js/notification-center.js, js/settings-modal.js; shared by every page)
+   ======================================== */
+
+/* "Clear Old" is styled inline in gold by notification-center.js, and as a flex child it stretched across the
+   whole header under the title. Pin it beside the close button, in pink (inline styles need !important). */
+body.theme-arcane .notification-panel-header .clear-old-btn {
+    position: absolute;
+    top: 18px;
+    right: 56px;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    background: rgba(255, 79, 180, .12) !important;
+    border: 1px solid rgba(255, 79, 180, .35) !important;
+    border-radius: 999px !important;
+    color: var(--pink-bright) !important;
+    font-family: var(--font);
+    letter-spacing: .02em;
+}
+body.theme-arcane .notification-panel-header .clear-old-btn:hover { background: rgba(255, 79, 180, .24) !important; }
+body.theme-arcane .notification-panel {
+    background: linear-gradient(160deg, #130a1a 0%, #0a0710 100%);
+}
+
+@media (max-width: 480px) {
+    /* five tabs (All, Votes, Social, Achievements, Messages) did not fit, "Achievements" was cut off */
+    body.theme-arcane .notif-tab { padding: 8px 4px; gap: 0; font-size: 11px; flex: 1 1 auto; justify-content: center; }
+    body.theme-arcane .notif-tab i { display: none; }
+}
+
+/* Profile Banner field: .setting-group label / .setting-input are only defined in profile.css, so on every other
+   page the label sat beside an unstyled white select */
+body.theme-arcane .settings-modal-container .setting-group > label {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .5rem;
+    font-weight: 700;
+}
+body.theme-arcane .settings-modal-container select.setting-input {
+    width: 100%;
+    padding: .75rem;
+    background: rgba(0, 0, 0, .3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: .95rem;
+}
+body.theme-arcane .settings-modal-container select.setting-input:focus {
+    outline: none;
+    border-color: var(--pink-bright);
+}
+body.theme-arcane .settings-modal-container select.setting-input option { background: #120a18; color: var(--text); }

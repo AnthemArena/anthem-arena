@@ -1,0 +1,67 @@
+diff --git a/css/edits-gallery.css b/css/edits-gallery.css
+index 2693760..98dcef9 100644
+--- a/css/edits-gallery.css
++++ b/css/edits-gallery.css
+@@ -189,7 +189,6 @@
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+     overflow-wrap: anywhere;
+-    min-height: 2.6em;          /* always two lines tall so the stats rows line up across a row of cards */
+ }
+ .page-gallery .edit-creator {
+     color: var(--pink-bright);
+@@ -201,10 +200,10 @@
+ }
+ .page-gallery a.edit-creator:hover { text-decoration: underline; }
+ .page-gallery .edit-stats {
++    margin-top: auto;           /* stats sit at the bottom of the card, so they line up even when one title wraps */
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: .4rem;
+-    margin: .25rem 0 0;
+     padding: .6rem 0;
+     border-top: 1px solid var(--line);
+     border-bottom: 1px solid var(--line);
+@@ -212,7 +211,7 @@
+ .page-gallery .edit-stats div { min-width: 0; }
+ .page-gallery .edit-stats dt { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
+ .page-gallery .edit-stats dd { margin: .1rem 0 0; font: 700 .95rem var(--font); color: var(--text); font-variant-numeric: tabular-nums; }
+-.page-gallery .edit-pills { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: auto; }
++.page-gallery .edit-pills { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .25rem; }
+ .page-gallery .pill {
+     padding: .15rem .6rem;
+     border: 1px solid var(--line);
+@@ -234,6 +233,8 @@
+     text-decoration: none;
+ }
+ .page-gallery .edit-vote:hover { background: var(--pink-bright); }
++.page-gallery .edit-vote.edit-bracket { background: transparent; color: var(--pink-bright); border: 1px solid var(--border); }
++.page-gallery .edit-vote.edit-bracket:hover { background: var(--pink-soft); }
+ 
+ /* ---------- next steps ---------- */
+ .page-gallery .gallery-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .85rem; margin-top: 2.5rem; }
+@@ -299,7 +300,7 @@
+     .page-gallery .chip-row { margin-top: .7rem; }
+     .page-gallery .gallery-count { margin-top: .6rem; }
+     .page-gallery .edit-body { padding: .7rem .7rem .85rem; }
+-    .page-gallery .edit-title { font-size: .92rem; }
++    .page-gallery .edit-title { font-size: .92rem; min-height: 2.6em; }   /* narrow cards: reserve two lines so the creator names line up */
+     .page-gallery .edit-play { width: 44px; height: 44px; }
+     .page-gallery .chip-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -.2rem; padding: .1rem .2rem .35rem; scrollbar-width: none; }
+     .page-gallery .chip-row::-webkit-scrollbar { display: none; }
+diff --git a/js/music-gallery.js b/js/music-gallery.js
+index 87189aa..f308366 100644
+--- a/js/music-gallery.js
++++ b/js/music-gallery.js
+@@ -181,7 +181,10 @@ function cardHTML(e) {
+         : `<span class="edit-creator">${esc(e.artist || 'Unknown creator')}</span>`;
+     const cups = (e.tournaments || []).map(c => `<span class="pill pill-cup">${esc(cupDisplayName(c))}</span>`).join('');
+     const chars = (e.characters || []).map(c => `<span class="pill">${esc(c)}</span>`).join('');
+-    const vote = s.liveMatch ? `<a class="edit-vote" href="/vote.html?match=${encodeURIComponent(s.liveMatch.matchId)}">Vote now</a>` : '';
++    // every card ends with one button so rows line up: Vote now when live, otherwise a link to the bracket
++    const vote = s.liveMatch
++        ? `<a class="edit-vote" href="/vote.html?match=${encodeURIComponent(s.liveMatch.matchId)}">Vote now</a>`
++        : `<a class="edit-vote edit-bracket" href="/brackets">View in bracket</a>`;
+     return `<article class="edit-card" data-id="${esc(e.id)}">
+         <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Watch ${esc(title)}">
+             <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">

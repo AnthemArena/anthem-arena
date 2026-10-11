@@ -1,30 +1,16 @@
-// music-gallery.js - League of Legends Music Tournament
+// music-gallery.js: the Arcane Moments EDITS GALLERY (page: /music-gallery, file name kept so nav and footer links still work).
+// Lists every edit that has been entered in a cup (data/edits.json, "tournaments" list not empty), with creator credit,
+// record, standing and a click-to-play Short. Records and standing come from the active cup's matches (/api/matches).
+//
+// getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
 import { getAllMatches } from './api-client.js';
-import { getBookForSong } from './bookMappings.js';
-
-// Keep Firebase imports for backward compatibility if needed elsewhere
-import { db } from './firebase-config.js';
+import { cupDisplayName } from './bracket-builder.js';
 
 // Use shared cache if available (set by vote.js)
 window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
 
-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
-
-let allVideos = []; // Store all video data
-const searchInput = document.getElementById('searchInput');
-const musicCount = document.getElementById('characterCount');
-const noResults = document.getElementById('noResults');
-const resetButton = document.getElementById('resetFilters');
-const musicGrid = document.getElementById('characterGrid');
-const sortSelect = document.getElementById('sortSelect');
-
-// Video modal elements
-const videoModal = document.getElementById('videoModal');
-const modalVideoFrame = document.getElementById('modalVideoFrame');
-const videoModalClose = document.querySelector('.video-modal-close');
-
 // ========================================
-// GET ALL TOURNAMENT STATS (OPTIMIZED - ONE QUERY)
+// GET ALL TOURNAMENT STATS (used by vote.js)
 // ========================================
 export async function getAllTournamentStats() {
     try {
@@ -88,625 +74,210 @@ export async function getAllTournamentStats() {
 }
 
 // ========================================
-// LOAD MUSIC VIDEOS (OPTIMIZED)
+// GALLERY
 // ========================================
-async function loadMusicVideos() {
+const grid = document.getElementById('editGrid');
+
+const STATUS_RANK = { champion: 0, live: 1, bracket: 2, eliminated: 3, entered: 4 };
+const state = { q: '', chars: new Set(), cup: '', status: '', sort: 'standing' };
+let ALL = [];
+let lastFocus = null;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtViews = n => !n ? '0' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n);
+const fmtDuration = s => s == null ? '' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+const isFinal = m => /-finals$/.test(m.matchId || '') || m.roundLabel === 'Final';
+const safeUrl = u => /^https:\/\//i.test(u || '') ? u : '';
+
+// What this edit has done in the active cup, worked out from its matches.
+function standingFor(edit, matches) {
+    const mine = matches.filter(m => m.song1?.id === edit.id || m.song2?.id === edit.id)
+        .sort((a, b) => (a.round || 0) - (b.round || 0));
+    if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
+
+    let wins = 0, losses = 0, lostIn = null, champion = false;
+    for (const m of mine) {
+        if (m.status !== 'completed') continue;
+        const winner = m.winnerId || m.winner;
+        if (winner === edit.id) { wins++; if (isFinal(m)) champion = true; }
+        else if (winner) { losses++; lostIn = m; }
+    }
+    const liveMatch = mine.find(m => m.status === 'live') || null;
+    const last = mine[mine.length - 1];
+    const reached = (liveMatch || last).roundLabel || '';
+
+    if (champion) return { kind: 'champion', label: 'Champion', wins, losses, reached: 'Champion', liveMatch: null };
+    if (lostIn) return { kind: 'eliminated', label: 'Out in ' + (lostIn.roundLabel || 'the cup'), wins, losses, reached: lostIn.roundLabel || '', liveMatch: null };
+    if (liveMatch) return { kind: 'live', label: 'Live now', wins, losses, reached, liveMatch };
+    return { kind: 'bracket', label: 'In the bracket', wins, losses, reached, liveMatch: null };
+}
+
+async function loadGallery() {
+    grid.setAttribute('aria-busy', 'true');
     try {
-        const response = await fetch('/data/music-videos.json');
-        allVideos = await response.json();
-        
-        // 🔥 Load ALL stats in ONE query
-        const tournamentStats = await getAllTournamentStats();
-        
-        // Apply live stats to each video
-        allVideos.forEach(video => {
-            const liveStats = tournamentStats[video.id];
-            
-            if (liveStats && liveStats.totalMatches > 0) {
-                // Override JSON stats with live Firebase data
-                video.stats.winRecord = liveStats.winRecord;
-                video.stats.winRate = liveStats.winRate;
-                
-                console.log(`✅ ${video.shortTitle}: ${liveStats.winRecord} (${liveStats.winRate})`);
-            }
-        });
-        
-        renderVideos(allVideos);
-        setupEventListeners();
-        filterMusicVideos();
-        
-        console.log(`✅ Loaded ${allVideos.length} music videos with live stats`);
-    } catch (error) {
-        console.error('Error loading music videos:', error);
-        noResults.style.display = 'block';
-        noResults.innerHTML = '<h3>Error loading music videos</h3><p>Please refresh the page.</p>';
+        const [res, matchesRaw] = await Promise.all([
+            fetch('/data/edits.json', { cache: 'no-cache' }),
+            window.pageLoadMatchesCache ? Promise.resolve(window.pageLoadMatchesCache) : getAllMatches().catch(() => [])
+        ]);
+        // the site redirects unknown paths to the homepage with status 200, so read as text and check
+        let edits;
+        try { edits = JSON.parse(await res.text()); } catch { throw new Error('data/edits.json is not available'); }
+        const matches = Array.isArray(matchesRaw) ? matchesRaw : [];
+
+        ALL = edits
+            .filter(e => Array.isArray(e.tournaments) && e.tournaments.length && e.status !== 'removed' && e.status !== 'blocked' && e.embedAllowed !== false)
+            .map(e => ({ ...e, standing: standingFor(e, matches) }));
+
+        buildFilters();
+        render();
+    } catch (err) {
+        console.error('Gallery failed to load:', err);
+        grid.innerHTML = '<div class="gallery-message"><h3>The gallery could not load</h3><p>Please check your connection and try again.</p><button type="button" class="gallery-retry" id="galleryRetry">Try again</button></div>';
+        document.getElementById('galleryRetry')?.addEventListener('click', loadGallery);
+        document.getElementById('editCount').textContent = '';
+    } finally {
+        grid.removeAttribute('aria-busy');
     }
 }
 
-// ========================================
-// RENDER VIDEO CARDS
-// ========================================
-function renderVideos(videos) {
-    musicGrid.innerHTML = ''; // Clear existing cards
-    
-    videos.forEach(video => {
-        const card = createVideoCard(video);
-        musicGrid.appendChild(card);
-    });
+function buildFilters() {
+    const chars = [...new Set(ALL.flatMap(e => e.characters || []))].sort();
+    const charBox = document.getElementById('charFilters');
+    charBox.innerHTML = chars.map(c => `<button type="button" class="chip" data-char="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
+    charBox.hidden = chars.length < 2;
+
+    const cups = [...new Set(ALL.flatMap(e => e.tournaments || []))].sort();
+    const cupSel = document.getElementById('cupFilter');
+    cupSel.innerHTML = '<option value="">All cups</option>' + cups.map(c => `<option value="${esc(c)}">${esc(cupDisplayName(c))}</option>`).join('');
+    cupSel.closest('.toolbar-field').hidden = cups.length < 2;
 }
 
-// ========================================
-// CREATE INDIVIDUAL VIDEO CARD
-// ========================================
-function createVideoCard(video) {
-    const card = document.createElement('div');
-    card.className = 'character-card';
-    
-    // Set data attributes for filtering
-    card.dataset.category = video.category;
-    card.dataset.year = getYearRange(video.year);
-    card.dataset.artist = video.artistGroup;
-    card.dataset.series = video.seriesCollection;
-    card.dataset.name = video.title;
-    card.dataset.videoId = video.videoId;
-    card.dataset.embedAllowed = video.embedAllowed !== false;
-    card.dataset.views = video.views;
-    
-    // ✨ Get book recommendation for this video
-    const book = getBookForSong(video);
-    const thumbnailUrl = `https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`;
-    
-    // ✨ Build book recommendation section (if book exists)
-    let bookSection = '';
-    if (book) {
-        bookSection = `
-            <div class="card-book-recommendation">
-                <div class="book-rec-compact">
-                    <span class="book-icon-small">📖</span>
-                    <div class="book-rec-text">
-                        <span class="book-rec-label">Explore the lore:</span>
-                        <a href="${book.amazonLink}" 
-                           target="_blank" 
-                           rel="noopener noreferrer nofollow"
-                           class="book-rec-link"
-                           onclick="event.stopPropagation(); trackBookClick('${video.slug}', 'gallery-card');">
-                            ${book.title} →
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    card.innerHTML = `
-        <div class="character-image-wrapper video-thumbnail">
-            <img src="${thumbnailUrl}" 
-                 alt="${video.shortTitle}" 
-                 class="character-image">
-            
-            <div class="play-overlay">
-                <div class="play-button">
-                    <svg width="60" height="60" viewBox="0 0 60 60">
-                        <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
-                        <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-        
-        <div class="character-info">
-            <h3 class="character-name">${video.shortTitle}</h3>
-            <p class="character-title">${getSubtitle(video)}</p>
-            
-            <div class="tournament-stats-detail">
-                <div class="stat-item">
-                    <span class="stat-icon">${getAccomplishmentIcon(video)}</span>
-                    <div class="stat-content">
-                        <span class="stat-number">${getAccomplishmentText(video)}</span>
-                        <span class="stat-desc">Status</span>
-                    </div>
-                </div>
-               <div class="stat-item">
-    <span class="stat-icon"><i class="fa-solid fa-eye"></i></span>
-    <div class="stat-content">
-        <span class="stat-number">${formatViews(video.views)}</span>
-        <span class="stat-desc">Views</span>
-    </div>
-</div>
-                ${getPerformanceStatHTML(video)}
-            </div>
-            
-            <div class="character-tags">
-                <span class="tag tag-seed">Seed #${video.seed}</span>
-                <span class="tag tag-category">${video.seriesCollection}</span>
-                ${getStatusBadge(video)}
-            </div>
-            
-            ${bookSection}
-        </div>
-    `;
-    
-    return card;
-}
-
-// ========================================
-// HELPER FUNCTIONS
-// ========================================
-
-function getYearRange(year) {
-    if (year >= 2024) return '2024-2025';
-    if (year >= 2022) return '2022-2023';
-    if (year >= 2020) return '2020-2021';
-    if (year >= 2018) return '2018-2019';
-    return '2014-2017';
-}
-
-function getSubtitle(video) {
-    let subtitle = '';
-    
-    // Add series/event info
-    if (video.seriesCollection === 'Worlds Anthem') {
-        subtitle = `Worlds ${video.year}`;
-    } else if (video.seriesCollection) {
-        subtitle = video.seriesCollection;
-    } else {
-        subtitle = `${video.year}`;
-    }
-    
-    // Add artist
-    subtitle += ` • ${video.artist}`;
-    
-    return subtitle;
-}
-
-function getAccomplishmentIcon(video) {
-    if (video.stats.championships >= 2) return '<i class="fa-solid fa-trophy"></i><i class="fa-solid fa-trophy"></i>';
-    if (video.stats.championships === 1) return '<i class="fa-solid fa-trophy"></i>';
-    if (video.tournamentStatus === 'eliminated') return '<i class="fa-solid fa-xmark"></i>';
-    return '<i class="fa-solid fa-bolt"></i>';
-}
-
-function getAccomplishmentText(video) {
-    if (video.stats.championships >= 2) return `${video.stats.championships}x Champion`;
-    if (video.stats.championships === 1) return 'Champion';
-    if (video.tournamentStatus === 'eliminated') return 'Eliminated';
-    return 'Competing';
-}
-
-function getStatusBadge(video) {
-    let badges = '';
-    
-    // Championship status
-    if (video.stats.championships >= 2) {
-        badges += '<span class="tag tag-champion">Legend</span>';
-    } else if (video.stats.championships === 1) {
-        badges += '<span class="tag tag-champion">Champion</span>';
-    } else if (video.tournamentStatus === 'eliminated') {
-        badges += '<span class="tag tag-eliminated">Eliminated</span>';
-    } else {
-        badges += '<span class="tag tag-competing">Competing</span>';
-    }
-    
-    // Multi-category indicator
-    if (video.additionalCategories && video.additionalCategories.length > 0) {
-        const extraCount = video.additionalCategories.length;
-        badges += ` <span class="tag tag-multi" title="Also in: ${video.additionalCategories.join(', ')}">+${extraCount} Series</span>`;
-    }
-    
-    return badges;
-}
-
-function getPerformanceStatHTML(video) {
-    if (video.stats.winRecord && video.stats.winRecord !== '0-0') {
-        return `
-            <div class="stat-item">
-                <span class="stat-icon"><i class="fa-solid fa-chart-line"></i></span>
-                <div class="stat-content">
-                    <span class="stat-number">${video.stats.winRecord}</span>
-                    <span class="stat-desc">${video.stats.winRate} Win Rate</span>
-                </div>
-            </div>
-        `;
-    }
-    
-    return `
-        <div class="stat-item">
-            <span class="stat-icon"><i class="fa-regular fa-calendar"></i></span>
-            <div class="stat-content">
-                <span class="stat-number">${video.year}</span>
-                <span class="stat-desc">Released</span>
-            </div>
-        </div>
-    `;
-}
-
-function formatViews(views) {
-    if (views >= 1000000000) return (views / 1000000000).toFixed(1) + 'B';
-    if (views >= 1000000) return (views / 1000000).toFixed(0) + 'M';
-    if (views >= 1000) return (views / 1000).toFixed(0) + 'K';
-    return views.toString();
-}
-
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// ========================================
-// SORTING FUNCTIONALITY
-// ========================================
-function sortVideos(videos, sortBy) {
-    const sorted = [...videos];
-    
-    switch(sortBy) {
-        case 'popular':
-            sorted.sort((a, b) => b.views - a.views);
-            break;
-        case 'newest':
-            sorted.sort((a, b) => b.year - a.year || b.uploadDate.localeCompare(a.uploadDate));
-            break;
-        case 'oldest':
-            sorted.sort((a, b) => a.year - b.year || a.uploadDate.localeCompare(b.uploadDate));
-            break;
-        case 'alphabetical':
-            sorted.sort((a, b) => a.shortTitle.localeCompare(b.shortTitle));
-            break;
-        case 'seed':
-            sorted.sort((a, b) => a.seed - b.seed);
-            break;
-        case 'championships':
-            sorted.sort((a, b) => (b.stats.championships || 0) - (a.stats.championships || 0));
-            break;
-        default:
-            sorted.sort((a, b) => a.seed - b.seed);
-    }
-    
-    return sorted;
-}
-
-// ========================================
-// FILTER FUNCTIONALITY (ENHANCED FOR MULTI-CATEGORY)
-// ========================================
-function filterMusicVideos() {
-    const filterInputs = document.querySelectorAll('.filter-input');
-    
-    // Get all checked filters
-    const activeFilters = {
-        series: [], 
-        year: []
+function visible() {
+    const q = state.q.trim().toLowerCase();
+    const list = ALL.filter(e =>
+        (!q || `${e.shortTitle || ''} ${e.title || ''} ${e.artist || ''}`.toLowerCase().includes(q)) &&
+        (!state.chars.size || (e.characters || []).some(c => state.chars.has(c))) &&
+        (!state.cup || (e.tournaments || []).includes(state.cup)) &&
+        (!state.status || e.standing.kind === state.status));
+    const byViews = (a, b) => (b.views || 0) - (a.views || 0);
+    const sorters = {
+        standing: (a, b) => STATUS_RANK[a.standing.kind] - STATUS_RANK[b.standing.kind] || b.standing.wins - a.standing.wins || byViews(a, b),
+        views: byViews,
+        wins: (a, b) => b.standing.wins - a.standing.wins || byViews(a, b),
+        newest: (a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || '')),
+        title: (a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
+        creator: (a, b) => (a.artist || '').localeCompare(b.artist || '')
     };
-
-    filterInputs.forEach(input => {
-        if (input.checked) {
-            const filterType = input.dataset.filter;
-            const value = input.value;
-            
-            if (filterType === 'series') {
-                activeFilters.series.push(value);
-            } else if (filterType === 'year') {
-                activeFilters.year.push(value);
-            }
-        }
-    });
-
-    // Get search term
-    const searchTerm = searchInput.value.toLowerCase();
-    
-    // Get sort option
-    const sortBy = sortSelect ? sortSelect.value : 'seed';
-
-    // Filter cards
-    let visibleVideos = [];
-
-    allVideos.forEach(video => {
-        const cardSeries = video.seriesCollection;
-        const additionalCats = video.additionalCategories || [];
-        const cardYear = getYearRange(video.year);
-        const cardName = video.title.toLowerCase();
-        const cardArtist = video.artist.toLowerCase();
-
-        // ✅ FIXED LOGIC:
-        // If NO filters are checked in a category, show NOTHING
-        // If ALL filters are checked in a category, show EVERYTHING
-        // If SOME filters are checked, show only matching items
-        
-        const seriesInputs = document.querySelectorAll('input[data-filter="series"]');
-        const yearInputs = document.querySelectorAll('input[data-filter="year"]');
-        
-        const allSeriesChecked = Array.from(seriesInputs).every(input => input.checked);
-        const allYearsChecked = Array.from(yearInputs).every(input => input.checked);
-        
-        const noSeriesChecked = activeFilters.series.length === 0;
-        const noYearsChecked = activeFilters.year.length === 0;
-
-        // Series filter logic
-        let matchesSeries;
-        if (noSeriesChecked) {
-            matchesSeries = false; // No filters selected = show nothing
-        } else if (allSeriesChecked) {
-            matchesSeries = true; // All filters selected = show everything
-        } else {
-            // Some filters selected = check if video matches
-            matchesSeries = activeFilters.series.includes(cardSeries) ||
-                           activeFilters.series.some(filter => additionalCats.includes(filter));
-        }
-        
-        // Year filter logic
-        let matchesYear;
-        if (noYearsChecked) {
-            matchesYear = false; // No filters selected = show nothing
-        } else if (allYearsChecked) {
-            matchesYear = true; // All filters selected = show everything
-        } else {
-            // Some filters selected = check if video matches
-            matchesYear = activeFilters.year.includes(cardYear);
-        }
-        
-        const matchesSearch = searchTerm === '' || cardName.includes(searchTerm) || cardArtist.includes(searchTerm);
-
-        // Show or hide card
-        if (matchesSeries && matchesYear && matchesSearch) {
-            visibleVideos.push(video);
-        }
-    });
-    
-    // Sort visible videos
-    visibleVideos = sortVideos(visibleVideos, sortBy);
-    
-    // Render sorted videos
-    renderVideos(visibleVideos);
-
-    // Prevent jarring scroll on filter change
-    if (window.scrollY > 300) {
-        window.scrollTo({
-            top: Math.min(window.scrollY, 300),
-            behavior: 'smooth'
-        });
-    }
-    
-    // Re-attach event listeners
-    attachCardEventListeners();
-
-    // Update count
-    musicCount.textContent = visibleVideos.length;
-
-    // Show/hide no results message
-    if (visibleVideos.length === 0) {
-        noResults.style.display = 'block';
-    } else {
-        noResults.style.display = 'none';
-    }
+    return list.sort(sorters[state.sort] || sorters.standing);
 }
 
-// ========================================
-// HELPER: UPDATE TOGGLE BUTTON TEXT
-// ========================================
-function updateToggleButtonText(filterType) {
-    const button = document.querySelector(`.filter-toggle[data-target="${filterType}"]`);
-    const inputs = document.querySelectorAll(`input[data-filter="${filterType}"]`);
-    const allChecked = Array.from(inputs).every(input => input.checked);
-    
-    if (button) {
-        button.textContent = allChecked ? 'Deselect All' : 'Select All';
-    }
+function cardHTML(e) {
+    const s = e.standing;
+    const title = e.shortTitle || e.title || 'Untitled edit';
+    const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
+    const creatorUrl = safeUrl(e.creatorUrl);
+    const creator = creatorUrl
+        ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
+        : `<span class="edit-creator">${esc(e.artist || 'Unknown creator')}</span>`;
+    const cups = (e.tournaments || []).map(c => `<span class="pill pill-cup">${esc(cupDisplayName(c))}</span>`).join('');
+    const chars = (e.characters || []).map(c => `<span class="pill">${esc(c)}</span>`).join('');
+    // every card ends with one button so rows line up: Vote now when live, otherwise a link to the bracket
+    const vote = s.liveMatch
+        ? `<a class="edit-vote" href="/vote.html?match=${encodeURIComponent(s.liveMatch.matchId)}">Vote now</a>`
+        : `<a class="edit-vote edit-bracket" href="/brackets">View in bracket</a>`;
+    return `<article class="edit-card" data-id="${esc(e.id)}">
+        <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Watch ${esc(title)}">
+            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">
+            <span class="edit-badge status-${s.kind}">${s.kind === 'champion' ? '<i class="fa-solid fa-trophy" aria-hidden="true"></i> ' : ''}${esc(s.label)}</span>
+            ${e.duration != null ? `<span class="edit-duration">${fmtDuration(e.duration)}</span>` : ''}
+            <span class="edit-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </button>
+        <div class="edit-body">
+            <h3 class="edit-title">${esc(title)}</h3>
+            ${creator}
+            <dl class="edit-stats">
+                <div><dt>Record</dt><dd>${record}</dd></div>
+                <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
+                <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
+            </dl>
+            <div class="edit-pills">${chars}${cups}</div>
+            ${vote}
+        </div>
+    </article>`;
 }
 
-// ========================================
-// EVENT LISTENERS SETUP (ENHANCED WITH TOGGLE + SHIFT-CLICK + SCROLL FIX)
-// ========================================
-function setupEventListeners() {
-    const filterInputs = document.querySelectorAll('.filter-input');
-    
-    // ✅ FIXED: Toggle buttons for Select/Deselect All
-    const filterToggles = document.querySelectorAll('.filter-toggle');
-    filterToggles.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const target = e.target.dataset.target; // 'series' or 'year'
-            const inputs = document.querySelectorAll(`input[data-filter="${target}"]`);
-            
-            // Check if all are currently checked
-            const allChecked = Array.from(inputs).every(input => input.checked);
-            
-            // Toggle all
-            inputs.forEach(input => {
-                input.checked = !allChecked;
-            });
-            
-            // Update button text
-            e.target.textContent = allChecked ? 'Select All' : 'Deselect All';
-            
-            // ✅ FIX: Force re-filter after toggling
-            filterMusicVideos();
-        });
+function render() {
+    const list = visible();
+    document.getElementById('editCount').textContent = `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
+    if (!ALL.length) {
+        grid.innerHTML = '<div class="gallery-message"><h3>No edits have entered a cup yet</h3><p>The first cup is on its way. Check back soon, or <a href="/live">see what is live</a>.</p></div>';
+        return;
+    }
+    if (!list.length) {
+        grid.innerHTML = '<div class="gallery-message"><h3>No edits match</h3><p>Try a different search or clear the filters.</p><button type="button" class="gallery-retry" id="clearFilters">Clear filters</button></div>';
+        document.getElementById('clearFilters')?.addEventListener('click', resetFilters);
+        return;
+    }
+    grid.innerHTML = list.map(cardHTML).join('');
+}
+
+function resetFilters() {
+    state.q = ''; state.chars.clear(); state.cup = ''; state.status = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('cupFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.querySelectorAll('#charFilters .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    render();
+}
+
+// ---------- video dialog ----------
+function openWatch(id, trigger) {
+    const e = ALL.find(x => x.id === id);
+    const dialog = document.getElementById('watchDialog');
+    if (!e || !dialog) return;
+    lastFocus = trigger || null;
+    document.getElementById('watchTitle').textContent = e.shortTitle || e.title || '';
+    const creatorUrl = safeUrl(e.creatorUrl);
+    document.getElementById('watchMeta').innerHTML =
+        (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +
+        ` <span aria-hidden="true">\u2022</span> <a href="https://www.youtube.com/shorts/${esc(e.videoId)}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` +
+        (e.standing.liveMatch ? ` <span aria-hidden="true">\u2022</span> <a href="/vote.html?match=${encodeURIComponent(e.standing.liveMatch.matchId)}">Vote now</a>` : '');
+    document.getElementById('watchFrame').src = `https://www.youtube.com/embed/${encodeURIComponent(e.videoId)}?autoplay=1&rel=0&playsinline=1`;
+    dialog.showModal();
+}
+function closeWatch() {
+    const dialog = document.getElementById('watchDialog');
+    if (dialog?.open) dialog.close();
+}
+
+function setup() {
+    document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value; render(); });
+    document.getElementById('cupFilter').addEventListener('change', e => { state.cup = e.target.value; render(); });
+    document.getElementById('statusFilter').addEventListener('change', e => { state.status = e.target.value; render(); });
+    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; render(); });
+    document.getElementById('charFilters').addEventListener('click', e => {
+        const b = e.target.closest('.chip'); if (!b) return;
+        const c = b.dataset.char, on = !state.chars.has(c);
+        on ? state.chars.add(c) : state.chars.delete(c);
+        b.setAttribute('aria-pressed', String(on));
+        render();
     });
-
-    // ✅ Shift+Click to isolate single filter
-    filterInputs.forEach(input => {
-        input.addEventListener('click', (e) => {
-            // If shift-clicking, deselect all others in that category
-            if (e.shiftKey) {
-                const filterType = input.dataset.filter;
-                
-                filterInputs.forEach(otherInput => {
-                    if (otherInput.dataset.filter === filterType && otherInput !== input) {
-                        otherInput.checked = false;
-                    }
-                });
-                
-                // Ensure the clicked item stays checked
-                input.checked = true;
-                
-                // Update toggle button text
-                updateToggleButtonText(filterType);
-                
-                // Trigger filter
-                filterMusicVideos();
-                
-                // ✅ FIX: Prevent normal change event from firing
-                e.preventDefault();
-                return;
-            }
-        });
-        
-        // Regular change event (no shift key)
-        input.addEventListener('change', (e) => {
-            // ✅ FIX: Only update if not a shift-click (already handled above)
-            if (!e.shiftKey) {
-                const filterType = input.dataset.filter;
-                updateToggleButtonText(filterType);
-                filterMusicVideos();
-            }
-        });
+    grid.addEventListener('click', e => {
+        const b = e.target.closest('[data-watch]');
+        if (b) openWatch(b.dataset.watch, b);
     });
-
-    // ✅ Smooth filter panel scrolling (prevent scroll hijacking)
-    const filterPanel = document.querySelector('.filter-panel');
-    if (filterPanel) {
-        filterPanel.addEventListener('wheel', (e) => {
-            const { scrollTop, scrollHeight, clientHeight } = filterPanel;
-            const atTop = scrollTop === 0;
-            const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            // Allow scroll within panel, prevent propagation to page
-            if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
-                e.stopPropagation();
-            }
-        }, { passive: false });
-    }
-
-    // Search input
-    if (searchInput) {
-        searchInput.addEventListener('input', filterMusicVideos);
-    }
-    
-    // Sort select
-    if (sortSelect) {
-        sortSelect.addEventListener('change', filterMusicVideos);
-    }
-
-    // Reset filters
-    if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            filterInputs.forEach(input => {
-                input.checked = true;
-            });
-            
-            // Reset toggle button texts
-            filterToggles.forEach(button => {
-                button.textContent = 'Deselect All';
-            });
-            
-            if (searchInput) searchInput.value = '';
-            if (sortSelect) sortSelect.value = 'seed';
-            
-            // ✅ FIX: Ensure filter runs after reset
-            filterMusicVideos();
-        });
-    }
-    
-    // Attach card listeners
-    attachCardEventListeners();
-
-    // Close video modal
-    if (videoModalClose) {
-        videoModalClose.addEventListener('click', closeVideoModal);
-    }
-    
-    if (videoModal) {
-        videoModal.addEventListener('click', function(e) {
-            if (e.target === videoModal) {
-                closeVideoModal();
-            }
-        });
-    }
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && videoModal && videoModal.style.display === 'block') {
-            closeVideoModal();
-        }
+    const dialog = document.getElementById('watchDialog');
+    dialog.addEventListener('click', e => { if (e.target === dialog) closeWatch(); });   // click on the backdrop
+    document.getElementById('watchClose').addEventListener('click', closeWatch);
+    dialog.addEventListener('close', () => {
+        document.getElementById('watchFrame').src = '';                                 // stop playback
+        if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
     });
 }
 
-function attachCardEventListeners() {
-    document.querySelectorAll('.character-card').forEach(card => {
-        // Make entire card show pointer cursor
-        card.style.cursor = 'pointer';
-        
-        // Prevent book recommendation area from triggering video
-        const bookRec = card.querySelector('.card-book-recommendation');
-        if (bookRec) {
-            bookRec.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-            bookRec.style.cursor = 'default';
-        }
-        
-        // Click anywhere on card opens video
-        card.addEventListener('click', function(e) {
-            const videoId = this.dataset.videoId;
-            const embedAllowed = this.dataset.embedAllowed === 'true';
-            
-            if (!embedAllowed) {
-                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-            } else {
-                openVideoModal(videoId);
-            }
-        });
-        
-        // Show play overlay on hover
-        card.addEventListener('mouseenter', function() {
-            const overlay = this.querySelector('.play-overlay');
-            if (overlay) {
-                overlay.style.opacity = '1';
-            }
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            const overlay = this.querySelector('.play-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-            }
-        });
-    });
-}
-
-function openVideoModal(videoId) {
-    if (modalVideoFrame && videoModal) {
-        modalVideoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-        videoModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeVideoModal() {
-    if (videoModal && modalVideoFrame) {
-        videoModal.style.display = 'none';
-        modalVideoFrame.src = '';
-        document.body.style.overflow = '';
-    }
-}
-
-// ========================================
-// INITIALIZE ON PAGE LOAD (CONDITIONAL)
-// ========================================
+// vote.js imports this module for getAllTournamentStats, so only start the gallery on the gallery page
 document.addEventListener('DOMContentLoaded', () => {
-    // Only run gallery-specific code if we're on the gallery page
-    if (musicGrid && searchInput) {
-        loadMusicVideos();
-    } else {
-        console.log('Gallery elements not found - skipping gallery initialization');
-    }
+    if (!grid) return;
+    setup();
+    loadGallery();
 });
-
-/**
- * Track book clicks for analytics
- */
-function trackBookClick(songSlug, location) {
-    console.log(`📊 Book clicked: ${songSlug} from ${location}`);
-}
-
-// Make available globally
-window.trackBookClick = trackBookClick;
-
-// (getAllTournamentStats already exported at line 28)
-
-console.log('League Music Gallery script loaded');

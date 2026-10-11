@@ -3,344 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
-    <title>Music Gallery | All LoL Songs & Videos | Anthem Arena</title>
-    <meta name="description" content="Browse all 64 League of Legends music videos in the tournament. Filter by K/DA, Pentakill, Worlds anthems, year, and artist. Watch trailers and view stats.">
-    <link rel="canonical" href="https://anthemarena.com/music-gallery">
-    
+
+    <title>Edits Gallery | Arcane Moments</title>
+    <meta name="description" content="Every fan edit that has entered an Arcane Moments cup: creators, records, results and a one-tap player.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Edits Gallery | Arcane Moments">
+    <meta property="og:description" content="Every fan edit that has entered an Arcane Moments cup: creators, records and results.">
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://anthemarena.com/music-gallery">
-    <meta property="og:title" content="Music Gallery | All LoL Songs | Anthem Arena">
-    <meta property="og:description" content="Explore all 64 League of Legends music videos competing in the tournament. Filter by K/DA, Pentakill, Worlds anthems, and more.">
-    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-    <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Gallery">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Music Gallery | All LoL Songs">
-    <meta name="twitter:description" content="Browse all 64 League of Legends music videos with filters for K/DA, Pentakill, Worlds anthems, and more.">
-    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
-    <meta name="twitter:image:alt" content="Anthem Arena Music Gallery">
-    
-    <!-- Fonts -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Stylesheets -->
-         <link rel="stylesheet" href="/css/main.css">
 
+    <!-- Fonts and icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
-    <link rel="stylesheet" href="/css/moments-gallery.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/edits-gallery.css">
+    <!-- Arcane look (opt-in via <body class="theme-arcane page-gallery">): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 
-    
-    <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "League of Legends Music Gallery",
-      "description": "Complete collection of League of Legends music videos including K/DA, Pentakill, Worlds anthems, and cinematics",
-      "url": "https://anthemarena.com/music-gallery"
+      "name": "Arcane Moments Edits Gallery",
+      "description": "Fan edits that have entered an Arcane Moments cup, with creator credit, records and results."
     }
     </script>
 
-      <!-- ✅ CRITICAL: Load global systems FIRST -->
+    <!-- Global systems first -->
     <script type="module" src="/js/firebase-config.js"></script>
     <script type="module" src="/js/notification-storage.js"></script>
     <script type="module" src="/js/notification-center.js"></script>
-
     <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body>
+<body class="theme-arcane page-gallery">
 
     <div id="nav-placeholder"></div>
     <script type="module" src="/js/navigation.js"></script>
 
-    <!-- Page Hero -->
-    <section class="roster-hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1 class="page-title">Music Gallery</h1>
-            <p class="page-subtitle">Explore all 64 League of Legends music videos competing in Season 1</p>
-        </div>
-    </section>
+    <main class="gallery-page">
+        <header class="gallery-hero">
+            <h1 class="gallery-title">Edits Gallery</h1>
+            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup, with its creator, record and result. Tap one to watch it.</p>
+        </header>
 
-    <!-- PAGE INTRO -->
-    <section class="page-intro">
-        <div class="container">
-            <p>
-                Browse all League of Legends music videos from <strong>Worlds anthems</strong> to 
-                <strong>Arcane</strong>, <strong>K/DA</strong>, <strong>Pentakill</strong>, 
-                and more. Filter by series, year, or search by name. Click any video to watch or 
-                <a href="/live">vote in active matches</a>. Track progress in the 
-                <a href="/brackets.html">tournament bracket</a> or view 
-                <a href="/stats.html">detailed statistics</a>.
-            </p>
-        </div>
-    </section>
-
-    <!-- Filters & Gallery -->
-    <section class="roster-section container">
-        
-      <!-- Filter Panel (Left Column) -->
-<aside class="filter-panel">
-    <h2 class="filter-title">Filters</h2>
-    
-    <!-- ✅ Pro Tip -->
-    <div class="filter-tip">
-        <i class="fa-solid fa-lightbulb"></i>
-        <strong>Pro tip:</strong> Shift+Click a filter to select only that one
-    </div>
-    
-    <!-- Search Bar -->
-    <div class="filter-group">
-        <label class="filter-label">Search</label>
-        <input type="text" id="searchInput" class="search-input" placeholder="Search by song or artist...">
-    </div>
-
-    <!-- ✅ UPDATED: Series/Collection Filter with Neutral Grouping -->
-    <div class="filter-group">
-        <div class="filter-header">
-            <label class="filter-label">Collection</label>
-            <button class="filter-toggle" data-target="series">Deselect All</button>
-        </div>
-        <div class="filter-options">
-            
-            <!-- WORLD CHAMPIONSHIPS -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">World Championships</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Worlds Anthem" checked>
-                    <span>Worlds Anthems</span>
-                </label>
-            </div>
-
-            <!-- SHOWS & SERIES -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">Shows & Series</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Arcane" checked>
-                    <span>Arcane</span>
-                </label>
-            </div>
-
-            <!-- VIRTUAL BANDS -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">Virtual Bands</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="K/DA" checked>
-                    <span>K/DA</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Pentakill" checked>
-                    <span>Pentakill</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="True Damage" checked>
-                    <span>True Damage</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="HEARTSTEEL" checked>
-                    <span>HEARTSTEEL</span>
-                </label>
-            </div>
-
-            <!-- IN-GAME CONTENT -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">In-Game Content</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Season Cinematic" checked>
-                    <span>Season Cinematics</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Champion Theme" checked>
-                    <span>Champion Themes</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Star Guardian" checked>
-                    <span>Star Guardian</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Spirit Blossom" checked>
-                    <span>Spirit Blossom</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Event Theme" checked>
-                    <span>Event Themes</span>
-                </label>
-            </div>
-
-            <!-- OTHER RIOT GAMES -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">Other Riot Games</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Wild Rift" checked>
-                    <span>Wild Rift</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="TFT" checked>
-                    <span>Teamfight Tactics</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Runeterra" checked>
-                    <span>Legends of Runeterra</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="2XKO" checked>
-                    <span>2XKO</span>
-                </label>
-            </div>
-
-            <!-- OTHER -->
-            <div class="filter-subgroup">
-                <span class="filter-subgroup-title">Other</span>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Regional Exclusive" checked>
-                    <span>Regional Exclusives</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" class="filter-input" data-filter="series" value="Standalone" checked>
-                    <span>Standalone Songs</span>
-                </label>
-            </div>
-            
-        </div>
-    </div>
-
-    <!-- Year Filter -->
-    <div class="filter-group">
-        <div class="filter-header">
-            <label class="filter-label">Release Year</label>
-            <button class="filter-toggle" data-target="year">Deselect All</button>
-        </div>
-        <div class="filter-options">
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
-                <span>2024-2025</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
-                <span>2022-2023</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
-                <span>2020-2021</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
-                <span>2018-2019</span>
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
-                <span>2014-2017</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Reset Button -->
-    <button class="reset-filters" id="resetFilters">Reset All Filters</button>
-</aside>
-
-        <!-- Main Content (Right Column) -->
-        <div class="roster-content">
-
-            <!-- Stats Bar with Sort -->
-            <div class="roster-stats">
-                <p>
-                    <span id="characterCount">64</span> music videos found
-                </p>
-                
-                <!-- ✅ NEW: Sort Dropdown -->
-                <div class="sort-controls">
-                    <label for="sortSelect">Sort by:</label>
-                    <select id="sortSelect" class="sort-select">
-                        <option value="seed">Seed (Default)</option>
-                        <option value="popular">Most Popular</option>
-                        <option value="championships">Most Championships</option>
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="alphabetical">A-Z</option>
+        <section class="gallery-toolbar" aria-label="Search and filter edits">
+            <div class="toolbar-row">
+                <div class="toolbar-field toolbar-search">
+                    <label for="searchInput">Search</label>
+                    <input type="search" id="searchInput" placeholder="Edit title or creator" autocomplete="off">
+                </div>
+                <div class="toolbar-field">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter">
+                        <option value="">All</option>
+                        <option value="live">Live now</option>
+                        <option value="bracket">In the bracket</option>
+                        <option value="eliminated">Eliminated</option>
+                        <option value="champion">Champions</option>
+                        <option value="entered">Entered</option>
+                    </select>
+                </div>
+                <div class="toolbar-field" hidden>
+                    <label for="cupFilter">Cup</label>
+                    <select id="cupFilter"><option value="">All cups</option></select>
+                </div>
+                <div class="toolbar-field">
+                    <label for="sortSelect">Sort by</label>
+                    <select id="sortSelect">
+                        <option value="standing">Standing</option>
+                        <option value="views">Most views</option>
+                        <option value="wins">Most wins</option>
+                        <option value="newest">Newest</option>
+                        <option value="title">Title A-Z</option>
+                        <option value="creator">Creator A-Z</option>
                     </select>
                 </div>
             </div>
+            <div class="chip-row" id="charFilters" role="group" aria-label="Filter by character" hidden></div>
+            <p class="gallery-count" id="editCount" aria-live="polite"></p>
+        </section>
 
-            <!-- Music Video Grid -->
-            <div class="character-grid" id="characterGrid">
-                <!-- Cards generated dynamically by JS -->
-            </div>
+        <section class="edit-grid" id="editGrid" aria-busy="true" aria-label="Edits">
+            <div class="gallery-message"><p>Loading edits&hellip;</p></div>
+        </section>
 
-            <!-- No Results Message -->
-            <div class="no-results" id="noResults" style="display: none;">
-                <h3>No music videos found</h3>
-                <p>Try adjusting your filters or search terms.</p>
-            </div>
+        <section class="gallery-next" aria-label="Keep exploring">
+            <a href="/live" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>
+            <a href="/brackets" class="next-link"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>See the bracket</span></a>
+            <a href="/stats" class="next-link"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i><span>Tournament stats</span></a>
+        </section>
+    </main>
 
-        </div> <!-- End of .roster-content -->
-
-    </section> <!-- End of .roster-section.container -->
-
-    <!-- TOURNAMENT ACTIONS SECTION -->
-    <section class="tournament-actions">
-        <div class="container">
-            <h2 class="section-title">Participate in the Tournament</h2>
-            <p class="section-subtitle">
-                Now that you've explored the music gallery, take the next step
-            </p>
-            <div class="actions-grid">
-                <a href="/live" class="action-card">
-<div class="action-icon"><i class="fa-solid fa-vote-yea"></i></div>
-                    <h3>Vote Now</h3>
-                    <p>Cast your votes in active matches and influence which songs advance to the next round</p>
-                    <span class="action-cta">View Active Matches →</span>
-                </a>
-                <a href="/brackets.html" class="action-card">
-<div class="action-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <h3>View Bracket</h3>
-                    <p>See the complete tournament structure and track how your favorite songs are progressing</p>
-                    <span class="action-cta">View Full Bracket →</span>
-                </a>
-                <a href="/stats.html" class="action-card">
-<div class="action-icon"><i class="fa-solid fa-chart-bar"></i></div>
-                    <h3>Statistics</h3>
-                    <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
-                    <span class="action-cta">View Stats Dashboard →</span>
-                </a>
-                <a href="/profile#votes" class="action-card">
-<div class="action-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <h3>Track Your Votes</h3>
-                    <p>Review your voting history, track predictions, and earn achievements for participation</p>
-                    <span class="action-cta">View Your History →</span>
-                </a>
-            </div>
+    <dialog id="watchDialog" class="watch-dialog" aria-labelledby="watchTitle">
+        <div class="watch-head">
+            <h2 id="watchTitle"></h2>
+            <button type="button" class="watch-close" id="watchClose" aria-label="Close player"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
-    </section>
-
-    <!-- Video Modal -->
-    <div class="video-modal" id="videoModal">
-        <div class="video-modal-content">
-            <span class="video-modal-close">×</span>
-            <iframe id="modalVideoFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <div class="watch-frame-wrap">
+            <iframe id="watchFrame" title="Edit player" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>
-    </div>
+        <p class="watch-meta" id="watchMeta"></p>
+    </dialog>
 
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
     <script type="module" src="/js/rank-system.js"></script>
-
     <script type="module" src="/js/music-gallery.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
 </body>
