@@ -1,0 +1,1592 @@
+diff --git a/css/edits-gallery.css b/css/edits-gallery.css
+new file mode 100644
+index 0000000..2693760
+--- /dev/null
++++ b/css/edits-gallery.css
+@@ -0,0 +1,311 @@
++/* ========================================
++   EDITS GALLERY (music-gallery.html, body.page-gallery)
++   Uses the Arcane theme tokens (--pink-bright, --card, --border ...) from arcane-theme.css.
++   ======================================== */
++.page-gallery .gallery-page {
++    max-width: 1200px;
++    margin: 0 auto;
++    padding: 2.5rem 1.25rem 3rem;
++}
++
++/* ---------- hero ---------- */
++.page-gallery .gallery-hero { text-align: center; margin-bottom: 1.75rem; }
++.page-gallery .gallery-title {
++    margin: 0 0 .6rem;
++    font-family: var(--font);
++    font-size: clamp(2rem, 6vw, 3.25rem);
++    font-weight: 800;
++    letter-spacing: -.01em;
++    color: var(--text);
++}
++.page-gallery .gallery-subtitle {
++    max-width: 640px;
++    margin: 0 auto;
++    color: var(--muted);
++    font-size: 1.05rem;
++    line-height: 1.55;
++}
++
++/* ---------- toolbar ---------- */
++.page-gallery .gallery-toolbar {
++    background: var(--card);
++    border: 1px solid var(--border);
++    border-radius: 18px;
++    padding: 1rem 1.1rem;
++    margin-bottom: 1.5rem;
++}
++.page-gallery .toolbar-row { display: flex; flex-wrap: wrap; gap: .85rem; align-items: flex-end; }
++.page-gallery .toolbar-field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
++.page-gallery .toolbar-field[hidden] { display: none; }
++.page-gallery .toolbar-search { flex: 1 1 240px; }
++.page-gallery .toolbar-field label {
++    font-size: .72rem;
++    font-weight: 700;
++    letter-spacing: .08em;
++    text-transform: uppercase;
++    color: var(--pink-bright);
++}
++.page-gallery .toolbar-field input,
++.page-gallery .toolbar-field select {
++    background: rgba(0, 0, 0, .35);
++    color: var(--text);
++    border: 1px solid var(--border);
++    border-radius: 10px;
++    padding: .65rem .8rem;
++    font: 500 .95rem var(--font);
++    min-height: 44px;
++}
++.page-gallery .toolbar-field input::placeholder { color: var(--text-faint); }
++.page-gallery .toolbar-field select option { background: #120a18; color: var(--text); }
++.page-gallery .gallery-toolbar :is(input, select, button):focus-visible,
++.page-gallery .edit-thumb:focus-visible,
++.page-gallery .edit-vote:focus-visible,
++.page-gallery .next-link:focus-visible {
++    outline: 2px solid var(--pink-bright);
++    outline-offset: 2px;
++}
++
++.page-gallery .chip-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
++.page-gallery .chip-row[hidden] { display: none; }
++.page-gallery .chip {
++    background: transparent;
++    color: var(--muted);
++    border: 1px solid var(--border);
++    border-radius: 999px;
++    padding: .45rem .95rem;
++    min-height: 40px;
++    font: 600 .88rem var(--font);
++    cursor: pointer;
++    transition: background .15s, color .15s, border-color .15s;
++}
++.page-gallery .chip:hover { color: var(--text); border-color: var(--pink-bright); }
++.page-gallery .chip[aria-pressed="true"] { background: var(--pink-soft); color: var(--pink-bright); border-color: var(--pink-bright); }
++.page-gallery .gallery-count { margin: .9rem 0 0; color: var(--muted); font-size: .9rem; }
++
++/* ---------- grid ---------- */
++.page-gallery .edit-grid {
++    display: grid;
++    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
++    gap: 1.25rem;
++}
++.page-gallery .gallery-message {
++    grid-column: 1 / -1;
++    text-align: center;
++    padding: 3rem 1rem;
++    background: var(--card);
++    border: 1px solid var(--line);
++    border-radius: 18px;
++    color: var(--muted);
++}
++.page-gallery .gallery-message h3 { margin: 0 0 .5rem; color: var(--text); font-size: 1.2rem; }
++.page-gallery .gallery-message a { color: var(--pink-bright); }
++.page-gallery .gallery-retry {
++    margin-top: 1rem;
++    background: var(--pink-soft);
++    color: var(--pink-bright);
++    border: 1px solid var(--pink-bright);
++    border-radius: 999px;
++    padding: .6rem 1.2rem;
++    min-height: 44px;
++    font: 700 .9rem var(--font);
++    cursor: pointer;
++}
++
++/* ---------- card ---------- */
++.page-gallery .edit-card {
++    display: flex;
++    flex-direction: column;
++    background: var(--card);
++    border: 1px solid var(--line);
++    border-radius: 18px;
++    overflow: hidden;
++    transition: border-color .2s, transform .2s;
++}
++.page-gallery .edit-card:hover { border-color: var(--border); transform: translateY(-2px); }
++
++.page-gallery .edit-thumb {
++    position: relative;
++    display: block;
++    width: 100%;
++    aspect-ratio: 9 / 16;
++    padding: 0;
++    border: 0;
++    background: #000;
++    cursor: pointer;
++    overflow: hidden;
++}
++.page-gallery .edit-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
++.page-gallery .edit-play {
++    position: absolute;
++    inset: 50% auto auto 50%;
++    transform: translate(-50%, -50%);
++    width: 54px; height: 54px;
++    border-radius: 50%;
++    display: grid; place-items: center;
++    background: rgba(6, 7, 14, .62);
++    border: 1px solid var(--border);
++    color: var(--pink-bright);
++    font-size: 1.1rem;
++    opacity: .9;
++    transition: transform .2s, background .2s;
++}
++.page-gallery .edit-thumb:hover .edit-play { transform: translate(-50%, -50%) scale(1.08); background: var(--pink-soft); }
++.page-gallery .edit-duration {
++    position: absolute; right: .55rem; bottom: .55rem;
++    padding: .15rem .5rem;
++    border-radius: 6px;
++    background: rgba(0, 0, 0, .7);
++    color: var(--text);
++    font: 600 .75rem var(--font);
++}
++.page-gallery .edit-badge {
++    position: absolute; top: .6rem; left: .6rem; right: auto;
++    max-width: calc(100% - 1.2rem);
++    padding: .25rem .65rem;
++    border-radius: 999px;
++    font: 700 .72rem var(--font);
++    letter-spacing: .03em;
++    text-transform: uppercase;
++    background: rgba(6, 7, 14, .78);
++    color: var(--muted);
++    border: 1px solid var(--line);
++    white-space: nowrap;
++    overflow: hidden;
++    text-overflow: ellipsis;
++}
++.page-gallery .edit-badge.status-live { background: var(--pink); color: #fff; border-color: var(--pink-bright); box-shadow: 0 0 18px rgba(255, 79, 180, .55); }
++.page-gallery .edit-badge.status-champion { background: linear-gradient(135deg, #ff4fb4, #ff9bd6); color: #1a0716; border-color: #ffd0ec; }
++.page-gallery .edit-badge.status-bracket { color: var(--pink-bright); border-color: var(--border); }
++.page-gallery .edit-badge.status-eliminated,
++.page-gallery .edit-badge.status-entered { color: var(--text-dim); }
++
++.page-gallery .edit-body { display: flex; flex-direction: column; gap: .5rem; padding: .85rem .9rem 1rem; flex: 1; }
++.page-gallery .edit-title {
++    margin: 0;
++    font: 700 1rem/1.3 var(--font);
++    color: var(--text);
++    display: -webkit-box;
++    -webkit-line-clamp: 2;
++    -webkit-box-orient: vertical;
++    overflow: hidden;
++    overflow-wrap: anywhere;
++    min-height: 2.6em;          /* always two lines tall so the stats rows line up across a row of cards */
++}
++.page-gallery .edit-creator {
++    color: var(--pink-bright);
++    font: 600 .88rem var(--font);
++    text-decoration: none;
++    overflow: hidden;
++    text-overflow: ellipsis;
++    white-space: nowrap;
++}
++.page-gallery a.edit-creator:hover { text-decoration: underline; }
++.page-gallery .edit-stats {
++    display: grid;
++    grid-template-columns: repeat(3, 1fr);
++    gap: .4rem;
++    margin: .25rem 0 0;
++    padding: .6rem 0;
++    border-top: 1px solid var(--line);
++    border-bottom: 1px solid var(--line);
++}
++.page-gallery .edit-stats div { min-width: 0; }
++.page-gallery .edit-stats dt { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
++.page-gallery .edit-stats dd { margin: .1rem 0 0; font: 700 .95rem var(--font); color: var(--text); font-variant-numeric: tabular-nums; }
++.page-gallery .edit-pills { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: auto; }
++.page-gallery .pill {
++    padding: .15rem .6rem;
++    border: 1px solid var(--line);
++    border-radius: 999px;
++    font: 600 .72rem var(--font);
++    color: var(--muted);
++}
++.page-gallery .pill-cup { color: var(--pink-bright); border-color: var(--border); }
++.page-gallery .edit-vote {
++    display: block;
++    text-align: center;
++    margin-top: .4rem;
++    padding: .65rem;
++    min-height: 44px;
++    background: var(--pink);
++    color: #fff;
++    border-radius: 12px;
++    font: 700 .92rem var(--font);
++    text-decoration: none;
++}
++.page-gallery .edit-vote:hover { background: var(--pink-bright); }
++
++/* ---------- next steps ---------- */
++.page-gallery .gallery-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .85rem; margin-top: 2.5rem; }
++.page-gallery .next-link {
++    display: inline-flex; align-items: center; gap: .6rem;
++    padding: .8rem 1.3rem;
++    min-height: 44px;
++    background: var(--card);
++    border: 1px solid var(--border);
++    border-radius: 999px;
++    color: var(--pink-bright);
++    font: 700 .92rem var(--font);
++    text-decoration: none;
++    transition: background .2s;
++}
++.page-gallery .next-link:hover { background: var(--pink-soft); }
++
++/* ---------- player dialog ---------- */
++.page-gallery .watch-dialog {
++    margin: auto;                 /* main.css resets margin to 0, which un-centres a modal <dialog> */
++    width: min(94vw, 420px);
++    max-height: 96vh;
++    padding: 0;
++    background: #0b0711;
++    color: var(--text);
++    border: 1px solid var(--pink-bright);
++    border-radius: 18px;
++    box-shadow: 0 30px 90px rgba(0, 0, 0, .7), 0 0 40px rgba(255, 79, 180, .18);
++    overflow: hidden;
++}
++.page-gallery .watch-dialog::backdrop { background: rgba(3, 2, 8, .84); backdrop-filter: blur(4px); }
++.page-gallery .watch-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .8rem 1rem; border-bottom: 1px solid var(--line); }
++.page-gallery .watch-head h2 { margin: 0; font: 700 1rem var(--font); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
++.page-gallery .watch-close {
++    flex: none; width: 44px; height: 44px;
++    display: grid; place-items: center;
++    background: var(--pink-soft);
++    color: var(--pink-bright);
++    border: 1px solid var(--border);
++    border-radius: 50%;
++    font-size: 1rem;
++    cursor: pointer;
++}
++.page-gallery .watch-close:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
++.page-gallery .watch-frame-wrap { height: min(68vh, 620px); aspect-ratio: 9 / 16; max-width: 100%; margin: .75rem auto 0; background: #000; }
++.page-gallery .watch-frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
++.page-gallery .watch-meta { margin: 0; padding: .8rem 1rem 1rem; text-align: center; color: var(--muted); font-size: .9rem; }
++.page-gallery .watch-meta a { color: var(--pink-bright); text-decoration: none; }
++.page-gallery .watch-meta a:hover { text-decoration: underline; }
++
++/* ---------- phones ---------- */
++@media (max-width: 560px) {
++    .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
++    .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
++    /* compact toolbar: search on its own row, status / cup / sort share the next one */
++    .page-gallery .gallery-toolbar { padding: .8rem; margin-bottom: 1.1rem; }
++    .page-gallery .toolbar-row { gap: .6rem; }
++    .page-gallery .toolbar-field { flex: 1 1 0; }
++    .page-gallery .toolbar-field select { padding: .55rem .5rem; font-size: .88rem; }
++    .page-gallery .toolbar-search { flex: 1 1 100%; }
++    .page-gallery .gallery-hero { margin-bottom: 1.1rem; }
++    .page-gallery .gallery-subtitle { font-size: .98rem; }
++    .page-gallery .chip-row { margin-top: .7rem; }
++    .page-gallery .gallery-count { margin-top: .6rem; }
++    .page-gallery .edit-body { padding: .7rem .7rem .85rem; }
++    .page-gallery .edit-title { font-size: .92rem; }
++    .page-gallery .edit-play { width: 44px; height: 44px; }
++    .page-gallery .chip-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -.2rem; padding: .1rem .2rem .35rem; scrollbar-width: none; }
++    .page-gallery .chip-row::-webkit-scrollbar { display: none; }
++    .page-gallery .chip { flex: none; }
++}
++@media (prefers-reduced-motion: reduce) {
++    .page-gallery .edit-card, .page-gallery .edit-play { transition: none; }
++    .page-gallery .edit-card:hover { transform: none; }
++}
+diff --git a/js/music-gallery.js b/js/music-gallery.js
+index 22db120..87189aa 100644
+--- a/js/music-gallery.js
++++ b/js/music-gallery.js
+@@ -1,30 +1,16 @@
+-// music-gallery.js - League of Legends Music Tournament
++// music-gallery.js: the Arcane Moments EDITS GALLERY (page: /music-gallery, file name kept so nav and footer links still work).
++// Lists every edit that has been entered in a cup (data/edits.json, "tournaments" list not empty), with creator credit,
++// record, standing and a click-to-play Short. Records and standing come from the active cup's matches (/api/matches).
++//
++// getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
+ import { getAllMatches } from './api-client.js';
+-import { getBookForSong } from './bookMappings.js';
+-
+-// Keep Firebase imports for backward compatibility if needed elsewhere
+-import { db } from './firebase-config.js';
++import { cupDisplayName } from './bracket-builder.js';
+ 
+ // Use shared cache if available (set by vote.js)
+ window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
+ 
+-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+-
+-let allVideos = []; // Store all video data
+-const searchInput = document.getElementById('searchInput');
+-const musicCount = document.getElementById('characterCount');
+-const noResults = document.getElementById('noResults');
+-const resetButton = document.getElementById('resetFilters');
+-const musicGrid = document.getElementById('characterGrid');
+-const sortSelect = document.getElementById('sortSelect');
+-
+-// Video modal elements
+-const videoModal = document.getElementById('videoModal');
+-const modalVideoFrame = document.getElementById('modalVideoFrame');
+-const videoModalClose = document.querySelector('.video-modal-close');
+-
+ // ========================================
+-// GET ALL TOURNAMENT STATS (OPTIMIZED - ONE QUERY)
++// GET ALL TOURNAMENT STATS (used by vote.js)
+ // ========================================
+ export async function getAllTournamentStats() {
+     try {
+@@ -88,625 +74,207 @@ export async function getAllTournamentStats() {
+ }
+ 
+ // ========================================
+-// LOAD MUSIC VIDEOS (OPTIMIZED)
++// GALLERY
+ // ========================================
+-async function loadMusicVideos() {
+-    try {
+-        const response = await fetch('/data/music-videos.json');
+-        allVideos = await response.json();
+-        
+-        // 🔥 Load ALL stats in ONE query
+-        const tournamentStats = await getAllTournamentStats();
+-        
+-        // Apply live stats to each video
+-        allVideos.forEach(video => {
+-            const liveStats = tournamentStats[video.id];
+-            
+-            if (liveStats && liveStats.totalMatches > 0) {
+-                // Override JSON stats with live Firebase data
+-                video.stats.winRecord = liveStats.winRecord;
+-                video.stats.winRate = liveStats.winRate;
+-                
+-                console.log(`✅ ${video.shortTitle}: ${liveStats.winRecord} (${liveStats.winRate})`);
+-            }
+-        });
+-        
+-        renderVideos(allVideos);
+-        setupEventListeners();
+-        filterMusicVideos();
+-        
+-        console.log(`✅ Loaded ${allVideos.length} music videos with live stats`);
+-    } catch (error) {
+-        console.error('Error loading music videos:', error);
+-        noResults.style.display = 'block';
+-        noResults.innerHTML = '<h3>Error loading music videos</h3><p>Please refresh the page.</p>';
++const grid = document.getElementById('editGrid');
++
++const STATUS_RANK = { champion: 0, live: 1, bracket: 2, eliminated: 3, entered: 4 };
++const state = { q: '', chars: new Set(), cup: '', status: '', sort: 'standing' };
++let ALL = [];
++let lastFocus = null;
++
++const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++const fmtViews = n => !n ? '0' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n);
++const fmtDuration = s => s == null ? '' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
++const isFinal = m => /-finals$/.test(m.matchId || '') || m.roundLabel === 'Final';
++const safeUrl = u => /^https:\/\//i.test(u || '') ? u : '';
++
++// What this edit has done in the active cup, worked out from its matches.
++function standingFor(edit, matches) {
++    const mine = matches.filter(m => m.song1?.id === edit.id || m.song2?.id === edit.id)
++        .sort((a, b) => (a.round || 0) - (b.round || 0));
++    if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
++
++    let wins = 0, losses = 0, lostIn = null, champion = false;
++    for (const m of mine) {
++        if (m.status !== 'completed') continue;
++        const winner = m.winnerId || m.winner;
++        if (winner === edit.id) { wins++; if (isFinal(m)) champion = true; }
++        else if (winner) { losses++; lostIn = m; }
+     }
++    const liveMatch = mine.find(m => m.status === 'live') || null;
++    const last = mine[mine.length - 1];
++    const reached = (liveMatch || last).roundLabel || '';
++
++    if (champion) return { kind: 'champion', label: 'Champion', wins, losses, reached: 'Champion', liveMatch: null };
++    if (lostIn) return { kind: 'eliminated', label: 'Out in ' + (lostIn.roundLabel || 'the cup'), wins, losses, reached: lostIn.roundLabel || '', liveMatch: null };
++    if (liveMatch) return { kind: 'live', label: 'Live now', wins, losses, reached, liveMatch };
++    return { kind: 'bracket', label: 'In the bracket', wins, losses, reached, liveMatch: null };
+ }
+ 
+-// ========================================
+-// RENDER VIDEO CARDS
+-// ========================================
+-function renderVideos(videos) {
+-    musicGrid.innerHTML = ''; // Clear existing cards
+-    
+-    videos.forEach(video => {
+-        const card = createVideoCard(video);
+-        musicGrid.appendChild(card);
+-    });
+-}
+-
+-// ========================================
+-// CREATE INDIVIDUAL VIDEO CARD
+-// ========================================
+-function createVideoCard(video) {
+-    const card = document.createElement('div');
+-    card.className = 'character-card';
+-    
+-    // Set data attributes for filtering
+-    card.dataset.category = video.category;
+-    card.dataset.year = getYearRange(video.year);
+-    card.dataset.artist = video.artistGroup;
+-    card.dataset.series = video.seriesCollection;
+-    card.dataset.name = video.title;
+-    card.dataset.videoId = video.videoId;
+-    card.dataset.embedAllowed = video.embedAllowed !== false;
+-    card.dataset.views = video.views;
+-    
+-    // ✨ Get book recommendation for this video
+-    const book = getBookForSong(video);
+-    const thumbnailUrl = `https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`;
+-    
+-    // ✨ Build book recommendation section (if book exists)
+-    let bookSection = '';
+-    if (book) {
+-        bookSection = `
+-            <div class="card-book-recommendation">
+-                <div class="book-rec-compact">
+-                    <span class="book-icon-small">📖</span>
+-                    <div class="book-rec-text">
+-                        <span class="book-rec-label">Explore the lore:</span>
+-                        <a href="${book.amazonLink}" 
+-                           target="_blank" 
+-                           rel="noopener noreferrer nofollow"
+-                           class="book-rec-link"
+-                           onclick="event.stopPropagation(); trackBookClick('${video.slug}', 'gallery-card');">
+-                            ${book.title} →
+-                        </a>
+-                    </div>
+-                </div>
+-            </div>
+-        `;
++async function loadGallery() {
++    grid.setAttribute('aria-busy', 'true');
++    try {
++        const [res, matchesRaw] = await Promise.all([
++            fetch('/data/edits.json', { cache: 'no-cache' }),
++            window.pageLoadMatchesCache ? Promise.resolve(window.pageLoadMatchesCache) : getAllMatches().catch(() => [])
++        ]);
++        // the site redirects unknown paths to the homepage with status 200, so read as text and check
++        let edits;
++        try { edits = JSON.parse(await res.text()); } catch { throw new Error('data/edits.json is not available'); }
++        const matches = Array.isArray(matchesRaw) ? matchesRaw : [];
++
++        ALL = edits
++            .filter(e => Array.isArray(e.tournaments) && e.tournaments.length && e.status !== 'removed' && e.status !== 'blocked' && e.embedAllowed !== false)
++            .map(e => ({ ...e, standing: standingFor(e, matches) }));
++
++        buildFilters();
++        render();
++    } catch (err) {
++        console.error('Gallery failed to load:', err);
++        grid.innerHTML = '<div class="gallery-message"><h3>The gallery could not load</h3><p>Please check your connection and try again.</p><button type="button" class="gallery-retry" id="galleryRetry">Try again</button></div>';
++        document.getElementById('galleryRetry')?.addEventListener('click', loadGallery);
++        document.getElementById('editCount').textContent = '';
++    } finally {
++        grid.removeAttribute('aria-busy');
+     }
+-    
+-    card.innerHTML = `
+-        <div class="character-image-wrapper video-thumbnail">
+-            <img src="${thumbnailUrl}" 
+-                 alt="${video.shortTitle}" 
+-                 class="character-image">
+-            
+-            <div class="play-overlay">
+-                <div class="play-button">
+-                    <svg width="60" height="60" viewBox="0 0 60 60">
+-                        <circle cx="30" cy="30" r="28" fill="rgba(200, 155, 60, 0.95)"/>
+-                        <polygon points="23,18 23,42 42,30" fill="#0a0a0a"/>
+-                    </svg>
+-                </div>
+-            </div>
+-        </div>
+-        
+-        <div class="character-info">
+-            <h3 class="character-name">${video.shortTitle}</h3>
+-            <p class="character-title">${getSubtitle(video)}</p>
+-            
+-            <div class="tournament-stats-detail">
+-                <div class="stat-item">
+-                    <span class="stat-icon">${getAccomplishmentIcon(video)}</span>
+-                    <div class="stat-content">
+-                        <span class="stat-number">${getAccomplishmentText(video)}</span>
+-                        <span class="stat-desc">Status</span>
+-                    </div>
+-                </div>
+-               <div class="stat-item">
+-    <span class="stat-icon"><i class="fa-solid fa-eye"></i></span>
+-    <div class="stat-content">
+-        <span class="stat-number">${formatViews(video.views)}</span>
+-        <span class="stat-desc">Views</span>
+-    </div>
+-</div>
+-                ${getPerformanceStatHTML(video)}
+-            </div>
+-            
+-            <div class="character-tags">
+-                <span class="tag tag-seed">Seed #${video.seed}</span>
+-                <span class="tag tag-category">${video.seriesCollection}</span>
+-                ${getStatusBadge(video)}
+-            </div>
+-            
+-            ${bookSection}
+-        </div>
+-    `;
+-    
+-    return card;
+ }
+ 
+-// ========================================
+-// HELPER FUNCTIONS
+-// ========================================
+-
+-function getYearRange(year) {
+-    if (year >= 2024) return '2024-2025';
+-    if (year >= 2022) return '2022-2023';
+-    if (year >= 2020) return '2020-2021';
+-    if (year >= 2018) return '2018-2019';
+-    return '2014-2017';
+-}
++function buildFilters() {
++    const chars = [...new Set(ALL.flatMap(e => e.characters || []))].sort();
++    const charBox = document.getElementById('charFilters');
++    charBox.innerHTML = chars.map(c => `<button type="button" class="chip" data-char="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
++    charBox.hidden = chars.length < 2;
+ 
+-function getSubtitle(video) {
+-    let subtitle = '';
+-    
+-    // Add series/event info
+-    if (video.seriesCollection === 'Worlds Anthem') {
+-        subtitle = `Worlds ${video.year}`;
+-    } else if (video.seriesCollection) {
+-        subtitle = video.seriesCollection;
+-    } else {
+-        subtitle = `${video.year}`;
+-    }
+-    
+-    // Add artist
+-    subtitle += ` • ${video.artist}`;
+-    
+-    return subtitle;
++    const cups = [...new Set(ALL.flatMap(e => e.tournaments || []))].sort();
++    const cupSel = document.getElementById('cupFilter');
++    cupSel.innerHTML = '<option value="">All cups</option>' + cups.map(c => `<option value="${esc(c)}">${esc(cupDisplayName(c))}</option>`).join('');
++    cupSel.closest('.toolbar-field').hidden = cups.length < 2;
+ }
+ 
+-function getAccomplishmentIcon(video) {
+-    if (video.stats.championships >= 2) return '<i class="fa-solid fa-trophy"></i><i class="fa-solid fa-trophy"></i>';
+-    if (video.stats.championships === 1) return '<i class="fa-solid fa-trophy"></i>';
+-    if (video.tournamentStatus === 'eliminated') return '<i class="fa-solid fa-xmark"></i>';
+-    return '<i class="fa-solid fa-bolt"></i>';
++function visible() {
++    const q = state.q.trim().toLowerCase();
++    const list = ALL.filter(e =>
++        (!q || `${e.shortTitle || ''} ${e.title || ''} ${e.artist || ''}`.toLowerCase().includes(q)) &&
++        (!state.chars.size || (e.characters || []).some(c => state.chars.has(c))) &&
++        (!state.cup || (e.tournaments || []).includes(state.cup)) &&
++        (!state.status || e.standing.kind === state.status));
++    const byViews = (a, b) => (b.views || 0) - (a.views || 0);
++    const sorters = {
++        standing: (a, b) => STATUS_RANK[a.standing.kind] - STATUS_RANK[b.standing.kind] || b.standing.wins - a.standing.wins || byViews(a, b),
++        views: byViews,
++        wins: (a, b) => b.standing.wins - a.standing.wins || byViews(a, b),
++        newest: (a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || '')),
++        title: (a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
++        creator: (a, b) => (a.artist || '').localeCompare(b.artist || '')
++    };
++    return list.sort(sorters[state.sort] || sorters.standing);
+ }
+ 
+-function getAccomplishmentText(video) {
+-    if (video.stats.championships >= 2) return `${video.stats.championships}x Champion`;
+-    if (video.stats.championships === 1) return 'Champion';
+-    if (video.tournamentStatus === 'eliminated') return 'Eliminated';
+-    return 'Competing';
++function cardHTML(e) {
++    const s = e.standing;
++    const title = e.shortTitle || e.title || 'Untitled edit';
++    const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
++    const creatorUrl = safeUrl(e.creatorUrl);
++    const creator = creatorUrl
++        ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
++        : `<span class="edit-creator">${esc(e.artist || 'Unknown creator')}</span>`;
++    const cups = (e.tournaments || []).map(c => `<span class="pill pill-cup">${esc(cupDisplayName(c))}</span>`).join('');
++    const chars = (e.characters || []).map(c => `<span class="pill">${esc(c)}</span>`).join('');
++    const vote = s.liveMatch ? `<a class="edit-vote" href="/vote.html?match=${encodeURIComponent(s.liveMatch.matchId)}">Vote now</a>` : '';
++    return `<article class="edit-card" data-id="${esc(e.id)}">
++        <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Watch ${esc(title)}">
++            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">
++            <span class="edit-badge status-${s.kind}">${s.kind === 'champion' ? '<i class="fa-solid fa-trophy" aria-hidden="true"></i> ' : ''}${esc(s.label)}</span>
++            ${e.duration != null ? `<span class="edit-duration">${fmtDuration(e.duration)}</span>` : ''}
++            <span class="edit-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
++        </button>
++        <div class="edit-body">
++            <h3 class="edit-title">${esc(title)}</h3>
++            ${creator}
++            <dl class="edit-stats">
++                <div><dt>Record</dt><dd>${record}</dd></div>
++                <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
++                <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
++            </dl>
++            <div class="edit-pills">${chars}${cups}</div>
++            ${vote}
++        </div>
++    </article>`;
+ }
+ 
+-function getStatusBadge(video) {
+-    let badges = '';
+-    
+-    // Championship status
+-    if (video.stats.championships >= 2) {
+-        badges += '<span class="tag tag-champion">Legend</span>';
+-    } else if (video.stats.championships === 1) {
+-        badges += '<span class="tag tag-champion">Champion</span>';
+-    } else if (video.tournamentStatus === 'eliminated') {
+-        badges += '<span class="tag tag-eliminated">Eliminated</span>';
+-    } else {
+-        badges += '<span class="tag tag-competing">Competing</span>';
++function render() {
++    const list = visible();
++    document.getElementById('editCount').textContent = `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
++    if (!ALL.length) {
++        grid.innerHTML = '<div class="gallery-message"><h3>No edits have entered a cup yet</h3><p>The first cup is on its way. Check back soon, or <a href="/live">see what is live</a>.</p></div>';
++        return;
+     }
+-    
+-    // Multi-category indicator
+-    if (video.additionalCategories && video.additionalCategories.length > 0) {
+-        const extraCount = video.additionalCategories.length;
+-        badges += ` <span class="tag tag-multi" title="Also in: ${video.additionalCategories.join(', ')}">+${extraCount} Series</span>`;
++    if (!list.length) {
++        grid.innerHTML = '<div class="gallery-message"><h3>No edits match</h3><p>Try a different search or clear the filters.</p><button type="button" class="gallery-retry" id="clearFilters">Clear filters</button></div>';
++        document.getElementById('clearFilters')?.addEventListener('click', resetFilters);
++        return;
+     }
+-    
+-    return badges;
++    grid.innerHTML = list.map(cardHTML).join('');
+ }
+ 
+-function getPerformanceStatHTML(video) {
+-    if (video.stats.winRecord && video.stats.winRecord !== '0-0') {
+-        return `
+-            <div class="stat-item">
+-                <span class="stat-icon"><i class="fa-solid fa-chart-line"></i></span>
+-                <div class="stat-content">
+-                    <span class="stat-number">${video.stats.winRecord}</span>
+-                    <span class="stat-desc">${video.stats.winRate} Win Rate</span>
+-                </div>
+-            </div>
+-        `;
+-    }
+-    
+-    return `
+-        <div class="stat-item">
+-            <span class="stat-icon"><i class="fa-regular fa-calendar"></i></span>
+-            <div class="stat-content">
+-                <span class="stat-number">${video.year}</span>
+-                <span class="stat-desc">Released</span>
+-            </div>
+-        </div>
+-    `;
+-}
+-
+-function formatViews(views) {
+-    if (views >= 1000000000) return (views / 1000000000).toFixed(1) + 'B';
+-    if (views >= 1000000) return (views / 1000000).toFixed(0) + 'M';
+-    if (views >= 1000) return (views / 1000).toFixed(0) + 'K';
+-    return views.toString();
+-}
+-
+-function capitalizeFirst(str) {
+-    return str.charAt(0).toUpperCase() + str.slice(1);
+-}
+-
+-// ========================================
+-// SORTING FUNCTIONALITY
+-// ========================================
+-function sortVideos(videos, sortBy) {
+-    const sorted = [...videos];
+-    
+-    switch(sortBy) {
+-        case 'popular':
+-            sorted.sort((a, b) => b.views - a.views);
+-            break;
+-        case 'newest':
+-            sorted.sort((a, b) => b.year - a.year || b.uploadDate.localeCompare(a.uploadDate));
+-            break;
+-        case 'oldest':
+-            sorted.sort((a, b) => a.year - b.year || a.uploadDate.localeCompare(b.uploadDate));
+-            break;
+-        case 'alphabetical':
+-            sorted.sort((a, b) => a.shortTitle.localeCompare(b.shortTitle));
+-            break;
+-        case 'seed':
+-            sorted.sort((a, b) => a.seed - b.seed);
+-            break;
+-        case 'championships':
+-            sorted.sort((a, b) => (b.stats.championships || 0) - (a.stats.championships || 0));
+-            break;
+-        default:
+-            sorted.sort((a, b) => a.seed - b.seed);
+-    }
+-    
+-    return sorted;
++function resetFilters() {
++    state.q = ''; state.chars.clear(); state.cup = ''; state.status = '';
++    document.getElementById('searchInput').value = '';
++    document.getElementById('cupFilter').value = '';
++    document.getElementById('statusFilter').value = '';
++    document.querySelectorAll('#charFilters .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
++    render();
+ }
+ 
+-// ========================================
+-// FILTER FUNCTIONALITY (ENHANCED FOR MULTI-CATEGORY)
+-// ========================================
+-function filterMusicVideos() {
+-    const filterInputs = document.querySelectorAll('.filter-input');
+-    
+-    // Get all checked filters
+-    const activeFilters = {
+-        series: [], 
+-        year: []
+-    };
+-
+-    filterInputs.forEach(input => {
+-        if (input.checked) {
+-            const filterType = input.dataset.filter;
+-            const value = input.value;
+-            
+-            if (filterType === 'series') {
+-                activeFilters.series.push(value);
+-            } else if (filterType === 'year') {
+-                activeFilters.year.push(value);
+-            }
+-        }
+-    });
+-
+-    // Get search term
+-    const searchTerm = searchInput.value.toLowerCase();
+-    
+-    // Get sort option
+-    const sortBy = sortSelect ? sortSelect.value : 'seed';
+-
+-    // Filter cards
+-    let visibleVideos = [];
+-
+-    allVideos.forEach(video => {
+-        const cardSeries = video.seriesCollection;
+-        const additionalCats = video.additionalCategories || [];
+-        const cardYear = getYearRange(video.year);
+-        const cardName = video.title.toLowerCase();
+-        const cardArtist = video.artist.toLowerCase();
+-
+-        // ✅ FIXED LOGIC:
+-        // If NO filters are checked in a category, show NOTHING
+-        // If ALL filters are checked in a category, show EVERYTHING
+-        // If SOME filters are checked, show only matching items
+-        
+-        const seriesInputs = document.querySelectorAll('input[data-filter="series"]');
+-        const yearInputs = document.querySelectorAll('input[data-filter="year"]');
+-        
+-        const allSeriesChecked = Array.from(seriesInputs).every(input => input.checked);
+-        const allYearsChecked = Array.from(yearInputs).every(input => input.checked);
+-        
+-        const noSeriesChecked = activeFilters.series.length === 0;
+-        const noYearsChecked = activeFilters.year.length === 0;
+-
+-        // Series filter logic
+-        let matchesSeries;
+-        if (noSeriesChecked) {
+-            matchesSeries = false; // No filters selected = show nothing
+-        } else if (allSeriesChecked) {
+-            matchesSeries = true; // All filters selected = show everything
+-        } else {
+-            // Some filters selected = check if video matches
+-            matchesSeries = activeFilters.series.includes(cardSeries) ||
+-                           activeFilters.series.some(filter => additionalCats.includes(filter));
+-        }
+-        
+-        // Year filter logic
+-        let matchesYear;
+-        if (noYearsChecked) {
+-            matchesYear = false; // No filters selected = show nothing
+-        } else if (allYearsChecked) {
+-            matchesYear = true; // All filters selected = show everything
+-        } else {
+-            // Some filters selected = check if video matches
+-            matchesYear = activeFilters.year.includes(cardYear);
+-        }
+-        
+-        const matchesSearch = searchTerm === '' || cardName.includes(searchTerm) || cardArtist.includes(searchTerm);
+-
+-        // Show or hide card
+-        if (matchesSeries && matchesYear && matchesSearch) {
+-            visibleVideos.push(video);
+-        }
+-    });
+-    
+-    // Sort visible videos
+-    visibleVideos = sortVideos(visibleVideos, sortBy);
+-    
+-    // Render sorted videos
+-    renderVideos(visibleVideos);
+-
+-    // Prevent jarring scroll on filter change
+-    if (window.scrollY > 300) {
+-        window.scrollTo({
+-            top: Math.min(window.scrollY, 300),
+-            behavior: 'smooth'
+-        });
+-    }
+-    
+-    // Re-attach event listeners
+-    attachCardEventListeners();
+-
+-    // Update count
+-    musicCount.textContent = visibleVideos.length;
+-
+-    // Show/hide no results message
+-    if (visibleVideos.length === 0) {
+-        noResults.style.display = 'block';
+-    } else {
+-        noResults.style.display = 'none';
+-    }
++// ---------- video dialog ----------
++function openWatch(id, trigger) {
++    const e = ALL.find(x => x.id === id);
++    const dialog = document.getElementById('watchDialog');
++    if (!e || !dialog) return;
++    lastFocus = trigger || null;
++    document.getElementById('watchTitle').textContent = e.shortTitle || e.title || '';
++    const creatorUrl = safeUrl(e.creatorUrl);
++    document.getElementById('watchMeta').innerHTML =
++        (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +
++        ` <span aria-hidden="true">\u2022</span> <a href="https://www.youtube.com/shorts/${esc(e.videoId)}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` +
++        (e.standing.liveMatch ? ` <span aria-hidden="true">\u2022</span> <a href="/vote.html?match=${encodeURIComponent(e.standing.liveMatch.matchId)}">Vote now</a>` : '');
++    document.getElementById('watchFrame').src = `https://www.youtube.com/embed/${encodeURIComponent(e.videoId)}?autoplay=1&rel=0&playsinline=1`;
++    dialog.showModal();
+ }
+-
+-// ========================================
+-// HELPER: UPDATE TOGGLE BUTTON TEXT
+-// ========================================
+-function updateToggleButtonText(filterType) {
+-    const button = document.querySelector(`.filter-toggle[data-target="${filterType}"]`);
+-    const inputs = document.querySelectorAll(`input[data-filter="${filterType}"]`);
+-    const allChecked = Array.from(inputs).every(input => input.checked);
+-    
+-    if (button) {
+-        button.textContent = allChecked ? 'Deselect All' : 'Select All';
+-    }
++function closeWatch() {
++    const dialog = document.getElementById('watchDialog');
++    if (dialog?.open) dialog.close();
+ }
+ 
+-// ========================================
+-// EVENT LISTENERS SETUP (ENHANCED WITH TOGGLE + SHIFT-CLICK + SCROLL FIX)
+-// ========================================
+-function setupEventListeners() {
+-    const filterInputs = document.querySelectorAll('.filter-input');
+-    
+-    // ✅ FIXED: Toggle buttons for Select/Deselect All
+-    const filterToggles = document.querySelectorAll('.filter-toggle');
+-    filterToggles.forEach(button => {
+-        button.addEventListener('click', (e) => {
+-            const target = e.target.dataset.target; // 'series' or 'year'
+-            const inputs = document.querySelectorAll(`input[data-filter="${target}"]`);
+-            
+-            // Check if all are currently checked
+-            const allChecked = Array.from(inputs).every(input => input.checked);
+-            
+-            // Toggle all
+-            inputs.forEach(input => {
+-                input.checked = !allChecked;
+-            });
+-            
+-            // Update button text
+-            e.target.textContent = allChecked ? 'Select All' : 'Deselect All';
+-            
+-            // ✅ FIX: Force re-filter after toggling
+-            filterMusicVideos();
+-        });
++function setup() {
++    document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value; render(); });
++    document.getElementById('cupFilter').addEventListener('change', e => { state.cup = e.target.value; render(); });
++    document.getElementById('statusFilter').addEventListener('change', e => { state.status = e.target.value; render(); });
++    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; render(); });
++    document.getElementById('charFilters').addEventListener('click', e => {
++        const b = e.target.closest('.chip'); if (!b) return;
++        const c = b.dataset.char, on = !state.chars.has(c);
++        on ? state.chars.add(c) : state.chars.delete(c);
++        b.setAttribute('aria-pressed', String(on));
++        render();
+     });
+-
+-    // ✅ Shift+Click to isolate single filter
+-    filterInputs.forEach(input => {
+-        input.addEventListener('click', (e) => {
+-            // If shift-clicking, deselect all others in that category
+-            if (e.shiftKey) {
+-                const filterType = input.dataset.filter;
+-                
+-                filterInputs.forEach(otherInput => {
+-                    if (otherInput.dataset.filter === filterType && otherInput !== input) {
+-                        otherInput.checked = false;
+-                    }
+-                });
+-                
+-                // Ensure the clicked item stays checked
+-                input.checked = true;
+-                
+-                // Update toggle button text
+-                updateToggleButtonText(filterType);
+-                
+-                // Trigger filter
+-                filterMusicVideos();
+-                
+-                // ✅ FIX: Prevent normal change event from firing
+-                e.preventDefault();
+-                return;
+-            }
+-        });
+-        
+-        // Regular change event (no shift key)
+-        input.addEventListener('change', (e) => {
+-            // ✅ FIX: Only update if not a shift-click (already handled above)
+-            if (!e.shiftKey) {
+-                const filterType = input.dataset.filter;
+-                updateToggleButtonText(filterType);
+-                filterMusicVideos();
+-            }
+-        });
+-    });
+-
+-    // ✅ Smooth filter panel scrolling (prevent scroll hijacking)
+-    const filterPanel = document.querySelector('.filter-panel');
+-    if (filterPanel) {
+-        filterPanel.addEventListener('wheel', (e) => {
+-            const { scrollTop, scrollHeight, clientHeight } = filterPanel;
+-            const atTop = scrollTop === 0;
+-            const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+-            
+-            // Allow scroll within panel, prevent propagation to page
+-            if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+-                e.stopPropagation();
+-            }
+-        }, { passive: false });
+-    }
+-
+-    // Search input
+-    if (searchInput) {
+-        searchInput.addEventListener('input', filterMusicVideos);
+-    }
+-    
+-    // Sort select
+-    if (sortSelect) {
+-        sortSelect.addEventListener('change', filterMusicVideos);
+-    }
+-
+-    // Reset filters
+-    if (resetButton) {
+-        resetButton.addEventListener('click', () => {
+-            filterInputs.forEach(input => {
+-                input.checked = true;
+-            });
+-            
+-            // Reset toggle button texts
+-            filterToggles.forEach(button => {
+-                button.textContent = 'Deselect All';
+-            });
+-            
+-            if (searchInput) searchInput.value = '';
+-            if (sortSelect) sortSelect.value = 'seed';
+-            
+-            // ✅ FIX: Ensure filter runs after reset
+-            filterMusicVideos();
+-        });
+-    }
+-    
+-    // Attach card listeners
+-    attachCardEventListeners();
+-
+-    // Close video modal
+-    if (videoModalClose) {
+-        videoModalClose.addEventListener('click', closeVideoModal);
+-    }
+-    
+-    if (videoModal) {
+-        videoModal.addEventListener('click', function(e) {
+-            if (e.target === videoModal) {
+-                closeVideoModal();
+-            }
+-        });
+-    }
+-    
+-    document.addEventListener('keydown', function(e) {
+-        if (e.key === 'Escape' && videoModal && videoModal.style.display === 'block') {
+-            closeVideoModal();
+-        }
++    grid.addEventListener('click', e => {
++        const b = e.target.closest('[data-watch]');
++        if (b) openWatch(b.dataset.watch, b);
+     });
+-}
+-
+-function attachCardEventListeners() {
+-    document.querySelectorAll('.character-card').forEach(card => {
+-        // Make entire card show pointer cursor
+-        card.style.cursor = 'pointer';
+-        
+-        // Prevent book recommendation area from triggering video
+-        const bookRec = card.querySelector('.card-book-recommendation');
+-        if (bookRec) {
+-            bookRec.addEventListener('click', function(e) {
+-                e.stopPropagation();
+-            });
+-            bookRec.style.cursor = 'default';
+-        }
+-        
+-        // Click anywhere on card opens video
+-        card.addEventListener('click', function(e) {
+-            const videoId = this.dataset.videoId;
+-            const embedAllowed = this.dataset.embedAllowed === 'true';
+-            
+-            if (!embedAllowed) {
+-                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+-            } else {
+-                openVideoModal(videoId);
+-            }
+-        });
+-        
+-        // Show play overlay on hover
+-        card.addEventListener('mouseenter', function() {
+-            const overlay = this.querySelector('.play-overlay');
+-            if (overlay) {
+-                overlay.style.opacity = '1';
+-            }
+-        });
+-        
+-        card.addEventListener('mouseleave', function() {
+-            const overlay = this.querySelector('.play-overlay');
+-            if (overlay) {
+-                overlay.style.opacity = '0';
+-            }
+-        });
++    const dialog = document.getElementById('watchDialog');
++    dialog.addEventListener('click', e => { if (e.target === dialog) closeWatch(); });   // click on the backdrop
++    document.getElementById('watchClose').addEventListener('click', closeWatch);
++    dialog.addEventListener('close', () => {
++        document.getElementById('watchFrame').src = '';                                 // stop playback
++        if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+     });
+ }
+ 
+-function openVideoModal(videoId) {
+-    if (modalVideoFrame && videoModal) {
+-        modalVideoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+-        videoModal.style.display = 'block';
+-        document.body.style.overflow = 'hidden';
+-    }
+-}
+-
+-function closeVideoModal() {
+-    if (videoModal && modalVideoFrame) {
+-        videoModal.style.display = 'none';
+-        modalVideoFrame.src = '';
+-        document.body.style.overflow = '';
+-    }
+-}
+-
+-// ========================================
+-// INITIALIZE ON PAGE LOAD (CONDITIONAL)
+-// ========================================
++// vote.js imports this module for getAllTournamentStats, so only start the gallery on the gallery page
+ document.addEventListener('DOMContentLoaded', () => {
+-    // Only run gallery-specific code if we're on the gallery page
+-    if (musicGrid && searchInput) {
+-        loadMusicVideos();
+-    } else {
+-        console.log('Gallery elements not found - skipping gallery initialization');
+-    }
++    if (!grid) return;
++    setup();
++    loadGallery();
+ });
+-
+-/**
+- * Track book clicks for analytics
+- */
+-function trackBookClick(songSlug, location) {
+-    console.log(`📊 Book clicked: ${songSlug} from ${location}`);
+-}
+-
+-// Make available globally
+-window.trackBookClick = trackBookClick;
+-
+-// (getAllTournamentStats already exported at line 28)
+-
+-console.log('League Music Gallery script loaded');
+\ No newline at end of file
+diff --git a/music-gallery.html b/music-gallery.html
+index d33e7d8..2288cc3 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -3,345 +3,124 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    
+-    <!-- SEO Meta Tags -->
+-    <title>Music Gallery | All LoL Songs & Videos | Anthem Arena</title>
+-    <meta name="description" content="Browse all 64 League of Legends music videos in the tournament. Filter by K/DA, Pentakill, Worlds anthems, year, and artist. Watch trailers and view stats.">
+-    <link rel="canonical" href="https://anthemarena.com/music-gallery">
+-    
++
++    <title>Edits Gallery | Arcane Moments</title>
++    <meta name="description" content="Every fan edit that has entered an Arcane Moments cup: creators, records, results and a one-tap player.">
++    <meta property="og:type" content="website">
++    <meta property="og:title" content="Edits Gallery | Arcane Moments">
++    <meta property="og:description" content="Every fan edit that has entered an Arcane Moments cup: creators, records and results.">
++
+     <!-- Favicon -->
+     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+-    
+-    <!-- Open Graph -->
+-    <meta property="og:type" content="website">
+-    <meta property="og:url" content="https://anthemarena.com/music-gallery">
+-    <meta property="og:title" content="Music Gallery | All LoL Songs | Anthem Arena">
+-    <meta property="og:description" content="Explore all 64 League of Legends music videos competing in the tournament. Filter by K/DA, Pentakill, Worlds anthems, and more.">
+-    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Gallery">
+-    <meta property="og:image:width" content="1200">
+-    <meta property="og:image:height" content="630">
+-    
+-    <!-- Twitter Card -->
+-    <meta name="twitter:card" content="summary_large_image">
+-    <meta name="twitter:title" content="Music Gallery | All LoL Songs">
+-    <meta name="twitter:description" content="Browse all 64 League of Legends music videos with filters for K/DA, Pentakill, Worlds anthems, and more.">
+-    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta name="twitter:image:alt" content="Anthem Arena Music Gallery">
+-    
+-    <!-- Fonts -->
+-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+-    
+-    <!-- Stylesheets -->
+-         <link rel="stylesheet" href="/css/main.css">
+ 
++    <!-- Fonts and icons -->
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++
++    <!-- Stylesheets -->
++    <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+-    <link rel="stylesheet" href="/css/moments-gallery.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+     <link rel="stylesheet" href="/css/settings.css">
++    <link rel="stylesheet" href="/css/edits-gallery.css">
++    <!-- Arcane look (opt-in via <body class="theme-arcane page-gallery">): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+ 
+-    
+-    <!-- Schema.org Structured Data -->
+     <script type="application/ld+json">
+     {
+       "@context": "https://schema.org",
+       "@type": "CollectionPage",
+-      "name": "League of Legends Music Gallery",
+-      "description": "Complete collection of League of Legends music videos including K/DA, Pentakill, Worlds anthems, and cinematics",
+-      "url": "https://anthemarena.com/music-gallery"
++      "name": "Arcane Moments Edits Gallery",
++      "description": "Fan edits that have entered an Arcane Moments cup, with creator credit, records and results."
+     }
+     </script>
+ 
+-      <!-- ✅ CRITICAL: Load global systems FIRST -->
++    <!-- Global systems first -->
+     <script type="module" src="/js/firebase-config.js"></script>
+     <script type="module" src="/js/notification-storage.js"></script>
+     <script type="module" src="/js/notification-center.js"></script>
+-
+     <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
++<body class="theme-arcane page-gallery">
+ 
+     <div id="nav-placeholder"></div>
+     <script type="module" src="/js/navigation.js"></script>
+ 
+-    <!-- Page Hero -->
+-    <section class="roster-hero">
+-        <div class="hero-overlay"></div>
+-        <div class="hero-content">
+-            <h1 class="page-title">Music Gallery</h1>
+-            <p class="page-subtitle">Explore all 64 League of Legends music videos competing in Season 1</p>
+-        </div>
+-    </section>
+-
+-    <!-- PAGE INTRO -->
+-    <section class="page-intro">
+-        <div class="container">
+-            <p>
+-                Browse all League of Legends music videos from <strong>Worlds anthems</strong> to 
+-                <strong>Arcane</strong>, <strong>K/DA</strong>, <strong>Pentakill</strong>, 
+-                and more. Filter by series, year, or search by name. Click any video to watch or 
+-                <a href="/live">vote in active matches</a>. Track progress in the 
+-                <a href="/brackets.html">tournament bracket</a> or view 
+-                <a href="/stats.html">detailed statistics</a>.
+-            </p>
+-        </div>
+-    </section>
+-
+-    <!-- Filters & Gallery -->
+-    <section class="roster-section container">
+-        
+-      <!-- Filter Panel (Left Column) -->
+-<aside class="filter-panel">
+-    <h2 class="filter-title">Filters</h2>
+-    
+-    <!-- ✅ Pro Tip -->
+-    <div class="filter-tip">
+-        <i class="fa-solid fa-lightbulb"></i>
+-        <strong>Pro tip:</strong> Shift+Click a filter to select only that one
+-    </div>
+-    
+-    <!-- Search Bar -->
+-    <div class="filter-group">
+-        <label class="filter-label">Search</label>
+-        <input type="text" id="searchInput" class="search-input" placeholder="Search by song or artist...">
+-    </div>
+-
+-    <!-- ✅ UPDATED: Series/Collection Filter with Neutral Grouping -->
+-    <div class="filter-group">
+-        <div class="filter-header">
+-            <label class="filter-label">Collection</label>
+-            <button class="filter-toggle" data-target="series">Deselect All</button>
+-        </div>
+-        <div class="filter-options">
+-            
+-            <!-- WORLD CHAMPIONSHIPS -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">World Championships</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Worlds Anthem" checked>
+-                    <span>Worlds Anthems</span>
+-                </label>
+-            </div>
+-
+-            <!-- SHOWS & SERIES -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">Shows & Series</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Arcane" checked>
+-                    <span>Arcane</span>
+-                </label>
+-            </div>
+-
+-            <!-- VIRTUAL BANDS -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">Virtual Bands</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="K/DA" checked>
+-                    <span>K/DA</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Pentakill" checked>
+-                    <span>Pentakill</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="True Damage" checked>
+-                    <span>True Damage</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="HEARTSTEEL" checked>
+-                    <span>HEARTSTEEL</span>
+-                </label>
+-            </div>
+-
+-            <!-- IN-GAME CONTENT -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">In-Game Content</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Season Cinematic" checked>
+-                    <span>Season Cinematics</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Champion Theme" checked>
+-                    <span>Champion Themes</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Star Guardian" checked>
+-                    <span>Star Guardian</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Spirit Blossom" checked>
+-                    <span>Spirit Blossom</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Event Theme" checked>
+-                    <span>Event Themes</span>
+-                </label>
+-            </div>
+-
+-            <!-- OTHER RIOT GAMES -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">Other Riot Games</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Wild Rift" checked>
+-                    <span>Wild Rift</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="TFT" checked>
+-                    <span>Teamfight Tactics</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Runeterra" checked>
+-                    <span>Legends of Runeterra</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="2XKO" checked>
+-                    <span>2XKO</span>
+-                </label>
+-            </div>
+-
+-            <!-- OTHER -->
+-            <div class="filter-subgroup">
+-                <span class="filter-subgroup-title">Other</span>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Regional Exclusive" checked>
+-                    <span>Regional Exclusives</span>
+-                </label>
+-                <label class="filter-checkbox">
+-                    <input type="checkbox" class="filter-input" data-filter="series" value="Standalone" checked>
+-                    <span>Standalone Songs</span>
+-                </label>
+-            </div>
+-            
+-        </div>
+-    </div>
+-
+-    <!-- Year Filter -->
+-    <div class="filter-group">
+-        <div class="filter-header">
+-            <label class="filter-label">Release Year</label>
+-            <button class="filter-toggle" data-target="year">Deselect All</button>
+-        </div>
+-        <div class="filter-options">
+-            <label class="filter-checkbox">
+-                <input type="checkbox" class="filter-input" data-filter="year" value="2024-2025" checked>
+-                <span>2024-2025</span>
+-            </label>
+-            <label class="filter-checkbox">
+-                <input type="checkbox" class="filter-input" data-filter="year" value="2022-2023" checked>
+-                <span>2022-2023</span>
+-            </label>
+-            <label class="filter-checkbox">
+-                <input type="checkbox" class="filter-input" data-filter="year" value="2020-2021" checked>
+-                <span>2020-2021</span>
+-            </label>
+-            <label class="filter-checkbox">
+-                <input type="checkbox" class="filter-input" data-filter="year" value="2018-2019" checked>
+-                <span>2018-2019</span>
+-            </label>
+-            <label class="filter-checkbox">
+-                <input type="checkbox" class="filter-input" data-filter="year" value="2014-2017" checked>
+-                <span>2014-2017</span>
+-            </label>
+-        </div>
+-    </div>
+-
+-    <!-- Reset Button -->
+-    <button class="reset-filters" id="resetFilters">Reset All Filters</button>
+-</aside>
+-
+-        <!-- Main Content (Right Column) -->
+-        <div class="roster-content">
+-
+-            <!-- Stats Bar with Sort -->
+-            <div class="roster-stats">
+-                <p>
+-                    <span id="characterCount">64</span> music videos found
+-                </p>
+-                
+-                <!-- ✅ NEW: Sort Dropdown -->
+-                <div class="sort-controls">
+-                    <label for="sortSelect">Sort by:</label>
+-                    <select id="sortSelect" class="sort-select">
+-                        <option value="seed">Seed (Default)</option>
+-                        <option value="popular">Most Popular</option>
+-                        <option value="championships">Most Championships</option>
+-                        <option value="newest">Newest First</option>
+-                        <option value="oldest">Oldest First</option>
+-                        <option value="alphabetical">A-Z</option>
++    <main class="gallery-page">
++        <header class="gallery-hero">
++            <h1 class="gallery-title">Edits Gallery</h1>
++            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup, with its creator, record and result. Tap one to watch it.</p>
++        </header>
++
++        <section class="gallery-toolbar" aria-label="Search and filter edits">
++            <div class="toolbar-row">
++                <div class="toolbar-field toolbar-search">
++                    <label for="searchInput">Search</label>
++                    <input type="search" id="searchInput" placeholder="Edit title or creator" autocomplete="off">
++                </div>
++                <div class="toolbar-field">
++                    <label for="statusFilter">Status</label>
++                    <select id="statusFilter">
++                        <option value="">All</option>
++                        <option value="live">Live now</option>
++                        <option value="bracket">In the bracket</option>
++                        <option value="eliminated">Eliminated</option>
++                        <option value="champion">Champions</option>
++                        <option value="entered">Entered</option>
++                    </select>
++                </div>
++                <div class="toolbar-field" hidden>
++                    <label for="cupFilter">Cup</label>
++                    <select id="cupFilter"><option value="">All cups</option></select>
++                </div>
++                <div class="toolbar-field">
++                    <label for="sortSelect">Sort by</label>
++                    <select id="sortSelect">
++                        <option value="standing">Standing</option>
++                        <option value="views">Most views</option>
++                        <option value="wins">Most wins</option>
++                        <option value="newest">Newest</option>
++                        <option value="title">Title A-Z</option>
++                        <option value="creator">Creator A-Z</option>
+                     </select>
+                 </div>
+             </div>
+-
+-            <!-- Music Video Grid -->
+-            <div class="character-grid" id="characterGrid">
+-                <!-- Cards generated dynamically by JS -->
+-            </div>
+-
+-            <!-- No Results Message -->
+-            <div class="no-results" id="noResults" style="display: none;">
+-                <h3>No music videos found</h3>
+-                <p>Try adjusting your filters or search terms.</p>
+-            </div>
+-
+-        </div> <!-- End of .roster-content -->
+-
+-    </section> <!-- End of .roster-section.container -->
+-
+-    <!-- TOURNAMENT ACTIONS SECTION -->
+-    <section class="tournament-actions">
+-        <div class="container">
+-            <h2 class="section-title">Participate in the Tournament</h2>
+-            <p class="section-subtitle">
+-                Now that you've explored the music gallery, take the next step
+-            </p>
+-            <div class="actions-grid">
+-                <a href="/live" class="action-card">
+-<div class="action-icon"><i class="fa-solid fa-vote-yea"></i></div>
+-                    <h3>Vote Now</h3>
+-                    <p>Cast your votes in active matches and influence which songs advance to the next round</p>
+-                    <span class="action-cta">View Active Matches →</span>
+-                </a>
+-                <a href="/brackets.html" class="action-card">
+-<div class="action-icon"><i class="fa-solid fa-trophy"></i></div>
+-                    <h3>View Bracket</h3>
+-                    <p>See the complete tournament structure and track how your favorite songs are progressing</p>
+-                    <span class="action-cta">View Full Bracket →</span>
+-                </a>
+-                <a href="/stats.html" class="action-card">
+-<div class="action-icon"><i class="fa-solid fa-chart-bar"></i></div>
+-                    <h3>Statistics</h3>
+-                    <p>Analyze detailed performance data, win rates, and voting patterns across all songs</p>
+-                    <span class="action-cta">View Stats Dashboard →</span>
+-                </a>
+-                <a href="/profile#votes" class="action-card">
+-<div class="action-icon"><i class="fa-solid fa-chart-line"></i></div>
+-                    <h3>Track Your Votes</h3>
+-                    <p>Review your voting history, track predictions, and earn achievements for participation</p>
+-                    <span class="action-cta">View Your History →</span>
+-                </a>
+-            </div>
++            <div class="chip-row" id="charFilters" role="group" aria-label="Filter by character" hidden></div>
++            <p class="gallery-count" id="editCount" aria-live="polite"></p>
++        </section>
++
++        <section class="edit-grid" id="editGrid" aria-busy="true" aria-label="Edits">
++            <div class="gallery-message"><p>Loading edits&hellip;</p></div>
++        </section>
++
++        <section class="gallery-next" aria-label="Keep exploring">
++            <a href="/live" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>
++            <a href="/brackets" class="next-link"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>See the bracket</span></a>
++            <a href="/stats" class="next-link"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i><span>Tournament stats</span></a>
++        </section>
++    </main>
++
++    <dialog id="watchDialog" class="watch-dialog" aria-labelledby="watchTitle">
++        <div class="watch-head">
++            <h2 id="watchTitle"></h2>
++            <button type="button" class="watch-close" id="watchClose" aria-label="Close player"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+         </div>
+-    </section>
+-
+-    <!-- Video Modal -->
+-    <div class="video-modal" id="videoModal">
+-        <div class="video-modal-content">
+-            <span class="video-modal-close">×</span>
+-            <iframe id="modalVideoFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
++        <div class="watch-frame-wrap">
++            <iframe id="watchFrame" title="Edit player" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+         </div>
+-    </div>
++        <p class="watch-meta" id="watchMeta"></p>
++    </dialog>
+ 
+     <div id="footer-placeholder"></div>
+     <script src="/js/footer.js"></script>
+ 
+     <script type="module" src="/js/rank-system.js"></script>
+-
+     <script type="module" src="/js/music-gallery.js"></script>
+     <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shorts embed test (delete after use)</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0711;color:#eee;font:14px/1.4 system-ui,sans-serif}
+  h1{font-size:18px;margin:0 0 4px}p{margin:0 0 14px;color:#b9aec6;max-width:900px}
+  .row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+  figure{margin:0;background:#150c20;border:1px solid #3a2150;border-radius:10px;padding:10px}
+  figcaption{font-size:12px;color:#ff70c3;margin-bottom:6px;max-width:360px}
+  iframe{display:block;border:0;background:#000}
+</style></head><body>
+<h1>Shorts embed test</h1>
+<p>Same Short in different frames. Look at which ones fill the frame with the picture and which add black bars or a square picture area. Take one screenshot of the whole page (scroll if needed). Open in a desktop browser; this file is for testing only, do not commit it.</p>
+<div class="row" id="row"></div>
+<script>
+const ID='ae-02YSlobE';
+const base='https://www.youtube.com/embed/'+ID+'?rel=0&playsinline=1';
+const V=[
+ ['A. Current setup: 9:16, 360x640',360,640,base],
+ ['B. 9:16, controls off',360,640,base+'&controls=0'],
+ ['C. 9:16, minimal branding (modestbranding, no annotations, no fullscreen button)',360,640,base+'&modestbranding=1&iv_load_policy=3&fs=0'],
+ ['D. 9:16 on youtube-nocookie.com',360,640,'https://www.youtube-nocookie.com/embed/'+ID+'?rel=0&playsinline=1'],
+ ['E. Smaller 9:16, 270x480',270,480,base],
+ ['F. Square, 360x360',360,360,base],
+ ['G. 4:5, 360x450',360,450,base],
+ ['H. Landscape 16:9, 640x360 (a normal embed)',640,360,base],
+ ['I. Very tall, 360x720',360,720,base],
+];
+const row=document.getElementById('row');
+V.forEach(([label,w,h,src])=>{
+  const f=document.createElement('figure');
+  f.innerHTML='<figcaption></figcaption>';
+  f.querySelector('figcaption').textContent=label;
+  const i=document.createElement('iframe');
+  i.width=w;i.height=h;i.src=src;i.title=label;
+  i.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
+  i.referrerPolicy='strict-origin-when-cross-origin';   // without this YouTube shows Error 153 on some hosts
+  i.setAttribute('allowfullscreen','');
+  f.appendChild(i);row.appendChild(f);
+});
+</script></body></html>

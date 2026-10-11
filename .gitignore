@@ -150,3 +150,4 @@ auto-update-seeds.js
 Thumbs.db
 # Local Netlify folder
 .netlify
+data/edits-report.html
