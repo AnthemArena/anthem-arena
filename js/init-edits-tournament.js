@@ -75,11 +75,12 @@ export async function previewEditsTournament({
 
     const edits = await loadEdits();
     const selected = selectEntries(edits, cupId, size);
-    const { entries, errors } = selected;
+    const { entries, errors, notes } = selected;
     if (errors.length) {
         throw new Error(`Cannot build ${cupId}:\n\n- ${errors.join('\n- ')}`);
     }
     size = selected.size;
+    (notes || []).forEach(n => console.info(`Note: ${n}`));
 
     const seed = drawSeed || makeDrawSeed(cupId);
     const cupName = cupDisplayName(cupId);

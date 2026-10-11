@@ -112,9 +112,12 @@ test('edits not entered in this cup are ignored', () => {
     const l = [...edits(16), mk(99, { tournaments: ['vi-cup-1'] })];
     assert.deepEqual(selectEntries(l, CUP, 16).errors, []);
 });
-test('one entry per creator is enforced', () => {
+test('several edits by one creator are allowed and reported as a note, not an error', () => {
     const l = edits(16); l[5] = mk(6, { channelId: 'chan1', artist: 'Creator 1' });
-    assert.match(errs(l), /One entry per creator/);
+    const r = selectEntries(l, CUP, 16);
+    assert.deepEqual(r.errors, []);
+    assert.equal(r.notes.length, 1);
+    assert.match(r.notes[0], /"Creator 1" has 2 edits/);
 });
 test('status "review" is blocked and the flags are shown', () => {
     const l = edits(16); l[3] = mk(4, { status: 'review', flags: ['long: 4m10s'] });

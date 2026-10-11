@@ -13,8 +13,10 @@ const cupId = args[0];
 if (!cupId) { console.error('Usage: node tools/bracket-preview.mjs <cup-id> [--size N] [--seed <draw seed>] [--file data/edits.json]'); process.exit(1); }
 
 const edits = JSON.parse(fs.readFileSync(file, 'utf8'));
-const { entries, errors, size } = selectEntries(edits, cupId, sizeArg ? Number(sizeArg) : null);
+const { entries, errors, notes, size } = selectEntries(edits, cupId, sizeArg ? Number(sizeArg) : null);
 if (errors.length) { console.error(`\nCannot build ${cupId}:\n  - ${errors.join('\n  - ')}\n`); process.exit(1); }
+
+if (notes.length) console.log(`\nNotes (not errors):\n  - ${notes.join('\n  - ')}`);
 
 const drawSeed = seedArg || makeDrawSeed(cupId);
 const matches = buildMatches({ cupId, cupName: cupDisplayName(cupId), entries, drawSeed });

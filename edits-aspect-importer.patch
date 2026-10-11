@@ -1,0 +1,226 @@
+diff --git a/data/edits.json b/data/edits.json
+index c8a7d49..602839c 100644
+--- a/data/edits.json
++++ b/data/edits.json
+@@ -25,7 +25,9 @@
+     "notes": "",
+     "status": "ok",
+     "flags": [],
+-    "lastChecked": "2026-10-05"
++    "lastChecked": "2026-10-05",
++    "aspect": "1:1",
++    "aspectSource": "manual"
+   },
+   {
+     "id": "ae-02YSlobE",
+@@ -53,6 +55,8 @@
+     "notes": "",
+     "status": "ok",
+     "flags": [],
+-    "lastChecked": "2026-10-05"
++    "lastChecked": "2026-10-05",
++    "aspect": "1:1",
++    "aspectSource": "manual"
+   }
+ ]
+diff --git a/package.json b/package.json
+index 54f5672..2d0b6da 100644
+--- a/package.json
++++ b/package.json
+@@ -6,6 +6,7 @@
+     "@netlify/blobs": "^7.0.0"
+   },
+   "devDependencies": {
++    "jpeg-js": "^0.4.4",
+     "postcss": "^8.4.0"
+   }
+ }
+diff --git a/tools/edits-aspect.js b/tools/edits-aspect.js
+new file mode 100644
+index 0000000..6f1a874
+--- /dev/null
++++ b/tools/edits-aspect.js
+@@ -0,0 +1,103 @@
++#!/usr/bin/env node
++// Works out the picture shape ("aspect") of each edit from its YouTube thumbnail and writes it to data/edits.json.
++//
++//   node tools/edits-aspect.js                 fill in aspect for every edit that has none (no API key needed)
++//   node tools/edits-aspect.js --redetect      also re-check edits whose aspect was set automatically
++//   node tools/edits-aspect.js data/edits.json --thumbs some-folder     offline test: reads <folder>/<videoId>.jpg
++//
++// How it works: YouTube's hqdefault.jpg is always a 4:3 frame (480x360). A square or vertical video sits in the middle with
++// black bars at the sides, a wide video with bars above and below. We measure the bars and snap the picture's shape to the
++// nearest known aspect. Edits with very dark edges can be misread, so anything unsure gets "aspectCheck": true.
++//
++// Manual override: just edit "aspect" in data/edits.json and set "aspectSource": "manual". Manual values are never touched.
++// Allowed values: "9:16", "3:4", "4:5", "1:1", "4:3", "16:9".
++import fs from 'fs';
++import path from 'path';
++import { pathToFileURL } from 'url';
++
++export const ASPECTS = { '9:16': 9 / 16, '3:4': 3 / 4, '4:5': 4 / 5, '1:1': 1, '4:3': 4 / 3, '16:9': 16 / 9 };
++const DARK = 28;          // luma at or below this counts as "black bar" (the bars are about 16, plus JPEG noise)
++const BAR_BRIGHT_MAX = 0.02; // a column/row is a bar if at most 2% of its pixels are brighter than DARK
++const SNAP_TOLERANCE = 0.025; // more than 2.5% away from a known shape = unsure
++const SYMMETRY_PX = 6;    // bars on the two sides should match to within this many pixels
++
++const snap = ratio => {
++  let best = null, dist = Infinity;
++  for (const [name, r] of Object.entries(ASPECTS)) { const d = Math.abs(Math.log(ratio / r)); if (d < dist) { dist = d; best = name; } }
++  return { aspect: best, distance: dist };
++};
++
++// Decode a JPEG and measure the bars. Returns { aspect, ratio, check, note } or { aspect: null, note }.
++export async function detectAspect(jpegBuffer) {
++  let decode;
++  try { ({ decode } = (await import('jpeg-js')).default || (await import('jpeg-js'))); }
++  catch { throw new Error('jpeg-js is not installed. Run: npm install'); }
++  const img = decode(jpegBuffer, { useTArray: true });
++  const W = img.width, H = img.height, px = img.data;
++  const luma = (x, y) => { const i = (y * W + x) * 4; return 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]; };
++  const isBarCol = (x, y0, y1) => { let b = 0; for (let y = y0; y < y1; y++) if (luma(x, y) > DARK) b++; return b / (y1 - y0) <= BAR_BRIGHT_MAX; };
++  const isBarRow = (y, x0, x1) => { let b = 0; for (let x = x0; x < x1; x++) if (luma(x, y) > DARK) b++; return b / (x1 - x0) <= BAR_BRIGHT_MAX; };
++
++  let left = 0; while (left < W && isBarCol(left, 0, H)) left++;
++  if (left >= W) return { aspect: null, note: 'thumbnail is completely black' };
++  let right = 0; while (right < W - left && isBarCol(W - 1 - right, 0, H)) right++;
++  let top = 0; while (top < H && isBarRow(top, left, W - right)) top++;
++  let bottom = 0; while (bottom < H - top && isBarRow(H - 1 - bottom, left, W - right)) bottom++;
++
++  const pw = W - left - right, ph = H - top - bottom;
++  if (pw < 20 || ph < 20) return { aspect: null, note: 'picture area too small to measure' };
++  const ratio = pw / ph, { aspect, distance } = snap(ratio);
++  const notes = [];
++  if (Math.abs(left - right) > SYMMETRY_PX) notes.push(`side bars uneven (${left}px / ${right}px)`);
++  if (Math.abs(top - bottom) > SYMMETRY_PX) notes.push(`top/bottom bars uneven (${top}px / ${bottom}px)`);
++  if (distance > SNAP_TOLERANCE) notes.push(`measured ${ratio.toFixed(3)}, not close to a standard shape`);
++  if (left > 0 && top > 0) notes.push('bars on all four sides');
++  return { aspect, ratio: Number(ratio.toFixed(3)), check: notes.length > 0, note: notes.join('; ') };
++}
++
++async function thumbnailFor(videoId, thumbsDir) {
++  if (thumbsDir) { const f = path.join(thumbsDir, `${videoId}.jpg`); return fs.existsSync(f) ? fs.readFileSync(f) : null; }
++  const res = await fetch(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`);
++  return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
++}
++
++// Fills aspect / aspectSource / aspectCheck on the entries in `list` (mutates them). Returns a list of report lines.
++export async function fillAspects(list, { redetect = false, thumbsDir = null } = {}) {
++  const lines = [];
++  for (const e of list) {
++    if (e.status === 'blocked') continue;
++    const manual = e.aspect && e.aspectSource !== 'auto';
++    if (manual) continue;                                    // manual values are never changed
++    if (e.aspect && !redetect) continue;                     // already detected, keep unless --redetect
++    let result;
++    try {
++      const buf = await thumbnailFor(e.videoId, thumbsDir);
++      if (!buf) { lines.push(`  ${e.videoId}  no thumbnail found, aspect left empty`); continue; }
++      result = await detectAspect(buf);
++    } catch (err) {
++      if (/jpeg-js/.test(err.message)) throw err;
++      lines.push(`  ${e.videoId}  could not read thumbnail (${err.message}), aspect left empty`); continue;
++    }
++    if (!result.aspect) { lines.push(`  ${e.videoId}  ${result.note}: set "aspect" by hand`); continue; }
++    e.aspect = result.aspect; e.aspectSource = 'auto';
++    if (result.check) { e.aspectCheck = true; lines.push(`  ${e.videoId}  ${result.aspect}  CHECK: ${result.note}  (${(e.shortTitle || e.title || '').slice(0, 40)})`); }
++    else { delete e.aspectCheck; lines.push(`  ${e.videoId}  ${result.aspect}  (${(e.shortTitle || e.title || '').slice(0, 40)})`); }
++  }
++  return lines;
++}
++
++// ---------- command line ----------
++if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
++  const args = process.argv.slice(2);
++  const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
++  const redetect = args.includes('--redetect'); if (redetect) args.splice(args.indexOf('--redetect'), 1);
++  const thumbsDir = take('--thumbs');
++  const file = args[0] || 'data/edits.json';
++  (async () => {
++    const list = JSON.parse(fs.readFileSync(file, 'utf8'));
++    const lines = await fillAspects(list, { redetect, thumbsDir });
++    fs.writeFileSync(file, JSON.stringify(list, null, 2) + '\n');
++    console.log(lines.length ? `Aspect for ${lines.length} edit(s) -> ${file}\n${lines.join('\n')}` : 'Nothing to do: every edit already has an aspect.');
++    if (lines.some(l => l.includes('CHECK'))) console.log('\nCHECK = unsure. Open the edit on YouTube, then set "aspect" by hand and "aspectSource": "manual".');
++  })().catch(e => { console.error('\nERROR: ' + e.message); process.exit(1); });
++}
+diff --git a/tools/edits-import.js b/tools/edits-import.js
+index 0d18ce9..e9fbe00 100644
+--- a/tools/edits-import.js
++++ b/tools/edits-import.js
+@@ -11,9 +11,11 @@
+ // Input file: one link per line. Blank lines and lines starting with # are ignored. Optional tags after a pipe:
+ //   https://www.youtube.com/watch?v=XXXXXXXXXXX | sad, fast cuts
+ //
+-// Existing entries are MERGED: your tags, notes, shortTitle and inTournament flag are kept; stats are refreshed.
++// Existing entries are MERGED: your tags, notes, shortTitle, aspect and inTournament flag are kept; stats are refreshed.
++// New entries also get their picture shape ("aspect": 1:1, 4:5, 9:16...) measured from the thumbnail (see tools/edits-aspect.js).
+ import fs from 'fs';
+ import path from 'path';
++import { fillAspects } from './edits-aspect.js';
+ 
+ const args = process.argv.slice(2);
+ const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
+@@ -77,12 +79,17 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+       year: Number((sn.publishedAt || '').slice(0, 4)) || null, uploadDate: (sn.publishedAt || '').slice(0, 10),
+       views: Number(ss.viewCount) || 0, likes: ss.likeCount != null ? Number(ss.likeCount) : null, duration: dur,
+       embedAllowed: st.embeddable !== false, characters: [...new Set([...(old.characters || []), ...detected])], tournaments: old.tournaments || [], tags, category: 'edit', seed: old.seed ?? null,
++      ...(old.aspect ? { aspect: old.aspect, aspectSource: old.aspectSource || 'manual', ...(old.aspectCheck ? { aspectCheck: true } : {}) } : {}),
+       notes: old.notes || '', status: old.status === 'removed' ? 'removed' : status, flags, lastChecked: new Date().toISOString().slice(0, 10),
+     });
+   }
+   // one entry per creator (tournament rule): flag extras, do not drop them from the gallery
+   for (const [ch, ids] of byChannel) if (ids.length > 1) for (const id of ids) { const r = out.find(o => o.videoId === id); r.flags.push(`same creator has ${ids.length} entries (one per creator in each tournament)`); if (r.status === 'ok') r.status = 'review'; }
+ 
++  // picture shape from the thumbnail (skipped in --fixture mode and when jpeg-js is not installed)
++  let aspectLines = [];
++  if (!fixture) { try { aspectLines = await fillAspects(out); } catch (err) { aspectLines = [`  skipped: ${err.message}`]; } }
++
+   fs.mkdirSync(path.dirname(outFile), { recursive: true });
+   fs.writeFileSync(outFile, JSON.stringify(out, null, 2) + '\n');
+ 
+@@ -90,6 +97,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+   const c = s => out.filter(o => o.status === s).length;
+   console.log(`\nChecked ${out.length} links -> ${outFile}   ok: ${c('ok')}   review: ${c('review')}   blocked: ${c('blocked')}\n`);
+   for (const o of out.filter(o => o.flags.length)) console.log(`  [${o.status.toUpperCase()}] ${o.videoId}  ${(o.title || '').slice(0, 50)}\n         ${o.flags.join('; ')}`);
++  if (aspectLines.length) console.log('\nPicture shape (aspect):\n' + aspectLines.join('\n'));
+   if (problems.length) console.log('\nInput problems:\n  ' + problems.join('\n  '));
+   console.log('\nCharacters are auto-detected from titles and descriptions: check them. Add a tournament id to an edit\'s "tournaments" list to enter it (for example "jinx-cup-1").');
+ })().catch(e => { console.error('\nERROR: ' + e.message); process.exit(1); });
+\ No newline at end of file
+diff --git a/tools/test-edits-aspect.mjs b/tools/test-edits-aspect.mjs
+new file mode 100644
+index 0000000..f279f9b
+--- /dev/null
++++ b/tools/test-edits-aspect.mjs
+@@ -0,0 +1,30 @@
++// Offline test for tools/edits-aspect.js: draws fake 480x360 thumbnails (picture in the middle, black bars around it,
++// noisy like a real JPEG) for each shape and checks the detector gets them right.   node tools/test-edits-aspect.mjs
++import jpeg from 'jpeg-js';
++import { detectAspect, ASPECTS } from './edits-aspect.js';
++
++const W = 480, H = 360;
++let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
++function thumb(ratio, { darkEdge = 0, black = false } = {}) {
++  let pw = Math.round(ratio <= W / H ? H * ratio : W), ph = Math.round(ratio <= W / H ? H : W / ratio);
++  const x0 = Math.round((W - pw) / 2), y0 = Math.round((H - ph) / 2), data = Buffer.alloc(W * H * 4);
++  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
++    const inside = !black && x >= x0 && x < x0 + pw && y >= y0 && y < y0 + ph, i = (y * W + x) * 4;
++    let v = inside ? 40 + 150 * Math.abs(Math.sin(x / 17 + y / 23)) + rnd() * 30 : 16 + rnd() * 3;
++    if (inside && darkEdge && (x - x0 < darkEdge || x0 + pw - x <= darkEdge)) v = 20 + rnd() * 4;   // video with a dark edge
++    data[i] = v; data[i + 1] = v * 0.9; data[i + 2] = v * 1.1; data[i + 3] = 255;
++  }
++  return jpeg.encode({ data, width: W, height: H }, 80).data;
++}
++
++let failed = 0;
++const check = (label, ok, extra = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${label} ${extra}`); if (!ok) failed++; };
++for (const [name, ratio] of Object.entries(ASPECTS)) {
++  const r = await detectAspect(thumb(ratio));
++  check(`${name} detected as ${r.aspect}`, r.aspect === name && !r.check, `(measured ${r.ratio})`);
++}
++const dark = await detectAspect(thumb(1, { darkEdge: 30 }));
++console.log(`INFO  square video with a very dark edge reads as ${dark.aspect} (${dark.ratio})${dark.check ? ' CHECK' : ''}: a known limit, use the manual override`);
++const blk = await detectAspect(thumb(1, { black: true }));
++check('all-black thumbnail returns no aspect', blk.aspect === null, `(${blk.note})`);
++process.exit(failed ? 1 : 0);

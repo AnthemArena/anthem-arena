@@ -1,0 +1,166 @@
+diff --git a/docs/arcane_moments.md b/docs/arcane_moments.md
+index fd55ecc..8789933 100644
+--- a/docs/arcane_moments.md
++++ b/docs/arcane_moments.md
+@@ -129,7 +129,7 @@ The card game (section 0) continues as a separate project. This section covers t
+ 
+ **Changes from the moments plan:** no scene tags / arcs / sibling rule; new curation step, creator credit, embeddability check, creator notification; the "song" wording migration now needs "edit" wording; the Jinx champion companion fits.
+ 
+-**Proposed rules (to confirm):** bracket of 16 or 32; Jinx is the clear focus; public YouTube video that allows embedding; original (no re-uploads); one entry per creator; random draw; creator names hidden in early rounds to reduce follower-count bias; message creators before launch (they do not have to opt in, but notification drives sharing); keep the fan-project disclaimer and a visible takedown contact.
++**Proposed rules (to confirm):** bracket of 16 or 32; Jinx is the clear focus; public YouTube video that allows embedding; original (no re-uploads); several edits per creator are allowed (decided 11 Oct 2026); random draw; creator names hidden in early rounds to reduce follower-count bias; message creators before launch (they do not have to opt in, but notification drives sharing); keep the fan-project disclaimer and a visible takedown contact.
+ 
+ **First build:** an import script (run in the Codespace with the existing YouTube API key): list of YouTube links in, checks (public, embeddable, duration, duplicate creators, view count, publish date) and a report out, tournament-ready JSON written. Test the logic offline with sample data; real calls need the user's key.
+ 
+@@ -145,7 +145,7 @@ The card game (section 0) continues as a separate project. This section covers t
+ **End goal (Oct 2026): a series of Arcane / League edit tournaments, with a "Major" as the biggest**
+ - Many themed tournaments (character cups such as Jinx first, then others) plus a **Major** open to any Arcane edit.
+ - **Qualifier structure (idea):** winners / finalists of the themed cups qualify for the Major. Results from the cups also give the Major a natural seeding (popularity seeding was dropped earlier), and a qualification story people can follow.
+-- **One master pool, many tournaments:** `data/edits.json` holds every edit (characters detected from titles and descriptions, a `tournaments` list per edit); each tournament is a selection from it. Tournament rules differ (Jinx cup: Jinx-focused; Major: any Arcane edit), but one entry per creator in each tournament.
++- **One master pool, many tournaments:** `data/edits.json` holds every edit (characters detected from titles and descriptions, a `tournaments` list per edit); each tournament is a selection from it. Tournament rules differ (Jinx cup: Jinx-focused; Major: any Arcane edit), and several edits by one creator are allowed in a tournament (decided 11 Oct 2026).
+ - **Architecture:** Phase 1 put the tournament ID in `arcane-config.js`. Running several tournaments needs the ID chosen per page (URL parameter such as `?t=jinx-cup-1`, with the config value as the default). The Phase 1 groundwork makes that a contained change.
+ - **Scope:** "League of Legends / Arcane edits" widens it. Riot's fan content policy applies as well as the Arcane (Netflix / Fortiche) footage; keep the disclaimer and takedown contact.
+ - **Scale risk:** the Major needs a large audience and a large bracket (64 or 128, or play-ins). Start small; each cup builds the audience for the Major. Not committed to a timeline.
+diff --git a/js/bracket-builder.js b/js/bracket-builder.js
+index 822cdd9..a4bc7d1 100644
+--- a/js/bracket-builder.js
++++ b/js/bracket-builder.js
+@@ -8,7 +8,7 @@
+ // Rules it enforces (see the plan):
+ //   - bracket size is a power of two from 2 to 128 (2, 4, 8, 16, 32, 64, 128)
+ //   - every entry is a public, embeddable edit that has been checked (status "ok")
+-//   - one entry per creator
++//   - several edits by one creator are allowed (decided 11 Oct 2026); they are listed in `notes`, never as errors
+ //   - random draw, reproducible from a published draw seed
+ //   - match ids carry the cup id, so votes from one cup can never collide with another
+ //     (votes are stored as {matchId}_{userId})
+@@ -68,9 +68,10 @@ export function cupDisplayName(cupId) {
+ //
+ // size is optional. Leave it out (null) and the bracket is as big as the entry list, which must then be
+ // 2, 4, 8, 16, 32, 64 or 128. Pass a size to insist on one (a Reset does, so a rebuild can never quietly
+-// become a different-sized bracket). Returns { entries, errors, size }; size is null when it cannot be built.
++// become a different-sized bracket). Returns { entries, errors, notes, size }; size is null when it cannot be built.
++// `notes` is information only (for example creators with more than one edit in the cup) and never blocks a build.
+ export function selectEntries(edits, cupId, size = null) {
+-    const errors = [];
++    const errors = [], notes = [];
+     const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
+ 
+     const auto = size == null;
+@@ -96,19 +97,16 @@ export function selectEntries(edits, cupId, size = null) {
+     }
+ 
+     const seenVideo = new Map();
+-    const seenCreator = new Map();
++    const byCreator = new Map();
+     for (const e of entered) {
+         if (seenVideo.has(e.videoId)) errors.push(`${label(e)}: listed twice.`);
+         seenVideo.set(e.videoId, true);
+ 
+         const creatorKey = e.channelId || (e.artist ? `name:${e.artist.toLowerCase()}` : null);
+-        if (creatorKey) {
+-            if (seenCreator.has(creatorKey)) {
+-                errors.push(`One entry per creator: "${e.artist}" has ${label(seenCreator.get(creatorKey))} and ${label(e)}.`);
+-            } else {
+-                seenCreator.set(creatorKey, e);
+-            }
+-        }
++        if (creatorKey) (byCreator.get(creatorKey) || byCreator.set(creatorKey, []).get(creatorKey)).push(e);
++    }
++    for (const list of byCreator.values()) {
++        if (list.length > 1) notes.push(`"${list[0].artist}" has ${list.length} edits in this cup: ${list.map(label).join(', ')}.`);
+     }
+ 
+     if (sizeOk && !auto && entered.length !== size) {
+@@ -116,7 +114,7 @@ export function selectEntries(edits, cupId, size = null) {
+             `Add or remove "${cupId}" in the "tournaments" list of edits in data/edits.json.`);
+     }
+ 
+-    return { entries: entered, errors, size: sizeOk ? target : null };
++    return { entries: entered, errors, notes, size: sizeOk ? target : null };
+ }
+ 
+ // ----------------------------------------
+diff --git a/js/init-edits-tournament.js b/js/init-edits-tournament.js
+index 94d29ed..ad1cc21 100644
+--- a/js/init-edits-tournament.js
++++ b/js/init-edits-tournament.js
+@@ -75,11 +75,12 @@ export async function previewEditsTournament({
+ 
+     const edits = await loadEdits();
+     const selected = selectEntries(edits, cupId, size);
+-    const { entries, errors } = selected;
++    const { entries, errors, notes } = selected;
+     if (errors.length) {
+         throw new Error(`Cannot build ${cupId}:\n\n- ${errors.join('\n- ')}`);
+     }
+     size = selected.size;
++    (notes || []).forEach(n => console.info(`Note: ${n}`));
+ 
+     const seed = drawSeed || makeDrawSeed(cupId);
+     const cupName = cupDisplayName(cupId);
+diff --git a/tools/bracket-preview.mjs b/tools/bracket-preview.mjs
+index 64d6973..87ba1fc 100644
+--- a/tools/bracket-preview.mjs
++++ b/tools/bracket-preview.mjs
+@@ -13,9 +13,11 @@ const cupId = args[0];
+ if (!cupId) { console.error('Usage: node tools/bracket-preview.mjs <cup-id> [--size N] [--seed <draw seed>] [--file data/edits.json]'); process.exit(1); }
+ 
+ const edits = JSON.parse(fs.readFileSync(file, 'utf8'));
+-const { entries, errors, size } = selectEntries(edits, cupId, sizeArg ? Number(sizeArg) : null);
++const { entries, errors, notes, size } = selectEntries(edits, cupId, sizeArg ? Number(sizeArg) : null);
+ if (errors.length) { console.error(`\nCannot build ${cupId}:\n  - ${errors.join('\n  - ')}\n`); process.exit(1); }
+ 
++if (notes.length) console.log(`\nNotes (not errors):\n  - ${notes.join('\n  - ')}`);
++
+ const drawSeed = seedArg || makeDrawSeed(cupId);
+ const matches = buildMatches({ cupId, cupName: cupDisplayName(cupId), entries, drawSeed });
+ const rounds = Math.max(...matches.map(m => m.round));
+diff --git a/tools/edits-import.js b/tools/edits-import.js
+index e9fbe00..7f1a36f 100644
+--- a/tools/edits-import.js
++++ b/tools/edits-import.js
+@@ -58,7 +58,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+ 
+   const prev = fs.existsSync(outFile) ? JSON.parse(fs.readFileSync(outFile, 'utf8')) : [];
+   const prevById = new Map(prev.map(p => [p.videoId, p]));
+-  const out = [], byChannel = new Map();
++  const out = [];
+ 
+   for (const e of entries) {
+     const v = meta.get(e.id), old = prevById.get(e.id) || {}, flags = [];
+@@ -71,7 +71,6 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+     if (dur != null && dur > MAX_SHORT_SECONDS) { flags.push(`long: ${Math.floor(dur / 60)}m${dur % 60}s (over ${MAX_SHORT_SECONDS / 60} min)`); if (status === 'ok') status = 'review'; }
+     const detected = detect(text);
+     if (FOCUS && !detected.includes(FOCUS)) { flags.push(`no mention of ${FOCUS} in title, description or tags`); if (status === 'ok') status = 'review'; }
+-    (byChannel.get(sn.channelId) || byChannel.set(sn.channelId, []).get(sn.channelId)).push(e.id);
+     const tags = [...new Set([...(old.tags || []), ...e.tags])];
+     out.push({
+       id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || sn.title, slug: old.slug || slugify(sn.title),
+@@ -83,8 +82,6 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+       notes: old.notes || '', status: old.status === 'removed' ? 'removed' : status, flags, lastChecked: new Date().toISOString().slice(0, 10),
+     });
+   }
+-  // one entry per creator (tournament rule): flag extras, do not drop them from the gallery
+-  for (const [ch, ids] of byChannel) if (ids.length > 1) for (const id of ids) { const r = out.find(o => o.videoId === id); r.flags.push(`same creator has ${ids.length} entries (one per creator in each tournament)`); if (r.status === 'ok') r.status = 'review'; }
+ 
+   // picture shape from the thumbnail (skipped in --fixture mode and when jpeg-js is not installed)
+   let aspectLines = [];
+diff --git a/tools/test-bracket-builder.mjs b/tools/test-bracket-builder.mjs
+index f9e1b52..9b859ab 100644
+--- a/tools/test-bracket-builder.mjs
++++ b/tools/test-bracket-builder.mjs
+@@ -112,9 +112,12 @@ test('edits not entered in this cup are ignored', () => {
+     const l = [...edits(16), mk(99, { tournaments: ['vi-cup-1'] })];
+     assert.deepEqual(selectEntries(l, CUP, 16).errors, []);
+ });
+-test('one entry per creator is enforced', () => {
++test('several edits by one creator are allowed and reported as a note, not an error', () => {
+     const l = edits(16); l[5] = mk(6, { channelId: 'chan1', artist: 'Creator 1' });
+-    assert.match(errs(l), /One entry per creator/);
++    const r = selectEntries(l, CUP, 16);
++    assert.deepEqual(r.errors, []);
++    assert.equal(r.notes.length, 1);
++    assert.match(r.notes[0], /"Creator 1" has 2 edits/);
+ });
+ test('status "review" is blocked and the flags are shown', () => {
+     const l = edits(16); l[3] = mk(4, { status: 'review', flags: ['long: 4m10s'] });

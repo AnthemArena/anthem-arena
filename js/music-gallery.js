@@ -187,7 +187,7 @@ function cardHTML(e) {
         : `<a class="edit-vote edit-bracket" href="/brackets">View in bracket</a>`;
     return `<article class="edit-card" data-id="${esc(e.id)}">
         <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Watch ${esc(title)}">
-            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">
+            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" style="${thumbStyle(e)}" loading="lazy" decoding="async">
             <span class="edit-badge status-${s.kind}">${s.kind === 'champion' ? '<i class="fa-solid fa-trophy" aria-hidden="true"></i> ' : ''}${esc(s.label)}</span>
             ${e.duration != null ? `<span class="edit-duration">${fmtDuration(e.duration)}</span>` : ''}
             <span class="edit-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
@@ -230,6 +230,24 @@ function resetFilters() {
     render();
 }
 
+// ---------- picture shape ----------
+// Each edit has an "aspect" in data/edits.json ("1:1", "4:5", "3:4", "9:16", "4:3", "16:9", set by tools/edits-aspect.js).
+// Missing or unreadable values fall back to 9:16, which is what the gallery assumed before aspect existed.
+const DEFAULT_ASPECT = 9 / 16;
+const CARD_RATIO = 4 / 5;               // every card thumbnail uses this shape (keep in step with .edit-thumb in css/edits-gallery.css)
+function aspectOf(e) {
+    const m = /^(\d{1,2}):(\d{1,2})$/.exec(e.aspect || '');
+    return m && +m[1] > 0 && +m[2] > 0 ? +m[1] / +m[2] : DEFAULT_ASPECT;
+}
+// hqdefault.jpg is a 4:3 frame with the picture centred between black bars. Size the image inside the card so the picture
+// fills the card and the bars fall outside it (a little extra zoom hides the soft edge of the bar).
+function thumbStyle(e) {
+    const ar = aspectOf(e);
+    const pictureW = Math.min(1, ar * 0.75), pictureH = Math.min(1, (4 / 3) / ar);   // share of the image the picture covers
+    const w = 1.02 * Math.max(1 / pictureW, 1 / (CARD_RATIO * 0.75 * pictureH));     // image width in card widths
+    return `width:${(w * 100).toFixed(1)}%;height:${(w * 0.75 * CARD_RATIO * 100).toFixed(1)}%`;
+}
+
 // ---------- video dialog ----------
 function openWatch(id, trigger) {
     const e = ALL.find(x => x.id === id);
@@ -242,6 +260,10 @@ function openWatch(id, trigger) {
         (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +
         ` <span aria-hidden="true">\u2022</span> <a href="https://www.youtube.com/shorts/${esc(e.videoId)}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` +
         (e.standing.liveMatch ? ` <span aria-hidden="true">\u2022</span> <a href="/vote.html?match=${encodeURIComponent(e.standing.liveMatch.matchId)}">Vote now</a>` : '');
+    // the frame takes the edit's own shape so square and wide edits have no black bars
+    const ar = aspectOf(e);
+    document.querySelector('#watchDialog .watch-frame-wrap').style.setProperty('--ar', ar.toFixed(4));
+    dialog.classList.toggle('is-wide', ar > 1.2);
     document.getElementById('watchFrame').src = `https://www.youtube.com/embed/${encodeURIComponent(e.videoId)}?autoplay=1&rel=0&playsinline=1`;
     dialog.showModal();
 }
