@@ -8,7 +8,7 @@
 // Rules it enforces (see the plan):
 //   - bracket size is a power of two from 2 to 128 (2, 4, 8, 16, 32, 64, 128)
 //   - every entry is a public, embeddable edit that has been checked (status "ok")
-//   - one entry per creator
+//   - several edits by one creator are allowed (decided 11 Oct 2026); they are listed in `notes`, never as errors
 //   - random draw, reproducible from a published draw seed
 //   - match ids carry the cup id, so votes from one cup can never collide with another
 //     (votes are stored as {matchId}_{userId})
@@ -68,9 +68,10 @@ export function cupDisplayName(cupId) {
 //
 // size is optional. Leave it out (null) and the bracket is as big as the entry list, which must then be
 // 2, 4, 8, 16, 32, 64 or 128. Pass a size to insist on one (a Reset does, so a rebuild can never quietly
-// become a different-sized bracket). Returns { entries, errors, size }; size is null when it cannot be built.
+// become a different-sized bracket). Returns { entries, errors, notes, size }; size is null when it cannot be built.
+// `notes` is information only (for example creators with more than one edit in the cup) and never blocks a build.
 export function selectEntries(edits, cupId, size = null) {
-    const errors = [];
+    const errors = [], notes = [];
     const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
 
     const auto = size == null;
@@ -96,19 +97,16 @@ export function selectEntries(edits, cupId, size = null) {
     }
 
     const seenVideo = new Map();
-    const seenCreator = new Map();
+    const byCreator = new Map();
     for (const e of entered) {
         if (seenVideo.has(e.videoId)) errors.push(`${label(e)}: listed twice.`);
         seenVideo.set(e.videoId, true);
 
         const creatorKey = e.channelId || (e.artist ? `name:${e.artist.toLowerCase()}` : null);
-        if (creatorKey) {
-            if (seenCreator.has(creatorKey)) {
-                errors.push(`One entry per creator: "${e.artist}" has ${label(seenCreator.get(creatorKey))} and ${label(e)}.`);
-            } else {
-                seenCreator.set(creatorKey, e);
-            }
-        }
+        if (creatorKey) (byCreator.get(creatorKey) || byCreator.set(creatorKey, []).get(creatorKey)).push(e);
+    }
+    for (const list of byCreator.values()) {
+        if (list.length > 1) notes.push(`"${list[0].artist}" has ${list.length} edits in this cup: ${list.map(label).join(', ')}.`);
     }
 
     if (sizeOk && !auto && entered.length !== size) {
@@ -116,7 +114,7 @@ export function selectEntries(edits, cupId, size = null) {
             `Add or remove "${cupId}" in the "tournaments" list of edits in data/edits.json.`);
     }
 
-    return { entries: entered, errors, size: sizeOk ? target : null };
+    return { entries: entered, errors, notes, size: sizeOk ? target : null };
 }
 
 // ----------------------------------------

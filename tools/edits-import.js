@@ -11,9 +11,11 @@
 // Input file: one link per line. Blank lines and lines starting with # are ignored. Optional tags after a pipe:
 //   https://www.youtube.com/watch?v=XXXXXXXXXXX | sad, fast cuts
 //
-// Existing entries are MERGED: your tags, notes, shortTitle and inTournament flag are kept; stats are refreshed.
+// Existing entries are MERGED: your tags, notes, shortTitle, aspect and inTournament flag are kept; stats are refreshed.
+// New entries also get their picture shape ("aspect": 1:1, 4:5, 9:16...) measured from the thumbnail (see tools/edits-aspect.js).
 import fs from 'fs';
 import path from 'path';
+import { fillAspects } from './edits-aspect.js';
 
 const args = process.argv.slice(2);
 const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
@@ -56,7 +58,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
 
   const prev = fs.existsSync(outFile) ? JSON.parse(fs.readFileSync(outFile, 'utf8')) : [];
   const prevById = new Map(prev.map(p => [p.videoId, p]));
-  const out = [], byChannel = new Map();
+  const out = [];
 
   for (const e of entries) {
     const v = meta.get(e.id), old = prevById.get(e.id) || {}, flags = [];
@@ -69,7 +71,6 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
     if (dur != null && dur > MAX_SHORT_SECONDS) { flags.push(`long: ${Math.floor(dur / 60)}m${dur % 60}s (over ${MAX_SHORT_SECONDS / 60} min)`); if (status === 'ok') status = 'review'; }
     const detected = detect(text);
     if (FOCUS && !detected.includes(FOCUS)) { flags.push(`no mention of ${FOCUS} in title, description or tags`); if (status === 'ok') status = 'review'; }
-    (byChannel.get(sn.channelId) || byChannel.set(sn.channelId, []).get(sn.channelId)).push(e.id);
     const tags = [...new Set([...(old.tags || []), ...e.tags])];
     out.push({
       id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || sn.title, slug: old.slug || slugify(sn.title),
@@ -77,11 +78,14 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
       year: Number((sn.publishedAt || '').slice(0, 4)) || null, uploadDate: (sn.publishedAt || '').slice(0, 10),
       views: Number(ss.viewCount) || 0, likes: ss.likeCount != null ? Number(ss.likeCount) : null, duration: dur,
       embedAllowed: st.embeddable !== false, characters: [...new Set([...(old.characters || []), ...detected])], tournaments: old.tournaments || [], tags, category: 'edit', seed: old.seed ?? null,
+      ...(old.aspect ? { aspect: old.aspect, aspectSource: old.aspectSource || 'manual', ...(old.aspectCheck ? { aspectCheck: true } : {}) } : {}),
       notes: old.notes || '', status: old.status === 'removed' ? 'removed' : status, flags, lastChecked: new Date().toISOString().slice(0, 10),
     });
   }
-  // one entry per creator (tournament rule): flag extras, do not drop them from the gallery
-  for (const [ch, ids] of byChannel) if (ids.length > 1) for (const id of ids) { const r = out.find(o => o.videoId === id); r.flags.push(`same creator has ${ids.length} entries (one per creator in each tournament)`); if (r.status === 'ok') r.status = 'review'; }
+
+  // picture shape from the thumbnail (skipped in --fixture mode and when jpeg-js is not installed)
+  let aspectLines = [];
+  if (!fixture) { try { aspectLines = await fillAspects(out); } catch (err) { aspectLines = [`  skipped: ${err.message}`]; } }
 
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(out, null, 2) + '\n');
@@ -90,6 +94,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
   const c = s => out.filter(o => o.status === s).length;
   console.log(`\nChecked ${out.length} links -> ${outFile}   ok: ${c('ok')}   review: ${c('review')}   blocked: ${c('blocked')}\n`);
   for (const o of out.filter(o => o.flags.length)) console.log(`  [${o.status.toUpperCase()}] ${o.videoId}  ${(o.title || '').slice(0, 50)}\n         ${o.flags.join('; ')}`);
+  if (aspectLines.length) console.log('\nPicture shape (aspect):\n' + aspectLines.join('\n'));
   if (problems.length) console.log('\nInput problems:\n  ' + problems.join('\n  '));
   console.log('\nCharacters are auto-detected from titles and descriptions: check them. Add a tournament id to an edit\'s "tournaments" list to enter it (for example "jinx-cup-1").');
 })().catch(e => { console.error('\nERROR: ' + e.message); process.exit(1); });

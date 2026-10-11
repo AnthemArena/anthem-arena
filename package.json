@@ -6,6 +6,7 @@
     "@netlify/blobs": "^7.0.0"
   },
   "devDependencies": {
+    "jpeg-js": "^0.4.4",
     "postcss": "^8.4.0"
   }
 }

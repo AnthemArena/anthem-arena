@@ -129,7 +129,7 @@ The card game (section 0) continues as a separate project. This section covers t
 
 **Changes from the moments plan:** no scene tags / arcs / sibling rule; new curation step, creator credit, embeddability check, creator notification; the "song" wording migration now needs "edit" wording; the Jinx champion companion fits.
 
-**Proposed rules (to confirm):** bracket of 16 or 32; Jinx is the clear focus; public YouTube video that allows embedding; original (no re-uploads); one entry per creator; random draw; creator names hidden in early rounds to reduce follower-count bias; message creators before launch (they do not have to opt in, but notification drives sharing); keep the fan-project disclaimer and a visible takedown contact.
+**Proposed rules (to confirm):** bracket of 16 or 32; Jinx is the clear focus; public YouTube video that allows embedding; original (no re-uploads); several edits per creator are allowed (decided 11 Oct 2026); random draw; creator names hidden in early rounds to reduce follower-count bias; message creators before launch (they do not have to opt in, but notification drives sharing); keep the fan-project disclaimer and a visible takedown contact.
 
 **First build:** an import script (run in the Codespace with the existing YouTube API key): list of YouTube links in, checks (public, embeddable, duration, duplicate creators, view count, publish date) and a report out, tournament-ready JSON written. Test the logic offline with sample data; real calls need the user's key.
 
@@ -145,7 +145,7 @@ The card game (section 0) continues as a separate project. This section covers t
 **End goal (Oct 2026): a series of Arcane / League edit tournaments, with a "Major" as the biggest**
 - Many themed tournaments (character cups such as Jinx first, then others) plus a **Major** open to any Arcane edit.
 - **Qualifier structure (idea):** winners / finalists of the themed cups qualify for the Major. Results from the cups also give the Major a natural seeding (popularity seeding was dropped earlier), and a qualification story people can follow.
-- **One master pool, many tournaments:** `data/edits.json` holds every edit (characters detected from titles and descriptions, a `tournaments` list per edit); each tournament is a selection from it. Tournament rules differ (Jinx cup: Jinx-focused; Major: any Arcane edit), but one entry per creator in each tournament.
+- **One master pool, many tournaments:** `data/edits.json` holds every edit (characters detected from titles and descriptions, a `tournaments` list per edit); each tournament is a selection from it. Tournament rules differ (Jinx cup: Jinx-focused; Major: any Arcane edit), and several edits by one creator are allowed in a tournament (decided 11 Oct 2026).
 - **Architecture:** Phase 1 put the tournament ID in `arcane-config.js`. Running several tournaments needs the ID chosen per page (URL parameter such as `?t=jinx-cup-1`, with the config value as the default). The Phase 1 groundwork makes that a contained change.
 - **Scope:** "League of Legends / Arcane edits" widens it. Riot's fan content policy applies as well as the Arcane (Netflix / Fortiche) footage; keep the disclaimer and takedown contact.
 - **Scale risk:** the Major needs a large audience and a large bracket (64 or 128, or play-ins). Start small; each cup builds the audience for the Major. Not committed to a timeline.

@@ -127,14 +127,14 @@
     position: relative;
     display: block;
     width: 100%;
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 4 / 5;           /* one shared card shape; js/music-gallery.js thumbStyle() sizes each image to fit it */
     padding: 0;
     border: 0;
     background: #000;
     cursor: pointer;
     overflow: hidden;
 }
-.page-gallery .edit-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.page-gallery .edit-thumb img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: none; display: block; }   /* width and height are set inline per edit */
 .page-gallery .edit-play {
     position: absolute;
     inset: 50% auto auto 50%;
@@ -279,7 +279,9 @@
     cursor: pointer;
 }
 .page-gallery .watch-close:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
-.page-gallery .watch-frame-wrap { height: min(68vh, 620px); aspect-ratio: 9 / 16; max-width: 100%; margin: .75rem auto 0; background: #000; }
+/* the frame takes the edit's own shape (--ar = width / height, set in JS): as tall as 68vh allows, never wider than the dialog */
+.page-gallery .watch-dialog.is-wide { width: min(94vw, 760px); }
+.page-gallery .watch-frame-wrap { --ar: .5625; width: min(100%, calc(min(68vh, 620px) * var(--ar))); aspect-ratio: var(--ar); margin: .75rem auto 0; background: #000; }
 .page-gallery .watch-frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
 .page-gallery .watch-meta { margin: 0; padding: .8rem 1rem 1rem; text-align: center; color: var(--muted); font-size: .9rem; }
 .page-gallery .watch-meta a { color: var(--pink-bright); text-decoration: none; }

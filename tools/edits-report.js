@@ -20,7 +20,7 @@ const rows = edits.map(e => ({
   creatorUrl: e.creatorUrl || '', creatorCount: perCreator[e.channelId] || 1, views: e.views || 0, likes: e.likes ?? null,
   likeRate: e.likes != null && e.views ? +(100 * e.likes / e.views).toFixed(2) : null, duration: e.duration ?? null,
   uploaded: e.uploadDate || '', characters: e.characters || [], cups: e.tournaments || [], status: e.status || 'ok',
-  flags: e.flags || [], notes: e.notes || '',
+  flags: e.flags || [], notes: e.notes || '', aspect: e.aspect || '', aspectCheck: !!e.aspectCheck,
 }));
 const chars = [...new Set(rows.flatMap(r => r.characters))].sort();
 const data = JSON.stringify({ rows, chars, generated: new Date().toISOString().slice(0, 10) }).replace(/</g, '\\u003c');
@@ -61,7 +61,7 @@ a{color:var(--pink);text-decoration:none}a:hover{text-decoration:underline}
 <table><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table>
 <script>
 const D=${data};const rows=D.rows;
-const cols=[['','thumb'],['Title','title'],['Creator','creator'],['Views','views','num'],['Likes','likes','num'],['Like %','likeRate','num'],['Length','duration','num'],['Uploaded','uploaded'],['Characters','characters'],['In cups','cups'],['Status / flags','status']];
+const cols=[['','thumb'],['Title','title'],['Creator','creator'],['Views','views','num'],['Likes','likes','num'],['Like %','likeRate','num'],['Length','duration','num'],['Aspect','aspect'],['Uploaded','uploaded'],['Characters','characters'],['In cups','cups'],['Status / flags','status']];
 let sortKey='views',sortDir=-1;
 const $=id=>document.getElementById(id);
 const fmt=n=>n==null?'–':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(n>=1e4?0:1)+'K':String(n);
@@ -85,10 +85,11 @@ function render(){
    +'<td><div class="title"><a href="https://www.youtube.com/shorts/'+x.id+'" target="_blank" rel="noopener">'+esc(x.title)+'</a></div>'+(x.notes?'<div class="note">'+esc(x.notes)+'</div>':'')+'<div class="note">'+esc(x.id)+'</div></td>'
    +'<td><a href="'+esc(x.creatorUrl)+'" target="_blank" rel="noopener">'+esc(x.creator)+'</a>'+(x.creatorCount>1?'<br><span class="pill dupe">'+x.creatorCount+' edits in pool</span>':'')+'</td>'
    +'<td class="num">'+fmt(x.views)+'</td><td class="num">'+fmt(x.likes)+'</td><td class="num">'+(x.likeRate==null?'–':x.likeRate+'%')+'</td>'
-   +'<td class="num">'+(x.duration==null?'–':x.duration+'s')+'</td><td>'+esc(x.uploaded)+'</td>'
+   +'<td class="num">'+(x.duration==null?'–':x.duration+'s')+'</td>'
+   +'<td>'+(x.aspect?'<span class="pill'+(x.aspectCheck?' dupe':'')+'">'+esc(x.aspect)+(x.aspectCheck?' ? check':'')+'</span>':'–')+'</td><td>'+esc(x.uploaded)+'</td>'
    +'<td>'+(x.characters.map(c=>'<span class="pill">'+esc(c)+'</span>').join('')||'–')+'</td>'
    +'<td>'+(x.cups.map(c=>'<span class="pill cup">'+esc(c)+'</span>').join('')||'–')+'</td>'
-   +'<td>'+(x.status!=='ok'?'<span class="pill '+(x.status==='blocked'?'bad':'dupe')+'">'+x.status+'</span>':'<span class="pill">ok</span>')+(x.flags.length?'<div class="flags">'+x.flags.map(esc).join('<br>')+'</div>':'')+'</td></tr>').join(''):'<tr><td colspan="11" class="empty">No edits match.</td></tr>';
+   +'<td>'+(x.status!=='ok'?'<span class="pill '+(x.status==='blocked'?'bad':'dupe')+'">'+x.status+'</span>':'<span class="pill">ok</span>')+(x.flags.length?'<div class="flags">'+x.flags.map(esc).join('<br>')+'</div>':'')+'</td></tr>').join(''):'<tr><td colspan="12" class="empty">No edits match.</td></tr>';
 }
 const creators=new Set(rows.map(r=>r.channelId)).size,okN=rows.filter(r=>r.status==='ok').length;
 const sortedV=rows.map(r=>r.views).sort((a,b)=>a-b),median=sortedV.length?sortedV[Math.floor(sortedV.length/2)]:0;
