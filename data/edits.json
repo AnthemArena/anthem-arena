@@ -243,7 +243,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "arcane-test-01"
+      "arcane-test-01",
+      "group-test-01"
     ],
     "tags": [],
     "category": "edit",
@@ -771,7 +772,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -864,7 +867,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -926,7 +931,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1267,7 +1274,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1298,7 +1307,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1329,7 +1340,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1360,7 +1373,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1546,7 +1561,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1763,7 +1780,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2104,7 +2123,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2321,7 +2342,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2352,7 +2375,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2414,7 +2439,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2507,7 +2534,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2631,7 +2660,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "group-test-01"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
