@@ -1,0 +1,859 @@
+diff --git a/admin.html b/admin.html
+index 7df59e8..ebbeb7d 100644
+--- a/admin.html
++++ b/admin.html
+@@ -2,10 +2,16 @@
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Tournament Admin - Arcane Edits</title>
++    <link rel="preconnect" href="https://fonts.googleapis.com">
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="/css/admin.css">
++    <!-- tokens + the Arcane background (cover image and pink glow), shared with the rest of the site -->
++    <link rel="stylesheet" href="/css/arcane-theme.css">
+ </head>
+-<body>
++<body class="theme-arcane page-admin">
+     <!-- Login Form (shown when not authenticated) -->
+     <div id="login-container" style="display: none;">
+         <div class="login-box">
+@@ -59,7 +65,7 @@
+                         🔄 Reset & Regenerate All Matches
+                     </button>
+                 </div>
+-                <div class="button-group" style="margin-top: 12px; align-items: center;">
++                <div class="button-group setup-row">
+                     <label for="cupFormat"><strong>Format for "Build Bracket":</strong></label>
+                     <select id="cupFormat">
+                         <option value="single">Single elimination (knockout only)</option>
+@@ -69,7 +75,7 @@
+                         ⚔️ Build Knockout from Group Results
+                     </button>
+                 </div>
+-                <p id="groupStageStatus" style="margin-top: 8px;"></p>
++                <p id="groupStageStatus" class="group-status"></p>
+             </section>
+ 
+             <!-- Development Tools Section -->
+@@ -100,8 +106,8 @@
+         <div class="form-row">
+             <input type="text" 
+                    id="blogMatchId" 
+-                   placeholder="round-1-match-1"
+-                   style="flex: 1;">
++                   class="grow"
++                   placeholder="round-1-match-1">
+             <button onclick="generateMatchRecapFromAdmin()" class="btn-primary">
+                 Generate Recap
+             </button>
+@@ -117,7 +123,7 @@
+                    placeholder="1" 
+                    min="1" 
+                    max="6"
+-                   style="width: 100px;">
++                   class="narrow">
+             <button onclick="generateRoundRecapFromAdmin()" class="btn-primary">
+                 Generate Round Recap
+             </button>
+@@ -138,7 +144,7 @@
+     <div class="control-group">
+         <h3>Recent Blog Posts</h3>
+         <div id="recentBlogPosts" class="blog-posts-list">
+-            <p style="color: #888;">Loading...</p>
++            <p class="empty-note">Loading...</p>
+         </div>
+     </div>
+ </div>
+@@ -153,6 +159,7 @@
+             <!-- Match Management -->
+             <section class="match-management">
+                 <h2>All Matches</h2>
++                <div class="table-wrap">
+                 <table class="admin-table">
+                     <thead>
+                         <tr>
+@@ -170,6 +177,7 @@
+                         <!-- Populated by JavaScript -->
+                     </tbody>
+                 </table>
++                </div>
+             </section>
+         </div>
+     </div>
+diff --git a/css/admin.css b/css/admin.css
+index dc52016..8770a09 100644
+--- a/css/admin.css
++++ b/css/admin.css
+@@ -1,287 +1,337 @@
+-/* admin.css */
++/* ========================================
++   ADMIN PANEL: Arcane theme
++   ----------------------------------------
++   Used only by admin.html, which also loads /css/arcane-theme.css and has <body class="theme-arcane page-admin">.
++   That file supplies the tokens used here (--pink, --pink-bright, --pink-soft, --panel, --border, --line, --text, --muted,
++   --text-dim, --radius, --shadow, --font) and the page background (cover image + pink glow).
++   Same language as the rest of the site: blurred panel cards with a pink border, a pink-gradient primary pill with dark text,
++   translucent secondary pills, small uppercase pink "eyebrow" labels.
++======================================== */
++
++body.page-admin {
++    --danger: #ff6b81;
++    --danger-soft: rgba(255, 107, 129, .12);
++    --ok: #6ee7b7;
++    margin: 0;
++    font-family: var(--font);
++    -webkit-font-smoothing: antialiased;
++}
++body.page-admin *, body.page-admin *::before, body.page-admin *::after { box-sizing: border-box; }
++body.page-admin :focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
++
++/* ---------- layout + header ---------- */
+ .admin-container {
+-    max-width: 1400px;
++    max-width: 1280px;
+     margin: 0 auto;
+-    padding: 2rem;
+-    background: #1a1a1a;
+-    color: #fff;
+-    min-height: 100vh;
++    padding: clamp(1rem, 3vw, 2.5rem);
++    display: grid;
++    grid-template-columns: minmax(0, 1fr);   /* lets the wide matches table scroll inside its own box instead of stretching the page */
++    gap: 1.25rem;
+ }
+-
++.admin-container > * { min-width: 0; }
+ .admin-header {
+-    text-align: center;
+-    margin-bottom: 3rem;
+-    padding-bottom: 2rem;
+-    border-bottom: 2px solid #c89b3c;
+-}
+-
+-.round-controls {
+-    background: rgba(40, 40, 50, 0.6);
+-    padding: 2rem;
+-    border-radius: 12px;
+-    margin-bottom: 3rem;
+-}
+-
+-.button-group {
+-    display: flex;
+-    gap: 1rem;
+-    margin-top: 1rem;
+-}
+-
+-.btn-primary {
+-    background: linear-gradient(135deg, #00c896, #00b482);
+-    color: #0a0a0a;
+-    padding: 0.75rem 1.5rem;
+-    border: none;
+-    border-radius: 8px;
+-    font-weight: 700;
+-    cursor: pointer;
+-}
+-
+-.btn-danger {
+-    background: linear-gradient(135deg, #dc3232, #c82020);
+-    color: white;
+-    padding: 0.75rem 1.5rem;
+-    border: none;
+-    border-radius: 8px;
+-    font-weight: 700;
+-    cursor: pointer;
+-}
+-
+-.btn-warning {
+-    background: linear-gradient(135deg, #c89b3c, #8b6914);
+-    color: #0a0a0a;
+-    padding: 0.5rem 1rem;
+-    border: none;
+-    border-radius: 6px;
+-    font-weight: 600;
+-    cursor: pointer;
+-}
+-
+-.admin-table {
+-    width: 100%;
+-    border-collapse: collapse;
+-    background: rgba(40, 40, 50, 0.6);
+-    border-radius: 12px;
+-    overflow: hidden;
+-}
+-
+-.admin-table th {
+-    background: rgba(200, 155, 60, 0.2);
+-    padding: 1rem;
+-    text-align: left;
+-    font-weight: 700;
+-    border-bottom: 2px solid #c89b3c;
+-}
+-
+-.admin-table td {
+-    padding: 1rem;
+-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+-}
+-
+-.status-badge {
+-    display: inline-block;
+-    padding: 0.25rem 0.75rem;
+-    border-radius: 12px;
+-    font-size: 0.85rem;
+-    font-weight: 600;
+-}
+-
+-.status-live {
+-    background: rgba(0, 200, 150, 0.2);
+-    color: #00c896;
+-    border: 1px solid #00c896;
+-}
+-
+-.status-upcoming {
+-    background: rgba(200, 155, 60, 0.2);
+-    color: #c89b3c;
+-    border: 1px solid #c89b3c;
+-}
+-
+-.status-completed {
+-    background: rgba(100, 100, 120, 0.2);
+-    color: #888;
+-    border: 1px solid #666;
+-}
+-
+-.winner-mark {
+-    color: #c89b3c;
+-    font-weight: 700;
+-}
+-/* Development Tools Section */
+-.dev-tools {
+-    background: #fff3cd;
+-    border: 2px solid #ffc107;
+-    border-radius: 8px;
+-    padding: 1.5rem;
+-    margin-bottom: 2rem;
+-}
+-
+-.dev-tools h2 {
+-    margin-top: 0;
+-    color: #856404;
+-}
+-
+-.warning-box {
+     display: flex;
+-    flex-direction: column;
++    align-items: center;
++    justify-content: space-between;
+     gap: 1rem;
++    padding: .5rem .25rem 1.1rem;
++    border-bottom: 1px solid var(--border);
+ }
+-
+-.warning-text {
+-    color: #dc3545;
+-    font-size: 0.9rem;
++.admin-header h1 {
+     margin: 0;
+-    font-weight: 500;
+-}
+-
+-.btn-danger {
+-    background: #dc3545;
+-    color: white;
+-    border: none;
+-    padding: 0.75rem 1.5rem;
+-    border-radius: 6px;
+-    font-weight: 600;
+-    font-size: 1rem;
+-    cursor: pointer;
+-    transition: all 0.2s;
+-    max-width: 300px;
+-}
+-
+-.btn-danger:hover {
+-    background: #c82333;
+-    transform: translateY(-2px);
+-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+-}
+-
+-.btn-danger:active {
+-    transform: translateY(0);
+-}
+-/* Login Styles */
+-#login-container {
+-    min-height: 100vh;
+-    display: flex;
++    font-size: clamp(1.6rem, 3.6vw, 2.3rem);
++    font-weight: 800;
++    letter-spacing: -.04em;
++    line-height: 1.1;
++}
++.admin-header p { margin: .35rem 0 0; color: var(--muted); font-size: .95rem; }
++
++/* ---------- panels ---------- */
++.tournament-init, .admin-section, .match-management {
++    padding: clamp(1rem, 2.4vw, 1.6rem);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    background: var(--panel);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++}
++.tournament-init h2, .admin-section h2, .match-management h2, .dev-tools h2 {
++    margin: 0 0 1rem;
++    font-size: 1.3rem;
++    font-weight: 800;
++    letter-spacing: -.03em;
++}
++.control-group { margin-top: 1.1rem; }
++.control-group:first-of-type { margin-top: 0; }
++.control-group h3 {
++    margin: 0 0 .55rem;
++    font-size: .75rem;
++    font-weight: 800;
++    letter-spacing: .18em;
++    text-transform: uppercase;
++    color: var(--pink-bright);
++}
++
++/* ---------- buttons ---------- */
++body.page-admin button, body.page-admin .btn-view {
++    display: inline-flex;
+     align-items: center;
+     justify-content: center;
+-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-}
+-
+-.login-box {
+-    background: white;
+-    padding: 2.5rem;
+-    border-radius: 12px;
+-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+-    max-width: 400px;
+-    width: 90%;
+-}
+-
+-.login-box h1 {
+-    margin: 0 0 0.5rem 0;
+-    color: #333;
+-    font-size: 1.75rem;
+-}
+-
+-.login-box p {
+-    margin: 0 0 2rem 0;
+-    color: #666;
+-    font-size: 0.95rem;
+-}
+-
+-#login-form {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 1rem;
+-}
+-
+-#login-form input {
+-    padding: 0.875rem;
+-    border: 2px solid #e0e0e0;
+-    border-radius: 6px;
+-    font-size: 1rem;
+-    transition: border-color 0.2s;
+-}
+-
+-#login-form input:focus {
+-    outline: none;
+-    border-color: #667eea;
+-}
+-
+-.btn-login {
+-    padding: 0.875rem;
+-    background: #667eea;
+-    color: white;
+-    border: none;
+-    border-radius: 6px;
+-    font-size: 1rem;
+-    font-weight: 600;
++    gap: .45rem;
++    min-height: 42px;
++    padding: .55rem 1.15rem;
++    border: 1px solid rgba(255, 255, 255, .13);
++    border-radius: 999px;
++    background: rgba(9, 10, 19, .58);
++    color: var(--text);
++    font: 700 .9rem var(--font);
++    text-decoration: none;
+     cursor: pointer;
+-    transition: all 0.2s;
+-}
+-
+-.btn-login:hover {
+-    background: #5568d3;
+-    transform: translateY(-2px);
+-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+-}
+-
+-.btn-login:active {
+-    transform: translateY(0);
++    transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+ }
++body.page-admin button:hover, body.page-admin .btn-view:hover { transform: translateY(-1px); border-color: var(--border); background: rgba(13, 15, 27, .85); }
++body.page-admin button:active { transform: translateY(0); }
++body.page-admin button:disabled { opacity: .5; cursor: default; transform: none; }
+ 
+-#login-error {
+-    color: #dc3545;
+-    font-size: 0.9rem;
+-    text-align: center;
+-    margin-top: 0.5rem;
+-    min-height: 1.5rem;
++/* primary: the pink gradient pill, dark text, like the homepage buttons */
++.btn-primary, .btn-login {
++    border-color: transparent !important;
++    background: linear-gradient(135deg, var(--pink-bright), var(--pink)) !important;
++    color: #160814 !important;
++    box-shadow: 0 10px 26px rgba(255, 79, 180, .22);
+ }
++.btn-primary:hover, .btn-login:hover { box-shadow: 0 14px 32px rgba(255, 79, 180, .34); }
+ 
+-/* Logout Button */
+-.admin-header {
+-    display: flex;
+-    justify-content: space-between;
+-    align-items: center;
++/* destructive: outlined red, fills on hover, so it never looks like a normal action */
++.btn-danger {
++    border-color: rgba(255, 107, 129, .5) !important;
++    background: var(--danger-soft) !important;
++    color: var(--danger) !important;
++}
++.btn-danger:hover { background: rgba(255, 107, 129, .22) !important; border-color: var(--danger) !important; }
++
++.btn-logout { min-height: 38px; padding: .4rem 1rem; color: var(--muted); }
++.btn-warning { border-color: rgba(255, 79, 180, .4); color: var(--pink-bright); }
++
++/* ---------- form controls ---------- */
++body.page-admin select,
++body.page-admin input[type="text"], body.page-admin input[type="number"],
++body.page-admin input[type="email"], body.page-admin input[type="password"] {
++    min-height: 42px;
++    padding: .55rem .9rem;
++    border: 1px solid var(--line);
++    border-radius: 12px;
++    background: rgba(255, 255, 255, .045);
++    color: var(--text);
++    font: 500 .95rem var(--font);
++    transition: border-color .18s ease, box-shadow .18s ease;
++}
++body.page-admin input::placeholder { color: var(--text-dim); }
++body.page-admin select:hover, body.page-admin input:hover { border-color: var(--border); }
++body.page-admin select:focus, body.page-admin input:focus {
++    outline: none;
++    border-color: var(--pink-bright);
++    box-shadow: 0 0 0 3px var(--pink-soft);
+ }
+-
+-.btn-logout {
+-    padding: 0.5rem 1rem;
+-    background: #6c757d;
+-    color: white;
+-    border: none;
+-    border-radius: 6px;
+-    font-weight: 600;
++body.page-admin select {
++    appearance: none;
++    -webkit-appearance: none;
++    padding-right: 2.3rem;
+     cursor: pointer;
+-    transition: all 0.2s;
+-}
+-
+-.btn-logout:hover {
+-    background: #5a6268;
++    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23ff70c3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
++    background-repeat: no-repeat;
++    background-position: right .85rem center;
++}
++body.page-admin select option { background: #0b0d18; color: var(--text); }
++body.page-admin input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--pink); cursor: pointer; }
++.checkbox-label { display: inline-flex; align-items: center; gap: .6rem; color: var(--muted); cursor: pointer; }
++.checkbox-label:hover { color: var(--text); }
++
++/* ---------- tournament setup ---------- */
++.button-group { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
++.setup-row { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
++.setup-row label {
++    font-size: .75rem;
++    font-weight: 800;
++    letter-spacing: .18em;
++    text-transform: uppercase;
++    color: var(--pink-bright);
++}
++.setup-row select { min-width: min(100%, 22rem); }
++/* one line saying how far a group-stage cup has got; hidden while empty */
++.group-status { margin: 1rem 0 0; }
++.group-status:empty { display: none; }
++.group-status:not(:empty) {
++    padding: .7rem 1rem;
++    border: 1px solid var(--border);
++    border-radius: 12px;
++    background: var(--pink-soft);
++    color: var(--text);
++    font-size: .92rem;
+ }
+ 
+-/* Development Tools Section */
++/* ---------- development tools: a clear danger zone ---------- */
+ .dev-tools {
+-    background: #fff3cd;
+-    border: 2px solid #ffc107;
+-    border-radius: 8px;
+-    padding: 1.5rem;
+-    margin-bottom: 2rem;
+-}
+-
+-.dev-tools h2 {
+-    margin-top: 0;
+-    color: #856404;
+-}
+-
+-.warning-box {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 1rem;
++    padding: clamp(1rem, 2.4vw, 1.6rem);
++    border: 1px solid rgba(255, 107, 129, .35);
++    border-radius: var(--radius);
++    background: linear-gradient(180deg, rgba(255, 107, 129, .07), rgba(11, 13, 24, .8));
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++}
++.dev-tools h2 { color: #ffa3b1; }
++.warning-box { display: grid; gap: .9rem; justify-items: start; }
++.warning-text { margin: 0; color: #ffa3b1; font-size: .9rem; line-height: 1.5; }
++
++/* ---------- blog generator ---------- */
++.form-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
++.form-row .grow { flex: 1 1 14rem; }
++.form-row .narrow { width: 6.5rem; }
++.empty-note { margin: 0; color: var(--text-dim); font-size: .92rem; }
++.blog-posts-list { display: grid; gap: .6rem; }
++.blog-post-item {
++    padding: .85rem 1rem;
++    border: 1px solid var(--line);
++    border-radius: 14px;
++    background: rgba(255, 255, 255, .03);
++}
++.blog-post-header { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
++.blog-post-header h4 { margin: 0; font-size: 1rem; letter-spacing: -.01em; }
++.blog-post-type, .featured-badge {
++    padding: .15rem .6rem;
++    border-radius: 999px;
++    font-size: .72rem;
++    font-weight: 800;
++    letter-spacing: .08em;
++    text-transform: uppercase;
++}
++.blog-post-type { border: 1px solid var(--border); background: var(--pink-soft); color: var(--pink-bright); }
++.featured-badge { border: 1px solid rgba(255, 214, 102, .4); background: rgba(255, 214, 102, .1); color: #ffd666; }
++.blog-post-meta { margin: .4rem 0 0; color: var(--text-dim); font-size: .85rem; }
++.blog-post-actions { margin-top: .6rem; }
++
++.log-output {
++    max-height: 260px;
++    overflow: auto;
++    padding: .8rem 1rem;
++    border: 1px solid var(--line);
++    border-radius: 14px;
++    background: rgba(3, 4, 10, .7);
++    font: 500 .82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
++}
++.log-output:empty::before { content: "Nothing logged yet."; color: var(--text-dim); }
++.log-entry { padding: .12rem 0; word-break: break-word; }
++.log-time { color: var(--text-faint); margin-right: .35rem; }
++.log-info { color: var(--muted); }
++.log-success { color: var(--ok); }
++.log-error { color: var(--danger); }
++
++/* ---------- matches table ---------- */
++.table-wrap {
++    container-type: inline-size;      /* lets .batch-bar be exactly as wide as the visible box (100cqw), however wide the table is */
++    overflow-x: auto;
++    border: 1px solid var(--line);
++    border-radius: 16px;
++    background: rgba(5, 6, 14, .45);
++}
++.admin-table { width: 100%; min-width: 940px; border-collapse: collapse; font-size: .92rem; }
++.admin-table th {
++    padding: .8rem 1rem;
++    text-align: left;
++    font-size: .72rem;
++    font-weight: 800;
++    letter-spacing: .16em;
++    text-transform: uppercase;
++    white-space: nowrap;
++    color: var(--pink-bright);
++    background: rgba(255, 79, 180, .08);
++    border-bottom: 1px solid var(--border);
++}
++.admin-table td { padding: .65rem .85rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
++.admin-table tbody tr:not(.batch-header):hover td { background: rgba(255, 255, 255, .03); }
++.admin-table th:nth-child(2), .admin-table th:nth-child(4) { width: 30%; }
++.admin-table td:nth-child(2), .admin-table td:nth-child(4) { min-width: 10.5rem; line-height: 1.35; }
++.admin-table td:nth-child(6) { white-space: nowrap; color: var(--muted); font-size: .86rem; }
++/* edit titles are long and full of hashtags: two lines in the table, the whole title on hover */
++.admin-table .edit-title-cell {
++    display: -webkit-box;
++    -webkit-line-clamp: 2;
++    -webkit-box-orient: vertical;
++    overflow: hidden;
++    overflow-wrap: anywhere;
++}
++.admin-table td:nth-child(3), .admin-table td:nth-child(5) { font-variant-numeric: tabular-nums; font-weight: 700; text-align: center; }
++.admin-table td:first-child { white-space: nowrap; font-weight: 700; }
++.batch-tag { color: var(--text-dim); font-weight: 500; }
++.error-cell { color: var(--danger); }
++
++/* a batch (a round's batch, or a group) is a pink band across the table with its Open / Close buttons on the right */
++.batch-header td { padding: 0; background: rgba(255, 79, 180, .11); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
++.batch-bar {
++    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem; padding: .7rem 1rem;
++    /* when the table scrolls sideways (phones, narrow windows) the band and its Open / Close buttons stay pinned to the visible left edge */
++    position: sticky; left: 0; width: 100cqw;
++}
++.batch-title { font-weight: 800; letter-spacing: -.01em; color: var(--text); }
++.batch-actions, .match-actions { display: inline-flex; flex-wrap: wrap; gap: .45rem; }
++.match-actions { flex-wrap: nowrap; }                      /* Close + View stay side by side */
++.admin-table td:last-child { white-space: nowrap; }
++.batch-actions button, .match-actions button, .match-actions .btn-view { min-height: 34px; padding: .3rem .85rem; font-size: .82rem; }
++.btn-open { border-color: rgba(255, 79, 180, .5) !important; background: var(--pink-soft) !important; color: var(--pink-bright) !important; }
++.btn-open:hover { background: rgba(255, 79, 180, .26) !important; border-color: var(--pink-bright) !important; }
++.btn-close { color: var(--text); }
++
++/* status pills: the page puts the status word in the class (status-badge live / upcoming / completed).
++   arcane-theme.css restyles .status-badge for the brackets page, so these rules are scoped to this page to win over it. */
++body.theme-arcane.page-admin .status-badge {
++    display: inline-flex;
++    align-items: center;
++    gap: .4rem;
++    padding: .2rem .7rem;
++    border: 1px solid var(--line);
++    border-radius: 999px;
++    font-size: .76rem;
++    font-weight: 800;
++    letter-spacing: .06em;
++    text-transform: uppercase;
++    color: var(--muted);
++}
++body.theme-arcane.page-admin .status-badge.live, .status-live { border-color: var(--pink-bright); background: var(--pink-soft); color: var(--pink-bright); }
++.status-badge.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pink-bright); box-shadow: 0 0 8px var(--pink-bright); animation: admin-pulse 1.8s ease-in-out infinite; }
++body.theme-arcane.page-admin .status-badge.upcoming, .status-upcoming { border-color: rgba(255, 214, 102, .4); background: rgba(255, 214, 102, .08); color: #ffd666; }
++body.theme-arcane.page-admin .status-badge.completed, .status-completed { border-color: var(--line); background: rgba(255, 255, 255, .04); color: var(--text-dim); }
++.winner-mark { color: var(--pink-bright); font-weight: 800; }
++@keyframes admin-pulse { 50% { opacity: .35; transform: scale(.8); } }
++
++/* ---------- login ---------- */
++#login-container { min-height: 100vh; align-items: center; justify-content: center; padding: 1rem; }
++.login-box {
++    width: min(100%, 26rem);
++    padding: clamp(1.4rem, 4vw, 2.2rem);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    background: var(--panel);
++    backdrop-filter: blur(14px);
++    -webkit-backdrop-filter: blur(14px);
++    box-shadow: var(--shadow);
++}
++.login-box h1 { margin: 0 0 .35rem; font-size: 1.7rem; font-weight: 800; letter-spacing: -.04em; }
++.login-box p { margin: 0 0 1.4rem; color: var(--muted); font-size: .95rem; }
++#login-form { display: grid; gap: .85rem; }
++#login-form input { width: 100%; }
++#login-form .btn-login { width: 100%; margin-top: .25rem; }
++#login-error { min-height: 1.4rem; margin-top: .2rem; color: var(--danger); font-size: .9rem; text-align: center; }
++
++/* ---------- phones ---------- */
++@media (max-width: 640px) {
++    .admin-header { align-items: flex-start; }
++    .button-group > button { flex: 1 1 100%; }
++    .setup-row select { width: 100%; }
++    .form-row > button { flex: 1 1 100%; }
++    .batch-bar { align-items: flex-start; }
++}
++@media (prefers-reduced-motion: reduce) {
++    body.page-admin button, body.page-admin .btn-view { transition: none; }
++    .status-badge.live::before { animation: none; }
+ }
+-
+-.warning-text {
+-    color: #dc3545;
+-    font-size: 0.9rem;
+-    margin: 0;
+-    font-weight: 500;
+-}
+\ No newline at end of file
+diff --git a/js/admin.js b/js/admin.js
+index 2da5ca1..d5e2a1a 100644
+--- a/js/admin.js
++++ b/js/admin.js
+@@ -28,6 +28,9 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https:/
+ import { ARCANE_CONFIG } from './arcane-config.js';
+ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+ 
++// edit titles come from YouTube and can contain quotes, < and &: escape them before they go into innerHTML
++const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++
+ // ========================================
+ // AUTHENTICATION
+ // ========================================
+@@ -149,7 +152,7 @@ async function loadRecentBlogPosts() {
+         if (!container) return;
+         
+         if (posts.length === 0) {
+-            container.innerHTML = '<p style="color: #888;">No blog posts yet. Generate one above!</p>';
++            container.innerHTML = '<p class="empty-note">No blog posts yet. Generate one above!</p>';
+             return;
+         }
+         
+@@ -747,12 +750,14 @@ async function loadMatches() {
+                     ? (groupsHere.length === 1 ? `Group ${groupsHere[0]}` : `Groups ${groupsHere[0]}-${groupsHere[groupsHere.length - 1]}`) + ` (Round ${currentRound}, Batch ${currentBatch})`
+                     : `Round ${currentRound} - Batch ${currentBatch}`;
+                 batchHeaderRow.innerHTML = `
+-                    <td colspan="8" style="background: #f0f0f0; font-weight: bold; padding: 12px;">
+-                        📦 ${batchLabel}
+-                        <span style="float: right;">
+-                            <button class="btn-open" onclick="openBatch(${currentRound}, ${currentBatch})" style="margin-right: 10px;">Open Batch</button>
+-                            <button class="btn-close" onclick="closeBatch(${currentRound}, ${currentBatch})">Close Batch</button>
+-                        </span>
++                    <td colspan="8">
++                        <div class="batch-bar">
++                            <span class="batch-title">📦 ${batchLabel}</span>
++                            <span class="batch-actions">
++                                <button class="btn-open" onclick="openBatch(${currentRound}, ${currentBatch})">Open Batch</button>
++                                <button class="btn-close" onclick="closeBatch(${currentRound}, ${currentBatch})">Close Batch</button>
++                            </span>
++                        </div>
+                     </td>
+                 `;
+                 tbody.appendChild(batchHeaderRow);
+@@ -769,10 +774,10 @@ async function loadMatches() {
+             
+             const row = document.createElement('tr');
+             row.innerHTML = `
+-                <td>${match.stage === 'group' ? `${match.group} · day ${match.matchday}` : `R${match.round}M${match.matchNumber}`} <span style="color: #666;">(B${match.batch})</span></td>
+-                <td>${match.song1.shortTitle || match.song1.title}</td>
++                <td>${match.stage === 'group' ? `${match.group} · day ${match.matchday}` : `R${match.round}M${match.matchNumber}`} <span class="batch-tag">(B${match.batch})</span></td>
++                <td><span class="edit-title-cell" title="${esc(match.song1.title || match.song1.shortTitle)}">${esc(match.song1.shortTitle || match.song1.title)}</span></td>
+                 <td>${match.song1.votes || 0}</td>
+-                <td>${match.song2.shortTitle || match.song2.title}</td>
++                <td><span class="edit-title-cell" title="${esc(match.song2.title || match.song2.shortTitle)}">${esc(match.song2.shortTitle || match.song2.title)}</span></td>
+                 <td>${match.song2.votes || 0}</td>
+                 <td>${dateStr}</td>
+                 <td>
+@@ -795,7 +800,7 @@ async function loadMatches() {
+         
+     } catch (error) {
+         console.error('❌ Error loading matches:', error);
+-        tbody.innerHTML = `<tr><td colspan="8" style="color: #dc3232;">Error: ${error.message}</td></tr>`;
++        tbody.innerHTML = `<tr><td colspan="8" class="error-cell">Error: ${error.message}</td></tr>`;
+     }
+ }
+ 
+diff --git a/tools/test-admin-browser.py b/tools/test-admin-browser.py
+index 6d224de..01c7e07 100644
+--- a/tools/test-admin-browser.py
++++ b/tools/test-admin-browser.py
+@@ -36,8 +36,21 @@ def route(r):
+     elif u.endswith('/data/edits.json'): r.fulfill(body=json.dumps(edits),content_type='application/json')
+     elif 'gstatic.com' in u or 'googleapis' in u or 'fonts' in u: r.fulfill(body='',content_type='text/plain')
+     else: r.continue_()
++PUMP=[None]
++def wait_for(cond, timeout=8.0, what=''):
++    # poll instead of sleeping a fixed time, so a slow machine cannot lose a race.
++    # Waits through page.wait_for_timeout, NOT time.sleep: an alert blocks the page until Playwright runs the dialog handler,
++    # and that only happens while the test is inside a Playwright call.
++    end=time.time()+timeout
++    while time.time()<end:
++        try:
++            if cond(): return True
++        except Exception: pass
++        PUMP[0].wait_for_timeout(50) if PUMP[0] else time.sleep(0.05)
++    raise AssertionError('timed out waiting for '+(what or 'condition'))
++
+ with sync_playwright() as p:
+-    b=p.chromium.launch(); pg=b.new_page(viewport={'width':1300,'height':900})
++    b=p.chromium.launch(); pg=b.new_page(viewport={'width':1300,'height':900}); PUMP[0]=pg
+     errs=[]; pg.on('pageerror',lambda e:errs.append(str(e))); pg.on('console',lambda m: errs.append('console.error: '+m.text) if m.type=='error' and 'Failed to load resource' not in m.text else None)
+     pg.route('**/*',route)
+     answers={'prompt':[]}
+@@ -58,7 +71,7 @@ with sync_playwright() as p:
+     pg.select_option('#cupFormat','groups')
+     answers['prompt']=['demo-seed-1','1']
+     with pg.expect_navigation(): pg.click('#initTournamentBtn')
+-    time.sleep(.3)
++    pg.wait_for_selector('.batch-header')
+     s=store(); m=[k for k in s if '/matches/' in k]
+     results['build']=(len(m), s['tournaments/jinx-cup-1']['format'], s['tournaments/jinx-cup-1']['drawSeed'])
+     pg.wait_for_selector('.batch-header');
+@@ -66,16 +79,16 @@ with sync_playwright() as p:
+     results['row_label']=pg.eval_on_selector('#matches-table tr:nth-child(2) td','e=>e.innerText.trim()')
+     results['status1']=pg.inner_text('#groupStageStatus')
+     # Knockout too early
+-    pg.click('#buildKnockoutBtn'); time.sleep(.3); results['early_msg']=dialogs[-1]
++    n0=len(dialogs); pg.click('#buildKnockoutBtn'); wait_for(lambda: len(dialogs)>n0,what='early knockout alert'); results['early_msg']=dialogs[-1]
+     # Open and close group A through the real buttons
+     pg.once('dialog',lambda d: None)
+-    pg.click('.batch-header:first-of-type .btn-open'); time.sleep(.5)
++    n0=len(dialogs); pg.click('.batch-header:first-of-type .btn-open'); wait_for(lambda: len(dialogs)>n0,what='open batch alert')
+     results['open_msg']=dialogs[-1]
+     live=pg.evaluate("[...window.__store.values()].filter(v=>v.stage==='group'&&v.group==='A').map(v=>v.status)")
+     results['A_after_open']=sorted(set(live))
+     # give votes so no ties (6 matches), then close batch
+     pg.evaluate("""()=>{for(const [k,v] of window.__store.entries()){ if(k.includes('/matches/') && v.stage==='group'){ v.song1.votes=(v.song1.seed<v.song2.seed)?30:10; v.song2.votes=(v.song1.seed<v.song2.seed)?10:30; v.totalVotes=40; v.status='live'; } } window.__persist(); }""")
+-    pg.click('.batch-header:first-of-type .btn-close'); time.sleep(.6)
++    n0=len(dialogs); pg.click('.batch-header:first-of-type .btn-close'); wait_for(lambda: len(dialogs)>n0+1,what='close batch alert')
+     results['close_A_msg']=dialogs[-1]
+     st=pg.evaluate("[...window.__store.entries()].filter(([k,v])=>k.includes('/matches/')&&v.stage==='group').map(([k,v])=>v).reduce((a,v)=>{a[v.group+':'+v.status]=(a[v.group+':'+v.status]||0)+1;return a},{})")
+     results['after_close_A']=st
+@@ -84,22 +97,21 @@ with sync_playwright() as p:
+         pg.click(f'.batch-header:nth-of-type({i}) .btn-close') if False else None
+     # simpler: close remaining groups via closeBatch calls
+     for g in (2,3,4):
+-        pg.evaluate(f"window.closeBatch(1,{g})"); time.sleep(.4)
++        n0=len(dialogs); pg.evaluate(f"window.closeBatch(1,{g})"); wait_for(lambda: len(dialogs)>n0+1,what=f'close group {g}')
+     reload()
+     results['status2']=pg.inner_text('#groupStageStatus')
+-    pg.click('#buildKnockoutBtn'); time.sleep(1.5); pg.wait_for_selector('#admin-content',state='visible')
++    n0=len(dialogs); pg.click('#buildKnockoutBtn'); wait_for(lambda: len(dialogs)>n0+1,what='knockout build'); pg.wait_for_load_state(); pg.wait_for_selector('#admin-content',state='visible')
+     results['knockout_confirm']=dialogs[-2]; results['knockout_done']=dialogs[-1]
+-    time.sleep(.5)
+     s=store(); results['final']=(len([k for k in s if '/matches/' in k]), s['tournaments/jinx-cup-1']['stage'], s['tournaments/jinx-cup-1']['groupStage']['knockoutBuilt'])
+     pg.wait_for_selector('.batch-header');
+     results['headers2']=pg.eval_on_selector_all('.batch-header td','els=>els.map(e=>e.innerText.split("\\n")[0].trim())')
+     results['status3']=pg.inner_text('#groupStageStatus')
+     # second knockout click refused
+-    pg.click('#buildKnockoutBtn'); time.sleep(.4); results['second_msg']=dialogs[-1]
++    n0=len(dialogs); pg.click('#buildKnockoutBtn'); wait_for(lambda: len(dialogs)>n0,what='second knockout alert'); results['second_msg']=dialogs[-1]
+     # Reset: should rebuild the group stage only, same draw
+     sg=store(); before=sorted((k,v['song1']['id'],v['song2']['id']) for k,v in sg.items() if '/matches/' in k and v.get('stage')=='group')
+     answers['prompt']=['OK']
+-    pg.click('#resetTournamentBtn'); time.sleep(2.0); pg.wait_for_selector('#admin-content',state='visible')
++    n0=len(dialogs); pg.click('#resetTournamentBtn'); wait_for(lambda: any('Tournament reset complete' in d[1] for d in dialogs[n0:]),what='group Reset'); pg.wait_for_load_state(); pg.wait_for_selector('#admin-content',state='visible')
+     s=store(); ms=[k for k in s if '/matches/' in k]
+     after=sorted((k,v['song1']['id'],v['song2']['id']) for k,v in s.items() if '/matches/' in k and v.get('stage')=='group')
+     results['reset_same_draw']=(before==after and len(after)==24)
+@@ -111,12 +123,12 @@ with sync_playwright() as p:
+     pg.select_option('#cupFormat','single')
+     answers['prompt']=['single-seed']
+     with pg.expect_navigation(): pg.click('#initTournamentBtn')
+-    time.sleep(.3)
++    pg.wait_for_selector('.batch-header')
+     s1=store(); m1=sorted((k,v['song1']['id'],v['song2']['id']) for k,v in s1.items() if '/matches/' in k)
+     t1=s1['tournaments/jinx-cup-1']
+     results['single_build']=(len(m1), t1.get('format'), t1.get('drawSeed'), t1.get('totalRounds'))
+     answers['prompt']=['OK']
+-    pg.click('#resetTournamentBtn'); time.sleep(2.0); pg.wait_for_selector('#admin-content',state='visible')
++    n0=len(dialogs); pg.click('#resetTournamentBtn'); wait_for(lambda: any('Tournament reset complete' in d[1] for d in dialogs[n0:]),what='single Reset'); pg.wait_for_load_state(); pg.wait_for_selector('#admin-content',state='visible')
+     s2=store(); m2=sorted((k,v['song1']['id'],v['song2']['id']) for k,v in s2.items() if '/matches/' in k)
+     results['single_reset_same']=(m1==m2 and len(m2)==15)
+     results['single_headers']=pg.eval_on_selector_all('.batch-header td','els=>els.map(e=>e.innerText.split("\\n")[0].trim())')

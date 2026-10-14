@@ -12,6 +12,7 @@
     "packageJson": {
       "dependencies": [
         "npm:@netlify/blobs@7",
+        "npm:jpeg-js@~0.4.4",
         "npm:postcss@^8.4.0"
       ]
     }

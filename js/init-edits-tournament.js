@@ -20,7 +20,7 @@ import {
 
 // Bracket size is not configured anywhere: it is the number of edits entered in the cup (2, 4, 8, 16, 32, 64 or 128).
 
-async function loadEdits() {
+export async function loadEdits() {
     const response = await fetch('/data/edits.json', { cache: 'no-store' });
     if (!response.ok) {
         throw new Error(`Could not load data/edits.json (${response.status}). Run the importer and commit the file first.`);
@@ -38,7 +38,7 @@ async function loadEdits() {
     }
 }
 
-function assertCupIsActive(cupId) {
+export function assertCupIsActive(cupId) {
     if (cupId !== ARCANE_CONFIG.tournamentId) {
         throw new Error(
             `Blocked: asked to build "${cupId}" but the active tournament is "${ARCANE_CONFIG.tournamentId}". ` +

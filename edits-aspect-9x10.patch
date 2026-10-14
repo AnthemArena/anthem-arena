@@ -1,0 +1,45 @@
+diff --git a/tools/edits-aspect.js b/tools/edits-aspect.js
+index 4910c33..435ab05 100644
+--- a/tools/edits-aspect.js
++++ b/tools/edits-aspect.js
+@@ -16,15 +16,16 @@
+ // so every fallback result gets "aspectCheck": true and shows a "? check" pill in the report.
+ //
+ // Manual override: just edit "aspect" in data/edits.json and set "aspectSource": "manual". Manual values are never touched.
+-// Allowed values: "9:16", "3:4", "4:5", "1:1", "4:3", "16:9".
++// Allowed values: "9:16", "3:4", "4:5", "9:10", "1:1", "4:3", "16:9". (9:10 = embed 720x800, common on real Shorts.)
+ import fs from 'fs';
+ import path from 'path';
+ import { pathToFileURL } from 'url';
+ 
+-export const ASPECTS = { '9:16': 9 / 16, '3:4': 3 / 4, '4:5': 4 / 5, '1:1': 1, '4:3': 4 / 3, '16:9': 16 / 9 };
++export const ASPECTS = { '9:16': 9 / 16, '3:4': 3 / 4, '4:5': 4 / 5, '9:10': 9 / 10, '1:1': 1, '4:3': 4 / 3, '16:9': 16 / 9 };
+ const DARK = 28;          // luma at or below this counts as "black bar" (the bars are about 16, plus JPEG noise)
+ const BAR_BRIGHT_MAX = 0.02; // a column/row is a bar if at most 2% of its pixels are brighter than DARK
+ const SNAP_TOLERANCE = 0.025; // more than 2.5% away from a known shape = unsure
++const API_SNAP_TOLERANCE = 0.06; // API sizes are exact, so only flag a shape this far from every known one
+ const SYMMETRY_PX = 6;    // bars on the two sides should match to within this many pixels
+ 
+ const snap = ratio => {
+@@ -66,7 +67,7 @@ export function aspectFromEmbed(width, height) {
+   const w = Number(width), h = Number(height);
+   if (!(w > 0) || !(h > 0)) return null;
+   const ratio = w / h, { aspect, distance } = snap(ratio);
+-  return { aspect, ratio: Number(ratio.toFixed(3)), check: distance > SNAP_TOLERANCE };
++  return { aspect, ratio: Number(ratio.toFixed(3)), check: distance > API_SNAP_TOLERANCE };
+ }
+ 
+ async function fetchPlayers(ids, key) {
+diff --git a/tools/test-edits-aspect.mjs b/tools/test-edits-aspect.mjs
+index b1dad37..48a2411 100644
+--- a/tools/test-edits-aspect.mjs
++++ b/tools/test-edits-aspect.mjs
+@@ -30,7 +30,7 @@ check('all-black thumbnail returns no aspect', blk.aspect === null, `(${blk.note
+ 
+ // ---- API embed size (main source) ----
+ // Real values from the YouTube API, checked 2026-10-11: square 720x720, Short 720x1280, landscape 720x405.
+-for (const [w, h, want] of [[720, 720, '1:1'], [720, 1280, '9:16'], [720, 405, '16:9'], [720, 540, '4:3'], [720, 900, '4:5']])
++for (const [w, h, want] of [[720, 720, '1:1'], [720, 1280, '9:16'], [720, 405, '16:9'], [720, 540, '4:3'], [720, 900, '4:5'], [720, 800, '9:10'], [720, 794, '9:10'], [720, 751, '1:1'], [720, 748, '1:1']])
+   check(`embed ${w}x${h} -> ${want}`, aspectFromEmbed(w, h)?.aspect === want && !aspectFromEmbed(w, h).check);
+ check('embed size missing -> null', aspectFromEmbed(undefined, undefined) === null && aspectFromEmbed('0', '0') === null);
+ check('odd embed shape is flagged', aspectFromEmbed(720, 600)?.check === true);

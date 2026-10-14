@@ -62,29 +62,11 @@ export function cupDisplayName(cupId) {
 // ----------------------------------------
 // ENTRY SELECTION + CHECKS
 // ----------------------------------------
-// An edit enters a cup when its "tournaments" list contains the cup id (the importer's last line says the same).
-// Anything that is entered but not usable is reported as an error, never silently skipped,
-// because you chose to enter it on purpose.
-//
-// size is optional. Leave it out (null) and the bracket is as big as the entry list, which must then be
-// 2, 4, 8, 16, 32, 64 or 128. Pass a size to insist on one (a Reset does, so a rebuild can never quietly
-// become a different-sized bracket). Returns { entries, errors, notes, size }; size is null when it cannot be built.
-// `notes` is information only (for example creators with more than one edit in the cup) and never blocks a build.
-export function selectEntries(edits, cupId, size = null) {
+// The per-edit checks every kind of cup shares (knockout and group stage): usable edit, no duplicates, creator notes.
+// Returns { errors, notes }. Several edits by one creator are allowed; they only produce a note.
+export function checkEntered(entered) {
     const errors = [], notes = [];
-    const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
-
-    const auto = size == null;
-    const target = auto ? entered.length : size;
-    const sizeOk = isValidBracketSize(target);
-
-    if (!sizeOk) {
-        errors.push(auto
-            ? `${cupId} has ${entered.length} edits entered. A bracket needs exactly ${BRACKET_SIZES.join(', ')}. ${sizeAdvice(entered.length)}`
-            : `Bracket size must be one of ${BRACKET_SIZES.join(', ')}. Got ${size}.`);
-    }
-
-    const label = e => `${e.shortTitle || e.title || e.videoId || '(no title)'} [${e.videoId || 'no id'}]`;
+    const label = entryLabel;
 
     for (const e of entered) {
         if (!e.videoId) errors.push(`${label(e)}: no videoId.`);
@@ -108,6 +90,36 @@ export function selectEntries(edits, cupId, size = null) {
     for (const list of byCreator.values()) {
         if (list.length > 1) notes.push(`"${list[0].artist}" has ${list.length} edits in this cup: ${list.map(label).join(', ')}.`);
     }
+    return { errors, notes };
+}
+
+export const entryLabel = e => `${e.shortTitle || e.title || e.videoId || '(no title)'} [${e.videoId || 'no id'}]`;
+
+// An edit enters a cup when its "tournaments" list contains the cup id (the importer's last line says the same).
+// Anything that is entered but not usable is reported as an error, never silently skipped,
+// because you chose to enter it on purpose.
+//
+// size is optional. Leave it out (null) and the bracket is as big as the entry list, which must then be
+// 2, 4, 8, 16, 32, 64 or 128. Pass a size to insist on one (a Reset does, so a rebuild can never quietly
+// become a different-sized bracket). Returns { entries, errors, notes, size }; size is null when it cannot be built.
+// `notes` is information only (for example creators with more than one edit in the cup) and never blocks a build.
+export function selectEntries(edits, cupId, size = null) {
+    const errors = [], notes = [];
+    const entered = (edits || []).filter(e => Array.isArray(e.tournaments) && e.tournaments.includes(cupId));
+
+    const auto = size == null;
+    const target = auto ? entered.length : size;
+    const sizeOk = isValidBracketSize(target);
+
+    if (!sizeOk) {
+        errors.push(auto
+            ? `${cupId} has ${entered.length} edits entered. A bracket needs exactly ${BRACKET_SIZES.join(', ')}. ${sizeAdvice(entered.length)}`
+            : `Bracket size must be one of ${BRACKET_SIZES.join(', ')}. Got ${size}.`);
+    }
+
+    const checked = checkEntered(entered);
+    errors.push(...checked.errors);
+    notes.push(...checked.notes);
 
     if (sizeOk && !auto && entered.length !== size) {
         errors.push(`The ${cupId} entry list has ${entered.length} edits but the bracket needs exactly ${size}. ` +
@@ -164,7 +176,7 @@ export function drawEntries(entries, drawSeed) {
 // ----------------------------------------
 // MATCH GENERATION
 // ----------------------------------------
-function toCompetitor(edit, drawPosition) {
+export function toCompetitor(edit, drawPosition) {
     return {
         id: edit.id || edit.videoId,
         seed: null,                       // no seeding: the draw is random (see drawPosition)

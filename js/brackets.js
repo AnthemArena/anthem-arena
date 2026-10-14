@@ -1,6 +1,6 @@
 // ========================================
 // BRACKETS PAGE FUNCTIONALITY
-// Single-elimination bracket of ANY size (2 to 128 entries).
+// Single-elimination bracket of ANY size (2 to 128 entries), or a group stage (groups of 4, top 2 qualify) followed by a knockout.
 // Everything on the page is drawn from the match documents themselves: the number of rounds, the round
 // names, the entry count and the champion all come from the data. Nothing here assumes a 64-bracket.
 // ========================================
@@ -15,6 +15,8 @@ import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 // ✅ ADD THIS LINE:
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { roundLabel } from './bracket-builder.js';   // same round names the builder stores on each match
+import { describeCup } from './group-builder.js';
+import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, cupSummary } from './brackets-groups.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // Facts about the bracket on screen, worked out from the matches in describeBracket().
@@ -43,22 +45,19 @@ if (typeof window.matchDatabase === 'undefined') {
 // HELPER FUNCTIONS
 // ========================================
 
-// Facts about the bracket, taken from the match documents.
+// Facts about the bracket, taken from the match documents. Single elimination: { totalRounds, entries, cupName } as always.
+// A group-stage cup adds { isGroupCup, groups, qualifiers, knockoutBuilt, firstKnockoutRound ... } (see describeCup).
 function describeBracket(matches) {
-    const totalRounds = Math.max(...matches.map(m => m.round));
-    const round1Matches = matches.filter(m => m.round === 1).length;
-    return {
-        totalRounds,
-        entries: round1Matches * 2,
-        cupName: matches.find(m => m.tournamentName)?.tournamentName || 'Tournament'
-    };
+    return describeCup(matches);
 }
 
 // What to show in an empty slot: "Winner of R1 M3" when we know which match feeds it, otherwise "TBD".
 function slotName(song, byId) {
     if (song.id !== 'TBD') return song.shortTitle || song.title;
     const source = song.sourceMatch ? byId.get(song.sourceMatch) : null;
-    return source ? `Winner of R${source.round} M${source.matchNumber}` : 'TBD';
+    if (!source) return 'TBD';
+    // in a group-stage cup round 2 is the first knockout round, so say its name instead of "R2"
+    return `Winner of ${bracketInfo.isGroupCup ? (source.roundLabel || `R${source.round}`) : `R${source.round}`} M${source.matchNumber}`;
 }
 
 // ========================================
@@ -95,6 +94,7 @@ async function loadBracketData() {
         
         hideBracketLoading();
         showBracketSections();
+        applyStage();   // group-stage cups: show the Groups or the Knockout tab (single elimination: nothing to do)
         
     } catch (error) {
         console.error('❌ Error loading bracket data:', error);
@@ -151,7 +151,9 @@ function hideBracketSections() {
     const sections = [
         'tournamentSelector',
         'bracketNavigation',
-        'bracketSection'
+        'bracketSection',
+        'stageTabsSection',
+        'groupStageSection'
     ];
     
     sections.forEach(sectionId => {
@@ -214,7 +216,7 @@ async function generateBracketFromFirebase(firebaseMatches) {
         window.matchDatabase[match.matchId] = {
             id: match.matchId,
             tournament: bracketInfo.cupName,
-            round: getRoundName(match.round),
+            round: match.stage === 'group' ? `Group ${match.group}` : getRoundName(match.round),
             date: match.date || 'TBD',
             status: match.status,
             competitor1: {
@@ -243,8 +245,11 @@ percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVo
     
     console.log(`✅ Populated window.matchDatabase with ${Object.keys(window.matchDatabase).length} matches`);
     
-    // Draw one column per round, however many rounds this cup has
+    // Draw one column per round, however many rounds this cup has (a group-stage cup: the knockout rounds only)
     renderRounds(firebaseMatches);
+
+    // Group-stage cups: the group tables, the tabs and the "knockout starts later" note
+    renderStageViews(firebaseMatches);
 
     // Dynamic stats (from the same matches, no second fetch)
     generateTournamentStats(firebaseMatches);
@@ -273,6 +278,20 @@ async function updateTournamentInfo(allMatches) {
             return;
         }
         
+        // A group-stage cup has its own wording (the knockout does not exist until the groups end)
+        if (bracketInfo.isGroupCup) {
+            const sum = cupSummary(allMatches, bracketInfo, { roundName: getRoundName, formatDate });
+            const grid = document.querySelector('.tournament-info .info-grid');
+            if (grid) {
+                grid.innerHTML = `
+                <div class="info-item"><span class="info-label">Status</span><span class="info-value ${sum.statusClass}">${sum.liveDot ? '<span class="live-dot"></span>' : ''}${esc(sum.statusText)}</span></div>
+                <div class="info-item"><span class="info-label">Edits</span><span class="info-value">${sum.edits}</span></div>
+                <div class="info-item"><span class="info-label">Progress</span><span class="info-value">${esc(sum.progress)}</span></div>
+                <div class="info-item"><span class="info-label">Format</span><span class="info-value">${esc(sum.format)}</span></div>`;
+            }
+            return;
+        }
+
         // Calculate stats
         const totalMatches = allMatches.length;
         const completedMatches = allMatches.filter(m => m.status === 'completed').length;
@@ -485,8 +504,13 @@ function renderRounds(matches) {
     const { totalRounds } = bracketInfo;
     let html = '';
 
-    for (let round = 1; round <= totalRounds; round++) {
-        const inRound = matches
+    // A group-stage cup draws only the knockout here (rounds 2 and up); the group matches have their own tables.
+    // Keeping the group matches out also keeps the bracket's column spacing right (it styles :nth-child(1..4) as the first rounds).
+    const firstRound = bracketInfo.isGroupCup ? bracketInfo.firstKnockoutRound : 1;
+    const pool = bracketInfo.isGroupCup ? matches.filter(m => m.stage !== 'group') : matches;
+
+    for (let round = firstRound; round <= totalRounds; round++) {
+        const inRound = pool
             .filter(m => m.round === round)
             .sort((a, b) => a.matchNumber - b.matchNumber);
         if (inRound.length === 0) continue;
@@ -507,7 +531,7 @@ function renderRounds(matches) {
     }
 
     container.innerHTML = html;
-    console.log(`✅ Drew ${totalRounds} round${totalRounds === 1 ? '' : 's'} (${matches.length} matches)`);
+    console.log(`✅ Drew ${html ? totalRounds - firstRound + 1 : 0} round(s) (${pool.length} matches)`);
 }
 
 /// ========================================
@@ -652,7 +676,7 @@ function updateStatsDisplay(stats) {
     // Most Voted Match
     const votedCard = document.querySelector('.stat-card:nth-child(4)');
     if (votedCard && stats.mostVoted) {
-        const roundName = getRoundName(stats.mostVoted.round);
+        const roundName = matchRoundName(stats.mostVoted);
         const song1IsTBD = stats.mostVoted.song1.id === 'TBD';
         const song2IsTBD = stats.mostVoted.song2.id === 'TBD';
         const matchName = esc(`${song1IsTBD ? 'TBD' : stats.mostVoted.song1.shortTitle} vs ${song2IsTBD ? 'TBD' : stats.mostVoted.song2.shortTitle}`);
@@ -667,7 +691,13 @@ function updateStatsDisplay(stats) {
 }
 
 function getRoundName(round) {
+    if (bracketInfo.isGroupCup && round === 1) return 'Group Stage';
     return roundLabel(round, bracketInfo.totalRounds);
+}
+
+// "Group C" for a group match, otherwise the round name (used where a single match is named)
+function matchRoundName(match) {
+    return match.stage === 'group' ? `Group ${match.group}` : getRoundName(match.round);
 }
 
 
@@ -707,6 +737,102 @@ function updateMatchCard(match) {
         window.matchDatabase[match.matchId].competitor2.percentage = song2Percentage;
         window.matchDatabase[match.matchId].status = match.status;
     }
+}
+
+// ========================================
+// GROUP-STAGE CUPS: tabs, group tables, filter chips
+// ========================================
+// Only a cup with a group stage gets any of this (see describeCup). A single-elimination cup leaves these sections empty and hidden,
+// so its page is exactly what it was. The HTML itself is built by js/brackets-groups.js.
+
+let currentStage = null;               // 'groups' | 'knockout' for a group-stage cup, null otherwise
+let stageHandlersAttached = false;
+
+function renderStageViews(matches) {
+    const tabsEl = document.getElementById('stageTabsSection');
+    const groupsEl = document.getElementById('groupStageSection');
+    const noteEl = document.getElementById('knockoutNote');
+
+    if (!bracketInfo.isGroupCup) {
+        currentStage = null;
+        if (tabsEl) { tabsEl.innerHTML = ''; tabsEl.style.display = 'none'; }
+        if (groupsEl) { groupsEl.innerHTML = ''; groupsEl.style.display = 'none'; }
+        if (noteEl) noteEl.innerHTML = '';
+        return;
+    }
+
+    const views = buildGroupViews(matches);
+    // which tab: the link (#knockout / #groups), else the tab the visitor was on, else the sensible default
+    const fromHash = location.hash === '#knockout' ? 'knockout' : location.hash === '#groups' ? 'groups' : null;
+    currentStage = fromHash || currentStage || defaultStage(matches, bracketInfo);
+
+    if (groupsEl) groupsEl.innerHTML = groupStageHtml(views, bracketInfo, { userVoted: checkUserVoted });
+    if (tabsEl) tabsEl.innerHTML = stageTabsHtml({ active: currentStage, info: bracketInfo, groupViews: views });
+    if (noteEl) noteEl.innerHTML = bracketInfo.knockoutBuilt ? '' : knockoutNoteHtml(bracketInfo, getRoundName(bracketInfo.firstKnockoutRound));
+    setupStageHandlers();
+}
+
+// Shows the Groups or the Knockout tab. Runs after showBracketSections(), which makes #bracketSection visible on its own.
+function applyStage() {
+    if (!bracketInfo.isGroupCup || !currentStage) return;
+    const tabsEl = document.getElementById('stageTabsSection');
+    const groupsEl = document.getElementById('groupStageSection');
+    const bracketEl = document.getElementById('bracketSection');
+    if (tabsEl) tabsEl.style.display = 'block';
+    if (groupsEl) groupsEl.style.display = currentStage === 'groups' ? 'block' : 'none';
+    if (bracketEl) bracketEl.style.display = currentStage === 'knockout' ? 'block' : 'none';
+    document.querySelectorAll('.stage-tab').forEach(tab => {
+        const on = tab.dataset.stage === currentStage;
+        tab.classList.toggle('active', on);
+        tab.setAttribute('aria-selected', String(on));
+    });
+}
+
+function showStage(stage) {
+    if (stage !== 'groups' && stage !== 'knockout') return;
+    currentStage = stage;
+    history.replaceState(null, '', `#${stage}`);
+    applyStage();
+}
+
+function filterGroups(filter) {
+    document.querySelectorAll('.gs-chip').forEach(chip => {
+        const on = chip.dataset.filter === filter;
+        chip.classList.toggle('active', on);
+        chip.setAttribute('aria-pressed', String(on));
+    });
+    let shown = 0;
+    document.querySelectorAll('.gs-card').forEach(card => {
+        const state = card.dataset.state;
+        const show = filter === 'all' || (filter === 'live' && state === 'live') || (filter === 'complete' && state === 'complete');
+        card.hidden = !show;
+        if (show) shown++;
+    });
+    const empty = document.getElementById('groupEmpty');
+    if (empty) empty.hidden = shown > 0;
+}
+
+// One delegated handler for everything in the group views, attached once (the HTML inside is re-drawn on every data load).
+function setupStageHandlers() {
+    if (stageHandlersAttached) return;
+    stageHandlersAttached = true;
+
+    document.addEventListener('click', (e) => {
+        if (!bracketInfo.isGroupCup) return;
+
+        const stageBtn = e.target.closest('[data-stage]');          // the tabs, and the button in the "knockout starts later" note
+        if (stageBtn) { showStage(stageBtn.dataset.stage); return; }
+
+        const chip = e.target.closest('.gs-chip');
+        if (chip) { filterGroups(chip.dataset.filter); return; }
+
+        // a finished group match opens the quick results view, like a bracket card; an open one goes to the vote page (the link)
+        const link = e.target.closest('.gs-match a');
+        if (link && link.dataset.status === 'completed' && typeof window.showMatchDetails === 'function') {
+            e.preventDefault();
+            window.showMatchDetails(link.dataset.matchId);
+        }
+    });
 }
 
 // ========================================
