@@ -19,11 +19,12 @@ const rows = edits.map(e => ({
   id: e.videoId, title: e.shortTitle || e.title || e.videoId, full: e.title || '', creator: e.artist || '', channelId: e.channelId || '',
   creatorUrl: e.creatorUrl || '', creatorCount: perCreator[e.channelId] || 1, views: e.views || 0, likes: e.likes ?? null,
   likeRate: e.likes != null && e.views ? +(100 * e.likes / e.views).toFixed(2) : null, duration: e.duration ?? null,
-  uploaded: e.uploadDate || '', characters: e.characters || [], cups: e.tournaments || [], status: e.status || 'ok',
-  flags: e.flags || [], notes: e.notes || '', aspect: e.aspect || '', aspectCheck: !!e.aspectCheck,
+  uploaded: e.uploadDate || '', characters: e.characters || [], group: e.group || '', cups: e.tournaments || [], status: e.status || 'ok',
+  flags: e.flags || [], notes: e.notes || '', aspect: e.aspect || '', aspectCheck: !!e.aspectCheck, aspectSource: e.aspectSource || '',
 }));
 const chars = [...new Set(rows.flatMap(r => r.characters))].sort();
-const data = JSON.stringify({ rows, chars, generated: new Date().toISOString().slice(0, 10) }).replace(/</g, '\\u003c');
+const groups = [...new Set(rows.map(r => r.group).filter(Boolean))].sort();
+const data = JSON.stringify({ rows, chars, groups, generated: new Date().toISOString().slice(0, 10) }).replace(/</g, '\\u003c');
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edits pool review</title>
@@ -53,6 +54,7 @@ a{color:var(--pink);text-decoration:none}a:hover{text-decoration:underline}
 <div class="bar">
   <input id="q" placeholder="Search title or creator…" size="28">
   <select id="char"><option value="">All characters</option></select>
+  <select id="grp"><option value="">All groups</option></select>
   <select id="status"><option value="">Any status</option><option value="ok">OK only</option><option value="review">Needs review</option><option value="blocked">Blocked</option></select>
   <label><input type="checkbox" id="oneper"> Best edit per creator only</label>
   <label><input type="checkbox" id="hideCup"> Hide edits already in a cup</label>
@@ -67,12 +69,13 @@ const $=id=>document.getElementById(id);
 const fmt=n=>n==null?'–':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(n>=1e4?0:1)+'K':String(n);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 D.chars.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('char').appendChild(o)});
+D.groups.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent='#'+g;$('grp').appendChild(o)});
 $('head').innerHTML=cols.map(c=>'<th data-k="'+c[1]+'"'+(c[2]?' class="num"':'')+'>'+c[0]+'</th>').join('');
 $('head').onclick=e=>{const k=e.target.dataset.k;if(!k||k==='thumb')return;sortDir=sortKey===k?-sortDir:(k==='title'||k==='creator'?1:-1);sortKey=k;render()};
-['q','char','status','oneper','hideCup'].forEach(i=>$(i).oninput=render);
+['q','char','grp','status','oneper','hideCup'].forEach(i=>$(i).oninput=render);
 function visible(){
-  const q=$('q').value.toLowerCase(),ch=$('char').value,st=$('status').value;
-  let r=rows.filter(x=>(!q||(x.title+' '+x.full+' '+x.creator).toLowerCase().includes(q))&&(!ch||x.characters.includes(ch))&&(!st||x.status===st)&&(!$('hideCup').checked||!x.cups.length));
+  const q=$('q').value.toLowerCase(),ch=$('char').value,gp=$('grp').value,st=$('status').value;
+  let r=rows.filter(x=>(!q||(x.title+' '+x.full+' '+x.creator).toLowerCase().includes(q))&&(!ch||x.characters.includes(ch))&&(!gp||x.group===gp)&&(!st||x.status===st)&&(!$('hideCup').checked||!x.cups.length));
   if($('oneper').checked){const best={};r.forEach(x=>{if(!best[x.channelId]||x.views>best[x.channelId].views)best[x.channelId]=x});r=r.filter(x=>best[x.channelId]===x)}
   const v=x=>{const a=x[sortKey];return Array.isArray(a)?a.join(',').toLowerCase():a==null?-1:typeof a==='string'?a.toLowerCase():a};
   return r.sort((a,b)=>{const A=v(a),B=v(b);return (A>B?1:A<B?-1:0)*sortDir});
@@ -86,7 +89,7 @@ function render(){
    +'<td><a href="'+esc(x.creatorUrl)+'" target="_blank" rel="noopener">'+esc(x.creator)+'</a>'+(x.creatorCount>1?'<br><span class="pill dupe">'+x.creatorCount+' edits in pool</span>':'')+'</td>'
    +'<td class="num">'+fmt(x.views)+'</td><td class="num">'+fmt(x.likes)+'</td><td class="num">'+(x.likeRate==null?'–':x.likeRate+'%')+'</td>'
    +'<td class="num">'+(x.duration==null?'–':x.duration+'s')+'</td>'
-   +'<td>'+(x.aspect?'<span class="pill'+(x.aspectCheck?' dupe':'')+'">'+esc(x.aspect)+(x.aspectCheck?' ? check':'')+'</span>':'–')+'</td><td>'+esc(x.uploaded)+'</td>'
+   +'<td>'+(x.aspect?'<span class="pill'+(x.aspectCheck?' dupe':'')+'" title="'+(x.aspectSource==='api'?'from the YouTube embed size':x.aspectSource==='manual'?'set by hand':'thumbnail fallback, unreliable: check')+'">'+esc(x.aspect)+(x.aspectCheck?' ? check':'')+'</span>':'–')+'</td><td>'+esc(x.uploaded)+'</td>'
    +'<td>'+(x.characters.map(c=>'<span class="pill">'+esc(c)+'</span>').join('')||'–')+'</td>'
    +'<td>'+(x.cups.map(c=>'<span class="pill cup">'+esc(c)+'</span>').join('')||'–')+'</td>'
    +'<td>'+(x.status!=='ok'?'<span class="pill '+(x.status==='blocked'?'bad':'dupe')+'">'+x.status+'</span>':'<span class="pill">ok</span>')+(x.flags.length?'<div class="flags">'+x.flags.map(esc).join('<br>')+'</div>':'')+'</td></tr>').join(''):'<tr><td colspan="12" class="empty">No edits match.</td></tr>';

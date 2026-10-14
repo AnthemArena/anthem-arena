@@ -163,6 +163,7 @@ function visible() {
     const sorters = {
         standing: (a, b) => STATUS_RANK[a.standing.kind] - STATUS_RANK[b.standing.kind] || b.standing.wins - a.standing.wins || byViews(a, b),
         views: byViews,
+        likes: (a, b) => (b.likes || 0) - (a.likes || 0) || byViews(a, b),
         wins: (a, b) => b.standing.wins - a.standing.wins || byViews(a, b),
         newest: (a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || '')),
         title: (a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
@@ -198,6 +199,7 @@ function cardHTML(e) {
             <dl class="edit-stats">
                 <div><dt>Record</dt><dd>${record}</dd></div>
                 <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
+                <div><dt>Likes</dt><dd>${e.likes == null ? '\u2013' : fmtViews(e.likes)}</dd></div>
                 <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
             </dl>
             <div class="edit-pills">${chars}${cups}</div>

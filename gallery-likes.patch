@@ -1,0 +1,53 @@
+diff --git a/css/edits-gallery.css b/css/edits-gallery.css
+index c3a5218..3a959cd 100644
+--- a/css/edits-gallery.css
++++ b/css/edits-gallery.css
+@@ -202,7 +202,7 @@
+ .page-gallery .edit-stats {
+     margin-top: auto;           /* stats sit at the bottom of the card, so they line up even when one title wraps */
+     display: grid;
+-    grid-template-columns: repeat(3, 1fr);
++    grid-template-columns: repeat(4, 1fr);
+     gap: .4rem;
+     padding: .6rem 0;
+     border-top: 1px solid var(--line);
+@@ -291,6 +291,7 @@
+ @media (max-width: 560px) {
+     .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
+     .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
++    .page-gallery .edit-stats { grid-template-columns: repeat(2, 1fr); }   /* four stats do not fit one row on a 2-up phone card */
+     /* compact toolbar: search on its own row, status / cup / sort share the next one */
+     .page-gallery .gallery-toolbar { padding: .8rem; margin-bottom: 1.1rem; }
+     .page-gallery .toolbar-row { gap: .6rem; }
+diff --git a/js/music-gallery.js b/js/music-gallery.js
+index 72c6378..306f183 100644
+--- a/js/music-gallery.js
++++ b/js/music-gallery.js
+@@ -163,6 +163,7 @@ function visible() {
+     const sorters = {
+         standing: (a, b) => STATUS_RANK[a.standing.kind] - STATUS_RANK[b.standing.kind] || b.standing.wins - a.standing.wins || byViews(a, b),
+         views: byViews,
++        likes: (a, b) => (b.likes || 0) - (a.likes || 0) || byViews(a, b),
+         wins: (a, b) => b.standing.wins - a.standing.wins || byViews(a, b),
+         newest: (a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || '')),
+         title: (a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
+@@ -198,6 +199,7 @@ function cardHTML(e) {
+             <dl class="edit-stats">
+                 <div><dt>Record</dt><dd>${record}</dd></div>
+                 <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
++                <div><dt>Likes</dt><dd>${e.likes == null ? '\u2013' : fmtViews(e.likes)}</dd></div>
+                 <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
+             </dl>
+             <div class="edit-pills">${chars}${cups}</div>
+diff --git a/music-gallery.html b/music-gallery.html
+index 2288cc3..32f9198 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -83,6 +83,7 @@
+                     <select id="sortSelect">
+                         <option value="standing">Standing</option>
+                         <option value="views">Most views</option>
++                        <option value="likes">Most likes</option>
+                         <option value="wins">Most wins</option>
+                         <option value="newest">Newest</option>
+                         <option value="title">Title A-Z</option>

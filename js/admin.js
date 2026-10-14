@@ -4,6 +4,8 @@
 
 import { db, auth } from './firebase-config.js';
 import { previewEditsTournament, writeEditsTournament, getStoredDraw } from './init-edits-tournament.js';
+import { previewGroupTournament, writeGroupTournament, getStoredGroupDraw, previewKnockoutBuild, writeKnockoutBuild } from './init-group-tournament.js';
+import { allGroupStandings } from './group-builder.js';
 
 // ✅ NEW: Import blog generation functions
 import {
@@ -25,6 +27,9 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https:/
 
 import { ARCANE_CONFIG } from './arcane-config.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+
+// edit titles come from YouTube and can contain quotes, < and &: escape them before they go into innerHTML
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // ========================================
 // AUTHENTICATION
@@ -147,7 +152,7 @@ async function loadRecentBlogPosts() {
         if (!container) return;
         
         if (posts.length === 0) {
-            container.innerHTML = '<p style="color: #888;">No blog posts yet. Generate one above!</p>';
+            container.innerHTML = '<p class="empty-note">No blog posts yet. Generate one above!</p>';
             return;
         }
         
@@ -631,10 +636,11 @@ window.closeBatch = async function(roundNumber, batchNumber) {
         console.log(`✅ Closed ${closedCount} matches`);
         
         // ✅ Stagger blog post generation
+        // declared out here: the summary alert below also reads it (it used to be scoped to the block, which threw a ReferenceError
+        // after every Close Batch with auto-blog on)
+        let delayMinutes = 0;
         if (shouldAutoGenerate && closedCount > 0) {
             logBlog(`📰 Scheduling ${closedCount} blog posts with smart timing...`);
-            
-            let delayMinutes = 0;
             
             // Priority 1: Upsets (immediate)
             for (const matchId of upsets) {
@@ -726,6 +732,7 @@ async function loadMatches() {
         });
         
         tbody.innerHTML = '';
+        showGroupStageStatus(matches);
         
         let currentRound = null;
         let currentBatch = null;
@@ -737,13 +744,20 @@ async function loadMatches() {
                 
                 const batchHeaderRow = document.createElement('tr');
                 batchHeaderRow.className = 'batch-header';
+                // a group-stage batch is one group (or several): say which, instead of "Round 1 - Batch 3"
+                const groupsHere = [...new Set(matches.filter(m => m.round === currentRound && m.batch === currentBatch && m.stage === 'group').map(m => m.group))];
+                const batchLabel = groupsHere.length
+                    ? (groupsHere.length === 1 ? `Group ${groupsHere[0]}` : `Groups ${groupsHere[0]}-${groupsHere[groupsHere.length - 1]}`) + ` (Round ${currentRound}, Batch ${currentBatch})`
+                    : `Round ${currentRound} - Batch ${currentBatch}`;
                 batchHeaderRow.innerHTML = `
-                    <td colspan="8" style="background: #f0f0f0; font-weight: bold; padding: 12px;">
-                        📦 Round ${currentRound} - Batch ${currentBatch}
-                        <span style="float: right;">
-                            <button class="btn-open" onclick="openBatch(${currentRound}, ${currentBatch})" style="margin-right: 10px;">Open Batch</button>
-                            <button class="btn-close" onclick="closeBatch(${currentRound}, ${currentBatch})">Close Batch</button>
-                        </span>
+                    <td colspan="8">
+                        <div class="batch-bar">
+                            <span class="batch-title">📦 ${batchLabel}</span>
+                            <span class="batch-actions">
+                                <button class="btn-open" onclick="openBatch(${currentRound}, ${currentBatch})">Open Batch</button>
+                                <button class="btn-close" onclick="closeBatch(${currentRound}, ${currentBatch})">Close Batch</button>
+                            </span>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(batchHeaderRow);
@@ -760,10 +774,10 @@ async function loadMatches() {
             
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>R${match.round}M${match.matchNumber} <span style="color: #666;">(B${match.batch})</span></td>
-                <td>${match.song1.shortTitle || match.song1.title}</td>
+                <td>${match.stage === 'group' ? `${match.group} · day ${match.matchday}` : `R${match.round}M${match.matchNumber}`} <span class="batch-tag">(B${match.batch})</span></td>
+                <td><span class="edit-title-cell" title="${esc(match.song1.title || match.song1.shortTitle)}">${esc(match.song1.shortTitle || match.song1.title)}</span></td>
                 <td>${match.song1.votes || 0}</td>
-                <td>${match.song2.shortTitle || match.song2.title}</td>
+                <td><span class="edit-title-cell" title="${esc(match.song2.title || match.song2.shortTitle)}">${esc(match.song2.shortTitle || match.song2.title)}</span></td>
                 <td>${match.song2.votes || 0}</td>
                 <td>${dateStr}</td>
                 <td>
@@ -786,7 +800,7 @@ async function loadMatches() {
         
     } catch (error) {
         console.error('❌ Error loading matches:', error);
-        tbody.innerHTML = `<tr><td colspan="8" style="color: #dc3232;">Error: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="error-cell">Error: ${error.message}</td></tr>`;
     }
 }
 
@@ -846,6 +860,68 @@ window.clearAllVotesForTesting = async function() {
 // INITIALIZATION
 // ========================================
 
+// ========================================
+// GROUP STAGE CUPS
+// ========================================
+// Format "Group stage + knockout": groups of 4, everyone plays everyone, the top 2 qualify into a knockout.
+// The group stage is round 1 (one admin batch per group, or several groups together), the knockout is rounds 2 and up.
+// All the rules live in js/group-builder.js; this is only the prompts and the confirm boxes.
+async function buildGroupCup(seed) {
+    const perBatch = prompt('Groups to open together in one batch.\n\n1 = "Open Batch" opens one group (6 matches) at a time. 4 = four groups (24 matches) at once.', '1');
+    if (perBatch === null) return;
+    const groupsPerBatch = Number(perBatch.trim() || 1);
+    if (!Number.isInteger(groupsPerBatch) || groupsPerBatch < 1) { alert('Groups per batch must be a whole number, 1 or more. Nothing was changed.'); return; }
+
+    // Builds in memory only. Errors (wrong number of edits, status not ok...) stop here.
+    const built = await previewGroupTournament({ drawSeed: seed, groupsPerBatch });
+    const SHOW = 6;
+    const more = built.lines.length > SHOW ? `\n...and ${built.lines.length - SHOW} more groups (full draw: node tools/group-preview.mjs ${built.cupId} --seed ${built.drawSeed})` : '';
+    const notes = built.notes.length ? `\n\nNotes:\n${built.notes.slice(0, 5).join('\n')}${built.notes.length > 5 ? `\n...and ${built.notes.length - 5} more` : ''}` : '';
+    const ok = confirm(
+        `Build ${built.cupName}: ${built.size} edits in ${built.groups.length} groups, ${built.matches.length} group matches.\n` +
+        `The top 2 of each group go into a ${built.tournament.groupStage.qualifiers}-edit knockout (built later).\n\n` +
+        `Draw seed: ${built.drawSeed}\n\n${built.lines.slice(0, SHOW).join('\n')}${more}${notes}\n\nWrite the group stage? Only run this once.`
+    );
+    if (!ok) return;
+
+    await writeGroupTournament(built);
+    alert(`✅ ${built.cupName} created (${built.matches.length} group matches).\n\nDraw seed: ${built.drawSeed}\nKeep a copy of this seed.\n\nRefresh to see the matches.`);
+    location.reload();
+}
+
+async function buildKnockoutFromGroups() {
+    try {
+        const plan = await previewKnockoutBuild();   // throws a clear message if the groups are not all closed yet
+        const SHOW = 8;
+        const warn = plan.warnings.length ? `\n\n⚠️ ${plan.warnings.join('\n⚠️ ')}` : '';
+        const more = plan.lines.length > SHOW ? `\n...and ${plan.lines.length - SHOW} more` : '';
+        const ok = confirm(
+            `Build the knockout: ${plan.qualifiedVideoIds.length} qualifiers (the top 2 of each of ${plan.standings.length} groups), ${plan.knockoutMatches.length} matches.\n\n` +
+            `${plan.firstRoundLabel}:\n${plan.lines.slice(0, SHOW).join('\n')}${more}${warn}\n\nWrite the knockout? This can only be done once.`
+        );
+        if (!ok) return;
+        await writeKnockoutBuild(plan);
+        alert(`✅ Knockout built (${plan.knockoutMatches.length} matches).\n\nOpen "${plan.firstRoundLabel}" from the match list. Refresh to see it.`);
+        location.reload();
+    } catch (error) {
+        alert('❌ ' + error.message);
+        console.error(error);
+    }
+}
+
+// One line under the setup buttons: how far a group-stage cup has got (works from the matches the page already loaded).
+function showGroupStageStatus(matches) {
+    const el = document.getElementById('groupStageStatus');
+    if (!el) return;
+    const group = matches.filter(m => m.stage === 'group');
+    if (!group.length) { el.textContent = ''; return; }
+    const standings = allGroupStandings(matches);
+    const done = standings.filter(g => g.complete).length;
+    const knockout = matches.filter(m => m.stage === 'knockout');
+    el.textContent = `Group stage: ${done} of ${standings.length} groups finished (${group.filter(m => m.status === 'completed').length} of ${group.length} matches closed). ` +
+        (knockout.length ? `Knockout built (${knockout.length} matches).` : done === standings.length ? 'Ready to build the knockout.' : 'Knockout not built yet.');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏆 Admin Panel Initializing...');
     
@@ -853,6 +929,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const seedInput = prompt('Draw seed (leave blank to generate a new random one).\n\nThe seed is saved on the tournament and lets anyone re-run the draw to check it.', '');
             if (seedInput === null) return;
+
+            // Group stage + knockout cups have their own build flow (see buildGroupCup below).
+            if (document.getElementById('cupFormat')?.value === 'groups') { await buildGroupCup(seedInput.trim() || null); return; }
 
             // Builds in memory only. Errors (wrong number of edits, duplicate creator, status not ok...) stop here.
             const built = await previewEditsTournament({ drawSeed: seedInput.trim() || null });
@@ -879,6 +958,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('buildKnockoutBtn')?.addEventListener('click', buildKnockoutFromGroups);
+
     document.getElementById('resetTournamentBtn')?.addEventListener('click', async () => {
         if (!confirm('⚠️ DELETE ALL MATCHES AND REGENERATE?\n\nThis cannot be undone! The same draw seed is reused, so the draw stays the same. Votes are NOT deleted (use Clear Votes for testing).')) {
             return;
@@ -897,8 +978,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Build and check the new bracket BEFORE deleting anything, so a problem with the entries
             // cannot leave the tournament empty. Reuses the saved draw seed so the draw does not change.
-            const stored = await getStoredDraw(ACTIVE_TOURNAMENT);
-            const built = await previewEditsTournament({ drawSeed: stored.drawSeed, size: stored.size });
+            // A group-stage cup is rebuilt from its saved seed AND its saved seeding (views and likes at the time of the draw),
+            // so the groups come out the same even though views have moved on. This also deletes any knockout matches.
+            const storedGroup = await getStoredGroupDraw(ACTIVE_TOURNAMENT);
+            const stored = storedGroup ? null : await getStoredDraw(ACTIVE_TOURNAMENT);
+            const built = storedGroup
+                ? await previewGroupTournament({ stored: storedGroup })
+                : await previewEditsTournament({ drawSeed: stored.drawSeed, size: stored.size });
             const matchesRef = collection(db, `tournaments/${ACTIVE_TOURNAMENT}/matches`);
             const snapshot = await getDocs(matchesRef);
             
@@ -913,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             alert(`✅ Deleted ${deleteCount} matches! Now regenerating...`);
             
-            await writeEditsTournament(built);
+            await (storedGroup ? writeGroupTournament(built) : writeEditsTournament(built));
             
             alert('✅ Tournament reset complete! Refresh page.');
             location.reload();

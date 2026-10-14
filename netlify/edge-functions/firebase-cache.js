@@ -76,6 +76,7 @@ export default async (request, context) => {
   try {
     let firebaseUrl = "";
     let fetchVotes = false; // Flag to determine if we need to fetch votes
+    let isMatchList = false; // true for "all matches": that is a LIST request and Firestore pages lists
     
     // Route to correct Firebase endpoint
     if (pathname === "/api/matches") {
@@ -87,6 +88,7 @@ export default async (request, context) => {
         // Get all matches
         firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
         fetchVotes = true; // ✅ Fetch votes for all matches
+        isMatchList = true;
       }
     } else if (pathname.startsWith("/api/match/")) {
       // Alternative route: Get single match
@@ -104,18 +106,25 @@ export default async (request, context) => {
     
     console.log(`🔥 Fetching from Firebase: ${firebaseUrl}`);
     
-    // Fetch from Firebase REST API
-    const response = await fetch(firebaseUrl, {
-      headers: {
-        "Content-Type": "application/json"
+    // Fetch from Firebase REST API.
+    // The match LIST is fetched page by page: Firestore returns one page at a time and may return fewer documents than exist,
+    // so a cup with many matches (a group stage is 24 to 384) must follow nextPageToken or the page shows only the first few.
+    let firestoreData;
+    if (isMatchList) {
+      firestoreData = await fetchAllPages(firebaseUrl);
+    } else {
+      const response = await fetch(firebaseUrl, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
       }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
+
+      firestoreData = await response.json();
     }
-    
-    const firestoreData = await response.json();
     
     // Transform Firestore format to your app format
     let transformed = transformFirestoreData(firestoreData);
@@ -153,6 +162,39 @@ export default async (request, context) => {
     });
   }
 };
+
+// ========================================
+// PAGED LIST FETCH
+// ========================================
+// Lists a Firestore collection through the REST API, following nextPageToken until there are no more pages.
+// Returns { documents: [...] } like a single-page response, so transformFirestoreData() needs no change.
+// Asks for the biggest page Firestore allows (300) to keep the number of requests down; the MAX_PAGES guard stops a runaway loop.
+const PAGE_SIZE = 300;
+const MAX_PAGES = 50;
+
+async function fetchAllPages(baseUrl) {
+  const documents = [];
+  let pageToken = null;
+  let pages = 0;
+
+  do {
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    const url = `${baseUrl}${separator}pageSize=${PAGE_SIZE}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}`;
+    const response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+
+    if (!response.ok) {
+      throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
+    }
+
+    const page = await response.json();
+    if (Array.isArray(page.documents)) documents.push(...page.documents);
+    pageToken = page.nextPageToken || null;
+    pages++;
+  } while (pageToken && pages < MAX_PAGES);
+
+  if (pageToken) console.warn(`⚠️ Stopped after ${MAX_PAGES} pages: the list is longer than ${MAX_PAGES * PAGE_SIZE} documents`);
+  return { documents };
+}
 
 // ========================================
 // ✅ NEW: VIEW TRACKING HANDLER

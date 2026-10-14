@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Admin - Arcane Edits</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin.css">
+    <!-- tokens + the Arcane background (cover image and pink glow), shared with the rest of the site -->
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 </head>
-<body>
+<body class="theme-arcane page-admin">
     <!-- Login Form (shown when not authenticated) -->
     <div id="login-container" style="display: none;">
         <div class="login-box">
@@ -59,6 +65,17 @@
                         🔄 Reset & Regenerate All Matches
                     </button>
                 </div>
+                <div class="button-group setup-row">
+                    <label for="cupFormat"><strong>Format for "Build Bracket":</strong></label>
+                    <select id="cupFormat">
+                        <option value="single">Single elimination (knockout only)</option>
+                        <option value="groups">Group stage + knockout (groups of 4, top 2 qualify)</option>
+                    </select>
+                    <button id="buildKnockoutBtn" class="btn btn-primary">
+                        ⚔️ Build Knockout from Group Results
+                    </button>
+                </div>
+                <p id="groupStageStatus" class="group-status"></p>
             </section>
 
             <!-- Development Tools Section -->
@@ -89,8 +106,8 @@
         <div class="form-row">
             <input type="text" 
                    id="blogMatchId" 
-                   placeholder="round-1-match-1"
-                   style="flex: 1;">
+                   class="grow"
+                   placeholder="round-1-match-1">
             <button onclick="generateMatchRecapFromAdmin()" class="btn-primary">
                 Generate Recap
             </button>
@@ -106,7 +123,7 @@
                    placeholder="1" 
                    min="1" 
                    max="6"
-                   style="width: 100px;">
+                   class="narrow">
             <button onclick="generateRoundRecapFromAdmin()" class="btn-primary">
                 Generate Round Recap
             </button>
@@ -127,7 +144,7 @@
     <div class="control-group">
         <h3>Recent Blog Posts</h3>
         <div id="recentBlogPosts" class="blog-posts-list">
-            <p style="color: #888;">Loading...</p>
+            <p class="empty-note">Loading...</p>
         </div>
     </div>
 </div>
@@ -142,6 +159,7 @@
             <!-- Match Management -->
             <section class="match-management">
                 <h2>All Matches</h2>
+                <div class="table-wrap">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -159,6 +177,7 @@
                         <!-- Populated by JavaScript -->
                     </tbody>
                 </table>
+                </div>
             </section>
         </div>
     </div>

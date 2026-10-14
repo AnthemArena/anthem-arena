@@ -1,0 +1,185 @@
+/* ========================================
+   BRACKETS PAGE: GROUP STAGE VIEW (Arcane theme)
+   ----------------------------------------
+   Only used by a cup with a group stage: js/brackets.js fills #stageTabsSection and #groupStageSection (see js/brackets-groups.js
+   for the markup). A single-elimination cup leaves both empty and hidden, so nothing here touches it.
+   Built on the theme tokens (--pink, --pink-bright, --pink-soft, --panel, --border, --line, --text, --muted, --text-dim, --radius,
+   --shadow, --font) with fallbacks, so the page still looks right if the theme file is missing.
+======================================== */
+
+.stage-tabs-section, .group-stage-section { --gs-pink: var(--pink, #ff4fb4); --gs-pink-bright: var(--pink-bright, #ff70c3); --gs-pink-soft: var(--pink-soft, rgba(255, 79, 180, .14)); --gs-panel: var(--panel, rgba(11, 13, 24, .78)); --gs-border: var(--border, rgba(255, 79, 180, .28)); --gs-line: var(--line, rgba(255, 255, 255, .1)); --gs-text: var(--text, #f6f3f7); --gs-muted: var(--muted, #b9b3c1); --gs-dim: var(--text-dim, #8f889a); }
+
+/* ---------- Group stage / Knockout tabs ---------- */
+.stage-tabs-section { padding: 2rem 0 0; }
+.stage-tabs {
+    display: flex;
+    gap: .35rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: .35rem;
+    border: 1px solid var(--gs-border);
+    border-radius: 999px;
+    background: var(--gs-panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+.stage-tab {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .1rem;
+    padding: .55rem 1.6rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--gs-muted);
+    font: 800 .95rem var(--font, system-ui, sans-serif);
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.stage-tab:hover { color: var(--gs-text); background: rgba(255, 255, 255, .05); }
+.stage-tab.active { color: #160814; background: linear-gradient(135deg, var(--gs-pink-bright), var(--gs-pink)); box-shadow: 0 8px 22px rgba(255, 79, 180, .28); }
+.stage-tab-meta { font-size: .72rem; font-weight: 600; letter-spacing: .02em; opacity: .85; }
+.stage-tab:focus-visible, .gs-chip:focus-visible, .ko-note-btn:focus-visible, .gs-matches summary:focus-visible, .gs-match a:focus-visible { outline: 2px solid var(--gs-pink-bright); outline-offset: 2px; }
+
+/* ---------- group stage section ---------- */
+.group-stage-section { padding: 2rem 0 4rem; }
+.gs-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; margin-bottom: 1.4rem; }
+.gs-title-main { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -.04em; color: var(--gs-text); }
+.gs-sub { margin: .4rem 0 0; color: var(--gs-muted); font-size: .95rem; max-width: 46rem; line-height: 1.5; }
+
+.gs-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.gs-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 999px;
+    background: rgba(9, 10, 19, .58);
+    color: var(--gs-text);
+    font: 700 .85rem var(--font, system-ui, sans-serif);
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease;
+}
+.gs-chip:hover { border-color: var(--gs-border); }
+.gs-chip.active { border-color: var(--gs-pink-bright); background: var(--gs-pink-soft); color: var(--gs-pink-bright); }
+.gs-chip-count { min-width: 1.5rem; padding: .05rem .45rem; border-radius: 999px; background: rgba(255, 255, 255, .08); font-size: .75rem; text-align: center; }
+.gs-chip.active .gs-chip-count { background: rgba(255, 79, 180, .25); }
+
+.gs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 23rem), 1fr)); gap: 1.1rem; align-items: start; }
+.gs-empty { margin: 2rem 0 0; text-align: center; color: var(--gs-dim); }
+
+/* ---------- a group card ---------- */
+.gs-card {
+    padding: 1.1rem 1.1rem .9rem;
+    border: 1px solid var(--gs-line);
+    border-radius: var(--radius, 22px);
+    background: var(--gs-panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow, 0 18px 50px rgba(0, 0, 0, .35));
+    min-width: 0;
+}
+.gs-card[hidden] { display: none; }
+.gs-card[data-state="live"] { border-color: var(--gs-pink-bright); box-shadow: 0 0 0 1px rgba(255, 79, 180, .25), 0 18px 50px rgba(255, 79, 180, .14); }
+.gs-card-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .7rem; }
+.gs-card-title { margin: 0; font-size: 1.15rem; font-weight: 800; letter-spacing: -.03em; color: var(--gs-text); }
+.gs-progress { display: inline-flex; align-items: center; gap: .4rem; padding: .2rem .7rem; border: 1px solid var(--gs-line); border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gs-muted); white-space: nowrap; }
+.gs-progress-live { border-color: var(--gs-pink-bright); background: var(--gs-pink-soft); color: var(--gs-pink-bright); }
+.gs-progress-done { color: var(--gs-dim); }
+
+/* ---------- standings ---------- */
+.gs-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.gs-table th { padding: .35rem .4rem; text-align: left; font-size: .66rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gs-pink-bright); border-bottom: 1px solid var(--gs-line); }
+.gs-table th.gs-num, .gs-table td.gs-num { text-align: right; }
+.gs-table td { padding: .5rem .3rem; border-bottom: 1px solid var(--gs-line); vertical-align: middle; }
+.gs-table tr:last-child td { border-bottom: 0; }
+.gs-rank { width: 1.6rem; text-align: center !important; font-weight: 800; color: var(--gs-dim); font-variant-numeric: tabular-nums; }
+.gs-num { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; color: var(--gs-text); }
+.gs-share { color: var(--gs-muted); }
+.gs-edit { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.gs-thumb { width: 44px; height: 25px; flex: none; border-radius: 6px; object-fit: cover; background: rgba(255, 255, 255, .06); }
+.gs-thumb-empty { display: inline-block; }
+.gs-edit-text { display: flex; flex-direction: column; min-width: 0; }
+.gs-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; font-weight: 600; line-height: 1.25; color: var(--gs-text); }
+.gs-creator { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; color: var(--gs-dim); }
+.gs-flag { width: 1%; white-space: nowrap; text-align: right; }
+
+/* the top two (the places that qualify) are marked while the group is still being played, and said outright once it is over */
+.gs-in-position .gs-rank { color: var(--gs-pink-bright); }
+.gs-in-position td:first-child { box-shadow: inset 3px 0 0 var(--gs-pink); }
+.gs-out { opacity: .62; }
+.gs-pill { display: inline-block; padding: .12rem .5rem; border-radius: 999px; font-size: .62rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.gs-pill-in { border: 1px solid var(--gs-pink-bright); background: var(--gs-pink-soft); color: var(--gs-pink-bright); }
+.gs-pill-out { border: 1px solid var(--gs-line); color: var(--gs-dim); }
+.gs-note { margin: .6rem 0 0; font-size: .78rem; color: var(--gs-dim); }
+.gs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- the group's matches ---------- */
+.gs-matches { margin-top: .7rem; border-top: 1px solid var(--gs-line); padding-top: .55rem; }
+.gs-matches summary { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .3rem 0; cursor: pointer; list-style: none; font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gs-muted); }
+.gs-matches summary::-webkit-details-marker { display: none; }
+.gs-matches summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--gs-pink-bright); border-bottom: 2px solid var(--gs-pink-bright); transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+.gs-matches[open] summary::after { transform: rotate(-135deg); }
+.gs-count { margin-left: auto; margin-right: .6rem; color: var(--gs-dim); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.gs-match-list { list-style: none; margin: .3rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.gs-match a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: .6rem;
+    row-gap: .15rem;
+    padding: .5rem .65rem;
+    border: 1px solid var(--gs-line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .03);
+    color: var(--gs-text);
+    text-decoration: none;
+    font-size: .8rem;
+    transition: border-color .18s ease, background .18s ease;
+}
+.gs-match a:hover { border-color: var(--gs-border); background: rgba(255, 255, 255, .06); }
+.gs-match.live a { border-color: rgba(255, 79, 180, .5); background: var(--gs-pink-soft); }
+/* the two edits sit one above the other, each with the room for its whole name; "vs" is a small prefix on the second */
+.gs-side { grid-column: 1; display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; min-width: 0; }
+.gs-vs { display: none; }
+.gs-vs + .gs-side::before { content: "vs"; flex: none; margin-right: .1rem; font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--gs-dim); }
+.gs-vs + .gs-side .gs-side-name { flex: 1; }
+.gs-side-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gs-muted); }
+.gs-win .gs-side-name { color: var(--gs-text); font-weight: 700; }
+.gs-pct { flex: none; font-variant-numeric: tabular-nums; color: var(--gs-text); }
+.gs-win .gs-pct { color: var(--gs-pink-bright); }
+.gs-tag { grid-column: 2; grid-row: 1 / span 2; align-self: center; padding: .12rem .55rem; border-radius: 999px; font-size: .64rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.gs-tag-live { display: inline-flex; align-items: center; gap: .35rem; border: 1px solid var(--gs-pink-bright); color: var(--gs-pink-bright); }
+.gs-tag-done { color: var(--gs-dim); border: 1px solid var(--gs-line); }
+.gs-tag-soon { color: #ffd666; border: 1px solid rgba(255, 214, 102, .35); }
+
+/* ---------- Knockout tab: the note shown until the knockout exists ---------- */
+.ko-note { max-width: 40rem; margin: 2.5rem auto; padding: 2rem 1.6rem; text-align: center; border: 1px solid var(--gs-border, rgba(255, 79, 180, .28)); border-radius: var(--radius, 22px); background: var(--gs-panel, rgba(11, 13, 24, .78)); color: var(--gs-text, #f6f3f7); }
+.ko-note-icon { font-size: 2rem; }
+.ko-note h3 { margin: .6rem 0 .5rem; font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; }
+.ko-note p { margin: 0 auto 1.2rem; max-width: 32rem; color: var(--gs-muted, #b9b3c1); line-height: 1.55; }
+.ko-note-btn { padding: .6rem 1.4rem; border: 0; border-radius: 999px; background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)); color: #160814; font: 800 .9rem var(--font, system-ui, sans-serif); cursor: pointer; }
+#bracketRounds:empty { display: none; }
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+    .stage-tabs { width: 100%; }
+    .stage-tab { flex: 1; padding: .55rem .6rem; font-size: .88rem; }
+    .gs-chips { width: 100%; flex-wrap: nowrap; gap: .4rem; }
+    .gs-chip { flex: 1 1 0; justify-content: center; gap: .35rem; padding: .5rem .4rem; font-size: .8rem; white-space: nowrap; }
+    .gs-chip-count { min-width: 1.2rem; padding: .05rem .35rem; }
+    /* on a narrow card the Qualified / Out words would squeeze the edit's title: show a tick or a cross instead (the words stay for screen readers) */
+    .gs-pill { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; padding: 0; font-size: 0; }
+    .gs-pill::before { font-size: .85rem; line-height: 1; }
+    .gs-pill-in::before { content: "\2713"; }
+    .gs-pill-out::before { content: "\00d7"; }
+    .gs-card { padding: .9rem .8rem .7rem; }
+    .gs-thumb { width: 40px; height: 23px; }
+    .gs-creator { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .stage-tab, .gs-chip, .gs-match a, .gs-matches summary::after { transition: none; }
+}
