@@ -3,7 +3,7 @@
 // ========================================
 
 export const ARCANE_CONFIG = {
-    tournamentId: 'arcane-test-01',
+    tournamentId: 'group-test-01',
     tournamentName: 'Arcane Moments',
 
     dataDragonVersion: '14.24.1',
