@@ -23,10 +23,11 @@ def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
 
-def load(browser, scenario, width=1280, height=900, mutate=None, scale=1):
+def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None):
     matches = json.load(open(f'{FIX}/{scenario}.json'))
     if mutate: matches = mutate(matches)
     ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale)
+    if init: ctx.add_init_script(init)
     pg = ctx.new_page(); errs = []
     pg.on('pageerror', lambda e: errs.append(str(e)))
     def route(r):
@@ -159,6 +160,28 @@ with sync_playwright() as p:
     check('phone: the three filter chips share one row', pg.eval_on_selector_all('.gs-chip', 'els=>new Set(els.map(e=>Math.round(e.getBoundingClientRect().top))).size') == 1)
     pg.click('.stage-tab[data-stage="knockout"]'); pg.wait_for_timeout(1300); pg.screenshot(path=f'{SHOTS}/knockout-note-phone.png')
     pg.context.close()
+    # ---------- voted state: the visitor's own picks (stored by vote.js as localStorage vote_<cup>_<matchId> = song1 | song2) ----------
+    cup = [l for l in open(os.path.join(ROOT, 'js/arcane-config.js')).read().splitlines() if 'tournamentId:' in l][0].split("'")[1]
+    live = [m for m in json.load(open(f'{FIX}/groups-mid-16.json')) if m['status'] == 'live' and m['stage'] == 'group']
+    live.sort(key=lambda m: m['matchId'])
+    picks = {live[0]['matchId']: 'song2', live[1]['matchId']: 'song1'}
+    init = ''.join(f"localStorage.setItem('vote_{cup}_{k}','{v}');" for k, v in picks.items())
+    pg, errs = load(b, 'groups-mid-16', init=init)
+    card = pg.locator('.gs-card[data-state="live"]').first
+    check('voted: counter reads 2/6 voted and the header note says so', '2/6 voted' in card.inner_text().lower() and 'you voted 2/6' in card.inner_text().lower(), card.inner_text()[:200])
+    card.locator('summary').scroll_into_view_if_needed()
+    check('voted: 2 rows show the quiet Voted tag, 4 still say Vote', card.locator('.gs-tag-voted').count() == 2 and card.locator('.gs-tag-live').count() == 4)
+    first = card.locator(f'a[data-match-id="{live[0]["matchId"]}"]')
+    check('voted: second edit ticked (pick song2), first dimmed', first.locator('.gs-side').nth(1).get_attribute('class').count('gs-picked') == 1 and 'gs-dimmed' in first.locator('.gs-side').nth(0).get_attribute('class'))
+    check('voted: percentages only on voted rows', card.locator('.gs-pct').count() == 4, card.locator('.gs-pct').count())
+    check('voted: voted row still links to the match page', first.get_attribute('href').startswith('vote?match='))
+    card.screenshot(path=f'{SHOTS}/groups-voted-card.png')
+    pg.set_viewport_size({'width': 390, 'height': 900}); pg.wait_for_timeout(300)
+    check('voted (phone): no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+    card.screenshot(path=f'{SHOTS}/groups-voted-card-phone.png')
+    check('voted: no page errors', not errs, errs)
+    pg.context.close()
+
     b.close()
 
 print('\n' + ('ALL CHECKS PASSED' if not failed else f'{len(failed)} FAILED'))

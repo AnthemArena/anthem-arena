@@ -156,6 +156,19 @@
 .gs-tag-done { color: var(--gs-dim); border: 1px solid var(--gs-line); }
 .gs-tag-soon { color: #ffd666; border: 1px solid rgba(255, 214, 102, .35); }
 
+/* ---------- voted state: the visitor's own pick ---------- */
+.gs-voted-note { display: block; margin: -.2rem 0 .6rem; font-size: .74rem; font-weight: 700; letter-spacing: .04em; color: var(--gs-dim); font-variant-numeric: tabular-nums; }
+.gs-voted-all { color: var(--gs-pink-bright); }
+/* a voted row is quieter than an open one: it is done, as far as this visitor is concerned, but it still opens the match to see the result */
+.gs-match.live.gs-voted a { border-color: var(--gs-line); background: rgba(255, 255, 255, .03); }
+.gs-match.live.gs-voted a:hover { border-color: var(--gs-border); background: rgba(255, 255, 255, .06); }
+.gs-tag-voted { border: 1px solid var(--gs-line); background: rgba(255, 255, 255, .04); color: var(--gs-muted); }
+.gs-picked .gs-side-name { color: var(--gs-text); font-weight: 700; }
+.gs-picked .gs-pct { color: var(--gs-pink-bright); }
+.gs-check { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; margin-right: -.1rem; border-radius: 50%; background: var(--gs-pink); color: #160814; font-size: .66rem; font-weight: 900; line-height: 1; align-self: center; }
+.gs-side.gs-picked { box-shadow: inset 3px 0 0 var(--gs-pink); padding-left: .45rem; margin-left: -.65rem; border-radius: 4px; }
+.gs-side.gs-dimmed { opacity: .5; }
+
 /* ---------- Knockout tab: the note shown until the knockout exists ---------- */
 .ko-note { max-width: 40rem; margin: 2.5rem auto; padding: 2rem 1.6rem; text-align: center; border: 1px solid var(--gs-border, rgba(255, 79, 180, .28)); border-radius: var(--radius, 22px); background: var(--gs-panel, rgba(11, 13, 24, .78)); color: var(--gs-text, #f6f3f7); }
 .ko-note-icon { font-size: 2rem; }

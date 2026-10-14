@@ -766,7 +766,7 @@ function renderStageViews(matches) {
     const fromHash = location.hash === '#knockout' ? 'knockout' : location.hash === '#groups' ? 'groups' : null;
     currentStage = fromHash || currentStage || defaultStage(matches, bracketInfo);
 
-    if (groupsEl) groupsEl.innerHTML = groupStageHtml(views, bracketInfo, { userVoted: checkUserVoted });
+    if (groupsEl) groupsEl.innerHTML = groupStageHtml(views, bracketInfo, { userVoted: checkUserVoted, userChoice: getUserVotedSongId });
     if (tabsEl) tabsEl.innerHTML = stageTabsHtml({ active: currentStage, info: bracketInfo, groupViews: views });
     if (noteEl) noteEl.innerHTML = bracketInfo.knockoutBuilt ? '' : knockoutNoteHtml(bracketInfo, getRoundName(bracketInfo.firstKnockoutRound));
     setupStageHandlers();
