@@ -60,38 +60,57 @@ function rowHtml(row, rank, complete) {
         </tr>`;
 }
 
-function matchRowHtml(m, { userVoted }) {
+// The voter's pick in a match: 'song1' | 'song2' | null. opts.userChoice(matchId) returns it (from localStorage on the page).
+// Older callers pass only opts.userVoted(matchId) (a yes/no): that still counts as voted, with no side to mark.
+function pickOf(m, opts) {
+    const choice = opts.userChoice ? opts.userChoice(m.matchId) : null;
+    const side = choice === 'song1' || choice === 'song2' ? choice : null;
+    const voted = !!side || !!(opts.userChoice ? choice : opts.userVoted && opts.userVoted(m.matchId));
+    return { side, voted };
+}
+
+function matchRowHtml(m, opts) {
     const done = m.status === 'completed', live = m.status === 'live';
-    const showPct = done || userVoted(m.matchId);
+    const { side, voted } = pickOf(m, opts);
+    const showPct = done || voted;
     const total = m.totalVotes || ((m.song1?.votes || 0) + (m.song2?.votes || 0));
     const pct = song => (showPct && total > 0) ? `<b class="gs-pct">${Math.round(((song.votes || 0) / total) * 100)}%</b>` : '';
     const win1 = done && m.winnerId === m.song1.id, win2 = done && m.winnerId === m.song2.id;
+    // the voter's pick is marked with a tick; in a live match the other edit is dimmed (a finished match keeps its winner styling)
+    const sideClass = (n, win) => `gs-side${win ? ' gs-win' : ''}${side === n ? ' gs-picked' : ''}${live && side && side !== n ? ' gs-dimmed' : ''}`;
+    const tick = n => side === n ? '<span class="gs-check" title="Your vote" aria-label="Your vote">&#10003;</span>' : '';
     const tag = done ? '<span class="gs-tag gs-tag-done">Final</span>'
+        : live && voted ? '<span class="gs-tag gs-tag-voted">&#10003; Voted</span>'
         : live ? '<span class="gs-tag gs-tag-live"><span class="live-dot"></span>Vote</span>'
         : '<span class="gs-tag gs-tag-soon">Soon</span>';
     return `
-        <li class="gs-match ${esc(m.status)}">
-            <a href="vote?match=${encodeURIComponent(m.matchId)}" data-match-id="${esc(m.matchId)}" data-status="${esc(m.status)}">
-                <span class="gs-side${win1 ? ' gs-win' : ''}"><span class="gs-side-name">${esc(short(m.song1))}</span>${pct(m.song1)}</span>
+        <li class="gs-match ${esc(m.status)}${voted ? ' gs-voted' : ''}">
+            <a href="vote?match=${encodeURIComponent(m.matchId)}" data-match-id="${esc(m.matchId)}" data-status="${esc(m.status)}"${voted ? ' data-voted="true"' : ''}>
+                <span class="${sideClass('song1', win1)}">${tick('song1')}<span class="gs-side-name">${esc(short(m.song1))}</span>${pct(m.song1)}</span>
                 <span class="gs-vs">vs</span>
-                <span class="gs-side${win2 ? ' gs-win' : ''}"><span class="gs-side-name">${esc(short(m.song2))}</span>${pct(m.song2)}</span>
+                <span class="${sideClass('song2', win2)}">${tick('song2')}<span class="gs-side-name">${esc(short(m.song2))}</span>${pct(m.song2)}</span>
                 ${tag}
             </a>
         </li>`;
 }
 
 export function groupCardHtml(view, opts = {}) {
-    const userVoted = opts.userVoted || (() => false);
     const total = view.matches.length;
+    const votedCount = view.matches.filter(m => pickOf(m, opts).voted).length;
+    const openCount = view.matches.filter(m => m.status === 'live').length;
     const progress = view.complete ? 'Finished' : `${view.played} of ${total} played`;
+    // while matches are open, say how many of them this visitor has voted in; the count inside the Matches list is "voted / total"
+    const votedNote = openCount && !view.complete
+        ? `<span class="gs-voted-note${votedCount === total ? ' gs-voted-all' : ''}">${votedCount === total ? '&#10003; ' : ''}You voted ${votedCount}/${total}</span>` : '';
     return `
-        <article class="gs-card" id="group-${esc(view.name)}" data-group="${esc(view.name)}" data-state="${view.state}">
+        <article class="gs-card" id="group-${esc(view.name)}" data-group="${esc(view.name)}" data-state="${view.state}" data-voted="${votedCount}">
             <header class="gs-card-head">
                 <h3 class="gs-card-title">Group ${esc(view.name)}</h3>
                 <span class="gs-progress${view.live ? ' gs-progress-live' : ''}${view.complete ? ' gs-progress-done' : ''}">
                     ${view.live ? '<span class="live-dot"></span>' : ''}${view.live ? `${view.live} live` : progress}
                 </span>
             </header>
+            ${votedNote}
             <table class="gs-table">
                 <caption class="gs-sr">Group ${esc(view.name)} standings</caption>
                 <thead><tr><th class="gs-rank">#</th><th>Edit</th><th class="gs-num">W-L</th><th class="gs-num">Share</th><th class="gs-flag"><span class="gs-sr">Status</span></th></tr></thead>
@@ -99,8 +118,8 @@ export function groupCardHtml(view, opts = {}) {
             </table>
             ${view.unresolvedTie ? '<p class="gs-note">Places 2 and 3 were level on everything: decided by draw position.</p>' : ''}
             <details class="gs-matches"${view.live ? ' open' : ''}>
-                <summary>Matches <span class="gs-count">${view.played}/${total}</span></summary>
-                <ul class="gs-match-list">${view.matches.map(m => matchRowHtml(m, { userVoted })).join('')}</ul>
+                <summary>Matches <span class="gs-count">${votedCount}/${total} voted</span></summary>
+                <ul class="gs-match-list">${view.matches.map(m => matchRowHtml(m, opts)).join('')}</ul>
             </details>
         </article>`;
 }

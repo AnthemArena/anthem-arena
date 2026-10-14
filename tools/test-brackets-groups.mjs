@@ -196,4 +196,47 @@ test('info panel: knockout built, live, and champion', () => {
     assert.match(champ.statusText, /^🏆 Champion: Edit \d+$/); assert.equal(champ.statusClass, 'status-completed'); assert.equal(champ.progress, '31 / 31 Matches');
 });
 
+test('voted state: tick on the pick, other edit dimmed, VOTED tag, counter "n/6 voted", header note', () => {
+    const v = buildGroupViews(midway().ms);                       // group B (v[1]) is live: 6 open matches
+    const b = v[1], id1 = b.matches[0].matchId, id2 = b.matches[1].matchId;
+    const choices = { [id1]: 'song2', [id2]: 'song1' };
+    const html = groupCardHtml(b, { userChoice: id => choices[id] || null });
+    assert.ok(html.includes('2/6 voted') && html.includes('You voted 2/6') && html.includes('data-voted="2"'));
+    assert.equal((html.match(/gs-tag-voted/g) || []).length, 2);                   // two voted rows get the quiet tag
+    assert.equal((html.match(/gs-tag-live/g) || []).length, 4);                    // the other four still say Vote
+    assert.equal((html.match(/gs-check/g) || []).length, 2);                       // one tick per voted match
+    assert.equal((html.match(/gs-dimmed/g) || []).length, 2);                      // the edit not picked is dimmed
+    const row1 = html.split('<li').find(x => x.includes(id1));                     // picked song2: the second side carries the tick
+    assert.ok(row1.indexOf('gs-picked') > row1.indexOf('gs-vs'));
+    assert.ok(row1.includes('gs-pct'));                                            // percentages appear on voted rows only
+    assert.equal((html.match(/gs-pct/g) || []).length, 4);                         // 2 voted rows x 2 sides
+});
+
+test('voted state: nothing voted = no ticks, "0/6 voted", no pick styling', () => {
+    const v = buildGroupViews(midway().ms);
+    const html = groupCardHtml(v[1], { userChoice: () => null });
+    assert.ok(html.includes('0/6 voted') && html.includes('You voted 0/6'));
+    assert.ok(!/gs-check|gs-picked|gs-dimmed|gs-tag-voted|gs-pct/.test(html));
+});
+
+test('voted state: voted in every open match reads as done; finished groups have no header note; finished matches keep winner styling', () => {
+    const v = buildGroupViews(midway().ms);
+    const all = groupCardHtml(v[1], { userChoice: () => 'song1' });
+    assert.ok(all.includes('gs-voted-all') && all.includes('6/6 voted'));
+    const done = groupCardHtml(v[0], { userChoice: m => 'song1' });                // group A is finished
+    assert.ok(!done.includes('gs-voted-note'));
+    assert.equal((done.match(/gs-dimmed/g) || []).length, 0);                      // finished: no dimming, the winner is already marked
+    assert.equal((done.match(/gs-win/g) || []).length, 6);
+    assert.equal((done.match(/gs-check/g) || []).length, 6);                       // the pick is still ticked
+    assert.ok(!groupCardHtml(v[3], { userChoice: () => null }).includes('gs-voted-note'));   // an upcoming group has nothing open: no note
+});
+
+test('voted state: the old yes/no option still works and an unknown stored value is not marked as a side', () => {
+    const v = buildGroupViews(midway().ms);
+    const yes = groupCardHtml(v[1], { userVoted: () => true });
+    assert.ok(yes.includes('6/6 voted') && !yes.includes('gs-check'));
+    const odd = groupCardHtml(v[1], { userChoice: () => 'banana' });
+    assert.ok(odd.includes('6/6 voted') && !odd.includes('gs-check') && !odd.includes('gs-dimmed'));
+});
+
 console.log(`\n${passed} tests passed`);
