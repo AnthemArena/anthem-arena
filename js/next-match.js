@@ -3,6 +3,7 @@
 // ========================================
 // js/vote.js uses these to (a) list the live matches the visitor has not voted in yet and (b) show a "Next match" bar once they have voted.
 // Matches from /api/matches carry `matchId` (not `id`), so every lookup goes through matchKey().
+import { cleanTitle } from './title-clean.js';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);

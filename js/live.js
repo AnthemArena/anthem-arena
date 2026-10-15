@@ -4,6 +4,7 @@
 // IMPORTS
 // ========================================
 import { getAllMatches } from './api-client.js';
+import { cleanTitle } from './title-clean.js';
 
 
 
@@ -640,14 +641,14 @@ function createMatchCard(match, index, isVoted) {
     
     card.innerHTML = `
         <div class="social-thumbnails">
-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/mqdefault.jpg" 
+            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/hqdefault.jpg" 
                  alt="${escapeHtml(match.song1.shortTitle || match.song1.title)}"
                  class="${userVotedSongId === 'song1' ? 'user-pick' : ''}"
                  loading="lazy">
             
             <div class="social-vs">VS</div>
             
-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/mqdefault.jpg"
+            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/hqdefault.jpg"
                  alt="${escapeHtml(match.song2.shortTitle || match.song2.title)}"
                  class="${userVotedSongId === 'song2' ? 'user-pick' : ''}"
                  loading="lazy">
@@ -655,14 +656,14 @@ function createMatchCard(match, index, isVoted) {
         
         <div class="social-info">
             <div class="song-details">
-                <h3>${escapeHtml(match.song1.shortTitle || match.song1.title)}</h3>
+                <h3>${escapeHtml(cleanTitle(match.song1.shortTitle || match.song1.title))}</h3>
                 <p>${escapeHtml(match.song1.artist)}${match.song1.year ? ' • ' + escapeHtml(match.song1.year) : ''}</p>
             </div>
             
             <div class="vs-divider">vs</div>
             
             <div class="song-details">
-                <h3>${escapeHtml(match.song2.shortTitle || match.song2.title)}</h3>
+                <h3>${escapeHtml(cleanTitle(match.song2.shortTitle || match.song2.title))}</h3>
                 <p>${escapeHtml(match.song2.artist)}${match.song2.year ? ' • ' + escapeHtml(match.song2.year) : ''}</p>
             </div>
         </div>

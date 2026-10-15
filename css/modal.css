@@ -799,3 +799,26 @@
 @media (max-width: 480px) {
     .modal-match-info { flex-direction: row; align-items: center; gap: 0.5rem; }
 }
+
+/* A finished match: shorter titles (two lines) so the result bars are on the first screen, and the two sides share their rows
+   (header / result / thumbnail) so they line up even when one title is longer. */
+.modal-container.is-completed .competitor-name-modal {
+    font-size: 1.4rem;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+@media (min-width: 969px) {   /* the modal is one column below 968 px, as above */
+    .modal-container.is-completed .modal-competitors { grid-template-rows: auto auto auto; row-gap: 0; }
+    .modal-container.is-completed .modal-competitors > .modal-competitor {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: 1 / span 3;
+    }
+    .modal-container.is-completed .modal-competitors > .modal-competitor:first-child { grid-column: 1; }
+    .modal-container.is-completed .modal-competitors > .modal-competitor:last-child { grid-column: 3; }
+    .modal-container.is-completed .modal-competitors > .modal-vs { grid-column: 2; grid-row: 1; }
+}
+

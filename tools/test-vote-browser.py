@@ -86,6 +86,50 @@ with sync_playwright() as p:
     pg.screenshot(path=f'{SHOTS}/vote-phone.png')
     pg.context.close()
 
+    # ---------- phone: vote button not a blob, About blocks below both players ----------
+    pg, errs = load(b, 393, 852, voted=False)
+    long_title = 'Bro tried to rizz Jinx - JINX EDIT || Britney Spears - Toxic #jinxedit #jinx #arcane #edit'
+    pg.evaluate("t=>{document.getElementById('vote-song1-name').textContent=t;}", long_title)
+    vb = rect(pg, '#vote-btn-competitor1')
+    radius = pg.evaluate("parseFloat(getComputedStyle(document.querySelector('#vote-btn-competitor1')).borderTopLeftRadius)")
+    check('phone: a very long title no longer makes a huge vote button (two lines at most)', vb['h'] <= 110, vb)
+    check('phone: the vote button is a rounded rectangle, not an oval', radius <= 40, radius)
+    pg.evaluate("document.querySelectorAll('.moment-details').forEach(e => e.classList.remove('moment-details--bare'))")   # edits WITH something to say keep their block: check the order for that case
+    a_vote, b_head, b_vid, a_det, b_det = (rect(pg, s) for s in ('#vote-btn-competitor1', '#competitor2-name', '#competitor2-wrapper', '#competitor-1-column .moment-details', '#competitor-2-column .moment-details'))
+    check('phone: order is player A, vote A, then player B (A\'s About block is not in between)', a_vote['y'] < b_head['y'] < b_vid['y'] < a_det['y'] < b_det['y'], (a_vote['y'], b_head['y'], b_vid['y'], a_det['y'], b_det['y']))
+    check('phone: each About block says which edit it is about', pg.inner_text('#competitor1-details-for').startswith('About: ') and pg.inner_text('#competitor2-details-for').startswith('About: ') and pg.inner_text('#competitor1-details-for') != pg.inner_text('#competitor2-details-for'), pg.inner_text('#competitor1-details-for'))
+    check('phone: second player is within about 1.5 screens of the first (it was about 3)', b_vid['y'] - rect(pg, '#competitor1-wrapper')['y'] < 1.5 * 852, b_vid['y'] - rect(pg, '#competitor1-wrapper')['y'])
+    pg.locator('#competitor-1-column .vote-section').scroll_into_view_if_needed(); pg.wait_for_timeout(200)
+    pg.screenshot(path=f'{SHOTS}/vote-phone-order.png', full_page=False)
+    pg.context.close()
+
+    # ---------- tidy titles and details ----------
+    pg, errs = load(b, 393, 852, voted=False)
+    raw1 = next(m for m in matches if m['matchId'] == CURRENT)['song1']['shortTitle']
+    raw2 = next(m for m in matches if m['matchId'] == CURRENT)['song2']['shortTitle']
+    check('(precondition) the test match titles really carry hashtags', '#' in raw1 or '#' in raw2, (raw1, raw2))
+    shown = [pg.inner_text(s) for s in ('#match-title', '#competitor1-name', '#competitor2-name', '#vote-song1-name', '#vote-song2-name', '#competitor1-details-for')]
+    import re as _re
+    check('headings, vote buttons and the About label show no trailing hashtags', all(not _re.search(r'#\w+\s*$', x.strip()) for x in shown), shown)
+    check('the full title is still the page title (nothing was lost from the data)', 'Vote:' in pg.title(), pg.title())
+    check('no filler "An Arcane moment competing..." sentence anywhere', 'An Arcane moment competing' not in pg.inner_text('body'))
+    check('phone: edits with nothing to say get no details block at all', not pg.is_visible('#competitor-1-column .moment-details') and not pg.is_visible('#competitor-2-column .moment-details'))
+    pg.screenshot(path=f'{SHOTS}/vote-phone-clean.png')
+    pg.context.close()
+
+    pg, errs = load(b, 1280, 900, voted=False)
+    check('desktop: the filler About section is gone but the seed / year / artist chips stay', not pg.is_visible('#competitor1-about') and pg.is_visible('#competitor1-meta'))
+    gap = pg.evaluate("(()=>{const b=document.querySelector('#competitor-1-column .moment-details').getBoundingClientRect(),c=document.querySelector('#competitor1-meta .meta-row').getBoundingClientRect();return c.top-b.top})()")
+    check('desktop: no empty band above the chips when an edit has no About text', gap <= 48, gap)
+    pg.screenshot(path=f'{SHOTS}/vote-desktop-clean.png')
+    pg.context.close()
+
+    # desktop keeps the About blocks under their own player
+    pg, errs = load(b, 1280, 900, voted=False)
+    d1, v1 = rect(pg, '#competitor-1-column .moment-details'), rect(pg, '#vote-btn-competitor1')
+    check('desktop: the About block still sits under its own vote button, and its "About:" label is hidden', d1['y'] > v1['b'] and not pg.is_visible('#competitor1-details-for'), (d1, v1))
+    pg.context.close()
+
     # ---------- voted: the Next match bar ----------
     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
         pg, errs = load(b, w, h, voted=True)

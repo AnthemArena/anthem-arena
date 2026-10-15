@@ -21,6 +21,7 @@ import { ensureUsername } from './username-system.js';
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
+import { cleanTitle } from './title-clean.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -452,10 +453,26 @@ function updateSongAbout(songData, competitorNum) {
 
     if (songData.about) {
         aboutText.textContent = songData.about;
+        aboutSection.style.display = '';
     } else {
-        // Fallback if no "about" text exists in JSON
-        aboutText.textContent = 'An Arcane moment competing in the Arcane Moments tournament.';
+        // No description for this edit: show nothing, rather than the same filler sentence under every edit
+        aboutText.textContent = '';
+        aboutSection.style.display = 'none';
     }
+}
+
+// An edit with no description and no tournament history has nothing under its player except chips that repeat
+// the seed badge and the "creator • year" line above. Mark that block so css/vote.css can hide it on a phone.
+function markBareDetails() {
+    [1, 2].forEach(n => {
+        const block = document.querySelector(`#competitor-${n}-column .moment-details`);
+        const about = document.getElementById(`competitor${n}-about`);
+        const accomplishments = document.getElementById(`competitor${n}-accomplishments`);
+        if (!block) return;
+        const hidden = el => !el || el.style.display === 'none';
+        block.classList.toggle('moment-details--bare', hidden(about) && hidden(accomplishments));
+        block.classList.toggle('moment-details--no-about', hidden(about));
+    });
 }
 
 // ========================================
@@ -493,6 +510,7 @@ const h2hRecord = undefined;
         // Update meta info
         updateCompetitorMeta(comp1Data, match.competitor1, comp1Meta);
         updateCompetitorMeta(comp2Data, match.competitor2, comp2Meta);
+        markBareDetails();
 
         console.log('✅ Competitor info updated with accomplishments and about text');
     } catch (error) {
@@ -1109,7 +1127,7 @@ function generateUsername() {
         // Update match title
         const matchTitle = document.getElementById('match-title');
         if (matchTitle) {
-            matchTitle.textContent = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
+            matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
         }
 
         // Update tournament badge
@@ -1172,8 +1190,14 @@ if (timeRemaining) {
     const voteSong1Name = document.getElementById('vote-song1-name');
     const voteSong2Name = document.getElementById('vote-song2-name');
 
-    if (voteSong1Name) voteSong1Name.textContent = currentMatch.competitor1.name;
-    if (voteSong2Name) voteSong2Name.textContent = currentMatch.competitor2.name;
+    if (voteSong1Name) voteSong1Name.textContent = cleanTitle(currentMatch.competitor1.name);
+    if (voteSong2Name) voteSong2Name.textContent = cleanTitle(currentMatch.competitor2.name);
+
+    // the "About" blocks move below both players on a phone, so each says which edit it is about
+    [1, 2].forEach(n => {
+        const el = document.getElementById(`competitor${n}-details-for`);
+        if (el) el.textContent = `About: ${cleanTitle(currentMatch['competitor' + n].name) || 'this edit'}`;
+    });
 
         // ========================================
         // UPDATE COMPETITOR 1 - BASIC INFO
@@ -1191,7 +1215,7 @@ if (timeRemaining) {
             comp1Seed.textContent = hasSeed ? `#${currentMatch.competitor1.seed} Seed` : '';
             comp1Seed.style.display = hasSeed ? '' : 'none';
         }
-        if (comp1Name) comp1Name.textContent = currentMatch.competitor1.name;
+        if (comp1Name) comp1Name.textContent = cleanTitle(currentMatch.competitor1.name);
         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
 if (comp1Votes) comp1Votes.style.display = 'none'; // ✅ Hide vote count
@@ -1223,7 +1247,7 @@ if (comp2Seed) {
     comp2Seed.textContent = hasSeed ? `#${currentMatch.competitor2.seed} Seed` : '';
     comp2Seed.style.display = hasSeed ? '' : 'none';
 }
-if (comp2Name) comp2Name.textContent = currentMatch.competitor2.name;
+if (comp2Name) comp2Name.textContent = cleanTitle(currentMatch.competitor2.name);
 if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
 if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
 if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
