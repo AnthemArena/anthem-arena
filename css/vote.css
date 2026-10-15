@@ -3085,3 +3085,90 @@
         font-size: 0.85rem;
     }
 }
+
+/* ========================================
+   PORTRAIT PLAYERS FOR SHORTS (14 Oct)
+   The players were 16:9, so a vertical Short filled only the middle half of the box between two black bars.
+   They are now 9:16 (like the gallery player in css/arcane-player.css), capped so a player, its buttons and its vote
+   button come close to fitting one screen.
+   ======================================== */
+.video-wrapper {
+    --player-h: min(64vh, 640px);
+    height: auto;
+    padding-bottom: 0;
+    aspect-ratio: 9 / 16;
+    width: min(100%, calc(var(--player-h) * 9 / 16));
+    margin: 0 auto;
+}
+@supports (height: 1dvh) {
+    .video-wrapper { --player-h: min(64dvh, 640px); }
+}
+
+@media (max-width: 768px) {
+    .video-wrapper { --player-h: min(58vh, 560px); }
+    /* Replay and Fullscreen side by side: saves a whole row on a phone */
+    .video-controls { flex-direction: row; gap: 0.5rem; }
+    .control-btn { padding: 0.65rem 0.4rem; font-size: 0.85rem; }
+}
+@supports (height: 1dvh) {
+    @media (max-width: 768px) {
+        .video-wrapper { --player-h: min(58dvh, 560px); }
+    }
+}
+
+/* ========================================
+   "NEXT MATCH" BAR: shown after you have voted (js/next-match.js, js/vote.js)
+   ======================================== */
+.next-match-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 900;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 0.8rem 1.1rem calc(0.8rem + env(safe-area-inset-bottom, 0px));
+    border: 1px solid var(--border, rgba(255, 79, 180, .25));
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: rgba(11, 13, 24, .94);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, .45);
+    color: var(--text, #f6f3f7);
+}
+.next-bar-text { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.next-bar-text strong { font-size: .95rem; }
+.next-bar-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; color: var(--muted, #b7b2bc); }
+.next-bar-btn {
+    flex: none;
+    padding: .7rem 1.2rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4));
+    color: #160814;
+    font: 800 .9rem var(--font, system-ui, sans-serif);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.next-bar-btn:focus-visible { outline: 2px solid var(--pink-bright, #ff70c3); outline-offset: 3px; }
+/* keep the end of the page clear of the bar */
+body.has-next-bar { padding-bottom: 5.5rem; }
+@media (max-width: 480px) {
+    .next-match-bar { gap: .6rem; padding-left: .8rem; padding-right: .8rem; }
+    .next-bar-text strong { font-size: .85rem; }
+    .next-bar-btn { padding: .65rem .9rem; font-size: .85rem; }
+}
+
+/* Side by side, the two columns share their rows (header, player, vote button), so the players and the vote buttons line up
+   even when one edit's title wraps onto more lines than the other's. Phones stack the columns and do not use this. */
+@media (min-width: 969px) {
+    .competitors-grid { row-gap: 0; }
+    #competitor-1-column, #competitor-2-column {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: 1 / span 4;
+        row-gap: 2rem;
+    }
+    #competitor-1-column { grid-column: 1; }
+    #competitor-2-column { grid-column: 3; }
+    .competitors-grid > .vs-divider { grid-column: 2; grid-row: 1; }
+}
+

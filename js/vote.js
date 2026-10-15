@@ -20,6 +20,7 @@ import { ensureUsername } from './username-system.js';
 // ✅ Import global notification system for achievement/level-up toasts
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
+import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -694,6 +695,29 @@ await loadOtherLiveMatches();
         }
     }
 
+// ========================================
+// "NEXT MATCH" BAR (shown once the visitor has voted in THIS match)
+// ========================================
+// With several matches open at once, the quickest way to more votes is to send a voter straight on to the next one.
+function updateNextMatchBar(remaining) {
+    let bar = document.getElementById('next-match-bar');
+    if (!hasVoted) {
+        if (bar) bar.remove();
+        document.body.classList.remove('has-next-bar');
+        return;
+    }
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'next-match-bar';
+        bar.className = 'next-match-bar';
+        bar.setAttribute('role', 'region');
+        bar.setAttribute('aria-label', 'Next match');
+        document.body.appendChild(bar);
+    }
+    bar.innerHTML = nextMatchBarHtml(remaining);
+    document.body.classList.add('has-next-bar');
+}
+
 /**
 // LOAD OTHER LIVE MATCHES
 // ========================================
@@ -724,13 +748,11 @@ try {
         const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
 
         // ✅ STEP 2: Filter - only live matches user HASN'T voted on yet (excluding current match)
-        const otherLiveMatches = allMatches.filter(match => {
-            const isLive = match.status === 'live';
-            const isNotCurrentMatch = match.id !== currentMatch.id;
-            const hasNotVoted = !userVotes[match.id];
+        // (matches from the API carry `matchId`, not `id`: the old filter read match.id, so it listed the current match and voted ones too)
+        const hasVotedId = id => !!userVotes[id] || !!localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${id}`);
+        const otherLiveMatches = unvotedLiveMatches(allMatches, { currentId: currentMatch.id, hasVoted: hasVotedId });
 
-            return isLive && isNotCurrentMatch && hasNotVoted;
-        });
+        updateNextMatchBar(otherLiveMatches);
 
         console.log(`✅ Found ${otherLiveMatches.length} unvoted live matches`);
 

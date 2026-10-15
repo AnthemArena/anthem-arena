@@ -1504,3 +1504,32 @@ body.theme-arcane .settings-modal-container select.setting-input:focus {
     border-color: var(--pink-bright);
 }
 body.theme-arcane .settings-modal-container select.setting-input option { background: #120a18; color: var(--text); }
+
+/* ---------- vote page: a compact header, so the players are on the first screen (14 Oct) ----------
+   The page title repeats both edit titles in 3.4rem type (three lines on a laptop) and the two columns repeat them again,
+   which pushed the videos below the fold. The title is smaller and capped at two lines; the full titles are still in the columns. */
+body.theme-arcane .vote-header { padding: 4.5rem 0 1.25rem; }
+body.theme-arcane .match-title {
+    font-size: clamp(1.35rem, 2.7vw, 2.2rem);
+    letter-spacing: -.03em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+body.theme-arcane .match-info { margin-top: .75rem; }
+@media (max-width: 768px) {
+    body.theme-arcane .vote-header { padding: 3.5rem 0 1rem; }
+}
+body.theme-arcane .voting-arena { padding: 1.75rem 0 4rem; }
+body.theme-arcane .competitor-column { gap: 1.25rem; }
+@media (min-width: 969px) {
+    body.theme-arcane #competitor-1-column, body.theme-arcane #competitor-2-column { row-gap: 1.25rem; }
+}
+@media (max-width: 768px) {
+    body.theme-arcane .voting-arena { padding: 1.25rem 0 3rem; }
+    /* the tournament and LIVE NOW badges can share a row */
+    body.theme-arcane .match-info { gap: .5rem; }
+    body.theme-arcane .info-badge { padding: .4rem .85rem; font-size: .75rem; }
+}
+
