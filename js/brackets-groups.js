@@ -4,6 +4,7 @@
 // js/brackets.js calls these when a cup has a group stage (see describeCup in js/group-builder.js).
 // A single-elimination cup never reaches this file's output, so its page is unchanged.
 import { allGroupStandings } from './group-builder.js';
+import { cleanTitle } from './title-clean.js';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
@@ -34,7 +35,8 @@ export const groupCounts = views => ({
 });
 
 const thumb = song => song?.videoId ? `https://img.youtube.com/vi/${encodeURIComponent(song.videoId)}/mqdefault.jpg` : '';
-const short = song => song?.shortTitle || song?.title || 'TBD';
+// display name: the title without its trailing hashtags (js/title-clean.js); the hover tooltip keeps the full title
+const short = song => cleanTitle(song?.shortTitle || song?.title || 'TBD');
 
 function rowHtml(row, rank, complete) {
     const qualifies = rank <= 2;
@@ -47,7 +49,7 @@ function rowHtml(row, rank, complete) {
     return `
         <tr class="gs-row${qualifies ? ' gs-in-position' : ''}${complete && !qualifies ? ' gs-out' : ''}" data-rank="${rank}">
             <td class="gs-rank">${rank}</td>
-            <td class="gs-edit" title="${esc([short(row.competitor), row.artist, seed].filter(Boolean).join(' · '))}">
+            <td class="gs-edit" title="${esc([row.competitor?.title || short(row.competitor), row.artist, seed].filter(Boolean).join(' · '))}">
                 ${row.competitor?.videoId ? `<img class="gs-thumb" src="${thumb(row.competitor)}" alt="" loading="lazy">` : '<span class="gs-thumb gs-thumb-empty"></span>'}
                 <span class="gs-edit-text">
                     <span class="gs-title">${esc(short(row.competitor))}</span>
@@ -99,6 +101,8 @@ export function groupCardHtml(view, opts = {}) {
     const votedCount = view.matches.filter(m => pickOf(m, opts).voted).length;
     const openCount = view.matches.filter(m => m.status === 'live').length;
     const progress = view.complete ? 'Finished' : `${view.played} of ${total} played`;
+    // "0/6 voted" only makes sense while there is something open to vote in; a finished or not-yet-open group with no votes of yours just says how many matches it has
+    const countLabel = (votedCount || openCount) ? `${votedCount}/${total} voted` : `${total} matches`;
     // while matches are open, say how many of them this visitor has voted in; the count inside the Matches list is "voted / total"
     const votedNote = openCount && !view.complete
         ? `<span class="gs-voted-note${votedCount === total ? ' gs-voted-all' : ''}">${votedCount === total ? '&#10003; ' : ''}You voted ${votedCount}/${total}</span>` : '';
@@ -118,7 +122,7 @@ export function groupCardHtml(view, opts = {}) {
             </table>
             ${view.unresolvedTie ? '<p class="gs-note">Places 2 and 3 were level on everything: decided by draw position.</p>' : ''}
             <details class="gs-matches"${view.live ? ' open' : ''}>
-                <summary>Matches <span class="gs-count">${votedCount}/${total} voted</span></summary>
+                <summary>Matches <span class="gs-count">${countLabel}</span></summary>
                 <ul class="gs-match-list">${view.matches.map(m => matchRowHtml(m, opts)).join('')}</ul>
             </details>
         </article>`;

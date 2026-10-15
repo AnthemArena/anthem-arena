@@ -5,6 +5,7 @@
 // getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
 import { getAllMatches } from './api-client.js';
 import { cupDisplayName } from './bracket-builder.js';
+import { cleanTitle } from './title-clean.js';
 
 // Use shared cache if available (set by vote.js)
 window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
@@ -174,7 +175,7 @@ function visible() {
 
 function cardHTML(e) {
     const s = e.standing;
-    const title = e.shortTitle || e.title || 'Untitled edit';
+    const title = cleanTitle(e.shortTitle || e.title || 'Untitled edit');
     const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
     const creatorUrl = safeUrl(e.creatorUrl);
     const creator = creatorUrl
@@ -256,7 +257,7 @@ function openWatch(id, trigger) {
     const dialog = document.getElementById('watchDialog');
     if (!e || !dialog) return;
     lastFocus = trigger || null;
-    document.getElementById('watchTitle').textContent = e.shortTitle || e.title || '';
+    document.getElementById('watchTitle').textContent = cleanTitle(e.shortTitle || e.title || '');
     const creatorUrl = safeUrl(e.creatorUrl);
     document.getElementById('watchMeta').innerHTML =
         (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +

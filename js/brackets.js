@@ -16,6 +16,7 @@ import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { roundLabel } from './bracket-builder.js';   // same round names the builder stores on each match
 import { describeCup } from './group-builder.js';
+import { cleanTitle } from './title-clean.js';
 import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, cupSummary } from './brackets-groups.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
@@ -53,7 +54,7 @@ function describeBracket(matches) {
 
 // What to show in an empty slot: "Winner of R1 M3" when we know which match feeds it, otherwise "TBD".
 function slotName(song, byId) {
-    if (song.id !== 'TBD') return song.shortTitle || song.title;
+    if (song.id !== 'TBD') return cleanTitle(song.shortTitle || song.title);
     const source = song.sourceMatch ? byId.get(song.sourceMatch) : null;
     if (!source) return 'TBD';
     // in a group-stage cup round 2 is the first knockout round, so say its name instead of "R2"
@@ -220,7 +221,7 @@ async function generateBracketFromFirebase(firebaseMatches) {
             date: match.date || 'TBD',
             status: match.status,
             competitor1: {
-                name: match.song1.shortTitle || match.song1.title,
+                name: cleanTitle(match.song1.shortTitle || match.song1.title),
                 seed: match.song1.seed,
                 source: `${match.song1.artist} • ${match.song1.year}`,
                 videoId: match.song1.videoId,
@@ -230,7 +231,7 @@ percentage: match.totalVotes > 0 ? Math.round((match.song1.votes / match.totalVo
                 winner: match.winnerId === match.song1.id
             },
             competitor2: {
-                name: match.song2.shortTitle || match.song2.title,
+                name: cleanTitle(match.song2.shortTitle || match.song2.title),
                 seed: match.song2.seed,
                 source: `${match.song2.artist} • ${match.song2.year}`,
                 videoId: match.song2.videoId,

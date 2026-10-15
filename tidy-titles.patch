@@ -1,0 +1,588 @@
+From e0d4ef39bf7581de7ef4e384f4353726f4b72ac5 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 15 Oct 2026 07:23:36 +0000
+Subject: [PATCH] Tidy titles and details: hide trailing hashtags when showing
+ edit names, drop the filler About text, hide empty details on phones, tools
+ to clean data/edits.json shortTitles
+
+---
+ css/vote.css                      |  6 +++
+ js/brackets-groups.js             |  6 ++-
+ js/brackets.js                    |  7 +--
+ js/live.js                        |  5 ++-
+ js/music-gallery.js               |  5 ++-
+ js/next-match.js                  |  1 +
+ js/title-clean.js                 | 26 +++++++++++
+ js/vote.js                        | 33 ++++++++++----
+ tools/edits-clean-titles.mjs      | 63 +++++++++++++++++++++++++++
+ tools/edits-import.js             |  3 +-
+ tools/test-edits-clean-titles.mjs | 72 +++++++++++++++++++++++++++++++
+ tools/test-title-clean.mjs        | 65 ++++++++++++++++++++++++++++
+ tools/test-vote-browser.py        | 20 +++++++++
+ 13 files changed, 294 insertions(+), 18 deletions(-)
+ create mode 100644 js/title-clean.js
+ create mode 100644 tools/edits-clean-titles.mjs
+ create mode 100644 tools/test-edits-clean-titles.mjs
+ create mode 100644 tools/test-title-clean.mjs
+
+diff --git a/css/vote.css b/css/vote.css
+index ecbe732..22b548c 100644
+--- a/css/vote.css
++++ b/css/vote.css
+@@ -3193,3 +3193,9 @@ body.has-next-bar { padding-bottom: 5.5rem; }
+     .details-for { display: block; margin: 0 0 .5rem; font-weight: 800; font-size: .95rem; color: var(--pink-bright, #ff70c3); overflow-wrap: anywhere; }
+ }
+ 
++/* On a phone, an edit with no description and no tournament history has nothing worth a block under its player
++   (the chips only repeat the seed badge and the "creator • year" line above it); js/vote.js marks those blocks. */
++@media (max-width: 968px) {
++    .moment-details--bare { display: none; }
++}
++
+diff --git a/js/brackets-groups.js b/js/brackets-groups.js
+index 9b118e4..9e4a44b 100644
+--- a/js/brackets-groups.js
++++ b/js/brackets-groups.js
+@@ -4,6 +4,7 @@
+ // js/brackets.js calls these when a cup has a group stage (see describeCup in js/group-builder.js).
+ // A single-elimination cup never reaches this file's output, so its page is unchanged.
+ import { allGroupStandings } from './group-builder.js';
++import { cleanTitle } from './title-clean.js';
+ 
+ const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+ export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
+@@ -34,7 +35,8 @@ export const groupCounts = views => ({
+ });
+ 
+ const thumb = song => song?.videoId ? `https://img.youtube.com/vi/${encodeURIComponent(song.videoId)}/mqdefault.jpg` : '';
+-const short = song => song?.shortTitle || song?.title || 'TBD';
++// display name: the title without its trailing hashtags (js/title-clean.js); the hover tooltip keeps the full title
++const short = song => cleanTitle(song?.shortTitle || song?.title || 'TBD');
+ 
+ function rowHtml(row, rank, complete) {
+     const qualifies = rank <= 2;
+@@ -47,7 +49,7 @@ function rowHtml(row, rank, complete) {
+     return `
+         <tr class="gs-row${qualifies ? ' gs-in-position' : ''}${complete && !qualifies ? ' gs-out' : ''}" data-rank="${rank}">
+             <td class="gs-rank">${rank}</td>
+-            <td class="gs-edit" title="${esc([short(row.competitor), row.artist, seed].filter(Boolean).join(' · '))}">
++            <td class="gs-edit" title="${esc([row.competitor?.title || short(row.competitor), row.artist, seed].filter(Boolean).join(' · '))}">
+                 ${row.competitor?.videoId ? `<img class="gs-thumb" src="${thumb(row.competitor)}" alt="" loading="lazy">` : '<span class="gs-thumb gs-thumb-empty"></span>'}
+                 <span class="gs-edit-text">
+                     <span class="gs-title">${esc(short(row.competitor))}</span>
+diff --git a/js/brackets.js b/js/brackets.js
+index 4398587..590146d 100644
+--- a/js/brackets.js
++++ b/js/brackets.js
+@@ -16,6 +16,7 @@ import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/f
+ import { ARCANE_CONFIG } from './arcane-config.js';
+ import { roundLabel } from './bracket-builder.js';   // same round names the builder stores on each match
+ import { describeCup } from './group-builder.js';
++import { cleanTitle } from './title-clean.js';
+ import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, cupSummary } from './brackets-groups.js';
+ const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
+ 
+@@ -53,7 +54,7 @@ function describeBracket(matches) {
+ 
+ // What to show in an empty slot: "Winner of R1 M3" when we know which match feeds it, otherwise "TBD".
+ function slotName(song, byId) {
+-    if (song.id !== 'TBD') return song.shortTitle || song.title;
++    if (song.id !== 'TBD') return cleanTitle(song.shortTitle || song.title);
+     const source = song.sourceMatch ? byId.get(song.sourceMatch) : null;
+     if (!source) return 'TBD';
+     // in a group-stage cup round 2 is the first knockout round, so say its name instead of "R2"
+@@ -220,7 +221,7 @@ async function generateBracketFromFirebase(firebaseMatches) {
+             date: match.date || 'TBD',
+             status: match.status,
+             competitor1: {
+-                name: match.song1.shortTitle || match.song1.title,
++                name: cleanTitle(match.song1.shortTitle || match.song1.title),
+                 seed: match.song1.seed,
+                 source: `${match.song1.artist} • ${match.song1.year}`,
+                 videoId: match.song1.videoId,
+@@ -230,7 +231,7 @@ percentage: match.totalVotes > 0 ? Math.round((match.song1.votes / match.totalVo
+                 winner: match.winnerId === match.song1.id
+             },
+             competitor2: {
+-                name: match.song2.shortTitle || match.song2.title,
++                name: cleanTitle(match.song2.shortTitle || match.song2.title),
+                 seed: match.song2.seed,
+                 source: `${match.song2.artist} • ${match.song2.year}`,
+                 videoId: match.song2.videoId,
+diff --git a/js/live.js b/js/live.js
+index 7f3a239..c7689df 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -4,6 +4,7 @@
+ // IMPORTS
+ // ========================================
+ import { getAllMatches } from './api-client.js';
++import { cleanTitle } from './title-clean.js';
+ 
+ 
+ 
+@@ -655,14 +656,14 @@ function createMatchCard(match, index, isVoted) {
+         
+         <div class="social-info">
+             <div class="song-details">
+-                <h3>${escapeHtml(match.song1.shortTitle || match.song1.title)}</h3>
++                <h3>${escapeHtml(cleanTitle(match.song1.shortTitle || match.song1.title))}</h3>
+                 <p>${escapeHtml(match.song1.artist)}${match.song1.year ? ' • ' + escapeHtml(match.song1.year) : ''}</p>
+             </div>
+             
+             <div class="vs-divider">vs</div>
+             
+             <div class="song-details">
+-                <h3>${escapeHtml(match.song2.shortTitle || match.song2.title)}</h3>
++                <h3>${escapeHtml(cleanTitle(match.song2.shortTitle || match.song2.title))}</h3>
+                 <p>${escapeHtml(match.song2.artist)}${match.song2.year ? ' • ' + escapeHtml(match.song2.year) : ''}</p>
+             </div>
+         </div>
+diff --git a/js/music-gallery.js b/js/music-gallery.js
+index 306f183..bf9c579 100644
+--- a/js/music-gallery.js
++++ b/js/music-gallery.js
+@@ -5,6 +5,7 @@
+ // getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
+ import { getAllMatches } from './api-client.js';
+ import { cupDisplayName } from './bracket-builder.js';
++import { cleanTitle } from './title-clean.js';
+ 
+ // Use shared cache if available (set by vote.js)
+ window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
+@@ -174,7 +175,7 @@ function visible() {
+ 
+ function cardHTML(e) {
+     const s = e.standing;
+-    const title = e.shortTitle || e.title || 'Untitled edit';
++    const title = cleanTitle(e.shortTitle || e.title || 'Untitled edit');
+     const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
+     const creatorUrl = safeUrl(e.creatorUrl);
+     const creator = creatorUrl
+@@ -256,7 +257,7 @@ function openWatch(id, trigger) {
+     const dialog = document.getElementById('watchDialog');
+     if (!e || !dialog) return;
+     lastFocus = trigger || null;
+-    document.getElementById('watchTitle').textContent = e.shortTitle || e.title || '';
++    document.getElementById('watchTitle').textContent = cleanTitle(e.shortTitle || e.title || '');
+     const creatorUrl = safeUrl(e.creatorUrl);
+     document.getElementById('watchMeta').innerHTML =
+         (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +
+diff --git a/js/next-match.js b/js/next-match.js
+index 5271f9a..4d44c74 100644
+--- a/js/next-match.js
++++ b/js/next-match.js
+@@ -3,6 +3,7 @@
+ // ========================================
+ // js/vote.js uses these to (a) list the live matches the visitor has not voted in yet and (b) show a "Next match" bar once they have voted.
+ // Matches from /api/matches carry `matchId` (not `id`), so every lookup goes through matchKey().
++import { cleanTitle } from './title-clean.js';
+ 
+ const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
+diff --git a/js/title-clean.js b/js/title-clean.js
+new file mode 100644
+index 0000000..a11fc44
+--- /dev/null
++++ b/js/title-clean.js
+@@ -0,0 +1,26 @@
++// ========================================
++// TITLE CLEANER: shows an edit's YouTube title without its trailing hashtags
++// ========================================
++// YouTube titles for edits usually end in a hashtag run:  "Bro tried to rizz Jinx 💀 - JINX EDIT || Britney Spears - Toxic #jinxedit #jinx #arcane #edit"
++// On a phone that is four lines of noise. This returns the part people actually read. It is for DISPLAY only: ids, stored
++// vote records and the full title (edits.json `title`) are never changed by it.
++//
++//   cleanTitle('Song - Edit || Artist #jinx #arcane')  ->  'Song - Edit || Artist'
++//
++// Only a TRAILING run of hashtags is removed (a #word in the middle of a sentence is part of the sentence), then any dangling
++// separator left in front of it ( ||  |  -  –  —  •  :  , ). If nothing sensible is left (under 3 characters), the original is returned.
++
++// a hashtag needs at least one letter (so "Top 10 #1" keeps its #1) and may be glued to the word before it ("her finger#jinx")
++const TRAILING_TAGS = /(?:[\s\u00a0]*#(?=[\p{N}_]*\p{L})[\p{L}\p{N}_]+)+[\s\u00a0]*$/u;
++const DANGLING = /[\s\u00a0|\-\u2013\u2014\u2022\u00b7:,]+$/u;
++
++export function cleanTitle(title) {
++    if (title == null) return '';
++    const original = String(title).replace(/\s+/g, ' ').trim();
++    let t = original;
++    // a title that is ONLY hashtags (or starts with one and has nothing else) is left alone
++    t = t.replace(TRAILING_TAGS, '');
++    t = t.replace(DANGLING, '');
++    t = t.trim();
++    return t.length >= 3 ? t : original;
++}
+diff --git a/js/vote.js b/js/vote.js
+index 5f1f20e..f0218b1 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -21,6 +21,7 @@ import { ensureUsername } from './username-system.js';
+ import './global-notifications.js';
+ import { createMatchCard } from './match-card-renderer.js';
+ import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
++import { cleanTitle } from './title-clean.js';
+ import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
+ import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
+ 
+@@ -452,12 +453,27 @@ function updateSongAbout(songData, competitorNum) {
+ 
+     if (songData.about) {
+         aboutText.textContent = songData.about;
++        aboutSection.style.display = '';
+     } else {
+-        // Fallback if no "about" text exists in JSON
+-        aboutText.textContent = 'An Arcane moment competing in the Arcane Moments tournament.';
++        // No description for this edit: show nothing, rather than the same filler sentence under every edit
++        aboutText.textContent = '';
++        aboutSection.style.display = 'none';
+     }
+ }
+ 
++// An edit with no description and no tournament history has nothing under its player except chips that repeat
++// the seed badge and the "creator • year" line above. Mark that block so css/vote.css can hide it on a phone.
++function markBareDetails() {
++    [1, 2].forEach(n => {
++        const block = document.querySelector(`#competitor-${n}-column .moment-details`);
++        const about = document.getElementById(`competitor${n}-about`);
++        const accomplishments = document.getElementById(`competitor${n}-accomplishments`);
++        if (!block) return;
++        const hidden = el => !el || el.style.display === 'none';
++        block.classList.toggle('moment-details--bare', hidden(about) && hidden(accomplishments));
++    });
++}
++
+ // ========================================
+ // UPDATE COMPETITOR INFO (CALL BOTH FUNCTIONS)
+ // ========================================
+@@ -493,6 +509,7 @@ const h2hRecord = undefined;
+         // Update meta info
+         updateCompetitorMeta(comp1Data, match.competitor1, comp1Meta);
+         updateCompetitorMeta(comp2Data, match.competitor2, comp2Meta);
++        markBareDetails();
+ 
+         console.log('✅ Competitor info updated with accomplishments and about text');
+     } catch (error) {
+@@ -1109,7 +1126,7 @@ function generateUsername() {
+         // Update match title
+         const matchTitle = document.getElementById('match-title');
+         if (matchTitle) {
+-            matchTitle.textContent = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
++            matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
+         }
+ 
+         // Update tournament badge
+@@ -1172,13 +1189,13 @@ if (timeRemaining) {
+     const voteSong1Name = document.getElementById('vote-song1-name');
+     const voteSong2Name = document.getElementById('vote-song2-name');
+ 
+-    if (voteSong1Name) voteSong1Name.textContent = currentMatch.competitor1.name;
+-    if (voteSong2Name) voteSong2Name.textContent = currentMatch.competitor2.name;
++    if (voteSong1Name) voteSong1Name.textContent = cleanTitle(currentMatch.competitor1.name);
++    if (voteSong2Name) voteSong2Name.textContent = cleanTitle(currentMatch.competitor2.name);
+ 
+     // the "About" blocks move below both players on a phone, so each says which edit it is about
+     [1, 2].forEach(n => {
+         const el = document.getElementById(`competitor${n}-details-for`);
+-        if (el) el.textContent = `About: ${currentMatch['competitor' + n].name || 'this edit'}`;
++        if (el) el.textContent = `About: ${cleanTitle(currentMatch['competitor' + n].name) || 'this edit'}`;
+     });
+ 
+         // ========================================
+@@ -1197,7 +1214,7 @@ if (timeRemaining) {
+             comp1Seed.textContent = hasSeed ? `#${currentMatch.competitor1.seed} Seed` : '';
+             comp1Seed.style.display = hasSeed ? '' : 'none';
+         }
+-        if (comp1Name) comp1Name.textContent = currentMatch.competitor1.name;
++        if (comp1Name) comp1Name.textContent = cleanTitle(currentMatch.competitor1.name);
+         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
+        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
+ if (comp1Votes) comp1Votes.style.display = 'none'; // ✅ Hide vote count
+@@ -1229,7 +1246,7 @@ if (comp2Seed) {
+     comp2Seed.textContent = hasSeed ? `#${currentMatch.competitor2.seed} Seed` : '';
+     comp2Seed.style.display = hasSeed ? '' : 'none';
+ }
+-if (comp2Name) comp2Name.textContent = currentMatch.competitor2.name;
++if (comp2Name) comp2Name.textContent = cleanTitle(currentMatch.competitor2.name);
+ if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
+ if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
+ if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
+diff --git a/tools/edits-clean-titles.mjs b/tools/edits-clean-titles.mjs
+new file mode 100644
+index 0000000..3f081c5
+--- /dev/null
++++ b/tools/edits-clean-titles.mjs
+@@ -0,0 +1,63 @@
++#!/usr/bin/env node
++// Gives every edit in data/edits.json a clean `shortTitle` (the YouTube title without its trailing hashtags).
++//
++//   node tools/edits-clean-titles.mjs             DRY RUN: lists what would change, writes nothing
++//   node tools/edits-clean-titles.mjs --write     saves the changes to data/edits.json
++//   node tools/edits-clean-titles.mjs my.json     work on another file
++//
++// Safe by design:
++//   - only entries whose shortTitle is still identical to the YouTube `title` (or missing) are touched: a shortTitle you wrote by hand is KEPT
++//   - only `shortTitle` changes; `title` (the full title shown on hover and kept for search) and every other field stay as they are
++//   - running it twice changes nothing the second time
++//   - it refuses to write if saving would reformat the file (so the diff is only the titles)
++// A cup copies shortTitle into its matches when the cup is BUILT, so run this BEFORE building a real cup; matches that already
++// exist keep the titles they were built with (the pages also hide trailing hashtags when they display a name).
++import fs from 'node:fs';
++import path from 'node:path';
++import { pathToFileURL } from 'node:url';
++import { cleanTitle } from '../js/title-clean.js';
++
++const norm = t => String(t ?? '').replace(/\s+/g, ' ').trim();
++
++// pure: returns { edits: <new array>, changed: [{ id, before, after }], keptByHand: n, alreadyClean: n }
++export function cleanEdits(edits) {
++    const changed = [];
++    let keptByHand = 0, alreadyClean = 0;
++    const out = edits.map(e => {
++        const handEdited = e.shortTitle && norm(e.shortTitle) !== norm(e.title);
++        if (handEdited) { keptByHand++; return e; }
++        const after = cleanTitle(e.title);
++        if (after === e.shortTitle) { alreadyClean++; return e; }
++        changed.push({ id: e.id, before: e.shortTitle ?? '(none)', after });
++        return { ...e, shortTitle: after };
++    });
++    return { edits: out, changed, keptByHand, alreadyClean };
++}
++
++function main() {
++    const args = process.argv.slice(2);
++    const write = args.includes('--write');
++    const file = path.resolve(args.find(a => !a.startsWith('--')) || 'data/edits.json');
++    const raw = fs.readFileSync(file, 'utf8');
++    const data = JSON.parse(raw);
++    if (!Array.isArray(data)) { console.error(`${file} is not a list of edits.`); process.exit(1); }
++
++    const { edits, changed, keptByHand, alreadyClean } = cleanEdits(data);
++    console.log(`${data.length} edits in ${path.relative(process.cwd(), file)}: ${changed.length} to clean, ${alreadyClean} already clean, ${keptByHand} with a shortTitle you wrote by hand (kept).\n`);
++    for (const c of changed.slice(0, 40)) console.log(`  ${c.before.slice(0, 100)}\n  -> ${c.after}\n`);
++    if (changed.length > 40) console.log(`  ... and ${changed.length - 40} more\n`);
++
++    if (!changed.length) { console.log('Nothing to do.'); return; }
++    if (!write) { console.log('Dry run: nothing written. Add --write to save.'); return; }
++
++    const indent = 2, tail = raw.endsWith('\n') ? '\n' : '';
++    const untouched = JSON.stringify(data, null, indent) + tail;
++    if (untouched !== raw) {
++        console.error('Refusing to write: saving would reformat the whole file, not just the titles. (Nothing was changed.)');
++        process.exit(1);
++    }
++    fs.writeFileSync(file, JSON.stringify(edits, null, indent) + tail);
++    console.log(`Saved ${changed.length} cleaned titles. Review with: git diff data/edits.json`);
++}
++
++if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
+diff --git a/tools/edits-import.js b/tools/edits-import.js
+index 4578660..4ca036a 100644
+--- a/tools/edits-import.js
++++ b/tools/edits-import.js
+@@ -23,6 +23,7 @@ import fs from 'fs';
+ import path from 'path';
+ import { fillAspects, fillAspectsFromApi } from './edits-aspect.js';
+ import { CHARACTERS, ALIASES, headingOf, charactersFromHeading } from './edits-groups.js';
++import { cleanTitle } from '../js/title-clean.js';   // new entries start with a title that has no trailing hashtags
+ 
+ const args = process.argv.slice(2);
+ const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
+@@ -88,7 +89,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
+     if (FOCUS && !detected.includes(FOCUS)) { flags.push(`no mention of ${FOCUS} in title, description or tags`); if (status === 'ok') status = 'review'; }
+     const tags = [...new Set([...(old.tags || []), ...e.tags])];
+     out.push({
+-      id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || sn.title, slug: old.slug || slugify(sn.title),
++      id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || cleanTitle(sn.title), slug: old.slug || slugify(sn.title),
+       artist: sn.channelTitle, creatorUrl: `https://www.youtube.com/channel/${sn.channelId}`, channelId: sn.channelId,
+       year: Number((sn.publishedAt || '').slice(0, 4)) || null, uploadDate: (sn.publishedAt || '').slice(0, 10),
+       views: Number(ss.viewCount) || 0, likes: ss.likeCount != null ? Number(ss.likeCount) : null, duration: dur,
+diff --git a/tools/test-edits-clean-titles.mjs b/tools/test-edits-clean-titles.mjs
+new file mode 100644
+index 0000000..9c4531b
+--- /dev/null
++++ b/tools/test-edits-clean-titles.mjs
+@@ -0,0 +1,72 @@
++// Offline tests for tools/edits-clean-titles.mjs.   node tools/test-edits-clean-titles.mjs
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { execFileSync } from 'node:child_process';
++import { cleanEdits } from './edits-clean-titles.mjs';
++
++let passed = 0;
++const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
++const edit = (id, title, shortTitle, extra = {}) => ({ id, title, shortTitle, slug: id, views: 5, ...extra });
++
++test('only shortTitle changes; a hand-written shortTitle is kept; clean ones are left', () => {
++    const input = [
++        edit('a', 'Song - Edit #jinx #arcane', 'Song - Edit #jinx #arcane'),        // never edited: cleaned
++        edit('b', 'Long Title #x', 'My own short name'),                            // hand-written: kept
++        edit('c', 'Already fine', 'Already fine'),                                   // nothing to remove
++        edit('d', 'No short title #q', undefined),                                   // missing: filled in
++    ];
++    const r = cleanEdits(input);
++    assert.deepEqual(r.edits.map(e => e.shortTitle), ['Song - Edit', 'My own short name', 'Already fine', 'No short title']);
++    assert.equal(r.keptByHand, 1);
++    assert.equal(r.alreadyClean, 1);
++    assert.deepEqual(r.changed.map(c => c.id), ['a', 'd']);
++    r.edits.forEach((e, i) => { assert.equal(e.title, input[i].title); assert.equal(e.views, 5); assert.equal(e.slug, input[i].slug); });
++    assert.equal(input[0].shortTitle, 'Song - Edit #jinx #arcane', 'the input is not mutated');
++});
++
++test('running it twice changes nothing the second time', () => {
++    const once = cleanEdits([edit('a', 'A - B #x #y', 'A - B #x #y')]).edits;
++    const twice = cleanEdits(once);
++    assert.equal(twice.changed.length, 0);
++    assert.deepEqual(twice.edits, once);
++});
++
++test('the real data/edits.json: cleaning keeps every id and title, and only shortTitle differs', () => {
++    const edits = JSON.parse(fs.readFileSync(new URL('../data/edits.json', import.meta.url), 'utf8'));
++    const r = cleanEdits(edits);
++    assert.equal(r.edits.length, edits.length);
++    r.edits.forEach((e, i) => {
++        const { shortTitle: a, ...restNew } = e, { shortTitle: b, ...restOld } = edits[i];
++        assert.deepEqual(restNew, restOld);
++        assert.ok(a && a.length >= 3);
++    });
++    assert.ok(r.changed.length > 0);
++});
++
++test('command line: a dry run writes nothing, --write changes only titles, a reformatting file is refused', () => {
++    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'edits-'));
++    const file = path.join(dir, 'edits.json');
++    const data = [edit('a', 'Song #jinx #arcane', 'Song #jinx #arcane'), edit('b', 'Keep', 'Keep')];
++    const text = JSON.stringify(data, null, 2) + '\n';
++    fs.writeFileSync(file, text);
++    const tool = new URL('./edits-clean-titles.mjs', import.meta.url).pathname;
++    const dry = execFileSync('node', [tool, file], { encoding: 'utf8' });
++    assert.ok(dry.includes('Dry run') && fs.readFileSync(file, 'utf8') === text);
++    execFileSync('node', [tool, file, '--write'], { encoding: 'utf8' });
++    const after = JSON.parse(fs.readFileSync(file, 'utf8'));
++    assert.equal(after[0].shortTitle, 'Song');
++    assert.equal(after[0].title, 'Song #jinx #arcane');
++    assert.equal(fs.readFileSync(file, 'utf8'), JSON.stringify(after, null, 2) + '\n');
++    assert.ok(execFileSync('node', [tool, file], { encoding: 'utf8' }).includes('Nothing to do'));
++    // a file in another format is refused rather than reformatted
++    const odd = path.join(dir, 'odd.json');
++    fs.writeFileSync(odd, JSON.stringify(data));          // one line, no indent
++    let refused = false;
++    try { execFileSync('node', [tool, odd, '--write'], { encoding: 'utf8', stdio: 'pipe' }); } catch (e) { refused = /Refusing to write/.test(String(e.stderr)); }
++    assert.ok(refused);
++    assert.equal(fs.readFileSync(odd, 'utf8'), JSON.stringify(data));
++});
++
++console.log(`\n${passed} tests passed`);
+diff --git a/tools/test-title-clean.mjs b/tools/test-title-clean.mjs
+new file mode 100644
+index 0000000..2e57255
+--- /dev/null
++++ b/tools/test-title-clean.mjs
+@@ -0,0 +1,65 @@
++// Offline tests for js/title-clean.js and the real titles in data/edits.json.   node tools/test-title-clean.mjs
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import { cleanTitle } from '../js/title-clean.js';
++
++let passed = 0;
++const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
++
++test('a trailing hashtag run is removed, with the separator left in front of it', () => {
++    assert.equal(cleanTitle('Bro tried to rizz Jinx \u{1F480} - JINX EDIT || Britney Spears - Toxic #jinxedit #jinx #arcane #edit'), 'Bro tried to rizz Jinx \u{1F480} - JINX EDIT || Britney Spears - Toxic');
++    assert.equal(cleanTitle('JINX edit|wannabe-why mona|Arcane #jinxarcane #powder #arcane #jinx'), 'JINX edit|wannabe-why mona|Arcane');
++    assert.equal(cleanTitle('Song - Edit || #jinx #arcane'), 'Song - Edit');
++    assert.equal(cleanTitle('Ekko Saves Jinx \u{1F625} | Arcane | #shorts #edit #viral #arcane'), 'Ekko Saves Jinx \u{1F625} | Arcane');
++});
++
++test('a title without hashtags is returned as it was (spaces tidied)', () => {
++    assert.equal(cleanTitle('Jinx Edit V1 | Timeless - The Weeknd, Playboi Carti'), 'Jinx Edit V1 | Timeless - The Weeknd, Playboi Carti');
++    assert.equal(cleanTitle('  too   many    spaces  '), 'too many spaces');
++});
++
++test('hashtags in the middle of a sentence stay (they are part of it); numbers are not hashtags', () => {
++    assert.equal(cleanTitle('I love #jinx so much - edit'), 'I love #jinx so much - edit');
++    assert.equal(cleanTitle('Top 10 #1'), 'Top 10 #1');
++    assert.equal(cleanTitle('Playlist #12 #jinx'), 'Playlist #12');
++});
++
++test('hashtags glued to the word before them are removed too', () => {
++    assert.equal(cleanTitle('Jinx lost her finger#jinx'), 'Jinx lost her finger');
++    assert.equal(cleanTitle('"Make me"-vi edit|Fight back(slowed+reverb)#arcane'), '"Make me"-vi edit|Fight back(slowed+reverb)');
++});
++
++test('"C#" and a lone # are not hashtags; non-Latin hashtags work', () => {
++    assert.equal(cleanTitle('Etude in C#'), 'Etude in C#');
++    assert.equal(cleanTitle('Jinx edit #\u30b8\u30f3\u30af #\u0430\u0440\u043a\u0435\u0439\u043d'), 'Jinx edit');
++});
++
++test('if nothing sensible is left, the original comes back (never an empty heading)', () => {
++    assert.equal(cleanTitle('#jinx #arcane'), '#jinx #arcane');
++    assert.equal(cleanTitle('ab #jinx'), 'ab #jinx');
++    assert.equal(cleanTitle(''), '');
++    assert.equal(cleanTitle(null), '');
++    assert.equal(cleanTitle(undefined), '');
++});
++
++test('it is idempotent and never longer than its input', () => {
++    for (const t of ['A - B #x #y', 'plain', 'x || y |', '"quoted" - t #q']) {
++        assert.equal(cleanTitle(cleanTitle(t)), cleanTitle(t));
++        assert.ok(cleanTitle(t).length <= t.length);
++    }
++});
++
++test('real titles in data/edits.json: none becomes empty, none ends in a hashtag any more, most get shorter', () => {
++    const edits = JSON.parse(fs.readFileSync(new URL('../data/edits.json', import.meta.url), 'utf8'));
++    let shorter = 0;
++    for (const e of edits) {
++        const c = cleanTitle(e.title);
++        assert.ok(c.length >= 3, `empty result for: ${e.title}`);
++        if (c.length < e.title.length) shorter++;
++    }
++    assert.ok(shorter > edits.length * 0.4, `only ${shorter} of ${edits.length} titles changed`);
++    const stillTrailing = edits.map(e => cleanTitle(e.title)).filter(c => /#[\p{L}\p{N}_]+\s*$/u.test(c));
++    assert.deepEqual(stillTrailing, [], 'titles still ending in a hashtag');
++});
++
++console.log(`\n${passed} tests passed`);
+diff --git a/tools/test-vote-browser.py b/tools/test-vote-browser.py
+index 376ecf0..e6aba7f 100644
+--- a/tools/test-vote-browser.py
++++ b/tools/test-vote-browser.py
+@@ -94,6 +94,7 @@ with sync_playwright() as p:
+     radius = pg.evaluate("parseFloat(getComputedStyle(document.querySelector('#vote-btn-competitor1')).borderTopLeftRadius)")
+     check('phone: a very long title no longer makes a huge vote button (two lines at most)', vb['h'] <= 110, vb)
+     check('phone: the vote button is a rounded rectangle, not an oval', radius <= 40, radius)
++    pg.evaluate("document.querySelectorAll('.moment-details').forEach(e => e.classList.remove('moment-details--bare'))")   # edits WITH something to say keep their block: check the order for that case
+     a_vote, b_head, b_vid, a_det, b_det = (rect(pg, s) for s in ('#vote-btn-competitor1', '#competitor2-name', '#competitor2-wrapper', '#competitor-1-column .moment-details', '#competitor-2-column .moment-details'))
+     check('phone: order is player A, vote A, then player B (A\'s About block is not in between)', a_vote['y'] < b_head['y'] < b_vid['y'] < a_det['y'] < b_det['y'], (a_vote['y'], b_head['y'], b_vid['y'], a_det['y'], b_det['y']))
+     check('phone: each About block says which edit it is about', pg.inner_text('#competitor1-details-for').startswith('About: ') and pg.inner_text('#competitor2-details-for').startswith('About: ') and pg.inner_text('#competitor1-details-for') != pg.inner_text('#competitor2-details-for'), pg.inner_text('#competitor1-details-for'))
+@@ -102,6 +103,25 @@ with sync_playwright() as p:
+     pg.screenshot(path=f'{SHOTS}/vote-phone-order.png', full_page=False)
+     pg.context.close()
+ 
++    # ---------- tidy titles and details ----------
++    pg, errs = load(b, 393, 852, voted=False)
++    raw1 = next(m for m in matches if m['matchId'] == CURRENT)['song1']['shortTitle']
++    raw2 = next(m for m in matches if m['matchId'] == CURRENT)['song2']['shortTitle']
++    check('(precondition) the test match titles really carry hashtags', '#' in raw1 or '#' in raw2, (raw1, raw2))
++    shown = [pg.inner_text(s) for s in ('#match-title', '#competitor1-name', '#competitor2-name', '#vote-song1-name', '#vote-song2-name', '#competitor1-details-for')]
++    import re as _re
++    check('headings, vote buttons and the About label show no trailing hashtags', all(not _re.search(r'#\w+\s*$', x.strip()) for x in shown), shown)
++    check('the full title is still the page title (nothing was lost from the data)', 'Vote:' in pg.title(), pg.title())
++    check('no filler "An Arcane moment competing..." sentence anywhere', 'An Arcane moment competing' not in pg.inner_text('body'))
++    check('phone: edits with nothing to say get no details block at all', not pg.is_visible('#competitor-1-column .moment-details') and not pg.is_visible('#competitor-2-column .moment-details'))
++    pg.screenshot(path=f'{SHOTS}/vote-phone-clean.png')
++    pg.context.close()
++
++    pg, errs = load(b, 1280, 900, voted=False)
++    check('desktop: the filler About section is gone but the seed / year / artist chips stay', not pg.is_visible('#competitor1-about') and pg.is_visible('#competitor1-meta'))
++    pg.screenshot(path=f'{SHOTS}/vote-desktop-clean.png')
++    pg.context.close()
++
+     # desktop keeps the About blocks under their own player
+     pg, errs = load(b, 1280, 900, voted=False)
+     d1, v1 = rect(pg, '#competitor-1-column .moment-details'), rect(pg, '#vote-btn-competitor1')
+-- 
+2.43.0
+

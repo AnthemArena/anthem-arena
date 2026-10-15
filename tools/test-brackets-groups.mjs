@@ -239,4 +239,13 @@ test('voted state: the old yes/no option still works and an unknown stored value
     assert.ok(odd.includes('6/6 voted') && !odd.includes('gs-check') && !odd.includes('gs-dimmed'));
 });
 
+test('counter: "n/6 voted" only while something is open or you have voted; otherwise it just says "6 matches"', () => {
+    const v = buildGroupViews(midway().ms);
+    assert.ok(groupCardHtml(v[1], {}).includes('0/6 voted'));                         // live group, nothing voted yet
+    assert.ok(groupCardHtml(v[0], { userChoice: () => null }).includes('>6 matches<'));   // finished group, you voted in none of it
+    assert.ok(!groupCardHtml(v[0], { userChoice: () => null }).includes('0/6 voted'));
+    assert.ok(groupCardHtml(v[3], { userChoice: () => null }).includes('>6 matches<'));   // group that has not opened yet
+    assert.ok(groupCardHtml(v[0], { userChoice: () => 'song1' }).includes('6/6 voted')); // finished group you did vote in
+});
+
 console.log(`\n${passed} tests passed`);

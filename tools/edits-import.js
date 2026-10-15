@@ -23,6 +23,7 @@ import fs from 'fs';
 import path from 'path';
 import { fillAspects, fillAspectsFromApi } from './edits-aspect.js';
 import { CHARACTERS, ALIASES, headingOf, charactersFromHeading } from './edits-groups.js';
+import { cleanTitle } from '../js/title-clean.js';   // new entries start with a title that has no trailing hashtags
 
 const args = process.argv.slice(2);
 const take = flag => { const i = args.indexOf(flag); return i >= 0 ? args.splice(i, 2)[1] : null; };
@@ -88,7 +89,7 @@ const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').
     if (FOCUS && !detected.includes(FOCUS)) { flags.push(`no mention of ${FOCUS} in title, description or tags`); if (status === 'ok') status = 'review'; }
     const tags = [...new Set([...(old.tags || []), ...e.tags])];
     out.push({
-      id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || sn.title, slug: old.slug || slugify(sn.title),
+      id: e.id, videoId: e.id, title: sn.title, shortTitle: old.shortTitle || cleanTitle(sn.title), slug: old.slug || slugify(sn.title),
       artist: sn.channelTitle, creatorUrl: `https://www.youtube.com/channel/${sn.channelId}`, channelId: sn.channelId,
       year: Number((sn.publishedAt || '').slice(0, 4)) || null, uploadDate: (sn.publishedAt || '').slice(0, 10),
       views: Number(ss.viewCount) || 0, likes: ss.likeCount != null ? Number(ss.likeCount) : null, duration: dur,

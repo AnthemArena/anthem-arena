@@ -3172,3 +3172,35 @@ body.has-next-bar { padding-bottom: 5.5rem; }
     .competitors-grid > .vs-divider { grid-column: 2; grid-row: 1; }
 }
 
+/* ========================================
+   PHONE ORDER (<= 968 px, one column): player A, vote A, VS, player B, vote B, THEN the "About" blocks.
+   The About block of edit A used to sit between A's vote button and edit B's player, so B's video was about
+   three screens below A's. The columns become transparent (display: contents) so their parts can be re-ordered.
+   ======================================== */
+.details-for { display: none; }
+@media (max-width: 968px) {
+    .competitors-grid { gap: 1.5rem; }
+    #competitor-1-column, #competitor-2-column { display: contents; }
+    #competitor-1-column .competitor-header { order: 1; }
+    #competitor-1-column .video-container   { order: 2; }
+    #competitor-1-column .vote-section      { order: 3; }
+    .competitors-grid > .vs-divider         { order: 4; }
+    #competitor-2-column .competitor-header { order: 5; }
+    #competitor-2-column .video-container   { order: 6; }
+    #competitor-2-column .vote-section      { order: 7; }
+    #competitor-1-column .moment-details    { order: 8; }
+    #competitor-2-column .moment-details    { order: 9; }
+    .details-for { display: block; margin: 0 0 .5rem; font-weight: 800; font-size: .95rem; color: var(--pink-bright, #ff70c3); overflow-wrap: anywhere; }
+}
+
+/* On a phone, an edit with no description and no tournament history has nothing worth a block under its player
+   (the chips only repeat the seed badge and the "creator • year" line above it); js/vote.js marks those blocks. */
+@media (max-width: 968px) {
+    .moment-details--bare { display: none; }
+}
+
+/* No About text: do not leave an empty band (block padding + the chips' top margin and rule) above the chips */
+.moment-details--no-about { padding-top: 1.1rem; }
+.moment-details--no-about .details-meta { margin-top: 0; }
+.moment-details--no-about .details-meta { padding-top: 0; border-top: 0; }
+

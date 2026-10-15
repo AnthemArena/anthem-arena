@@ -1,0 +1,214 @@
+From 0e1a66b8a0da50af41361aae0b9e640d8cfc98e9 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 15 Oct 2026 17:00:30 +0000
+Subject: [PATCH] Live page: portrait Shorts covers, two-line titles, dim the
+ cover you did not pick; vote page: no empty band above the detail chips
+
+---
+ css/live.css               | 28 +++++++++++-
+ css/vote.css               |  5 ++
+ js/live.js                 |  4 +-
+ js/vote.js                 |  1 +
+ tools/test-live-browser.py | 93 ++++++++++++++++++++++++++++++++++++++
+ tools/test-vote-browser.py |  2 +
+ 6 files changed, 130 insertions(+), 3 deletions(-)
+ create mode 100644 tools/test-live-browser.py
+
+diff --git a/css/live.css b/css/live.css
+index 78c68c3..d0d84be 100644
+--- a/css/live.css
++++ b/css/live.css
+@@ -2838,4 +2838,30 @@ text-align: center;
+     .ticker-content .time-ago {
+         font-size: 0.75rem;
+     }
+-}
+\ No newline at end of file
++}
++
++/* ========================================
++   SHORTS COVERS (14 Oct)
++   YouTube's thumbnail for a Short is a 4:3 picture with black bars either side of a vertical image. The covers are now
++   9:16 crops of it (object-fit: cover from the centre), so the Short fills the cover instead of sitting in a black box.
++   ======================================== */
++.social-thumbnails img {
++    width: 38%;
++    aspect-ratio: 9 / 16;
++    max-height: 17rem;
++    background: #000;
++}
++.social-thumbnails { align-items: center; justify-content: center; gap: 0.75rem; }
++.social-thumbnails .social-vs { width: auto; flex: none; }
++
++/* titles: two lines at most, so cards in a row stay the same height */
++.social-match-card .song-details h3 {
++    display: -webkit-box;
++    -webkit-box-orient: vertical;
++    -webkit-line-clamp: 2;
++    overflow: hidden;
++}
++
++/* a match you have voted in: the cover you picked keeps its glow, the other one steps back */
++.social-match-card.voted .social-thumbnails:has(img.user-pick) img:not(.user-pick) { opacity: 0.45; filter: grayscale(0.4); }
++
+diff --git a/css/vote.css b/css/vote.css
+index 22b548c..abb7716 100644
+--- a/css/vote.css
++++ b/css/vote.css
+@@ -3199,3 +3199,8 @@ body.has-next-bar { padding-bottom: 5.5rem; }
+     .moment-details--bare { display: none; }
+ }
+ 
++/* No About text: do not leave an empty band (block padding + the chips' top margin and rule) above the chips */
++.moment-details--no-about { padding-top: 1.1rem; }
++.moment-details--no-about .details-meta { margin-top: 0; }
++.moment-details--no-about .details-meta { padding-top: 0; border-top: 0; }
++
+diff --git a/js/live.js b/js/live.js
+index c7689df..109afd8 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -641,14 +641,14 @@ function createMatchCard(match, index, isVoted) {
+     
+     card.innerHTML = `
+         <div class="social-thumbnails">
+-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/mqdefault.jpg" 
++            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/hqdefault.jpg" 
+                  alt="${escapeHtml(match.song1.shortTitle || match.song1.title)}"
+                  class="${userVotedSongId === 'song1' ? 'user-pick' : ''}"
+                  loading="lazy">
+             
+             <div class="social-vs">VS</div>
+             
+-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/mqdefault.jpg"
++            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/hqdefault.jpg"
+                  alt="${escapeHtml(match.song2.shortTitle || match.song2.title)}"
+                  class="${userVotedSongId === 'song2' ? 'user-pick' : ''}"
+                  loading="lazy">
+diff --git a/js/vote.js b/js/vote.js
+index f0218b1..8087d56 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -471,6 +471,7 @@ function markBareDetails() {
+         if (!block) return;
+         const hidden = el => !el || el.style.display === 'none';
+         block.classList.toggle('moment-details--bare', hidden(about) && hidden(accomplishments));
++        block.classList.toggle('moment-details--no-about', hidden(about));
+     });
+ }
+ 
+diff --git a/tools/test-live-browser.py b/tools/test-live-browser.py
+new file mode 100644
+index 0000000..9f3e3f4
+--- /dev/null
++++ b/tools/test-live-browser.py
+@@ -0,0 +1,93 @@
++# Optional browser test of the REAL live page (live.html + js/live.js) with a mocked /api/matches.
++#   python3 tools/test-live-browser.py            (screenshots go to /tmp/live-shots)
++import os, sys, json, subprocess, threading, http.server, socketserver, functools, re
++from urllib.parse import urlparse
++from playwright.sync_api import sync_playwright
++
++ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++FIX = '/tmp/bracket-fixtures'; SHOTS = '/tmp/live-shots'
++os.makedirs(SHOTS, exist_ok=True)
++subprocess.run(['node', os.path.join(ROOT, 'tools/test-support/bracket-fixtures.mjs'), FIX], check=True, capture_output=True)
++
++class Q(http.server.SimpleHTTPRequestHandler):
++    def log_message(self, *a): pass
++httpd = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=ROOT)); PORT = httpd.server_address[1]
++threading.Thread(target=httpd.serve_forever, daemon=True).start()
++
++FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
++APP = "export const initializeApp=()=>({});"
++AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
++failed = []
++def check(name, ok, got=None):
++    print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
++    if not ok: failed.append(name)
++
++matches = json.load(open(f'{FIX}/groups-mid-16.json'))
++live = sorted([m for m in matches if m['status'] == 'live'], key=lambda m: m['matchId'])
++VOTED = live[0]['matchId']
++
++def load(browser, width, height):
++    ctx = browser.new_context(viewport={'width': width, 'height': height})
++    votes = {VOTED: {'songId': 'song2', 'songTitle': 'x', 'opponentTitle': 'y', 'timestamp': 1}}
++    ctx.add_init_script(f"localStorage.setItem('username','tester');localStorage.setItem('isPublic','true');localStorage.setItem('userVotes', JSON.stringify({json.dumps(votes)}));")
++    pg = ctx.new_page(); errs = []
++    pg.on('pageerror', lambda e: errs.append(str(e)))
++    def route(r):
++        u = r.request.url; path = urlparse(u).path
++        if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
++        elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
++        elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
++        elif path.endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
++        elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
++        elif u.startswith('https://img.youtube.com'):
++            r.fulfill(body=open('/tmp/cover.jpg', 'rb').read(), content_type='image/jpeg')
++        elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
++        else: r.continue_()
++    pg.route('**/*', route)
++    pg.goto(f'http://127.0.0.1:{PORT}/live.html')
++    pg.wait_for_timeout(3500)
++    return pg, errs
++
++# a 4:3 stand-in for YouTube's thumbnail: black bars either side of a vertical picture
++from PIL import Image, ImageDraw
++im = Image.new('RGB', (480, 360), (0, 0, 0)); d = ImageDraw.Draw(im); d.rectangle([139, 0, 341, 360], fill=(150, 60, 140)); im.save('/tmp/cover.jpg')
++
++rect = lambda pg, sel, n=0: pg.evaluate(f"(()=>{{const e=document.querySelectorAll({json.dumps(sel)})[{n}];if(!e)return null;const r=e.getBoundingClientRect();return {{x:r.x,y:r.y,w:r.width,h:r.height,r:r.right,b:r.bottom}}}})()")
++
++with sync_playwright() as p:
++    b = p.chromium.launch()
++    for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
++        pg, errs = load(b, w, h)
++        n_cards = pg.locator('#socialGrid .social-match-card').count()
++        check(f'{tag}: the page shows the live matches you have not voted in ({len(live) - 1})', n_cards == len(live) - 1, n_cards)
++        c = rect(pg, '#socialGrid .social-match-card img', 0)
++        check(f'{tag}: covers are portrait (9:16), not landscape boxes', c and abs(c['w'] / c['h'] - 9 / 16) < 0.03, c)
++        card = rect(pg, '#socialGrid .social-match-card')
++        check(f'{tag}: covers stay inside their card', c['x'] >= card['x'] and c['r'] <= card['r'] and c['b'] <= card['b'], (c, card))
++        check(f'{tag}: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
++        titles = pg.eval_on_selector_all('#socialGrid .social-match-card .song-details h3', 'els=>els.map(e=>e.textContent.trim())')
++        check(f'{tag}: card titles show no trailing hashtags', titles and all(not re.search(r'#\w+\s*$', t) for t in titles), titles)
++        hs = pg.eval_on_selector_all('#socialGrid .social-match-card .song-details h3', 'els=>els.map(e=>e.getBoundingClientRect().height)')
++        lh = pg.evaluate("parseFloat(getComputedStyle(document.querySelector('#socialGrid .social-match-card .song-details h3')).lineHeight) || 24")
++        check(f'{tag}: titles are two lines at most', all(x <= lh * 2 + 4 for x in hs), (hs, lh))
++        src = pg.get_attribute('#socialGrid .social-match-card img', 'src')
++        check(f'{tag}: covers use the sharper 4:3 thumbnail (hqdefault)', 'hqdefault' in src, src)
++        pg.screenshot(path=f'{SHOTS}/live-{tag}.png')
++        # the voted section (collapsed by default): open it and look at the pick
++        voted = pg.locator('#votedGrid .social-match-card.voted').first
++        check(f'{tag}: the match you voted in is listed under "Your Votes"', voted.count() == 1)
++        if voted.count() and not voted.is_visible():
++            pg.click('#votedToggle'); pg.wait_for_timeout(400)      # the section can be collapsed: open it
++        voted.scroll_into_view_if_needed()
++        if voted.count() and voted.is_visible():
++            pick = pg.evaluate("(()=>{const c=document.querySelector('.social-match-card.voted');const a=c.querySelectorAll('img');return [a[0].classList.contains('user-pick'),a[1].classList.contains('user-pick'),getComputedStyle(a[0]).opacity,getComputedStyle(a[1]).opacity]})()")
++            check(f'{tag}: on a voted card the picked cover is highlighted and the other is dimmed', pick[1] and not pick[0] and float(pick[0 + 2]) < 0.9 and float(pick[3]) == 1, pick)
++            pg.screenshot(path=f'{SHOTS}/live-{tag}-voted.png')
++        else:
++            check(f'{tag}: the voted card can be seen', False)
++        check(f'{tag}: no page errors', not errs, errs)
++        pg.context.close()
++    b.close()
++
++print('\n' + ('ALL CHECKS PASSED' if not failed else f'{len(failed)} FAILED'))
++sys.exit(1 if failed else 0)
+diff --git a/tools/test-vote-browser.py b/tools/test-vote-browser.py
+index e6aba7f..5686d28 100644
+--- a/tools/test-vote-browser.py
++++ b/tools/test-vote-browser.py
+@@ -119,6 +119,8 @@ with sync_playwright() as p:
+ 
+     pg, errs = load(b, 1280, 900, voted=False)
+     check('desktop: the filler About section is gone but the seed / year / artist chips stay', not pg.is_visible('#competitor1-about') and pg.is_visible('#competitor1-meta'))
++    gap = pg.evaluate("(()=>{const b=document.querySelector('#competitor-1-column .moment-details').getBoundingClientRect(),c=document.querySelector('#competitor1-meta .meta-row').getBoundingClientRect();return c.top-b.top})()")
++    check('desktop: no empty band above the chips when an edit has no About text', gap <= 48, gap)
+     pg.screenshot(path=f'{SHOTS}/vote-desktop-clean.png')
+     pg.context.close()
+ 
+-- 
+2.43.0
+

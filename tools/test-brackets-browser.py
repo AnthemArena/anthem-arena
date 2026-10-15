@@ -180,6 +180,12 @@ with sync_playwright() as p:
         order = pg.evaluate("(()=>{const c=document.querySelector('.modal-competitor');const r=c.querySelector('.modal-result').getBoundingClientRect().top,t=c.querySelector('.modal-video-thumbnail').getBoundingClientRect().top;return r<t})()")
         check(f'modal ({tag}): result bars come before the thumbnail', order)
         check(f'modal ({tag}): no winner tick after the title', pg.evaluate("getComputedStyle(document.querySelector('.modal-competitor.winner .competitor-name-modal'),'::after').content") in ('none', 'normal', '\"\"'))
+        vis = pg.evaluate("(()=>{const b=document.querySelector('.modal-body').getBoundingClientRect(),r=document.querySelector('.result-percentage').getBoundingClientRect();return {resultBottom:r.bottom,bodyBottom:b.bottom}})()")
+        check(f'modal ({tag}): the result is on the first screen (no scrolling needed to see the percentage)', vis['resultBottom'] <= vis['bodyBottom'] + 1, vis)
+        if tag == 'desktop':
+            tops = pg.eval_on_selector_all('.modal-video-thumbnail', 'els=>els.map(e=>Math.round(e.getBoundingClientRect().top))')
+            res = pg.eval_on_selector_all('.modal-result', 'els=>els.map(e=>Math.round(e.getBoundingClientRect().top))')
+            check('modal (desktop): both sides line up (results and thumbnails at the same height)', len(tops) == 2 and abs(tops[0] - tops[1]) <= 2 and abs(res[0] - res[1]) <= 2, (res, tops))
         pg.screenshot(path=f'{SHOTS}/modal-closed-{tag}.png')
         check(f'modal ({tag}): no page errors', not [e for e in errs if 'notification' not in e.lower()], errs)
         pg.context.close()

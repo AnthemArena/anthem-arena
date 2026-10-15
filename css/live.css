@@ -2839,3 +2839,29 @@ text-align: center;
         font-size: 0.75rem;
     }
 }
+
+/* ========================================
+   SHORTS COVERS (14 Oct)
+   YouTube's thumbnail for a Short is a 4:3 picture with black bars either side of a vertical image. The covers are now
+   9:16 crops of it (object-fit: cover from the centre), so the Short fills the cover instead of sitting in a black box.
+   ======================================== */
+.social-thumbnails img {
+    width: 38%;
+    aspect-ratio: 9 / 16;
+    max-height: 17rem;
+    background: #000;
+}
+.social-thumbnails { align-items: center; justify-content: center; gap: 0.75rem; }
+.social-thumbnails .social-vs { width: auto; flex: none; }
+
+/* titles: two lines at most, so cards in a row stay the same height */
+.social-match-card .song-details h3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+/* a match you have voted in: the cover you picked keeps its glow, the other one steps back */
+.social-match-card.voted .social-thumbnails:has(img.user-pick) img:not(.user-pick) { opacity: 0.45; filter: grayscale(0.4); }
+

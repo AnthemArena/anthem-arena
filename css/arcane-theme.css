@@ -1533,3 +1533,19 @@ body.theme-arcane .competitor-column { gap: 1.25rem; }
     body.theme-arcane .info-badge { padding: .4rem .85rem; font-size: .75rem; }
 }
 
+/* ---------- vote button: a long YouTube title (hashtags and all) made it a 7-line pink oval on a phone ----------
+   Rounded rectangle instead of a 999px pill, the label capped at two lines, and the "voted" tick put in FRONT of the text
+   so it can never be clipped. */
+body.theme-arcane .vote-btn { border-radius: 28px; padding: 1rem 1.5rem; }
+body.theme-arcane .vote-btn .vote-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-align: center;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+body.theme-arcane .vote-btn.voted .vote-text::after { content: none; }
+body.theme-arcane .vote-btn.voted .vote-text::before { content: '\2713  '; }
+
