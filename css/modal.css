@@ -248,8 +248,8 @@
 }
 
 .modal-competitor.winner .competitor-name-modal::after {
-    content: ' ✓';
-    color: #C8AA6E;
+    /* no tick after the title: it looked like "your vote". The winner has its own "Winner" badge below the bar. */
+    content: none;
 }
 
 /* VS Divider */
@@ -758,4 +758,44 @@
     letter-spacing: 0.5px;
     display: inline-block;
     margin-top: 0.5rem;
+}
+
+/* ========================================
+   SHORTS-FRIENDLY MATCH MODAL (14 Oct)
+   - thumbnails are portrait (9:16 crops of YouTube's 4:3 thumbnail, which has black bars either side of a Short)
+   - the action button sits OUTSIDE the scrolling body, so it never covers the content
+   - a finished match shows its result bars first, the thumbnails after
+   ======================================== */
+.modal-video-thumbnail.portrait {
+    width: auto;
+    height: min(34vh, 300px);
+    aspect-ratio: 9 / 16;
+    margin: 0.75rem auto;
+}
+
+.modal-container .modal-actions {
+    position: static;
+    margin: 0;
+    padding: 0.9rem 1.5rem 1.1rem;
+    background: none;
+    box-shadow: none;
+    flex: none;
+}
+
+.modal-container.is-completed .modal-competitor {
+    display: flex;
+    flex-direction: column;
+}
+.modal-container.is-completed .competitor-header-modal { order: 1; }
+.modal-container.is-completed .modal-result { order: 2; }
+.modal-container.is-completed .modal-video-thumbnail { order: 3; }
+
+@media (max-width: 768px) {
+    .modal-video-thumbnail.portrait { height: min(30vh, 240px); }
+    .modal-container .modal-actions { padding: 0.75rem 1rem 1rem; }
+}
+
+/* on a phone the three badges sit in one wrapping row instead of three rows, so the result shows sooner */
+@media (max-width: 480px) {
+    .modal-match-info { flex-direction: row; align-items: center; gap: 0.5rem; }
 }

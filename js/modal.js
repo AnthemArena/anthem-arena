@@ -84,9 +84,22 @@ function showMatchDetails(matchId) {
     setupModalListeners(modal);
     
     // Start countdown if needed
-    if (match.date && (match.status === 'upcoming' || match.status === 'live')) {
+    if (validDate(match.date) && (match.status === 'upcoming' || match.status === 'live')) {
         startModalCountdown(match);
     }
+}
+
+// A usable Date, or null. Unscheduled matches carry a placeholder such as 'TBD', which used to print "Invalid Date".
+function validDate(value) {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+// "1 vote" / "2 votes" (any noun)
+function countOf(n, word) {
+    const v = Number(n) || 0;
+    return `${v.toLocaleString()} ${word}${v === 1 ? '' : 's'}`;
 }
 
 // Create modal HTML structure
@@ -118,22 +131,23 @@ function createModalHTML(match) {
     
     // ✅ Button logic - simplified for completed matches
     const voteButton = isCompleted
-        ? `<button class="modal-btn secondary" onclick="closeMatchModal()">Close</button>`
+        ? `<a href="vote?match=${match.id}" class="modal-vote-btn primary">View match page</a>`
         : match.status === 'live'
         ? `<a href="vote?match=${match.id}" class="modal-vote-btn ${hasVoted ? 'voted' : 'primary'}">
              ${hasVoted ? `✅ You Voted: ${votedForName}` : '🎵 Cast Your Vote'}
            </a>`
         : `<a href="vote?match=${match.id}" class="modal-vote-btn primary">View Match Details</a>`;
     
-    // Format date nicely
-    const formattedDate = match.date 
-        ? new Date(match.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    // Format date nicely (nothing at all when the match has no real date yet)
+    const when = validDate(match.date);
+    const formattedDate = when
+        ? when.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
         : '';
     
     return `
 <div id="match-modal" class="match-modal">
     <div class="modal-overlay">
-        <div class="modal-container">
+        <div class="modal-container${isCompleted ? ' is-completed' : ''}">
             <button class="modal-close" onclick="closeMatchModal()" aria-label="Close modal">×</button>
             
             <div class="modal-header">
@@ -144,7 +158,7 @@ function createModalHTML(match) {
                 </div>
                 <h2 class="modal-title">${isCompleted ? 'Final Results' : 'Match Preview'}</h2>
                 <p class="modal-meta">
-                    ${isCompleted ? `${match.totalVotes.toLocaleString()} total votes` : match.status === 'live' ? `🔴 Live Now` : 'Coming Soon'}
+                    ${isCompleted ? `${countOf(match.totalVotes, 'total vote')}` : match.status === 'live' ? `🔴 Live Now` : 'Coming Soon'}
                     ${formattedDate ? ' • ' + formattedDate : ''}
                     ${hasVoted && isCompleted ? ` • You voted for ${votedForName}` : ''}
                 </p>
@@ -153,7 +167,7 @@ function createModalHTML(match) {
             <div class="modal-body">
                 <div class="modal-competitors">
                     <!-- Competitor 1 -->
-                    <div class="modal-competitor ${match.competitor1.winner ? 'winner' : ''} ${match.competitor1.percentage > match.competitor2.percentage && !isCompleted ? 'leading' : ''}">
+                    <div class="modal-competitor ${match.competitor1.winner ? 'winner' : ''} ${userVote === 'song1' ? 'your-pick' : ''} ${match.competitor1.percentage > match.competitor2.percentage && !isCompleted ? 'leading' : ''}">
                         <div class="competitor-header-modal">
                             ${match.competitor1.seed != null ? `<span class="competitor-seed-modal">#${match.competitor1.seed} Seed</span>` : ''}
                             <h3 class="competitor-name-modal">${match.competitor1.name}</h3>
@@ -161,7 +175,7 @@ function createModalHTML(match) {
                         </div>
                         
                         <!-- Video Thumbnail -->
-                        <div class="modal-video-thumbnail ${isCompleted ? 'static' : ''}">
+                        <div class="modal-video-thumbnail portrait ${isCompleted ? 'static' : ''}">
                             <img src="https://img.youtube.com/vi/${match.competitor1.videoId}/hqdefault.jpg" 
                                  alt="${match.competitor1.name}"
                                  loading="lazy">
@@ -180,7 +194,7 @@ function createModalHTML(match) {
                                 </div>
                                 <div class="result-stats">
                                     <span class="result-percentage">${match.competitor1.percentage}%</span>
-                                    <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
+                                    <span class="result-label">${countOf(match.competitor1.votes, 'vote')}</span>
                                 </div>
                                 ${match.competitor1.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
                                 ${hasVoted && userVote === 'song1' ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
@@ -190,7 +204,7 @@ function createModalHTML(match) {
                                 </div>
                                 <div class="result-stats">
                                     <span class="result-percentage live-percentage">${match.competitor1.percentage}%</span>
-                                    <span class="result-label">${match.competitor1.votes.toLocaleString()} votes</span>
+                                    <span class="result-label">${countOf(match.competitor1.votes, 'vote')}</span>
                                 </div>
                                 ${match.competitor1.percentage > match.competitor2.percentage ? '<span class="leading-badge">📈 Leading</span>' : ''}
                             ` : `
@@ -207,7 +221,7 @@ function createModalHTML(match) {
                     </div>
                     
                     <!-- Competitor 2 -->
-                    <div class="modal-competitor ${match.competitor2.winner ? 'winner' : ''} ${match.competitor2.percentage > match.competitor1.percentage && !isCompleted ? 'leading' : ''}">
+                    <div class="modal-competitor ${match.competitor2.winner ? 'winner' : ''} ${userVote === 'song2' ? 'your-pick' : ''} ${match.competitor2.percentage > match.competitor1.percentage && !isCompleted ? 'leading' : ''}">
                         <div class="competitor-header-modal">
                             ${match.competitor2.seed != null ? `<span class="competitor-seed-modal">#${match.competitor2.seed} Seed</span>` : ''}
                             <h3 class="competitor-name-modal">${match.competitor2.name}</h3>
@@ -215,7 +229,7 @@ function createModalHTML(match) {
                         </div>
                         
                         <!-- Video Thumbnail -->
-                        <div class="modal-video-thumbnail ${isCompleted ? 'static' : ''}">
+                        <div class="modal-video-thumbnail portrait ${isCompleted ? 'static' : ''}">
                             <img src="https://img.youtube.com/vi/${match.competitor2.videoId}/hqdefault.jpg" 
                                  alt="${match.competitor2.name}"
                                  loading="lazy">
@@ -234,7 +248,7 @@ function createModalHTML(match) {
                                 </div>
                                 <div class="result-stats">
                                     <span class="result-percentage">${match.competitor2.percentage}%</span>
-                                    <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
+                                    <span class="result-label">${countOf(match.competitor2.votes, 'vote')}</span>
                                 </div>
                                 ${match.competitor2.winner ? '<span class="result-winner-badge">🏆 Winner</span>' : ''}
                                 ${hasVoted && userVote === 'song2' ? '<span class="your-vote-badge">✓ Your Vote</span>' : ''}
@@ -244,7 +258,7 @@ function createModalHTML(match) {
                                 </div>
                                 <div class="result-stats">
                                     <span class="result-percentage live-percentage">${match.competitor2.percentage}%</span>
-                                    <span class="result-label">${match.competitor2.votes.toLocaleString()} votes</span>
+                                    <span class="result-label">${countOf(match.competitor2.votes, 'vote')}</span>
                                 </div>
                                 ${match.competitor2.percentage > match.competitor1.percentage ? '<span class="leading-badge">📈 Leading</span>' : ''}
                             ` : `
@@ -255,11 +269,11 @@ function createModalHTML(match) {
                         </div>
                     </div>
                 </div>
-                
-                <!-- Action Buttons -->
-                <div class="modal-actions">
-                    ${voteButton}
-                </div>
+            </div>
+            
+            <!-- Action Buttons (outside the scrolling body so they never cover the content) -->
+            <div class="modal-actions">
+                ${voteButton}
             </div>
         </div>
     </div>
