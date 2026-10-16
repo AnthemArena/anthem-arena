@@ -19,6 +19,7 @@ import { ACHIEVEMENTS } from './achievements.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
+import { loadCupHistory } from './cup-history.js';
 
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
@@ -204,6 +205,7 @@ async function loadProfile(username) {
 
         // Owner-only voting style + share image, then honour #votes etc.
         await loadOwnerInsights(profile.userId);
+        loadCupHistory(profile.userId);   // not awaited: the history fills in when it is ready
         openTabFromHash();
         
     } catch (error) {

@@ -14,7 +14,8 @@ function matchSummary(m) {
     const v1 = m.song1?.votes || 0, v2 = m.song2?.votes || 0, total = v1 + v2;
     const p1 = total ? (v1 / total) * 100 : 50;
     return { matchId: m.matchId, label: m.roundLabel || '', status: m.status, edit1: nameOf(m.song1), edit2: nameOf(m.song2),
-        votes1: v1, votes2: v2, total, percent1: p1, percent2: 100 - p1, gap: Math.abs(v1 - v2), lean: Math.abs(50 - p1) };
+        votes1: v1, votes2: v2, total, percent1: p1, percent2: 100 - p1, gap: Math.abs(v1 - v2), lean: Math.abs(50 - p1),
+        seed1: Number.isFinite(m.song1?.seed) ? m.song1.seed : null, seed2: Number.isFinite(m.song2?.seed) ? m.song2.seed : null, winner: m.status === 'completed' ? winnerSide(m) : 0 };
 }
 
 export function computeStats(matches = []) {
@@ -54,6 +55,9 @@ export function computeStats(matches = []) {
     const sums = voted.map(matchSummary);
     const pick = (cmp) => sums.reduce((best, s) => (!best || cmp(s, best) ? s : best), null);
     const finished = sums.filter(s => s.status === 'completed' && s.total > 0);
+    // Upset: the lower seed (bigger seed number) won. Needs both seeds, so random-draw cups simply have none.
+    const upsetSize = x => (x.winner === 1 && x.seed1 !== null && x.seed2 !== null ? x.seed1 - x.seed2 : x.winner === 2 && x.seed1 !== null && x.seed2 !== null ? x.seed2 - x.seed1 : 0);
+    const upset = sums.reduce((b, x) => (upsetSize(x) > 0 && (!b || upsetSize(x) > upsetSize(b)) ? x : b), null);
     const mostVotedEdit = rows.reduce((b, e) => (!b || e.votes > b.votes ? e : b), null);
     const bestShare = rows.filter(e => e.played > 0).reduce((b, e) => (!b || e.share > b.share ? e : b), null);
 
@@ -67,6 +71,7 @@ export function computeStats(matches = []) {
             mostVotedMatch: pick((s, b) => s.total > b.total),
             closest: finished.reduce((b, s) => (!b || s.lean < b.lean ? s : b), null),
             blowout: finished.reduce((b, s) => (!b || s.lean > b.lean ? s : b), null),
+            upset: upset ? { ...upset, seedGap: upsetSize(upset), winnerName: upset.winner === 1 ? upset.edit1 : upset.edit2, loserName: upset.winner === 1 ? upset.edit2 : upset.edit1, winnerSeed: upset.winner === 1 ? upset.seed1 : upset.seed2, loserSeed: upset.winner === 1 ? upset.seed2 : upset.seed1 } : null,
             mostVotedEdit: mostVotedEdit && mostVotedEdit.votes > 0 ? mostVotedEdit : null,
             bestShare: bestShare && bestShare.share > 0 ? bestShare : null
         }
@@ -79,3 +84,28 @@ export const SORTS = {
     wins: (a, b) => b.wins - a.wins || b.share - a.share || b.votes - a.votes
 };
 export function sortRows(rows, key = 'votes') { return [...rows].sort(SORTS[key] || SORTS.votes); }
+
+// ---- All cups ----
+// entries: [{ cup: { id, name, status, startDate, champion }, matches: [...] }]. A cup whose matches failed to load has matches: null.
+// Returns one comparison row per cup, lifetime totals, and the best record of each kind with the cup it came from.
+export function compareCups(entries = []) {
+    const rows = [], best = { mostVotedMatch: null, closest: null, blowout: null, upset: null };
+    const better = {
+        mostVotedMatch: (a, b) => a.total > b.total,
+        closest: (a, b) => a.lean < b.lean,
+        blowout: (a, b) => a.lean > b.lean,
+        upset: (a, b) => a.seedGap > b.seedGap
+    };
+    for (const { cup, matches } of entries || []) {
+        if (!cup) continue;
+        if (!Array.isArray(matches) || !matches.length) { rows.push({ id: cup.id, name: cup.name || cup.id, status: cup.status || 'complete', startDate: cup.startDate || null, loaded: false, votes: 0, matches: 0, finished: 0, edits: 0 }); continue; }
+        const s = computeStats(matches);
+        rows.push({ id: cup.id, name: cup.name || cup.id, status: cup.status || 'complete', startDate: cup.startDate || null, loaded: true, votes: s.totalVotes, matches: s.totalMatches, finished: s.completed, edits: s.editCount, champion: cup.champion || null, mostVotedEdit: s.records.mostVotedEdit });
+        for (const k of Object.keys(best)) {
+            const r = s.records[k];
+            if (r && (!best[k] || better[k](r, best[k]))) best[k] = { ...r, cupId: cup.id, cupName: cup.name || cup.id };
+        }
+    }
+    rows.sort((a, b) => String(b.startDate || '').localeCompare(String(a.startDate || '')));
+    return { cups: rows, totals: { votes: rows.reduce((t, r) => t + r.votes, 0), cups: rows.length, matches: rows.reduce((t, r) => t + r.matches, 0), finished: rows.reduce((t, r) => t + r.finished, 0) }, records: best };
+}

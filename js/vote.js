@@ -1976,7 +1976,7 @@ console.log(
         }
 
         // ✅ ADD THIS: Check for founding member badge
-        const earnedFoundingBadge = awardFoundingMemberBadge();
+        const earnedFoundingBadge = await awardFoundingMemberBadge(userId);
         if (earnedFoundingBadge) {
             console.log('👑 User earned Founding Member badge!');
             // Toast will show automatically from founding-member-tracker.js

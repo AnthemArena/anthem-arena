@@ -1,0 +1,20 @@
+/* Profile cup history. Loaded after arcane-theme.css; uses its tokens. */
+body.theme-arcane.page-profile .cup-history { margin: 0 0 28px; }
+body.theme-arcane.page-profile .cup-history .section-title { margin-bottom: 14px; }
+.ch-lifetime { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.ch-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+.ch-stat strong { display: block; font-size: 1.5rem; color: var(--pink-bright); }
+.ch-stat span { font-size: .78rem; color: var(--muted); }
+.ch-cup { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; }
+.ch-cup summary { cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; list-style: none; }
+.ch-cup summary::-webkit-details-marker { display: none; }
+.ch-name { font-weight: 700; color: var(--text); }
+.ch-votes { color: var(--pink-bright); font-weight: 600; }
+.ch-meta { grid-column: 1 / -1; font-size: .8rem; color: var(--muted); }
+.ch-picks { list-style: none; margin: 0; padding: 0 16px 12px; }
+.ch-picks li { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.ch-pick { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-round { color: var(--text-dim); font-size: .78rem; }
+.ch-won { color: #5fd38d; } .ch-lost { color: var(--pink); } .ch-pending { color: var(--text-faint); }
+.ch-more, .ch-empty { color: var(--muted); font-size: .85rem; padding: 0 16px 12px; margin: 0; }
+.ch-empty { padding: 16px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; }

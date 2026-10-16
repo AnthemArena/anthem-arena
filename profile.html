@@ -24,6 +24,7 @@
     <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
     <link rel="stylesheet" href="/css/arcane-theme.generated.css">
     <link rel="stylesheet" href="/css/arcane-theme.css">
+    <link rel="stylesheet" href="/css/cup-history.css">
 
     
     <!-- Firebase -->
@@ -315,6 +316,9 @@
 
                         <!-- Owner-only: voting style + share image (filled by profile-insights.js) -->
                         <div id="ownerInsights" class="owner-insights" hidden></div>
+
+                        <!-- Every real cup this person has voted in, plus lifetime totals (js/cup-history.js) -->
+                        <section id="cupHistory" class="cup-history" hidden aria-label="Cup history"></section>
                         
                         <!-- Overall Participation -->
                         <div class="participation-overview">
