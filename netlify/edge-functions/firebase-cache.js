@@ -5,7 +5,7 @@
 
 const CACHE_DURATION = 30; // 30 seconds
 const FIREBASE_PROJECT = "arcane-moments";
-const TOURNAMENT = "group-test-01";
+const TOURNAMENT = "jinx-cup-1";
 
 // Edge cache storage
 const edgeCache = new Map();
