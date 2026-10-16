@@ -1,0 +1,363 @@
+From 193aee71ccf81620f669c70c8083fa339adbadc6 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 16 Oct 2026 20:33:40 +0100
+Subject: [PATCH] Profile cup history: lifetime totals and per-cup breakdown,
+ past-cup match API
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013psebDbek43PiPjqCtRkhL
+---
+ css/cup-history.css                      | 20 ++++++
+ data/cups.json                           |  6 ++
+ docs/arcane_moments.md                   | 12 +++-
+ js/api-client.js                         |  8 ++-
+ js/cup-history-model.js                  | 91 ++++++++++++++++++++++++
+ js/cup-history.js                        | 32 +++++++++
+ js/profile-page.js                       |  2 +
+ netlify/edge-functions/firebase-cache.js | 11 +--
+ profile.html                             |  4 ++
+ tools/test-cup-history-model.mjs         | 25 +++++++
+ 10 files changed, 203 insertions(+), 8 deletions(-)
+ create mode 100644 css/cup-history.css
+ create mode 100644 data/cups.json
+ create mode 100644 js/cup-history-model.js
+ create mode 100644 js/cup-history.js
+ create mode 100644 tools/test-cup-history-model.mjs
+
+diff --git a/css/cup-history.css b/css/cup-history.css
+new file mode 100644
+index 0000000..6e2fe3d
+--- /dev/null
++++ b/css/cup-history.css
+@@ -0,0 +1,20 @@
++/* Profile cup history. Loaded after arcane-theme.css; uses its tokens. */
++body.theme-arcane.page-profile .cup-history { margin: 0 0 28px; }
++body.theme-arcane.page-profile .cup-history .section-title { margin-bottom: 14px; }
++.ch-lifetime { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
++.ch-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
++.ch-stat strong { display: block; font-size: 1.5rem; color: var(--pink-bright); }
++.ch-stat span { font-size: .78rem; color: var(--muted); }
++.ch-cup { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; }
++.ch-cup summary { cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; list-style: none; }
++.ch-cup summary::-webkit-details-marker { display: none; }
++.ch-name { font-weight: 700; color: var(--text); }
++.ch-votes { color: var(--pink-bright); font-weight: 600; }
++.ch-meta { grid-column: 1 / -1; font-size: .8rem; color: var(--muted); }
++.ch-picks { list-style: none; margin: 0; padding: 0 16px 12px; }
++.ch-picks li { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); font-size: .9rem; }
++.ch-pick { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
++.ch-round { color: var(--text-dim); font-size: .78rem; }
++.ch-won { color: #5fd38d; } .ch-lost { color: var(--pink); } .ch-pending { color: var(--text-faint); }
++.ch-more, .ch-empty { color: var(--muted); font-size: .85rem; padding: 0 16px 12px; margin: 0; }
++.ch-empty { padding: 16px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; }
+diff --git a/data/cups.json b/data/cups.json
+new file mode 100644
+index 0000000..136cb6b
+--- /dev/null
++++ b/data/cups.json
+@@ -0,0 +1,6 @@
++{
++  "_note": "One entry per real cup, oldest first. Profiles and stats only count cups listed here, so test cups are left out on purpose. Add the new cup when you switch to it; set status to complete and fill in champion when it ends.",
++  "cups": [
++    { "id": "jinx-cup-1", "name": "Jinx Cup 1", "status": "active", "startDate": "2026-10-16", "champion": null }
++  ]
++}
+diff --git a/docs/arcane_moments.md b/docs/arcane_moments.md
+index a71503b..2404326 100644
+--- a/docs/arcane_moments.md
++++ b/docs/arcane_moments.md
+@@ -380,4 +380,14 @@ Files read: `champion-packs/*.json`, `js/champion-loader.js`, `js/achievements.j
+ - Playlists are fetched server-side by `netlify/functions/arcane-playlist.js` (the API key is not exposed). Playlist IDs and row config live in `js/arcane-home.js` (`SITE_CONFIG`).
+ - Voters are identified by a `userId` in localStorage (with anonymous Firebase auth). A private window is a fresh voter for testing.
+ - Tournament ID: `arcane-test-01` in `js/arcane-config.js`.
+-- Handy commands: `git status`, `git add -u`, `git commit -m "…"`, `git push`. Delete patch files after applying.
+\ No newline at end of file
++- Handy commands: `git status`, `git add -u`, `git commit -m "…"`, `git push`. Delete patch files after applying.
++## Profile cup history (patch 1 of 2)
++
++People who vote in more than one cup keep their history. Votes were never deleted: the profile used to hide votes whose match was not in the active cup's match list, so after a cup switch everything looked empty.
++
++- `data/cups.json` lists the real cups (oldest first). Only listed cups count in history, so test cups are left out on purpose. **When you switch to a new cup, add it here** (`status: "active"`), and set the old one to `complete` with a `champion`. A test (`tools/test-cup-history-model.mjs`) fails if the active cup is missing.
++- `/api/matches?tournament=<cupId>` returns a past cup's matches (id format checked; cached separately). Default is still the active cup.
++- `js/cup-history-model.js` (pure, tested): per cup votes, participation, "picks that won"; lifetime votes, cups entered, average participation (a lifetime % would shrink every cup, so the average is used), pick accuracy.
++- Profile > Journey tab shows lifetime totals and one collapsible row per cup (`js/cup-history.js`, `css/cup-history.css`).
++- Still current-cup only by design: the Votes tab list and count, and the participation circle.
++- Patch 2 (next): stats page cup selector + all-time view (votes and voters per cup, biggest upsets, closest matches).
+diff --git a/js/api-client.js b/js/api-client.js
+index 431fd6a..15d769c 100644
+--- a/js/api-client.js
++++ b/js/api-client.js
+@@ -9,12 +9,14 @@ const API_BASE = '/api';
+ /**
+  * Fetch all matches (cached at Netlify edge)
+  */
+-export async function getAllMatches(bypassCache = false) {
++export async function getAllMatches(bypassCache = false, tournament = null) {
+     try {
+         console.log('Fetching matches from edge cache...');
+         
+-        const cacheBuster = bypassCache ? `?_refresh=${Date.now()}` : '';
+-        const url = `${API_BASE}/matches${cacheBuster}`;
++        const params = [];
++        if (bypassCache) params.push(`_refresh=${Date.now()}`);
++        if (tournament) params.push(`tournament=${encodeURIComponent(tournament)}`);   // a past cup; default is the active cup
++        const url = `${API_BASE}/matches${params.length ? '?' + params.join('&') : ''}`;
+         
+         const response = await fetch(url, {
+             headers: {
+diff --git a/js/cup-history-model.js b/js/cup-history-model.js
+new file mode 100644
+index 0000000..aeb65bd
+--- /dev/null
++++ b/js/cup-history-model.js
+@@ -0,0 +1,91 @@
++// Pure helpers: what a voter did across every real cup. No DOM, no Firebase, so it runs in Node tests.
++//
++//   buildCupHistory({ votes, cups, matchesByCup }) -> { cups: [row...], lifetime }
++//
++// votes         the user's vote docs ({ matchId, tournament, choice: 'song1' | 'song2', timestamp })
++// cups          entries from data/cups.json. Only these cups count, so test cups never appear.
++// matchesByCup  { [cupId]: match[] } as returned by /api/matches?tournament=<cupId>. A cup may be missing (request failed).
++
++const sideOf = (match, id) => (id && (id === match.song1?.id || id === 'song1') ? 1 : id && (id === match.song2?.id || id === 'song2') ? 2 : 0);
++const cleanTitle = c => String(c?.shortTitle || c?.title || c?.name || '').replace(/\s*#\w+/g, '').trim();
++
++export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {}) {
++    const listed = new Map((cups || []).map(c => [c.id, c]));
++    const byCup = new Map();
++    for (const v of votes || []) {
++        if (!v || !listed.has(v.tournament)) continue;
++        if (!byCup.has(v.tournament)) byCup.set(v.tournament, new Map());
++        byCup.get(v.tournament).set(v.matchId, v);          // one vote per match
++    }
++
++    const rows = [];
++    for (const cup of cups || []) {
++        const mine = byCup.get(cup.id);
++        if (!mine || !mine.size) continue;                   // cups the user never voted in are not history
++        const matches = matchesByCup[cup.id];
++        const known = Array.isArray(matches) && matches.length > 0;
++        const index = new Map((known ? matches : []).map(m => [m.matchId || m.id, m]));
++        const real = known ? matches.filter(m => m.song1?.id !== 'TBD' && m.song2?.id !== 'TBD') : [];
++
++        let decided = 0, correct = 0, lastPick = null;
++        const picks = [];
++        for (const [matchId, v] of mine) {
++            const m = index.get(matchId);
++            if (!m) continue;
++            const mySide = sideOf(m, v.choice);
++            const comp = mySide === 1 ? m.song1 : mySide === 2 ? m.song2 : null;
++            const won = m.status === 'completed' ? sideOf(m, m.winnerId) : 0;
++            const pick = { matchId, label: m.roundLabel || '', title: cleanTitle(comp), status: m.status, result: !won ? 'pending' : (won === mySide ? 'won' : 'lost'), timestamp: Number(v.timestamp || 0) };
++            if (won) { decided++; if (won === mySide) correct++; }
++            picks.push(pick);
++            if (!lastPick || pick.timestamp > lastPick.timestamp) lastPick = pick;
++        }
++        picks.sort((a, b) => b.timestamp - a.timestamp);
++
++        const total = real.length;
++        rows.push({
++            id: cup.id, name: cup.name || cup.id, status: cup.status || 'complete', startDate: cup.startDate || null, champion: cup.champion || null,
++            votes: mine.size,
++            totalMatches: total || null,
++            participation: total ? Math.min(100, Math.round(mine.size / total * 100)) : null,
++            decided, correct,
++            accuracy: decided ? Math.round(correct / decided * 100) : null,
++            picks
++        });
++    }
++
++    // Newest cup first.
++    rows.sort((a, b) => String(b.startDate || '').localeCompare(String(a.startDate || '')));
++
++    const withPct = rows.filter(r => r.participation !== null);
++    const decided = rows.reduce((s, r) => s + r.decided, 0), correct = rows.reduce((s, r) => s + r.correct, 0);
++    return {
++        cups: rows,
++        lifetime: {
++            totalVotes: rows.reduce((s, r) => s + r.votes, 0),
++            cupsEntered: rows.length,
++            avgParticipation: withPct.length ? Math.round(withPct.reduce((s, r) => s + r.participation, 0) / withPct.length) : null,
++            accuracy: decided ? Math.round(correct / decided * 100) : null,
++            decided
++        }
++    };
++}
++
++// ---- HTML (pure string building, so it is testable in Node) ----
++const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++
++const stat = (value, label) => `<div class="ch-stat"><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`;
++const resultIcon = r => r === 'won' ? '<span class="ch-won" title="Your pick won">✓</span>' : r === 'lost' ? '<span class="ch-lost" title="Your pick lost">✕</span>' : '<span class="ch-pending" title="Not decided yet">·</span>';
++
++export function renderCupHistory(history) {
++    const l = history.lifetime;
++    const title = '<h3 class="section-title"><i class="fas fa-clock-rotate-left"></i> Cup History</h3>';
++    if (!history.cups.length) return title + '<p class="ch-empty">No cup history yet. Votes in a cup show up here, and stay here when the next cup starts.</p>';
++    const head = `<div class="ch-lifetime">${stat(l.totalVotes, 'Votes cast')}${stat(l.cupsEntered, l.cupsEntered === 1 ? 'Cup entered' : 'Cups entered')}${l.avgParticipation === null ? '' : stat(l.avgParticipation + '%', 'Avg participation')}${l.accuracy === null ? '' : stat(l.accuracy + '%', 'Picks that won')}</div>`;
++    const rows = history.cups.map(c => {
++        const meta = [c.status === 'active' ? 'Live now' : 'Finished', c.participation === null ? null : `${c.participation}% of matches`, c.accuracy === null ? null : `${c.correct} of ${c.decided} picks won`].filter(Boolean).join(' · ');
++        const picks = c.picks.slice(0, 20).map(p => `<li>${resultIcon(p.result)}<span class="ch-pick">${esc(p.title || 'Your pick')}</span><span class="ch-round">${esc(p.label)}</span></li>`).join('');
++        return `<details class="ch-cup"${c.status === 'active' ? ' open' : ''}><summary><span class="ch-name">${esc(c.name)}</span><span class="ch-votes">${c.votes} ${c.votes === 1 ? 'vote' : 'votes'}</span><span class="ch-meta">${esc(meta)}</span></summary>${picks ? `<ul class="ch-picks">${picks}</ul>${c.picks.length > 20 ? `<p class="ch-more">Showing your latest 20 of ${c.picks.length}.</p>` : ''}` : ''}</details>`;
++    }).join('');
++    return title + head + rows;
++}
+diff --git a/js/cup-history.js b/js/cup-history.js
+new file mode 100644
+index 0000000..a74e535
+--- /dev/null
++++ b/js/cup-history.js
+@@ -0,0 +1,32 @@
++// Profile "Cup history": every real cup the viewed user has voted in, plus lifetime totals.
++// Data: the user's vote docs (all cups), data/cups.json (which cups count), and /api/matches?tournament=<cup> per cup voted in.
++import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
++import { db } from './firebase-config.js';
++import { getAllMatches } from './api-client.js';
++import { buildCupHistory, renderCupHistory } from './cup-history-model.js';
++
++async function loadCups() {
++    const res = await fetch('/data/cups.json', { cache: 'no-cache' });
++    if (!res.ok) throw new Error(`cups.json ${res.status}`);
++    return (await res.json()).cups || [];
++}
++
++export async function loadCupHistory(userId) {
++    const host = document.getElementById('cupHistory');
++    if (!host || !userId) return;
++    try {
++        const [cups, snap] = await Promise.all([loadCups(), getDocs(query(collection(db, 'votes'), where('userId', '==', userId)))]);
++        const votes = snap.docs.map(d => d.data());
++        const voted = new Set(votes.map(v => v.tournament));
++        const matchesByCup = {};
++        await Promise.all(cups.filter(c => voted.has(c.id)).map(async c => {
++            const m = await getAllMatches(false, c.id);
++            if (m.length) matchesByCup[c.id] = m;
++        }));
++        host.innerHTML = renderCupHistory(buildCupHistory({ votes, cups, matchesByCup }));
++        host.hidden = false;
++    } catch (error) {
++        console.warn('Cup history unavailable:', error);
++        host.hidden = true;
++    }
++}
+diff --git a/js/profile-page.js b/js/profile-page.js
+index 84f5f99..03c7dd9 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -19,6 +19,7 @@ import { ACHIEVEMENTS } from './achievements.js';
+ import { ARCANE_CONFIG } from './arcane-config.js';
+ import { tidyNames } from './title-clean.js';
+ import { hasSeed, renderOwnerInsights } from './profile-insights.js';
++import { loadCupHistory } from './cup-history.js';
+ 
+ // ========================================
+ // HELPER FUNCTIONS - Loading Spinner
+@@ -204,6 +205,7 @@ async function loadProfile(username) {
+ 
+         // Owner-only voting style + share image, then honour #votes etc.
+         await loadOwnerInsights(profile.userId);
++        loadCupHistory(profile.userId);   // not awaited: the history fills in when it is ready
+         openTabFromHash();
+         
+     } catch (error) {
+diff --git a/netlify/edge-functions/firebase-cache.js b/netlify/edge-functions/firebase-cache.js
+index 1a141f4..f4d0596 100644
+--- a/netlify/edge-functions/firebase-cache.js
++++ b/netlify/edge-functions/firebase-cache.js
+@@ -18,6 +18,9 @@ export default async (request, context) => {
+   const url = new URL(request.url);
+   const pathname = url.pathname;
+   const matchId = url.searchParams.get('matchId');
++  // Optional ?tournament=<cupId> reads a past cup (profiles and stats history). Anything that is not a plain cup id is ignored.
++  const askedCup = url.searchParams.get('tournament');
++  const cup = askedCup && /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(askedCup) ? askedCup : TOURNAMENT;
+ 
+    // ✅ NEW: Handle total votes endpoint
+   if (pathname === "/api/total-votes") {
+@@ -45,7 +48,7 @@ export default async (request, context) => {
+   const bypassCache = url.searchParams.get('_refresh') !== null;
+   
+   // Create cache key including matchId if present
+-  const cacheKey = matchId ? `${pathname}?matchId=${matchId}` : pathname;
++  const cacheKey = (matchId ? `${pathname}?matchId=${matchId}` : pathname) + (cup !== TOURNAMENT ? `#${cup}` : '');
+   
+   console.log(`📡 Edge request: ${cacheKey}${bypassCache ? ' (BYPASS)' : ''}`);
+   
+@@ -82,18 +85,18 @@ export default async (request, context) => {
+     if (pathname === "/api/matches") {
+       if (matchId) {
+         // Get single match by ID
+-        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${matchId}`;
++        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches/${matchId}`;
+         fetchVotes = true; // ✅ Fetch votes for single match
+       } else {
+         // Get all matches
+-        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
++        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches`;
+         fetchVotes = true; // ✅ Fetch votes for all matches
+         isMatchList = true;
+       }
+     } else if (pathname.startsWith("/api/match/")) {
+       // Alternative route: Get single match
+       const pathMatchId = pathname.replace("/api/match/", "");
+-      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${pathMatchId}`;
++      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches/${pathMatchId}`;
+       fetchVotes = true; // ✅ Fetch votes for single match
+     }
+     
+diff --git a/profile.html b/profile.html
+index 2d856ef..92849ad 100644
+--- a/profile.html
++++ b/profile.html
+@@ -24,6 +24,7 @@
+     <!-- Arcane look (opt-in via <body class="theme-arcane">): load after every other stylesheet -->
+     <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+     <link rel="stylesheet" href="/css/arcane-theme.css">
++    <link rel="stylesheet" href="/css/cup-history.css">
+ 
+     
+     <!-- Firebase -->
+@@ -315,6 +316,9 @@
+ 
+                         <!-- Owner-only: voting style + share image (filled by profile-insights.js) -->
+                         <div id="ownerInsights" class="owner-insights" hidden></div>
++
++                        <!-- Every real cup this person has voted in, plus lifetime totals (js/cup-history.js) -->
++                        <section id="cupHistory" class="cup-history" hidden aria-label="Cup history"></section>
+                         
+                         <!-- Overall Participation -->
+                         <div class="participation-overview">
+diff --git a/tools/test-cup-history-model.mjs b/tools/test-cup-history-model.mjs
+new file mode 100644
+index 0000000..200fa67
+--- /dev/null
++++ b/tools/test-cup-history-model.mjs
+@@ -0,0 +1,25 @@
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import { buildCupHistory, renderCupHistory } from '../js/cup-history-model.js';
++import { ARCANE_CONFIG } from '../js/arcane-config.js';
++
++let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
++const m = (id, status, winner, extra = {}) => ({ matchId: id, roundLabel: 'Group A', status, winnerId: winner, song1: { id: 'a', shortTitle: 'Alpha #jinx' }, song2: { id: 'b', shortTitle: 'Beta #jinx' }, ...extra });
++const cups = [{ id: 'c1', name: 'Cup 1', status: 'complete', startDate: '2026-10-01' }, { id: 'c2', name: 'Cup 2', status: 'active', startDate: '2026-11-01' }];
++const v = (matchId, tournament, choice, ts = 1) => ({ matchId, tournament, choice, timestamp: ts });
++const matchesByCup = { c1: [m('x1', 'completed', 'a'), m('x2', 'completed', 'b'), m('x3', 'upcoming', null)], c2: [m('y1', 'live', null), m('y2', 'upcoming', null)] };
++
++t('empty and null input are safe', () => { assert.deepEqual(buildCupHistory().cups, []); assert.equal(buildCupHistory({ votes: null, cups: null }).lifetime.totalVotes, 0); });
++t('test cups not in cups.json are ignored', () => { const h = buildCupHistory({ votes: [v('t1', 'group-test-01', 'song1')], cups, matchesByCup }); assert.equal(h.lifetime.totalVotes, 0); assert.equal(h.cups.length, 0); });
++t('counts votes and participation per cup', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1'), v('x2', 'c1', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].votes, 2); assert.equal(h.cups[0].participation, 67); });
++t('pick accuracy counts finished matches only', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1'), v('x2', 'c1', 'song1'), v('x3', 'c1', 'song2')], cups, matchesByCup }); const r = h.cups[0]; assert.equal(r.decided, 2); assert.equal(r.correct, 1); assert.equal(r.accuracy, 50); assert.equal(r.picks.find(p => p.matchId === 'x3').result, 'pending'); });
++t('choice may be an edit id', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'a')], cups, matchesByCup }); assert.equal(h.cups[0].correct, 1); });
++t('duplicate votes on a match count once', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1'), v('x1', 'c1', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].votes, 1); });
++t('several cups: newest first, lifetime adds up', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1'), v('y1', 'c2', 'song1')], cups, matchesByCup }); assert.deepEqual(h.cups.map(r => r.id), ['c2', 'c1']); assert.equal(h.lifetime.totalVotes, 2); assert.equal(h.lifetime.cupsEntered, 2); assert.equal(h.lifetime.avgParticipation, Math.round((50 + 33) / 2)); });
++t('a cup whose matches failed to load still shows votes', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups, matchesByCup: {} }); assert.equal(h.cups[0].votes, 1); assert.equal(h.cups[0].participation, null); assert.equal(h.lifetime.avgParticipation, null); });
++t('cleaned titles in picks', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].picks[0].title, 'Alpha'); });
++t('TBD slots do not inflate the match total', () => { const mm = { c1: [m('x1', 'completed', 'a'), m('k1', 'upcoming', null, { song2: { id: 'TBD' } })] }; assert.equal(buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups, matchesByCup: mm }).cups[0].totalMatches, 1); });
++t('the active cup is listed in data/cups.json', () => { const f = JSON.parse(fs.readFileSync(new URL('../data/cups.json', import.meta.url))); assert.ok(f.cups.some(c => c.id === ARCANE_CONFIG.tournamentId), 'add the active cup to data/cups.json'); });
++t('html: shows cups, lifetime and escapes names', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups: [{ ...cups[0], name: 'A <b>Cup</b>' }], matchesByCup }); const html = renderCupHistory(h); assert.ok(html.includes('Cup History')); assert.ok(html.includes('A &lt;b&gt;Cup&lt;/b&gt;')); assert.ok(!html.includes('<b>Cup')); assert.ok(html.includes('Votes cast')); assert.ok(html.includes('ch-won')); });
++t('html: empty history explains itself', () => { assert.ok(renderCupHistory(buildCupHistory()).includes('No cup history yet')); });
++console.log(`${n} passed`);
+-- 
+2.43.0
+

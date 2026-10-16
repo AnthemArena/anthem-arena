@@ -1,0 +1,6 @@
+{
+  "_note": "One entry per real cup, oldest first. Profiles and stats only count cups listed here, so test cups are left out on purpose. Add the new cup when you switch to it; set status to complete and fill in champion when it ends.",
+  "cups": [
+    { "id": "jinx-cup-1", "name": "Jinx Cup 1", "status": "active", "startDate": "2026-10-16", "champion": null }
+  ]
+}

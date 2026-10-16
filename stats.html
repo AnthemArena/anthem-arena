@@ -55,6 +55,7 @@
         <header class="stats-hero">
             <h1 class="stats-title">Cup Stats</h1>
             <p class="stats-subtitle" id="cupSubtitle">Live numbers from the current Arcane Moments cup: votes, rankings, group tables and records.</p>
+            <div class="stats-cup-pick" id="cupPick" hidden><label for="cupSelect">Cup</label><select id="cupSelect"></select></div>
             <p class="stats-updated" id="statsUpdated" aria-live="polite"></p>
         </header>
 
@@ -63,6 +64,7 @@
             <button type="button" role="tab" class="stats-tab" id="tab-edits" aria-controls="pane-edits" aria-selected="false" data-tab="edits" tabindex="-1"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><span>Edits</span></button>
             <button type="button" role="tab" class="stats-tab" id="tab-groups" aria-controls="pane-groups" aria-selected="false" data-tab="groups" tabindex="-1"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i><span>Groups</span></button>
             <button type="button" role="tab" class="stats-tab" id="tab-records" aria-controls="pane-records" aria-selected="false" data-tab="records" tabindex="-1"><i class="fa-solid fa-medal" aria-hidden="true"></i><span>Records</span></button>
+            <button type="button" role="tab" class="stats-tab" id="tab-allcups" aria-controls="pane-allcups" aria-selected="false" data-tab="allcups" tabindex="-1"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>All cups</span></button>
         </nav>
 
         <section class="stats-pane" id="pane-overview" role="tabpanel" aria-labelledby="tab-overview" aria-busy="true">
@@ -71,6 +73,7 @@
         <section class="stats-pane" id="pane-edits" role="tabpanel" aria-labelledby="tab-edits" hidden></section>
         <section class="stats-pane" id="pane-groups" role="tabpanel" aria-labelledby="tab-groups" hidden></section>
         <section class="stats-pane" id="pane-records" role="tabpanel" aria-labelledby="tab-records" hidden></section>
+        <section class="stats-pane" id="pane-allcups" role="tabpanel" aria-labelledby="tab-allcups" hidden></section>
 
         <section class="stats-next" aria-label="Keep exploring">
             <a href="/live" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>

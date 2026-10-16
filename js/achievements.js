@@ -537,6 +537,22 @@ export const ACHIEVEMENTS = {
   // SESSION / SPECIAL
   // ========================================
 
+  // Awarded by js/founding-member-tracker.js (it grants the 500 XP itself),
+  // so the condition never fires here and cannot pay the XP out twice.
+  'founding-member': {
+    id: 'founding-member',
+    name: 'Founding Member',
+    description: 'One of the first 1,000 voters',
+    icon: '👑',
+    xp: 500,
+    category: 'special',
+    hidden: true,
+    tier: 'legendary',
+    rarity: 'legendary',
+    condition: () => false,
+    progress: () => ({ current: 1, target: 1 })
+  },
+
   'long-session': {
     id: 'long-session',
     name: 'Long Session',

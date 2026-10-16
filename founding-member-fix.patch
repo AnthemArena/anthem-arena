@@ -1,0 +1,98 @@
+From e270fc247a87e31a991107077d023eb5b20aded1 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 16 Oct 2026 20:26:57 +0100
+Subject: [PATCH] Fix Founding Member: save badge to profile, stop double XP,
+ add achievement definition
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013psebDbek43PiPjqCtRkhL
+---
+ js/achievements.js            | 16 ++++++++++++++++
+ js/founding-member-tracker.js | 16 ++++++++++++++++
+ js/vote.js                    |  2 +-
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/js/achievements.js b/js/achievements.js
+index b80e161..82f199b 100644
+--- a/js/achievements.js
++++ b/js/achievements.js
+@@ -537,6 +537,22 @@ export const ACHIEVEMENTS = {
+   // SESSION / SPECIAL
+   // ========================================
+ 
++  // Awarded by js/founding-member-tracker.js (it grants the 500 XP itself),
++  // so the condition never fires here and cannot pay the XP out twice.
++  'founding-member': {
++    id: 'founding-member',
++    name: 'Founding Member',
++    description: 'One of the first 1,000 voters',
++    icon: '👑',
++    xp: 500,
++    category: 'special',
++    hidden: true,
++    tier: 'legendary',
++    rarity: 'legendary',
++    condition: () => false,
++    progress: () => ({ current: 1, target: 1 })
++  },
++
+   'long-session': {
+     id: 'long-session',
+     name: 'Long Session',
+diff --git a/js/founding-member-tracker.js b/js/founding-member-tracker.js
+index 4262e58..4b33eae 100644
+--- a/js/founding-member-tracker.js
++++ b/js/founding-member-tracker.js
+@@ -40,6 +40,8 @@ export async function initFoundingMemberTracking(userId) {
+  */
+ export async function awardFoundingMemberBadge(userId) {
+   try {
++    userId = userId || localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
++
+     // Check if milestone reached
+     const milestoneReached = localStorage.getItem(MILESTONE_REACHED_KEY);
+     if (milestoneReached === 'true') {
+@@ -56,6 +58,8 @@ export async function awardFoundingMemberBadge(userId) {
+ 
+     // Award locally
+     localStorage.setItem(LOCAL_FOUNDING_KEY, 'true');
++    // The XP is paid right here, so the page-load backfill must not pay it again.
++    localStorage.setItem('foundingMemberXPBackfilled', 'true');
+ 
+     // Award XP
+     const newXP = addXP(500, 'founding-member-achievement');
+@@ -164,6 +168,18 @@ export async function backfillFoundingMemberXP() {
+     localStorage.setItem('foundingMemberXPBackfilled', 'true');
+     console.log(`✨ Backfilled 500 XP! New total: ${newXP} XP`);
+ 
++    // Older awards never reached the Firestore profile, so save the badge now.
++    try {
++      const uid = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
++      if (uid) {
++        await updateDoc(doc(db, 'profiles', uid), {
++          unlockedAchievements: arrayUnion(FOUNDING_MEMBER_ACHIEVEMENT_ID)
++        });
++      }
++    } catch (e) {
++      console.warn('Could not sync Founding Member badge to profile:', e.message);
++    }
++
+     if (window.showBulletin) {
+       window.showBulletin({
+         priority: 1,
+diff --git a/js/vote.js b/js/vote.js
+index 0a2f32e..5ef2d9d 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -1976,7 +1976,7 @@ console.log(
+         }
+ 
+         // ✅ ADD THIS: Check for founding member badge
+-        const earnedFoundingBadge = awardFoundingMemberBadge();
++        const earnedFoundingBadge = await awardFoundingMemberBadge(userId);
+         if (earnedFoundingBadge) {
+             console.log('👑 User earned Founding Member badge!');
+             // Toast will show automatically from founding-member-tracker.js
+-- 
+2.43.0
+

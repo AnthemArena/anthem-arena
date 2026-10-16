@@ -18,6 +18,9 @@ export default async (request, context) => {
   const url = new URL(request.url);
   const pathname = url.pathname;
   const matchId = url.searchParams.get('matchId');
+  // Optional ?tournament=<cupId> reads a past cup (profiles and stats history). Anything that is not a plain cup id is ignored.
+  const askedCup = url.searchParams.get('tournament');
+  const cup = askedCup && /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(askedCup) ? askedCup : TOURNAMENT;
 
    // ✅ NEW: Handle total votes endpoint
   if (pathname === "/api/total-votes") {
@@ -45,7 +48,7 @@ export default async (request, context) => {
   const bypassCache = url.searchParams.get('_refresh') !== null;
   
   // Create cache key including matchId if present
-  const cacheKey = matchId ? `${pathname}?matchId=${matchId}` : pathname;
+  const cacheKey = (matchId ? `${pathname}?matchId=${matchId}` : pathname) + (cup !== TOURNAMENT ? `#${cup}` : '');
   
   console.log(`📡 Edge request: ${cacheKey}${bypassCache ? ' (BYPASS)' : ''}`);
   
@@ -82,18 +85,18 @@ export default async (request, context) => {
     if (pathname === "/api/matches") {
       if (matchId) {
         // Get single match by ID
-        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${matchId}`;
+        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches/${matchId}`;
         fetchVotes = true; // ✅ Fetch votes for single match
       } else {
         // Get all matches
-        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
+        firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches`;
         fetchVotes = true; // ✅ Fetch votes for all matches
         isMatchList = true;
       }
     } else if (pathname.startsWith("/api/match/")) {
       // Alternative route: Get single match
       const pathMatchId = pathname.replace("/api/match/", "");
-      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches/${pathMatchId}`;
+      firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}/matches/${pathMatchId}`;
       fetchVotes = true; // ✅ Fetch votes for single match
     }
     
