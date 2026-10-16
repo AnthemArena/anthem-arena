@@ -26,7 +26,7 @@ def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
 
-def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None):
+def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None, path='/'):
     matches = [] if scenario == 'none' else json.load(open(f'{FIX}/{scenario}.json'))
     if mutate: matches = mutate(matches)
     ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale)
@@ -46,8 +46,8 @@ def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=N
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
         else: r.continue_()
     pg.route('**/*', route)
-    pg.goto(f'http://127.0.0.1:{PORT}/')
-    pg.wait_for_function("document.querySelectorAll('.home-pill').length && document.getElementById('homePill').textContent !== 'Loading…'", timeout=15000)
+    pg.goto(f'http://127.0.0.1:{PORT}{path}')
+    if path == '/': pg.wait_for_function("document.querySelectorAll('.home-pill').length && document.getElementById('homePill').textContent !== 'Loading…'", timeout=15000)
     pg.wait_for_timeout(300)
     return pg, errs
 
@@ -72,6 +72,12 @@ with sync_playwright() as p:
         check('latest results show', shown(pg, '#recent') and pg.locator('#recent li').count() >= 1)
         check('most voted edits shown once votes exist', 'Most voted' in txt(pg, '#popular') and pg.locator('#popular .edit-card').count() >= 1, txt(pg, '#popular')[:60])
         check('new edits shows 6', pg.locator('#newest .edit-card').count() == 6, pg.locator('#newest .edit-card').count())
+        check('results name the creators', pg.locator('#recent .result-text small').count() >= 2 and pg.locator('#recent .result-text small').first.inner_text().strip() != '')
+        check('edit cards open that edit in the gallery', pg.locator('#newest a.edit-card').first.get_attribute('href').startswith('/music-gallery?watch='))
+        check('hero buttons are on the first screen', pg.evaluate("document.querySelector('#homeActions a').getBoundingClientRect().bottom < window.innerHeight"))
+        if w < 500:
+            tops = pg.eval_on_selector_all('#homeStats div', 'els=>els.map(e=>Math.round(e.getBoundingClientRect().top))')
+            check('stats sit in one row on a phone', len(set(tops)) == 1, tops)
         check('no hashtags in any name', '#' not in pg.inner_text('main'))
         check('no old wording', not any(k in pg.inner_text('main') for k in OLD), pg.inner_text('main')[:150])
         check('title is Arcane Moments', 'Arcane Moments' in pg.title(), pg.title())
@@ -79,6 +85,14 @@ with sync_playwright() as p:
         check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
         pg.screenshot(path=f'{SHOTS}/{label}-live.png', full_page=True)
         pg.context.close()
+
+    print('--- gallery opens a linked edit ---')
+    first = json.loads(EDITS)[0]['id']
+    pg, errs = load(b, 'groups-mid-16', path=f'/music-gallery.html?watch={first}')
+    pg.wait_for_timeout(800)
+    check('player dialog is open for the linked edit', pg.evaluate("document.getElementById('watchDialog').open"))
+    check('it plays the right video', first in pg.evaluate("document.getElementById('watchFrame').src"), pg.evaluate("document.getElementById('watchFrame').src"))
+    pg.context.close()
 
     print('--- no matches built yet ---')
     pg, errs = load(b, 'none')

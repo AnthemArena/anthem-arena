@@ -19,7 +19,7 @@ let edits = [], state = null, cupName = '';
 const mini = (c) => `<span class="mini"><img src="${thumb(c.videoId)}" alt="" loading="lazy" decoding="async"><b>${esc(c.title)}</b><i>${esc(c.creator)}</i></span>`;
 
 function editCard(e, meta) {
-    return `<a class="edit-card" href="/music-gallery"><img src="${thumb(e.videoId)}" alt="" loading="lazy" decoding="async">
+    return `<a class="edit-card" href="/music-gallery?watch=${encodeURIComponent(e.id)}" aria-label="Watch ${esc(e.title)}"><img src="${thumb(e.videoId)}" alt="" loading="lazy" decoding="async">
         <b>${esc(e.title)}</b><i>${esc(e.creator)}</i><span class="edit-meta">${esc(meta)}</span></a>`;
 }
 
@@ -77,7 +77,7 @@ function render() {
 
     section('recent', 'Results', 'Latest results',
         s.recent.length ? `<ul class="result-list">${s.recent.map(r => r.winner ? `<li><a href="/vote?match=${encodeURIComponent(r.matchId)}"><span class="result-label">${esc(r.label)}</span>
-            <span class="result-text"><b>${esc(r.winner.title)}</b> beat ${esc(r.loser.title)}</span><span class="result-votes">${plural(r.total, 'vote')}</span></a></li>` : '').join('')}</ul>` : '',
+            <span class="result-text"><b>${esc(r.winner.title)}</b> <small>${esc(r.winner.creator)}</small> beat ${esc(r.loser.title)} <small>${esc(r.loser.creator)}</small></span><span class="result-votes">${plural(r.total, 'vote')}</span></a></li>` : '').join('')}</ul>` : '',
         '<a class="more" href="/matches">All matches</a>');
 
     const voted = s.topVoted;
