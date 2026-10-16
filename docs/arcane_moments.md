@@ -381,3 +381,13 @@ Files read: `champion-packs/*.json`, `js/champion-loader.js`, `js/achievements.j
 - Voters are identified by a `userId` in localStorage (with anonymous Firebase auth). A private window is a fresh voter for testing.
 - Tournament ID: `arcane-test-01` in `js/arcane-config.js`.
 - Handy commands: `git status`, `git add -u`, `git commit -m "…"`, `git push`. Delete patch files after applying.
+## Profile cup history (patch 1 of 2)
+
+People who vote in more than one cup keep their history. Votes were never deleted: the profile used to hide votes whose match was not in the active cup's match list, so after a cup switch everything looked empty.
+
+- `data/cups.json` lists the real cups (oldest first). Only listed cups count in history, so test cups are left out on purpose. **When you switch to a new cup, add it here** (`status: "active"`), and set the old one to `complete` with a `champion`. A test (`tools/test-cup-history-model.mjs`) fails if the active cup is missing.
+- `/api/matches?tournament=<cupId>` returns a past cup's matches (id format checked; cached separately). Default is still the active cup.
+- `js/cup-history-model.js` (pure, tested): per cup votes, participation, "picks that won"; lifetime votes, cups entered, average participation (a lifetime % would shrink every cup, so the average is used), pick accuracy.
+- Profile > Journey tab shows lifetime totals and one collapsible row per cup (`js/cup-history.js`, `css/cup-history.css`).
+- Still current-cup only by design: the Votes tab list and count, and the participation circle.
+- Patch 2 (next): stats page cup selector + all-time view (votes and voters per cup, biggest upsets, closest matches).

@@ -9,12 +9,14 @@ const API_BASE = '/api';
 /**
  * Fetch all matches (cached at Netlify edge)
  */
-export async function getAllMatches(bypassCache = false) {
+export async function getAllMatches(bypassCache = false, tournament = null) {
     try {
         console.log('Fetching matches from edge cache...');
         
-        const cacheBuster = bypassCache ? `?_refresh=${Date.now()}` : '';
-        const url = `${API_BASE}/matches${cacheBuster}`;
+        const params = [];
+        if (bypassCache) params.push(`_refresh=${Date.now()}`);
+        if (tournament) params.push(`tournament=${encodeURIComponent(tournament)}`);   // a past cup; default is the active cup
+        const url = `${API_BASE}/matches${params.length ? '?' + params.join('&') : ''}`;
         
         const response = await fetch(url, {
             headers: {
