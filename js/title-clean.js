@@ -32,3 +32,15 @@ export function shortTitle(title, max = 40) {
     const first = clean.split(/\s+[-\u2013\u2014]\s+|\s*\|\|?\s*/)[0].trim() || clean;
     return first.length > max ? first.slice(0, max - 1).trimEnd() + '\u2026' : first;
 }
+
+// Old posts and activity rows carry a SENTENCE with the raw titles already written into it ("chose Bro tried to rizz Jinx - JINX
+// EDIT #jinx over ..."). This swaps each known raw name inside the text for its short form, longest name first.
+//   tidyNames('chose A - EDIT #x over B', ['A - EDIT #x', 'B'])  ->  'chose A over B'
+export function tidyNames(text, names = [], max = 60) {
+    let out = String(text ?? '');
+    for (const raw of [...new Set(names.filter(n => typeof n === 'string' && n.trim()))].sort((a, b) => b.length - a.length)) {
+        const short = shortTitle(raw, max);
+        if (short && short !== raw) out = out.split(raw).join(short);
+    }
+    return out;
+}
