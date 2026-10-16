@@ -22,7 +22,9 @@ import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { cleanTitle } from './title-clean.js';
-import { renderChampionBubble } from './champion-bubble.js';
+import { renderChampionBubble, loadChampionPack } from './champion-bubble.js';
+import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, TAG_FOR_KEY } from './champion-modal.js';
+import { getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -974,7 +976,7 @@ async function checkVoteStatus() {
             <div style="font-size: 1.5rem;"><i class="fa-solid fa-check"></i></div>
                 <div>
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Vote Recorded</div>
-                    <div style="opacity: 0.9;">You voted for <strong>${escapeHtml(songName)}</strong></div>
+                    <div style="opacity: 0.9;">You voted for <strong>${escapeHtml(cleanTitle(songName))}</strong></div>
                 </div>
             </div>
         `;
@@ -1138,6 +1140,9 @@ function generateUsername() {
                 // the two columns below carry the names, so the heading is just a small label (the tab title keeps "A vs B")
                 matchTitle.textContent = `Match ${inGroup[1]}`;
                 matchTitle.classList.add('match-title--label');
+                // the label shares the badge row (MATCH 1 · Group B · time left) instead of stacking above it: saves ~45px
+                const row = document.querySelector('.vote-header .match-info');
+                if (row && matchTitle.parentElement !== row) row.prepend(matchTitle);
             } else {
                 matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
             }
@@ -1967,8 +1972,7 @@ console.log(
         // Reload with cache bypass to get fresh vote count
         await reloadMatchData(true);
 
-        // Show success notification
-        showNotification(`✅ Vote cast for "${songName}"!`, 'success');
+        // (no "Vote cast" toast here: the post-vote modal says it, and the toast used to sit on top of the modal)
 
         // Show voted indicator
         disableVoting(songId);
@@ -1979,6 +1983,9 @@ console.log(
 // ✅ Hide spinner before showing modal
         hideLoadingSpinner();
 
+        // the modal's "Next match" button reads the bar, so build the bar first
+        await loadOtherLiveMatches();
+
         // ✅ SAFETY CHECK: Ensure we have valid data before showing modal
         if (!songName || !songData || !xpData || !rank) {
             console.error('❌ Missing data for post-vote modal:', {
@@ -1987,16 +1994,13 @@ console.log(
                 xpData: !!xpData,
                 rank: !!rank
             });
-            showNotification('Vote recorded but modal failed to load', 'warning');
+            showNotification(`Vote cast for "${cleanTitle(songName || '')}"`, 'success');
         } else {
             // Show modal with correct numbers
             showPostVoteModal(songName, songData, xpData, rank);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
 
-
-        // Load other live matches
-        await loadOtherLiveMatches();
 
         console.log('✅ Vote submitted successfully!');
 
@@ -2433,41 +2437,15 @@ function updateVoteCountsUI() {
 
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `vote-toast vote-toast--${type}`;
+    notification.setAttribute('role', 'status');
     notification.textContent = message;
-
-    const bgColor = {
-        'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
-        'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
-        'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
-    }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
-
-    notification.style.cssText = `
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        background: ${bgColor};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        font-family: 'Lora', serif;
-        font-size: 0.95rem;
-        font-weight: 600;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    `;
-
+    // styled by .notification in css/arcane-theme.css (pink, top of the screen, clear of the modal's buttons and the bottom bars)
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
+        notification.classList.add('vote-toast--out');
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
@@ -2557,7 +2535,7 @@ function showNotification(message, type = 'success') {
  * @param {object} xpData - XP earned data from calculateVoteXP
  * @param {object} rank - User's rank data from getUserRank
  */
-function showPostVoteModal(songName, songData, xpData, rank) {
+async function showPostVoteModal(songName, songData, xpData, rank) {
 
     // ✨ Calculate voting situation
     // Prefer the explicit slot; fall back to seed only when both seeds exist and differ.
@@ -2888,106 +2866,38 @@ else {
 // ========================================
 // ✅ IMPROVED: XP EARNED SECTION
 // ========================================
-let xpSection = `
-    <div class="xp-earned-section">
-        <div class="xp-header">
-        <span class="xp-icon"><i class="fa-solid fa-sparkles"></i></span>
-            <div class="xp-details">
-                <div class="xp-amount">+${xpData.totalXP} XP Earned!</div>
-                <div class="xp-breakdown">
-                    <span class="xp-base">+${xpData.baseXP} Base vote</span>
-                    ${xpData.bonuses.length > 0 ? `
-                        ${xpData.bonuses.map(bonus => `
-                            <span class="xp-bonus surprise">
-                                🎁 +${bonus.xp} ${bonus.type}
-                            </span>
-                        `).join('')}
-                    ` : ''}
-                </div>
-            </div>
-        </div>
+// The cup champion answers the vote (lines per kind of vote live in champion-packs/<id>.json under "modal")
+    const championId = getCupChampionId();
+    const meta = getCompanionPack(championId);
+    const champKey = meta?.championId || 'Jinx';
+    const pack = await loadChampionPack(championId);
+    const userVotesMap = (() => { try { return JSON.parse(localStorage.getItem('userVotes') || '{}'); } catch (e) { return {}; } })();
+    const modalKey = pickModalKey({
+        isFirstEver: Object.keys(userVotesMap).length <= 1,
+        streak: parseInt(localStorage.getItem('votingStreak') || '0', 10),
+        isUnderdog: checkIfUnderdog(votedFor === 'song1'),
+        isEarly: isEarlyVoting,
+        situationType
+    });
+    const prettyName = cleanTitle(songName);
+    const skin = pack?.portrait?.skin ?? 0;
+    const line = chooseModalLine(pack, modalKey,
+        { pick: prettyName.split(/\s+[-–—]\s+|\s*\|\|?\s*/)[0].trim() || prettyName, streak: localStorage.getItem('votingStreak') || '' },
+        currentMatch.id || '');
 
-        ${xpData.bonuses.length > 0 ? `
-            <div class="bonus-reveal">
-                <span class="reveal-icon">🎉</span>
-                <span class="reveal-text">
-                    Bonus! You earned ${xpData.bonuses.length} extra reward${xpData.bonuses.length === 1 ? '' : 's'}!
-                </span>
-            </div>
-        ` : ''}
+    // "Next match" comes from the same list the bar uses (loadOtherLiveMatches ran before this)
+    const nextEl = document.querySelector('#next-match-bar [data-next-match]');
+    const next = nextEl ? { href: nextEl.getAttribute('href'), label: 'Next match' } : null;
 
-        <div class="xp-progress-container">
-            <div class="xp-level-info">
-                <span class="xp-level-badge">${rank.currentLevel.title}</span>
-                <span class="xp-level-text">Level ${rank.currentLevel.level}</span>
-            </div>
-            ${rank.nextLevel ? `
-                <div class="xp-bar-wrapper">
-                    <div class="xp-bar" style="width: ${rank.progressPercentage}%"></div>
-                </div>
-                <div class="xp-next-level">
-                    ${rank.progressXP.toLocaleString()} / ${rank.xpForNextLevel.toLocaleString()} XP to Level ${rank.nextLevel.level}
-                </div>
-            ` : `
-                <div class="xp-max-level">🏆 Maximum Level Reached!</div>
-            `}
-        </div>
-    </div>
-`;
-
-    // ========================================
-// BMC SUPPORT SECTION
-// ========================================
-let bmcSection = `
-    <div class="bmc-support-section">
-        <div class="bmc-callout">
-            <span class="bmc-icon">☕</span>
-            <div class="bmc-text">
-                <strong>Enjoying the tournament?</strong>
-                <p>Help keep it running!</p>
-            </div>
-        </div>
-        <a href="https://ko-fi.com/arcanemoments" target="_blank" rel="noopener noreferrer" class="bmc-button">
-            Support on Ko-fi
-        </a>
-    </div>
-`;
-
-    // ========================================
-    // MODAL HTML
-    // ========================================
     const modal = document.getElementById('vote-modal');
-    modal.innerHTML = `
-        <div class="modal-overlay" onclick="closePostVoteModal()"></div>
-        <div class="modal-content post-vote-content ${situationType}">
-            <button class="modal-close" onclick="closePostVoteModal()">×</button>
-
-            <div class="modal-success-icon ${situationType}">
-                ${modalIcon}
-            </div>
-            <h2 class="modal-title">
-                ${modalTitle}
-            </h2>
-            ${successMessage}
-
-            ${xpSection}
-
-                    ${bmcSection}
-
-
-
-            ${shareMessage}
-
-            <div class="modal-actions">
-                <button class="modal-btn primary" onclick="closePostVoteModal()">
-                    Continue Voting
-                </button>
-                <a href="/matches.html" class="modal-btn secondary">
-                    View All Matches
-                </a>
-            </div>
-        </div>
-    `;
+    modal.innerHTML = buildPostVoteModalHtml({
+        situationType, line, tag: TAG_FOR_KEY[modalKey] || '', championName: pack?.name || champKey,
+        portraitUrl: getChampionTileUrl(champKey, skin), splashUrl: getChampionSplashUrl(champKey, skin),
+        voteTitle: prettyName, songNameRaw: songName, shareContext,
+        xp: xpData, rank, next, bracketHref: 'brackets'
+    });
+    const portraitImg = modal.querySelector('.pvm-portrait');
+    if (portraitImg) portraitImg.onerror = () => { portraitImg.onerror = null; portraitImg.src = getChampionTileUrl(champKey, 0); };
 
     modal.classList.add('active');
     modal.style.display = 'flex';

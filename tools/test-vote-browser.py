@@ -77,6 +77,8 @@ with sync_playwright() as p:
     print(f"        info: first vote button bottom at {round(vb['b'])}px (window 900px) with the page at the top")
     check('desktop: the player is on the first screen (at least 40% of it visible without scrolling)', w1['y'] + 0.4 * w1['h'] <= 900, w1)
     print(f"        info: desktop player top at {round(w1['y'])}px of 900px (was about 800px before this patch)")
+    check('desktop: the MATCH label shares the badge row (no extra line above the bubble)', pg.evaluate("document.querySelector('.match-info .match-title--label') !== null") , None)
+    check('desktop: the portrait shows its "another line" badge', pg.evaluate("getComputedStyle(document.querySelector('.cb-portrait'), '::after').content") not in ('none', 'normal', '""'))
     check('desktop: no next-match bar before voting', pg.query_selector('#next-match-bar') is None)
     # the cup champion's speech bubble: visible, says something, and says nothing about the standings before a vote
     check('desktop: the champion bubble is shown with a line', pg.is_visible('#champion-bubble .cb-text') and len(pg.inner_text('#champion-bubble .cb-text').strip()) > 10, pg.inner_text('#champion-bubble'))
@@ -171,6 +173,27 @@ with sync_playwright() as p:
         check(f'voted ({tag}): the bubble now talks about your pick ("voted-..." state)', (vst or '').startswith('voted-'), vst)
         sec = pg.inner_text('#other-matches-section h2') if pg.query_selector('#other-matches-section h2') else ''
         check(f'voted ({tag}): the "More Matches" list agrees ({EXPECT_LEFT})', f'{EXPECT_LEFT} More Matches' in sec, sec)
+        # the post-vote modal, built by the same module vote.js uses, shown over the real page with the real stylesheet
+        pg.evaluate("""async () => {
+            const m = await import('/js/champion-modal.js');
+            const pack = await (await fetch('/champion-packs/jinx.json')).json();
+            const modal = document.getElementById('vote-modal');
+            modal.innerHTML = m.buildPostVoteModalHtml({ situationType: 'early', line: m.chooseModalLine(pack, 'early', {}, 'x'), tag: 'Early voter', championName: 'Jinx',
+                portraitUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Jinx_37.jpg', splashUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_37.jpg',
+                voteTitle: 'Bro tried to rizz Jinx', songNameRaw: 'Bro', shareContext: 'early',
+                xp: { totalXP: 40, baseXP: 10, bonuses: [{ type: 'First vote today', xp: 30 }] },
+                rank: { currentLevel: { title: 'Undercity Regular', level: 2 }, nextLevel: { level: 3 }, progressPercentage: 40, progressXP: 40, xpForNextLevel: 100 },
+                next: { href: 'vote?match=x', label: 'Next match' } });
+            modal.classList.add('active'); modal.style.display = 'flex';
+        }""")
+        pg.wait_for_timeout(400)
+        mp, ma = rect(pg, '.pvm-btn--primary'), rect(pg, '.pvm-btn--ghost')
+        check(f'modal ({tag}): "Next match" and "View all matches" are both on the first screen without scrolling', mp and ma and mp['b'] <= h and ma['b'] <= h, (mp, ma, h))
+        check(f'modal ({tag}): the modal fits inside the window width', (rect(pg, '.pvm')['r'] <= w + 1), rect(pg, '.pvm'))
+        check(f'modal ({tag}): the share row sits below the actions', rect(pg, '.pvm-share')['y'] > mp['b'], (rect(pg, '.pvm-share'), mp))
+        check(f'modal ({tag}): the champion line is shown and the old heading is gone', pg.is_visible('.pvm-line') and not pg.query_selector('.modal-title'))
+        pg.screenshot(path=f'{SHOTS}/vote-modal-{tag}.png')
+        pg.evaluate("closePostVoteModal()")
         pg.screenshot(path=f'{SHOTS}/vote-voted-{tag}.png')
         check(f'voted ({tag}): no errors from the new code', not [e for e in errs if 'next-match' in e or 'updateNextMatchBar' in e or 'unvotedLiveMatches' in e], errs)
         pg.context.close()
