@@ -6,6 +6,7 @@ import { db } from './firebase-config.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { getAllMatches } from './api-client.js';
+import { shortTitle } from './title-clean.js';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
 
@@ -807,12 +808,12 @@ async function loadRecentActivity() {
                     <img src="${avatarUrl}" alt="${activity.username}" class="activity-avatar-mini">
                     <div class="activity-info-mini">
                         <div class="activity-username">${activity.username}</div>
-                        <div class="activity-action">${action} ${truncate(activity.songTitle, 18)}</div>
+                        <div class="activity-action">${action} ${truncate(shortTitle(activity.songTitle, 40), 18)}</div>
                         <div class="activity-time">${timeAgo}</div>
                     </div>
                     ${thumbnailUrl ? `
                         <img src="${thumbnailUrl}" 
-                             alt="${activity.songTitle}" 
+                             alt="${shortTitle(activity.songTitle, 40)}" 
                              class="activity-song-thumbnail"
                              loading="lazy">
                     ` : ''}

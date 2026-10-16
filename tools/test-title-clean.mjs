@@ -1,7 +1,7 @@
 // Offline tests for js/title-clean.js and the real titles in data/edits.json.   node tools/test-title-clean.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { cleanTitle, shortTitle } from '../js/title-clean.js';
+import { cleanTitle, shortTitle, tidyNames } from '../js/title-clean.js';
 
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
@@ -67,6 +67,16 @@ test('shortTitle keeps the first part of a long edit title', () => {
     assert.equal(shortTitle('Jinx edit 💙🔥 #arcane #jinx'), 'Jinx edit 💙🔥');
     assert.equal(shortTitle(''), '');
     assert.equal(shortTitle('A'.repeat(60), 20), 'A'.repeat(19) + '…');
+});
+
+test('tidyNames swaps raw titles inside a saved sentence (old feed posts) for their short form', () => {
+    const a = 'Bro tried to rizz Jinx \u{1F480} - JINX EDIT || Britney Spears - Toxic #jinxedit #jinx #arcane #edit';
+    const b = 'Jinx edit \u{1F499}\u{1F525} #arcane #leagueoflegends #jinx';
+    assert.equal(tidyNames(`chose ${a} over ${b}`, [a, b]), 'chose Bro tried to rizz Jinx \u{1F480} over Jinx edit \u{1F499}\u{1F525}');
+    assert.equal(tidyNames(`voted for ${a}`, [a, undefined, null, '']), 'voted for Bro tried to rizz Jinx \u{1F480}');
+    assert.equal(tidyNames('no names here', [a]), 'no names here');
+    assert.equal(tidyNames('same ' + a + ' twice ' + a, [a, a]), 'same Bro tried to rizz Jinx \u{1F480} twice Bro tried to rizz Jinx \u{1F480}');
+    assert.equal(tidyNames(undefined, [a]), '');
 });
 
 console.log(`\n${passed} tests passed`);

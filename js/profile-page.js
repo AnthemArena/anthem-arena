@@ -17,6 +17,7 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
+import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 
 // ========================================
@@ -3007,7 +3008,9 @@ function renderProfilePostCard(post, isFeatured = false) {
 
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        const smartText = post.text || `voted for ${post.votedSongName || post.songTitle}`;
+        // saved sentences carry the raw titles (with hashtags): show the short names instead
+        const smartText = tidyNames(post.text || `voted for ${post.votedSongName || post.songTitle}`,
+            [post.votedSongName, post.opponentSongName, post.votedMomentName, post.opponentMomentName, post.songTitle]);
         return `
             <p class="post-text vote-text">
                 <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}

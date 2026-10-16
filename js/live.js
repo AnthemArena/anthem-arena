@@ -4,7 +4,7 @@
 // IMPORTS
 // ========================================
 import { getAllMatches } from './api-client.js';
-import { cleanTitle } from './title-clean.js';
+import { cleanTitle, shortTitle } from './title-clean.js';
 import { mountSay, pickLiveState, formatLeft } from './champion-says.js';
 
 
@@ -120,7 +120,7 @@ function displayActivityInTicker(activity) {
     
     const username = activity.username || 'Someone';
     const timeAgo = getTimeAgo(activity.timestamp);
-    const songName = activity.votedForName || activity.songTitle || 'a song';
+    const songName = shortTitle(activity.votedForName || activity.songTitle || 'a song', 50);
     
     tickerText.innerHTML = `
         <strong>${escapeHtml(username)}</strong> voted for 
