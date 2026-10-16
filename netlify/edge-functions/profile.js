@@ -6,6 +6,31 @@
 const CACHE_DURATION = 30; // 30 seconds
 const FIREBASE_PROJECT = "arcane-moments";
 
+// ---- Firestore REST access --------------------------------------------------------------------------------------
+// Requests with no API key are anonymous: Google throttles them per source address, and Netlify's edge servers share
+// addresses with many other sites, which is how /api/matches began answering 429 Too Many Requests while the site's own
+// reads (and the daily quota) were fine. Sending the project's web key makes the call count against this project.
+// If the key were ever blocked (403), the call is repeated without it, so this can only help, never break reads.
+// Read from the Netlify environment variable FIREBASE_WEB_API_KEY (Site configuration > Environment variables), not hardcoded.
+// If it is not set, requests go out without a key, exactly as before.
+const firestoreKey = () => (typeof Deno !== "undefined" && Deno.env?.get("FIREBASE_WEB_API_KEY")) || "";
+const SITE_ORIGIN = "https://arcanemoments.netlify.app/";
+async function fsFetch(url, init = {}) {
+  const key = firestoreKey();
+  if (!key) return fetch(url, init);
+  const keyed = url + (url.includes("?") ? "&" : "?") + "key=" + encodeURIComponent(key);
+  const headers = { ...(init.headers || {}), Referer: SITE_ORIGIN };
+  const response = await fetch(keyed, { ...init, headers });
+  if (response.status === 403) return fetch(url, init);
+  return response;
+}
+// Short, safe description of a failed Firestore response, so an error says WHY (quota, rate limit, rules...) and not just the code.
+async function describeFailure(response) {
+  let detail = "";
+  try { detail = (await response.clone().text()).replace(/\s+/g, " ").slice(0, 240); } catch { /* ignore */ }
+  return `${response.status} ${response.statusText}${detail ? " | " + detail : ""}`;
+}
+
 // Edge cache storage
 const edgeCache = new Map();
 
@@ -60,7 +85,7 @@ export default async (request, context) => {
     if (username) {
       const profileUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
       
-      const response = await fetch(profileUrl, {
+      const response = await fsFetch(profileUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,7 +141,7 @@ export default async (request, context) => {
       // Direct fetch by userId
       const profileUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/profiles/${userId}`;
       
-      const response = await fetch(profileUrl);
+      const response = await fsFetch(profileUrl);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -164,7 +189,7 @@ async function fetchProfileStats(userId) {
   const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
   
   try {
-    const response = await fetch(votesUrl, {
+    const response = await fsFetch(votesUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

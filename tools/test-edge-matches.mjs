@@ -6,6 +6,7 @@ import path from 'node:path';
 
 const file = process.argv[2] ? path.resolve(process.argv[2]) : new URL('../netlify/edge-functions/firebase-cache.js', import.meta.url).pathname;
 const handler = (await import(pathToFileURL(file).href)).default;
+globalThis.Deno = { env: { get: n => (n === 'FIREBASE_WEB_API_KEY' ? 'test-key-123' : undefined) } };   // what Netlify provides
 const quiet = () => { for (const k of ['log', 'warn', 'error', 'info']) console[k] = () => {}; };
 quiet();
 
@@ -116,6 +117,36 @@ await test('429 with a recent good copy: serves the stale copy instead of an err
 await test('429 with nothing cached is still an honest error', async () => {
     fakeFirestore(10, { rate429: 99 });
     const res = await call('&tournament=never-loaded'); assert.equal(res.status, 500); assert.match((await res.json()).error, /429/);
+});
+
+await test('every Firestore request carries the project key (anonymous calls were being throttled)', async () => {
+    const log = fakeFirestore(5);
+    await call('&tournament=key-cup');
+    assert.ok(log.length > 0 && log.every(r => r.search.includes('key=test-key-123')), JSON.stringify(log));
+});
+
+await test('with no key configured, requests go out without one (as before)', async () => {
+    const saved = globalThis.Deno; globalThis.Deno = { env: { get: () => undefined } };
+    const log = fakeFirestore(5); const res = await call('&tournament=nokey-cup');
+    globalThis.Deno = saved;
+    assert.equal(res.status, 200); assert.ok(log.every(r => !r.search.includes('key=')), JSON.stringify(log));
+});
+
+await test('if the key is refused (403) the same request is repeated without it', async () => {
+    const real = globalThis.fetch, seen = [];
+    fakeFirestore(5);
+    const inner = globalThis.fetch;
+    globalThis.fetch = async (url, init) => { seen.push(String(url)); return String(url).includes('key=') ? new Response('blocked', { status: 403 }) : inner(url, init); };
+    const res = await call('&tournament=blocked-key-cup');
+    assert.equal(res.status, 200); assert.equal((await res.json()).length, 5);
+    assert.ok(seen.some(u => u.includes('key=')) && seen.some(u => !u.includes('key=')));
+    globalThis.fetch = real;
+});
+
+await test('a failed Firestore call says why in the error (first part of the response body)', async () => {
+    globalThis.fetch = async () => new Response(JSON.stringify({ error: { status: 'RESOURCE_EXHAUSTED', message: 'Quota exceeded' } }), { status: 429, statusText: 'Too Many Requests' });
+    const res = await call('&tournament=why-cup');
+    assert.equal(res.status, 500); const msg = (await res.json()).error; assert.match(msg, /429/); assert.match(msg, /RESOURCE_EXHAUSTED/);
 });
 
 process.stdout.write(`\n${passed} tests passed\n`);
