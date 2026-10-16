@@ -75,16 +75,26 @@
 # REDIRECTS - ORDER MATTERS!
 # ========================================
 
-# Blog routes (MUST come before catch-all)
+# The blog was removed: send old links to the feed
 [[redirects]]
-  from = "/blog/:slug"
-  to = "/blog-post.html"
-  status = 200
+  from = "/blog/*"
+  to = "/feed"
+  status = 301
 
 [[redirects]]
   from = "/blog"
-  to = "/blog.html"
-  status = 200
+  to = "/feed"
+  status = 301
+
+[[redirects]]
+  from = "/blog.html"
+  to = "/feed"
+  status = 301
+
+[[redirects]]
+  from = "/blog-post.html"
+  to = "/feed"
+  status = 301
 
 # Profile routes with username
 [[redirects]]
