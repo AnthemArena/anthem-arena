@@ -109,6 +109,7 @@ async function loadGallery() {
 
         buildFilters();
         render();
+        openFromLink();
     } catch (err) {
         console.error('Gallery failed to load:', err);
         grid.innerHTML = '<div class="gallery-message"><h3>The gallery could not load</h3><p>Please check your connection and try again.</p><button type="button" class="gallery-retry" id="galleryRetry">Try again</button></div>';
@@ -245,6 +246,11 @@ function openWatch(id, trigger) {
     dialog.classList.toggle('is-wide', ar > 1.2);
     document.getElementById('watchFrame').src = `https://www.youtube.com/embed/${encodeURIComponent(e.videoId)}?autoplay=1&rel=0&playsinline=1`;
     dialog.showModal();
+}
+// /music-gallery?watch=<edit id> (links from the homepage) opens that edit's player straight away
+function openFromLink() {
+    const id = new URLSearchParams(location.search).get('watch');
+    if (id && ALL.some(x => x.id === id)) openWatch(id, null);
 }
 function closeWatch() {
     const dialog = document.getElementById('watchDialog');
