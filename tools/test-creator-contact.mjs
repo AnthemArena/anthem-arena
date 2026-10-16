@@ -19,6 +19,17 @@ test('an edit title is quoted in the message and survives odd characters', () =>
 test('the address is written in one file only (js/creator-contact.js), not in the pages', () => {
     for (const f of ['../music-gallery.html', '../about.html', '../js/footer.js', '../js/music-gallery.js']) assert.ok(!read(f).includes(CREATOR_EMAIL), f);
 });
+test('the old Anthem Arena address is gone everywhere', () => {
+    for (const f of ['../music-gallery.html', '../about.html', '../js/footer.js', '../js/creator-contact.js']) assert.ok(!read(f).includes('anthemarena@outlook.com'), f);
+});
+test('plain contact links get a plain mailto, removal links get the subject', () => {
+    const src = read('../js/creator-contact.js');
+    assert.match(src, /data-contact-mail/); assert.match(src, /mailto:\$\{CREATOR_EMAIL\}/);
+});
+test('the pages say the video is embedded from YouTube, not hosted here', () => {
+    assert.match(read('../music-gallery.html'), /do not host or copy any video/);
+    assert.match(read('../about.html'), /do not host, copy or\s+re-upload any video/);
+});
 test('the gallery, the About page and the footer all link creators to the right place', () => {
     assert.match(read('../music-gallery.html'), /data-creator-mail/); assert.match(read('../music-gallery.html'), /js\/creator-contact\.js/);
     assert.match(read('../about.html'), /id="creators"/); assert.match(read('../about.html'), /js\/creator-contact\.js/);

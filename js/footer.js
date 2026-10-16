@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
                 <div class="footer-contact">
-                    <a href="mailto:anthemarena@outlook.com" class="footer-email-link">
+                    <a href="/about#contact" data-contact-mail data-show-address class="footer-email-link">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
-                        <span>anthemarena@outlook.com</span>
+                        <span data-address>Email us</span>
                     </a>
                 </div>
 
@@ -219,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Insert footer into the page
     document.getElementById('footer-placeholder').innerHTML = footerHTML;
+    // the contact address lives in one file (js/creator-contact.js); this fills in the footer link once the footer exists
+    import('/js/creator-contact.js').then(m => m.wireCreatorLinks()).catch(() => {});
     
     // ========================================
     // ATTACH EVENT LISTENERS (After HTML is inserted)

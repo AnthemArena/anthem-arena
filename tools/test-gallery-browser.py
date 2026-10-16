@@ -73,6 +73,8 @@ with sync_playwright() as p:
         check(f'{tag}: status filter says "Finished their run", not "Eliminated"', 'Finished their run' in opts and 'Eliminated' not in opts, opts)
         href = pg.get_attribute('a[data-creator-mail]', 'href') or ''
         check(f'{tag}: the creator removal link is a mailto to the right address with a subject', href.startswith('mailto:arcanemomentsfanpage@gmail.com?subject=Edit%20removal%20request'), href)
+        fl = pg.locator('.footer-email-link')
+        check(f'{tag}: the footer email link points to the new address (filled in after the footer loads)', fl.count() == 1 and fl.get_attribute('href') == 'mailto:arcanemomentsfanpage@gmail.com' and 'arcanemomentsfanpage@gmail.com' in fl.inner_text(), (fl.get_attribute('href'), fl.inner_text()) if fl.count() else 'no footer link')
         cta = rect(pg, '.creators-btn')
         check(f'{tag}: the removal button is visible and fits the screen', cta and cta['x'] >= 0 and cta['r'] <= w, cta)
         pg.select_option('#statusFilter', 'eliminated'); pg.wait_for_timeout(300)
