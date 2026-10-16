@@ -40,6 +40,8 @@ export async function initFoundingMemberTracking(userId) {
  */
 export async function awardFoundingMemberBadge(userId) {
   try {
+    userId = userId || localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
+
     // Check if milestone reached
     const milestoneReached = localStorage.getItem(MILESTONE_REACHED_KEY);
     if (milestoneReached === 'true') {
@@ -56,6 +58,8 @@ export async function awardFoundingMemberBadge(userId) {
 
     // Award locally
     localStorage.setItem(LOCAL_FOUNDING_KEY, 'true');
+    // The XP is paid right here, so the page-load backfill must not pay it again.
+    localStorage.setItem('foundingMemberXPBackfilled', 'true');
 
     // Award XP
     const newXP = addXP(500, 'founding-member-achievement');
@@ -163,6 +167,18 @@ export async function backfillFoundingMemberXP() {
     const newXP = addXP(500, 'founding-member-achievement');
     localStorage.setItem('foundingMemberXPBackfilled', 'true');
     console.log(`✨ Backfilled 500 XP! New total: ${newXP} XP`);
+
+    // Older awards never reached the Firestore profile, so save the badge now.
+    try {
+      const uid = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
+      if (uid) {
+        await updateDoc(doc(db, 'profiles', uid), {
+          unlockedAchievements: arrayUnion(FOUNDING_MEMBER_ACHIEVEMENT_ID)
+        });
+      }
+    } catch (e) {
+      console.warn('Could not sync Founding Member badge to profile:', e.message);
+    }
 
     if (window.showBulletin) {
       window.showBulletin({
