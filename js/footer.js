@@ -170,6 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="footer-legal-links">
                 <a href="/about">About</a>
                 <span class="separator">•</span>
+                <a href="/about#creators">For creators</a>
+                <span class="separator">•</span>
                 <a href="/legal/privacy">Privacy</a>
                 <span class="separator">•</span>
                 <a href="/legal/terms">Terms</a>

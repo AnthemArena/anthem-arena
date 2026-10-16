@@ -54,6 +54,8 @@ def load(browser, width, height):
     pg.wait_for_timeout(3000)
     return pg, errs
 
+rect = lambda pg, sel: pg.evaluate(f"(()=>{{const e=document.querySelector({json.dumps(sel)});if(!e)return null;const r=e.getBoundingClientRect();return {{x:r.x,y:r.y,w:r.width,h:r.height,r:r.right,b:r.bottom}}}})()")
+
 with sync_playwright() as p:
     b = p.chromium.launch()
     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
@@ -69,6 +71,10 @@ with sync_playwright() as p:
         check(f'{tag}: no "1-2" style records anywhere in the grid', not re.search(r'(?<![\d:])\d\s*[–-]\s*\d(?![\d:])', txt), re.findall(r'.{0,12}\d\s*[–-]\s*\d.{0,12}', txt)[:3])
         opts = pg.eval_on_selector_all('#statusFilter option', 'els=>els.map(e=>e.textContent.trim())')
         check(f'{tag}: status filter says "Finished their run", not "Eliminated"', 'Finished their run' in opts and 'Eliminated' not in opts, opts)
+        href = pg.get_attribute('a[data-creator-mail]', 'href') or ''
+        check(f'{tag}: the creator removal link is a mailto to the right address with a subject', href.startswith('mailto:arcanemomentsfanpage@gmail.com?subject=Edit%20removal%20request'), href)
+        cta = rect(pg, '.creators-btn')
+        check(f'{tag}: the removal button is visible and fits the screen', cta and cta['x'] >= 0 and cta['r'] <= w, cta)
         pg.select_option('#statusFilter', 'eliminated'); pg.wait_for_timeout(300)
         only = pg.eval_on_selector_all('.edit-badge', 'els=>els.map(e=>e.textContent.trim())')
         check(f'{tag}: the "Finished their run" filter keeps only edits whose group is over and who did not go through', only and set(only) == {'Group stage'}, only)
