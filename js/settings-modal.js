@@ -926,6 +926,8 @@ await setDoc(doc(db, 'profiles', userId), {
 
     // Temporary compatibility field for legacy modules
     championPackId: companionId,
+    // true only when they picked a companion themselves; otherwise they follow the cup's champion
+    companionChosen: !!window.championLoader?.hasChosenCompanion?.(),
     banner: banner,
     bio: bio,
     socialLinks: socialLinks,

@@ -92,6 +92,12 @@
         </div>
         
         <h1 class="match-title" id="match-title"></h1>
+
+        <!-- the cup's champion comments on where you are in this match (js/champion-bubble.js); stays hidden until it has a line -->
+        <div class="champion-bubble" id="champion-bubble" hidden>
+            <button type="button" class="cb-portrait" aria-label="Hear another line"><img alt="" width="60" height="60"></button>
+            <div class="cb-speech" role="status" aria-live="polite"><p class="cb-text"></p></div>
+        </div>
         
      <div class="match-info">
     <div class="info-badge tournament" id="tournament-badge">

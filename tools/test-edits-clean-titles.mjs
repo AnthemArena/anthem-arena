@@ -42,7 +42,8 @@ test('the real data/edits.json: cleaning keeps every id and title, and only shor
         assert.deepEqual(restNew, restOld);
         assert.ok(a && a.length >= 3);
     });
-    assert.ok(r.changed.length > 0);
+    // the file may already have been cleaned (the owner ran --write), so check stability rather than 'something changed'
+    assert.equal(cleanEdits(r.edits).changed.length, 0);
 });
 
 test('command line: a dry run writes nothing, --write changes only titles, a reformatting file is refused', () => {

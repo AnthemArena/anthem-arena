@@ -22,6 +22,7 @@ import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { cleanTitle } from './title-clean.js';
+import { renderChampionBubble } from './champion-bubble.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -643,6 +644,9 @@ await trackMatchView(matchData.id || matchId);
 currentMatch = {
     id: matchData.id || matchData.matchId,
     round: matchData.round || 1,
+    winnerId: matchData.winnerId || null,              // video id of the winner on a finished match
+    stage: matchData.stage || null,                    // 'group' for group-stage matches
+    matchNumber: matchData.matchNumber || null,        // 1-6 within a group
     roundLabel: matchData.roundLabel || null,          // e.g. "Final", "Semi-finals", "Round of 16" (set by the bracket builder)
     tournamentName: matchData.tournamentName || null,  // e.g. "Arcane Test 01"
     status: matchData.status,
@@ -681,6 +685,7 @@ await checkVoteStatus();
 
 // Update page content
 await updatePageContent();
+updateChampionBubble();
 
 // ✅ NEW: Update vote counts UI AFTER page content is set
 if (hasVoted) {
@@ -1127,7 +1132,15 @@ function generateUsername() {
         // Update match title
         const matchTitle = document.getElementById('match-title');
         if (matchTitle) {
-            matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
+            // group matches are numbered within their group in the id ("...-group-B-match-3"); matchNumber is the cup-wide count
+            const inGroup = currentMatch.stage === 'group' ? String(currentMatch.id || '').match(/-match-(\d+)$/) : null;
+            if (inGroup) {
+                // the two columns below carry the names, so the heading is just a small label (the tab title keeps "A vs B")
+                matchTitle.textContent = `Match ${inGroup[1]}`;
+                matchTitle.classList.add('match-title--label');
+            } else {
+                matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
+            }
         }
 
         // Update tournament badge
@@ -2306,6 +2319,35 @@ function checkIfFirstVoter() {
 // ========================================
 // UPDATE VOTE COUNTS UI
 // ========================================
+// The cup champion's speech bubble: tell it where this viewer is in this match (js/champion-bubble.js)
+function updateChampionBubble() {
+    try {
+        if (!currentMatch?.competitor1 || !currentMatch?.competitor2) return;
+        const c1 = currentMatch.competitor1, c2 = currentMatch.competitor2;
+        const mine = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);   // 'song1' | 'song2' | null
+        const voted = !!(hasVoted || mine);
+        const pick = mine === 'song2' ? c2 : mine === 'song1' ? c1 : null;
+        const other = pick === c1 ? c2 : c1;
+        const v1 = c1.votes || 0, v2 = c2.votes || 0;
+        const winner = currentMatch.winnerId
+            ? (c1.videoId === currentMatch.winnerId ? c1 : c2.videoId === currentMatch.winnerId ? c2 : null)
+            : (v1 === v2 ? null : (v1 > v2 ? c1 : c2));
+        renderChampionBubble({
+            matchId: currentMatch.id,
+            status: currentMatch.status === 'completed' ? 'completed' : currentMatch.status === 'upcoming' ? 'upcoming' : 'live',
+            hasVoted: voted,
+            // standings are only handed over once the viewer has voted, as the page itself does
+            pickVotes: voted ? (pick || c1).votes || 0 : 0,
+            otherVotes: voted ? (pick ? other : c2).votes || 0 : 0,
+            total: voted || currentMatch.status === 'completed' ? (currentMatch.totalVotes || v1 + v2) : (currentMatch.totalVotes || 0),
+            endDate: currentMatch.endDate,
+            pickIsWinner: !!pick && winner === pick,
+            tied: !winner,
+            pickName: pick?.name, otherName: pick ? other.name : c2.name, winnerName: winner?.name
+        });
+    } catch (e) { console.warn('champion bubble skipped:', e); }
+}
+
 function updateVoteCountsUI() {
     // Safety check
     if (!currentMatch || !currentMatch.competitor1 || !currentMatch.competitor2) {
@@ -2378,6 +2420,7 @@ function updateVoteCountsUI() {
     }
 
     console.log('UI updated with current vote counts');
+    updateChampionBubble();
 }
 
     // ========================================

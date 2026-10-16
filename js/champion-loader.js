@@ -1,7 +1,9 @@
 import {
     COMPANION_PACKS,
-    getCompanionPack
+    getCompanionPack,
+    getCupChampionId
 } from './arcane-config.js';
+import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
 
 console.log('🎭 champion-loader.js loaded');
 
@@ -532,6 +534,8 @@ async function setUserCompanionPack(companionId) {
         await loadChampionPack(companionId);
 
         localStorage.setItem('companionId', companionId);
+        // an explicit pick from Settings: from now on this overrides the cup champion, even when it is Jinx
+        localStorage.setItem('companionChosen', 'true');
 
         // Keep the old key for compatibility while other files are migrated.
         localStorage.setItem('championPack', companionId);
@@ -544,12 +548,13 @@ async function setUserCompanionPack(companionId) {
     }
 }
 
+// The visitor's own pick, or the cup champion when they have not picked one (see js/companion-choice.js).
 function getUserCompanionPack() {
-    return (
-        localStorage.getItem('companionId') ||
-        localStorage.getItem('championPack') ||
-        'jinx'
-    );
+    return resolveCompanionId(localStorage, getCupChampionId());
+}
+
+function userHasChosenCompanion() {
+    return hasChosenCompanion(localStorage);
 }
 
 // Legacy compatibility wrappers.
@@ -564,12 +569,10 @@ const getUserChampionPack = getUserCompanionPack;
 async function initializeChampionPack() {
     let userChoice = getUserCompanionPack();
 
-    // New users start with Jinx as their default Arcane companion.
-    if (!localStorage.getItem('companionId')) {
-        userChoice = 'jinx';
-        localStorage.setItem('companionId', 'jinx');
-        localStorage.setItem('championPack', 'jinx');
-        console.log('🎪 First visit - setting Jinx as default companion!');
+    // Visitors who have not picked a companion follow the cup's champion. Nothing is written to storage for the
+    // default, so a later change of cup champion reaches them (a written default would look like their own choice).
+    if (!userHasChosenCompanion()) {
+        console.log(`🎪 No companion chosen - using the cup champion: ${userChoice}`);
     }
 
     console.log(`🎭 Initializing Arcane companion: ${userChoice}`);
@@ -594,6 +597,7 @@ window.championLoader = {
     // New Arcane terminology
     setUserCompanionPack,
     getUserCompanionPack,
+    hasChosenCompanion: userHasChosenCompanion,
 
     // Legacy compatibility
     setUserChampionPack,

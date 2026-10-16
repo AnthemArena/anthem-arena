@@ -410,8 +410,9 @@ function updateRoundBanner() {
 
     const matchWord = info.count === 1 ? 'match' : 'matches';
     banner.querySelector('.countdown-content').innerHTML = `
-        <i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong> • ${info.count} ${matchWord}${
-            info.endDate ? ' • Ends in <span id="countdownTimer">...</span>' : ' • Voting is open'}
+        <span class="cd-part"><i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong></span>
+        <span class="cd-part">${info.count} ${matchWord}</span>
+        ${info.endDate ? '<span class="cd-part">Ends in <span id="countdownTimer">...</span></span>' : '<span class="cd-part">Voting is open</span>'}
     `;
     banner.style.display = '';
 
