@@ -217,11 +217,15 @@ export function addXP(xpToAdd, source = 'vote') {
         
       // ✅ Show level-up toast notification
         if (window.showBulletin) {
+            const voiced = window.championLoader?.getAchievementMessage('level-up', {
+                rank: newRank.currentLevel.title, xp: xpToAdd
+            });
             window.showBulletin({
                 type: 'level-up',
-              message: `⬆️ New Arcane Rank!`,
-detail: `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
-cta: 'View Progress',
+                level: newLevel,
+                message: voiced?.message || `⬆️ New Arcane Rank!`,
+detail: voiced?.detail || `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
+cta: voiced?.cta || 'View Progress',
                 ctaAction: () => window.location.href = '/profile#votes',
                 duration: 5000
             });

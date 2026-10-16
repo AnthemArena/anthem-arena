@@ -1683,24 +1683,7 @@ body.theme-arcane .vote-toast--out { animation: pvmToastOut .3s ease both; }
 @keyframes pvmToastIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 @keyframes pvmToastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
 
-/* ---------- achievement / level-up / bulletin popups: pink instead of gold, clear of the bars and the Netlify badge ---------- */
-body.theme-arcane .bulletin-banner.achievement,
-body.theme-arcane .bulletin-banner.level-up {
-    border: 1px solid var(--border, rgba(255, 79, 180, .4)) !important;
-    box-shadow: 0 10px 34px rgba(0, 0, 0, .6), 0 0 30px rgba(255, 79, 180, .22) !important;
-    background: rgba(11, 13, 24, .97);
-}
-body.theme-arcane .bulletin-banner .achievement-toast { background: transparent !important; }
-body.theme-arcane .bulletin-banner .achievement-badge-large {
-    background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)); border-color: rgba(255, 255, 255, .25);
-    box-shadow: 0 4px 20px rgba(255, 79, 180, .4);
-}
-body.theme-arcane .bulletin-banner .achievement-label { color: var(--pink-bright, #ff70c3); font-family: var(--font, system-ui, sans-serif); }
-body.theme-arcane .bulletin-banner .achievement-title { color: var(--text, #f6f3f7) !important; font-family: var(--font, system-ui, sans-serif); }
-body.theme-arcane .bulletin-banner .achievement-cta {
-    background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)) !important; color: #160814 !important;
-    font-family: var(--font, system-ui, sans-serif); font-weight: 800; letter-spacing: .02em; text-transform: none;
-}
+/* achievement / level-up popups take the champion's splash and colours from the pack, like every other bulletin (global-notifications.js) */
 /* lift every popup above the "Next match" bar and the Netlify badge in the bottom-right */
 body.theme-arcane .bulletin-banner { bottom: 76px; }
 body.theme-arcane.has-next-bar .bulletin-banner { bottom: 7rem; }
@@ -1715,8 +1698,8 @@ body.theme-arcane .post-vote-content.pvm {
 }
 body.theme-arcane .pvm .modal-close { z-index: 3; color: #fff; background: rgba(0, 0, 0, .45); border-radius: 50%; width: 36px; height: 36px; top: .6rem; right: .6rem; font-size: 1.5rem; opacity: .9; }
 body.theme-arcane .pvm-hero {
-    position: relative; padding: 2.2rem 1.25rem 1.25rem;
-    background: linear-gradient(180deg, rgba(11, 13, 24, .35), rgba(11, 13, 24, .96)), var(--pvm-splash, none) center 22% / cover no-repeat, #120a18;
+    position: relative; padding: 4.2rem 1.25rem 1.1rem;
+    background: linear-gradient(180deg, rgba(11, 13, 24, 0) 0%, rgba(11, 13, 24, .55) 55%, rgba(11, 13, 24, .97) 100%), var(--pvm-splash, none) center 15% / cover no-repeat, #120a18;
 }
 body.theme-arcane .pvm-hero-row { display: flex; align-items: center; gap: .9rem; }
 body.theme-arcane .pvm-portrait {
@@ -1734,7 +1717,7 @@ body.theme-arcane .pvm-speech::before {
 }
 body.theme-arcane .pvm-line { margin: 0; font: 700 1.05rem/1.4 var(--font, system-ui, sans-serif); color: var(--text, #f6f3f7); }
 body.theme-arcane .pvm-body { padding: 1rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
-body.theme-arcane .pvm-voted { margin: 0; font: 500 .92rem/1.4 var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); }
+body.theme-arcane .pvm-voted { margin: 0; font: 500 .92rem/1.4 var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); text-align: center; }
 body.theme-arcane .pvm-voted strong { color: var(--text, #f6f3f7); }
 body.theme-arcane .pvm-tag {
     display: inline-block; margin-left: .35rem; padding: .12rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .04em;
@@ -1770,8 +1753,13 @@ body.theme-arcane .pvm-share-btn:hover { border-color: var(--pink-bright, #ff70c
 body.theme-arcane .pvm-kofi { margin-left: auto; font: 600 .78rem var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); text-decoration: underline; text-underline-offset: 3px; }
 body.theme-arcane .pvm-kofi:hover { color: var(--pink-bright, #ff70c3); }
 @media (max-width: 520px) {
-    body.theme-arcane .pvm-hero { padding: 2rem 1rem 1rem; }
+    body.theme-arcane .pvm-hero { padding: 3.4rem 1rem 1rem; }
     body.theme-arcane .pvm-line { font-size: .98rem; }
     body.theme-arcane .pvm-body { padding: .9rem 1rem 1rem; }
     body.theme-arcane .pvm-kofi { margin-left: 0; width: 100%; }
 }
+
+/* popups (alerts, achievements, level-ups): the site font instead of the old gold-theme serif; colours still come from the champion pack */
+body.theme-arcane .bulletin-banner .bulletin-message,
+body.theme-arcane .bulletin-banner .bulletin-toast-cta,
+body.theme-arcane .bulletin-banner .bulletin-toast-cta-secondary { font-family: var(--font, system-ui, sans-serif); }
