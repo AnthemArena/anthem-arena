@@ -6,7 +6,7 @@
 const CACHE_DURATION = 120; // 2 minutes
 const FIREBASE_PROJECT = "arcane-moments";
 // Keep in sync with ARCANE_CONFIG.tournamentId in js/arcane-config.js
-const TOURNAMENT = "group-test-01";
+const TOURNAMENT = "jinx-cup-1";
 
 // Edge cache storage
 const edgeCache = new Map();

@@ -3,7 +3,7 @@
 // ========================================
 
 export const ARCANE_CONFIG = {
-    tournamentId: 'group-test-01',
+    tournamentId: 'jinx-cup-1',
     tournamentName: 'Arcane Moments',
 
     // The character this cup is themed around. Drives the speech-bubble portrait and lines on the vote page, and the

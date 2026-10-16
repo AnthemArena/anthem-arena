@@ -41,7 +41,7 @@ service cloud.firestore {
     // (and ARCANE_CONFIG.tournamentId in js/arcane-config.js) when the
     // entries are reset under a new id.
     function activeTournament() {
-      return 'group-test-01';
+      return 'jinx-cup-1';
     }
 
     // TODO: replace with the admin account's UID
