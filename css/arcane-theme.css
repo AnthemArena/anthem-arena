@@ -1772,3 +1772,26 @@ body.theme-arcane .social-container > .champion-say { order: 2; }
 body.theme-arcane .social-container > .champion-say[hidden] { display: none; }
 body.theme-arcane .brackets-header + .champion-say, body.theme-arcane .brackets-header .champion-say { margin-top: .75rem; }
 body.theme-arcane #noMatches .champion-say { margin: 0 auto 1.25rem; }
+
+
+/* ---------- vote page: a closed or not-yet-open match shows a result, not a call to action ---------- */
+body.theme-arcane .vote-btn.is-closed,
+body.theme-arcane .vote-btn.is-closed:hover {
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: var(--text-dim, #b9a8c4);
+    filter: none;
+    opacity: .9;
+}
+body.theme-arcane .vote-btn.is-closed.is-winner,
+body.theme-arcane .vote-btn.is-closed.is-winner:hover {
+    background: rgba(255, 79, 180, .14);
+    border-color: var(--pink-bright, #ff6fc3);
+    color: var(--pink-bright, #ff6fc3);
+    box-shadow: 0 0 22px rgba(255, 79, 180, .35);
+    opacity: 1;
+}
+body.theme-arcane .vote-btn.is-closed .vote-text { text-transform: none; letter-spacing: .02em; }

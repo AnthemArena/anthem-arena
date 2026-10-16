@@ -221,8 +221,25 @@ with sync_playwright() as p:
     pg, errs = load(b, 1280, 900, voted=False, mid=done)
     check('finished match, not voted: the bubble says voting is over (closed-unvoted)', pg.get_attribute('#champion-bubble', 'data-state') == 'closed-unvoted', pg.get_attribute('#champion-bubble', 'data-state'))
     check('finished match: no page errors from the bubble', not [e for e in errs if 'bubble' in e.lower()], errs)
+    labels = pg.eval_on_selector_all('.vote-btn .vote-text', 'els=>els.map(e=>e.textContent.trim())')
+    check('finished match, not voted: the buttons show the result, not "Vote for ..."', sorted(labels) == ['Lost this match', 'Won this match'], labels)
+    check('finished match: both buttons are disabled, and exactly one is marked as the winner', pg.eval_on_selector_all('.vote-btn', 'els=>els.every(e=>e.disabled)') and pg.locator('.vote-btn.is-winner').count() == 1)
+    check('finished match: the winner button is the one for the match winner', pg.eval_on_selector('.vote-btn.is-winner', 'e=>e.dataset.competitor') in ('song1', 'song2'))
+    check('finished match: the percentages are visible', pg.eval_on_selector_all('.vote-stats', 'els=>els.every(e=>!e.classList.contains("hidden"))'))
+    errs_real = [e for e in errs if 'docChanges' not in e]   # the fake Firestore has no docChanges(); the notification listener asks for it
+    check('finished match: no page errors', not errs_real, errs_real)
     pg.screenshot(path=f'{SHOTS}/vote-closed.png')
+    pg.locator('#vote-btn-competitor1').scroll_into_view_if_needed(); pg.wait_for_timeout(300)
+    pg.screenshot(path=f'{SHOTS}/vote-closed-buttons.png')
     pg.context.close()
+
+    # ---------- a match that has not opened yet ----------
+    soon = next((m['matchId'] for m in matches if m['status'] == 'upcoming'), None)
+    if soon:
+        pg, errs = load(b, 1280, 900, voted=False, mid=soon)
+        labels = pg.eval_on_selector_all('.vote-btn .vote-text', 'els=>els.map(e=>e.textContent.trim())')
+        check('upcoming match: the buttons say voting opens soon and are disabled', labels == ['Voting opens soon', 'Voting opens soon'] and pg.eval_on_selector_all('.vote-btn', 'els=>els.every(e=>e.disabled)'), labels)
+        pg.context.close()
 
     b.close()
 

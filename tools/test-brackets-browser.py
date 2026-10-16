@@ -95,11 +95,15 @@ with sync_playwright() as p:
     pg.wait_for_timeout(1300); pg.screenshot(path=f'{SHOTS}/knockout-note.png')
     pg.click('.ko-note-btn'); check('note button goes back to the groups', vis(pg, '#groupStageSection') and not vis(pg, '#bracketSection') and pg.evaluate('location.hash') == '#groups')
 
-    # a finished match opens the results view (or at least does not navigate away) ; an open one links to the vote page
+    # a finished match is a plain link to its vote page (which shows the result); there is no separate results popup any more
     url0 = pg.url
-    pg.click('#group-A summary'); pg.click('#group-A .gs-match a >> nth=0'); time.sleep(0.3)
-    check('finished match click stays on the page (results view)', pg.url == url0, pg.url)
-    check('finished match click opens the results modal', pg.evaluate("(()=>{const m=document.querySelector('.modal, .match-modal, #matchModal, [class*=modal]');return !!m&&getComputedStyle(m).display!=='none'})()"), None)
+    pg.click('#group-A summary')
+    done_link = pg.locator('#group-A .gs-match a[data-status="completed"]').first
+    href = done_link.get_attribute('href') or ''
+    check('finished group match links to its vote page', href.startswith('vote?match='), href)
+    check('the old results popup is gone (no showMatchDetails, no #match-modal)', pg.evaluate("typeof window.showMatchDetails === 'undefined' && !document.getElementById('match-modal')"))
+    done_link.click(); pg.wait_for_timeout(600)
+    check('clicking a finished group match goes to its vote page', 'vote?match=' in pg.url and pg.url != url0, pg.url)
     check('no uncaught page errors (group cup)', not [e for e in errs if 'notification' not in e.lower()], errs)
     pg.context.close()
 
@@ -167,36 +171,6 @@ with sync_playwright() as p:
     check('phone: the three filter chips share one row', pg.eval_on_selector_all('.gs-chip', 'els=>new Set(els.map(e=>Math.round(e.getBoundingClientRect().top))).size') == 1)
     pg.click('.stage-tab[data-stage="knockout"]'); pg.wait_for_timeout(1300); pg.screenshot(path=f'{SHOTS}/knockout-note-phone.png')
     pg.context.close()
-    # ---------- closed-match modal (js/modal.js, css/modal.css): no Invalid Date, singular votes, portrait thumbnails, actions outside the body ----------
-    def one_vote(ms):
-        done = sorted([m for m in ms if m['stage'] == 'group' and m['status'] == 'completed'], key=lambda m: m['matchId'])[0]
-        done['date'] = 'TBD'; done['totalVotes'] = 1
-        done['song1']['votes'] = 1; done['song2']['votes'] = 0; done['winnerId'] = done['song1']['id']
-        return ms
-    for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
-        pg, errs = load(b, 'groups-mid-16', width=w, height=h, mutate=one_vote)
-        pg.click('#group-A summary'); pg.click('#group-A .gs-match a >> nth=0'); pg.wait_for_timeout(500)
-        mt = pg.inner_text('.modal-meta')
-        check(f'modal ({tag}): no "Invalid Date" for an unscheduled match', 'Invalid Date' not in mt, mt)
-        check(f'modal ({tag}): "1 total vote" and "1 vote" are singular', '1 total vote' in mt and '1 total votes' not in mt and '1 votes' not in pg.inner_text('.modal-body'), mt)
-        th = pg.eval_on_selector_all('.modal-video-thumbnail', 'els=>els.map(e=>{const r=e.getBoundingClientRect();return [Math.round(r.width),Math.round(r.height)]})')
-        check(f'modal ({tag}): thumbnails are portrait', len(th) == 2 and all(hh > ww for ww, hh in th), th)
-        geo = pg.evaluate("(()=>{const b=document.querySelector('.modal-body'),a=document.querySelector('.modal-actions'),c=document.querySelector('.modal-container');const br=b.getBoundingClientRect(),ar=a.getBoundingClientRect(),cr=c.getBoundingClientRect();return {outside:!b.contains(a),gap:ar.top-br.bottom,fits:cr.bottom<=innerHeight+1,link:(a.querySelector('a')||{}).href||''}})()")
-        check(f'modal ({tag}): action button sits below the scrolling body, not over it', geo['outside'] and geo['gap'] >= -1, geo)
-        check(f'modal ({tag}): fits the window and offers View match page', geo['fits'] and 'vote?match=' in geo['link'], geo)
-        order = pg.evaluate("(()=>{const c=document.querySelector('.modal-competitor');const r=c.querySelector('.modal-result').getBoundingClientRect().top,t=c.querySelector('.modal-video-thumbnail').getBoundingClientRect().top;return r<t})()")
-        check(f'modal ({tag}): result bars come before the thumbnail', order)
-        check(f'modal ({tag}): no winner tick after the title', pg.evaluate("getComputedStyle(document.querySelector('.modal-competitor.winner .competitor-name-modal'),'::after').content") in ('none', 'normal', '\"\"'))
-        vis = pg.evaluate("(()=>{const b=document.querySelector('.modal-body').getBoundingClientRect(),r=document.querySelector('.result-percentage').getBoundingClientRect();return {resultBottom:r.bottom,bodyBottom:b.bottom}})()")
-        check(f'modal ({tag}): the result is on the first screen (no scrolling needed to see the percentage)', vis['resultBottom'] <= vis['bodyBottom'] + 1, vis)
-        if tag == 'desktop':
-            tops = pg.eval_on_selector_all('.modal-video-thumbnail', 'els=>els.map(e=>Math.round(e.getBoundingClientRect().top))')
-            res = pg.eval_on_selector_all('.modal-result', 'els=>els.map(e=>Math.round(e.getBoundingClientRect().top))')
-            check('modal (desktop): both sides line up (results and thumbnails at the same height)', len(tops) == 2 and abs(tops[0] - tops[1]) <= 2 and abs(res[0] - res[1]) <= 2, (res, tops))
-        pg.screenshot(path=f'{SHOTS}/modal-closed-{tag}.png')
-        check(f'modal ({tag}): no page errors', not [e for e in errs if 'notification' not in e.lower()], errs)
-        pg.context.close()
-
     # ---------- voted state: the visitor's own picks (stored by vote.js as localStorage vote_<cup>_<matchId> = song1 | song2) ----------
     cup = [l for l in open(os.path.join(ROOT, 'js/arcane-config.js')).read().splitlines() if 'tournamentId:' in l][0].split("'")[1]
     live = [m for m in json.load(open(f'{FIX}/groups-mid-16.json')) if m['status'] == 'live' and m['stage'] == 'group']
