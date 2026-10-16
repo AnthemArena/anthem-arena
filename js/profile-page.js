@@ -2500,9 +2500,24 @@ async function calculateTournamentParticipation(userId) {
         const { getAllMatches } = await import('./api-client.js');
         const allMatches = await getAllMatches();
 
+        // Only matches that have opened can be voted on, so only those count. Measuring against all 384 group
+        // matches would leave everyone near 0% while the groups open one at a time.
         const tournamentMatches = allMatches.filter(
-            match => match.tournament === CURRENT_TOURNAMENT
+            match => match.tournament === CURRENT_TOURNAMENT && match.status !== 'upcoming'
         );
+
+        // Group stage matches all share round 1, so name that row from the matches themselves.
+        const roundLabels = {};
+        tournamentMatches.forEach(match => {
+            const num = parseInt(String(match.round ?? 1).replace(/\D/g, ''), 10) || 1;
+            if (!roundLabels[num]) roundLabels[num] = match.stage === 'group' ? 'Group stage' : (match.roundLabel || '');
+        });
+        // Under 1% would round to a flat 0%, which reads as "nothing". Show one decimal there instead.
+        const pctOf = (a, b) => {
+            if (!b) return 0;
+            const x = (a / b) * 100;
+            return x > 0 && x < 1 ? Math.max(0.1, Math.round(x * 10) / 10) : Math.round(x);
+        };
 
         console.log(
             `📊 Found ${tournamentMatches.length} matches in ${TOURNAMENT_NAME}`
@@ -2571,14 +2586,11 @@ async function calculateTournamentParticipation(userId) {
             .map(roundNumber => {
                 const total = matchesByRound[roundNumber];
                 const voted = votesByRound[roundNumber] || 0;
-                const percentage =
-                    total > 0
-                        ? Math.round((voted / total) * 100)
-                        : 0;
+                const percentage = pctOf(voted, total);
 
                 return {
                     round: roundNumber,
-                    roundName: getRoundName(roundNumber),
+                    roundName: roundLabels[roundNumber] || getRoundName(roundNumber),
                     voted,
                     total,
                     percentage
@@ -2588,10 +2600,7 @@ async function calculateTournamentParticipation(userId) {
         const totalPossible = tournamentMatches.length;
         const totalVotes = votedMatchIds.size;
 
-        const overallPercentage =
-            totalPossible > 0
-                ? Math.round((totalVotes / totalPossible) * 100)
-                : 0;
+        const overallPercentage = pctOf(totalVotes, totalPossible);
 
         return {
             tournamentId: CURRENT_TOURNAMENT,
@@ -2756,7 +2765,7 @@ function renderParticipationTab() {
     🎬 ${participation.tournamentName}
 </strong>
         </div>
-        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches in this tournament.</p>
+        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches open so far.</p>
     `;
     
     // Render rounds breakdown
