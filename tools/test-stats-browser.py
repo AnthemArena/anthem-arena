@@ -25,7 +25,7 @@ def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
 
-def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None):
+def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None, cups=None, past=None, query=''):
     matches = json.load(open(f'{FIX}/{scenario}.json'))
     if mutate: matches = mutate(matches)
     ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale)
@@ -37,6 +37,8 @@ def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=N
         if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
         elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
         elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
+        elif cups is not None and u.split('?')[0].endswith('/data/cups.json'): r.fulfill(body=json.dumps({'cups': cups}), content_type='application/json')
+        elif past is not None and u.split('?')[0].endswith('/api/matches') and 'tournament=' in u: r.fulfill(body=json.dumps(past.get(u.split('tournament=')[1].split('&')[0], [])), content_type='application/json', headers={'X-Cache': 'MOCK'})
         elif u.split('?')[0].endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
         elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
         elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
@@ -44,7 +46,7 @@ def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=N
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
         else: r.continue_()
     pg.route('**/*', route)
-    pg.goto(f'http://127.0.0.1:{PORT}/stats.html')
+    pg.goto(f'http://127.0.0.1:{PORT}/stats.html{query}')
     pg.wait_for_function("(()=>{const e=document.getElementById('pane-overview');return !!e && !e.hasAttribute('aria-busy')})()", timeout=15000)
     pg.wait_for_timeout(300)
     return pg, errs
@@ -95,7 +97,7 @@ with sync_playwright() as p:
         check('no sideways scroll (records)', noscroll(pg))
         pg.screenshot(path=f'{SHOTS}/{label}-records.png', full_page=True)
 
-        pg.keyboard.press('Control+Home'); pg.focus('#tab-records'); pg.keyboard.press('ArrowRight')
+        pg.keyboard.press('Control+Home'); pg.focus('#tab-allcups'); pg.keyboard.press('ArrowRight')
         check('arrow keys move between tabs', pg.evaluate("document.activeElement.id") == 'tab-overview')
         check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
         pg.context.close()
@@ -118,6 +120,26 @@ with sync_playwright() as p:
     tab(pg, 'groups')
     check('32 group cards on a phone', pg.locator('.group-card').count() == 32, pg.locator('.group-card').count())
     check('no sideways scroll (128 groups)', noscroll(pg))
+    pg.context.close()
+    print('--- two cups ---')
+    done = json.load(open(f'{FIX}/groups-done-16.json')); live = json.load(open(f'{FIX}/groups-mid-16.json'))
+    two = [{'id': 'old-cup', 'name': 'Old Cup', 'status': 'complete', 'startDate': '2026-09-01', 'champion': 'Someone'}, {'id': 'new-cup', 'name': 'New Cup', 'status': 'active', 'startDate': '2026-10-01'}]
+    pg, errs = load(b, 'groups-mid-16', cups=two, past={'old-cup': done})
+    check('picker appears with two cups', vis(pg, '#cupSelect') and pg.locator('#cupSelect option').count() == 2)
+    check('live cup is selected by default', pg.eval_on_selector('#cupSelect', 'e=>e.value') == 'new-cup')
+    tab(pg, 'allcups')
+    check('all cups lists both cups', pg.locator('.cup-row').count() == 2, pg.locator('.cup-row').count())
+    check('all cups totals add both cups', int(pg.inner_text('#pane-allcups .stat-card strong').replace(',', '')) > 0)
+    pg.screenshot(path=f'{SHOTS}/allcups.png', full_page=True)
+    pg.select_option('#cupSelect', 'old-cup'); pg.wait_for_timeout(500)
+    check('picking the old cup says it is finished', 'finished' in pg.inner_text('#statsUpdated').lower(), pg.inner_text('#statsUpdated'))
+    check('old cup has no vote links in records', pg.locator('#pane-records a.record-card').count() == 0)
+    check('no page errors with two cups', not errs, errs)
+    pg.context.close()
+    pg, errs = load(b, 'groups-mid-16', 375, 740, cups=two, past={'old-cup': done}, query='?cup=old-cup')
+    check('?cup= opens that cup', pg.eval_on_selector('#cupSelect', 'e=>e.value') == 'old-cup')
+    tab(pg, 'allcups')
+    check('no sideways scroll (all cups, phone)', noscroll(pg))
     pg.context.close()
     b.close()
 

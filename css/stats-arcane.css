@@ -105,3 +105,17 @@ a.record-card:hover { background: var(--pink-soft); }
     .page-stats .stats-tab { padding: .55rem .6rem; font-size: .88rem; }
     .page-stats .stats-tab i { display: none; }
 }
+
+/* ---- Cup picker and the All cups tab ---- */
+.page-stats .stats-cup-pick { display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 0; }
+.page-stats .stats-cup-pick label { color: var(--muted); font-size: .85rem; }
+.page-stats .stats-cup-pick select { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font: inherit; }
+.page-stats .cup-list { list-style: none; margin: 0; padding: 0; }
+.page-stats .cup-row { display: grid; grid-template-columns: 1fr repeat(3, auto); gap: 14px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.page-stats .cup-row:first-child { border-top: 0; }
+.page-stats .cup-row-main strong { display: block; color: var(--text); }
+.page-stats .cup-row-main span, .page-stats .cup-row-nums span { color: var(--muted); font-size: .8rem; }
+.page-stats .cup-row-nums { text-align: right; }
+.page-stats .cup-row-nums b { display: block; color: var(--pink-bright); }
+@media (max-width: 600px) { .page-stats .cup-row { grid-template-columns: 1fr 1fr 1fr; } .page-stats .cup-row-main { grid-column: 1 / -1; } .page-stats .cup-row-nums { text-align: left; } }
+.page-stats #pane-allcups .record-grid { margin-top: 16px; }

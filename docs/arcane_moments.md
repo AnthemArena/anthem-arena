@@ -390,4 +390,12 @@ People who vote in more than one cup keep their history. Votes were never delete
 - `js/cup-history-model.js` (pure, tested): per cup votes, participation, "picks that won"; lifetime votes, cups entered, average participation (a lifetime % would shrink every cup, so the average is used), pick accuracy.
 - Profile > Journey tab shows lifetime totals and one collapsible row per cup (`js/cup-history.js`, `css/cup-history.css`).
 - Still current-cup only by design: the Votes tab list and count, and the participation circle.
-- Patch 2 (next): stats page cup selector + all-time view (votes and voters per cup, biggest upsets, closest matches).
+- Patch 2 (done, below): stats page cup selector + All cups tab.
+
+## Stats: cup selector and All cups tab (patch 2 of 2)
+
+- With two or more cups in `data/cups.json`, the stats header shows a cup picker (also `?cup=<id>`). Picking a finished cup shows its final numbers on every tab; its records are not links, because finished cups have no vote page. The live cup still refreshes every minute.
+- New **All cups** tab: votes, cups and finished matches across every listed cup, a cup-by-cup table (votes, matches done, edits, champion) and the best records of all time (most voted match, closest finish, biggest landslide, biggest upset), each naming its cup.
+- New record **Biggest upset** (also on the Records tab): the lowest seed to beat a higher seed, by seed gap. Random-draw cups have no seeds, so it is simply absent there.
+- `compareCups()` in `js/stats-model.js`; a cup whose matches fail to load is listed as "Could not load", not fatal.
+- Not included: unique voters per cup. That needs a count of distinct voters from the votes collection, which the match list cannot give. Add it with a small edge endpoint if wanted.
