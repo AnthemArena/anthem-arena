@@ -1651,3 +1651,127 @@ body.theme-arcane .cb-text { margin: 0; font-family: var(--font); font-size: 1re
     body.theme-arcane .cb-speech { padding: .55rem .8rem; }
     body.theme-arcane .cb-text { font-size: .92rem; }
 }
+
+/* ========================================
+   17 Oct: POST-VOTE MODAL IN THE CHAMPION'S VOICE (js/champion-modal.js), TOAST + ACHIEVEMENT RESTYLE, BUBBLE TWEAKS
+   ======================================== */
+
+/* ---------- bubble tweaks ---------- */
+/* label shares the badge row */
+body.theme-arcane .match-info .match-title.match-title--label { margin: 0; display: inline-flex; align-items: center; align-self: center; }
+/* the portrait carries a small "another line" badge (it is a button; this tells people) */
+body.theme-arcane .cb-portrait { position: relative; overflow: visible; }
+body.theme-arcane .cb-portrait img { border-radius: 50%; }
+body.theme-arcane .cb-portrait::after {
+    content: '\21BB'; position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 800; line-height: 1;
+    background: var(--pink-bright); color: #160814; border: 2px solid var(--card, #0b0d18); pointer-events: none;
+}
+
+/* ---------- vote-page toasts (showNotification in js/vote.js) ---------- */
+body.theme-arcane .vote-toast {
+    position: fixed; top: 4.5rem; left: 50%; transform: translateX(-50%); z-index: 10001;
+    max-width: min(32rem, calc(100vw - 2rem)); padding: .7rem 1.1rem; border-radius: 999px;
+    font: 700 .9rem var(--font, system-ui, sans-serif); color: var(--text, #f6f3f7);
+    background: rgba(11, 13, 24, .96); border: 1px solid var(--border, rgba(255, 79, 180, .35));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 24px rgba(255, 79, 180, .18);
+    animation: pvmToastIn .25s ease both; text-align: center;
+}
+body.theme-arcane .vote-toast--error { border-color: rgba(255, 90, 90, .6); }
+body.theme-arcane .vote-toast--warning { border-color: rgba(255, 190, 80, .6); }
+body.theme-arcane .vote-toast--out { animation: pvmToastOut .3s ease both; }
+@keyframes pvmToastIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes pvmToastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
+
+/* ---------- achievement / level-up / bulletin popups: pink instead of gold, clear of the bars and the Netlify badge ---------- */
+body.theme-arcane .bulletin-banner.achievement,
+body.theme-arcane .bulletin-banner.level-up {
+    border: 1px solid var(--border, rgba(255, 79, 180, .4)) !important;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, .6), 0 0 30px rgba(255, 79, 180, .22) !important;
+    background: rgba(11, 13, 24, .97);
+}
+body.theme-arcane .bulletin-banner .achievement-toast { background: transparent !important; }
+body.theme-arcane .bulletin-banner .achievement-badge-large {
+    background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)); border-color: rgba(255, 255, 255, .25);
+    box-shadow: 0 4px 20px rgba(255, 79, 180, .4);
+}
+body.theme-arcane .bulletin-banner .achievement-label { color: var(--pink-bright, #ff70c3); font-family: var(--font, system-ui, sans-serif); }
+body.theme-arcane .bulletin-banner .achievement-title { color: var(--text, #f6f3f7) !important; font-family: var(--font, system-ui, sans-serif); }
+body.theme-arcane .bulletin-banner .achievement-cta {
+    background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)) !important; color: #160814 !important;
+    font-family: var(--font, system-ui, sans-serif); font-weight: 800; letter-spacing: .02em; text-transform: none;
+}
+/* lift every popup above the "Next match" bar and the Netlify badge in the bottom-right */
+body.theme-arcane .bulletin-banner { bottom: 76px; }
+body.theme-arcane.has-next-bar .bulletin-banner { bottom: 7rem; }
+@media (max-width: 520px) {
+    body.theme-arcane .bulletin-banner { right: 12px; left: 12px; width: auto; max-width: none; }
+}
+
+/* ---------- post-vote modal ---------- */
+body.theme-arcane .post-vote-content.pvm {
+    padding: 0; max-width: 520px; width: min(92vw, 520px); overflow-y: auto; overflow-x: hidden;
+    border: 1px solid var(--border, rgba(255, 79, 180, .35)); border-radius: 22px;
+}
+body.theme-arcane .pvm .modal-close { z-index: 3; color: #fff; background: rgba(0, 0, 0, .45); border-radius: 50%; width: 36px; height: 36px; top: .6rem; right: .6rem; font-size: 1.5rem; opacity: .9; }
+body.theme-arcane .pvm-hero {
+    position: relative; padding: 2.2rem 1.25rem 1.25rem;
+    background: linear-gradient(180deg, rgba(11, 13, 24, .35), rgba(11, 13, 24, .96)), var(--pvm-splash, none) center 22% / cover no-repeat, #120a18;
+}
+body.theme-arcane .pvm-hero-row { display: flex; align-items: center; gap: .9rem; }
+body.theme-arcane .pvm-portrait {
+    flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--pink-bright, #ff70c3); box-shadow: 0 0 0 4px rgba(255, 79, 184, .15), 0 6px 20px rgba(255, 79, 184, .3);
+}
+body.theme-arcane .pvm-speech {
+    position: relative; min-width: 0; padding: .75rem 1rem; border-radius: 16px;
+    background: rgba(11, 13, 24, .88); border: 1px solid var(--border, rgba(255, 79, 180, .35)); backdrop-filter: blur(6px);
+}
+body.theme-arcane .pvm-speech::before {
+    content: ''; position: absolute; left: -7px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+    background: rgba(11, 13, 24, .88); border-left: 1px solid var(--border, rgba(255, 79, 180, .35)); border-bottom: 1px solid var(--border, rgba(255, 79, 180, .35));
+    transform: rotate(45deg);
+}
+body.theme-arcane .pvm-line { margin: 0; font: 700 1.05rem/1.4 var(--font, system-ui, sans-serif); color: var(--text, #f6f3f7); }
+body.theme-arcane .pvm-body { padding: 1rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+body.theme-arcane .pvm-voted { margin: 0; font: 500 .92rem/1.4 var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); }
+body.theme-arcane .pvm-voted strong { color: var(--text, #f6f3f7); }
+body.theme-arcane .pvm-tag {
+    display: inline-block; margin-left: .35rem; padding: .12rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--pink-bright, #ff70c3); background: rgba(255, 79, 184, .14); border: 1px solid rgba(255, 79, 184, .4); white-space: nowrap;
+}
+body.theme-arcane .pvm-xp { padding: .85rem 1rem; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+body.theme-arcane .pvm-xp-row { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .75rem; }
+body.theme-arcane .pvm-xp-total { font: 800 1.35rem var(--font, system-ui, sans-serif); color: var(--pink-bright, #ff70c3); }
+body.theme-arcane .pvm-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+body.theme-arcane .pvm-chip { padding: .15rem .6rem; border-radius: 999px; font: 700 .75rem var(--font, system-ui, sans-serif); color: var(--text, #f6f3f7); background: rgba(255, 255, 255, .08); }
+body.theme-arcane .pvm-chip--bonus { background: rgba(255, 79, 184, .18); color: #ffd6ee; }
+body.theme-arcane .pvm-level { margin-top: .6rem; font: 700 .85rem var(--font, system-ui, sans-serif); color: var(--text, #f6f3f7); }
+body.theme-arcane .pvm-level small { font-weight: 500; color: var(--muted, #b7b2bc); }
+body.theme-arcane .pvm-bar { margin-top: .4rem; height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+body.theme-arcane .pvm-bar span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--pink, #ff4fb4), var(--pink-bright, #ff70c3)); }
+body.theme-arcane .pvm-level-next { margin-top: .35rem; font: 500 .75rem var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); }
+body.theme-arcane .pvm-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+body.theme-arcane .pvm-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 48px; padding: .7rem 1.2rem; border-radius: 999px;
+    font: 800 .95rem var(--font, system-ui, sans-serif); text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+body.theme-arcane .pvm-btn--primary { flex: 1 1 11rem; background: linear-gradient(135deg, var(--pink-bright, #ff70c3), var(--pink, #ff4fb4)); color: #160814; border: 0; box-shadow: 0 8px 24px rgba(255, 79, 184, .35); }
+body.theme-arcane .pvm-btn--ghost { flex: 1 1 8rem; color: var(--text, #f6f3f7); background: transparent; border: 1px solid rgba(255, 255, 255, .22); }
+body.theme-arcane .pvm-btn:focus-visible, body.theme-arcane .pvm-share-btn:focus-visible { outline: 2px solid var(--pink-bright, #ff70c3); outline-offset: 3px; }
+body.theme-arcane .pvm-btn--ghost:hover { border-color: var(--pink-bright, #ff70c3); }
+body.theme-arcane .pvm-share { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem .5rem; padding-top: .75rem; border-top: 1px solid rgba(255, 255, 255, .08); }
+body.theme-arcane .pvm-share-label { font: 700 .72rem var(--font, system-ui, sans-serif); letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #b7b2bc); margin-right: .2rem; }
+body.theme-arcane .pvm-share-btn {
+    padding: .35rem .75rem; border-radius: 999px; font: 600 .78rem var(--font, system-ui, sans-serif); cursor: pointer;
+    color: var(--text, #f6f3f7); background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .14);
+}
+body.theme-arcane .pvm-share-btn:hover { border-color: var(--pink-bright, #ff70c3); }
+body.theme-arcane .pvm-kofi { margin-left: auto; font: 600 .78rem var(--font, system-ui, sans-serif); color: var(--muted, #b7b2bc); text-decoration: underline; text-underline-offset: 3px; }
+body.theme-arcane .pvm-kofi:hover { color: var(--pink-bright, #ff70c3); }
+@media (max-width: 520px) {
+    body.theme-arcane .pvm-hero { padding: 2rem 1rem 1rem; }
+    body.theme-arcane .pvm-line { font-size: .98rem; }
+    body.theme-arcane .pvm-body { padding: .9rem 1rem 1rem; }
+    body.theme-arcane .pvm-kofi { margin-left: 0; width: 100%; }
+}
