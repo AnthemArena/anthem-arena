@@ -10,8 +10,8 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-10-10",
-    "views": 4165,
-    "likes": 225,
+    "views": 4208,
+    "likes": 226,
     "duration": 15,
     "embedAllowed": true,
     "group": "caitlyn",
@@ -23,12 +23,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "qkkJAKVpmds",
@@ -73,8 +73,8 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-03-20",
-    "views": 506750,
-    "likes": 33880,
+    "views": 506802,
+    "likes": 33885,
     "duration": 29,
     "embedAllowed": true,
     "group": "ekkoandjinx",
@@ -105,8 +105,8 @@
     "channelId": "UC70oKLUP_MLfQDgzdS3mFMw",
     "year": 2024,
     "uploadDate": "2024-11-26",
-    "views": 6952820,
-    "likes": 409699,
+    "views": 6954981,
+    "likes": 409779,
     "duration": 55,
     "embedAllowed": true,
     "group": "ekkoandjinx",
@@ -137,8 +137,8 @@
     "channelId": "UCJd9SdUF48ZKDifyoQM-Naw",
     "year": 2025,
     "uploadDate": "2025-03-24",
-    "views": 341662,
-    "likes": 12841,
+    "views": 341758,
+    "likes": 12844,
     "duration": 29,
     "embedAllowed": true,
     "group": "ekkoandjinx",
@@ -169,9 +169,41 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2024,
     "uploadDate": "2024-11-29",
-    "views": 6049068,
-    "likes": 476372,
+    "views": 6049359,
+    "likes": 476385,
     "duration": 46,
+    "embedAllowed": true,
+    "group": "ekkoandjinx",
+    "characters": [
+      "Ekko",
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "Sx4N8axiZQw",
+    "videoId": "Sx4N8axiZQw",
+    "title": "Someone very special... - Jinx & Ekko Edit (\"Arcane Season 2\")｜Narvent - Her Eyes",
+    "shortTitle": "Someone very special... - Jinx & Ekko Edit (\"Arcane Season 2\")｜Narvent - Her Eyes",
+    "slug": "someone-very-special-jinx-ekko-edit-arcane-season-2narvent-h",
+    "artist": "Sunzyel",
+    "creatorUrl": "https://www.youtube.com/channel/UCJW95vNauvclIsVbDGE7IbQ",
+    "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
+    "year": 2024,
+    "uploadDate": "2024-11-25",
+    "views": 497591,
+    "likes": 49318,
+    "duration": 34,
     "embedAllowed": true,
     "group": "ekkoandjinx",
     "characters": [
@@ -191,6 +223,35 @@
     "aspectSource": "api"
   },
   {
+    "id": "jcAZiIU8rTY",
+    "videoId": "jcAZiIU8rTY",
+    "title": "YESS FELICIA #arcaneleagueoflegends #leagueoflegends #jinxarcane #arcane #viarcane",
+    "shortTitle": "YESS FELICIA",
+    "slug": "yess-felicia-arcaneleagueoflegends-leagueoflegends-jinxarcan",
+    "artist": "Dew Asia",
+    "creatorUrl": "https://www.youtube.com/channel/UCb8iIFUB-QH7WQBVkQQYQBw",
+    "channelId": "UCb8iIFUB-QH7WQBVkQQYQBw",
+    "year": 2026,
+    "uploadDate": "2026-09-24",
+    "views": 606955,
+    "likes": 44960,
+    "duration": 12,
+    "embedAllowed": true,
+    "group": "felicia",
+    "characters": [],
+    "charactersSource": "title",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
     "id": "kZ2QbZ8BRv4",
     "videoId": "kZ2QbZ8BRv4",
     "title": "Let The World Burn Ft. Isha [AMV] | Arcane Season 2 #arcane #animeedit",
@@ -201,8 +262,8 @@
     "channelId": "UCGJNlfc99FTQcoiNhwise1Q",
     "year": 2024,
     "uploadDate": "2024-11-25",
-    "views": 1754769,
-    "likes": 59078,
+    "views": 1755030,
+    "likes": 59082,
     "duration": 16,
     "embedAllowed": true,
     "group": "isha",
@@ -214,12 +275,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "HllpbaKvsmo",
@@ -294,8 +355,8 @@
     "channelId": "UCp2jIoQ7kwo3G_0P2PM4uTg",
     "year": 2024,
     "uploadDate": "2024-07-12",
-    "views": 1056875,
-    "likes": 27174,
+    "views": 1057065,
+    "likes": 27182,
     "duration": 12,
     "embedAllowed": true,
     "group": "jinx",
@@ -304,7 +365,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "arcane-test-01"
+      "arcane-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -327,8 +389,8 @@
     "channelId": "UCxuRTYjrvNKcrg4bxr2nkiw",
     "year": 2025,
     "uploadDate": "2025-03-27",
-    "views": 4881207,
-    "likes": 145925,
+    "views": 4881625,
+    "likes": 145936,
     "duration": 23,
     "embedAllowed": true,
     "group": "jinx",
@@ -338,7 +400,8 @@
     "charactersSource": "heading",
     "tournaments": [
       "arcane-test-01",
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -361,8 +424,8 @@
     "channelId": "UCp2jIoQ7kwo3G_0P2PM4uTg",
     "year": 2024,
     "uploadDate": "2024-07-16",
-    "views": 49079,
-    "likes": 2615,
+    "views": 49080,
+    "likes": 2616,
     "duration": 23,
     "embedAllowed": true,
     "group": "jinx",
@@ -370,7 +433,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -401,7 +466,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -463,7 +530,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -485,7 +554,7 @@
     "channelId": "UCp2jIoQ7kwo3G_0P2PM4uTg",
     "year": 2024,
     "uploadDate": "2024-07-16",
-    "views": 33716,
+    "views": 33717,
     "likes": 3540,
     "duration": 15,
     "embedAllowed": true,
@@ -494,7 +563,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -525,7 +596,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -556,7 +629,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -587,7 +662,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -609,7 +686,7 @@
     "channelId": "UCAuE9oej-HBmmx8UbowgpgA",
     "year": 2025,
     "uploadDate": "2025-10-15",
-    "views": 48480,
+    "views": 48481,
     "likes": 4605,
     "duration": 59,
     "embedAllowed": true,
@@ -618,7 +695,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -640,8 +719,8 @@
     "channelId": "UCortQmEEnbVhsAwTLXLbTsw",
     "year": 2025,
     "uploadDate": "2025-01-31",
-    "views": 757144,
-    "likes": 24586,
+    "views": 757272,
+    "likes": 24599,
     "duration": 14,
     "embedAllowed": true,
     "group": "jinx",
@@ -649,7 +728,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -671,8 +752,8 @@
     "channelId": "UC-gtuIjADUL3Aq43qo5HHEQ",
     "year": 2026,
     "uploadDate": "2026-08-30",
-    "views": 502770,
-    "likes": 8825,
+    "views": 504098,
+    "likes": 8844,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -680,7 +761,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -702,8 +785,8 @@
     "channelId": "UCGE0kPeIEHK0qD8F6eR2_EA",
     "year": 2025,
     "uploadDate": "2025-08-04",
-    "views": 111954,
-    "likes": 4324,
+    "views": 112007,
+    "likes": 4326,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -711,7 +794,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -733,8 +818,8 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-09-07",
-    "views": 54583,
-    "likes": 2233,
+    "views": 54633,
+    "likes": 2234,
     "duration": 17,
     "embedAllowed": true,
     "group": "jinx",
@@ -742,7 +827,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -764,8 +851,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2025,
     "uploadDate": "2025-01-16",
-    "views": 923565,
-    "likes": 53120,
+    "views": 923644,
+    "likes": 53123,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -773,7 +860,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -795,7 +884,7 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-07-17",
-    "views": 381868,
+    "views": 381890,
     "likes": 21613,
     "duration": 33,
     "embedAllowed": true,
@@ -804,7 +893,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -826,8 +917,8 @@
     "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
     "year": 2026,
     "uploadDate": "2026-10-04",
-    "views": 102626,
-    "likes": 2818,
+    "views": 103218,
+    "likes": 2827,
     "duration": 17,
     "embedAllowed": true,
     "group": "jinx",
@@ -835,7 +926,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -857,8 +950,8 @@
     "channelId": "UCVq_Ef116yHdXNQ6lrnL-7g",
     "year": 2023,
     "uploadDate": "2023-05-24",
-    "views": 4801027,
-    "likes": 221736,
+    "views": 4801306,
+    "likes": 221737,
     "duration": 11,
     "embedAllowed": true,
     "group": "jinx",
@@ -867,7 +960,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -890,8 +984,8 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2024,
     "uploadDate": "2024-08-10",
-    "views": 843563,
-    "likes": 37767,
+    "views": 843645,
+    "likes": 37766,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -899,7 +993,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -921,8 +1017,8 @@
     "channelId": "UCkTZ4mjibq-m6n0DxEE6CZg",
     "year": 2026,
     "uploadDate": "2026-07-24",
-    "views": 48733,
-    "likes": 1764,
+    "views": 48748,
+    "likes": 1765,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -930,7 +1026,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -952,8 +1050,8 @@
     "channelId": "UCsPrCy58P1ZfKETXd0NT-ew",
     "year": 2025,
     "uploadDate": "2025-05-25",
-    "views": 1156883,
-    "likes": 46212,
+    "views": 1157077,
+    "likes": 46213,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -962,7 +1060,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -985,7 +1084,7 @@
     "channelId": "UC7C5yufUQ1wJYVtwXSWl7sQ",
     "year": 2025,
     "uploadDate": "2025-08-02",
-    "views": 332654,
+    "views": 332664,
     "likes": null,
     "duration": 43,
     "embedAllowed": true,
@@ -994,7 +1093,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1016,8 +1117,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-09-01",
-    "views": 1766407,
-    "likes": 122337,
+    "views": 1766468,
+    "likes": 122333,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -1026,7 +1127,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1049,7 +1151,7 @@
     "channelId": "UC-oLx-o9DNE7Oq0yWNe8ziw",
     "year": 2024,
     "uploadDate": "2024-11-11",
-    "views": 891242,
+    "views": 891310,
     "likes": 39200,
     "duration": 16,
     "embedAllowed": true,
@@ -1058,7 +1160,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1080,8 +1184,8 @@
     "channelId": "UC-FrDfyApA9CCbZ5CJ4z6fg",
     "year": 2025,
     "uploadDate": "2025-01-31",
-    "views": 1033875,
-    "likes": 38569,
+    "views": 1034103,
+    "likes": 38577,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -1089,7 +1193,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1111,8 +1217,8 @@
     "channelId": "UCNcB2MhgCYBgKXOhXX9ShCg",
     "year": 2025,
     "uploadDate": "2025-08-18",
-    "views": 484332,
-    "likes": 15435,
+    "views": 484372,
+    "likes": 15438,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -1120,7 +1226,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1142,8 +1250,8 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-05-29",
-    "views": 501738,
-    "likes": 19193,
+    "views": 501825,
+    "likes": 19196,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -1151,7 +1259,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1173,8 +1283,8 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2025,
     "uploadDate": "2025-07-16",
-    "views": 649825,
-    "likes": 20139,
+    "views": 649914,
+    "likes": 20137,
     "duration": 17,
     "embedAllowed": true,
     "group": "jinx",
@@ -1182,7 +1292,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1204,8 +1316,8 @@
     "channelId": "UCVq_Ef116yHdXNQ6lrnL-7g",
     "year": 2024,
     "uploadDate": "2024-04-14",
-    "views": 712606,
-    "likes": 28934,
+    "views": 712677,
+    "likes": 28933,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -1213,7 +1325,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1235,8 +1349,8 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-10-04",
-    "views": 47951,
-    "likes": 2434,
+    "views": 48340,
+    "likes": 2445,
     "duration": 16,
     "embedAllowed": true,
     "group": "jinx",
@@ -1244,7 +1358,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1266,8 +1382,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2024,
     "uploadDate": "2024-11-13",
-    "views": 847260,
-    "likes": 33566,
+    "views": 847340,
+    "likes": 33569,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -1275,7 +1391,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1297,8 +1415,8 @@
     "channelId": "UCsPrCy58P1ZfKETXd0NT-ew",
     "year": 2025,
     "uploadDate": "2025-06-22",
-    "views": 849546,
-    "likes": 34611,
+    "views": 849630,
+    "likes": 34615,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -1306,7 +1424,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1328,8 +1448,8 @@
     "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
     "year": 2025,
     "uploadDate": "2025-07-21",
-    "views": 310831,
-    "likes": 9480,
+    "views": 310857,
+    "likes": 9481,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -1337,7 +1457,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1359,7 +1481,7 @@
     "channelId": "UCyHwpMc9ynUijF4sXoC-Yuw",
     "year": 2024,
     "uploadDate": "2024-11-24",
-    "views": 2036369,
+    "views": 2036490,
     "likes": 79556,
     "duration": 10,
     "embedAllowed": true,
@@ -1369,7 +1491,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1392,8 +1515,8 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-05-28",
-    "views": 1169323,
-    "likes": 25783,
+    "views": 1169430,
+    "likes": 25784,
     "duration": 14,
     "embedAllowed": true,
     "group": "jinx",
@@ -1402,7 +1525,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1425,8 +1549,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-11-20",
-    "views": 5435578,
-    "likes": 344093,
+    "views": 5435785,
+    "likes": 344085,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -1435,7 +1559,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1458,8 +1583,8 @@
     "channelId": "UCnCcd3baUg8V7C50Cl2n09g",
     "year": 2024,
     "uploadDate": "2024-11-25",
-    "views": 1212598,
-    "likes": 79346,
+    "views": 1212764,
+    "likes": 79348,
     "duration": 50,
     "embedAllowed": true,
     "group": "jinx",
@@ -1468,7 +1593,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1491,7 +1617,7 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-06-29",
-    "views": 197205,
+    "views": 197367,
     "likes": 6923,
     "duration": 23,
     "embedAllowed": true,
@@ -1500,7 +1626,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1531,7 +1659,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1553,8 +1683,8 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-09-24",
-    "views": 236290,
-    "likes": 7489,
+    "views": 236335,
+    "likes": 7490,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -1562,7 +1692,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1584,8 +1716,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-07-02",
-    "views": 176939,
-    "likes": 6246,
+    "views": 177072,
+    "likes": 6254,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -1593,7 +1725,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1615,7 +1749,7 @@
     "channelId": "UCAuE9oej-HBmmx8UbowgpgA",
     "year": 2026,
     "uploadDate": "2026-07-12",
-    "views": 58962,
+    "views": 58964,
     "likes": 1749,
     "duration": 20,
     "embedAllowed": true,
@@ -1624,7 +1758,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1646,8 +1782,8 @@
     "channelId": "UCVq_Ef116yHdXNQ6lrnL-7g",
     "year": 2023,
     "uploadDate": "2023-06-06",
-    "views": 1318975,
-    "likes": 47599,
+    "views": 1319029,
+    "likes": 47597,
     "duration": 13,
     "embedAllowed": true,
     "group": "jinx",
@@ -1656,7 +1792,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1679,7 +1816,7 @@
     "channelId": "UCF17EMPK9eSXEtQw9cQP2tQ",
     "year": 2025,
     "uploadDate": "2025-09-16",
-    "views": 361939,
+    "views": 362006,
     "likes": 18856,
     "duration": 45,
     "embedAllowed": true,
@@ -1688,7 +1825,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1710,8 +1849,8 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-09-21",
-    "views": 35257,
-    "likes": 1385,
+    "views": 35323,
+    "likes": 1390,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -1719,7 +1858,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1741,7 +1882,7 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2025,
     "uploadDate": "2025-08-11",
-    "views": 968560,
+    "views": 968622,
     "likes": 34866,
     "duration": 16,
     "embedAllowed": true,
@@ -1750,7 +1891,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1772,7 +1915,7 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-06-19",
-    "views": 199801,
+    "views": 199950,
     "likes": 8988,
     "duration": 23,
     "embedAllowed": true,
@@ -1781,7 +1924,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1803,8 +1948,8 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2026,
     "uploadDate": "2026-07-27",
-    "views": 125771,
-    "likes": 5061,
+    "views": 125826,
+    "likes": 5060,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -1812,7 +1957,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1834,7 +1981,7 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-09-02",
-    "views": 523815,
+    "views": 523828,
     "likes": 25592,
     "duration": 31,
     "embedAllowed": true,
@@ -1843,7 +1990,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1865,8 +2014,8 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-04-26",
-    "views": 2033509,
-    "likes": 38597,
+    "views": 2033596,
+    "likes": 38598,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -1875,7 +2024,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -1898,8 +2048,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-09-04",
-    "views": 600992,
-    "likes": 39776,
+    "views": 601065,
+    "likes": 39775,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -1907,7 +2057,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1929,8 +2081,8 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-08-23",
-    "views": 43026,
-    "likes": 1741,
+    "views": 43048,
+    "likes": 1743,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -1938,7 +2090,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1960,8 +2114,8 @@
     "channelId": "UClLCjOvAT5XU894729icD0A",
     "year": 2024,
     "uploadDate": "2024-11-21",
-    "views": 310906,
-    "likes": 36416,
+    "views": 310910,
+    "likes": 36415,
     "duration": 49,
     "embedAllowed": true,
     "group": "jinx",
@@ -1969,7 +2123,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -1991,8 +2147,8 @@
     "channelId": "UCNGm8zDKJju2oFy_0lcGrZA",
     "year": 2025,
     "uploadDate": "2025-04-09",
-    "views": 406755,
-    "likes": 15135,
+    "views": 406783,
+    "likes": 15137,
     "duration": 28,
     "embedAllowed": true,
     "group": "jinx",
@@ -2000,7 +2156,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2022,7 +2180,7 @@
     "channelId": "UCrtZg-IuoCemnc10983HMJA",
     "year": 2025,
     "uploadDate": "2025-07-02",
-    "views": 208821,
+    "views": 208838,
     "likes": 4250,
     "duration": 11,
     "embedAllowed": true,
@@ -2031,7 +2189,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2053,7 +2213,7 @@
     "channelId": "UCiZLvvOHJB4UvnfoPnlT8XA",
     "year": 2022,
     "uploadDate": "2022-11-16",
-    "views": 710026,
+    "views": 710030,
     "likes": 48742,
     "duration": 35,
     "embedAllowed": true,
@@ -2062,7 +2222,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2084,8 +2246,8 @@
     "channelId": "UColsCByViyvYFZNlrvb28lw",
     "year": 2026,
     "uploadDate": "2026-05-26",
-    "views": 194256,
-    "likes": 10674,
+    "views": 194359,
+    "likes": 10677,
     "duration": 28,
     "embedAllowed": true,
     "group": "jinx",
@@ -2093,7 +2255,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2115,7 +2279,7 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-08-08",
-    "views": 216087,
+    "views": 216106,
     "likes": 8064,
     "duration": 15,
     "embedAllowed": true,
@@ -2124,7 +2288,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2146,8 +2312,8 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2025,
     "uploadDate": "2025-01-30",
-    "views": 51088,
-    "likes": 2468,
+    "views": 51129,
+    "likes": 2467,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -2155,7 +2321,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2177,8 +2345,8 @@
     "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
     "year": 2024,
     "uploadDate": "2024-12-19",
-    "views": 305697,
-    "likes": 25233,
+    "views": 305707,
+    "likes": 25231,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -2186,7 +2354,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2208,8 +2378,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-03-12",
-    "views": 1257520,
-    "likes": 66468,
+    "views": 1257653,
+    "likes": 66469,
     "duration": 27,
     "embedAllowed": true,
     "group": "jinx",
@@ -2218,7 +2388,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2241,8 +2412,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2025,
     "uploadDate": "2025-09-11",
-    "views": 323848,
-    "likes": 14515,
+    "views": 323877,
+    "likes": 14516,
     "duration": 35,
     "embedAllowed": true,
     "group": "jinx",
@@ -2250,7 +2421,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2272,8 +2445,8 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-07-31",
-    "views": 1039289,
-    "likes": 42566,
+    "views": 1039320,
+    "likes": 42568,
     "duration": 34,
     "embedAllowed": true,
     "group": "jinx",
@@ -2281,7 +2454,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2303,7 +2478,7 @@
     "channelId": "UCsPrCy58P1ZfKETXd0NT-ew",
     "year": 2025,
     "uploadDate": "2025-08-16",
-    "views": 311729,
+    "views": 311747,
     "likes": 7156,
     "duration": 17,
     "embedAllowed": true,
@@ -2312,7 +2487,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2334,8 +2511,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-09-25",
-    "views": 802715,
-    "likes": 45880,
+    "views": 802746,
+    "likes": 45882,
     "duration": 20,
     "embedAllowed": true,
     "group": "jinx",
@@ -2343,7 +2520,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2365,7 +2544,7 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2025,
     "uploadDate": "2025-02-12",
-    "views": 415257,
+    "views": 415280,
     "likes": 15041,
     "duration": 21,
     "embedAllowed": true,
@@ -2374,7 +2553,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2396,8 +2577,8 @@
     "channelId": "UC-gtuIjADUL3Aq43qo5HHEQ",
     "year": 2026,
     "uploadDate": "2026-09-23",
-    "views": 10827,
-    "likes": 488,
+    "views": 10855,
+    "likes": 489,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -2405,7 +2586,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2427,7 +2610,7 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-05-13",
-    "views": 1446167,
+    "views": 1446212,
     "likes": 40595,
     "duration": 17,
     "embedAllowed": true,
@@ -2437,7 +2620,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2460,8 +2644,8 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2023,
     "uploadDate": "2023-06-28",
-    "views": 6252336,
-    "likes": 371308,
+    "views": 6252392,
+    "likes": 371305,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -2470,7 +2654,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2493,8 +2678,8 @@
     "channelId": "UC1GvpVfQqj-zXyRQrH4HoTQ",
     "year": 2026,
     "uploadDate": "2026-09-24",
-    "views": 12180,
-    "likes": 705,
+    "views": 12227,
+    "likes": 709,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -2502,7 +2687,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2524,7 +2711,7 @@
     "channelId": "UCTUBWKDHZf65WDiZpslYGGQ",
     "year": 2025,
     "uploadDate": "2025-01-16",
-    "views": 3127687,
+    "views": 3128120,
     "likes": 143139,
     "duration": 23,
     "embedAllowed": true,
@@ -2534,7 +2721,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2557,8 +2745,8 @@
     "channelId": "UCia8_zTx28PDo0eXtjrBpaQ",
     "year": 2026,
     "uploadDate": "2026-07-10",
-    "views": 136861,
-    "likes": 3945,
+    "views": 136932,
+    "likes": 3944,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -2566,7 +2754,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2588,8 +2778,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2025,
     "uploadDate": "2025-10-29",
-    "views": 587217,
-    "likes": 14993,
+    "views": 587294,
+    "likes": 14996,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -2597,7 +2787,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2619,8 +2811,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-02-17",
-    "views": 1071411,
-    "likes": 64962,
+    "views": 1071488,
+    "likes": 64963,
     "duration": 31,
     "embedAllowed": true,
     "group": "jinx",
@@ -2629,7 +2821,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2652,8 +2845,8 @@
     "channelId": "UCNGm8zDKJju2oFy_0lcGrZA",
     "year": 2025,
     "uploadDate": "2025-04-04",
-    "views": 602889,
-    "likes": 16385,
+    "views": 602922,
+    "likes": 16383,
     "duration": 18,
     "embedAllowed": true,
     "group": "jinx",
@@ -2661,7 +2854,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2683,7 +2878,7 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-02-03",
-    "views": 454737,
+    "views": 454785,
     "likes": 33939,
     "duration": 41,
     "embedAllowed": true,
@@ -2692,7 +2887,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2714,8 +2911,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2025,
     "uploadDate": "2025-10-07",
-    "views": 388493,
-    "likes": 11008,
+    "views": 388545,
+    "likes": 11009,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -2723,7 +2920,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2745,8 +2944,8 @@
     "channelId": "UCVq_Ef116yHdXNQ6lrnL-7g",
     "year": 2023,
     "uploadDate": "2023-05-25",
-    "views": 2078453,
-    "likes": 105141,
+    "views": 2078467,
+    "likes": 105140,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -2755,7 +2954,8 @@
     ],
     "charactersSource": "heading",
     "tournaments": [
-      "group-test-01"
+      "group-test-01",
+      "jinx-cup-1"
     ],
     "tags": [],
     "category": "edit",
@@ -2778,8 +2978,8 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-05-16",
-    "views": 441488,
-    "likes": 21414,
+    "views": 441525,
+    "likes": 21412,
     "duration": 44,
     "embedAllowed": true,
     "group": "jinx",
@@ -2787,7 +2987,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2809,8 +3011,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-01-18",
-    "views": 418913,
-    "likes": 21289,
+    "views": 418948,
+    "likes": 21290,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -2818,7 +3020,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2840,7 +3044,7 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-05-28",
-    "views": 77867,
+    "views": 77876,
     "likes": 4145,
     "duration": 20,
     "embedAllowed": true,
@@ -2849,7 +3053,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2871,8 +3077,8 @@
     "channelId": "UCFIB166uFg8KekzAxfh7Okw",
     "year": 2024,
     "uploadDate": "2024-12-04",
-    "views": 794819,
-    "likes": 57297,
+    "views": 794835,
+    "likes": 57296,
     "duration": 42,
     "embedAllowed": true,
     "group": "jinx",
@@ -2880,7 +3086,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2902,7 +3110,7 @@
     "channelId": "UColsCByViyvYFZNlrvb28lw",
     "year": 2025,
     "uploadDate": "2025-06-12",
-    "views": 315183,
+    "views": 315241,
     "likes": 12700,
     "duration": 29,
     "embedAllowed": true,
@@ -2911,7 +3119,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2933,8 +3143,8 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2026,
     "uploadDate": "2026-04-24",
-    "views": 98495,
-    "likes": 4925,
+    "views": 98581,
+    "likes": 4929,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -2942,7 +3152,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2964,7 +3176,7 @@
     "channelId": "UCih_LnICssAkUW4krb30sbw",
     "year": 2025,
     "uploadDate": "2025-05-14",
-    "views": 874320,
+    "views": 874370,
     "likes": 32065,
     "duration": 20,
     "embedAllowed": true,
@@ -2973,7 +3185,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -2995,7 +3209,7 @@
     "channelId": "UCSZbHmLCcZEvZelwrSbC6BA",
     "year": 2025,
     "uploadDate": "2025-09-14",
-    "views": 49222,
+    "views": 49223,
     "likes": 2490,
     "duration": 26,
     "embedAllowed": true,
@@ -3004,7 +3218,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -3026,7 +3242,7 @@
     "channelId": "UCecxrzxUMv9GobTCv4esCbA",
     "year": 2026,
     "uploadDate": "2026-09-15",
-    "views": 8876,
+    "views": 8883,
     "likes": 307,
     "duration": 21,
     "embedAllowed": true,
@@ -3035,7 +3251,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -3057,8 +3275,8 @@
     "channelId": "UCNrZhispNhOGz-REAHkOzMQ",
     "year": 2024,
     "uploadDate": "2024-10-01",
-    "views": 142223,
-    "likes": 10803,
+    "views": 142225,
+    "likes": 10804,
     "duration": 41,
     "embedAllowed": true,
     "group": "jinx",
@@ -3066,7 +3284,9 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -3097,16 +3317,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "dI1hMncrpDI",
@@ -3119,8 +3341,8 @@
     "channelId": "UCiu53ncMaRm1BytyqHBp30Q",
     "year": 2025,
     "uploadDate": "2025-07-12",
-    "views": 87725,
-    "likes": 3198,
+    "views": 87727,
+    "likes": 3199,
     "duration": 46,
     "embedAllowed": true,
     "group": "jinx",
@@ -3128,16 +3350,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "jEh7KHnKk9k",
@@ -3150,7 +3374,7 @@
     "channelId": "UCoSQj4QSz54A7_7IHb3V3DQ",
     "year": 2026,
     "uploadDate": "2026-09-28",
-    "views": 20324,
+    "views": 20345,
     "likes": 1117,
     "duration": 15,
     "embedAllowed": true,
@@ -3159,16 +3383,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "2eZyakUbgls",
@@ -3181,8 +3407,8 @@
     "channelId": "UCnh_kmMpMwpbuwp_U37BMjQ",
     "year": 2024,
     "uploadDate": "2024-12-02",
-    "views": 99596,
-    "likes": 4865,
+    "views": 99597,
+    "likes": 4866,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -3190,16 +3416,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "w8p8c5u35pY",
@@ -3212,7 +3440,7 @@
     "channelId": "UC7C5yufUQ1wJYVtwXSWl7sQ",
     "year": 2025,
     "uploadDate": "2025-09-28",
-    "views": 141857,
+    "views": 141871,
     "likes": null,
     "duration": 36,
     "embedAllowed": true,
@@ -3221,16 +3449,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "QNr0i-QsjSM",
@@ -3243,7 +3473,7 @@
     "channelId": "UC3_abytnpoOx4Z3_9N6wiSA",
     "year": 2026,
     "uploadDate": "2026-09-27",
-    "views": 13356,
+    "views": 13360,
     "likes": 970,
     "duration": 14,
     "embedAllowed": true,
@@ -3252,16 +3482,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "LghpsYyHM6U",
@@ -3274,7 +3506,7 @@
     "channelId": "UCHMCN9Q3ZSoCwY4SkAhyhLw",
     "year": 2026,
     "uploadDate": "2026-04-09",
-    "views": 69307,
+    "views": 69326,
     "likes": 3016,
     "duration": 25,
     "embedAllowed": true,
@@ -3283,16 +3515,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "wMukQsao68k",
@@ -3305,7 +3539,7 @@
     "channelId": "UCF17EMPK9eSXEtQw9cQP2tQ",
     "year": 2025,
     "uploadDate": "2025-10-11",
-    "views": 177857,
+    "views": 177888,
     "likes": 7969,
     "duration": 42,
     "embedAllowed": true,
@@ -3314,16 +3548,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "8Xv-5eolTXY",
@@ -3336,8 +3572,8 @@
     "channelId": "UCWkxyPI2cRvjrg_6ZAX1crg",
     "year": 2025,
     "uploadDate": "2025-10-24",
-    "views": 346215,
-    "likes": 7049,
+    "views": 346232,
+    "likes": 7050,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -3345,16 +3581,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "1QduLyckehM",
@@ -3367,7 +3605,7 @@
     "channelId": "UCbVQqtfleeHMKZaq9TBWFSg",
     "year": 2025,
     "uploadDate": "2025-01-13",
-    "views": 110617,
+    "views": 110624,
     "likes": 8296,
     "duration": 55,
     "embedAllowed": true,
@@ -3376,16 +3614,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "tQsoBJqR6rs",
@@ -3398,8 +3638,8 @@
     "channelId": "UCFORoZqnouzZ38UPl3Lmc_w",
     "year": 2025,
     "uploadDate": "2025-10-24",
-    "views": 393307,
-    "likes": 8801,
+    "views": 393374,
+    "likes": 8802,
     "duration": 18,
     "embedAllowed": true,
     "group": "jinx",
@@ -3407,16 +3647,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "w9K3PyuSjGw",
@@ -3438,16 +3680,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "ZW0UYMcUyDM",
@@ -3460,8 +3704,8 @@
     "channelId": "UCQkkhHk4FFYEGI6MGbdy_OA",
     "year": 2025,
     "uploadDate": "2025-05-22",
-    "views": 842812,
-    "likes": 38618,
+    "views": 842841,
+    "likes": 38615,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -3469,16 +3713,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "9A3lcdNPLw4",
@@ -3491,7 +3737,7 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-08-15",
-    "views": 41541,
+    "views": 41555,
     "likes": 2058,
     "duration": 30,
     "embedAllowed": true,
@@ -3500,16 +3746,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "q1FZ-oZOQqk",
@@ -3522,8 +3770,8 @@
     "channelId": "UC3DYm46JD4kC06WOYwzE8TA",
     "year": 2026,
     "uploadDate": "2026-06-24",
-    "views": 41735,
-    "likes": 2931,
+    "views": 41742,
+    "likes": 2930,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -3531,16 +3779,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "lSDxUM_xqW4",
@@ -3553,7 +3803,7 @@
     "channelId": "UCwwP48JJWSNiDSo3jAW2DzA",
     "year": 2026,
     "uploadDate": "2026-06-12",
-    "views": 35177,
+    "views": 35183,
     "likes": null,
     "duration": 18,
     "embedAllowed": true,
@@ -3562,16 +3812,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "OScI_wxcnMM",
@@ -3584,8 +3836,8 @@
     "channelId": "UC-gtuIjADUL3Aq43qo5HHEQ",
     "year": 2026,
     "uploadDate": "2026-10-07",
-    "views": 30498,
-    "likes": 1065,
+    "views": 30820,
+    "likes": 1072,
     "duration": 18,
     "embedAllowed": true,
     "group": "jinx",
@@ -3593,16 +3845,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "hVZFQ_RJ_Q8",
@@ -3615,8 +3869,8 @@
     "channelId": "UCtSHT8dpWLoEPrm4JIxdwsg",
     "year": 2026,
     "uploadDate": "2026-08-25",
-    "views": 24296,
-    "likes": 2432,
+    "views": 24337,
+    "likes": 2443,
     "duration": 72,
     "embedAllowed": true,
     "group": "jinx",
@@ -3624,16 +3878,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "NdZJTCm1rio",
@@ -3655,16 +3911,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "DB3oGBAhEBg",
@@ -3677,8 +3935,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-10-23",
-    "views": 880192,
-    "likes": 69116,
+    "views": 880290,
+    "likes": 69119,
     "duration": 34,
     "embedAllowed": true,
     "group": "jinx",
@@ -3686,16 +3944,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "9lQFQO36HgA",
@@ -3717,16 +3977,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Q8QZs0JULjg",
@@ -3748,16 +4010,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "4:5",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "4:5",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "yglhkPVu7pc",
@@ -3779,16 +4043,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "IVmepZ2QBbo",
@@ -3801,8 +4067,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2025,
     "uploadDate": "2025-09-18",
-    "views": 112115,
-    "likes": 4481,
+    "views": 112116,
+    "likes": 4482,
     "duration": 28,
     "embedAllowed": true,
     "group": "jinx",
@@ -3810,16 +4076,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "TcTMz3MRoBM",
@@ -3832,8 +4100,8 @@
     "channelId": "UCo3yr_xlpf9JSlK50dGG3qg",
     "year": 2025,
     "uploadDate": "2025-04-05",
-    "views": 504033,
-    "likes": 19828,
+    "views": 504047,
+    "likes": 19830,
     "duration": 16,
     "embedAllowed": true,
     "group": "jinx",
@@ -3841,16 +4109,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "g9pgfMC00Pg",
@@ -3872,16 +4142,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "DxUbKsBSP48",
@@ -3894,7 +4166,7 @@
     "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
     "year": 2026,
     "uploadDate": "2026-04-22",
-    "views": 51273,
+    "views": 51283,
     "likes": 3507,
     "duration": 34,
     "embedAllowed": true,
@@ -3903,16 +4175,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "xElj1aWcqtc",
@@ -3925,8 +4199,8 @@
     "channelId": "UCSZbHmLCcZEvZelwrSbC6BA",
     "year": 2026,
     "uploadDate": "2026-05-09",
-    "views": 65499,
-    "likes": 3781,
+    "views": 65527,
+    "likes": 3782,
     "duration": 32,
     "embedAllowed": true,
     "group": "jinx",
@@ -3934,16 +4208,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Coajvj8qLek",
@@ -3956,8 +4232,8 @@
     "channelId": "UCNGm8zDKJju2oFy_0lcGrZA",
     "year": 2025,
     "uploadDate": "2025-01-20",
-    "views": 309828,
-    "likes": 15656,
+    "views": 309835,
+    "likes": 15655,
     "duration": 20,
     "embedAllowed": true,
     "group": "jinx",
@@ -3965,16 +4241,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Vqpz06s6vBg",
@@ -3996,16 +4274,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "SWMtlRggX7s",
@@ -4018,8 +4298,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-07-14",
-    "views": 62898,
-    "likes": 2995,
+    "views": 62952,
+    "likes": 2996,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -4027,16 +4307,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "C1i2yeGGkg4",
@@ -4049,7 +4331,7 @@
     "channelId": "UCiu53ncMaRm1BytyqHBp30Q",
     "year": 2026,
     "uploadDate": "2026-09-06",
-    "views": 23212,
+    "views": 23224,
     "likes": 1079,
     "duration": 19,
     "embedAllowed": true,
@@ -4058,16 +4340,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "DONMieW7eGM",
@@ -4080,8 +4364,8 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2026,
     "uploadDate": "2026-06-30",
-    "views": 28094,
-    "likes": 1744,
+    "views": 28105,
+    "likes": 1745,
     "duration": 36,
     "embedAllowed": true,
     "group": "jinx",
@@ -4089,16 +4373,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "91yWUJOCSOY",
@@ -4111,7 +4397,7 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-05-21",
-    "views": 56507,
+    "views": 56538,
     "likes": 3663,
     "duration": 27,
     "embedAllowed": true,
@@ -4120,16 +4406,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "5u00UQZOBLI",
@@ -4142,7 +4430,7 @@
     "channelId": "UCxuRTYjrvNKcrg4bxr2nkiw",
     "year": 2025,
     "uploadDate": "2025-05-13",
-    "views": 916225,
+    "views": 916325,
     "likes": 31314,
     "duration": 24,
     "embedAllowed": true,
@@ -4151,16 +4439,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "eX44rxOwvVE",
@@ -4173,8 +4463,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-06-27",
-    "views": 103206,
-    "likes": 4543,
+    "views": 103228,
+    "likes": 4545,
     "duration": 25,
     "embedAllowed": true,
     "group": "jinx",
@@ -4182,16 +4472,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "sYgla5X7-co",
@@ -4204,8 +4496,8 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-07-29",
-    "views": 14290,
-    "likes": 696,
+    "views": 14294,
+    "likes": 697,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -4213,16 +4505,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "8mobnIGwtB4",
@@ -4235,8 +4529,8 @@
     "channelId": "UCSivVbJSGz0rleI-jehAKbQ",
     "year": 2024,
     "uploadDate": "2024-11-10",
-    "views": 468380,
-    "likes": 28744,
+    "views": 468386,
+    "likes": 28745,
     "duration": 34,
     "embedAllowed": true,
     "group": "jinx",
@@ -4244,16 +4538,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "3:4",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "3:4",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "-7ofeJ4f2TE",
@@ -4275,16 +4571,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "fJc4_x9R7xM",
@@ -4297,8 +4595,8 @@
     "channelId": "UCHMCN9Q3ZSoCwY4SkAhyhLw",
     "year": 2026,
     "uploadDate": "2026-04-26",
-    "views": 43411,
-    "likes": 2475,
+    "views": 43414,
+    "likes": 2474,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -4306,16 +4604,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "sjlutLswZ8M",
@@ -4328,8 +4628,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-07-31",
-    "views": 58302,
-    "likes": 2361,
+    "views": 58369,
+    "likes": 2360,
     "duration": 18,
     "embedAllowed": true,
     "group": "jinx",
@@ -4337,16 +4637,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "cz8OqOkIRE4",
@@ -4359,8 +4661,8 @@
     "channelId": "UCb8iIFUB-QH7WQBVkQQYQBw",
     "year": 2026,
     "uploadDate": "2026-09-17",
-    "views": 596719,
-    "likes": 35286,
+    "views": 596911,
+    "likes": 35301,
     "duration": 9,
     "embedAllowed": true,
     "group": "jinx",
@@ -4368,16 +4670,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "WLQKwJBUL7I",
@@ -4390,7 +4694,7 @@
     "channelId": "UCFIB166uFg8KekzAxfh7Okw",
     "year": 2024,
     "uploadDate": "2024-12-18",
-    "views": 338567,
+    "views": 338577,
     "likes": 6502,
     "duration": 18,
     "embedAllowed": true,
@@ -4399,16 +4703,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "oEueP4phDko",
@@ -4421,7 +4727,7 @@
     "channelId": "UC7C5yufUQ1wJYVtwXSWl7sQ",
     "year": 2026,
     "uploadDate": "2026-07-05",
-    "views": 22307,
+    "views": 22308,
     "likes": null,
     "duration": 33,
     "embedAllowed": true,
@@ -4430,16 +4736,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "_l5svUgoRh4",
@@ -4461,16 +4769,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "mGnKrmB2Ipc",
@@ -4483,8 +4793,8 @@
     "channelId": "UCia8_zTx28PDo0eXtjrBpaQ",
     "year": 2026,
     "uploadDate": "2026-07-20",
-    "views": 14292,
-    "likes": 820,
+    "views": 14294,
+    "likes": 821,
     "duration": 11,
     "embedAllowed": true,
     "group": "jinx",
@@ -4492,16 +4802,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "-pS7fe9A_3s",
@@ -4523,16 +4835,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "x6tB1nRRi9c",
@@ -4545,7 +4859,7 @@
     "channelId": "UCOYliYJUDuSMasjoxwU8wEQ",
     "year": 2026,
     "uploadDate": "2026-08-29",
-    "views": 3981,
+    "views": 3982,
     "likes": 113,
     "duration": 23,
     "embedAllowed": true,
@@ -4554,16 +4868,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "u4KXN7-w88o",
@@ -4585,16 +4901,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "4:5",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "4:5",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "I6RLb5m_ofk",
@@ -4616,16 +4934,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "z_HkUoGPMOY",
@@ -4647,16 +4967,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "4:5",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "4:5",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "EKjrqMQ40Qs",
@@ -4669,8 +4991,8 @@
     "channelId": "UCTA69NXNnRn5pP5tHfqyIpg",
     "year": 2024,
     "uploadDate": "2024-11-02",
-    "views": 66758,
-    "likes": 1996,
+    "views": 66796,
+    "likes": 1997,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -4678,16 +5000,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "3:4",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "3:4",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Hqbu4x6sp74",
@@ -4700,8 +5024,8 @@
     "channelId": "UCaCAEeu83xsmuv720JnjE5Q",
     "year": 2026,
     "uploadDate": "2026-10-10",
-    "views": 11615,
-    "likes": 630,
+    "views": 11618,
+    "likes": 631,
     "duration": 21,
     "embedAllowed": true,
     "group": "jinx",
@@ -4709,16 +5033,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "bKnWPSRh5nk",
@@ -4740,16 +5066,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "64z2T1HyjiI",
@@ -4762,7 +5090,7 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2025,
     "uploadDate": "2025-07-19",
-    "views": 66659,
+    "views": 66665,
     "likes": 3624,
     "duration": 33,
     "embedAllowed": true,
@@ -4771,16 +5099,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "xy7Do0ugZCk",
@@ -4793,7 +5123,7 @@
     "channelId": "UC4MnfqJTeN2FQmLerYSVOxg",
     "year": 2025,
     "uploadDate": "2025-04-24",
-    "views": 147342,
+    "views": 147403,
     "likes": 2223,
     "duration": 16,
     "embedAllowed": true,
@@ -4802,16 +5132,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "vf0W6FvOsK8",
@@ -4824,7 +5156,7 @@
     "channelId": "UCRcT5FtGQsHz15BFaVl3puQ",
     "year": 2026,
     "uploadDate": "2026-07-31",
-    "views": 41591,
+    "views": 41609,
     "likes": 1674,
     "duration": 20,
     "embedAllowed": true,
@@ -4833,16 +5165,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "4PYY7fAWxNY",
@@ -4855,8 +5189,8 @@
     "channelId": "UCg_boyPtT8P-w5FEfM8SneQ",
     "year": 2025,
     "uploadDate": "2025-09-02",
-    "views": 799151,
-    "likes": 22785,
+    "views": 799239,
+    "likes": 22786,
     "duration": 23,
     "embedAllowed": true,
     "group": "jinx",
@@ -4864,16 +5198,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "AGyHvwzbCbI",
@@ -4886,8 +5222,8 @@
     "channelId": "UCcAlyBZuebPaqCshbSaeX-g",
     "year": 2025,
     "uploadDate": "2025-02-19",
-    "views": 964571,
-    "likes": 77090,
+    "views": 964611,
+    "likes": 77089,
     "duration": 43,
     "embedAllowed": true,
     "group": "jinx",
@@ -4895,16 +5231,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "3:4",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "3:4",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "4i1elHczBSQ",
@@ -4917,7 +5255,7 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2026,
     "uploadDate": "2026-06-06",
-    "views": 36827,
+    "views": 36841,
     "likes": 1738,
     "duration": 17,
     "embedAllowed": true,
@@ -4926,16 +5264,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "VCxUGXA5LsU",
@@ -4957,16 +5297,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "mLIDT1Fvf_g",
@@ -4979,8 +5321,8 @@
     "channelId": "UC-_qplD0UAVLrJ429rZJjXg",
     "year": 2026,
     "uploadDate": "2026-10-12",
-    "views": 10421,
-    "likes": 690,
+    "views": 10756,
+    "likes": 701,
     "duration": 17,
     "embedAllowed": true,
     "group": "jinx",
@@ -4988,16 +5330,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "cRi5R7wJsVE",
@@ -5010,7 +5354,7 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-05-18",
-    "views": 676554,
+    "views": 676606,
     "likes": 24797,
     "duration": 21,
     "embedAllowed": true,
@@ -5019,16 +5363,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "jPbuITvjbbg",
@@ -5041,8 +5387,8 @@
     "channelId": "UCSZbHmLCcZEvZelwrSbC6BA",
     "year": 2026,
     "uploadDate": "2026-04-15",
-    "views": 136677,
-    "likes": 6199,
+    "views": 136714,
+    "likes": 6197,
     "duration": 19,
     "embedAllowed": true,
     "group": "jinx",
@@ -5050,16 +5396,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Se40StqUfNQ",
@@ -5072,8 +5420,8 @@
     "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
     "year": 2025,
     "uploadDate": "2025-01-20",
-    "views": 205678,
-    "likes": 15503,
+    "views": 205699,
+    "likes": 15502,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -5081,16 +5429,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "FlvVjC8_MUI",
@@ -5103,7 +5453,7 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2024,
     "uploadDate": "2024-10-01",
-    "views": 339118,
+    "views": 339121,
     "likes": 26199,
     "duration": 29,
     "embedAllowed": true,
@@ -5112,16 +5462,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "3:4",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "3:4",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "poa25sjPNLs",
@@ -5134,8 +5486,8 @@
     "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
     "year": 2026,
     "uploadDate": "2026-08-19",
-    "views": 96022,
-    "likes": 4336,
+    "views": 96218,
+    "likes": 4348,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -5143,16 +5495,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "-DlqFLnTIs8",
@@ -5165,8 +5519,8 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2026,
     "uploadDate": "2026-05-06",
-    "views": 59498,
-    "likes": 3460,
+    "views": 59521,
+    "likes": 3461,
     "duration": 33,
     "embedAllowed": true,
     "group": "jinx",
@@ -5174,16 +5528,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "26Ad4TST174",
@@ -5196,7 +5552,7 @@
     "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
     "year": 2026,
     "uploadDate": "2026-04-20",
-    "views": 45864,
+    "views": 45852,
     "likes": 2964,
     "duration": 30,
     "embedAllowed": true,
@@ -5205,16 +5561,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "63dKbQGZ1Qs",
@@ -5227,8 +5585,8 @@
     "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
     "year": 2025,
     "uploadDate": "2025-09-26",
-    "views": 183304,
-    "likes": 4623,
+    "views": 183321,
+    "likes": 4622,
     "duration": 17,
     "embedAllowed": true,
     "group": "jinx",
@@ -5236,16 +5594,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "fHB0mzxQcIQ",
@@ -5258,7 +5618,7 @@
     "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
     "year": 2026,
     "uploadDate": "2026-06-20",
-    "views": 46722,
+    "views": 46729,
     "likes": 3373,
     "duration": 32,
     "embedAllowed": true,
@@ -5267,16 +5627,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "HbsEsUPFz40",
@@ -5290,7 +5652,7 @@
     "year": 2025,
     "uploadDate": "2025-09-06",
     "views": 292407,
-    "likes": 24085,
+    "likes": 24086,
     "duration": 53,
     "embedAllowed": true,
     "group": "jinx",
@@ -5298,16 +5660,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "1pn9wbHp_V8",
@@ -5320,8 +5684,8 @@
     "channelId": "UC1GvpVfQqj-zXyRQrH4HoTQ",
     "year": 2026,
     "uploadDate": "2026-05-20",
-    "views": 104458,
-    "likes": 8145,
+    "views": 104495,
+    "likes": 8149,
     "duration": 34,
     "embedAllowed": true,
     "group": "jinx",
@@ -5329,16 +5693,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "BmuuMhVB4f4",
@@ -5351,7 +5717,7 @@
     "channelId": "UCtxkq8RG88YeSt7AFqvRsJg",
     "year": 2025,
     "uploadDate": "2025-08-19",
-    "views": 13285,
+    "views": 13290,
     "likes": 492,
     "duration": 18,
     "embedAllowed": true,
@@ -5360,16 +5726,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "4r-Zmi9wDlE",
@@ -5382,8 +5750,8 @@
     "channelId": "UCeEe8z_eufmLEaoD5w_RDXQ",
     "year": 2026,
     "uploadDate": "2026-08-11",
-    "views": 359257,
-    "likes": 15234,
+    "views": 359264,
+    "likes": 15232,
     "duration": 14,
     "embedAllowed": true,
     "group": "jinx",
@@ -5391,16 +5759,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "6eSuUolfb2s",
@@ -5422,16 +5792,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "zLFCZi5XnZ4",
@@ -5444,7 +5816,7 @@
     "channelId": "UChbW6xveqn4NFo9rDnKdtQg",
     "year": 2026,
     "uploadDate": "2026-09-19",
-    "views": 517747,
+    "views": 517950,
     "likes": null,
     "duration": 15,
     "embedAllowed": true,
@@ -5453,16 +5825,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "qx6WjKn7aAE",
@@ -5475,8 +5849,8 @@
     "channelId": "UCenIGgzOtFO_G1TYrIOIgXA",
     "year": 2026,
     "uploadDate": "2026-08-24",
-    "views": 29754,
-    "likes": 1214,
+    "views": 29763,
+    "likes": 1213,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -5484,16 +5858,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Vro5QtMH-FM",
@@ -5506,8 +5882,8 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-07-17",
-    "views": 120476,
-    "likes": 5004,
+    "views": 120548,
+    "likes": 5006,
     "duration": 24,
     "embedAllowed": true,
     "group": "jinx",
@@ -5515,16 +5891,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "sWy4vm8a3xI",
@@ -5537,7 +5915,7 @@
     "channelId": "UCW1Bt1HSb5CMGCas-VlrlzQ",
     "year": 2026,
     "uploadDate": "2026-08-14",
-    "views": 58620,
+    "views": 58646,
     "likes": 1908,
     "duration": 49,
     "embedAllowed": true,
@@ -5546,16 +5924,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Sail_4jh77g",
@@ -5568,8 +5948,8 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-09-18",
-    "views": 52994,
-    "likes": 2427,
+    "views": 53149,
+    "likes": 2432,
     "duration": 25,
     "embedAllowed": true,
     "group": "jinx",
@@ -5577,16 +5957,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "wfIhlEn8A0Q",
@@ -5599,8 +5981,8 @@
     "channelId": "UCSZbHmLCcZEvZelwrSbC6BA",
     "year": 2026,
     "uploadDate": "2026-06-27",
-    "views": 100631,
-    "likes": 3915,
+    "views": 100650,
+    "likes": 3916,
     "duration": 27,
     "embedAllowed": true,
     "group": "jinx",
@@ -5608,16 +5990,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "R7vfsv1YLrg",
@@ -5630,8 +6014,8 @@
     "channelId": "UC70oKLUP_MLfQDgzdS3mFMw",
     "year": 2024,
     "uploadDate": "2024-12-21",
-    "views": 637599,
-    "likes": 60164,
+    "views": 637631,
+    "likes": 60165,
     "duration": 46,
     "embedAllowed": true,
     "group": "jinx",
@@ -5639,16 +6023,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "4:5",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "4:5",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "8qAxR-o09Oo",
@@ -5661,7 +6047,7 @@
     "channelId": "UCAuE9oej-HBmmx8UbowgpgA",
     "year": 2026,
     "uploadDate": "2026-07-01",
-    "views": 13355,
+    "views": 13356,
     "likes": 508,
     "duration": 11,
     "embedAllowed": true,
@@ -5670,16 +6056,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "wjRATxaSYxE",
@@ -5692,7 +6080,7 @@
     "channelId": "UCenIGgzOtFO_G1TYrIOIgXA",
     "year": 2026,
     "uploadDate": "2026-08-04",
-    "views": 24457,
+    "views": 24460,
     "likes": 816,
     "duration": 19,
     "embedAllowed": true,
@@ -5701,16 +6089,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "8wM3Qsp9DXI",
@@ -5723,8 +6113,8 @@
     "channelId": "UC1GvpVfQqj-zXyRQrH4HoTQ",
     "year": 2026,
     "uploadDate": "2026-06-03",
-    "views": 34638,
-    "likes": 1749,
+    "views": 34645,
+    "likes": 1750,
     "duration": 18,
     "embedAllowed": true,
     "group": "jinx",
@@ -5732,16 +6122,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "QwTn1JbM7SY",
@@ -5754,8 +6146,8 @@
     "channelId": "UCoSQj4QSz54A7_7IHb3V3DQ",
     "year": 2026,
     "uploadDate": "2026-09-21",
-    "views": 21504,
-    "likes": 1182,
+    "views": 21524,
+    "likes": 1183,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -5763,16 +6155,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "sscdnEev2_o",
@@ -5794,16 +6188,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "FHUZGd5yRG4",
@@ -5816,8 +6212,8 @@
     "channelId": "UCFX6DFXzABK2TGBi3YdEqRg",
     "year": 2024,
     "uploadDate": "2024-12-30",
-    "views": 292335,
-    "likes": 21793,
+    "views": 292337,
+    "likes": 21792,
     "duration": 15,
     "embedAllowed": true,
     "group": "jinx",
@@ -5825,16 +6221,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "LaGhigejbn8",
@@ -5847,7 +6245,7 @@
     "channelId": "UCYaPTHoqC0nAMha-4k87nKg",
     "year": 2026,
     "uploadDate": "2026-09-12",
-    "views": 4824,
+    "views": 4825,
     "likes": 225,
     "duration": 21,
     "embedAllowed": true,
@@ -5856,16 +6254,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "3Vo8tlsWdyI",
@@ -5878,8 +6278,8 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2026,
     "uploadDate": "2026-05-12",
-    "views": 62593,
-    "likes": 3283,
+    "views": 62665,
+    "likes": 3291,
     "duration": 30,
     "embedAllowed": true,
     "group": "jinx",
@@ -5887,16 +6287,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "SUyvKlYKMA0",
@@ -5918,16 +6320,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "khP4DGuLGsg",
@@ -5940,7 +6344,7 @@
     "channelId": "UCkTZ4mjibq-m6n0DxEE6CZg",
     "year": 2026,
     "uploadDate": "2026-07-28",
-    "views": 34319,
+    "views": 34331,
     "likes": 1087,
     "duration": 16,
     "embedAllowed": true,
@@ -5949,16 +6353,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "fMb_tZxnHfk",
@@ -5980,16 +6386,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "oOLLvLgcfNk",
@@ -6002,7 +6410,7 @@
     "channelId": "UC-gtuIjADUL3Aq43qo5HHEQ",
     "year": 2026,
     "uploadDate": "2026-07-29",
-    "views": 12154,
+    "views": 12157,
     "likes": 576,
     "duration": 50,
     "embedAllowed": true,
@@ -6011,16 +6419,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "lEQ_gK1UtXI",
@@ -6046,12 +6456,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "ICF82m7YLyQ",
@@ -6064,7 +6474,7 @@
     "channelId": "UCEfc2zTpFQAlOQdl7JA5w4A",
     "year": 2026,
     "uploadDate": "2026-06-02",
-    "views": 14164,
+    "views": 14167,
     "likes": 834,
     "duration": 23,
     "embedAllowed": true,
@@ -6073,16 +6483,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "3OOfN9fumBQ",
@@ -6095,7 +6507,7 @@
     "channelId": "UColsCByViyvYFZNlrvb28lw",
     "year": 2026,
     "uploadDate": "2026-03-09",
-    "views": 149658,
+    "views": 149662,
     "likes": 7312,
     "duration": 36,
     "embedAllowed": true,
@@ -6104,16 +6516,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "wR8gDbv303A",
@@ -6126,8 +6540,8 @@
     "channelId": "UCSivVbJSGz0rleI-jehAKbQ",
     "year": 2025,
     "uploadDate": "2025-07-24",
-    "views": 59047,
-    "likes": 1415,
+    "views": 59062,
+    "likes": 1416,
     "duration": 26,
     "embedAllowed": true,
     "group": "jinx",
@@ -6135,16 +6549,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "3:4",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "3:4",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "cn35I8LUjHM",
@@ -6157,8 +6573,8 @@
     "channelId": "UC-GUzJ-YkpHpp_NOtQcnbkg",
     "year": 2026,
     "uploadDate": "2026-09-04",
-    "views": 18834,
-    "likes": 535,
+    "views": 18844,
+    "likes": 536,
     "duration": 12,
     "embedAllowed": true,
     "group": "jinx",
@@ -6166,16 +6582,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "b7Qm6paB24E",
@@ -6197,16 +6615,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "kJWY8ZuuxeM",
@@ -6219,7 +6639,7 @@
     "channelId": "UCv8Q01C6e32iknBxYJOAjGw",
     "year": 2026,
     "uploadDate": "2026-04-12",
-    "views": 7611,
+    "views": 7613,
     "likes": 662,
     "duration": 22,
     "embedAllowed": true,
@@ -6228,16 +6648,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "jtv3chluBiU",
@@ -6250,7 +6672,7 @@
     "channelId": "UClHPDGLyhxlernhd4jTNv3A",
     "year": 2025,
     "uploadDate": "2025-01-09",
-    "views": 696804,
+    "views": 696910,
     "likes": 25157,
     "duration": 13,
     "embedAllowed": true,
@@ -6259,16 +6681,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "M_3X5IbhuPk",
@@ -6290,16 +6714,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Skh6yh31o3s",
@@ -6321,16 +6747,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "zza2tsDZXWc",
@@ -6343,8 +6771,8 @@
     "channelId": "UC1GvpVfQqj-zXyRQrH4HoTQ",
     "year": 2026,
     "uploadDate": "2026-06-12",
-    "views": 93528,
-    "likes": 5596,
+    "views": 93537,
+    "likes": 5597,
     "duration": 38,
     "embedAllowed": true,
     "group": "jinx",
@@ -6352,16 +6780,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "2uJaCBgEUAw",
@@ -6383,16 +6813,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "RAoimeRae8Q",
@@ -6414,16 +6846,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "lxTAsYrKkwY",
@@ -6445,16 +6879,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "_2cRineNVyE",
@@ -6467,7 +6903,7 @@
     "channelId": "UCAuE9oej-HBmmx8UbowgpgA",
     "year": 2026,
     "uploadDate": "2026-07-14",
-    "views": 11624,
+    "views": 11625,
     "likes": 658,
     "duration": 12,
     "embedAllowed": true,
@@ -6476,16 +6912,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "z3Hl5rxcBFg",
@@ -6498,8 +6936,8 @@
     "channelId": "UCKt4eO7kdzLt3QNs6GKnzVA",
     "year": 2026,
     "uploadDate": "2026-09-19",
-    "views": 122891,
-    "likes": 5048,
+    "views": 123073,
+    "likes": 5061,
     "duration": 20,
     "embedAllowed": true,
     "group": "jinx",
@@ -6507,16 +6945,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "lnxOMpcRkIw",
@@ -6529,7 +6969,7 @@
     "channelId": "UCg12ujkgHEu7DdbCXaDbguw",
     "year": 2026,
     "uploadDate": "2026-10-05",
-    "views": 8787,
+    "views": 8793,
     "likes": 796,
     "duration": 16,
     "embedAllowed": true,
@@ -6538,16 +6978,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "67_QBenx_PI",
@@ -6560,7 +7002,7 @@
     "channelId": "UCHMCN9Q3ZSoCwY4SkAhyhLw",
     "year": 2026,
     "uploadDate": "2026-05-08",
-    "views": 35295,
+    "views": 35296,
     "likes": 2525,
     "duration": 28,
     "embedAllowed": true,
@@ -6569,16 +7011,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "-k_cQFTHd1Y",
@@ -6591,7 +7035,7 @@
     "channelId": "UCoSQj4QSz54A7_7IHb3V3DQ",
     "year": 2026,
     "uploadDate": "2026-09-26",
-    "views": 11156,
+    "views": 11168,
     "likes": null,
     "duration": 15,
     "embedAllowed": true,
@@ -6600,16 +7044,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "UbH0fBY-0_A",
@@ -6631,16 +7077,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "VlM3zq2QEkE",
@@ -6653,7 +7101,7 @@
     "channelId": "UCDRllTIEQo0c_dHkAXG5LWw",
     "year": 2026,
     "uploadDate": "2026-06-28",
-    "views": 11637,
+    "views": 11639,
     "likes": 568,
     "duration": 19,
     "embedAllowed": true,
@@ -6662,16 +7110,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "fSSSn6FcBlg",
@@ -6684,7 +7134,7 @@
     "channelId": "UCxLixvbRpI8yDAZq_9P5j0w",
     "year": 2026,
     "uploadDate": "2026-05-28",
-    "views": 77058,
+    "views": 77065,
     "likes": 4047,
     "duration": 37,
     "embedAllowed": true,
@@ -6693,16 +7143,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "_d9T--gNJ7M",
@@ -6715,7 +7167,7 @@
     "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
     "year": 2026,
     "uploadDate": "2026-07-11",
-    "views": 55853,
+    "views": 55872,
     "likes": 1936,
     "duration": 23,
     "embedAllowed": true,
@@ -6724,16 +7176,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "2AFTxSqn9rY",
@@ -6755,16 +7209,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "R7Q_waHH-L8",
@@ -6786,16 +7242,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "M4l6CbdHG4E",
@@ -6808,7 +7266,7 @@
     "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
     "year": 2026,
     "uploadDate": "2026-10-07",
-    "views": 3879,
+    "views": 3892,
     "likes": 189,
     "duration": 22,
     "embedAllowed": true,
@@ -6817,16 +7275,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "nQ9N8oXY15c",
@@ -6848,16 +7308,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "LcnUMDCGW08",
@@ -6870,7 +7332,7 @@
     "channelId": "UCDBHQazA4Im9TYTkiiA7ExA",
     "year": 2025,
     "uploadDate": "2025-02-23",
-    "views": 517739,
+    "views": 517828,
     "likes": 14408,
     "duration": 10,
     "embedAllowed": true,
@@ -6879,16 +7341,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "3wn223wY9Sk",
@@ -6901,7 +7365,7 @@
     "channelId": "UCk8g-Jy1h0VNj87KUTQfJlQ",
     "year": 2025,
     "uploadDate": "2025-01-19",
-    "views": 75419,
+    "views": 75417,
     "likes": 4355,
     "duration": 25,
     "embedAllowed": true,
@@ -6910,16 +7374,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Ucs5LEeAn3M",
@@ -6932,7 +7398,7 @@
     "channelId": "UCS7U3WE3-qN_FyyoCPRdqwQ",
     "year": 2024,
     "uploadDate": "2024-11-21",
-    "views": 44617,
+    "views": 44634,
     "likes": 2130,
     "duration": 24,
     "embedAllowed": true,
@@ -6941,16 +7407,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "4:5",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "4:5",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "0Uo4REqQw6M",
@@ -6976,12 +7444,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "iVBFhsW1jN8",
@@ -6994,7 +7462,7 @@
     "channelId": "UChqEQsexWcygKKdntizDRlA",
     "year": 2024,
     "uploadDate": "2024-11-22",
-    "views": 239172,
+    "views": 239171,
     "likes": 10635,
     "duration": 13,
     "embedAllowed": true,
@@ -7003,16 +7471,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "CjaR3jAyYvU",
@@ -7025,7 +7495,7 @@
     "channelId": "UCqMsaFnV7zrXCdv5yOL0bBg",
     "year": 2026,
     "uploadDate": "2026-09-12",
-    "views": 2474,
+    "views": 2477,
     "likes": null,
     "duration": 28,
     "embedAllowed": true,
@@ -7034,16 +7504,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "KyRL0GOzv8E",
@@ -7056,7 +7528,7 @@
     "channelId": "UColsCByViyvYFZNlrvb28lw",
     "year": 2026,
     "uploadDate": "2026-04-17",
-    "views": 111460,
+    "views": 111489,
     "likes": 5863,
     "duration": 28,
     "embedAllowed": true,
@@ -7065,16 +7537,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "EkSJOIzXwPI",
@@ -7087,7 +7561,7 @@
     "channelId": "UCkQaJS0X0aEe-KrCIO0ja3g",
     "year": 2026,
     "uploadDate": "2026-09-22",
-    "views": 7102,
+    "views": 7106,
     "likes": 238,
     "duration": 18,
     "embedAllowed": true,
@@ -7096,16 +7570,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "HXq4jWPx29U",
@@ -7131,12 +7607,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "sE5Gy_0A8KI",
@@ -7149,8 +7625,8 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-07-10",
-    "views": 32163,
-    "likes": 2047,
+    "views": 32180,
+    "likes": 2046,
     "duration": 22,
     "embedAllowed": true,
     "group": "jinx",
@@ -7158,16 +7634,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "KYVErJji24Q",
@@ -7180,7 +7658,7 @@
     "channelId": "UC3CiWmlH6swxpY-SFaE9eDw",
     "year": 2026,
     "uploadDate": "2026-04-23",
-    "views": 15317,
+    "views": 15332,
     "likes": 420,
     "duration": 17,
     "embedAllowed": true,
@@ -7189,16 +7667,18 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "oFUiTSIJi9k",
@@ -7211,7 +7691,7 @@
     "channelId": "UCrvv5yejnPT6xrAB7E4ME_w",
     "year": 2026,
     "uploadDate": "2026-09-26",
-    "views": 2391,
+    "views": 2393,
     "likes": 73,
     "duration": 12,
     "embedAllowed": true,
@@ -7224,12 +7704,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:16",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "Z_O6e_angZY",
@@ -7251,7 +7731,1385 @@
       "Jinx"
     ],
     "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "O1k_XGrIWlc",
+    "videoId": "O1k_XGrIWlc",
+    "title": "Jinx Edit || Song - Under The Influence || Arcane || #arcaneleagueoflegends #jinxedit #Jinx #arcane",
+    "shortTitle": "Jinx Edit || Song - Under The Influence || Arcane",
+    "slug": "jinx-edit-song-under-the-influence-arcane-arcaneleagueoflege",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-10-16",
+    "views": 1500,
+    "likes": 170,
+    "duration": 14,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "Fv2t94wD9rk",
+    "videoId": "Fv2t94wD9rk",
+    "title": "The Artist💀, The Art 🐐 | Jinx Arcane edit #jinx #arcane #edit",
+    "shortTitle": "The Artist💀, The Art 🐐 | Jinx Arcane edit",
+    "slug": "the-artist-the-art-jinx-arcane-edit-jinx-arcane-edit",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-10-16",
+    "views": 1562,
+    "likes": 282,
+    "duration": 18,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "U_j_4xjWkI0",
+    "videoId": "U_j_4xjWkI0",
+    "title": "Jinx Edit || Song - Soul On Fire || Arcane || #arcaneleagueoflegends #jinxedit #Jinx #arcane",
+    "shortTitle": "Jinx Edit || Song - Soul On Fire || Arcane",
+    "slug": "jinx-edit-song-soul-on-fire-arcane-arcaneleagueoflegends-jin",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-10-12",
+    "views": 8272,
+    "likes": 671,
+    "duration": 17,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "LKowgwhZBfg",
+    "videoId": "LKowgwhZBfg",
+    "title": "Yep That's My Wife🤭 - Jinx edit | Odetari - I'M A BLACKHOLE (STAR) #fyptikok",
+    "shortTitle": "Yep That's My Wife🤭 - Jinx edit | Odetari - I'M A BLACKHOLE (STAR)",
+    "slug": "yep-thats-my-wife-jinx-edit-odetari-im-a-blackhole-star-fypt",
+    "artist": "Mr Ted Edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCIiDhgieRJHsi5CZMxG-CUA",
+    "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
+    "year": 2026,
+    "uploadDate": "2026-10-16",
+    "views": 1972,
+    "likes": 217,
+    "duration": 17,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "QsS7sXqtZ48",
+    "videoId": "QsS7sXqtZ48",
+    "title": "One Day... | Jinx Arcane edit #jinx #arcane #edit",
+    "shortTitle": "One Day... | Jinx Arcane edit",
+    "slug": "one-day-jinx-arcane-edit-jinx-arcane-edit",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-08-09",
+    "views": 48019,
+    "likes": 1857,
+    "duration": 21,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "-n2OGCmcbk4",
+    "videoId": "-n2OGCmcbk4",
+    "title": "Jinx Edit || Song - Don't Worry About A Thing || Arcane || #arcaneleagueoflegends #jinxedit #Jinx",
+    "shortTitle": "Jinx Edit || Song - Don't Worry About A Thing || Arcane",
+    "slug": "jinx-edit-song-dont-worry-about-a-thing-arcane-arcaneleagueo",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-07-27",
+    "views": 34486,
+    "likes": 1367,
+    "duration": 25,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "J4kTOCv1GwA",
+    "videoId": "J4kTOCv1GwA",
+    "title": "Jinx Edit || Song - Sweet But A Psycho || Arcane || #arcaneleagueoflegends #jinxedit #Jinx",
+    "shortTitle": "Jinx Edit || Song - Sweet But A Psycho || Arcane",
+    "slug": "jinx-edit-song-sweet-but-a-psycho-arcane-arcaneleagueoflegen",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-07-22",
+    "views": 66300,
+    "likes": 2330,
+    "duration": 27,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "0W3Cq6FLXiM",
+    "videoId": "0W3Cq6FLXiM",
+    "title": "The Craziest Female Character?... | Jinx Edit | FUNK TAKA",
+    "shortTitle": "The Craziest Female Character?... | Jinx Edit | FUNK TAKA",
+    "slug": "the-craziest-female-character-jinx-edit-funk-taka",
+    "artist": "Consoles To Cinema",
+    "creatorUrl": "https://www.youtube.com/channel/UC1GvpVfQqj-zXyRQrH4HoTQ",
+    "channelId": "UC1GvpVfQqj-zXyRQrH4HoTQ",
+    "year": 2026,
+    "uploadDate": "2026-06-02",
+    "views": 37505,
+    "likes": 2038,
+    "duration": 30,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
+    "id": "khlddExDFIE",
+    "videoId": "khlddExDFIE",
+    "title": "The Best Feeling In The World - Jinx Edit (Arcane) | SEM DEMORA (Slowed & Reverb)",
+    "shortTitle": "The Best Feeling In The World - Jinx Edit (Arcane) | SEM DEMORA (Slowed & Reverb)",
+    "slug": "the-best-feeling-in-the-world-jinx-edit-arcane-sem-demora-sl",
+    "artist": "NousFX",
+    "creatorUrl": "https://www.youtube.com/channel/UC2lAipdL6BdewEVkGNPbQyA",
+    "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
+    "year": 2026,
+    "uploadDate": "2026-08-24",
+    "views": 52609,
+    "likes": 2550,
+    "duration": 47,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
+    "id": "44l9B5R5LIQ",
+    "videoId": "44l9B5R5LIQ",
+    "title": "Jinx Edit || Song - Don't Let Me Down || Arcane || #arcaneleagueoflegends #jinxedit #Jinx #arcane",
+    "shortTitle": "Jinx Edit || Song - Don't Let Me Down || Arcane",
+    "slug": "jinx-edit-song-dont-let-me-down-arcane-arcaneleagueoflegends",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-10-02",
+    "views": 26204,
+    "likes": 1620,
+    "duration": 27,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "onA9f8mT7EQ",
+    "videoId": "onA9f8mT7EQ",
+    "title": "Jinx First Appearance in the show | Arcane Jinx edit | #jinx #arcane #edit",
+    "shortTitle": "Jinx First Appearance in the show | Arcane Jinx edit",
+    "slug": "jinx-first-appearance-in-the-show-arcane-jinx-edit-jinx-arca",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-10-09",
+    "views": 15113,
+    "likes": 994,
+    "duration": 20,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "lvButGlwp0E",
+    "videoId": "lvButGlwp0E",
+    "title": "WHO'S JINX HERE? - Jinx edit | MONTAGEM UNKNOWN - AKXNESHIVA #fyptiktok",
+    "shortTitle": "WHO'S JINX HERE? - Jinx edit | MONTAGEM UNKNOWN - AKXNESHIVA",
+    "slug": "whos-jinx-here-jinx-edit-montagem-unknown-akxneshiva-fyptikt",
+    "artist": "Mr Ted Edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCIiDhgieRJHsi5CZMxG-CUA",
+    "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
+    "year": 2026,
+    "uploadDate": "2026-08-22",
+    "views": 30206,
+    "likes": 1156,
+    "duration": 16,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "ReWHsA-Eobk",
+    "videoId": "ReWHsA-Eobk",
+    "title": "Jinx.. Powder? Sad Jinx #jinx #arcane #leagueoflegends jinx sad edit ♕♡",
+    "shortTitle": "Jinx.. Powder? Sad Jinx #jinx #arcane #leagueoflegends jinx sad edit ♕♡",
+    "slug": "jinx-powder-sad-jinx-jinx-arcane-leagueoflegends-jinx-sad-ed",
+    "artist": " سامر يسري Samer Yousry  I",
+    "creatorUrl": "https://www.youtube.com/channel/UCQFi-jUyBCKybRXcB65qlNQ",
+    "channelId": "UCQFi-jUyBCKybRXcB65qlNQ",
+    "year": 2024,
+    "uploadDate": "2024-12-06",
+    "views": 67009,
+    "likes": 1754,
+    "duration": 15,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "EcxxA1MgBLk",
+    "videoId": "EcxxA1MgBLk",
+    "title": "Ridiculous?​ | Jinx Edit (Arcane) | #arcane #jinx",
+    "shortTitle": "Ridiculous?​ | Jinx Edit (Arcane)",
+    "slug": "ridiculous-jinx-edit-arcane-arcane-jinx",
+    "artist": "𝗞𝗬𝗟𝗟𝗔.",
+    "creatorUrl": "https://www.youtube.com/channel/UCoSQj4QSz54A7_7IHb3V3DQ",
+    "channelId": "UCoSQj4QSz54A7_7IHb3V3DQ",
+    "year": 2026,
+    "uploadDate": "2026-10-15",
+    "views": 5019,
+    "likes": null,
+    "duration": 17,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "UnpfICJMgdY",
+    "videoId": "UnpfICJMgdY",
+    "title": "So late to this trend 😭 - Jinx Edit | Paparazzi (slowed by me) |",
+    "shortTitle": "So late to this trend 😭 - Jinx Edit | Paparazzi (slowed by me)",
+    "slug": "so-late-to-this-trend-jinx-edit-paparazzi-slowed-by-me",
+    "artist": "ShadeCWW",
+    "creatorUrl": "https://www.youtube.com/channel/UCYaPTHoqC0nAMha-4k87nKg",
+    "channelId": "UCYaPTHoqC0nAMha-4k87nKg",
+    "year": 2026,
+    "uploadDate": "2026-09-03",
+    "views": 17487,
+    "likes": 641,
+    "duration": 21,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "DtPZYpIqhgk",
+    "videoId": "DtPZYpIqhgk",
+    "title": "I'm a HERO - Jinx Edit (\"Arcane Season 2\")｜Alexandra Stan - Mr Saxobeat",
+    "shortTitle": "I'm a HERO - Jinx Edit (\"Arcane Season 2\")｜Alexandra Stan - Mr Saxobeat",
+    "slug": "im-a-hero-jinx-edit-arcane-season-2alexandra-stan-mr-saxobea",
+    "artist": "Sunzyel",
+    "creatorUrl": "https://www.youtube.com/channel/UCJW95vNauvclIsVbDGE7IbQ",
+    "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
+    "year": 2024,
+    "uploadDate": "2024-12-23",
+    "views": 178060,
+    "likes": 13979,
+    "duration": 37,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
+    "id": "88-x2YlQnk4",
+    "videoId": "88-x2YlQnk4",
+    "title": "Jinx x Blue Angel | edit | it's ok I'm ok - Tate McRae #arcaneedit #samuelcampbelledits",
+    "shortTitle": "Jinx x Blue Angel | edit | it's ok I'm ok - Tate McRae",
+    "slug": "jinx-x-blue-angel-edit-its-ok-im-ok-tate-mcrae-arcaneedit-sa",
+    "artist": "samuel campbell edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCoIwbk_zCUPomAoo-w2z19g",
+    "channelId": "UCoIwbk_zCUPomAoo-w2z19g",
+    "year": 2026,
+    "uploadDate": "2026-10-15",
+    "views": 1048,
+    "likes": 29,
+    "duration": 32,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
     "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "EFlSCSciX0E",
+    "videoId": "EFlSCSciX0E",
+    "title": "Sister Thought I Missed Her | Jinx Arcane edit | bonde gosta-ultra-slowed #jinx #arcane #edit",
+    "shortTitle": "Sister Thought I Missed Her | Jinx Arcane edit | bonde gosta-ultra-slowed",
+    "slug": "sister-thought-i-missed-her-jinx-arcane-edit-bonde-gosta-ult",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-07-15",
+    "views": 59056,
+    "likes": 2516,
+    "duration": 23,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "AEHRcAYuWFY",
+    "videoId": "AEHRcAYuWFY",
+    "title": "\"What are you planning?\" | Jinx (Arcane) Edit #jinx #arcane",
+    "shortTitle": "\"What are you planning?\" | Jinx (Arcane) Edit",
+    "slug": "what-are-you-planning-jinx-arcane-edit-jinx-arcane",
+    "artist": "quang",
+    "creatorUrl": "https://www.youtube.com/channel/UC-XLN3DcVuqac3k4H2W7G2w",
+    "channelId": "UC-XLN3DcVuqac3k4H2W7G2w",
+    "year": 2026,
+    "uploadDate": "2026-05-07",
+    "views": 38406,
+    "likes": 2103,
+    "duration": 27,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "80F5gHYwK1c",
+    "videoId": "80F5gHYwK1c",
+    "title": "Had to || Dont let me down - Slowed || #jinx #arcane #netflix #netflixseries #edit #trending",
+    "shortTitle": "Had to || Dont let me down - Slowed",
+    "slug": "had-to-dont-let-me-down-slowed-jinx-arcane-netflix-netflixse",
+    "artist": "Enlixity",
+    "creatorUrl": "https://www.youtube.com/channel/UC41dLnsWl1dEIoiEVX1Ywrw",
+    "channelId": "UC41dLnsWl1dEIoiEVX1Ywrw",
+    "year": 2026,
+    "uploadDate": "2026-10-15",
+    "views": 196,
+    "likes": 10,
+    "duration": 18,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "6smWb3JrgYU",
+    "videoId": "6smWb3JrgYU",
+    "title": "SHAWTY SO KAWAII😩 - Jinx edit | Senpai - Shiki #fyptiktok",
+    "shortTitle": "SHAWTY SO KAWAII😩 - Jinx edit | Senpai - Shiki",
+    "slug": "shawty-so-kawaii-jinx-edit-senpai-shiki-fyptiktok",
+    "artist": "Mr Ted Edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCIiDhgieRJHsi5CZMxG-CUA",
+    "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
+    "year": 2026,
+    "uploadDate": "2026-08-21",
+    "views": 10846,
+    "likes": 391,
+    "duration": 19,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "64PJWrMOq48",
+    "videoId": "64PJWrMOq48",
+    "title": "JINX | Heavenly Jumpstyle EDIT✨| ARCANE edit |",
+    "shortTitle": "JINX | Heavenly Jumpstyle EDIT✨| ARCANE edit",
+    "slug": "jinx-heavenly-jumpstyle-edit-arcane-edit",
+    "artist": "CacaoClips",
+    "creatorUrl": "https://www.youtube.com/channel/UCenIGgzOtFO_G1TYrIOIgXA",
+    "channelId": "UCenIGgzOtFO_G1TYrIOIgXA",
+    "year": 2026,
+    "uploadDate": "2026-08-26",
+    "views": 7230,
+    "likes": 431,
+    "duration": 26,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "Ydzwts85vds",
+    "videoId": "Ydzwts85vds",
+    "title": "#jinx #arcane #edit #viral #fyp",
+    "shortTitle": "#jinx #arcane #edit #viral #fyp",
+    "slug": "jinx-arcane-edit-viral-fyp",
+    "artist": "Kaja🫩",
+    "creatorUrl": "https://www.youtube.com/channel/UC_9N3tkETzNxNnTx2d_M98A",
+    "channelId": "UC_9N3tkETzNxNnTx2d_M98A",
+    "year": 2026,
+    "uploadDate": "2026-10-15",
+    "views": 1302,
+    "likes": 97,
+    "duration": 50,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "FvZQSa7qUrA",
+    "videoId": "FvZQSa7qUrA",
+    "title": "Jinx Edit || Song - Clean Bandit || After Effects || #arcaneleagueoflegends #jinxedit #Jinx #arcane",
+    "shortTitle": "Jinx Edit || Song - Clean Bandit || After Effects",
+    "slug": "jinx-edit-song-clean-bandit-after-effects-arcaneleagueoflege",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-06-18",
+    "views": 16863,
+    "likes": 741,
+    "duration": 30,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "ydQX07_VlCg",
+    "videoId": "ydQX07_VlCg",
+    "title": "Switch... | Jinx Arcane edit #jinx #arcane #edit",
+    "shortTitle": "Switch... | Jinx Arcane edit",
+    "slug": "switch-jinx-arcane-edit-jinx-arcane-edit",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-05-23",
+    "views": 161287,
+    "likes": 5678,
+    "duration": 18,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "iJBi60aN9z4",
+    "videoId": "iJBi60aN9z4",
+    "title": "JINX Edit || Twenty one pilots – Heathens #shorts #arcane #arcaneseason2 #jinx",
+    "shortTitle": "JINX Edit || Twenty one pilots – Heathens",
+    "slug": "jinx-edit-twenty-one-pilots-heathens-shorts-arcane-arcanesea",
+    "artist": "OnLLy",
+    "creatorUrl": "https://www.youtube.com/channel/UCYzyEOLxeyCnKJBRZMsXGWw",
+    "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
+    "year": 2024,
+    "uploadDate": "2024-09-07",
+    "views": 552571,
+    "likes": 35423,
+    "duration": 27,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "3:4",
+    "aspectSource": "api"
+  },
+  {
+    "id": "AKOqjRlsy2E",
+    "videoId": "AKOqjRlsy2E",
+    "title": "RIP JINX - Jinx Edit (Arcane) | VØJ x Narvent Memory Reboot (Slowed)",
+    "shortTitle": "RIP JINX - Jinx Edit (Arcane) | VØJ x Narvent Memory Reboot (Slowed)",
+    "slug": "rip-jinx-jinx-edit-arcane-vj-x-narvent-memory-reboot-slowed",
+    "artist": "NousFX",
+    "creatorUrl": "https://www.youtube.com/channel/UC2lAipdL6BdewEVkGNPbQyA",
+    "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
+    "year": 2024,
+    "uploadDate": "2024-11-23",
+    "views": 351576,
+    "likes": 34229,
+    "duration": 41,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
+    "id": "2VWc4f7O4oI",
+    "videoId": "2VWc4f7O4oI",
+    "title": "(Trend) I forgot to give you the last rose 🌹​ | Jinx Edit (Arcane) | #arcane #jinx",
+    "shortTitle": "(Trend) I forgot to give you the last rose 🌹​ | Jinx Edit (Arcane)",
+    "slug": "trend-i-forgot-to-give-you-the-last-rose-jinx-edit-arcane-ar",
+    "artist": "𝗞𝗬𝗟𝗟𝗔.",
+    "creatorUrl": "https://www.youtube.com/channel/UCoSQj4QSz54A7_7IHb3V3DQ",
+    "channelId": "UCoSQj4QSz54A7_7IHb3V3DQ",
+    "year": 2026,
+    "uploadDate": "2026-10-02",
+    "views": 19026,
+    "likes": null,
+    "duration": 15,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "K7IsDi-Cuxw",
+    "videoId": "K7IsDi-Cuxw",
+    "title": "This song is stuck in my head🥀| Jinx edit | Song: Yararara",
+    "shortTitle": "This song is stuck in my head🥀| Jinx edit | Song: Yararara",
+    "slug": "this-song-is-stuck-in-my-head-jinx-edit-song-yararara",
+    "artist": "RenablazEdits",
+    "creatorUrl": "https://www.youtube.com/channel/UCjmuvpUPuvtZXinvmSEbGOg",
+    "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
+    "year": 2026,
+    "uploadDate": "2026-08-15",
+    "views": 15197,
+    "likes": 740,
+    "duration": 26,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "xmLuyCyoiHI",
+    "videoId": "xmLuyCyoiHI",
+    "title": "She was not a hero || Jinx Arcane Edit || Irokz - Funk Universo (Slowed) #jinx #arcane #shorts #edit",
+    "shortTitle": "She was not a hero || Jinx Arcane Edit || Irokz - Funk Universo (Slowed)",
+    "slug": "she-was-not-a-hero-jinx-arcane-edit-irokz-funk-universo-slow",
+    "artist": "GeoxEdits",
+    "creatorUrl": "https://www.youtube.com/channel/UCubnJbQ-RsR_bIDsywx30oA",
+    "channelId": "UCubnJbQ-RsR_bIDsywx30oA",
+    "year": 2026,
+    "uploadDate": "2026-10-10",
+    "views": 6079,
+    "likes": null,
+    "duration": 22,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "qPN6NIJhnwo",
+    "videoId": "qPN6NIJhnwo",
+    "title": "From Cait's Pov | Arcane jinx edit | buenatekk slowed #jinx #arcane #edit",
+    "shortTitle": "From Cait's Pov | Arcane jinx edit | buenatekk slowed",
+    "slug": "from-caits-pov-arcane-jinx-edit-buenatekk-slowed-jinx-arcane",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-06-11",
+    "views": 58745,
+    "likes": 2519,
+    "duration": 20,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "j8NmI6jZp0I",
+    "videoId": "j8NmI6jZp0I",
+    "title": "Jinx Edit || Song - Hear The Sound || Arcane || #arcaneleagueoflegends #jinxedit #Jinx #arcane",
+    "shortTitle": "Jinx Edit || Song - Hear The Sound || Arcane",
+    "slug": "jinx-edit-song-hear-the-sound-arcane-arcaneleagueoflegends-j",
+    "artist": "Carnom",
+    "creatorUrl": "https://www.youtube.com/channel/UCq72byMMH69pZ2C9uvK4Dow",
+    "channelId": "UCq72byMMH69pZ2C9uvK4Dow",
+    "year": 2026,
+    "uploadDate": "2026-09-13",
+    "views": 13101,
+    "likes": 998,
+    "duration": 31,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "BtU3KZobG_A",
+    "videoId": "BtU3KZobG_A",
+    "title": "\"When he met me, and when I killed him\" || JINX Edit #shorts #arcane #arcaneseason2 #jinx",
+    "shortTitle": "\"When he met me, and when I killed him\" || JINX Edit",
+    "slug": "when-he-met-me-and-when-i-killed-him-jinx-edit-shorts-arcane",
+    "artist": "OnLLy",
+    "creatorUrl": "https://www.youtube.com/channel/UCYzyEOLxeyCnKJBRZMsXGWw",
+    "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
+    "year": 2024,
+    "uploadDate": "2024-08-11",
+    "views": 2214145,
+    "likes": 116417,
+    "duration": 24,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "3:4",
+    "aspectSource": "api"
+  },
+  {
+    "id": "93e9iDr7Qqk",
+    "videoId": "93e9iDr7Qqk",
+    "title": "Jinx Edit//#jinx //#arcane //#edit //#fyp //By M4LIS0N",
+    "shortTitle": "Jinx Edit//#jinx //#arcane //#edit //#fyp //By M4LIS0N",
+    "slug": "jinx-editjinx-arcane-edit-fyp-by-m4lis0n",
+    "artist": "꧁𖤐𝔐𝔞𝔩𝔦𝔰𝔬𝔫𖤐꧂",
+    "creatorUrl": "https://www.youtube.com/channel/UCMi2ZNVPGlYa_MC0JYbersw",
+    "channelId": "UCMi2ZNVPGlYa_MC0JYbersw",
+    "year": 2026,
+    "uploadDate": "2026-10-15",
+    "views": 610,
+    "likes": 26,
+    "duration": 26,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "z8PWiSmNaoI",
+    "videoId": "z8PWiSmNaoI",
+    "title": "jinx star edit #edit #leagueoflegends #jinx #jinxarcane #arcane #arcaneedit #aftereffect #edits",
+    "shortTitle": "jinx star edit",
+    "slug": "jinx-star-edit-edit-leagueoflegends-jinx-jinxarcane-arcane-a",
+    "artist": "jennzzedits",
+    "creatorUrl": "https://www.youtube.com/channel/UCNGm8zDKJju2oFy_0lcGrZA",
+    "channelId": "UCNGm8zDKJju2oFy_0lcGrZA",
+    "year": 2026,
+    "uploadDate": "2026-10-13",
+    "views": 7978,
+    "likes": 723,
+    "duration": 14,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "USw3OEmlzug",
+    "videoId": "USw3OEmlzug",
+    "title": "Yeah, why not? 🫣💙 #arcane #jinx #powder #edit #foryou",
+    "shortTitle": "Yeah, why not? 🫣💙",
+    "slug": "yeah-why-not-arcane-jinx-powder-edit-foryou",
+    "artist": "Mel_T",
+    "creatorUrl": "https://www.youtube.com/channel/UCTA69NXNnRn5pP5tHfqyIpg",
+    "channelId": "UCTA69NXNnRn5pP5tHfqyIpg",
+    "year": 2026,
+    "uploadDate": "2026-10-13",
+    "views": 15250,
+    "likes": 1254,
+    "duration": 12,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "eFYoTaonmcI",
+    "videoId": "eFYoTaonmcI",
+    "title": "I Think I'm Obsessed With Her😩 - Jinx edit | Dark Horse - Katy Perry #fyptiktok #arcaneedit",
+    "shortTitle": "I Think I'm Obsessed With Her😩 - Jinx edit | Dark Horse - Katy Perry",
+    "slug": "i-think-im-obsessed-with-her-jinx-edit-dark-horse-katy-perry",
+    "artist": "Mr Ted Edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCIiDhgieRJHsi5CZMxG-CUA",
+    "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
+    "year": 2026,
+    "uploadDate": "2026-08-21",
+    "views": 28339,
+    "likes": 838,
+    "duration": 19,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "7aCH0nUBRKQ",
+    "videoId": "7aCH0nUBRKQ",
+    "title": "#JINX - The song fits her song much!!! || song:Greed || #jinxedit #jinxarcane #fyp #viral",
+    "shortTitle": "#JINX - The song fits her song much!!! || song:Greed",
+    "slug": "jinx-the-song-fits-her-song-much-songgreed-jinxedit-jinxarca",
+    "artist": "SAEYLAEDITS",
+    "creatorUrl": "https://www.youtube.com/channel/UCQO-EB0_KXUeeSBocI_BNEA",
+    "channelId": "UCQO-EB0_KXUeeSBocI_BNEA",
+    "year": 2026,
+    "uploadDate": "2026-10-16",
+    "views": 120,
+    "likes": 7,
+    "duration": 13,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "_nWUsuF0Rgs",
+    "videoId": "_nWUsuF0Rgs",
+    "title": "The snack 😏 | Arcane jinx edit | Nati nati song #arcane #jinx #edit",
+    "shortTitle": "The snack 😏 | Arcane jinx edit | Nati nati song",
+    "slug": "the-snack-arcane-jinx-edit-nati-nati-song-arcane-jinx-edit",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-06-03",
+    "views": 100924,
+    "likes": 4091,
+    "duration": 23,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "N8fqpsILrcY",
+    "videoId": "N8fqpsILrcY",
+    "title": "Lefty... | Jinx arcane edit ( Melodia-sentada-super-slowed ) #jinx #arcane #edit",
+    "shortTitle": "Lefty... | Jinx arcane edit ( Melodia-sentada-super-slowed )",
+    "slug": "lefty-jinx-arcane-edit-melodia-sentada-super-slowed-jinx-arc",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-08-20",
+    "views": 42362,
+    "likes": 2023,
+    "duration": 24,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "1MRciaHiABE",
+    "videoId": "1MRciaHiABE",
+    "title": "I AM JINX | Arcane | Jinx Edit | Discord server in bio",
+    "shortTitle": "I AM JINX | Arcane | Jinx Edit | Discord server in bio",
+    "slug": "i-am-jinx-arcane-jinx-edit-discord-server-in-bio",
+    "artist": "hurricane",
+    "creatorUrl": "https://www.youtube.com/channel/UCRcT5FtGQsHz15BFaVl3puQ",
+    "channelId": "UCRcT5FtGQsHz15BFaVl3puQ",
+    "year": 2024,
+    "uploadDate": "2024-11-17",
+    "views": 103092,
+    "likes": 8439,
+    "duration": 56,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "vg04eisTCtA",
+    "videoId": "vg04eisTCtA",
+    "title": "Quick Edit | Jinx arcane edit #jinx #arcane #edit",
+    "shortTitle": "Quick Edit | Jinx arcane edit",
+    "slug": "quick-edit-jinx-arcane-edit-jinx-arcane-edit",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-08-23",
+    "views": 46146,
+    "likes": 2272,
+    "duration": 22,
+    "embedAllowed": true,
+    "group": "jinx",
+    "characters": [
+      "Jinx"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
@@ -7273,7 +9131,7 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2025,
     "uploadDate": "2025-01-29",
-    "views": 353436,
+    "views": 353507,
     "likes": 25921,
     "duration": 30,
     "embedAllowed": true,
@@ -7305,8 +9163,8 @@
     "channelId": "UCeQJtgEVNBBbzV7J4jArYTw",
     "year": 2024,
     "uploadDate": "2024-11-12",
-    "views": 2232510,
-    "likes": 137486,
+    "views": 2232624,
+    "likes": 137484,
     "duration": 34,
     "embedAllowed": true,
     "group": "jinxandisha",
@@ -7319,12 +9177,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "j0ZV_1aGM94",
@@ -7337,9 +9195,41 @@
     "channelId": "UCnROa0EFl5PPj77NoRHPghg",
     "year": 2025,
     "uploadDate": "2025-05-23",
-    "views": 598938,
-    "likes": 25678,
+    "views": 598985,
+    "likes": 25679,
     "duration": 22,
+    "embedAllowed": true,
+    "group": "jinxandisha",
+    "characters": [
+      "Jinx",
+      "Isha"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "FnJp9L2xygU",
+    "videoId": "FnJp9L2xygU",
+    "title": "Jinx & Isha Edit (\"Arcane Season 2\")｜Narvent - Her Eyes",
+    "shortTitle": "Jinx & Isha Edit (\"Arcane Season 2\")｜Narvent - Her Eyes",
+    "slug": "jinx-isha-edit-arcane-season-2narvent-her-eyes",
+    "artist": "Sunzyel",
+    "creatorUrl": "https://www.youtube.com/channel/UCJW95vNauvclIsVbDGE7IbQ",
+    "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
+    "year": 2024,
+    "uploadDate": "2024-11-16",
+    "views": 1007599,
+    "likes": 93376,
+    "duration": 34,
     "embedAllowed": true,
     "group": "jinxandisha",
     "characters": [
@@ -7359,6 +9249,38 @@
     "aspectSource": "api"
   },
   {
+    "id": "JK9d0U0jWhI",
+    "videoId": "JK9d0U0jWhI",
+    "title": "#ISHA•Litte Girl Gone|#arcane #jinx #jinxandisha #arcaneedit #edit #fyp",
+    "shortTitle": "#ISHA•Litte Girl Gone",
+    "slug": "ishalitte-girl-gonearcane-jinx-jinxandisha-arcaneedit-edit-f",
+    "artist": "Sky_art_",
+    "creatorUrl": "https://www.youtube.com/channel/UChztN65nLxqjlYiPtJ7zuug",
+    "channelId": "UChztN65nLxqjlYiPtJ7zuug",
+    "year": 2025,
+    "uploadDate": "2025-01-05",
+    "views": 746552,
+    "likes": 30832,
+    "duration": 17,
+    "embedAllowed": true,
+    "group": "jinxandisha",
+    "characters": [
+      "Jinx",
+      "Isha"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
     "id": "_H5br4NLJaU",
     "videoId": "_H5br4NLJaU",
     "title": "Big Mama☠️ - Jinx & Sevika Edit (Arcane)｜Sean Paul, Dua Lipa - No Lie",
@@ -7369,9 +9291,41 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-01-20",
-    "views": 151888,
+    "views": 151894,
     "likes": 10135,
     "duration": 38,
+    "embedAllowed": true,
+    "group": "jinxandsevika",
+    "characters": [
+      "Jinx",
+      "Sevika"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "Wh12V63Ygrk",
+    "videoId": "Wh12V63Ygrk",
+    "title": "Diabolical Duo - JINX & SEVIKA EDIT || Cold Lie (slowed) #jinxedit #jinx #arcane #edit #arcaneedit",
+    "shortTitle": "Diabolical Duo - JINX & SEVIKA EDIT || Cold Lie (slowed)",
+    "slug": "diabolical-duo-jinx-sevika-edit-cold-lie-slowed-jinxedit-jin",
+    "artist": "Dima Gorgon",
+    "creatorUrl": "https://www.youtube.com/channel/UCT5RvhVUiRkYf5SXjAiHdug",
+    "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
+    "year": 2024,
+    "uploadDate": "2024-12-02",
+    "views": 278319,
+    "likes": 24168,
+    "duration": 37,
     "embedAllowed": true,
     "group": "jinxandsevika",
     "characters": [
@@ -7391,6 +9345,38 @@
     "aspectSource": "api"
   },
   {
+    "id": "SMpQ6p1pKXU",
+    "videoId": "SMpQ6p1pKXU",
+    "title": "Haven't I Done You Enough Favors ? - Jinx & Sevika Edit｜MONTAGEM BATIDA",
+    "shortTitle": "Haven't I Done You Enough Favors ? - Jinx & Sevika Edit｜MONTAGEM BATIDA",
+    "slug": "havent-i-done-you-enough-favors-jinx-sevika-editmontagem-bat",
+    "artist": "Sunzyel",
+    "creatorUrl": "https://www.youtube.com/channel/UCJW95vNauvclIsVbDGE7IbQ",
+    "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
+    "year": 2025,
+    "uploadDate": "2025-11-05",
+    "views": 207749,
+    "likes": 9935,
+    "duration": 35,
+    "embedAllowed": true,
+    "group": "jinxandsevika",
+    "characters": [
+      "Jinx",
+      "Sevika"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
     "id": "vGCZLjPOM9I",
     "videoId": "vGCZLjPOM9I",
     "title": "Jinx and Rumi edit",
@@ -7401,7 +9387,7 @@
     "channelId": "UCjmuvpUPuvtZXinvmSEbGOg",
     "year": 2025,
     "uploadDate": "2025-08-03",
-    "views": 229426,
+    "views": 229430,
     "likes": 5777,
     "duration": 13,
     "embedAllowed": true,
@@ -7414,12 +9400,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "dZh0CnqfU5o",
@@ -7445,12 +9431,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "3zPxg8K88t0",
@@ -7463,8 +9449,8 @@
     "channelId": "UC-XLN3DcVuqac3k4H2W7G2w",
     "year": 2025,
     "uploadDate": "2025-06-26",
-    "views": 433693,
-    "likes": 33960,
+    "views": 433750,
+    "likes": 33962,
     "duration": 39,
     "embedAllowed": true,
     "group": "jinxandsilco",
@@ -7495,8 +9481,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-03-13",
-    "views": 420987,
-    "likes": 26353,
+    "views": 421054,
+    "likes": 26357,
     "duration": 59,
     "embedAllowed": true,
     "group": "jinxandsilco",
@@ -7527,7 +9513,7 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2025,
     "uploadDate": "2025-01-22",
-    "views": 474670,
+    "views": 474705,
     "likes": 26937,
     "duration": 42,
     "embedAllowed": true,
@@ -7541,12 +9527,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "yV_ik4ymYno",
@@ -7559,8 +9545,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2025,
     "uploadDate": "2025-02-14",
-    "views": 246531,
-    "likes": 13581,
+    "views": 246579,
+    "likes": 13582,
     "duration": 28,
     "embedAllowed": true,
     "group": "jinxandsilco",
@@ -7573,12 +9559,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "o_dvSgNPSiE",
@@ -7605,11 +9591,107 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:16",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "vn5R01mTjnY",
+    "videoId": "vn5R01mTjnY",
+    "title": "Quick edit | Jinx & Vi Arcane edit #jinx #viarcane #arcane",
+    "shortTitle": "Quick edit | Jinx & Vi Arcane edit",
+    "slug": "quick-edit-jinx-vi-arcane-edit-jinx-viarcane-arcane",
+    "artist": "ITZGeo15",
+    "creatorUrl": "https://www.youtube.com/channel/UCB9PvD3heGYbS9a5YVU8r1g",
+    "channelId": "UCB9PvD3heGYbS9a5YVU8r1g",
+    "year": 2026,
+    "uploadDate": "2026-04-28",
+    "views": 69914,
+    "likes": 2697,
+    "duration": 19,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
     "notes": "",
     "status": "ok",
     "flags": [],
     "lastChecked": "2026-10-16",
     "aspect": "9:16",
+    "aspectSource": "api"
+  },
+  {
+    "id": "PpvhFwVBP-U",
+    "videoId": "PpvhFwVBP-U",
+    "title": "\"Light it up and I'LL FIND YOU\" || JINX & VI Edit #shorts #jinx #viarcane #arcane #arcaneedit #edit",
+    "shortTitle": "\"Light it up and I'LL FIND YOU\" || JINX & VI Edit",
+    "slug": "light-it-up-and-ill-find-you-jinx-vi-edit-shorts-jinx-viarca",
+    "artist": "OnLLy",
+    "creatorUrl": "https://www.youtube.com/channel/UCYzyEOLxeyCnKJBRZMsXGWw",
+    "channelId": "UCYzyEOLxeyCnKJBRZMsXGWw",
+    "year": 2026,
+    "uploadDate": "2026-08-11",
+    "views": 24500,
+    "likes": 904,
+    "duration": 27,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "kXVL9p9Lx6I",
+    "videoId": "kXVL9p9Lx6I",
+    "title": "SAME PERSON BTW😍 - Arcane Jinx edit | Before And After Dagestan | ZELENUYU #fyptiktok",
+    "shortTitle": "SAME PERSON BTW😍 - Arcane Jinx edit | Before And After Dagestan | ZELENUYU",
+    "slug": "same-person-btw-arcane-jinx-edit-before-and-after-dagestan-z",
+    "artist": "Mr Ted Edits",
+    "creatorUrl": "https://www.youtube.com/channel/UCIiDhgieRJHsi5CZMxG-CUA",
+    "channelId": "UCIiDhgieRJHsi5CZMxG-CUA",
+    "year": 2026,
+    "uploadDate": "2026-08-18",
+    "views": 41653,
+    "likes": 1408,
+    "duration": 17,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
     "aspectSource": "api"
   },
   {
@@ -7623,8 +9705,8 @@
     "channelId": "UCTUBWKDHZf65WDiZpslYGGQ",
     "year": 2025,
     "uploadDate": "2025-03-03",
-    "views": 959438,
-    "likes": 22307,
+    "views": 959590,
+    "likes": 22306,
     "duration": 16,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7655,8 +9737,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2025,
     "uploadDate": "2025-05-24",
-    "views": 2081564,
-    "likes": 117471,
+    "views": 2081758,
+    "likes": 117476,
     "duration": 55,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7687,8 +9769,8 @@
     "channelId": "UCRcT5FtGQsHz15BFaVl3puQ",
     "year": 2024,
     "uploadDate": "2024-11-25",
-    "views": 169142,
-    "likes": 15545,
+    "views": 169157,
+    "likes": 15544,
     "duration": 60,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7719,8 +9801,8 @@
     "channelId": "UCJW95vNauvclIsVbDGE7IbQ",
     "year": 2024,
     "uploadDate": "2024-11-10",
-    "views": 460511,
-    "likes": 30060,
+    "views": 460532,
+    "likes": 30059,
     "duration": 32,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7733,12 +9815,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "lKWz9ByrCMo",
@@ -7751,7 +9833,7 @@
     "channelId": "UCimfCAWxnvCa0L3UB8XVG8w",
     "year": 2026,
     "uploadDate": "2026-05-31",
-    "views": 32508,
+    "views": 32518,
     "likes": 1480,
     "duration": 15,
     "embedAllowed": true,
@@ -7765,12 +9847,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "DFPqtVfuBtw",
@@ -7783,8 +9865,8 @@
     "channelId": "UCih_LnICssAkUW4krb30sbw",
     "year": 2025,
     "uploadDate": "2025-05-26",
-    "views": 456061,
-    "likes": 24813,
+    "views": 456103,
+    "likes": 24816,
     "duration": 44,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7797,12 +9879,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "LW2hLEqSUJg",
@@ -7815,8 +9897,8 @@
     "channelId": "UCSZbHmLCcZEvZelwrSbC6BA",
     "year": 2025,
     "uploadDate": "2025-07-09",
-    "views": 450269,
-    "likes": 13390,
+    "views": 450342,
+    "likes": 13392,
     "duration": 32,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7829,12 +9911,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "rf42ZUWIYkk",
@@ -7847,8 +9929,8 @@
     "channelId": "UCEfc2zTpFQAlOQdl7JA5w4A",
     "year": 2025,
     "uploadDate": "2025-08-30",
-    "views": 501253,
-    "likes": 20719,
+    "views": 501293,
+    "likes": 20725,
     "duration": 29,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7861,12 +9943,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "3UT4YTq5F3g",
@@ -7879,8 +9961,8 @@
     "channelId": "UCxuRTYjrvNKcrg4bxr2nkiw",
     "year": 2025,
     "uploadDate": "2025-10-18",
-    "views": 341866,
-    "likes": 13730,
+    "views": 342075,
+    "likes": 13737,
     "duration": 43,
     "embedAllowed": true,
     "group": "jinxandvi",
@@ -7893,12 +9975,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "1:1",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "wKJt8zna-A8",
@@ -7925,12 +10007,12 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   },
   {
     "id": "9HBJPdSirjE",
@@ -7943,9 +10025,41 @@
     "channelId": "UCYabeMtm4sUI4Y4EYXFfx9Q",
     "year": 2026,
     "uploadDate": "2026-10-03",
-    "views": 7797,
+    "views": 7799,
     "likes": 576,
     "duration": 15,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "aspect": "1:1",
+    "aspectSource": "api",
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "UZHQ-jfIrTM",
+    "videoId": "UZHQ-jfIrTM",
+    "title": "\"Why?!\" - Jinx and Vi edit | Narvent - Fainted",
+    "shortTitle": "\"Why?!\" - Jinx and Vi edit | Narvent - Fainted",
+    "slug": "why-jinx-and-vi-edit-narvent-fainted",
+    "artist": "ryxver",
+    "creatorUrl": "https://www.youtube.com/channel/UCXi3QzDa2fkKoTO6oiAFVjQ",
+    "channelId": "UCXi3QzDa2fkKoTO6oiAFVjQ",
+    "year": 2026,
+    "uploadDate": "2026-10-12",
+    "views": 4991,
+    "likes": 307,
+    "duration": 43,
     "embedAllowed": true,
     "group": "jinxandvi",
     "characters": [
@@ -7965,6 +10079,102 @@
     "aspectSource": "api"
   },
   {
+    "id": "K07V2ZPSjbo",
+    "videoId": "K07V2ZPSjbo",
+    "title": "Jinx Vs Vi - Jinx & Vi Edit (Arcane) | shadow lady du6ak phonk edit (Slowed & Reverb)",
+    "shortTitle": "Jinx Vs Vi - Jinx & Vi Edit (Arcane) | shadow lady du6ak phonk edit (Slowed & Reverb)",
+    "slug": "jinx-vs-vi-jinx-vi-edit-arcane-shadow-lady-du6ak-phonk-edit-",
+    "artist": "NousFX",
+    "creatorUrl": "https://www.youtube.com/channel/UC2lAipdL6BdewEVkGNPbQyA",
+    "channelId": "UC2lAipdL6BdewEVkGNPbQyA",
+    "year": 2026,
+    "uploadDate": "2026-07-17",
+    "views": 61002,
+    "likes": 4486,
+    "duration": 30,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
+    "id": "1yFdxjDTLwA",
+    "videoId": "1yFdxjDTLwA",
+    "title": "Jinx and Vi Edit - Woodkid - To Ashes and Blood #shorts #arcane #arcaneseason2 #jinx #jinxedit #vi",
+    "shortTitle": "Jinx and Vi Edit - Woodkid - To Ashes and Blood",
+    "slug": "jinx-and-vi-edit-woodkid-to-ashes-and-blood-shorts-arcane-ar",
+    "artist": "Blade_AE",
+    "creatorUrl": "https://www.youtube.com/channel/UCpoFitCwjf657n9vIXNeaJw",
+    "channelId": "UCpoFitCwjf657n9vIXNeaJw",
+    "year": 2024,
+    "uploadDate": "2024-12-19",
+    "views": 567548,
+    "likes": 35968,
+    "duration": 54,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "1:1",
+    "aspectSource": "api"
+  },
+  {
+    "id": "qj9S1GjW_HY",
+    "videoId": "qj9S1GjW_HY",
+    "title": "\"Are we still sisters?\" - JINX & VI EDIT || IDFC - Blackbear #jinxedit #jinx #viarcane #arcane",
+    "shortTitle": "\"Are we still sisters?\" - JINX & VI EDIT || IDFC - Blackbear",
+    "slug": "are-we-still-sisters-jinx-vi-edit-idfc-blackbear-jinxedit-ji",
+    "artist": "Dima Gorgon",
+    "creatorUrl": "https://www.youtube.com/channel/UCT5RvhVUiRkYf5SXjAiHdug",
+    "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
+    "year": 2025,
+    "uploadDate": "2025-04-12",
+    "views": 280881,
+    "likes": 17046,
+    "duration": 42,
+    "embedAllowed": true,
+    "group": "jinxandvi",
+    "characters": [
+      "Jinx",
+      "Vi"
+    ],
+    "charactersSource": "heading",
+    "tournaments": [],
+    "tags": [],
+    "category": "edit",
+    "seed": null,
+    "notes": "",
+    "status": "ok",
+    "flags": [],
+    "lastChecked": "2026-10-16",
+    "aspect": "9:10",
+    "aspectSource": "api"
+  },
+  {
     "id": "5YkDTqFtKF4",
     "videoId": "5YkDTqFtKF4",
     "title": "Arcane - lux Love for Jinx #edits #fyp arcaneedit#arcaneseason2#arcaneleagueoflegends#jinx#jinxedit",
@@ -7975,7 +10185,7 @@
     "channelId": "UC4hCbeReFAZ6DXRbyNLDD9g",
     "year": 2025,
     "uploadDate": "2025-02-09",
-    "views": 1951219,
+    "views": 1951230,
     "likes": null,
     "duration": 19,
     "embedAllowed": true,
@@ -8038,8 +10248,8 @@
     "channelId": "UCT5RvhVUiRkYf5SXjAiHdug",
     "year": 2024,
     "uploadDate": "2024-09-22",
-    "views": 1110770,
-    "likes": 59722,
+    "views": 1110884,
+    "likes": 59729,
     "duration": 31,
     "embedAllowed": true,
     "group": "vi",
@@ -8051,11 +10261,11 @@
     "tags": [],
     "category": "edit",
     "seed": null,
+    "aspect": "9:10",
+    "aspectSource": "api",
     "notes": "",
     "status": "ok",
     "flags": [],
-    "lastChecked": "2026-10-16",
-    "aspect": "9:10",
-    "aspectSource": "api"
+    "lastChecked": "2026-10-16"
   }
 ]
