@@ -140,7 +140,15 @@ export default async (request, context) => {
     // so a cup with many matches (a group stage is 24 to 384) must follow nextPageToken or the page shows only the first few.
     let firestoreData;
     if (isMatchList) {
-      firestoreData = await fetchAllPages(firebaseUrl);
+      try {
+        firestoreData = await fetchMatchListCheaply(cup);
+      } catch (error) {
+        // Quota/rate limits must surface (the stale-copy fallback below handles them). Anything else (index, query shape) falls
+        // back to the plain full list, which always worked.
+        if (/\b429\b/.test(String(error.message))) throw error;
+        console.warn("⚠️ Cheap match list failed, using the full list:", error.message);
+        firestoreData = await fetchAllPages(firebaseUrl);
+      }
     } else {
       const response = await fsFetch(firebaseUrl, {
         headers: {
@@ -208,6 +216,47 @@ export default async (request, context) => {
     });
   }
 };
+
+// ========================================
+// CHEAP MATCH LIST
+// ========================================
+// Firestore bills one read per document returned. A full group stage is 384 matches, but only the opened ones (live or
+// finished) change from minute to minute: the rest sit at "upcoming" until an admin opens their batch. So the list is two
+// queries: opened matches (fresh every CACHE_DURATION seconds) + upcoming matches (kept UPCOMING_CACHE_MS). If a match is
+// opened in between, the fresh copy wins over the cached "upcoming" one.
+const UPCOMING_CACHE_MS = 10 * 60 * 1000;
+
+async function queryMatches(cup, op) {
+  const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${cup}:runQuery`;
+  const response = await fsFetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: "matches" }],
+        where: { fieldFilter: { field: { fieldPath: "status" }, op, value: { stringValue: "upcoming" } } }
+      }
+    })
+  });
+  if (!response.ok) throw new Error(`Firebase error: ${await describeFailure(response)}`);
+  const rows = await response.json();
+  return (Array.isArray(rows) ? rows : []).filter(r => r.document).map(r => r.document);
+}
+
+async function fetchMatchListCheaply(cup) {
+  const opened = await queryMatches(cup, "NOT_EQUAL");
+
+  const upcomingKey = `upcoming-docs#${cup}`;
+  let upcoming = edgeCache.get(upcomingKey);
+  if (!upcoming || (Date.now() - upcoming.timestamp) >= UPCOMING_CACHE_MS) {
+    upcoming = { data: await queryMatches(cup, "EQUAL"), timestamp: Date.now() };
+    edgeCache.set(upcomingKey, upcoming);
+  }
+
+  const idOf = d => String(d.name || "").split("/").pop();
+  const openedIds = new Set(opened.map(idOf));
+  return { documents: [...opened, ...upcoming.data.filter(d => !openedIds.has(idOf(d)))] };
+}
 
 // ========================================
 // PAGED LIST FETCH
@@ -438,11 +487,41 @@ async function handleTotalVotes(request) {
     }
     
     console.log('🔥 Fetching total votes from Firebase...');
-    
-    // Query all votes using structured query
+
+    // A COUNT aggregation is billed at about one read per 1,000 votes, where reading every vote document cost one read each
+    // (thousands of reads every refresh once the cup is busy). It counts the votes of the active cup only, so test cups do
+    // not count towards the Founding Member 1,000. If the aggregation is unavailable the old full read below is used.
+    let countedVotes = null;
+    try {
+      const aggUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runAggregationQuery`;
+      const aggResponse = await fsFetch(aggUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredAggregationQuery: {
+            structuredQuery: {
+              from: [{ collectionId: 'votes' }],
+              where: { fieldFilter: { field: { fieldPath: 'tournament' }, op: 'EQUAL', value: { stringValue: TOURNAMENT } } }
+            },
+            aggregations: [{ alias: 'n', count: {} }]
+          }
+        })
+      });
+      if (aggResponse.status === 429) throw new Error(`Firebase error: ${await describeFailure(aggResponse)}`);
+      if (aggResponse.ok) {
+        const rows = await aggResponse.json();
+        const n = rows?.[0]?.result?.aggregateFields?.n?.integerValue;
+        if (n !== undefined) countedVotes = Number(n);
+      }
+    } catch (error) {
+      if (/\b429\b/.test(String(error.message))) throw error;
+      console.warn('⚠️ Vote count aggregation failed, reading votes instead:', error.message);
+    }
+
+    // Query all votes using structured query (fallback)
     const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
     
-    const response = await fsFetch(votesUrl, {
+    const response = countedVotes !== null ? null : await fsFetch(votesUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -459,14 +538,12 @@ async function handleTotalVotes(request) {
       })
     });
     
-    if (!response.ok) {
+    if (response && !response.ok) {
       throw new Error(`Firebase error: ${response.status}`);
     }
     
-    const data = await response.json();
-    
     // Count total votes (each document = 1 vote)
-    const totalVotes = data.filter(item => item.document).length;
+    const totalVotes = countedVotes !== null ? countedVotes : (await response.json()).filter(item => item.document).length;
     
     console.log(`✅ Total site votes: ${totalVotes}`);
     
