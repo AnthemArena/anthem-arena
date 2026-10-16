@@ -1549,3 +1549,105 @@ body.theme-arcane .vote-btn .vote-text {
 body.theme-arcane .vote-btn.voted .vote-text::after { content: none; }
 body.theme-arcane .vote-btn.voted .vote-text::before { content: '\2713  '; }
 
+
+/* ========================================
+   16 Oct polish: live page + vote page
+   ======================================== */
+
+/* live banner: "Group B is live! · 6 matches · Ends in ..." as parts that wrap cleanly, with a dot between parts that is
+   only drawn when they share a line (no stray dot at the start of a wrapped line) */
+body.theme-arcane .countdown-content { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .15rem 0; }
+body.theme-arcane .countdown-content .cd-part { white-space: nowrap; }
+body.theme-arcane .countdown-content .cd-part + .cd-part::before { content: '\2022'; margin: 0 .6rem; opacity: .7; }
+@media (max-width: 520px) {
+    body.theme-arcane .countdown-content { flex-direction: column; align-items: center; }
+    body.theme-arcane .countdown-content .cd-part + .cd-part::before { content: none; }
+}
+
+/* "Founding member" tag sits above the thumbnails on every screen size, not on top of the picked cover */
+body.theme-arcane .social-match-card.voted::before {
+    position: static;
+    display: block;
+    width: fit-content;
+    max-width: calc(100% - 1.5rem);
+    margin: .75rem auto .6rem;
+    box-shadow: none;
+    text-align: center;
+}
+
+/* Community Activity rows: long names are cut with "...", the time stays visible */
+body.theme-arcane .mini-activity-card { min-width: 0; overflow: hidden; }
+body.theme-arcane .mini-activity-card .mini-thumbnail { flex: none; }
+body.theme-arcane .mini-activity-card .mini-info { flex: 1 1 0; min-width: 0; }
+body.theme-arcane .mini-activity-card .mini-user,
+body.theme-arcane .mini-activity-card .mini-song { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.theme-arcane .mini-activity-card .mini-time { flex: none; }
+body.theme-arcane .mini-activity-feed .feed-content { min-width: 0; }
+
+/* desktop: open matches first (as on phones), then the progress bar, ticker, hero and activity */
+@media (min-width: 769px) {
+    body.theme-arcane .social-container { display: flex; flex-direction: column; align-items: center; }
+    body.theme-arcane .social-container > * { width: 100%; margin-left: 0; margin-right: 0; box-sizing: border-box; min-width: 0; }
+    body.theme-arcane .social-container > .countdown-banner   { order: 1; }
+    body.theme-arcane .social-container > .unvoted-section    { order: 2; }
+    body.theme-arcane .social-container > .voted-section      { order: 3; }
+    body.theme-arcane .social-container > .no-matches         { order: 4; }
+    body.theme-arcane .social-container > .progress-container { order: 5; }
+    body.theme-arcane .social-container > .activity-ticker    { order: 6; }
+    body.theme-arcane .social-container > .hero-header        { order: 7; }
+    body.theme-arcane .social-container > .mini-activity-feed { order: 8; }
+    body.theme-arcane .social-container > .landing-footer     { order: 9; }
+}
+
+/* vote page: the gold note icon on the pink button read as a faint circle; the label is enough */
+body.theme-arcane .vote-btn .vote-icon { display: none; }
+
+/* vote page: one rule between the chips and the history row, not two or three */
+body.theme-arcane .moment-details .tournament-stats { border-top: 0; border-bottom: 0; padding-top: 0; padding-bottom: 0; }
+
+/* vote page: heading as a small label when the columns below already carry both names */
+body.theme-arcane .match-title.match-title--label {
+    font-size: .85rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--pink-bright);
+    margin: .25rem 0 .75rem;
+}
+/* no About text: the chips are the first thing in the card, so no rule above them either */
+body.theme-arcane .moment-details--no-about .details-meta { border-top: 0; padding-top: 0; margin-top: 0; }
+
+/* ========================================
+   17 Oct: CUP CHAMPION SPEECH BUBBLE (vote page, js/champion-bubble.js)
+   ======================================== */
+body.theme-arcane .champion-bubble {
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+    max-width: 42rem; margin: 0 auto .75rem; padding: 0 1rem;
+}
+body.theme-arcane .champion-bubble[hidden] { display: none; }
+body.theme-arcane .cb-portrait {
+    flex: none; width: 60px; height: 60px; padding: 0; border-radius: 50%; overflow: hidden; cursor: pointer;
+    border: 2px solid var(--pink-bright); background: var(--card);
+    box-shadow: 0 0 0 4px rgba(255, 79, 184, .12), 0 6px 20px rgba(255, 79, 184, .25);
+    transition: transform .15s ease;
+}
+body.theme-arcane .cb-portrait:hover { transform: scale(1.05) rotate(-2deg); }
+body.theme-arcane .cb-portrait:focus-visible { outline: 3px solid var(--pink-bright); outline-offset: 3px; }
+body.theme-arcane .cb-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; }
+body.theme-arcane .cb-speech {
+    position: relative; min-width: 0; padding: .6rem 1rem; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--border, var(--line)); box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+}
+/* the tail pointing at the portrait */
+body.theme-arcane .cb-speech::before {
+    content: ''; position: absolute; left: -7px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+    background: var(--card); border-left: 1px solid var(--border, var(--line)); border-bottom: 1px solid var(--border, var(--line));
+    transform: rotate(45deg);
+}
+body.theme-arcane .cb-text { margin: 0; font-family: var(--font); font-size: 1rem; font-weight: 600; line-height: 1.45; color: var(--text); }
+@media (max-width: 520px) {
+    body.theme-arcane .champion-bubble { gap: .75rem; padding: 0 .5rem; }
+    body.theme-arcane .cb-portrait { width: 52px; height: 52px; }
+    body.theme-arcane .cb-speech { padding: .55rem .8rem; }
+    body.theme-arcane .cb-text { font-size: .92rem; }
+}

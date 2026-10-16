@@ -2878,48 +2878,49 @@ function initBulletinSystem() {
 // LOAD USER'S CHAMPION PACK FROM PROFILE
 // ========================================
 async function loadUserChampionPack() {
-    const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
-    
-    if (!userId) {
-        // Load default Jinx pack for anonymous users
-        await window.championLoader?.loadChampionPack('jinx');  // ✅ FIXED
-        console.log('✅ Loaded default Jinx pack (anonymous user)');
+    const loader = window.championLoader;
+    const cupChampion = window.ARCANE_CUP_CHAMPION || 'jinx';
+
+    // 1. a companion picked in Settings on this browser always wins
+    if (loader?.hasChosenCompanion?.()) {
+        await loader.loadChampionPack(loader.getUserCompanionPack());
+        console.log(`✅ User's own companion loaded: ${loader.getUserCompanionPack()}`);
         return;
     }
-    
+
+    const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
+
+    // 2. nobody to look up: the cup champion is the default companion
+    if (!userId) {
+        await loader?.loadChampionPack(cupChampion);
+        console.log(`✅ Loaded the cup champion (${cupChampion}) for an anonymous visitor`);
+        return;
+    }
+
     try {
-        // ✅ Check localStorage first (fast path) - use consistent key
-        let championPackId = localStorage.getItem('championPack');  // ✅ FIXED: match champion-loader.js
-        
-        // ✅ If not cached, fetch from Firebase
-        if (!championPackId) {
-            const profileDoc = await getDoc(doc(db, 'profiles', userId));
-            
-            if (profileDoc.exists()) {
-                const profile = profileDoc.data();
-                championPackId = profile.championPackId || 'jinx';
-                
-                // Cache it with correct key
-                localStorage.setItem('championPack', championPackId);  // ✅ FIXED
-                console.log(`✅ Loaded championPackId from Firebase: ${championPackId}`);
-            } else {
-                // No profile yet, use default
-                championPackId = 'jinx';
-                console.log('⚠️ No profile found, defaulting to Jinx');
+        // 3. a pick saved on their profile from another browser/device (a pick = the flag, or anything other than the old
+        //    Jinx default, which every profile saved before the flag existed carries)
+        let packId = cupChampion;
+        const profileDoc = await getDoc(doc(db, 'profiles', userId));
+        if (profileDoc.exists()) {
+            const profile = profileDoc.data();
+            const saved = profile.championPackId || profile.companionId;
+            if (saved && (profile.companionChosen === true || saved !== 'jinx')) {
+                packId = saved;
+                localStorage.setItem('companionId', saved);
+                localStorage.setItem('championPack', saved);
+                if (profile.companionChosen === true) localStorage.setItem('companionChosen', 'true');
+                console.log(`✅ Loaded the saved companion from the profile: ${saved}`);
             }
-        } else {
-            console.log(`✅ Using cached championPackId: ${championPackId}`);
         }
-        
-        // Load the pack with correct function name
-        await window.championLoader?.loadChampionPack(championPackId);  // ✅ FIXED
-        console.log(`✅ User champion pack loaded: ${championPackId}`);
-        
+
+        await loader?.loadChampionPack(packId);
+        console.log(`✅ Companion loaded: ${packId}`);
+
     } catch (error) {
         console.error('❌ Error loading user champion pack:', error);
-        // Fallback to Jinx on error
-        await window.championLoader?.loadChampionPack('jinx');  // ✅ FIXED
-        console.log('⚠️ Fell back to Jinx pack due to error');
+        await loader?.loadChampionPack(cupChampion);
+        console.log(`⚠️ Fell back to the cup champion (${cupChampion}) due to error`);
     }
 }
 

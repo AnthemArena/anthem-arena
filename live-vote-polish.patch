@@ -1,0 +1,187 @@
+diff --git a/css/arcane-theme.css b/css/arcane-theme.css
+index b1aaaa5..aad5bb8 100644
+--- a/css/arcane-theme.css
++++ b/css/arcane-theme.css
+@@ -1549,3 +1549,70 @@ body.theme-arcane .vote-btn .vote-text {
+ body.theme-arcane .vote-btn.voted .vote-text::after { content: none; }
+ body.theme-arcane .vote-btn.voted .vote-text::before { content: '\2713  '; }
+ 
++
++/* ========================================
++   16 Oct polish: live page + vote page
++   ======================================== */
++
++/* live banner: "Group B is live! · 6 matches · Ends in ..." as parts that wrap cleanly, with a dot between parts that is
++   only drawn when they share a line (no stray dot at the start of a wrapped line) */
++body.theme-arcane .countdown-content { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .15rem 0; }
++body.theme-arcane .countdown-content .cd-part { white-space: nowrap; }
++body.theme-arcane .countdown-content .cd-part + .cd-part::before { content: '\2022'; margin: 0 .6rem; opacity: .7; }
++@media (max-width: 520px) {
++    body.theme-arcane .countdown-content { flex-direction: column; align-items: center; }
++    body.theme-arcane .countdown-content .cd-part + .cd-part::before { content: none; }
++}
++
++/* "Founding member" tag sits above the thumbnails on every screen size, not on top of the picked cover */
++body.theme-arcane .social-match-card.voted::before {
++    position: static;
++    display: block;
++    width: fit-content;
++    max-width: calc(100% - 1.5rem);
++    margin: .75rem auto .6rem;
++    box-shadow: none;
++    text-align: center;
++}
++
++/* Community Activity rows: long names are cut with "...", the time stays visible */
++body.theme-arcane .mini-activity-card { min-width: 0; overflow: hidden; }
++body.theme-arcane .mini-activity-card .mini-thumbnail { flex: none; }
++body.theme-arcane .mini-activity-card .mini-info { flex: 1 1 0; min-width: 0; }
++body.theme-arcane .mini-activity-card .mini-user,
++body.theme-arcane .mini-activity-card .mini-song { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
++body.theme-arcane .mini-activity-card .mini-time { flex: none; }
++body.theme-arcane .mini-activity-feed .feed-content { min-width: 0; }
++
++/* desktop: open matches first (as on phones), then the progress bar, ticker, hero and activity */
++@media (min-width: 769px) {
++    body.theme-arcane .social-container { display: flex; flex-direction: column; align-items: center; }
++    body.theme-arcane .social-container > * { width: 100%; margin-left: 0; margin-right: 0; box-sizing: border-box; min-width: 0; }
++    body.theme-arcane .social-container > .countdown-banner   { order: 1; }
++    body.theme-arcane .social-container > .unvoted-section    { order: 2; }
++    body.theme-arcane .social-container > .voted-section      { order: 3; }
++    body.theme-arcane .social-container > .no-matches         { order: 4; }
++    body.theme-arcane .social-container > .progress-container { order: 5; }
++    body.theme-arcane .social-container > .activity-ticker    { order: 6; }
++    body.theme-arcane .social-container > .hero-header        { order: 7; }
++    body.theme-arcane .social-container > .mini-activity-feed { order: 8; }
++    body.theme-arcane .social-container > .landing-footer     { order: 9; }
++}
++
++/* vote page: the gold note icon on the pink button read as a faint circle; the label is enough */
++body.theme-arcane .vote-btn .vote-icon { display: none; }
++
++/* vote page: one rule between the chips and the history row, not two or three */
++body.theme-arcane .moment-details .tournament-stats { border-top: 0; border-bottom: 0; padding-top: 0; padding-bottom: 0; }
++
++/* vote page: heading as a small label when the columns below already carry both names */
++body.theme-arcane .match-title.match-title--label {
++    font-size: .85rem;
++    font-weight: 800;
++    letter-spacing: .14em;
++    text-transform: uppercase;
++    color: var(--pink-bright);
++    margin: .25rem 0 .75rem;
++}
++/* no About text: the chips are the first thing in the card, so no rule above them either */
++body.theme-arcane .moment-details--no-about .details-meta { border-top: 0; padding-top: 0; margin-top: 0; }
+diff --git a/js/live.js b/js/live.js
+index 109afd8..7063621 100644
+--- a/js/live.js
++++ b/js/live.js
+@@ -410,8 +410,9 @@ function updateRoundBanner() {
+ 
+     const matchWord = info.count === 1 ? 'match' : 'matches';
+     banner.querySelector('.countdown-content').innerHTML = `
+-        <i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong> • ${info.count} ${matchWord}${
+-            info.endDate ? ' • Ends in <span id="countdownTimer">...</span>' : ' • Voting is open'}
++        <span class="cd-part"><i class="fa-solid fa-trophy"></i> <strong>${escapeHtml(info.label)} is live!</strong></span>
++        <span class="cd-part">${info.count} ${matchWord}</span>
++        ${info.endDate ? '<span class="cd-part">Ends in <span id="countdownTimer">...</span></span>' : '<span class="cd-part">Voting is open</span>'}
+     `;
+     banner.style.display = '';
+ 
+diff --git a/js/vote.js b/js/vote.js
+index 8087d56..b70f25f 100644
+--- a/js/vote.js
++++ b/js/vote.js
+@@ -643,6 +643,8 @@ await trackMatchView(matchData.id || matchId);
+ currentMatch = {
+     id: matchData.id || matchData.matchId,
+     round: matchData.round || 1,
++    stage: matchData.stage || null,                    // 'group' for group-stage matches
++    matchNumber: matchData.matchNumber || null,        // 1-6 within a group
+     roundLabel: matchData.roundLabel || null,          // e.g. "Final", "Semi-finals", "Round of 16" (set by the bracket builder)
+     tournamentName: matchData.tournamentName || null,  // e.g. "Arcane Test 01"
+     status: matchData.status,
+@@ -1127,7 +1129,15 @@ function generateUsername() {
+         // Update match title
+         const matchTitle = document.getElementById('match-title');
+         if (matchTitle) {
+-            matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
++            // group matches are numbered within their group in the id ("...-group-B-match-3"); matchNumber is the cup-wide count
++            const inGroup = currentMatch.stage === 'group' ? String(currentMatch.id || '').match(/-match-(\d+)$/) : null;
++            if (inGroup) {
++                // the two columns below carry the names, so the heading is just a small label (the tab title keeps "A vs B")
++                matchTitle.textContent = `Match ${inGroup[1]}`;
++                matchTitle.classList.add('match-title--label');
++            } else {
++                matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
++            }
+         }
+ 
+         // Update tournament badge
+diff --git a/tools/test-edits-clean-titles.mjs b/tools/test-edits-clean-titles.mjs
+index 9c4531b..d6adb98 100644
+--- a/tools/test-edits-clean-titles.mjs
++++ b/tools/test-edits-clean-titles.mjs
+@@ -42,7 +42,8 @@ test('the real data/edits.json: cleaning keeps every id and title, and only shor
+         assert.deepEqual(restNew, restOld);
+         assert.ok(a && a.length >= 3);
+     });
+-    assert.ok(r.changed.length > 0);
++    // the file may already have been cleaned (the owner ran --write), so check stability rather than 'something changed'
++    assert.equal(cleanEdits(r.edits).changed.length, 0);
+ });
+ 
+ test('command line: a dry run writes nothing, --write changes only titles, a reformatting file is refused', () => {
+diff --git a/tools/test-live-browser.py b/tools/test-live-browser.py
+index 9f3e3f4..1594985 100644
+--- a/tools/test-live-browser.py
++++ b/tools/test-live-browser.py
+@@ -85,6 +85,21 @@ with sync_playwright() as p:
+             pg.screenshot(path=f'{SHOTS}/live-{tag}-voted.png')
+         else:
+             check(f'{tag}: the voted card can be seen', False)
++        # 16 Oct: matches before the hero on every screen size; banner without a stray bullet; badge off the covers; long activity names cut
++        first_card, hero = rect(pg, '#socialGrid .social-match-card'), rect(pg, '.hero-header')
++        check(f'{tag}: the open matches come before the "Vote for your favourite edits" hero', first_card and hero and first_card['y'] < hero['y'], (first_card, hero))
++        banner_bullets = pg.evaluate("[...document.querySelectorAll('.countdown-content .cd-part')].slice(1).map(e=>getComputedStyle(e,'::before').content)")
++        if tag == 'phone':
++            check('phone: banner parts stack with no leading bullet', all(c in ('none', 'normal') for c in banner_bullets), banner_bullets)
++        else:
++            check('desktop: banner parts are separated by a dot', all('\u2022' in c for c in banner_bullets) and len(banner_bullets) >= 1, banner_bullets)
++        vc = pg.evaluate("(()=>{const c=document.querySelector('.social-match-card.voted');if(!c)return null;const t=c.getBoundingClientRect();const i=c.querySelector('img').getBoundingClientRect();const bt=parseFloat(getComputedStyle(c,'::before').marginTop)||0;return {pos:getComputedStyle(c,'::before').position}})()")
++        check(f'{tag}: the founding-member tag sits in the flow (not on top of the covers)', vc and vc['pos'] == 'static', vc)
++        pg.evaluate("""(()=>{const f=document.querySelector('.mini-activity-feed .feed-content')||document.querySelector('.mini-activity-feed');
++            f.innerHTML='<div class="mini-activity-card"><img class="mini-thumbnail" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="><div class="mini-info"><div class="mini-user">SwiftSentinel993</div><div class="mini-song">BORING! || Arcane - Jinx Edit || Beautiful is Boring - BONES UK and a very long extra tail of words</div></div><div class="mini-time">21h ago</div></div>';})()""")
++        pg.wait_for_timeout(200)
++        ov = pg.evaluate("(()=>{const c=document.querySelector('.mini-activity-card');const t=c.querySelector('.mini-time').getBoundingClientRect();const r=c.getBoundingClientRect();return {cardR:r.right,timeR:t.right,vw:innerWidth,sw:c.scrollWidth,cw:c.clientWidth}})()")
++        check(f'{tag}: a long Community Activity title is cut inside its card and the time stays visible', ov['timeR'] <= ov['cardR'] + 1 and ov['cardR'] <= ov['vw'] and ov['sw'] <= ov['cw'] + 1, ov)
+         check(f'{tag}: no page errors', not errs, errs)
+         pg.context.close()
+     b.close()
+diff --git a/tools/test-vote-browser.py b/tools/test-vote-browser.py
+index 5686d28..ec362ae 100644
+--- a/tools/test-vote-browser.py
++++ b/tools/test-vote-browser.py
+@@ -27,6 +27,9 @@ def check(name, ok, got=None):
+ matches = json.load(open(f'{FIX}/groups-mid-16.json'))
+ live = sorted([m for m in matches if m['status'] == 'live'], key=lambda m: m['matchId'])
+ CURRENT, OTHER_VOTED = live[0]['matchId'], live[1]['matchId']
++# the real edits.json is cleaned now, so give the match being viewed hashtag-laden titles to prove they are hidden
++for _s in ('song1', 'song2'):
++    next(m for m in matches if m['matchId'] == CURRENT)[_s]['shortTitle'] += ' #jinx #arcane #edit'
+ EXPECT_LEFT = len(live) - 2        # everything live except the one being viewed and the one already voted in
+ 
+ def load(browser, width, height, voted):
+@@ -112,6 +115,11 @@ with sync_playwright() as p:
+     import re as _re
+     check('headings, vote buttons and the About label show no trailing hashtags', all(not _re.search(r'#\w+\s*$', x.strip()) for x in shown), shown)
+     check('the full title is still the page title (nothing was lost from the data)', 'Vote:' in pg.title(), pg.title())
++    h1 = pg.text_content('#match-title').strip()
++    check('group match: the heading is a short "Match N" label, the columns carry the names', h1 == 'Match ' + CURRENT.rsplit('-match-', 1)[1] and pg.evaluate("document.getElementById('match-title').classList.contains('match-title--label')"), h1)
++    rules = pg.evaluate("[...document.querySelectorAll('.moment-details--no-about .details-meta')].map(e=>getComputedStyle(e).borderTopWidth)")
++    check('no rule above the chips when an edit has no About text', rules and all(float(r.replace("px","")) == 0 for r in rules), rules)
++    check('the vote buttons have no faint icon circle', not pg.is_visible('#vote-btn-competitor1 .vote-icon') and not pg.is_visible('#vote-btn-competitor2 .vote-icon'))
+     check('no filler "An Arcane moment competing..." sentence anywhere', 'An Arcane moment competing' not in pg.inner_text('body'))
+     check('phone: edits with nothing to say get no details block at all', not pg.is_visible('#competitor-1-column .moment-details') and not pg.is_visible('#competitor-2-column .moment-details'))
+     pg.screenshot(path=f'{SHOTS}/vote-phone-clean.png')

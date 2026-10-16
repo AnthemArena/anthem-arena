@@ -6,11 +6,17 @@ export const ARCANE_CONFIG = {
     tournamentId: 'group-test-01',
     tournamentName: 'Arcane Moments',
 
+    // The character this cup is themed around. Drives the speech-bubble portrait and lines on the vote page, and the
+    // companion/toast pack for anyone who has not chosen their own (companion ids, see COMPANION_PACKS below).
+    cupChampion: 'jinx',
+
     dataDragonVersion: '14.24.1',
     dataDragonChampionCdn:
         'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/',
     dataDragonSplashCdn:
         'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/',
+    dataDragonTileCdn:
+        'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/',
 
     // Characters available for Arcane profile/avatar features.
     characters: [
@@ -76,6 +82,18 @@ export function getChampionImageUrl(championId) {
     return `${ARCANE_CONFIG.dataDragonChampionCdn}${championId}.png`;
 }
 
+// Square crop of a skin (a face, not a full-body splash). Skin 0 is the default look.
+export function getChampionTileUrl(championId, skinNumber = 0) {
+    if (!championId) return null;
+
+    return `${ARCANE_CONFIG.dataDragonTileCdn}${championId}_${skinNumber}.jpg`;
+}
+
+// Companion id of this cup's champion; falls back to Jinx if the configured pack is missing or disabled.
+export function getCupChampionId() {
+    return getCompanionPack(ARCANE_CONFIG.cupChampion)?.id || 'jinx';
+}
+
 export function getChampionSplashUrl(championId, skinNumber = 0) {
     if (!championId) return null;
 
@@ -84,4 +102,5 @@ export function getChampionSplashUrl(championId, skinNumber = 0) {
 // Exposed for classic (non-module) scripts such as modal.js.
 if (typeof window !== 'undefined') {
     window.ARCANE_TOURNAMENT_ID = ARCANE_CONFIG.tournamentId;
+    window.ARCANE_CUP_CHAMPION = getCupChampionId();
 }

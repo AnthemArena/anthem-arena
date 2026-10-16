@@ -1531,5 +1531,85 @@
         "More Chaos!!"
       ]
     }
+  },
+  "portrait": {
+    "skin": 37
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. I'm bored already. Check back soon?",
+      "Shh. Something's about to start. I can feel it.",
+      "Locked for now. Doesn't mean I can't scheme."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Okay, it's never easy.",
+      "Watch both. Then pick the one that gets under your skin.",
+      "I won't tell anyone who you picked. Probably.",
+      "Take your time. Actually, don't. I'm very curious.",
+      "Go on, nobody's judging. Okay, I am. A little.",
+      "Pick the one you'd watch again at 2am. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's voted yet. Be first, I dare you.",
+      "Quiet in here. Say something with a vote.",
+      "Empty. A bit lonely. Fix that?"
+    ],
+    "closing-24h": [
+      "Less than a day left, and you're still just standing there. Pick.",
+      "The day's nearly gone. Don't make me count it out loud."
+    ],
+    "closing-3h": [
+      "Hours left. Hours! Vote before it stops mattering.",
+      "Tick, tick. You hear that? That's your time running out."
+    ],
+    "closing-final": [
+      "Last hour. Do it now, think about it later.",
+      "Any second now. Seriously. Click something."
+    ],
+    "voted-early": [
+      "You're one of the first here. Bold. I like bold.",
+      "Hardly anyone's voted and you picked a side anyway. Respect."
+    ],
+    "voted-ahead": [
+      "Look at you, backing the popular one. Don't get comfortable.",
+      "{pct}% with you. You've got taste. Okay, I didn't say that.",
+      "Your pick's ahead. Everyone's agreeing with you for once.",
+      "{pick} is pulling away. Feels good, huh? Hold onto it.",
+      "Ahead, for now. Votes are fickle. So are people."
+    ],
+    "voted-close": [
+      "That's close. Annoyingly close. I can't look. I'm looking.",
+      "A hair apart. One more vote could flip it. Tell a friend.",
+      "Neck and neck. Your pick needs you, and a few of your friends.",
+      "{pct} to {otherPct}. Somebody's getting hurt here, and it's me, from stress."
+    ],
+    "voted-tied": [
+      "Dead even. Nobody wins, nobody loses, everybody screams.",
+      "A perfect tie. Honestly, rude."
+    ],
+    "voted-behind": [
+      "You're behind. Don't sulk. I'd sulk, but you shouldn't.",
+      "{pick} is down. Underdog. That's my kind of pick.",
+      "They're ahead. Doesn't make you wrong. Just early.",
+      "Behind by {diff} points. Tell people. Loudly. Make a mess of it.",
+      "Everyone's going the other way. Cool. Stay different."
+    ],
+    "closed-won": [
+      "Your pick won. Of course it did. You get me.",
+      "A win. A quiet little victory. I'll take it.",
+      "{pick} went through. You called it."
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it sting, then go again.",
+      "Didn't make it. I've had worse days. So have you. Next one.",
+      "{pick} is out. Sorry. Really."
+    ],
+    "closed-tied": [
+      "A tie. Somebody had to blink, and nobody did."
+    ],
+    "closed-unvoted": [
+      "Voting's over. You missed this one. There's always another.",
+      "All done here. {winner} took it. Next time, say something."
+    ]
   }
 }

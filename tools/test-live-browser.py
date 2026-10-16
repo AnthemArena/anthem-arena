@@ -85,6 +85,21 @@ with sync_playwright() as p:
             pg.screenshot(path=f'{SHOTS}/live-{tag}-voted.png')
         else:
             check(f'{tag}: the voted card can be seen', False)
+        # 16 Oct: matches before the hero on every screen size; banner without a stray bullet; badge off the covers; long activity names cut
+        first_card, hero = rect(pg, '#socialGrid .social-match-card'), rect(pg, '.hero-header')
+        check(f'{tag}: the open matches come before the "Vote for your favourite edits" hero', first_card and hero and first_card['y'] < hero['y'], (first_card, hero))
+        banner_bullets = pg.evaluate("[...document.querySelectorAll('.countdown-content .cd-part')].slice(1).map(e=>getComputedStyle(e,'::before').content)")
+        if tag == 'phone':
+            check('phone: banner parts stack with no leading bullet', all(c in ('none', 'normal') for c in banner_bullets), banner_bullets)
+        else:
+            check('desktop: banner parts are separated by a dot', all('\u2022' in c for c in banner_bullets) and len(banner_bullets) >= 1, banner_bullets)
+        vc = pg.evaluate("(()=>{const c=document.querySelector('.social-match-card.voted');if(!c)return null;const t=c.getBoundingClientRect();const i=c.querySelector('img').getBoundingClientRect();const bt=parseFloat(getComputedStyle(c,'::before').marginTop)||0;return {pos:getComputedStyle(c,'::before').position}})()")
+        check(f'{tag}: the founding-member tag sits in the flow (not on top of the covers)', vc and vc['pos'] == 'static', vc)
+        pg.evaluate("""(()=>{const f=document.querySelector('.mini-activity-feed .feed-content')||document.querySelector('.mini-activity-feed');
+            f.innerHTML='<div class="mini-activity-card"><img class="mini-thumbnail" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="><div class="mini-info"><div class="mini-user">SwiftSentinel993</div><div class="mini-song">BORING! || Arcane - Jinx Edit || Beautiful is Boring - BONES UK and a very long extra tail of words</div></div><div class="mini-time">21h ago</div></div>';})()""")
+        pg.wait_for_timeout(200)
+        ov = pg.evaluate("(()=>{const c=document.querySelector('.mini-activity-card');const t=c.querySelector('.mini-time').getBoundingClientRect();const r=c.getBoundingClientRect();return {cardR:r.right,timeR:t.right,vw:innerWidth,sw:c.scrollWidth,cw:c.clientWidth}})()")
+        check(f'{tag}: a long Community Activity title is cut inside its card and the time stays visible', ov['timeR'] <= ov['cardR'] + 1 and ov['cardR'] <= ov['vw'] and ov['sw'] <= ov['cw'] + 1, ov)
         check(f'{tag}: no page errors', not errs, errs)
         pg.context.close()
     b.close()

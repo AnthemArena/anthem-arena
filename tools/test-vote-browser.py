@@ -20,6 +20,8 @@ APP = "export const initializeApp=()=>({});"
 AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
 CUP = [l for l in open(os.path.join(ROOT, 'js/arcane-config.js')).read().splitlines() if 'tournamentId:' in l][0].split("'")[1]
 failed = []
+import base64
+PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
@@ -27,9 +29,12 @@ def check(name, ok, got=None):
 matches = json.load(open(f'{FIX}/groups-mid-16.json'))
 live = sorted([m for m in matches if m['status'] == 'live'], key=lambda m: m['matchId'])
 CURRENT, OTHER_VOTED = live[0]['matchId'], live[1]['matchId']
+# the real edits.json is cleaned now, so give the match being viewed hashtag-laden titles to prove they are hidden
+for _s in ('song1', 'song2'):
+    next(m for m in matches if m['matchId'] == CURRENT)[_s]['shortTitle'] += ' #jinx #arcane #edit'
 EXPECT_LEFT = len(live) - 2        # everything live except the one being viewed and the one already voted in
 
-def load(browser, width, height, voted):
+def load(browser, width, height, voted, mid=None):
     ctx = browser.new_context(viewport={'width': width, 'height': height})
     init = f"localStorage.setItem('username','tester');localStorage.setItem('isPublic','true');localStorage.setItem('tournamentUserId','u1');"
     init += f"localStorage.setItem('userVotes', JSON.stringify({{'{OTHER_VOTED}': {{songId:'song1', songTitle:'x', opponentTitle:'y', timestamp:1}}}}));"
@@ -47,11 +52,12 @@ def load(browser, width, height, voted):
             body = next((m for m in matches if m['matchId'] == mid), None) if mid else matches
             r.fulfill(body=json.dumps(body), content_type='application/json', headers={'X-Cache': 'MOCK'})
         elif '/api/' in u: r.fulfill(body='{}', content_type='application/json')
+        elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
         elif u.startswith('https://img.youtube.com') or 'youtube.com/embed' in u: r.fulfill(body='', content_type='image/jpeg' if 'img.' in u else 'text/html')
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
         else: r.continue_()
     pg.route('**/*', route)
-    pg.goto(f'http://127.0.0.1:{PORT}/vote.html?match={CURRENT}')
+    pg.goto(f'http://127.0.0.1:{PORT}/vote.html?match={mid or CURRENT}')
     pg.wait_for_timeout(3500)
     return pg, errs
 
@@ -72,6 +78,16 @@ with sync_playwright() as p:
     check('desktop: the player is on the first screen (at least 40% of it visible without scrolling)', w1['y'] + 0.4 * w1['h'] <= 900, w1)
     print(f"        info: desktop player top at {round(w1['y'])}px of 900px (was about 800px before this patch)")
     check('desktop: no next-match bar before voting', pg.query_selector('#next-match-bar') is None)
+    # the cup champion's speech bubble: visible, says something, and says nothing about the standings before a vote
+    check('desktop: the champion bubble is shown with a line', pg.is_visible('#champion-bubble .cb-text') and len(pg.inner_text('#champion-bubble .cb-text').strip()) > 10, pg.inner_text('#champion-bubble'))
+    bst = pg.get_attribute('#champion-bubble', 'data-state')
+    check('desktop: before voting the bubble is in a state that cannot reveal the standings', bst in ('prevote', 'prevote-empty', 'closing-24h', 'closing-3h', 'closing-final'), bst)
+    check('desktop: before voting the line has no percentages', '%' not in pg.inner_text('#champion-bubble .cb-text'), pg.inner_text('#champion-bubble .cb-text'))
+    first_line = pg.inner_text('#champion-bubble .cb-text')
+    pg.click('#champion-bubble .cb-portrait'); pg.wait_for_timeout(150)
+    check('desktop: tapping the portrait gives another line', pg.inner_text('#champion-bubble .cb-text') != first_line, first_line)
+    bb, hh = rect(pg, '#champion-bubble'), rect(pg, '.match-info')
+    check('desktop: the bubble sits between the heading label and the badges, inside the window', bb and hh and bb['y'] < hh['y'] and bb['r'] <= 1280, (bb, hh))
     pg.screenshot(path=f'{SHOTS}/vote-desktop.png')
     pg.context.close()
 
@@ -83,6 +99,7 @@ with sync_playwright() as p:
     check('phone: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
     r1, r2 = rect(pg, '.replay-btn', 0), rect(pg, '.fullscreen-btn', 0)
     check('phone: Replay and Fullscreen sit side by side', abs(r1['y'] - r2['y']) < 3 and r2['x'] > r1['r'] - 1, (r1, r2))
+    check('phone: the champion bubble fits the screen with the portrait beside the text', pg.is_visible('#champion-bubble') and rect(pg, '#champion-bubble')['r'] <= 390 and rect(pg, '#champion-bubble .cb-portrait')['r'] <= rect(pg, '#champion-bubble .cb-speech')['x'] + 8, rect(pg, '#champion-bubble'))
     pg.screenshot(path=f'{SHOTS}/vote-phone.png')
     pg.context.close()
 
@@ -112,6 +129,11 @@ with sync_playwright() as p:
     import re as _re
     check('headings, vote buttons and the About label show no trailing hashtags', all(not _re.search(r'#\w+\s*$', x.strip()) for x in shown), shown)
     check('the full title is still the page title (nothing was lost from the data)', 'Vote:' in pg.title(), pg.title())
+    h1 = pg.text_content('#match-title').strip()
+    check('group match: the heading is a short "Match N" label, the columns carry the names', h1 == 'Match ' + CURRENT.rsplit('-match-', 1)[1] and pg.evaluate("document.getElementById('match-title').classList.contains('match-title--label')"), h1)
+    rules = pg.evaluate("[...document.querySelectorAll('.moment-details--no-about .details-meta')].map(e=>getComputedStyle(e).borderTopWidth)")
+    check('no rule above the chips when an edit has no About text', rules and all(float(r.replace("px","")) == 0 for r in rules), rules)
+    check('the vote buttons have no faint icon circle', not pg.is_visible('#vote-btn-competitor1 .vote-icon') and not pg.is_visible('#vote-btn-competitor2 .vote-icon'))
     check('no filler "An Arcane moment competing..." sentence anywhere', 'An Arcane moment competing' not in pg.inner_text('body'))
     check('phone: edits with nothing to say get no details block at all', not pg.is_visible('#competitor-1-column .moment-details') and not pg.is_visible('#competitor-2-column .moment-details'))
     pg.screenshot(path=f'{SHOTS}/vote-phone-clean.png')
@@ -145,11 +167,21 @@ with sync_playwright() as p:
             br = rect(pg, '#next-match-bar')
             check(f'voted ({tag}): the bar is pinned to the bottom of the window and inside the screen', abs(br['b'] - h) < 2 and br['x'] >= 0 and br['r'] <= w, br)
             check(f'voted ({tag}): the page has room under it (body padding)', pg.evaluate("document.body.classList.contains('has-next-bar')"))
+        vst = pg.get_attribute('#champion-bubble', 'data-state')
+        check(f'voted ({tag}): the bubble now talks about your pick ("voted-..." state)', (vst or '').startswith('voted-'), vst)
         sec = pg.inner_text('#other-matches-section h2') if pg.query_selector('#other-matches-section h2') else ''
         check(f'voted ({tag}): the "More Matches" list agrees ({EXPECT_LEFT})', f'{EXPECT_LEFT} More Matches' in sec, sec)
         pg.screenshot(path=f'{SHOTS}/vote-voted-{tag}.png')
         check(f'voted ({tag}): no errors from the new code', not [e for e in errs if 'next-match' in e or 'updateNextMatchBar' in e or 'unvotedLiveMatches' in e], errs)
         pg.context.close()
+
+    # ---------- a finished match you did not vote in ----------
+    done = next(m['matchId'] for m in matches if m['status'] == 'completed')
+    pg, errs = load(b, 1280, 900, voted=False, mid=done)
+    check('finished match, not voted: the bubble says voting is over (closed-unvoted)', pg.get_attribute('#champion-bubble', 'data-state') == 'closed-unvoted', pg.get_attribute('#champion-bubble', 'data-state'))
+    check('finished match: no page errors from the bubble', not [e for e in errs if 'bubble' in e.lower()], errs)
+    pg.screenshot(path=f'{SHOTS}/vote-closed.png')
+    pg.context.close()
 
     b.close()
 
