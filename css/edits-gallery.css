@@ -202,7 +202,7 @@
 .page-gallery .edit-stats {
     margin-top: auto;           /* stats sit at the bottom of the card, so they line up even when one title wraps */
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: .4rem;
     padding: .6rem 0;
     border-top: 1px solid var(--line);
@@ -237,6 +237,20 @@
 .page-gallery .edit-vote.edit-bracket:hover { background: var(--pink-soft); }
 
 /* ---------- next steps ---------- */
+.page-gallery .gallery-creators {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.25rem;
+    margin-top: 2.5rem; padding: 1.25rem 1.4rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+}
+.page-gallery .gallery-creators h2 { margin: 0 0 .35rem; font-size: 1.05rem; color: var(--text); }
+.page-gallery .gallery-creators p { margin: 0; font-size: .9rem; line-height: 1.5; color: var(--text-dim); max-width: 60ch; }
+.page-gallery .creators-btn {
+    flex: none; display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.1rem; border-radius: 999px;
+    background: var(--pink-soft); color: var(--pink-bright); border: 1px solid var(--pink-bright);
+    font: 700 .9rem var(--font); text-decoration: none; white-space: nowrap;
+}
+.page-gallery .creators-btn:hover { background: var(--pink); color: #fff; }
+.page-gallery .creators-btn:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
 .page-gallery .gallery-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .85rem; margin-top: 2.5rem; }
 .page-gallery .next-link {
     display: inline-flex; align-items: center; gap: .6rem;
@@ -289,9 +303,10 @@
 
 /* ---------- phones ---------- */
 @media (max-width: 560px) {
+    .page-gallery .gallery-creators { flex-direction: column; align-items: stretch; text-align: left; }
+    .page-gallery .creators-btn { justify-content: center; }
     .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
     .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-    .page-gallery .edit-stats { grid-template-columns: repeat(2, 1fr); }   /* four stats do not fit one row on a 2-up phone card */
     /* compact toolbar: search on its own row, status / cup / sort share the next one */
     .page-gallery .gallery-toolbar { padding: .8rem; margin-bottom: 1.1rem; }
     .page-gallery .toolbar-row { gap: .6rem; }

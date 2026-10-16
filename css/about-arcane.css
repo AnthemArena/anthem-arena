@@ -1,0 +1,117 @@
+/* ========================================
+   ABOUT PAGE (about.html, body.page-about)
+   Uses the Arcane theme tokens (--pink-bright, --card, --border ...) from arcane-theme.css, same family as the edits gallery.
+   ======================================== */
+.page-about .about-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+}
+
+/* ---------- hero ---------- */
+.page-about .about-hero { text-align: center; margin-bottom: 1.75rem; }
+.page-about .about-title {
+    margin: 0 0 .6rem;
+    font-family: var(--font);
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    color: var(--text);
+}
+.page-about .about-subtitle {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.55;
+}
+
+/* ---------- the current cup ---------- */
+.page-about .about-live {
+    margin-bottom: 1.5rem;
+    padding: 1.4rem 1.4rem 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 79, 180, .08);
+}
+.page-about .live-kicker { margin: 0 0 .9rem; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--pink-bright); }
+.page-about .live-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin: 0 0 1.25rem; }
+.page-about .live-stats div { min-width: 0; }
+.page-about .live-stats dt { font-size: .68rem; letter-spacing: .09em; text-transform: uppercase; color: var(--text-dim); }
+.page-about .live-stats dd { margin: .2rem 0 0; font: 800 clamp(1.5rem, 5vw, 2.1rem) var(--font); color: var(--text); font-variant-numeric: tabular-nums; }
+.page-about .live-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .65rem; }
+
+.page-about .about-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: .65rem 1.2rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .04);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font: 700 .9rem var(--font);
+    text-decoration: none;
+}
+.page-about .about-btn:hover { background: var(--pink-soft); }
+.page-about .about-btn--primary { background: var(--pink-soft); color: var(--pink-bright); border-color: var(--pink-bright); }
+.page-about .about-btn--primary:hover { background: var(--pink); color: #fff; }
+.page-about .about-btn:focus-visible, .page-about a:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
+
+/* ---------- cards ---------- */
+.page-about .about-card {
+    margin-bottom: 1.1rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--line, rgba(255, 255, 255, .08));
+    border-radius: 18px;
+    scroll-margin-top: 90px;
+}
+.page-about .about-card h2 { margin: 0 0 .75rem; font: 800 1.3rem var(--font); color: var(--text); }
+.page-about .about-card h3 { margin: 0 0 .25rem; font: 700 1rem var(--font); color: var(--text); }
+.page-about .about-card p { margin: 0 0 .75rem; color: var(--muted); font-size: .98rem; line-height: 1.65; }
+.page-about .about-card p:last-child { margin-bottom: 0; }
+.page-about .about-card strong { color: var(--text); }
+.page-about .about-card a { color: var(--pink-bright); text-decoration: underline; text-underline-offset: 2px; word-break: break-word; }
+.page-about .about-note { font-size: .86rem; color: var(--text-dim); }
+.page-about .about-notice { padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 12px; background: var(--pink-soft); color: var(--text); }
+
+/* steps: numbered, one per row */
+.page-about .about-steps { list-style: none; margin: 0; padding: 0; counter-reset: step; display: grid; gap: .9rem; }
+.page-about .about-steps li { position: relative; padding-left: 3rem; counter-increment: step; }
+.page-about .about-steps li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: .05rem;
+    width: 2.1rem; height: 2.1rem; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--pink-soft); color: var(--pink-bright); border: 1px solid var(--border);
+    font: 800 .95rem var(--font);
+}
+.page-about .about-steps p { margin: 0; }
+
+/* plain lists */
+.page-about .about-list { margin: 0; padding-left: 1.1rem; display: grid; gap: .55rem; color: var(--muted); line-height: 1.6; }
+.page-about .about-list li::marker { color: var(--pink-bright); }
+
+/* companions */
+.page-about .companion-grid { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem; }
+.page-about .companion { display: flex; gap: .85rem; align-items: center; padding: .75rem; border: 1px solid var(--line, rgba(255, 255, 255, .08)); border-radius: 14px; background: rgba(0, 0, 0, .25); }
+.page-about .companion img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); flex: none; }
+.page-about .companion h3 { margin: 0 0 .15rem; }
+.page-about .companion p { margin: 0; font-size: .86rem; line-height: 1.45; }
+
+/* contact */
+.page-about .about-card p.about-email { margin: 0 0 1rem; font: 700 clamp(1rem, 4.2vw, 1.25rem) var(--font); overflow-wrap: anywhere; }
+.page-about .about-contact { list-style: none; margin: 0 0 .75rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .75rem; }
+.page-about .about-contact li { padding: .9rem 1rem; border: 1px solid var(--line, rgba(255, 255, 255, .08)); border-radius: 14px; background: rgba(0, 0, 0, .25); }
+.page-about .about-contact h3 i { color: var(--pink-bright); margin-right: .35rem; }
+.page-about .about-contact p { margin: 0 0 .3rem; }
+
+/* ---------- phones ---------- */
+@media (max-width: 560px) {
+    .page-about .about-page { padding: 1.5rem .85rem 2.5rem; }
+    .page-about .about-subtitle { font-size: .98rem; }
+    .page-about .about-card { padding: 1.15rem 1.05rem; }
+    .page-about .about-live { padding: 1.15rem .9rem; }
+    .page-about .live-actions .about-btn { flex: 1 1 100%; }
+}

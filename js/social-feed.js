@@ -5,6 +5,7 @@
 
 import { db } from './firebase-config.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
+import { shortTitle } from './title-clean.js';
 import { 
     collection, 
     doc, 
@@ -171,8 +172,8 @@ if (isPublic === false || !userId) {
         // GENERATE CONTEXT-AWARE POST TEXT
         // ========================================
         const postText = generateVotePostText({
-            votedSongName: voteData.votedSongName || voteData.songTitle,
-            opponentSongName: voteData.opponentSongName,
+            votedSongName: shortTitle(voteData.votedSongName || voteData.songTitle, 60),
+            opponentSongName: shortTitle(voteData.opponentSongName, 60),
             matchTitle: voteData.matchTitle,
             round: voteData.round
         }, matchState);
@@ -190,8 +191,8 @@ const post = {
     text: postText,
     matchId: voteData.matchId,
     matchTitle: voteData.matchTitle,
-    votedSongName: voteData.votedSongName || voteData.songTitle,
-    opponentSongName: voteData.opponentSongName,
+    votedSongName: shortTitle(voteData.votedSongName || voteData.songTitle, 60),
+    opponentSongName: shortTitle(voteData.opponentSongName, 60),
     votedSongId: voteData.songId,
         opponentSongId: voteData.opponentSongId,  // ✅ ADD THIS LINE
 

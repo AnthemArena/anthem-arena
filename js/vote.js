@@ -22,6 +22,7 @@ import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { cleanTitle, shortTitle } from './title-clean.js';
+import { votingState, closedButton } from './vote-closed.js';
 import { renderChampionBubble, loadChampionPack } from './champion-bubble.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
@@ -697,6 +698,7 @@ if (hasVoted) {
 
 // ✨ Add dynamic stats and descriptions
 await updateCompetitorInfo(currentMatch);
+applyClosedState();
 
 // Initialize YouTube players
             initializeYouTubePlayers();
@@ -860,6 +862,30 @@ try {
         document.getElementById('other-matches-section').style.display = 'none';
     }
 }
+    // ========================================
+    // CLOSED / NOT-YET-OPEN MATCH: the big buttons become a result, not a call to action
+    // ========================================
+    // Visitors who already voted keep the "You voted for this" look from disableVoting(); everyone else sees who won
+    // (or "Voting opens soon"), and a finished match shows its percentages.
+    function applyClosedState() {
+        if (!currentMatch || hasVoted) return;
+        const state = votingState(currentMatch);
+        if (state === 'open') return;
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+            const { text, winner } = closedButton(currentMatch, btn.dataset.competitor, state);
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+            btn.classList.add('is-closed');
+            btn.classList.toggle('is-winner', winner);
+            const label = btn.querySelector('.vote-text');
+            if (label) label.textContent = text;
+        });
+        if (state === 'closed') {
+            updateVoteCountsUI();
+            document.querySelectorAll('.vote-stats').forEach(el => { el.classList.add('revealed'); el.classList.remove('hidden'); });
+        }
+    }
+
     // ========================================
     // ⭐ UPDATED: CHECK VOTE STATUS (FIREBASE)
     // ========================================
@@ -1180,6 +1206,7 @@ if (timeRemaining) {
             } else if (timer && timer.expired) {
                 timeRemaining.innerHTML = '<i class="fa-solid fa-stopwatch"></i> Voting Closed'; // ✅ Changed
                 timeRemaining.style.color = '#999';
+                if (typeof applyClosedState === 'function') applyClosedState();
             } else {
                 // Fallback
                 timeRemaining.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE NOW'; // ✅ Changed

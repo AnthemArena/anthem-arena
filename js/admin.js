@@ -1,22 +1,11 @@
 // ========================================
-// ADMIN PANEL - TOURNAMENT MANAGEMENT + BLOG GENERATION
+// ADMIN PANEL - TOURNAMENT MANAGEMENT
 // ========================================
 
 import { db, auth } from './firebase-config.js';
 import { previewEditsTournament, writeEditsTournament, getStoredDraw } from './init-edits-tournament.js';
 import { previewGroupTournament, writeGroupTournament, getStoredGroupDraw, previewKnockoutBuild, writeKnockoutBuild } from './init-group-tournament.js';
 import { allGroupStandings } from './group-builder.js';
-
-// ✅ NEW: Import blog generation functions
-import {
-    generateMatchRecap,
-    generateRoundRecap,
-    generateRoundPreview,
-    saveBlogPost,
-    getAllBlogPosts,
-    autoGenerateMatchRecap,
-    autoGenerateRoundRecap
-} from './blog-generator.js';
 
 import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, deleteField, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -43,7 +32,6 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
         loadMatches();
-        loadRecentBlogPosts();
     } else {
         console.log('❌ Not authenticated');
         document.getElementById('login-container').style.display = 'flex';
@@ -80,177 +68,6 @@ window.logoutAdmin = async function() {
         alert(`Error: ${error.message}`);
     }
 };
-
-// ========================================
-// BLOG GENERATION FUNCTIONS
-// ========================================
-
-window.generateMatchRecapFromAdmin = async function() {
-    const matchId = document.getElementById('blogMatchId').value.trim();
-    
-    if (!matchId) {
-        alert('Please enter a match ID');
-        return;
-    }
-    
-    logBlog(`🤖 Generating match recap for ${matchId}...`);
-    
-    try {
-        const blogPost = await generateMatchRecap(matchId);
-        await saveBlogPost(blogPost);
-        
-        logBlog(`✅ SUCCESS: "${blogPost.headline}"`, 'success');
-        logBlog(`📝 Post ID: ${blogPost.id}`);
-        logBlog(`🔗 Slug: /blog/${blogPost.slug}`);
-        
-        document.getElementById('blogMatchId').value = '';
-        loadRecentBlogPosts();
-        
-        alert(`✅ Blog post created!\n\n${blogPost.headline}\n\nView at: /blog/${blogPost.slug}`);
-        
-    } catch (error) {
-        logBlog(`❌ ERROR: ${error.message}`, 'error');
-        alert(`❌ Error: ${error.message}`);
-        console.error(error);
-    }
-};
-
-window.generateRoundRecapFromAdmin = async function() {
-    const roundNumber = parseInt(document.getElementById('blogRoundNumber').value);
-    
-    if (!roundNumber || roundNumber < 1 || roundNumber > 6) {
-        alert('Please enter a valid round number (1-6)');
-        return;
-    }
-    
-    logBlog(`🤖 Generating round ${roundNumber} recap...`);
-    
-    try {
-        const blogPost = await generateRoundRecap(roundNumber);
-        await saveBlogPost(blogPost);
-        
-        logBlog(`✅ SUCCESS: "${blogPost.headline}"`, 'success');
-        logBlog(`📝 Post ID: ${blogPost.id}`);
-        
-        document.getElementById('blogRoundNumber').value = '';
-        loadRecentBlogPosts();
-        
-        alert(`✅ Round recap created!\n\n${blogPost.headline}`);
-        
-    } catch (error) {
-        logBlog(`❌ ERROR: ${error.message}`, 'error');
-        alert(`❌ Error: ${error.message}`);
-        console.error(error);
-    }
-};
-
-async function loadRecentBlogPosts() {
-    try {
-        const posts = await getAllBlogPosts(5);
-        const container = document.getElementById('recentBlogPosts');
-        
-        if (!container) return;
-        
-        if (posts.length === 0) {
-            container.innerHTML = '<p class="empty-note">No blog posts yet. Generate one above!</p>';
-            return;
-        }
-        
-        container.innerHTML = posts.map(post => `
-            <div class="blog-post-item">
-                <div class="blog-post-header">
-                    <span class="blog-post-type">${post.type}</span>
-                    ${post.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
-                </div>
-                <h4>${post.headline}</h4>
-                <p class="blog-post-meta">
-                    ${new Date(post.publishedDate).toLocaleDateString()} • 
-                    ${post.category} • 
-                    ${post.tags.slice(0, 2).join(', ')}
-                </p>
-                <div class="blog-post-actions">
-                    <a href="/blog/${post.slug}" target="_blank" class="btn-view">View Post</a>
-                </div>
-            </div>
-        `).join('');
-        
-        logBlog(`✅ Loaded ${posts.length} recent blog posts`);
-        
-    } catch (error) {
-        console.error('Error loading recent blog posts:', error);
-        logBlog(`⚠️ Failed to load recent posts: ${error.message}`, 'error');
-    }
-}
-
-function logBlog(message, type = 'info') {
-    const logOutput = document.getElementById('blogGenerationLog');
-    if (!logOutput) return;
-    
-    const timestamp = new Date().toLocaleTimeString();
-    const className = type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : 'log-info';
-    
-    const logEntry = document.createElement('div');
-    logEntry.className = `log-entry ${className}`;
-    logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
-    
-    logOutput.insertBefore(logEntry, logOutput.firstChild);
-    
-    while (logOutput.children.length > 50) {
-        logOutput.removeChild(logOutput.lastChild);
-    }
-}
-
-// ========================================
-// STAGGERED BLOG GENERATION QUEUE
-// ========================================
-
-let blogGenerationQueue = [];
-let isProcessingQueue = false;
-
-async function addToGenerationQueue(matchId, delayMinutes = 0) {
-    blogGenerationQueue.push({
-        matchId,
-        scheduledTime: Date.now() + (delayMinutes * 60 * 1000)
-    });
-    
-    logBlog(`📋 Queued blog for ${matchId} (publish in ${delayMinutes}m)`);
-    
-    if (!isProcessingQueue) {
-        processGenerationQueue();
-    }
-}
-
-async function processGenerationQueue() {
-    isProcessingQueue = true;
-    
-    while (blogGenerationQueue.length > 0) {
-        const now = Date.now();
-        const nextItem = blogGenerationQueue[0];
-        
-        if (now >= nextItem.scheduledTime) {
-            blogGenerationQueue.shift();
-            
-            try {
-                logBlog(`🤖 Generating scheduled blog for ${nextItem.matchId}...`);
-                const blogPost = await autoGenerateMatchRecap(nextItem.matchId);
-                
-                if (blogPost) {
-                    logBlog(`✅ Published: "${blogPost.headline}"`, 'success');
-                    loadRecentBlogPosts();
-                }
-            } catch (error) {
-                logBlog(`❌ Failed to generate ${nextItem.matchId}: ${error.message}`, 'error');
-            }
-        } else {
-            const waitTime = nextItem.scheduledTime - now;
-            logBlog(`⏳ Next blog in ${Math.round(waitTime / 60000)}m...`);
-            await new Promise(resolve => setTimeout(resolve, Math.min(waitTime, 60000)));
-        }
-    }
-    
-    isProcessingQueue = false;
-    logBlog(`✅ Blog generation queue complete`);
-}
 
 // ========================================
 // ROUND DEADLINES
@@ -407,21 +224,6 @@ window.closeMatch = async function(matchId) {
         
         await advanceWinnerToNextRound(match, winnerData);
         
-        // Single match = immediate blog (no staggering)
-        const autoGenerate = document.getElementById('autoGenerateBlog');
-        if (autoGenerate && autoGenerate.checked) {
-            logBlog(`🤖 Generating blog for ${matchId}...`);
-            try {
-                const blogPost = await autoGenerateMatchRecap(matchId);
-                if (blogPost) {
-                    logBlog(`✅ Published: "${blogPost.headline}"`, 'success');
-                    loadRecentBlogPosts();
-                }
-            } catch (error) {
-                logBlog(`⚠️ Blog generation failed: ${error.message}`, 'error');
-            }
-        }
-        
         // ✅ UPDATED ALERT - Show if tiebreaker was used
         const tiebreakerMsg = winMethod === 'tiebreaker-seed' 
             ? `\n\n⚖️ TIEBREAKER: Won by higher seed (${winnerData.seed} > ${winnerData === match.song1 ? match.song2.seed : match.song1.seed})`
@@ -515,20 +317,6 @@ window.openBatch = async function(roundNumber, batchNumber) {
         
         console.log(`✅ Opened ${updateCount} matches:`, matchList);
         
-        // ✅ Generate round preview if this is batch 1
-        const autoGenerate = document.getElementById('autoGenerateBlog');
-        if (autoGenerate && autoGenerate.checked && batchNumber === 1) {
-            logBlog(`🔮 Generating Round ${roundNumber} preview...`);
-            try {
-                const previewPost = await generateRoundPreview(roundNumber);
-                await saveBlogPost(previewPost);
-                logBlog(`✅ Round preview published: "${previewPost.headline}"`, 'success');
-                loadRecentBlogPosts();
-            } catch (error) {
-                logBlog(`⚠️ Preview generation failed: ${error.message}`, 'error');
-            }
-        }
-        
         alert(`✅ Round ${roundNumber}, Batch ${batchNumber} is now LIVE!\n\n${updateCount} matches opened:\n${matchList.join('\n')}`);
         
         loadMatches();
@@ -540,7 +328,7 @@ window.openBatch = async function(roundNumber, batchNumber) {
 };
 
 window.closeBatch = async function(roundNumber, batchNumber) {
-    if (!confirm(`Close Round ${roundNumber}, Batch ${batchNumber}?\n\nThis will:\n- Determine winners\n- Advance them to next round\n- Stagger blog post generation`)) return;
+    if (!confirm(`Close Round ${roundNumber}, Batch ${batchNumber}?\n\nThis will:\n- Determine winners\n- Advance them to next round`)) return;
     
     try {
         console.log(`🔒 Closing Round ${roundNumber}, Batch ${batchNumber}...`);
@@ -556,13 +344,6 @@ window.closeBatch = async function(roundNumber, batchNumber) {
         let closedCount = 0;
         const tiedMatches = [];
         const results = [];
-        const autoGenerate = document.getElementById('autoGenerateBlog');
-        const shouldAutoGenerate = autoGenerate && autoGenerate.checked;
-        
-        // ✅ Categorize matches for staggered posting
-        const upsets = [];
-        const nailbiters = [];
-        const regularMatches = [];
         
         for (const matchDoc of snapshot.docs) {
             const match = matchDoc.data();
@@ -614,89 +395,12 @@ window.closeBatch = async function(roundNumber, batchNumber) {
             const tiebreakerIndicator = winMethod === 'tiebreaker-seed' ? ' ⚖️' : '';
             results.push(`${match.matchId}: ${winnerData.shortTitle} defeats ${loserData.shortTitle} (${winnerData.votes}-${loserData.votes})${tiebreakerIndicator}`);
             closedCount++;
-            
-            // ✅ Categorize for staggered posting
-            if (shouldAutoGenerate) {
-                const voteDiff = Math.abs(winnerData.votes - loserData.votes);
-                const totalVotes = match.totalVotes || (winnerData.votes + loserData.votes);
-                const percentDiff = totalVotes > 0 ? (voteDiff / totalVotes) * 100 : 0;
-                const isUpset = loserData.seed < winnerData.seed;
-                const isNailbiter = voteDiff <= 5 || percentDiff <= 5;
-                
-                if (isUpset && Math.abs(loserData.seed - winnerData.seed) >= 8) {
-                    upsets.push(match.matchId);
-                } else if (isNailbiter) {
-                    nailbiters.push(match.matchId);
-                } else {
-                    regularMatches.push(match.matchId);
-                }
-            }
         }
         
         console.log(`✅ Closed ${closedCount} matches`);
         
-        // ✅ Stagger blog post generation
-        // declared out here: the summary alert below also reads it (it used to be scoped to the block, which threw a ReferenceError
-        // after every Close Batch with auto-blog on)
-        let delayMinutes = 0;
-        if (shouldAutoGenerate && closedCount > 0) {
-            logBlog(`📰 Scheduling ${closedCount} blog posts with smart timing...`);
-            
-            // Priority 1: Upsets (immediate)
-            for (const matchId of upsets) {
-                await addToGenerationQueue(matchId, delayMinutes);
-                delayMinutes += 15;
-            }
-            
-            // Priority 2: Nail-biters
-            for (const matchId of nailbiters) {
-                await addToGenerationQueue(matchId, delayMinutes);
-                delayMinutes += 20;
-            }
-            
-            // Priority 3: Regular matches
-            for (const matchId of regularMatches) {
-                await addToGenerationQueue(matchId, delayMinutes);
-                delayMinutes += 30;
-            }
-            
-            logBlog(`📅 Blog schedule:`, 'success');
-            logBlog(`  • ${upsets.length} upsets (0-${upsets.length * 15}m)`);
-            logBlog(`  • ${nailbiters.length} thrillers (${upsets.length * 15}-${upsets.length * 15 + nailbiters.length * 20}m)`);
-            logBlog(`  • ${regularMatches.length} regular (${upsets.length * 15 + nailbiters.length * 20}+m)`);
-            
-            // ✅ Schedule round recap after all match recaps (only if round complete)
-            const roundRecapDelay = delayMinutes + 120;
-            
-            setTimeout(async () => {
-                const stillLiveQuery = query(
-                    matchesRef,
-                    where('round', '==', roundNumber),
-                    where('status', '==', 'live')
-                );
-                const stillLiveSnap = await getDocs(stillLiveQuery);
-                
-                if (stillLiveSnap.empty) {
-                    logBlog(`🎉 Round ${roundNumber} complete! Generating round recap...`);
-                    try {
-                        const roundBlogPost = await autoGenerateRoundRecap(roundNumber);
-                        if (roundBlogPost) {
-                            logBlog(`✅ Round recap published: "${roundBlogPost.headline}"`, 'success');
-                            loadRecentBlogPosts();
-                        }
-                    } catch (error) {
-                        logBlog(`⚠️ Round recap failed: ${error.message}`, 'error');
-                    }
-                } else {
-                    logBlog(`ℹ️ Round ${roundNumber} still has ${stillLiveSnap.size} live matches - skipping round recap`);
-                }
-            }, roundRecapDelay * 60 * 1000);
-            
-            logBlog(`📖 Round recap scheduled in ${Math.round(roundRecapDelay / 60)}h ${roundRecapDelay % 60}m (if round complete)`);
-        }
-        
         const tiedNote = tiedMatches.length ? `⚖️ ${tiedMatches.length} TIED and left live. Cast your deciding vote, then close again:\n${tiedMatches.join('\n')}\n\n` : '';
-        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${tiedNote}${closedCount} matches completed\n\n${shouldAutoGenerate ? `Blog posts scheduled:\n• ${upsets.length} upsets\n• ${nailbiters.length} thrillers\n• ${regularMatches.length} regular\n\nPublishing over next ${Math.round(delayMinutes / 60)}h ${delayMinutes % 60}m` : 'Auto-blog disabled'}\n\n${results.slice(0, 3).join('\n')}${results.length > 3 ? `\n...and ${results.length - 3} more` : ''}`);
+        alert(`✅ Round ${roundNumber}, Batch ${batchNumber} closed!\n\n${tiedNote}${closedCount} matches completed\n\n${results.slice(0, 3).join('\n')}${results.length > 3 ? `\n...and ${results.length - 3} more` : ''}`);
         
         loadMatches();
         
@@ -1010,8 +714,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    loadRecentBlogPosts();
-    logBlog('🎨 Admin Panel loaded - Blog generation ready');
 });
 // ========================================
 // RECOUNT ALL ROUND 1 VOTES

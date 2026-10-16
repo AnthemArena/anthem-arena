@@ -3,296 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - League Music Tournament</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <title>Privacy Policy | Arcane Moments</title>
+    <meta name="description" content="What Arcane Moments collects, what is public, which services it uses and how to ask for your data to be deleted.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Privacy Policy | Arcane Moments">
+    <meta property="og:description" content="What Arcane Moments collects, what is public, which services it uses and how to ask for your data to be deleted.">
+    <link rel="canonical" href="https://arcanemoments.netlify.app/legal/privacy">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+
+    <!-- Fonts and icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/legal-arcane.css">
+    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0a0a;
-            color: #f0f0f0;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-        }
-
-        /* Page Header */
-        .page-header {
-            background: linear-gradient(180deg, rgba(200, 155, 60, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
-            padding: 80px 0 60px;
-            text-align: center;
-            border-bottom: 1px solid rgba(200, 155, 60, 0.2);
-        }
-
-        .page-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
-            color: #C89B3C;
-            letter-spacing: 0.1em;
-            margin-bottom: 20px;
-        }
-
-        .page-subtitle {
-            font-size: 1.1rem;
-            color: #b0b0b0;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Content Container */
-        .content-container {
-            max-width: 900px;
-            margin: 80px auto;
-            padding: 0 40px;
-        }
-
-        .content-box {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(200, 155, 60, 0.2);
-            padding: 60px;
-            margin-bottom: 40px;
-        }
-
-        .section-heading {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-            color: #C89B3C;
-            margin-bottom: 30px;
-            letter-spacing: 0.05em;
-        }
-
-        .section-subheading {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.3rem;
-            color: #C89B3C;
-            margin: 40px 0 20px;
-            letter-spacing: 0.05em;
-        }
-
-        .content-text {
-            font-size: 1.05rem;
-            line-height: 1.9;
-            color: #d0d0d0;
-            margin-bottom: 25px;
-        }
-
-        .content-text strong {
-            color: #C89B3C;
-        }
-
-        .content-text a {
-            color: #C89B3C;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(200, 155, 60, 0.3);
-            transition: border-color 0.3s ease;
-        }
-
-        .content-text a:hover {
-            border-bottom-color: #C89B3C;
-        }
-
-        .bullet-list {
-            margin: 20px 0 25px 30px;
-            color: #d0d0d0;
-        }
-
-        .bullet-list li {
-            margin-bottom: 15px;
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-
-        .highlight-box {
-            background: rgba(200, 155, 60, 0.1);
-            border-left: 3px solid #C89B3C;
-            padding: 25px 30px;
-            margin: 30px 0;
-        }
-
-        .last-updated {
-            font-size: 0.9rem;
-            color: #999;
-            text-align: center;
-            margin-top: 40px;
-            font-style: italic;
-        }
-    </style>
+    <!-- Global systems first -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body>
+<body class="theme-arcane page-legal">
 
- <div id="nav-placeholder"></div>
-<script type="module" src="/js/navigation.js"></script>
+    <div id="nav-placeholder"></div>
+    <script type="module" src="/js/navigation.js"></script>
 
-    <header class="page-header">
-        <h1 class="page-title">Privacy Policy</h1>
-        <p class="page-subtitle">How we protect and handle your information</p>
-    </header>
+    <main class="legal-page">
+        <header class="legal-hero">
+            <h1 class="legal-title">Privacy Policy</h1>
+            <p class="legal-subtitle">What the site collects, what is public and how to ask us to delete it.</p>
+            <p class="legal-updated">Last updated 16 October 2026</p>
+        </header>
 
-    <div class="content-container">
-        <div class="content-box">
-            <h2 class="section-heading">Your Privacy Matters</h2>
-            
-            <p class="content-text">
-                At League Music Tournament, we respect your privacy and are committed to protecting any information you share with us. This Privacy Policy explains what information we collect, how we use it, and your rights regarding that information.
-            </p>
+        <nav class="legal-switch" aria-label="Legal pages">
+            <a href="/legal/terms">Terms</a>
+            <a href="/legal/privacy" aria-current="page">Privacy</a>
+            <a href="/legal/disclosure">Affiliate Disclosure</a>
+        </nav>
 
-            <div class="highlight-box">
-                <p class="content-text" style="margin-bottom: 0;">
-                    <strong>Simple Version:</strong> We collect minimal information, don't sell your data, and use standard analytics to improve the site. You can browse and vote anonymously, and we only collect information if you voluntarily contact us.
-                </p>
-            </div>
+        <aside class="legal-plain"><strong>In plain English</strong><p>There are no ads and no analytics on the site. You are signed in anonymously, so you can vote without giving your name or email. We keep what the site needs to run the cup and your profile, we do not sell it, and you can ask us to delete it.</p></aside>
 
-            <h3 class="section-subheading">Information We Collect</h3>
-            
-            <p class="content-text">
-                <strong>Information You Provide:</strong> We only collect personal information that you voluntarily provide to us, such as:
-            </p>
+        <section class="legal-card">
+            <h2>Who we are</h2>
+            <p>Arcane Moments is a small, fan-made project run by an individual. To reach us about anything on this page, <a data-contact-mail data-show-address href="/about#contact">email us</a>.</p>
+        </section>
 
-            <ul class="bullet-list">
-                <li>Name and email address if you contact us through our contact form</li>
-                <li>Email address if you subscribe to tournament notifications</li>
-                <li>Any information you include in messages you send to us</li>
+        <section class="legal-card">
+            <h2>What we collect</h2>
+            <p>We only collect what the site needs to work:</p>
+            <ul>
+                <li><strong>An anonymous ID.</strong> When you visit, the site signs you in anonymously (Google Firebase Authentication). That creates a random ID with no name or email attached.</li>
+                <li><strong>Your votes.</strong> Votes are saved against that ID so we can stop duplicate votes, count results, and show you your own votes.</li>
+                <li><strong>Your profile.</strong> A username, avatar and companion you choose, plus levels, XP, streaks and achievements the site calculates from what you do, and your settings.</li>
+                <li><strong>Community activity.</strong> Posts, comments, likes and reactions you make, and activity items such as "voted in a match", saved with your username.</li>
+                <li><strong>Messages you send us.</strong> If you email us, we see your email address and what you write.</li>
+                <li><strong>Technical data.</strong> Our hosting and database providers see technical information such as your IP address, browser type and the pages you request, as any website does.</li>
             </ul>
+        </section>
 
-            <p class="content-text">
-                <strong>Voting Data:</strong> When you cast votes in tournaments:
-            </p>
+        <section class="legal-card">
+            <h2>What is public</h2>
+            <p>Your username, avatar and level, and your posts, comments, reactions and the activity items above, may be shown to other visitors on the feed, activity and profile pages. Your anonymous ID is not shown. Please do not put your real name or other personal details in your username, avatar or posts.</p>
+        </section>
 
-            <ul class="bullet-list">
-                <li>We use browser localStorage to prevent duplicate voting (stored locally on your device)</li>
-                <li>We may collect anonymous voting statistics to display tournament results</li>
-                <li>No personally identifiable information is collected or stored when you vote</li>
+        <section class="legal-card">
+            <h2>What stays on your device</h2>
+            <p>The site keeps small items in your browser's storage so it works without asking you to sign up again: for example your anonymous ID, username, avatar, chosen companion, which alerts you have seen, and your recent votes. We do not set our own cookies for tracking. You can clear this at any time in your browser settings, but you may lose your profile on that device.</p>
+        </section>
+
+        <section class="legal-card">
+            <h2>Services we use</h2>
+            <p>Some of what you see comes from other companies, who may receive your IP address and device details when your browser loads their content, and who have their own privacy policies:</p>
+            <ul>
+                <li><strong>Google Firebase</strong> for anonymous sign-in and the database that stores votes, profiles and posts</li>
+                <li><strong>Netlify</strong> to host the site and run its servers</li>
+                <li><strong>YouTube</strong> for the embedded edit players and edit thumbnails (it may set cookies when a player loads)</li>
+                <li><strong>Riot Games</strong> for champion images used in avatars and companions</li>
+                <li><strong>Google Fonts and cdnjs</strong> for fonts and icons</li>
+                <li><strong>Ko-fi and Amazon</strong> only if you click a link to them</li>
             </ul>
+        </section>
 
-            <p class="content-text">
-                <strong>Automatically Collected Information:</strong> Like most websites, we automatically collect certain technical information when you visit:
-            </p>
+        <section class="legal-card">
+            <h2>How we use it</h2>
+            <p>To run the cups and show results, to give you a profile and community features, to spot and stop cheating and abuse, to answer you when you write, and to keep the site working. We do not sell your information, do not use it for advertising, and do not use analytics or tracking services at the moment. If that changes we will update this page first.</p>
+        </section>
 
-            <ul class="bullet-list">
-                <li><strong>Analytics Data:</strong> We may use analytics services (such as Google Analytics) to understand how visitors use our site. This includes information like pages visited, time spent on the site, browser type, and general location (country/city level, not precise location)</li>
-                <li><strong>Cookies:</strong> We may use cookies and similar technologies to improve your experience and gather analytics data</li>
-                <li><strong>Log Data:</strong> Our servers may automatically record information such as IP addresses, browser types, and referring URLs</li>
-            </ul>
+        <section class="legal-card">
+            <h2>How long we keep it</h2>
+            <p>We keep votes and profiles while the site runs, so past cups and your profile stay available. Vote totals are part of the permanent record of a cup.</p>
+        </section>
 
-            <h3 class="section-subheading">How We Use Your Information</h3>
-            
-            <p class="content-text">
-                We use the information we collect to:
-            </p>
+        <section class="legal-card">
+            <h2>Your choices and rights</h2>
+            <p>You can browse and vote without giving us any personal details. You can ask us to show you what we hold about you, correct it, or delete your profile, posts and comments; <a data-contact-mail data-show-address href="/about#contact">email us</a> with your username so we can find it. If we delete your profile, votes already counted remain in the cup totals but are no longer linked to a profile. Depending on where you live, you may have further rights under local data protection law, and you may complain to your data protection authority.</p>
+        </section>
 
-            <ul class="bullet-list">
-                <li>Process and display tournament votes and results</li>
-                <li>Respond to your inquiries and communications</li>
-                <li>Send tournament notifications (if you've subscribed)</li>
-                <li>Improve and optimize our website content and user experience</li>
-                <li>Understand which music videos and tournaments are most popular</li>
-                <li>Detect and prevent voting fraud or abuse</li>
-                <li>Comply with legal obligations</li>
-            </ul>
+        <section class="legal-card">
+            <h2>Children</h2>
+            <p>The site is not aimed at children under 13 and we do not knowingly collect their personal information. If you think a child has given us any, please tell us and we will remove it.</p>
+        </section>
 
-            <p class="content-text">
-                <strong>We do not:</strong>
-            </p>
+        <section class="legal-card">
+            <h2>Security and where data is stored</h2>
+            <p>We rely on our providers' security and take reasonable care, but no service is completely secure. Our providers run servers in several countries, including the United States, so your information may be processed outside your own country.</p>
+        </section>
 
-            <ul class="bullet-list">
-                <li>Sell, rent, or trade your personal information to third parties</li>
-                <li>Use your information for marketing purposes without your consent</li>
-                <li>Share your information except as described in this policy</li>
-                <li>Track your personal voting history or preferences</li>
-            </ul>
+        <section class="legal-card">
+            <h2>Changes</h2>
+            <p>We may update this policy. The "last updated" date above shows when. We will say so on the site if a change is significant.</p>
+        </section>
 
-            <h3 class="section-subheading">Third-Party Services</h3>
-            
-            <p class="content-text">
-                <strong>Amazon Associates:</strong> As an Amazon Associate, when you click affiliate links and make purchases, Amazon may collect information according to their own privacy policy. We do not receive any personally identifiable information about your purchases.
-            </p>
+    </main>
 
-            <p class="content-text">
-                <strong>YouTube:</strong> Embedded YouTube videos may collect information according to Google's privacy policy. We do not control YouTube's data collection practices.
-            </p>
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
 
-            <p class="content-text">
-                <strong>Analytics Services:</strong> We may use third-party analytics services that collect information about your use of the site. These services have their own privacy policies governing how they use information.
-            </p>
-
-            <p class="content-text">
-                <strong>External Links:</strong> Our site contains links to external websites (including Amazon, YouTube, and other resources). We are not responsible for the privacy practices of these external sites.
-            </p>
-
-            <h3 class="section-subheading">Cookies and Tracking Technologies</h3>
-            
-            <p class="content-text">
-                We may use cookies and similar tracking technologies to improve your experience and collect analytics data. You can control cookies through your browser settings. Note that disabling cookies may affect some site functionality, including the ability to vote.
-            </p>
-
-            <p class="content-text">
-                <strong>Types of cookies we may use:</strong>
-            </p>
-
-            <ul class="bullet-list">
-                <li><strong>Essential Cookies:</strong> Necessary for basic site functionality and voting</li>
-                <li><strong>Analytics Cookies:</strong> Help us understand how visitors use the site</li>
-                <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
-            </ul>
-
-            <h3 class="section-subheading">Data Security</h3>
-            
-            <p class="content-text">
-                We take reasonable measures to protect information from unauthorized access, alteration, or destruction. However, no internet transmission is completely secure, and we cannot guarantee absolute security.
-            </p>
-
-            <h3 class="section-subheading">Children's Privacy</h3>
-            
-            <p class="content-text">
-                Our site is not directed to children under 13, and we do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.
-            </p>
-
-            <h3 class="section-subheading">Your Rights and Choices</h3>
-            
-            <p class="content-text">
-                You have the right to:
-            </p>
-
-            <ul class="bullet-list">
-                <li>Browse our site and vote anonymously without providing personal information</li>
-                <li>Opt out of analytics tracking using browser settings or opt-out tools</li>
-                <li>Unsubscribe from tournament notifications at any time</li>
-                <li>Request access to any personal information we have about you</li>
-                <li>Request correction or deletion of your personal information</li>
-                <li>Withdraw consent for us to use your information (where applicable)</li>
-            </ul>
-
-            <h3 class="section-subheading">Changes to This Policy</h3>
-            
-            <p class="content-text">
-                We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice on our site or updating the "Last Updated" date below. Your continued use of the site after changes constitutes acceptance of the updated policy.
-            </p>
-
-            <h3 class="section-subheading">International Visitors</h3>
-            
-            <p class="content-text">
-                Our site is hosted in the United States. If you are visiting from outside the United States, please be aware that your information may be transferred to, stored, and processed in the United States where our servers are located.
-            </p>
-
-            <h3 class="section-subheading">Contact Us</h3>
-            
-            <p class="content-text">
-                If you have questions about this Privacy Policy or wish to exercise your rights regarding your personal information, please contact us through our <a href="/about.html">contact page</a>.
-            </p>
-
-            <p class="last-updated">Last Updated: October 24, 2025</p>
-        </div>
-    </div>
-
- <div id="footer-placeholder"></div>
- <script src="/js/footer.js"></script>
-
+    <script type="module" src="/js/creator-contact.js"></script>
+    <script type="module" src="/js/rank-system.js"></script>
+    <script type="module" src="/js/settings-modal.js"></script>
 </body>
 </html>

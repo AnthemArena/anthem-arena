@@ -2,7 +2,6 @@
 # Needs Python + playwright with chromium:   pip install playwright && playwright install chromium
 #   python3 tools/test-admin-browser.py
 # It builds a 16-edit group cup, plays and closes every group with the real buttons, builds the knockout, then runs Reset.
-# (Blog-generation errors in the log are expected: there is no blog function behind the local static server.)
 import json, threading, http.server, socketserver, functools, sys, time
 from playwright.sync_api import sync_playwright
 import os

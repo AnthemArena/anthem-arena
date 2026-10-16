@@ -8,5 +8,11 @@
   "devDependencies": {
     "jpeg-js": "^0.4.4",
     "postcss": "^8.4.0"
+  },
+  "scripts": {
+    "edits": "node tools/edits-refresh.mjs",
+    "test:all": "node tools/test-all.mjs",
+    "test:quick": "node tools/test-all.mjs --quick",
+    "launch": "node tools/launch-check.mjs"
   }
 }

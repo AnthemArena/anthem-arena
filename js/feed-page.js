@@ -16,6 +16,7 @@ import {
 // Follow buttons use follow-system.js: it writes the `follows` collection that the Firestore rules,
 // the profile page and the sidebar counts all use (the version in social-feed.js is the old one).
 import { followUser, unfollowUser, isFollowing } from './follow-system.js';
+import { shortTitle } from './title-clean.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
@@ -385,11 +386,12 @@ function convertActivityToFeedPost(activity, matchMap) {
     const secondMoment = match?.song2 || match?.competitor2;
 
     const getMomentName = (moment, fallback = 'Unknown Moment') => {
-        return (
+        return shortTitle(
             moment?.shortTitle ||
             moment?.title ||
             moment?.name ||
-            fallback
+            fallback,
+            60
         );
     };
 
@@ -1002,16 +1004,17 @@ function renderPostContent(post) {
     if (post.type === 'vote') {
         // Keep old database field names for compatibility,
         // but present everything as Arcane moments.
-        const votedMomentName =
+        // shortTitle at display time, so posts saved earlier (with hashtags in the name) read cleanly too
+        const votedMomentName = shortTitle(
             post.votedMomentName ||
             post.votedSongName ||
             post.songTitle ||
-            'Unknown Moment';
+            'Unknown Moment', 60);
 
-        const opponentMomentName =
+        const opponentMomentName = shortTitle(
             post.opponentMomentName ||
             post.opponentSongName ||
-            'Unknown Moment';
+            'Unknown Moment', 60);
 
         const userPct = post.matchState?.userPct ?? 50;
         const opponentPct = 100 - userPct;

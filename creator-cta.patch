@@ -1,0 +1,201 @@
+diff --git a/about.html b/about.html
+index a4767bd..8e66091 100644
+--- a/about.html
++++ b/about.html
+@@ -549,6 +549,27 @@
+                 </div>
+             </div>
+ 
++            <!-- For creators -->
++            <div class="content-section" id="creators">
++                <div class="content-box">
++                    <div class="content-header">
++                        <div class="icon-circle"><i class="fa-solid fa-film"></i></div>
++                        <h2 class="section-title">For Creators</h2>
++                    </div>
++                    <div class="content-text">
++                        <p>
++                            Arcane Moments is a fan project that celebrates the edits the community makes. Every edit is shown with
++                            your name and a link to your channel, and the video plays from YouTube, so views and likes go to you.
++                        </p>
++                        <p>
++                            If you would rather your edit was not shown on the site or entered in a tournament, email
++                            <a data-creator-mail data-show-address href="mailto:">us</a> with a link to your video and we will remove it.
++                            Removal is quickest before a cup is drawn.
++                        </p>
++                    </div>
++                </div>
++            </div>
++
+             <!-- Contact Section -->
+             <div class="content-section" id="contact">
+                 <div class="content-box">
+@@ -624,6 +645,7 @@
+     <script type="module" src="/js/global-notifications.js"></script>
+ 
+     <script src="/js/about.js"></script>
++    <script type="module" src="/js/creator-contact.js"></script>
+     <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/css/edits-gallery.css b/css/edits-gallery.css
+index c3a5218..3a20e1a 100644
+--- a/css/edits-gallery.css
++++ b/css/edits-gallery.css
+@@ -237,6 +237,20 @@
+ .page-gallery .edit-vote.edit-bracket:hover { background: var(--pink-soft); }
+ 
+ /* ---------- next steps ---------- */
++.page-gallery .gallery-creators {
++    display: flex; align-items: center; justify-content: space-between; gap: 1.25rem;
++    margin-top: 2.5rem; padding: 1.25rem 1.4rem;
++    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
++}
++.page-gallery .gallery-creators h2 { margin: 0 0 .35rem; font-size: 1.05rem; color: var(--text); }
++.page-gallery .gallery-creators p { margin: 0; font-size: .9rem; line-height: 1.5; color: var(--text-dim); max-width: 60ch; }
++.page-gallery .creators-btn {
++    flex: none; display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.1rem; border-radius: 999px;
++    background: var(--pink-soft); color: var(--pink-bright); border: 1px solid var(--pink-bright);
++    font: 700 .9rem var(--font); text-decoration: none; white-space: nowrap;
++}
++.page-gallery .creators-btn:hover { background: var(--pink); color: #fff; }
++.page-gallery .creators-btn:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
+ .page-gallery .gallery-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .85rem; margin-top: 2.5rem; }
+ .page-gallery .next-link {
+     display: inline-flex; align-items: center; gap: .6rem;
+@@ -289,6 +303,8 @@
+ 
+ /* ---------- phones ---------- */
+ @media (max-width: 560px) {
++    .page-gallery .gallery-creators { flex-direction: column; align-items: stretch; text-align: left; }
++    .page-gallery .creators-btn { justify-content: center; }
+     .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
+     .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+     /* compact toolbar: search on its own row, status / cup / sort share the next one */
+diff --git a/js/creator-contact.js b/js/creator-contact.js
+new file mode 100644
+index 0000000..4ebdbb5
+--- /dev/null
++++ b/js/creator-contact.js
+@@ -0,0 +1,24 @@
++// Where creators write if they want their edit left out or removed. One place, so the address is changed here only.
++// Any link with  data-creator-mail  gets its mailto: (with a subject) and, if it has data-show-address, the address as its text.
++// Without JavaScript the link text still says to email Arcane Moments, so nothing breaks. Building the address here instead of
++// writing it into every page also keeps it out of the simplest address-harvesting bots.
++export const CREATOR_EMAIL = 'arcanemomentsfanpage@gmail.com';
++export const REMOVAL_SUBJECT = 'Edit removal request';
++
++export function removalMailto(editTitle = '') {
++    const t = String(editTitle || '').trim();
++    const body = `Hi,\n\nI'm the creator of ${t ? `"${t}"` : 'an edit'} and I'd like it removed from Arcane Moments.\n\nLink to my video: \n\nThanks`;
++    return `mailto:${CREATOR_EMAIL}?subject=${encodeURIComponent(REMOVAL_SUBJECT)}&body=${encodeURIComponent(body)}`;
++}
++
++export function wireCreatorLinks(root = document) {
++    root.querySelectorAll('a[data-creator-mail]').forEach(a => {
++        a.href = removalMailto();
++        if (a.hasAttribute('data-show-address')) a.textContent = CREATOR_EMAIL;
++    });
++}
++
++if (typeof document !== 'undefined') {
++    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => wireCreatorLinks());
++    else wireCreatorLinks();
++}
+diff --git a/js/footer.js b/js/footer.js
+index e61f05f..1eba698 100644
+--- a/js/footer.js
++++ b/js/footer.js
+@@ -170,6 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
+             <div class="footer-legal-links">
+                 <a href="/about">About</a>
+                 <span class="separator">•</span>
++                <a href="/about#creators">For creators</a>
++                <span class="separator">•</span>
+                 <a href="/legal/privacy">Privacy</a>
+                 <span class="separator">•</span>
+                 <a href="/legal/terms">Terms</a>
+diff --git a/music-gallery.html b/music-gallery.html
+index df1493b..143fdd5 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -99,6 +99,14 @@
+             <div class="gallery-message"><p>Loading edits&hellip;</p></div>
+         </section>
+ 
++        <section class="gallery-creators" aria-labelledby="creatorsHeading">
++            <div>
++                <h2 id="creatorsHeading">Made one of these edits?</h2>
++                <p>Every edit is shown with your name and a link to your channel, so voters can find more of your work. If you would rather not be included, email us and we will take it out. The sooner the better: an edit can be removed any time before a cup is drawn.</p>
++            </div>
++            <a class="creators-btn" data-creator-mail href="/about#creators"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Request removal</a>
++        </section>
++
+         <section class="gallery-next" aria-label="Keep exploring">
+             <a href="/live" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>
+             <a href="/brackets" class="next-link"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>See the bracket</span></a>
+@@ -123,5 +131,6 @@
+     <script type="module" src="/js/rank-system.js"></script>
+     <script type="module" src="/js/music-gallery.js"></script>
+     <script type="module" src="/js/settings-modal.js"></script>
++    <script type="module" src="/js/creator-contact.js"></script>
+ </body>
+ </html>
+diff --git a/tools/test-creator-contact.mjs b/tools/test-creator-contact.mjs
+new file mode 100644
+index 0000000..39b2b13
+--- /dev/null
++++ b/tools/test-creator-contact.mjs
+@@ -0,0 +1,27 @@
++// The creator removal link.   node tools/test-creator-contact.mjs
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import { CREATOR_EMAIL, REMOVAL_SUBJECT, removalMailto } from '../js/creator-contact.js';
++const read = p => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
++let passed = 0;
++const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
++
++test('the mailto goes to the creator address with a subject and a starter message', () => {
++    const u = new URL(removalMailto());
++    assert.equal(u.protocol, 'mailto:'); assert.equal(u.pathname, CREATOR_EMAIL);
++    assert.equal(u.searchParams.get('subject'), REMOVAL_SUBJECT);
++    assert.match(u.searchParams.get('body'), /removed from Arcane Moments/);
++});
++test('an edit title is quoted in the message and survives odd characters', () => {
++    const body = new URL(removalMailto('Jinx & "Vi" #1 \u{1F480}')).searchParams.get('body');
++    assert.ok(body.includes('"Jinx & "Vi" #1 \u{1F480}"'));
++});
++test('the address is written in one file only (js/creator-contact.js), not in the pages', () => {
++    for (const f of ['../music-gallery.html', '../about.html', '../js/footer.js', '../js/music-gallery.js']) assert.ok(!read(f).includes(CREATOR_EMAIL), f);
++});
++test('the gallery, the About page and the footer all link creators to the right place', () => {
++    assert.match(read('../music-gallery.html'), /data-creator-mail/); assert.match(read('../music-gallery.html'), /js\/creator-contact\.js/);
++    assert.match(read('../about.html'), /id="creators"/); assert.match(read('../about.html'), /js\/creator-contact\.js/);
++    assert.match(read('../js/footer.js'), /href="\/about#creators"/);
++});
++console.log(`\n${passed} tests passed`);
+diff --git a/tools/test-gallery-browser.py b/tools/test-gallery-browser.py
+index c6e678f..9577d5b 100644
+--- a/tools/test-gallery-browser.py
++++ b/tools/test-gallery-browser.py
+@@ -54,6 +54,8 @@ def load(browser, width, height):
+     pg.wait_for_timeout(3000)
+     return pg, errs
+ 
++rect = lambda pg, sel: pg.evaluate(f"(()=>{{const e=document.querySelector({json.dumps(sel)});if(!e)return null;const r=e.getBoundingClientRect();return {{x:r.x,y:r.y,w:r.width,h:r.height,r:r.right,b:r.bottom}}}})()")
++
+ with sync_playwright() as p:
+     b = p.chromium.launch()
+     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
+@@ -69,6 +71,10 @@ with sync_playwright() as p:
+         check(f'{tag}: no "1-2" style records anywhere in the grid', not re.search(r'(?<![\d:])\d\s*[–-]\s*\d(?![\d:])', txt), re.findall(r'.{0,12}\d\s*[–-]\s*\d.{0,12}', txt)[:3])
+         opts = pg.eval_on_selector_all('#statusFilter option', 'els=>els.map(e=>e.textContent.trim())')
+         check(f'{tag}: status filter says "Finished their run", not "Eliminated"', 'Finished their run' in opts and 'Eliminated' not in opts, opts)
++        href = pg.get_attribute('a[data-creator-mail]', 'href') or ''
++        check(f'{tag}: the creator removal link is a mailto to the right address with a subject', href.startswith('mailto:arcanemomentsfanpage@gmail.com?subject=Edit%20removal%20request'), href)
++        cta = rect(pg, '.creators-btn')
++        check(f'{tag}: the removal button is visible and fits the screen', cta and cta['x'] >= 0 and cta['r'] <= w, cta)
+         pg.select_option('#statusFilter', 'eliminated'); pg.wait_for_timeout(300)
+         only = pg.eval_on_selector_all('.edit-badge', 'els=>els.map(e=>e.textContent.trim())')
+         check(f'{tag}: the "Finished their run" filter keeps only edits whose group is over and who did not go through', only and set(only) == {'Group stage'}, only)

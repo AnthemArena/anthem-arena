@@ -1,87 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arcane Moments</title>
-<meta name="description" content="Arcane moments, one scene at a time. Watch the Arcane Moments Shorts collection and follow the journey toward an Arcane Moments tournament.">
-<link rel="icon" type="image/png" href="/logo.png">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#080914">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://arcanemoments.netlify.app/">
-<meta property="og:title" content="Arcane Moments">
-<meta property="og:description" content="Arcane moments, one scene at a time.">
-<meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
-<meta property="og:image:alt" content="Arcane Moments">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Arcane Moments">
-<meta name="twitter:description" content="Arcane moments, one scene at a time.">
-<meta name="twitter:image" content="https://arcanemoments.netlify.app/og-image.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="/css/arcane-home.css">
-<link rel="stylesheet" href="/css/arcane-player.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="canonical" href="https://arcanemoments.netlify.app/">
+    <meta property="og:url" content="https://arcanemoments.netlify.app/">
+    <meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Arcane Moments | Vote for the best Arcane fan edits</title>
+    <meta name="description" content="Arcane Moments is a fan-made tournament where you vote for the best Arcane edits. Watch the matches, vote, and follow the bracket.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Arcane Moments | Vote for the best Arcane fan edits">
+    <meta property="og:description" content="Vote for the best Arcane fan edits.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+
+    <!-- Fonts and icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/scrollbar.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/home-arcane.css">
+    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Arcane Moments",
+      "description": "A fan-made tournament where you vote for the best Arcane edits."
+    }
+    </script>
+
+    <!-- Global systems first -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body>
-<div class="page-background" aria-hidden="true"></div>
-<div class="page-glow page-glow-left" aria-hidden="true"></div>
-<div class="page-glow page-glow-right" aria-hidden="true"></div>
-<main class="site-shell">
-  <header class="hero">
-    <div class="hero-logo-wrap"><img src="/logo.png" alt="Arcane Moments" class="hero-logo"></div>
-    <p class="eyebrow">💙💜 The unforgettable moments from Arcane</p>
-    <h1>Arcane Moments</h1>
-    <p class="hero-copy">The scenes, lines and reveals that make Arcane unforgettable, one Short at a time.</p>
-    <div class="hero-actions">
-      <a class="primary-button" href="#moments">Start watching <i class="fa-solid fa-play" aria-hidden="true"></i></a>
-      <a class="secondary-button" id="youtube-cta" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i>Subscribe on YouTube</a>
-    </div>
-  </header>
+<body class="theme-arcane page-home">
 
-  <section id="moments" class="moments-section" aria-labelledby="moments-heading">
-    <div class="section-heading">
-      <div><p class="section-kicker">WATCH</p><h2 id="moments-heading">Arcane Moments</h2></div>
-      <a id="channel-link" class="text-link" href="#" target="_blank" rel="noopener">Visit channel <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-    </div>
-    <div id="playlist-rows" class="playlist-rows">
-      <div class="loading-state"><span class="loading-dot"></span><span>Loading moments…</span></div>
-    </div>
-  </section>
+    <div id="nav-placeholder"></div>
+    <script type="module" src="/js/navigation.js"></script>
 
-  <section class="intro-card" style="margin-top:72px" aria-labelledby="intro-heading">
-    <div class="intro-card-icon"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div>
-      <p class="section-kicker">COMING SOON</p>
-      <h2 id="intro-heading">The Arcane Moments tournament</h2>
-      <p>We're working through Arcane scene by scene, collecting the iconic moments and the small ones that deserve a second look. The goal is a full tournament built around them. Follow along to be there when it opens.</p>
-    </div>
-  </section>
+    <main class="home-page">
+        <header class="home-hero">
+            <img src="/logo.png" alt="Arcane Moments" class="home-logo" width="260" height="260">
+            <p class="home-pill" id="homePill" aria-live="polite">Loading&hellip;</p>
+            <h1 class="home-title">Arcane Moments</h1>
+            <p class="home-lead" id="homeLead">A fan-made tournament where you vote for the best Arcane edits.</p>
+            <div class="home-actions" id="homeActions">
+                <a class="btn btn-primary" href="/live">Vote now</a>
+                <a class="btn btn-ghost" href="/brackets">See the bracket</a>
+            </div>
+            <dl class="home-stats" id="homeStats" hidden></dl>
+        </header>
 
-  <section class="support-section" aria-labelledby="support-heading">
-    <div class="support-inner">
-      <div>
-        <p class="section-kicker">SUPPORT</p>
-        <h2 id="support-heading">Enjoying the project?</h2>
-        <p>Help keep the Shorts coming and the tournament on track by supporting us on Ko-fi.</p>
-      </div>
-      <a id="kofi-link" class="kofi-button" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i>Support on Ko-fi</a>
-    </div>
-  </section>
+        <section class="home-block" id="champion" hidden aria-labelledby="championHead"></section>
+        <section class="home-block" id="featured" hidden aria-labelledby="featuredHead"></section>
+        <section class="home-block" id="recent" hidden aria-labelledby="recentHead"></section>
+        <section class="home-block" id="popular" hidden aria-labelledby="popularHead"></section>
+        <section class="home-block" id="newest" hidden aria-labelledby="newestHead"></section>
 
-  <section class="social-section" aria-labelledby="social-heading">
-    <p class="section-kicker">FOLLOW</p>
-    <h2 id="social-heading">Find Arcane Moments elsewhere</h2>
-    <div class="social-grid" id="social-links"></div>
-  </section>
+        <section class="home-block how" id="how" aria-labelledby="howHead">
+            <h2 id="howHead">How it works</h2>
+            <ol class="how-list">
+                <li><b>Edits enter.</b> Fan edits of Arcane, made by creators on YouTube, are drawn into groups of four.</li>
+                <li><b>You vote.</b> Every match is two edits head to head. Watch both, then pick your favourite.</li>
+                <li><b>Two go through.</b> The top two in each group move on to the knockout.</li>
+                <li><b>One is crowned.</b> Knockout rounds run until a single edit is left standing.</li>
+            </ol>
+            <p class="how-more"><a href="/about">More about the cup and how creators are credited</a></p>
+        </section>
+    </main>
 
-  <footer class="site-footer">
-    <div class="footer-brand"><strong>ARCANE MOMENTS</strong><span>Fan-made</span></div>
-    <p>An unofficial fan project. Not affiliated with or endorsed by Riot Games, Fortiche or Netflix. Arcane and related marks belong to their owners.</p>
-  </footer>
-</main>
-<script type="module" src="/js/arcane-home.js"></script>
+    <div id="footer-placeholder"></div>
+    <script src="/js/footer.js"></script>
+
+    <script type="module" src="/js/rank-system.js"></script>
+    <script type="module" src="/js/home.js"></script>
+    <script type="module" src="/js/settings-modal.js"></script>
 </body>
 </html>
