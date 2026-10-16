@@ -13,6 +13,7 @@
     "edits": "node tools/edits-refresh.mjs",
     "test:all": "node tools/test-all.mjs",
     "test:quick": "node tools/test-all.mjs --quick",
-    "launch": "node tools/launch-check.mjs"
+    "launch": "node tools/launch-check.mjs",
+    "tag": "node tools/edits-tag.mjs"
   }
 }
