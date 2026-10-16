@@ -21,7 +21,7 @@ import { ensureUsername } from './username-system.js';
 import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
-import { cleanTitle } from './title-clean.js';
+import { cleanTitle, shortTitle } from './title-clean.js';
 import { renderChampionBubble, loadChampionPack } from './champion-bubble.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
@@ -2893,7 +2893,7 @@ else {
     modal.innerHTML = buildPostVoteModalHtml({
         situationType, line, tag: TAG_FOR_KEY[modalKey] || '', championName: pack?.name || champKey,
         portraitUrl: getChampionTileUrl(champKey, skin), splashUrl: getChampionSplashUrl(champKey, skin),
-        voteTitle: prettyName, songNameRaw: songName, shareContext,
+        voteTitle: shortTitle(songName, 46), songNameRaw: songName, shareContext,
         xp: xpData, rank, next, bracketHref: 'brackets'
     });
     const portraitImg = modal.querySelector('.pvm-portrait');

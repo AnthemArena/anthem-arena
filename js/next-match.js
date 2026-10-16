@@ -3,7 +3,7 @@
 // ========================================
 // js/vote.js uses these to (a) list the live matches the visitor has not voted in yet and (b) show a "Next match" bar once they have voted.
 // Matches from /api/matches carry `matchId` (not `id`), so every lookup goes through matchKey().
-import { cleanTitle } from './title-clean.js';
+import { cleanTitle, shortTitle } from './title-clean.js';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
@@ -31,6 +31,6 @@ export function nextMatchBarHtml(remaining) {
     }
     const next = remaining[0];
     return `
-        <div class="next-bar-text"><strong>${n} more ${n === 1 ? 'match needs' : 'matches need'} your vote</strong><span>${esc(next.song1?.shortTitle || next.song1?.title || 'TBD')} vs ${esc(next.song2?.shortTitle || next.song2?.title || 'TBD')}</span></div>
+        <div class="next-bar-text"><strong>${n} more ${n === 1 ? 'match needs' : 'matches need'} your vote</strong><span>${esc(shortTitle(next.song1?.shortTitle || next.song1?.title || 'TBD', 28))} vs ${esc(shortTitle(next.song2?.shortTitle || next.song2?.title || 'TBD', 28))}</span></div>
         <a class="next-bar-btn" href="vote?match=${encodeURIComponent(matchKey(next))}" data-next-match="${esc(matchKey(next))}">Next match &rarr;</a>`;
 }

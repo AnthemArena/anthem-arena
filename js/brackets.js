@@ -17,6 +17,7 @@ import { ARCANE_CONFIG } from './arcane-config.js';
 import { roundLabel } from './bracket-builder.js';   // same round names the builder stores on each match
 import { describeCup } from './group-builder.js';
 import { cleanTitle } from './title-clean.js';
+import { mountSay, pickBracketsState } from './champion-says.js';
 import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, cupSummary } from './brackets-groups.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
@@ -167,6 +168,7 @@ function hideBracketSections() {
 }
 
 function showEmptyState() {
+    updateBracketsSay([], true);
     const bracketSection = document.getElementById('bracketSection');
     if (bracketSection) {
         bracketSection.style.display = 'block';
@@ -251,6 +253,8 @@ percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVo
 
     // Group-stage cups: the group tables, the tabs and the "knockout starts later" note
     renderStageViews(firebaseMatches);
+    lastBracketMatches = firebaseMatches;
+    updateBracketsSay(firebaseMatches);
 
     // Dynamic stats (from the same matches, no second fetch)
     generateTournamentStats(firebaseMatches);
@@ -747,6 +751,26 @@ function updateMatchCard(match) {
 // so its page is exactly what it was. The HTML itself is built by js/brackets-groups.js.
 
 let currentStage = null;               // 'groups' | 'knockout' for a group-stage cup, null otherwise
+let lastBracketMatches = [];
+
+// The cup champion's line under the page heading (js/champion-says.js)
+function updateBracketsSay(matches = lastBracketMatches, empty = false) {
+    const list = Array.isArray(matches) ? matches : [];
+    const maxRound = list.reduce((r, m) => Math.max(r, m.round || 1), 1);
+    const finalMatches = list.filter(m => (m.round || 1) === maxRound);
+    const finished = finalMatches.length > 0 && finalMatches.every(m => m.status === 'completed') && (!bracketInfo.isGroupCup || bracketInfo.knockoutBuilt);
+    const state = pickBracketsState({
+        empty: empty || list.length === 0, isGroupCup: !!bracketInfo.isGroupCup, knockoutBuilt: !!bracketInfo.knockoutBuilt,
+        stage: currentStage, anyLive: list.some(m => m.status === 'live'), finished
+    });
+    mountSay({
+        id: 'champion-say-brackets', state, seed: 'brackets',
+        place: el => {
+            const head = document.querySelector('.brackets-header .header-content');
+            if (head && head.parentNode) head.parentNode.insertBefore(el, head.nextSibling);
+        }
+    }).catch(e => console.warn('champion line skipped:', e));
+}
 let stageHandlersAttached = false;
 
 function renderStageViews(matches) {
@@ -794,6 +818,7 @@ function showStage(stage) {
     currentStage = stage;
     history.replaceState(null, '', `#${stage}`);
     applyStage();
+    updateBracketsSay();
 }
 
 function filterGroups(filter) {

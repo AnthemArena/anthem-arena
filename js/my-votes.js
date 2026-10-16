@@ -1370,7 +1370,7 @@ function createVoteCard(vote) {
     const roundName = getRoundName(vote.round);
     
     // Get tournament name
-    const tournamentName = match.tournamentName || 'Anthem Arena Championship S1';
+    const tournamentName = match.tournamentName || 'Arcane Moments';
     
     // Determine card class
     const cardClass = vote.voteType;

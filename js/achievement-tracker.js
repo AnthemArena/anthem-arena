@@ -412,6 +412,7 @@ export function showAchievementUnlock(achievement) {
             matchId: `achievement-${achievement.id}`,
             thumbnailUrl: achievementIcon, // ✅ Use League item icon
             icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
+            achievementName: achievement.name,
             message: championMessage?.message || `🏆 Achievement Unlocked: ${achievement.name}`,
             detail: championMessage?.detail || `${achievement.description} • +${achievement.xp} XP • ${achievement.rarity}`,
             cta: championMessage?.cta || 'View Achievements',

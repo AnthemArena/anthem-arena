@@ -180,7 +180,7 @@ with sync_playwright() as p:
             const modal = document.getElementById('vote-modal');
             modal.innerHTML = m.buildPostVoteModalHtml({ situationType: 'early', line: m.chooseModalLine(pack, 'early', {}, 'x'), tag: 'Early voter', championName: 'Jinx',
                 portraitUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Jinx_37.jpg', splashUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_37.jpg',
-                voteTitle: 'Bro tried to rizz Jinx', songNameRaw: 'Bro', shareContext: 'early',
+                voteTitle: 'Bro tried to rizz Jinx 💀', songNameRaw: 'Bro', shareContext: 'early',
                 xp: { totalXP: 40, baseXP: 10, bonuses: [{ type: 'First vote today', xp: 30 }] },
                 rank: { currentLevel: { title: 'Undercity Regular', level: 2 }, nextLevel: { level: 3 }, progressPercentage: 40, progressXP: 40, xpForNextLevel: 100 },
                 next: { href: 'vote?match=x', label: 'Next match' } });
@@ -194,6 +194,24 @@ with sync_playwright() as p:
         check(f'modal ({tag}): the champion line is shown and the old heading is gone', pg.is_visible('.pvm-line') and not pg.query_selector('.modal-title'))
         pg.screenshot(path=f'{SHOTS}/vote-modal-{tag}.png')
         pg.evaluate("closePostVoteModal()")
+        # the achievement popup in the champion's voice (splash + colours from the pack), clear of the Next match bar
+        pg.evaluate("closePostVoteModal()")
+        shown = pg.evaluate("""() => {
+            const m = window.championLoader && window.championLoader.getAchievementMessage('first-choice', { name: 'First Choice', description: 'Cast your first vote', xp: 10, rarity: 'common' });
+            if (!m) return null;
+            window.showBulletin({ priority: 2, type: 'achievement', matchId: 'achievement-first-choice', achievementName: 'First Choice', icon: '🏆',
+                message: m.message, detail: m.detail, cta: m.cta, action: 'navigate', targetUrl: '/profile#achievements' });
+            return m;
+        }""")
+        pg.wait_for_timeout(900)
+        check(f'achievement ({tag}): the champion pack gave a line, a detail and a button', bool(shown and shown['message'] and shown['detail'] and shown['cta']), shown)
+        check(f'achievement ({tag}): no placeholder is left in the text ({{xp}} used to stay in)', bool(shown) and '{' not in shown['message'] + shown['detail'] + shown['cta'], shown)
+        ab = rect(pg, '#bulletin-banner')
+        check(f'achievement ({tag}): the popup is on screen and shows the achievement name above the champion line', bool(ab) and ab['r'] <= w and ab['y'] >= 0 and 'First Choice' in pg.inner_text('#bulletin-banner .achievement-title') and pg.is_visible('#bulletin-banner .achievement-line'), ab)
+        nb = rect(pg, '#next-match-bar')
+        check(f'achievement ({tag}): the popup does not cover the Next match bar', bool(ab and nb) and (ab['b'] <= nb['y'] + 1 or ab['x'] >= nb['r'] - 1 or ab['r'] <= nb['x'] + 1), (ab, nb))
+        check(f'achievement ({tag}): the popup takes the champion splash like the other alerts', pg.evaluate("getComputedStyle(document.querySelector('#bulletin-banner')).backgroundImage").startswith('url('), pg.evaluate("getComputedStyle(document.querySelector('#bulletin-banner')).backgroundImage"))
+        pg.screenshot(path=f'{SHOTS}/vote-achievement-{tag}.png')
         pg.screenshot(path=f'{SHOTS}/vote-voted-{tag}.png')
         check(f'voted ({tag}): no errors from the new code', not [e for e in errs if 'next-match' in e or 'updateNextMatchBar' in e or 'unvotedLiveMatches' in e], errs)
         pg.context.close()

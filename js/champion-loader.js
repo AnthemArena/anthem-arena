@@ -425,6 +425,23 @@ function replacePlaceholders(text, data) {
     if (data.timeLeft !== undefined) {
         result = result.replace(/\{timeLeft\}/g, data.timeLeft);
     }
+
+    // Achievement and rank data ({xp} used to be left in the text as-is)
+    if (data.xp !== undefined) {
+        result = result.replace(/\{xp\}/g, data.xp);
+    }
+    if (data.name) {
+        result = result.replace(/\{name\}/g, data.name);
+    }
+    if (data.description) {
+        result = result.replace(/\{description\}/g, String(data.description).replace(/[.!]+$/, ''));
+    }
+    if (data.rarity) {
+        result = result.replace(/\{rarity\}/g, data.rarity);
+    }
+    if (data.rank) {
+        result = result.replace(/\{rank\}/g, data.rank);
+    }
     
     return result;
 }
