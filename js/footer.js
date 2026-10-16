@@ -181,12 +181,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <!-- Riot Games Disclaimer -->
             <p class="footer-disclaimer">
-                Anthem Arena was created under Riot Games' "Legal Jibber Jabber" 
+                Arcane Moments was created under Riot Games' "Legal Jibber Jabber" 
                 policy using assets owned by Riot Games. Riot Games does not endorse or 
                 sponsor this project.
             </p>
             <p class="footer-disclaimer">
-                League of Legends® and all related logos, characters, music, and content 
+                League of Legends®, Arcane and all related logos, characters, music, and content 
                 are trademarks and copyrights of Riot Games, Inc.
             </p>
             
