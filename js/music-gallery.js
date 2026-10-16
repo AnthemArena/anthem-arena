@@ -1,11 +1,13 @@
 // music-gallery.js: the Arcane Moments EDITS GALLERY (page: /music-gallery, file name kept so nav and footer links still work).
 // Lists every edit that has been entered in a cup (data/edits.json, "tournaments" list not empty), with creator credit,
-// record, standing and a click-to-play Short. Records and standing come from the active cup's matches (/api/matches).
+// standing and a click-to-play Short. Standing comes from the active cup's matches (/api/matches) via js/edit-standing.js.
+// The cards show progress ("Group stage", "Finalist"), not a win-loss record.
 //
 // getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
 import { getAllMatches } from './api-client.js';
 import { cupDisplayName } from './bracket-builder.js';
 import { cleanTitle } from './title-clean.js';
+import { standingFor } from './edit-standing.js';
 
 // Use shared cache if available (set by vote.js)
 window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
@@ -87,31 +89,7 @@ let lastFocus = null;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmtViews = n => !n ? '0' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n);
 const fmtDuration = s => s == null ? '' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-const isFinal = m => /-finals$/.test(m.matchId || '') || m.roundLabel === 'Final';
 const safeUrl = u => /^https:\/\//i.test(u || '') ? u : '';
-
-// What this edit has done in the active cup, worked out from its matches.
-function standingFor(edit, matches) {
-    const mine = matches.filter(m => m.song1?.id === edit.id || m.song2?.id === edit.id)
-        .sort((a, b) => (a.round || 0) - (b.round || 0));
-    if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
-
-    let wins = 0, losses = 0, lostIn = null, champion = false;
-    for (const m of mine) {
-        if (m.status !== 'completed') continue;
-        const winner = m.winnerId || m.winner;
-        if (winner === edit.id) { wins++; if (isFinal(m)) champion = true; }
-        else if (winner) { losses++; lostIn = m; }
-    }
-    const liveMatch = mine.find(m => m.status === 'live') || null;
-    const last = mine[mine.length - 1];
-    const reached = (liveMatch || last).roundLabel || '';
-
-    if (champion) return { kind: 'champion', label: 'Champion', wins, losses, reached: 'Champion', liveMatch: null };
-    if (lostIn) return { kind: 'eliminated', label: 'Out in ' + (lostIn.roundLabel || 'the cup'), wins, losses, reached: lostIn.roundLabel || '', liveMatch: null };
-    if (liveMatch) return { kind: 'live', label: 'Live now', wins, losses, reached, liveMatch };
-    return { kind: 'bracket', label: 'In the bracket', wins, losses, reached, liveMatch: null };
-}
 
 async function loadGallery() {
     grid.setAttribute('aria-busy', 'true');
@@ -176,7 +154,6 @@ function visible() {
 function cardHTML(e) {
     const s = e.standing;
     const title = cleanTitle(e.shortTitle || e.title || 'Untitled edit');
-    const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
     const creatorUrl = safeUrl(e.creatorUrl);
     const creator = creatorUrl
         ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
@@ -198,7 +175,6 @@ function cardHTML(e) {
             <h3 class="edit-title">${esc(title)}</h3>
             ${creator}
             <dl class="edit-stats">
-                <div><dt>Record</dt><dd>${record}</dd></div>
                 <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
                 <div><dt>Likes</dt><dd>${e.likes == null ? '\u2013' : fmtViews(e.likes)}</dd></div>
                 <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
