@@ -411,3 +411,7 @@ On 16 Oct the site lost all its matches: `/api/matches` returned `Firebase error
 - The list now reads the vote counters stored on each match document (every vote increments them in the same batch), so one list request replaces about 385. A single match (`?matchId=`) still counts its votes exactly.
 - If Firestore refuses a request, the edge function retries 429/503 twice, then serves its last good copy (up to 10 minutes old, header `X-Cache: STALE`) instead of an error.
 - Still heavy, worth fixing later: `/api/total-votes` (founding member threshold) reads every vote document each refresh. It should read the match counters or a single counter document. `/api/live-matches` queries votes per live match, which is fine while few matches are live.
+
+## Edge functions now send the project key (second 429 fix)
+
+After the counters fix `/api/matches` still answered 429 even though the day's reads (32k) were under the Spark cap of 50k. The edge functions called Firestore's REST API anonymously, and Google throttles anonymous calls per source address; Netlify's edge servers share addresses with many other sites. Every Firestore call in `firebase-cache.js`, `live-matches.js` and `profile.js` now goes through `fsFetch()`, which adds the project's public web key (the same one in `js/firebase-config.js`) so the call counts against this project. If the key is ever refused with 403 the call is repeated without it. Errors now include the first part of Firestore's reply, so a 500 says why (`RESOURCE_EXHAUSTED`, rules, key...). If 429 persists, read that text first.

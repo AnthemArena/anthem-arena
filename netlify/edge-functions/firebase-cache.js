@@ -6,6 +6,27 @@
 const CACHE_DURATION = 30; // 30 seconds
 const STALE_OK_MS = 10 * 60 * 1000; // serve a copy up to 10 minutes old if Firestore refuses
 const FIREBASE_PROJECT = "arcane-moments";
+
+// ---- Firestore REST access --------------------------------------------------------------------------------------
+// Requests with no API key are anonymous: Google throttles them per source address, and Netlify's edge servers share
+// addresses with many other sites, which is how /api/matches began answering 429 Too Many Requests while the site's own
+// reads (and the daily quota) were fine. Sending the project's public web key makes the call count against this project.
+// If the key were ever blocked (403), the call is repeated without it, so this can only help, never break reads.
+const FIRESTORE_WEB_KEY = "AIzaSyCApnc605mPNOEsAcVnKeXbBTokk7iZP5E";
+const SITE_ORIGIN = "https://arcanemoments.netlify.app/";
+async function fsFetch(url, init = {}) {
+  const keyed = url + (url.includes("?") ? "&" : "?") + "key=" + FIRESTORE_WEB_KEY;
+  const headers = { ...(init.headers || {}), Referer: SITE_ORIGIN };
+  const response = await fetch(keyed, { ...init, headers });
+  if (response.status === 403) return fetch(url, init);
+  return response;
+}
+// Short, safe description of a failed Firestore response, so an error says WHY (quota, rate limit, rules...) and not just the code.
+async function describeFailure(response) {
+  let detail = "";
+  try { detail = (await response.clone().text()).replace(/\s+/g, " ").slice(0, 240); } catch { /* ignore */ }
+  return `${response.status} ${response.statusText}${detail ? " | " + detail : ""}`;
+}
 const TOURNAMENT = "jinx-cup-1";
 
 // Edge cache storage
@@ -117,14 +138,14 @@ export default async (request, context) => {
     if (isMatchList) {
       firestoreData = await fetchAllPages(firebaseUrl);
     } else {
-      const response = await fetch(firebaseUrl, {
+      const response = await fsFetch(firebaseUrl, {
         headers: {
           "Content-Type": "application/json"
         }
       });
 
       if (!response.ok) {
-        throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
+        throw new Error(`Firebase error: ${await describeFailure(response)}`);
       }
 
       firestoreData = await response.json();
@@ -201,14 +222,14 @@ async function fetchAllPages(baseUrl) {
   do {
     const separator = baseUrl.includes("?") ? "&" : "?";
     const url = `${baseUrl}${separator}pageSize=${PAGE_SIZE}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}`;
-    let response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+    let response = await fsFetch(url, { headers: { "Content-Type": "application/json" } });
     for (let attempt = 0; !response.ok && (response.status === 429 || response.status === 503) && attempt < 2; attempt++) {
       await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
-      response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+      response = await fsFetch(url, { headers: { "Content-Type": "application/json" } });
     }
 
     if (!response.ok) {
-      throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
+      throw new Error(`Firebase error: ${await describeFailure(response)}`);
     }
 
     const page = await response.json();
@@ -242,7 +263,7 @@ async function handleViewTracking(request) {
     const viewUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/matchViews/${matchId}`;
     
     // Try to get current view data
-    const getResponse = await fetch(viewUrl);
+    const getResponse = await fsFetch(viewUrl);
     let currentViews = 0;
     let recentTimestamps = [];
     
@@ -263,7 +284,7 @@ async function handleViewTracking(request) {
       }
       
       // Update Firestore
-      await fetch(viewUrl, {
+      await fsFetch(viewUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -284,7 +305,7 @@ async function handleViewTracking(request) {
       // Create new view record
       recentTimestamps = [timestamp];
       
-      await fetch(viewUrl, {
+      await fsFetch(viewUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -345,7 +366,7 @@ async function handleViewStats(matchId) {
     
     const viewUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/matchViews/${matchId}`;
     
-    const response = await fetch(viewUrl);
+    const response = await fsFetch(viewUrl);
     
     if (!response.ok) {
       // No views yet
@@ -417,7 +438,7 @@ async function handleTotalVotes(request) {
     // Query all votes using structured query
     const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
     
-    const response = await fetch(votesUrl, {
+    const response = await fsFetch(votesUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -515,7 +536,7 @@ async function handleActivityFeed(request) {
   try {
     const activityUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery`;
     
-    const response = await fetch(activityUrl, {
+    const response = await fsFetch(activityUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -607,7 +628,7 @@ async function fetchVotesForMatch(matchId) {
   console.log(`🗳️ Fetching votes for match: ${matchId}`);
   
   try {
-    const response = await fetch(votesUrl, {
+    const response = await fsFetch(votesUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

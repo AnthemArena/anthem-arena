@@ -5,6 +5,27 @@
 
 const CACHE_DURATION = 120; // 2 minutes
 const FIREBASE_PROJECT = "arcane-moments";
+
+// ---- Firestore REST access --------------------------------------------------------------------------------------
+// Requests with no API key are anonymous: Google throttles them per source address, and Netlify's edge servers share
+// addresses with many other sites, which is how /api/matches began answering 429 Too Many Requests while the site's own
+// reads (and the daily quota) were fine. Sending the project's public web key makes the call count against this project.
+// If the key were ever blocked (403), the call is repeated without it, so this can only help, never break reads.
+const FIRESTORE_WEB_KEY = "AIzaSyCApnc605mPNOEsAcVnKeXbBTokk7iZP5E";
+const SITE_ORIGIN = "https://arcanemoments.netlify.app/";
+async function fsFetch(url, init = {}) {
+  const keyed = url + (url.includes("?") ? "&" : "?") + "key=" + FIRESTORE_WEB_KEY;
+  const headers = { ...(init.headers || {}), Referer: SITE_ORIGIN };
+  const response = await fetch(keyed, { ...init, headers });
+  if (response.status === 403) return fetch(url, init);
+  return response;
+}
+// Short, safe description of a failed Firestore response, so an error says WHY (quota, rate limit, rules...) and not just the code.
+async function describeFailure(response) {
+  let detail = "";
+  try { detail = (await response.clone().text()).replace(/\s+/g, " ").slice(0, 240); } catch { /* ignore */ }
+  return `${response.status} ${response.statusText}${detail ? " | " + detail : ""}`;
+}
 // Keep in sync with ARCANE_CONFIG.tournamentId in js/arcane-config.js
 const TOURNAMENT = "jinx-cup-1";
 
@@ -46,7 +67,7 @@ export default async (request, context) => {
     // FIXED: Query nested collection path
     const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/matches`;
     
-    const response = await fetch(queryUrl, {
+    const response = await fsFetch(queryUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -126,7 +147,7 @@ async function fetchVotesForMatch(matchId) {
   const votesUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/tournaments/${TOURNAMENT}/votes`;
   
   try {
-    const response = await fetch(votesUrl);
+    const response = await fsFetch(votesUrl);
     
     if (!response.ok) return [];
     
