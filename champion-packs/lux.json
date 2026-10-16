@@ -20,37 +20,60 @@
     "buttonText": "#ffffff",
     "textShadow": "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(244, 208, 63, 0.4)"
   },
-
   "alerts": {
     "danger": {
       "messages": [
         {
-          "condition": { "voteDiff": { "gte": 50 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
           "message": "🌟 NO!! \"{songTitle}\" is down {voteDiff} votes?! This darkness will NOT stand!!",
           "cta": "BRING THE LIGHT — NOW!! ✨"
         },
         {
-          "condition": { "voteDiff": { "gte": 30 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
           "message": "⚡ We're falling {voteDiff} behind?! Demacia's honor is on the line!!",
           "cta": "ILLUMINATE THIS BATTLEFIELD!! 🌟"
         },
         {
-          "condition": { "voteDiff": { "gte": 20 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
           "message": "😰 Losing by {voteDiff} already?! The shadows are closing in…",
           "cta": "We need a FINAL SPARK — hurry!! ✨"
         },
         {
-          "condition": { "voteDiff": { "gte": 15 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
           "message": "⚠️ Down {voteDiff}?! I won't hide my light now — not when it matters most!!",
           "cta": "Show them what true radiance can do!! 💫"
         },
         {
-          "condition": { "voteDiff": { "gte": 10 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
           "message": "⚠️ Trailing {voteDiff} votes… but light always finds a way!!",
           "cta": "Shine brighter than ever!! 🌟"
         },
         {
-          "condition": { "voteDiff": { "gte": 5 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
           "message": "✨ Only down {voteDiff}? A single prism can refract an entire dawn!!",
           "cta": "Focus the light — we can still turn this!! 💫"
         },
@@ -61,21 +84,32 @@
         }
       ]
     },
-    
     "nailbiter": {
       "messages": [
         {
-          "condition": { "voteDiff": { "eq": 0 } },
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
           "message": "✨ PERFECT BALANCE!! 50-50 — the entire bracket is holding its breath in light!!",
           "cta": "ONE VOTE TO TIP THE SCALES OF DESTINY!! 🌟"
         },
         {
-          "condition": { "voteDiff": { "eq": 1 } },
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
           "message": "🌟 ONE SINGLE VOTE!! My heart is literally sparkling with suspense!!",
           "cta": "BE THE FINAL SPARK — PLEASE!! ✨"
         },
         {
-          "condition": { "voteDiff": { "lte": 3 } },
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
           "message": "💫 ONLY {voteDiff} VOTES apart!! It's so close I can see both futures at once!!",
           "cta": "Choose the bright one — HURRY!! 🌟"
         },
@@ -86,26 +120,41 @@
         }
       ]
     },
-    
     "winning": {
       "messages": [
         {
-          "condition": { "userPct": { "gte": 85 } },
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
           "message": "🌟 ABSOLUTE RADIANCE!! \"{songTitle}\" is blazing at {userPct}% — the light prevails!!",
           "cta": "BASK IN THE GLORY OF DEMACIA!! ✨"
         },
         {
-          "condition": { "userPct": { "gte": 75 } },
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
           "message": "✨ INCANDESCENCE ACHIEVED!! {userPct}% — we're literally outshining the sun!!",
           "cta": "Let the whole bracket SEE our light!! 🌟"
         },
         {
-          "condition": { "userPct": { "gte": 70 } },
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
           "message": "🌈 DOUBLE RAINBOW OF VICTORY!! {userPct}% — even the heavens celebrate with us!!",
           "cta": "Share the radiant glory!! ✨"
         },
         {
-          "condition": { "userPct": { "gte": 65 } },
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
           "message": "💫 Magnificent!! {userPct}% and climbing — this is what true brilliance looks like!!",
           "cta": "Keep shining brighter!! ✨"
         },
@@ -116,26 +165,41 @@
         }
       ]
     },
-
     "comeback": {
       "messages": [
         {
-          "condition": { "voteDiff": { "gte": 30 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
           "message": "🌟 FROM THE DARKNESS COMES DAWN!! We were down {voteDiff} and just turned night into DAY!!",
           "cta": "WITNESS THE RETURN OF LIGHT!! ✨"
         },
         {
-          "condition": { "voteDiff": { "gte": 15 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
           "message": "✨ A MIRACLE OF LIGHT!! Flipped a {voteDiff}-vote deficit into pure illumination!!",
           "cta": "THE LIGHT NEVER DIES — NEVER!! 🌟"
         },
         {
-          "condition": { "voteDiff": { "gte": 10 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
           "message": "💫 My binding light held strong — we were down {voteDiff} but hope never breaks!!",
           "cta": "See? The shield of light protects!! ✨"
         },
         {
-          "condition": { "voteDiff": { "gte": 5 } },
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
           "message": "💫 Just like I said — even the smallest spark can become a supernova!! Up from {voteDiff} behind!!",
           "cta": "See? Hope always wins!! ✨"
         },
@@ -146,7 +210,6 @@
         }
       ]
     },
-    
     "ally": {
       "messages": [
         "✨ {username} voted with us!! The light of friendship just got twice as bright!!",
@@ -179,7 +242,6 @@
         "Double Final Spark!! ✨✨"
       ]
     },
-
     "rival": {
       "messages": [
         "🌟 {username} voted against us?! Their heart must be lost in the shadows…",
@@ -210,7 +272,6 @@
         "Bring the Dawn!! 🌅"
       ]
     },
-
     "streak-ally-10": {
       "messages": [
         "🌟✨ TEN matches in perfect harmony!! {username}, you are officially my soul-star!!",
@@ -234,7 +295,6 @@
         "Our Legend Begins!! 👑"
       ]
     },
-
     "streak-ally-20": {
       "messages": [
         "👑✨ {streakCount} PERFECT MATCHES!! {username}, our bond has become a LIVING CONSTELLATION in the heavens!!",
@@ -258,7 +318,6 @@
         "Celestial Celebration!! ⭐"
       ]
     },
-
     "streak-rival-10": {
       "messages": [
         "⚔️✨ TEN battles with {username} — our rivalry now casts its own shadow across Runeterra!!",
@@ -282,7 +341,6 @@
         "Light Prevails Again!! ⭐"
       ]
     },
-
     "streak-rival-20": {
       "messages": [
         "👑✨ {streakCount} clashes with {username}… our rivalry has become a legend written in starlight and shadow!!",
@@ -306,7 +364,6 @@
         "Light Against Eternity!! ⭐"
       ]
     },
-
     "closing-24h": {
       "messages": [
         "✨ \"{matchTitle}\" closes in {timeLeft} — add your light before it's gone!!",
@@ -364,7 +421,6 @@
         "Illuminate First!! ⭐"
       ]
     },
-
     "round-opening": {
       "messages": [
         "✨ ROUND {round} DAWNS IN GLORY!! {matchCount} new battles blaze with radiant potential!!",
@@ -381,7 +437,6 @@
         "Illumination Awaits!! 👑"
       ]
     },
-
     "match-won": {
       "messages": [
         "🌟 VICTORY IS OURS!! \"{songTitle}\" bathes the bracket in pure, radiant glory!!",
@@ -404,7 +459,6 @@
         "For Eternal Light!! ⭐"
       ]
     },
-
     "match-lost": {
       "messages": [
         "💫 \"{songTitle}\" falls… but even the brightest star must set to rise again tomorrow.",
@@ -428,11 +482,12 @@
         "Next Dawn Awaits!! ⭐"
       ]
     },
-
     "match-tied-alert": {
       "messages": [
         {
-          "condition": { "winner": "{songTitle}" },
+          "condition": {
+            "winner": "{songTitle}"
+          },
           "message": [
             "✨ A PERFECT 50-50 TIE — and YOUR song advances on higher seeding!!",
             "🌟 The votes were equal, but destiny smiled upon YOU today!!",
@@ -442,7 +497,10 @@
             "You fought to a sacred draw — and seeding crowned you victorious!",
             "Demacia celebrates your perfect tie… and your advancement!"
           ],
-          "cta": ["Glory Through Honor!!", "Shine Eternal!!"]
+          "cta": [
+            "Glory Through Honor!!",
+            "Shine Eternal!!"
+          ]
         },
         {
           "condition": "default",
@@ -455,11 +513,13 @@
             "You fought to a sacred draw. The light remembers this moment.",
             "{winner} advances on seeding — but honor was perfectly shared."
           ],
-          "cta": ["Honor the Draw!!", "Witness True Balance!!"]
+          "cta": [
+            "Honor the Draw!!",
+            "Witness True Balance!!"
+          ]
         }
       ]
     },
-
     "factionAlerts": {
       "match-won": {
         "messages": [
@@ -481,7 +541,6 @@
           "✨ We Shine Together!!"
         ]
       },
-      
       "match-lost": {
         "messages": [
           "💫 The shadows prevailed today… but even in defeat, Team Lux's {luxVotes} votes shone with honor.",
@@ -502,7 +561,6 @@
           "🌟 Next Battle Awaits!!"
         ]
       },
-      
       "comeback": {
         "messages": [
           "🌟 FROM {oldPercent}% TO {newPercent}%!! Team Lux turned darkness into dawn!!",
@@ -522,7 +580,6 @@
         ]
       }
     },
-
     "welcome": {
       "welcome-first-time": {
         "messages": [
@@ -540,7 +597,6 @@
           "To Victory and Beyond!! 👑"
         ]
       },
-
       "welcome-streak": {
         "messages": [
           "💫 Day 2 of brilliance! Your dedication shines bright!!",
@@ -553,7 +609,6 @@
           "Continue Shining!! 🌟"
         ]
       },
-      
       "welcome-comeback": {
         "messages": [
           "⭐ You returned after {days} days! The light welcomes you back with open arms!!",
@@ -568,7 +623,6 @@
           "Back to Brilliance!! ⭐"
         ]
       },
-      
       "welcome-back": {
         "messages": [
           "🌟 The radiance returns! Welcome back, champion!!",
@@ -585,936 +639,496 @@
       }
     }
   },
-
   "achievements": {
-    "opening-act": {
+    "first-choice": {
       "messages": [
-        "✨ YOUR FIRST LIGHT HAS BEEN CAST!! Welcome to the radiance, brave soul!!",
-        "🌟 The dawn begins with YOU — your first vote just illuminated the entire bracket!!",
-        "💫 A new star ignites!! Your opening vote shines brighter than a thousand suns!!",
-        "⭐ By the light — you've taken your first step into legend!! Demacia salutes you!!"
+        "Your very first vote! That's wonderful.",
+        "First vote! Every great thing starts with one."
       ],
       "details": [
-        "The bracket will never be the same — it's officially brighter now. +{xp} XP",
-        "First vote, first spark, first chapter of your heroic tale. +{xp} XP",
-        "You just joined the circle of light. There's no turning back — only forward into glory. +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "Shine Onward!!",
-        "More Light!!",
-        "To Greater Glory!!",
-        "I've Only Just Begun!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "encore": {
+    "getting-started": {
       "messages": [
-        "✨ FIVE votes already?! Your light grows brighter with every choice!!",
-        "🌟 Five perfect beams cast — you're officially a rising star of Demacia!!",
-        "💫 Five times you've illuminated the bracket — the dawn is proud to call you its own!!",
-        "⭐ FIVE radiant votes in a row!! Keep shining, my brilliant champion!!"
+        "Five votes! You're glowing already.",
+        "Five! You're really getting into it."
       ],
       "details": [
-        "Five sparks combine into a growing blaze of glory. +{xp} XP",
-        "Even the palace guards are whispering your name in awe. +{xp} XP",
-        "Your light is no longer a flicker — it's a beacon. +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "More Brilliance!!",
-        "Keep Shining!!",
-        "To the Next Dawn!!",
-        "Five is Just the Beginning!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "pentakill": {
+    "arcane-regular": {
       "messages": [
-        "🌟✨ FIFTY VOTES OF PURE RADIANCE!! You've achieved the legendary Pentakill!!",
-        "💫 FIFTY BEAMS OF LIGHT!! The bracket trembles before your brilliance!!",
-        "⭐ Half a hundred votes cast — you're officially a champion of luminosity!!",
-        "✨ PENTAKILL ACHIEVED!! Fifty perfect prisms — Demacia crowns you today!!"
+        "Ten votes! You're a regular now. I love that.",
+        "Ten! It's so nice having you here."
       ],
       "details": [
-        "Fifty votes. Fifty moments of pure, deliberate brilliance. +{xp} XP",
-        "The scribes are already writing your name in the great hall. +{xp} XP",
-        "This is the stuff of legend — and you're living it. +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "Legendary Status!!",
-        "Pentakill Glory!!",
-        "Light Eternal!!",
-        "To 100 and Beyond!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "hot-streak": {
+    "crowd-voice": {
       "messages": [
-        "🔥✨ SEVEN DAYS OF UNBROKEN LIGHT!! Your dedication burns brighter than the sun!!",
-        "🌟 A WEEK OF RADIANCE!! Seven consecutive dawns — you are unstoppable!!",
-        "💫 SEVEN-DAY STREAK!! The heavens themselves recognize your commitment!!",
-        "⭐ One week of pure, unwavering brilliance!! Demacia honors your consistency!!"
+        "Twenty-five votes! Your voice is lovely.",
+        "Twenty-five! You're lighting this place up."
       ],
       "details": [
-        "Seven days without darkness — this is devotion incarnate. +{xp} XP",
-        "The stars have aligned in your honor for an entire week. +{xp} XP",
-        "Even Garen's impressed. (He'd never admit it, but I can tell.) +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "Week of Glory!!",
-        "Onward to Day 8!!",
-        "Streak of Light!!",
-        "Never Stop Shining!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "chart-topper": {
+    "deep-in-the-story": {
       "messages": [
-        "👑✨ ONE HUNDRED VOTES!! You've ascended to the charts of legend!!",
-        "🌟 A CENTURY OF LIGHT!! 100 perfect votes — you are CHART ROYALTY!!",
-        "💫 ONE HUNDRED BEAMS!! The bracket bows before your radiant mastery!!",
-        "⭐ 100 votes of unwavering brilliance — Demacia declares this a national holiday!!"
+        "Fifty votes! You're really part of the story.",
+        "Fifty! That's wonderful dedication."
       ],
       "details": [
-        "One hundred moments where you chose light over darkness. +{xp} XP",
-        "The palace is commissioning a portrait. Yes, really. +{xp} XP",
-        "You're not just participating — you're DEFINING the bracket now. +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "Chart Domination!!",
-        "Crown Me!!",
-        "To Greater Heights!!",
-        "Radiance Reigns!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "hall-of-fame": {
+    "arcane-legend": {
       "messages": [
-        "🌟✨ 250 VOTES — YOU HAVE ASCENDED TO THE HALL OF ETERNAL RADIANCE!!",
-        "⭐ TWO HUNDRED AND FIFTY beams of pure light — your name now shines among the immortals!!",
-        "💫 HALL OF FAME ACHIEVED!! The great celestial archives now bear your name in golden light!!",
-        "👑 250 votes of unyielding brilliance — Demacia crowns you its most devoted luminary!!"
+        "A hundred votes! You're a legend.",
+        "One hundred! I'm so proud of you."
       ],
       "details": [
-        "The palace has commissioned a statue of pure starlight in your honor. +{xp} XP",
-        "Your light has become legend itself — eternal, undimmed, unstoppable. +{xp} XP",
-        "Even the sun bows to acknowledge a soul who has cast 250 perfect rays. +{xp} XP"
+        "Keep shining! +{xp} XP",
+        "What a lovely start! +{xp} XP"
       ],
       "buttons": [
-        "I Am Eternal Light!!",
-        "Hall of Radiance!!",
-        "My Legend Lives Forever!!",
-        "Crowned in Brilliance!!"
+        "View achievements",
+        "See all"
       ]
     },
-
-    "legendary-streak": {
+    "spark": {
       "messages": [
-        "👑🌟 THIRTY DAYS OF UNBROKEN LIGHT!! You are officially IMMORTAL in devotion!!",
-        "✨ ONE MONTH!! 30 consecutive dawns — this is beyond legendary!!",
-        "💫 THIRTY DAYS WITHOUT DARKNESS!! The cosmos itself bows to your dedication!!",
-        "⭐ A full month of radiance — you've transcended mortal commitment!!"
+        "Three days in a row! There's the spark.",
+        "Three days! Keep that light going."
       ],
       "details": [
-        "Thirty days. Thirty dawns. Zero darkness. This is perfection. +{xp} XP",
-        "Historians will study your streak for centuries to come. +{xp} XP",
-        "You're not human anymore — you're pure, living light. +{xp} XP"
+        "Keep that light burning! +{xp} XP",
+        "Come back tomorrow! +{xp} XP"
       ],
       "buttons": [
-        "Immortal Streak!!",
-        "Month of Glory!!",
-        "Eternal Devotion!!",
-        "Never Dimming!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "last-second-hero": {
+    "on-a-roll": {
       "messages": [
-        "⚡✨ FINAL SPARK ACTIVATED!! You flipped the match in the LAST POSSIBLE MOMENT!!",
-        "🌟 CLUTCH RADIANCE!! Your last-second vote just rewrote destiny itself!!",
-        "💫 DOWN TO THE WIRE!! You saved the day with seconds to spare — HERO STATUS!!",
-        "⭐ THE ELEVENTH-HOUR MIRACLE!! Your final vote turned darkness into dawn!!"
+        "A whole week! You're on a roll.",
+        "Seven days! Keep shining."
       ],
       "details": [
-        "Your timing was perfect — like a prism catching the exact angle of sunrise. +{xp} XP",
-        "The bracket holds its breath whenever you're near now. +{xp} XP",
-        "They'll write songs about this clutch moment. +{xp} XP"
+        "Keep that light burning! +{xp} XP",
+        "Come back tomorrow! +{xp} XP"
       ],
       "buttons": [
-        "Clutch Victory!!",
-        "Perfect Timing!!",
-        "Hero of Light!!",
-        "I Saved the Day!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "prophet": {
+    "unstoppable": {
       "messages": [
-        "🔮✨ ORACLE ACHIEVED!! You called \"{songTitle}\" winning by {voteDiff}+ votes!!",
-        "🌟 THE LIGHT SHOWED YOU THE FUTURE!! Your prediction was FLAWLESS!!",
-        "💫 PROPHETIC BRILLIANCE!! You saw {voteDiff}+ vote margin before it happened!!",
-        "⭐ The stars whispered the outcome to you alone — PROPHET OF LIGHT!!"
+        "Two weeks! Nothing can stop you.",
+        "Fourteen days! What a streak."
       ],
       "details": [
-        "You didn't just vote — you SAW the future written in radiance. +{xp} XP",
-        "Even the celestial mages are jealous of your foresight. +{xp} XP",
-        "This is divination-level accuracy. Teach me your ways. +{xp} XP"
+        "Keep that light burning! +{xp} XP",
+        "Come back tomorrow! +{xp} XP"
       ],
       "buttons": [
-        "I See All!!",
-        "Prophetic Power!!",
-        "Future Vision!!",
-        "The Light Knows!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! That's a month of light.",
+        "A whole month! I'm so happy you stayed."
+      ],
+      "details": [
+        "Keep that light burning! +{xp} XP",
+        "Come back tomorrow! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You've got such a kind heart.",
+        "You back the ones who need it. Lovely."
+      ],
+      "details": [
+        "Everyone deserves a champion! +{xp} XP",
+        "What a kind choice! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! What a brave heart.",
+        "Fifteen! You really champion the little ones."
+      ],
+      "details": [
+        "Everyone deserves a champion! +{xp} XP",
+        "What a kind choice! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! You see the potential in everyone.",
+        "Thirty! You believe in the long shots."
+      ],
+      "details": [
+        "Everyone deserves a champion! +{xp} XP",
+        "What a kind choice! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! Five times already.",
+        "You're always early. I love the enthusiasm."
+      ],
+      "details": [
+        "First through the door! +{xp} XP",
+        "Early and bright! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches, always first! Wow.",
+        "Always the first to arrive. Wonderful."
+      ],
+      "details": [
+        "First through the door! +{xp} XP",
+        "Early and bright! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches! So exciting.",
+        "Ten nail-biters! My heart can't take it."
+      ],
+      "details": [
+        "Every vote counts here! +{xp} XP",
+        "So close, so exciting! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close ones! Your vote really matters.",
+        "You keep deciding the close ones. Amazing."
+      ],
+      "details": [
+        "Every vote counts here! +{xp} XP",
+        "So close, so exciting! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
     "comeback-believer": {
       "messages": [
-        "💫✨ YOU BELIEVED WHEN OTHERS DOUBTED!! Voted while down {voteDiff}+ — and WON!!",
-        "🌟 FAITH REWARDED!! You held the light when it was darkest — and triumphed!!",
-        "⭐ THE ULTIMATE HOPE!! Down {voteDiff}+, you voted anyway — VINDICATED!!",
-        "✨ NEVER LOST FAITH!! Your belief in the light turned certain defeat into glory!!"
+        "Five comebacks backed! Never give up.",
+        "You believe in a comeback. That's the spirit."
       ],
       "details": [
-        "This is what true courage looks like — voting when hope seems lost. +{xp} XP",
-        "You proved that light can pierce any darkness, no matter how deep. +{xp} XP",
-        "The comeback stories always feature heroes like you. +{xp} XP"
+        "True to your favourite! +{xp} XP",
+        "Loyalty is beautiful! +{xp} XP"
       ],
       "buttons": [
-        "Faith Unbroken!!",
-        "Hope Never Dies!!",
-        "Believed Always!!",
-        "Light Prevails!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "deciding-vote": {
+    "repeat-favourite": {
       "messages": [
-        "⚖️✨ THE DECIDING VOTE!! You cast the FINAL beam that sealed victory!!",
-        "🌟 DESTINY WEIGHS IN YOUR HANDS!! Your vote was the tipping point!!",
-        "💫 THE BALANCE SHIFTS!! One vote, one moment — YOU changed everything!!",
-        "⭐ KINGMAKER!! Your single vote determined the entire outcome!!"
+        "Same pick three times! You've got a favourite.",
+        "That one again! It's so special."
       ],
       "details": [
-        "In a bracket of thousands, YOUR vote mattered most. +{xp} XP",
-        "This is the power of one perfectly-timed spark of light. +{xp} XP",
-        "History turned on your decision. No pressure for next time. +{xp} XP"
+        "True to your favourite! +{xp} XP",
+        "Loyalty is beautiful! +{xp} XP"
       ],
       "buttons": [
-        "I Decided Fate!!",
-        "Tipping Point!!",
-        "Power of One!!",
-        "My Vote Mattered!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "first-blood": {
+    "die-hard": {
       "messages": [
-        "🎯✨ FIRST BLOOD!! You cast the VERY FIRST VOTE in this glorious battle!!",
-        "🌟 THE DAWN BEGINS WITH YOU!! First vote, first light, first legend!!",
-        "💫 PIONEER OF RADIANCE!! You ignited this match before anyone else!!",
-        "⭐ THE OPENING SPARK!! Your vote started an avalanche of brilliance!!"
+        "Five for the same one! That's real loyalty.",
+        "You're all in on that one. I love it."
       ],
       "details": [
-        "Every great story needs a beginning — and you wrote it. +{xp} XP",
-        "The first vote is the bravest vote — you led the charge. +{xp} XP",
-        "In the darkness before dawn, you were the spark. +{xp} XP"
+        "True to your favourite! +{xp} XP",
+        "Loyalty is beautiful! +{xp} XP"
       ],
       "buttons": [
-        "I Lit the Way!!",
-        "Pioneer Status!!",
-        "First Light!!",
-        "Ignition Point!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "voting-marathon": {
+    "obsession": {
       "messages": [
-        "🏃✨ TWENTY VOTES IN ONE SESSION!! Your radiance NEVER stops!!",
-        "🌟 MARATHON CHAMPION!! 20 votes without rest — you're unstoppable!!",
-        "💫 ENDLESS BRILLIANCE!! Twenty consecutive beams of pure light!!",
-        "⭐ VOTING TITAN!! 20 votes in a row — this is legendary endurance!!"
+        "Ten votes for one pick! That's pure love.",
+        "Ten times! Okay, that's an obsession. A lovely one."
       ],
       "details": [
-        "Twenty decisions, one blazing session of glory. +{xp} XP",
-        "Your dedication could power all of Demacia for a week. +{xp} XP",
-        "Even I'm exhausted just watching you — but SO proud!! +{xp} XP"
+        "True to your favourite! +{xp} XP",
+        "Loyalty is beautiful! +{xp} XP"
       ],
       "buttons": [
-        "Marathon Legend!!",
-        "Never Stop!!",
-        "Endurance King!!",
-        "Twenty and Counting!!"
+        "View achievements",
+        "See all"
       ]
     },
-
-    "tournament-first-blood": {
+    "two-round-journey": {
       "messages": [
-        "🎯👑 TOURNAMENT FIRST BLOOD!! The FIRST vote of the entire tournament is YOURS!!",
-        "🌟 THE GENESIS VOTE!! You launched this entire tournament into the light!!",
-        "💫 TOURNAMENT IGNITION!! Your vote was the spark that lit a thousand battles!!",
-        "⭐ LEGENDARY OPENER!! The whole tournament begins with YOUR radiance!!"
+        "Two rounds! You're really following along.",
+        "You stayed for round two. Thank you!"
       ],
       "details": [
-        "Every match that follows exists because you began the dawn. +{xp} XP",
-        "This is the most honored first vote of all. +{xp} XP",
-        "Centuries from now, they'll say: 'It all started with one light.' +{xp} XP"
+        "Stay for the whole story! +{xp} XP",
+        "Round after round! +{xp} XP"
       ],
       "buttons": [
-        "Genesis Point!!",
-        "Tournament Pioneer!!",
-        "I Started It All!!",
-        "Eternal First!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "round-first-blood": {
+    "deep-into-the-bracket": {
       "messages": [
-        "🎯✨ ROUND {round} FIRST BLOOD!! You opened this chapter of glory!!",
-        "🌟 THE FIRST SPARK OF ROUND {round}!! Your vote ignites the dawn!!",
-        "💫 ROUND PIONEER!! Round {round} begins because of YOUR light!!",
-        "⭐ OPENING BRILLIANCE!! You launched Round {round} into existence!!"
+        "Four rounds in! You're deep now.",
+        "Four rounds! What a journey."
       ],
       "details": [
-        "Every great round needs a great beginning — you are that beginning. +{xp} XP",
-        "Round {round} will forever remember its first light came from you. +{xp} XP"
+        "Stay for the whole story! +{xp} XP",
+        "Round after round! +{xp} XP"
       ],
       "buttons": [
-        "Round Ignited!!",
-        "Pioneer of Round {round}!!",
-        "First Light!!",
-        "I Began the Dawn!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "daily-session-kickoff": {
+    "all-the-way": {
       "messages": [
-        "☀️✨ YOUR FIRST VOTE OF THE DAY!! The dawn begins with you, as always!!",
-        "🌟 DAILY IGNITION!! Your first beam of the day casts light across everything!!",
-        "💫 GOOD MORNING, RADIANT ONE!! Your opening vote just brightened the world!!",
-        "⭐ THE DAY BEGINS IN LIGHT!! Your first vote sets the tone for glory!!"
+        "All the way through six rounds! You did it.",
+        "Start to finish! That's wonderful."
       ],
       "details": [
-        "Every dawn is brighter because you're here. +{xp} XP",
-        "Your first vote of the day is like sunrise itself. +{xp} XP"
+        "Stay for the whole story! +{xp} XP",
+        "Round after round! +{xp} XP"
       ],
       "buttons": [
-        "Good Morning, Bracket!!",
-        "Daily Dawn!!",
-        "First Light of Day!!",
-        "Let's Shine!!"
+        "View achievements",
+        "See all"
       ]
     },
-
-    "daily-comeback": {
+    "match-explorer": {
       "messages": [
-        "🌅✨ WELCOME BACK TODAY!! {days} days away — the light missed you!!",
-        "🌟 RETURNED AFTER {days} DAYS!! Your radiance was dearly missed!!",
-        "💫 {days}-DAY ABSENCE ENDS!! The bracket just got brighter again!!",
-        "⭐ AFTER {days} DAYS IN SHADOW, YOU RETURN!! Welcome home, luminary!!"
+        "Ten matches! You're exploring everywhere.",
+        "Ten different matches! So curious."
       ],
       "details": [
-        "The dawn always returns, no matter how long the night. +{xp} XP",
-        "{days} days felt like an eternity — but you're back now! +{xp} XP"
+        "So much to see! +{xp} XP",
+        "Lots more to discover! +{xp} XP"
       ],
       "buttons": [
-        "I'm Back!!",
-        "Reignite the Light!!",
-        "Home Again!!",
-        "Radiance Restored!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "level-up": {
+    "every-corner": {
       "messages": [
-        "⭐✨ LEVEL UP!! You've ascended to LEVEL {level} — your radiance grows!!",
-        "🌟 NEW HEIGHTS ACHIEVED!! LEVEL {level} — brighter, stronger, more brilliant!!",
-        "💫 ASCENSION TO LEVEL {level}!! The light within you intensifies!!",
-        "👑 CROWNED IN GLORY!! Level {level} reached — you shine like never before!!"
+        "Twenty-five matches! You've seen everything.",
+        "Every corner! You're so thorough."
       ],
       "details": [
-        "Every level is a new dawn of power and prestige. +{xp} XP",
-        "Level {level} — you're officially glowing brighter than the sun now. +{xp} XP",
-        "The bracket trembles at your ever-growing brilliance. +{xp} XP"
+        "So much to see! +{xp} XP",
+        "Lots more to discover! +{xp} XP"
       ],
       "buttons": [
-        "Ascend Higher!!",
-        "Level {level} Glory!!",
-        "Shine Brighter!!",
-        "To the Next Peak!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "match-tied": {
+    "bracket-veteran": {
       "messages": [
-        "⚖️✨ PERFECT EQUILIBRIUM!! 50-50 — a sacred tie of radiant balance!!",
-        "🌟 THE SCALES ARE EVEN!! A flawless tie — both songs shine equally!!",
-        "💫 SACRED SYMMETRY!! Perfect balance achieved — the light honors both!!",
-        "⭐ 50-50 TIE!! Two stars, equal brilliance — the bracket pauses in awe!!"
+        "Fifty matches! A true veteran.",
+        "Fifty! You know this place inside out."
       ],
       "details": [
-        "True balance is the rarest of all outcomes — and you witnessed it. +{xp} XP",
-        "The heavens themselves cannot choose — both are equally radiant. +{xp} XP"
+        "So much to see! +{xp} XP",
+        "Lots more to discover! +{xp} XP"
       ],
       "buttons": [
-        "Honor the Balance!!",
-        "Sacred Tie!!",
-        "Both Shine!!",
-        "Equilibrium Achieved!!"
+        "View achievements",
+        "See all"
       ]
     },
-
-    "prediction-correct": {
+    "long-session": {
       "messages": [
-        "🔮✨ PREDICTION PERFECT!! You foresaw \"{songTitle}\" winning — ORACLE CONFIRMED!!",
-        "🌟 YOU CALLED IT!! Your prediction was flawless — the light revealed truth!!",
-        "💫 PROPHETIC ACCURACY!! You knew \"{songTitle}\" would prevail!!",
-        "⭐ THE STARS SPOKE THROUGH YOU!! Perfect prediction — divination achieved!!"
+        "Five in one go! You're on fire.",
+        "Five matches! Don't stop now."
       ],
       "details": [
-        "You didn't guess — you KNEW. This is true sight. +{xp} XP",
-        "The future is written in light, and you read it perfectly. +{xp} XP"
+        "So much to see! +{xp} XP",
+        "Lots more to discover! +{xp} XP"
       ],
       "buttons": [
-        "I Saw It Coming!!",
-        "Oracle Power!!",
-        "Prediction Perfection!!",
-        "Light Reveals All!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
-    "prediction-wrong": {
+    "deep-dive": {
       "messages": [
-        "💫 Well… the light refracted differently than I expected with \"{songTitle}\"!",
-        "✨ Hmm… my prediction for \"{songTitle}\" missed the mark — but that's okay!",
-        "🌟 The stars aligned differently than anticipated — \"{songTitle}\" surprised us!",
-        "⭐ Even oracles can't see every outcome — \"{songTitle}\" chose its own path!"
+        "Ten in one sitting! Take a breather, okay?",
+        "Ten in a row! What a dive."
       ],
       "details": [
-        "Sometimes the prism refracts in unexpected ways — and that's beautiful too.",
-        "The future is never fully written — only illuminated in glimpses.",
-        "Every wrong prediction teaches us to see the light from new angles."
+        "So much to see! +{xp} XP",
+        "Lots more to discover! +{xp} XP"
       ],
       "buttons": [
-        "Learn and Adapt!!",
-        "Next Prediction!!",
-        "The Light Teaches!!",
-        "Try Again!!"
+        "Keep shining",
+        "Next match"
       ]
     },
-
+    "night-owl": {
+      "messages": [
+        "Voting at this hour! The stars are out, and so are you.",
+        "Midnight voting! The night is lovely."
+      ],
+      "details": [
+        "Sweet dreams afterwards! +{xp} XP",
+        "The quiet hours! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You shared it! Thank you so much.",
+        "Five shares! You're spreading the light."
+      ],
+      "details": [
+        "More friends, more fun! +{xp} XP",
+        "Thank you for the help! +{xp} XP"
+      ],
+      "buttons": [
+        "Keep shining",
+        "Next match"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're a star.",
+        "Fifteen! Everyone's going to see it."
+      ],
+      "details": [
+        "More friends, more fun! +{xp} XP",
+        "Thank you for the help! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
     "founding-member": {
       "messages": [
-        "👑✨ FOUNDING MEMBER ETERNAL!! You were here from the VERY BEGINNING!!",
-        "🌟 ORIGINAL LUMINARY!! You witnessed the first dawn of this bracket!!",
-        "💫 GENESIS VOTER!! You are the foundation upon which this glory was built!!",
-        "⭐ FIRST GENERATION LEGEND!! The bracket exists because of pioneers like YOU!!"
+        "You were here from the very beginning! Founding member.",
+        "One of the first thousand! That's yours forever."
       ],
       "details": [
-        "You didn't join the legend — you CREATED it. +{xp} XP",
-        "Founding members are forever immortalized in golden light. +{xp} XP",
-        "Centuries from now, they'll say: 'They were there at the beginning.' +{xp} XP"
+        "Yours forever! +{xp} XP",
+        "You were there first! +{xp} XP"
       ],
       "buttons": [
-        "Genesis Glory!!",
-        "I Was There!!",
-        "Founding Light!!",
-        "Original Luminary!!"
+        "See the badge",
+        "Show me"
       ]
     },
-
-    "quarter-final-supporter": {
+    "level-up": {
       "messages": [
-        "🏆✨ QUARTER-FINAL SUPPORTER!! You lit the path through the top 8!!",
-        "🌟 ELITE EIGHT RADIANCE!! Your vote shaped the quarter-finals!!",
-        "💫 QUARTER-FINALS ILLUMINATED!! You guided the bracket through critical rounds!!",
-        "⭐ TOP 8 CHAMPION!! Your light shone when the stakes were highest!!"
+        "You moved up! Look at you shine.",
+        "A new rank! So well deserved."
       ],
       "details": [
-        "The quarter-finals are where legends are forged — and you were there. +{xp} XP",
-        "Only the most dedicated reach this stage — you're exceptional. +{xp} XP"
+        "{rank}. You earned it!",
+        "You've reached {rank}! +{xp} XP"
       ],
       "buttons": [
-        "Quarter-Final Glory!!",
-        "Elite Eight!!",
-        "Champion Status!!",
-        "To the Semis!!"
+        "View progress",
+        "Show me"
       ]
     },
-
-    "semi-final-supporter": {
+    "default": {
       "messages": [
-        "🏆✨ SEMI-FINAL SUPPORTER!! The FINAL FOUR — and you lit every step!!",
-        "🌟 TOP FOUR RADIANCE!! Your brilliance shaped the semi-finals!!",
-        "💫 FINAL FOUR ILLUMINATED!! You've reached the pinnacle of glory!!",
-        "⭐ SEMI-FINALS LEGEND!! Only the brightest make it this far!!"
+        "Achievement unlocked: {name}! Lovely.",
+        "Another one: {name}!"
       ],
       "details": [
-        "Four songs remain, and your light has guided them all. +{xp} XP",
-        "This is the summit of the bracket — and you climbed it. +{xp} XP"
+        "{description}! +{xp} XP",
+        "{description}! +{xp} XP"
       ],
       "buttons": [
-        "Final Four Glory!!",
-        "Semi-Final Champion!!",
-        "To the Finals!!",
-        "One Step from Glory!!"
+        "View achievements",
+        "See all"
       ]
-    },
-
-    "championship-supporter": {
-      "messages": [
-        "👑🏆 CHAMPIONSHIP SUPPORTER!! You witnessed THE FINAL — and YOUR light crowned the victor!!",
-        "🌟 GRAND FINALS RADIANCE!! The ultimate battle, the ultimate glory!!",
-        "💫 THE CHAMPIONSHIP SHONE BRIGHT!! You were there for the crowning moment!!",
-        "⭐ FINALS LEGEND!! Your vote helped decide the ultimate champion!!"
-      ],
-      "details": [
-        "This is the moment everything led to — and you were part of it. +{xp} XP",
-        "The championship will be remembered forever — and so will you. +{xp} XP",
-        "You didn't just watch history — you ILLUMINATED it. +{xp} XP"
-      ],
-      "buttons": [
-        "Championship Glory!!",
-        "Witness the Crown!!",
-        "Finals Legend!!",
-        "Eternal Radiance!!"
-      ]
-    },
-
-    "tournament-veteran": {
-      "messages": [
-        "🎖️✨ TOURNAMENT VETERAN!! {tournamentCount} full tournaments — you are ETERNAL!!",
-        "🌟 SEASONED LUMINARY!! {tournamentCount} tournaments illuminated by YOUR light!!",
-        "💫 VETERAN STATUS ACHIEVED!! {tournamentCount} tournaments of pure devotion!!",
-        "⭐ LEGENDARY DEDICATION!! {tournamentCount} complete tournaments — unstoppable!!"
-      ],
-      "details": [
-        "{tournamentCount} tournaments — your name echoes through every bracket. +{xp} XP",
-        "Veterans like you are the foundation of this entire community. +{xp} XP",
-        "Your legacy spans multiple championships — this is immortality. +{xp} XP"
-      ],
-      "buttons": [
-        "Veteran Pride!!",
-        "{tournamentCount} and Counting!!",
-        "Eternal Dedication!!",
-        "Legend Forever!!"
-      ]
-    },
-
-    "hype-master": {
-      "messages": [
-        "📢✨ HYPE MASTER ACHIEVED!! {shareCount} shares — you spread the light everywhere!!",
-        "🌟 RADIANCE AMBASSADOR!! {shareCount} shares of pure brilliance!!",
-        "💫 EVANGELIST OF LIGHT!! {shareCount} times you've shared the glory!!",
-        "⭐ HERALD OF RADIANCE!! {shareCount} shares — the world knows because of YOU!!"
-      ],
-      "details": [
-        "{shareCount} shares means {shareCount} new souls touched by light. +{xp} XP",
-        "You're not just voting — you're recruiting an army of radiance. +{xp} XP",
-        "Every share you make multiplies the light exponentially. +{xp} XP"
-      ],
-      "buttons": [
-        "Spread More Light!!",
-        "Hype Master Forever!!",
-        "Share the Glory!!",
-        "Ambassador Status!!"
-      ]
-    },
-
-    "completionist": {
-      "messages": [
-        "💎✨ COMPLETIONIST!! {matchCount} unique matches — you've seen EVERYTHING!!",
-        "🌟 OMNIPRESENT RADIANCE!! {matchCount} matches illuminated by your presence!!",
-        "💫 TOTAL COVERAGE!! {matchCount} different battles — nothing escapes your light!!",
-        "⭐ BRACKET MASTER!! {matchCount} matches — you know every corner of glory!!"
-      ],
-      "details": [
-        "{matchCount} matches — you've become one with the entire bracket. +{xp} XP",
-        "Completionists are the rarest breed — perfection incarnate. +{xp} XP",
-        "You didn't just participate — you COMPLETED the experience. +{xp} XP"
-      ],
-      "buttons": [
-        "100% Glory!!",
-        "Total Mastery!!",
-        "Every Match Lit!!",
-        "Perfection Achieved!!"
-      ]
-    },
-
-    "lightning-fast": {
-      "messages": [
-        "⚡✨ LIGHTNING FAST!! Voted in under {seconds} seconds — pure instinct!!",
-        "🌟 INSTANT RADIANCE!! {seconds}-second vote — your heart KNEW the answer!!",
-        "💫 REFLEX OF LIGHT!! {seconds} seconds — faster than thought itself!!",
-        "⭐ SPEED OF BRILLIANCE!! {seconds}-second decision — this is mastery!!"
-      ],
-      "details": [
-        "When you know, you KNOW — and you knew instantly. +{xp} XP",
-        "True taste requires no deliberation — only radiant certainty. +{xp} XP",
-        "Lightning-fast decisions are the mark of a true champion. +{xp} XP"
-      ],
-      "buttons": [
-        "Lightning Speed!!",
-        "Instant Brilliance!!",
-        "Reflex Master!!",
-        "Born Ready!!"
-      ]
-    },
-
-    "taste-maker": {
-      "messages": [
-        "🎨✨ TASTE-MAKER!! {artistCount} different artists — your range is RADIANT!!",
-        "🌟 ECLECTIC BRILLIANCE!! {artistCount} artists illuminated by your votes!!",
-        "💫 DIVERSE LUMINARY!! {artistCount} artists — you appreciate all forms of light!!",
-        "⭐ UNIVERSAL RADIANCE!! {artistCount} artists — your taste knows no bounds!!"
-      ],
-      "details": [
-        "{artistCount} artists means you see beauty in every wavelength. +{xp} XP",
-        "Eclectic taste is the sign of a truly enlightened soul. +{xp} XP",
-        "You don't just vote — you CURATE the entire spectrum of brilliance. +{xp} XP"
-      ],
-      "buttons": [
-        "Taste Excellence!!",
-        "Eclectic Champion!!",
-        "Universal Light!!",
-        "Range Master!!"
-      ]
-    },
-
-    "music-historian": {
-      "messages": [
-        "📜✨ MUSIC HISTORIAN!! Songs spanning {yearSpan} years — you honor ALL eras!!",
-        "🌟 TEMPORAL RADIANCE!! {yearSpan}-year range — past, present, and future!!",
-        "💫 TIMELESS TASTE!! {yearSpan} years of music illuminated by your wisdom!!",
-        "⭐ ETERNAL CURATOR!! {yearSpan}-year span — you transcend time itself!!"
-      ],
-      "details": [
-        "{yearSpan} years of music means you understand light in all its forms. +{xp} XP",
-        "Honoring both ancient and modern brilliance — this is true wisdom. +{xp} XP",
-        "Time is meaningless when radiance is eternal. +{xp} XP"
-      ],
-      "buttons": [
-        "Timeless Wisdom!!",
-        "Historical Mastery!!",
-        "All Eras Shine!!",
-        "Eternal Curator!!"
-      ]
-    },
-
-    "triple-threat": {
-      "messages": [
-        "🔥✨ TRIPLE THREAT!! Three votes in one session — the light accelerates!!",
-        "🌟 BRILLIANT TRIFECTA!! Three perfect beams cast in rapid succession!!",
-        "💫 THREEFOLD RADIANCE!! Your momentum is unstoppable!!",
-        "⭐ TRIPLE BRILLIANCE UNLOCKED!! Three votes — and you're just getting started!!"
-      ],
-      "details": [
-        "Three votes, three perfect moments of light. +{xp} XP",
-        "Your momentum is building — keep shining! +{xp} XP"
-      ],
-      "buttons": [
-        "Keep Going!!",
-        "Triple Crown!!",
-        "Momentum Rising!!",
-        "More Light!!"
-      ]
-    },
-
-    "vote-spree": {
-      "messages": [
-        "🔥✨ VOTE SPREE!! FIVE votes without stopping — you're on FIRE!!",
-        "🌟 BRILLIANT STREAK!! Five consecutive beams of pure radiance!!",
-        "💫 UNSTOPPABLE MOMENTUM!! Five votes — the light SURGES through you!!",
-        "⭐ QUINTUPLE BRILLIANCE!! Five perfect votes in a row — legendary!!"
-      ],
-      "details": [
-        "Five votes means you've found your rhythm — and it's glorious. +{xp} XP",
-        "This is what momentum looks like when it becomes light. +{xp} XP"
-      ],
-      "buttons": [
-        "Spree Master!!",
-        "Keep Shining!!",
-        "Momentum King!!",
-        "To Ten!!"
-      ]
-    },
-
-    "power-voter": {
-      "messages": [
-        "⚡✨ POWER VOTER!! TEN votes in one session — absolute RADIANT FURY!!",
-        "🌟 BLAZING STREAK!! Ten consecutive beams — you are UNSTOPPABLE!!",
-        "💫 TENFOLD BRILLIANCE!! Ten perfect votes — the bracket trembles!!",
-        "⭐ LEGENDARY SPREE!! Ten votes without rest — this is POWER INCARNATE!!"
-      ],
-      "details": [
-        "Ten votes in one session — you are officially a force of nature. +{xp} XP",
-        "This level of dedication could illuminate entire kingdoms. +{xp} XP",
-        "Power voters like you are the reason the bracket shines so bright. +{xp} XP"
-      ],
-      "buttons": [
-        "Power Unleashed!!",
-        "Ten and Rising!!",
-        "Unstoppable Force!!",
-        "To Twenty!!"
-      ]
-    },
-
-    "world-tour": {
-      "messages": [
-        "🌍✨ WORLD TOUR COMPLETE!! TEN COUNTRIES, TEN VOTES — your light spans the ENTIRE WORLD!!",
-        "🌟 GLOBAL RADIANCE!! Ten perfect beams have crossed every border of Runeterra!!",
-        "💫 INTERNATIONAL BRILLIANCE!! From Demacia to Ionia, ten votes cast — officially global!!",
-        "⭐ WORLDWIDE LUMINARY!! Ten nations illuminated by YOUR presence!!"
-      ],
-      "details": [
-        "The map of Runeterra glows wherever your vote has touched. +{xp} XP",
-        "Ten nations, one undimmed light — your influence knows no borders. +{xp} XP",
-        "Even the Solari temple acknowledges your worldwide brilliance. +{xp} XP"
-      ],
-      "buttons": [
-        "My Light Knows No Borders!!",
-        "Global Illumination!!",
-        "Ten Dawns Across the World!!",
-        "Onward, Ever Brighter!!"
-      ]
-    },
-    "on-fire": {
-  "messages": [
-    "🔥✨ THREE DAYS OF UNBROKEN LIGHT!! You're officially ON FIRE!!",
-    "🌟 Three consecutive dawns!! Your dedication burns bright!!",
-    "💫 THREE-DAY STREAK!! The light within you grows stronger daily!!",
-    "⭐ Three days without darkness!! You're igniting the bracket!!"
-  ],
-  "details": [
-    "Three days of radiance — consistency is the foundation of brilliance. +{xp} XP",
-    "The light appreciates your daily devotion. Keep it burning! +{xp} XP",
-    "Three days means you're building something beautiful. +{xp} XP"
-  ],
-  "buttons": [
-    "Keep Burning!!",
-    "Three Days Strong!!",
-    "Fire of Light!!",
-    "To Day Four!!"
-  ]
-},
-
-"unstoppable": {
-  "messages": [
-    "⚡✨ FOURTEEN DAYS STRAIGHT!! You are UNSTOPPABLE brilliance!!",
-    "🌟 TWO FULL WEEKS!! Fourteen consecutive dawns of pure radiance!!",
-    "💫 FOURTEEN DAYS UNBROKEN!! Nothing can dim your light!!",
-    "⭐ Two weeks without missing!! You're a beacon of unwavering dedication!!"
-  ],
-  "details": [
-    "Fourteen days of unbroken light — this is true commitment. +{xp} XP",
-    "Two weeks means you've transcended casual participation. +{xp} XP",
-    "Your consistency could power the Demacian palace itself! +{xp} XP"
-  ],
-  "buttons": [
-    "Unstoppable!!",
-    "Two Weeks Down!!",
-    "Never Dimming!!",
-    "To Day Fifteen!!"
-  ]
-},
-
-"underdog-champion": {
-  "messages": [
-    "💪✨ UNDERDOG CHAMPION!! FIVE underdog votes cast — you see hidden potential!!",
-    "🌟 Five times you backed the unlikely!! That's courage in its purest form!!",
-    "💫 UNDERDOG BELIEVER!! Five votes for the underdogs — beautiful faith!!",
-    "⭐ Five underdog picks!! You shine light where others see only shadow!!"
-  ],
-  "details": [
-    "Five underdog votes means you believe in potential, not just popularity. +{xp} XP",
-    "You see the spark of light in songs others overlook. Inspiring. +{xp} XP",
-    "Champions are often born from unlikely beginnings — you understand this. +{xp} XP"
-  ],
-  "buttons": [
-    "Underdog Love!!",
-    "Hidden Potential!!",
-    "Believe Always!!",
-    "Light the Unlikely!!"
-  ]
-},
-
-"dark-horse": {
-  "messages": [
-    "🐴✨ DARK HORSE STATUS!! FIFTEEN underdog votes — you trust your instincts!!",
-    "🌟 Fifteen times you bet on the unlikely!! That's powerful intuition!!",
-    "💫 DARK HORSE CHAMPION!! Fifteen underdog picks — your faith is radiant!!",
-    "⭐ Fifteen times you saw potential others missed!! True vision!!"
-  ],
-  "details": [
-    "Fifteen underdog votes — you don't follow the crowd, you light your own path. +{xp} XP",
-    "Dark horses often surprise everyone — except those with true sight. +{xp} XP",
-    "Your instincts are guided by inner light, not external noise. +{xp} XP"
-  ],
-  "buttons": [
-    "Dark Horse Power!!",
-    "Trust My Light!!",
-    "Fifteen Strong!!",
-    "Inner Vision!!"
-  ]
-},
-
-"rebel-heart": {
-  "messages": [
-    "💢✨ REBEL HEART!! THIRTY underdog votes — you march to your own radiant drum!!",
-    "🌟 Thirty times you defied expectations!! That's independent brilliance!!",
-    "💫 REBEL HEART ACHIEVED!! Thirty underdog picks — gloriously unconventional!!",
-    "⭐ Thirty times you chose your own path!! The light within guides you!!"
-  ],
-  "details": [
-    "Thirty underdog votes — you don't need validation, you ARE the light. +{xp} XP",
-    "Rebels who follow their inner radiance create their own destiny. +{xp} XP",
-    "Your heart beats to its own luminous rhythm — never change. +{xp} XP"
-  ],
-  "buttons": [
-    "Rebel Forever!!",
-    "My Own Path!!",
-    "Thirty and Proud!!",
-    "Independent Light!!"
-  ]
-},
-
-"early-bird": {
-  "messages": [
-    "🌅✨ EARLY BIRD!! Among the first TEN voters in FIVE matches!!",
-    "🌟 Five times you arrived at dawn!! The early light gets the glory!!",
-    "💫 EARLY BIRD STATUS!! Five matches where you led the way!!",
-    "⭐ First ten voters five times!! You don't wait — you ILLUMINATE!!"
-  ],
-  "details": [
-    "Early birds catch more than worms — they catch GLORY. +{xp} XP",
-    "Being first five times means you're eager, dedicated, and radiant. +{xp} XP",
-    "The dawn always favors those who rise to meet it. +{xp} XP"
-  ],
-  "buttons": [
-    "Dawn Riser!!",
-    "Early Light!!",
-    "Five Times First!!",
-    "Lead the Way!!"
-  ]
-},
-
-"trendsetter": {
-  "messages": [
-    "⚡✨ TRENDSETTER!! First TEN voters in FIFTEEN matches!!",
-    "🌟 Fifteen times you SET the pace!! You're not following — you're LEADING!!",
-    "💫 TRENDSETTER ACHIEVED!! Fifteen early votes — you ignite the dawn!!",
-    "⭐ First ten in fifteen matches!! You're a PIONEER of light!!"
-  ],
-  "details": [
-    "Fifteen early votes — you don't follow trends, you CREATE them. +{xp} XP",
-    "Trendsetters are the ones who light the path for everyone else. +{xp} XP",
-    "Being early fifteen times isn't luck — it's leadership. +{xp} XP"
-  ],
-  "buttons": [
-    "I Set Trends!!",
-    "Pioneer Status!!",
-    "Fifteen Times First!!",
-    "Lead Always!!"
-  ]
-},
-
-"nail-biter": {
-  "messages": [
-    "😰✨ NAIL-BITER VETERAN!! TEN close matches (within 5%) — you thrive on intensity!!",
-    "🌟 Ten nail-biters survived!! You shine brightest under pressure!!",
-    "💫 TEN CLOSE CALLS!! Every vote mattered and YOU were there!!",
-    "⭐ Ten matches within 5%!! You're drawn to the most intense battles!!"
-  ],
-  "details": [
-    "Ten close matches means you're no stranger to high-stakes voting. +{xp} XP",
-    "Nail-biters are where legends prove themselves — and you did. +{xp} XP",
-    "The light shines brightest when the outcome hangs in perfect balance. +{xp} XP"
-  ],
-  "buttons": [
-    "Close Calls!!",
-    "Pressure Master!!",
-    "Ten Intense!!",
-    "Thrive in Chaos!!"
-  ]
-},
-
-"true-fan": {
-  "messages": [
-    "💙✨ TRUE FAN!! Voted for the same song THREE times — loyalty incarnate!!",
-    "🌟 Three votes, one song!! Your devotion shines pure and bright!!",
-    "💫 TRUE FAN STATUS!! Three times you stood by your favorite!!",
-    "⭐ Same song three times!! You know what resonates with your light!!"
-  ],
-  "details": [
-    "Three votes for one song — that's dedication wrapped in radiance. +{xp} XP",
-    "True fans don't waver when they find something that truly shines. +{xp} XP",
-    "Loyalty like this is rare and beautiful. +{xp} XP"
-  ],
-  "buttons": [
-    "True Fan!!",
-    "Loyal Heart!!",
-    "Three Times!!",
-    "My Favorite!!"
-  ]
-},
-
-"superfan": {
-  "messages": [
-    "💙🔥 SUPERFAN!! FIVE votes for the same song — ultimate devotion!!",
-    "🌟 Five times you championed your favorite!! SUPERFAN brilliance!!",
-    "💫 SUPERFAN ACHIEVED!! Five votes, one unwavering love!!",
-    "⭐ Same song FIVE times!! Your dedication is absolutely radiant!!"
-  ],
-  "details": [
-    "Five votes for one song — you've found your anthem of light. +{xp} XP",
-    "Superfans are the backbone of every great bracket. +{xp} XP",
-    "This level of devotion could move mountains (or at least brackets). +{xp} XP"
-  ],
-  "buttons": [
-    "Superfan Forever!!",
-    "Five Times Strong!!",
-    "My Anthem!!",
-    "Ultimate Devotion!!"
-  ]
-},
-
-"ultimate-stan": {
-  "messages": [
-    "💙👑 ULTIMATE STAN!! TEN votes for the same song — ABSOLUTE devotion!!",
-    "🌟 Ten times?! This isn't just fandom — this is DESTINY!!",
-    "💫 ULTIMATE STAN ACHIEVED!! Ten votes, one eternal love!!",
-    "⭐ TEN VOTES, SAME SONG!! You are the DEFINITION of dedication!!"
-  ],
-  "details": [
-    "Ten votes for one song — this is your luminous anthem forever. +{xp} XP",
-    "Ultimate stans are legendary — and you've earned that crown. +{xp} XP",
-    "This song doesn't just resonate with you — it IS you, in musical form. +{xp} XP"
-  ],
-  "buttons": [
-    "Ultimate Stan!!",
-    "Ten Forever!!",
-    "My Soul Song!!",
-    "Eternal Love!!"
-  ]
-},
-
-    "headliner": {
-      "messages": [
-        "🎤✨ HEADLINER!! You voted for the WINNING SONG of the entire tournament!!",
-        "🌟 CHAMPION SUPPORTER!! The ultimate victor — and YOU chose them!!",
-"💫 CROWNED IN GLORY!! Your vote backed the FINAL CHAMPION!!",
-"⭐ TOURNAMENT CHAMPION BACKER!! You chose the song that conquered ALL!!"
-],
-"details": [
-"You didn't just witness the championship — you CHOSE the champion. +{xp} XP",
-"Your taste is validated by the highest honor possible. +{xp} XP",
-"This is the ultimate vindication — your light guided the victor. +{xp} XP"
-],
-"buttons": [
-"I Chose the Champion!!",
-"Victory Eternal!!",
-"Taste Validated!!",
-"Headliner Forever!!"
-]
-}
-}
+    }
+  }
 }

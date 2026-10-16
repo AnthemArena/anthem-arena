@@ -1,7 +1,7 @@
 // Offline tests for js/title-clean.js and the real titles in data/edits.json.   node tools/test-title-clean.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { cleanTitle } from '../js/title-clean.js';
+import { cleanTitle, shortTitle } from '../js/title-clean.js';
 
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
@@ -60,6 +60,13 @@ test('real titles in data/edits.json: none becomes empty, none ends in a hashtag
     assert.ok(shorter > edits.length * 0.4, `only ${shorter} of ${edits.length} titles changed`);
     const stillTrailing = edits.map(e => cleanTitle(e.title)).filter(c => /#[\p{L}\p{N}_]+\s*$/u.test(c));
     assert.deepEqual(stillTrailing, [], 'titles still ending in a hashtag');
+});
+
+test('shortTitle keeps the first part of a long edit title', () => {
+    assert.equal(shortTitle('Bro tried to rizz Jinx 💀 - JINX EDIT || Britney Spears - Toxic #jinxedit #jinx'), 'Bro tried to rizz Jinx 💀');
+    assert.equal(shortTitle('Jinx edit 💙🔥 #arcane #jinx'), 'Jinx edit 💙🔥');
+    assert.equal(shortTitle(''), '');
+    assert.equal(shortTitle('A'.repeat(60), 20), 'A'.repeat(19) + '…');
 });
 
 console.log(`\n${passed} tests passed`);

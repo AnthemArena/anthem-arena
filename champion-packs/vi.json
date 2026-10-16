@@ -680,935 +680,494 @@
     }
   },
   "achievements": {
-    "opening-act": {
+    "first-choice": {
       "messages": [
-        "👊 FIRST VOTE DOWN!! Welcome to the bracket, kid — you just threw your first punch!!",
-        "💥 Your opening vote!! Nice hit — now let's see if you can keep it up!!",
-        "🥊 First blood to YOU!! Every fight starts with one vote — that was yours!!",
-        "⚡ Boom!! First vote cast!! You're officially in the game now!!"
+        "First vote. See? Not so hard.",
+        "You picked. Good. That's the hardest part."
       ],
       "details": [
-        "Every fighter remembers their first punch. This is yours. +{xp} XP",
-        "First vote, first step. Let's see what you're made of. +{xp} XP",
-        "You're in the ring now. No turning back. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Bring It!! 👊",
-        "More Fights!! 💥",
-        "Let's Go!! 🥊",
-        "Next Punch!! ⚡"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "encore": {
+    "getting-started": {
       "messages": [
-        "👊 FIVE VOTES!! You're starting to get the hang of this!!",
-        "💥 Five punches thrown!! Not bad for a rookie!!",
-        "🥊 Five down!! You're building a solid fighting record here!!",
-        "⚡ Five votes in!! Keep swinging, kid — you're doing great!!"
+        "Five votes. You're not just looking around anymore.",
+        "Five. You're sticking around. Good."
       ],
       "details": [
-        "Five votes means you're committed. I like that. +{xp} XP",
-        "You're finding your rhythm — keep it up. +{xp} XP",
-        "Five fights, five decisions. You're learning. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Keep Swinging!! 👊",
-        "More Votes!! 💥",
-        "Let's Roll!! 🥊",
-        "Five Down!! ⚡"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "pentakill": {
+    "arcane-regular": {
       "messages": [
-        "💥👊 FIFTY VOTES!! You just hit PENTAKILL status — that's LEGENDARY!!",
-        "🥊 FIFTY PUNCHES THROWN!! You're a certified brawler now!!",
-        "⚡ Half a hundred votes!! You're not playing around anymore!!",
-        "🔥 PENTAKILL ACHIEVED!! Fifty votes cast — you're officially a BEAST!!"
+        "Ten votes. You're a regular now.",
+        "Ten. Keep showing up like that."
       ],
       "details": [
-        "Fifty votes. Fifty fights. Fifty decisions. That's dedication. +{xp} XP",
-        "You've earned your stripes with this one. +{xp} XP",
-        "Pentakill means you're serious. Respect. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Hell Yeah!! 👊",
-        "Pentakill King!! 💥",
-        "Keep Fighting!! 🥊",
-        "To One Hundred!! ⚡"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "hot-streak": {
+    "crowd-voice": {
       "messages": [
-        "🔥👊 SEVEN DAYS STRAIGHT!! You're on a HOT STREAK!!",
-        "💥 A FULL WEEK!! Seven days without missing — that's discipline!!",
-        "🥊 SEVEN CONSECUTIVE DAYS!! You don't quit, do you? I like that!!",
-        "⚡ One week unbroken!! You're building serious momentum!!"
+        "Twenty-five votes. People are going to notice you.",
+        "Twenty-five. That's a voice worth hearing."
       ],
       "details": [
-        "Seven days means you're committed to the fight. +{xp} XP",
-        "A week without missing? That's warrior mentality. +{xp} XP",
-        "Consistency wins championships. Keep it up. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Week Done!! 👊",
-        "Day Eight!! 💥",
-        "Streak Mode!! 🥊",
-        "Never Stop!! ⚡"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "chart-topper": {
+    "deep-in-the-story": {
       "messages": [
-        "🔥💥 ONE HUNDRED VOTES?! You're a LEGEND!! That's chart-topper dedication!!",
-        "👊 A HUNDRED VOTES!! You don't just fight — you DOMINATE!!",
-        "🥊 TRIPLE DIGITS!! Nobody can touch your commitment!!",
-        "⚡ ONE HUNDRED PUNCHES THROWN!! You've earned legendary status!!"
+        "Fifty votes. You're not just watching, you're in it.",
+        "Fifty. That takes some stamina."
       ],
       "details": [
-        "One hundred votes. Not one miss. That's championship material. +{xp} XP",
-        "Triple digits of showing up every time? Unbreakable. +{xp} XP",
-        "This is what separates the fighters from the legends. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Unbreakable!! 👊",
-        "Century Complete!! 💥",
-        "Legendary!! 🥊",
-        "To Two Hundred!! ⚡"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "night-owl": {
+    "arcane-legend": {
       "messages": [
-        "🌙👊 Late night voting?! I respect the dedication — night owls get it done!!",
-        "💥 Fighting past midnight?! That's Zaun hours right there!!",
-        "🥊 Voting in the dead of night!! True fighters never sleep!!",
-        "⚡ Late-night punch!! Some of the best fights happen after dark!!"
+        "A hundred votes. Okay, that's legend stuff.",
+        "A hundred. Respect."
       ],
       "details": [
-        "Night voting means you're serious about this. +{xp} XP",
-        "The undercity never sleeps, and neither do you. +{xp} XP",
-        "Late-night dedication? That's warrior spirit. +{xp} XP"
+        "Keep voting. +{xp} XP",
+        "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Night Fight!! 🌙",
-        "After Dark!! 👊",
-        "Never Sleep!! 💥",
-        "Midnight Brawl!! 🥊"
+        "View achievements",
+        "See all"
       ]
     },
-    "early-bird": {
+    "spark": {
       "messages": [
-        "🌅👊 First ten voters in FIVE matches?! That's dedication!!",
-        "💥 Early bird gets the vote!! You're always first to the fight!!",
-        "🥊 Five times you showed up early!! I like your work ethic!!",
-        "⚡ Among the first voters five times!! That's commitment!!"
+        "Three days in a row. You came back.",
+        "Three days. That's the start of something."
       ],
       "details": [
-        "Early voting means you're serious about winning. +{xp} XP",
-        "First to arrive, first to fight. That's leadership. +{xp} XP",
-        "The best fighters show up before everyone else. +{xp} XP"
+        "Keep that streak alive. +{xp} XP",
+        "Come back tomorrow. +{xp} XP"
       ],
       "buttons": [
-        "Dawn Patrol!! 🌅",
-        "Early Start!! 👊",
-        "Rise & Fight!! 💥",
-        "Morning Warrior!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "underdog-champion": {
+    "on-a-roll": {
       "messages": [
-        "💥 FIVE UNDERDOG PICKS?! You've got guts — I like that!!",
-        "👊 Voted for five underdogs!! You see potential others miss!!",
-        "🥊 Five times you backed the underdog!! That's instinct right there!!",
-        "⚡ Underdog champion status!! You're not afraid to take risks!!"
+        "A week straight. Don't stop now.",
+        "Seven days. That's commitment."
       ],
       "details": [
-        "Picking underdogs takes guts. You've got plenty. +{xp} XP",
-        "You see what others don't. That's talent. +{xp} XP",
-        "Five underdogs backed. That's a fighter's mentality. +{xp} XP"
+        "Keep that streak alive. +{xp} XP",
+        "Come back tomorrow. +{xp} XP"
       ],
       "buttons": [
-        "Underdog Power!! 👊",
-        "Risk Taker!! 💥",
-        "Gut Instinct!! 🥊",
-        "Keep Betting!! ⚡"
-      ]
-    },
-    "last-second-hero": {
-      "messages": [
-        "⏰💥 LAST-SECOND CLUTCH VOTE!! You TIED or FLIPPED the match at the BUZZER!!",
-        "👊 Final moment heroics!! That's ICE IN YOUR VEINS!!",
-        "🥊 Down to the wire and YOU delivered the deciding punch!! LEGENDARY!!",
-        "⚡ Last-second vote changed EVERYTHING!! That's championship mentality!!"
-      ],
-      "details": [
-        "Clutch voting in the final second. That's pure pressure performance. +{xp} XP",
-        "When it matters most, you showed up. That's a hero. +{xp} XP",
-        "Final-second heroics — legends are made of this. +{xp} XP"
-      ],
-      "buttons": [
-        "Clutch!! ⏰",
-        "Final Punch!! 👊",
-        "Game Winner!! 💥",
-        "Ice Cold!! 🥊"
-      ]
-    },
-    "comeback-believer": {
-      "messages": [
-        "💢 FIVE COMEBACK VOTES!! You backed FIVE losing songs and believed!!",
-        "👊 Voted for five songs that were DOWN!! That's loyalty!!",
-        "🥊 Five times you stood with the losing side!! Never-give-up mentality!!",
-        "⚡ Comeback believer status earned!! You don't abandon a fight!!"
-      ],
-      "details": [
-        "Five times you voted for the underdog position. That's heart. +{xp} XP",
-        "You don't quit on a song just because it's losing. Respect. +{xp} XP",
-        "Backing the losing side takes guts. You've got it. +{xp} XP"
-      ],
-      "buttons": [
-        "Never Quit!! 👊",
-        "Believer!! 💥",
-        "Stand Strong!! 🥊",
-        "Comeback Kid!! ⚡"
-      ]
-    },
-    "match-won": {
-      "messages": [
-        "👊 VICTORY!! Your song WON the match!!",
-        "💥 You backed the winner!! That's how it's DONE!!",
-        "🥊 Your pick ADVANCED!! Hell yeah!!",
-        "⚡ Match WON!! Your vote helped seal the deal!!"
-      ],
-      "details": [
-        "Your vote packed a punch. Winner's circle. +{xp} XP",
-        "That's what winning looks like, kid. +{xp} XP",
-        "One fight won. Keep the momentum going. +{xp} XP"
-      ],
-      "buttons": [
-        "Hell Yeah!! 👊",
-        "Victory!! 💥",
-        "Winner!! 🥊",
-        "Next Fight!! ⚡"
-      ]
-    },
-    "match-lost": {
-      "messages": [
-        "💢 Your song lost this one. Tough break, but you fought well.",
-        "👊 Didn't win this time. That's how it goes sometimes.",
-        "🥊 Your pick went down. Dust yourself off — next fight's waiting.",
-        "⚡ Lost the match, but not the war. Keep swinging."
-      ],
-      "details": [
-        "You can't win every fight. But you showed up. +{xp} XP",
-        "Even the toughest fighters take losses sometimes. +{xp} XP",
-        "That's life in the ring — you win some, you lose some. +{xp} XP"
-      ],
-      "buttons": [
-        "Get Back Up!! 👊",
-        "Next Round!! 💥",
-        "Keep Fighting!! 🥊",
-        "Move Forward!! ⚡"
-      ]
-    },
-    "world-tour": {
-      "messages": [
-        "👊 TEN VOTES!! You're getting serious now!!",
-        "💥 Ten punches thrown!! You're no rookie anymore!!",
-        "🥊 Double digits!! Your fighting record is growing!!",
-        "⚡ Ten votes down!! Keep the momentum going!!"
-      ],
-      "details": [
-        "Ten votes means you're committed to the fight. +{xp} XP",
-        "You're building something here. I can see it. +{xp} XP",
-        "Ten decisions made. You're finding your style. +{xp} XP"
-      ],
-      "buttons": [
-        "Ten Down!! 👊",
-        "Keep Going!! 💥",
-        "Double Digits!! 🥊",
-        "Next Ten!! ⚡"
-      ]
-    },
-    "headliner": {
-      "messages": [
-        "🔥👊 TWENTY-FIVE VOTES!! You're a HEADLINER now!!",
-        "💥 Quarter century of votes!! You're making your mark!!",
-        "🥊 25 fights won!! That's serious dedication!!",
-        "⚡ Twenty-five punches!! You're building a reputation!!"
-      ],
-      "details": [
-        "Twenty-five votes. That's not luck — that's commitment. +{xp} XP",
-        "You're showing up and fighting every time. Respect. +{xp} XP",
-        "Quarter century of decisions. You're a veteran now. +{xp} XP"
-      ],
-      "buttons": [
-        "25 Strong!! 👊",
-        "Headliner!! 💥",
-        "Keep Fighting!! 🥊",
-        "To Fifty!! ⚡"
-      ]
-    },
-    "hall-of-fame": {
-      "messages": [
-        "🏆💥 TWO HUNDRED FIFTY VOTES?! HALL OF FAME STATUS!!",
-        "👊 250 PUNCHES THROWN!! You're IMMORTAL in this bracket!!",
-        "🥊 HALL OF FAME ACHIEVED!! Nobody touches your dedication!!",
-        "⚡ Two-fifty?! You're not just fighting — you're DOMINATING!!"
-      ],
-      "details": [
-        "Two hundred fifty votes. That's hall of fame material. +{xp} XP",
-        "You've earned legendary status with this one. +{xp} XP",
-        "This is what champions are made of. +{xp} XP"
-      ],
-      "buttons": [
-        "Hall Of Fame!! 🏆",
-        "Immortal!! 👊",
-        "Legendary!! 💥",
-        "Unstoppable!! 🥊"
-      ]
-    },
-    "on-fire": {
-      "messages": [
-        "🔥👊 THREE DAYS STRAIGHT!! You're ON FIRE!!",
-        "💥 Three consecutive days!! That's momentum building!!",
-        "🥊 Three-day streak!! You're consistent — I like that!!",
-        "⚡ Three days without missing!! Keep that fire burning!!"
-      ],
-      "details": [
-        "Three days in a row. That's discipline starting to show. +{xp} XP",
-        "Consistency is how you build strength. +{xp} XP",
-        "Three-day streak means you're serious. +{xp} XP"
-      ],
-      "buttons": [
-        "Day Four!! 🔥",
-        "Keep It Up!! 👊",
-        "Fire Mode!! 💥",
-        "Streak On!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
     "unstoppable": {
       "messages": [
-        "⚡💥 FOURTEEN DAYS STRAIGHT?! You're UNSTOPPABLE!!",
-        "👊 TWO WEEKS UNBROKEN!! That's warrior mentality!!",
-        "🥊 Fourteen consecutive days!! Nothing can stop you!!",
-        "🔥 Two full weeks!! You're a MACHINE!!"
+        "Two weeks. Nothing's slowing you down.",
+        "Fourteen days. You don't quit."
       ],
       "details": [
-        "Fourteen days without missing. That's champion mindset. +{xp} XP",
-        "Two weeks of showing up every single day? Unbreakable. +{xp} XP",
-        "This is what separates good from great. +{xp} XP"
+        "Keep that streak alive. +{xp} XP",
+        "Come back tomorrow. +{xp} XP"
       ],
       "buttons": [
-        "Unstoppable!! ⚡",
-        "Two Weeks!! 👊",
-        "Never Stop!! 💥",
-        "Day Fifteen!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "legendary-streak": {
+    "arcane-dedication": {
       "messages": [
-        "🏆🔥 THIRTY DAYS STRAIGHT?! LEGENDARY STREAK!!",
-        "👊 A FULL MONTH!! You're a LIVING LEGEND!!",
-        "💥 Thirty consecutive days!! NOBODY can touch your dedication!!",
-        "🥊 ONE MONTH UNBROKEN!! That's CHAMPIONSHIP material!!"
+        "Thirty days. That's real dedication.",
+        "A whole month. I'm impressed. Don't tell anyone I said so."
       ],
       "details": [
-        "Thirty days. One month. Zero misses. Legendary. +{xp} XP",
-        "This is the kind of dedication that defines champions. +{xp} XP",
-        "A full month of showing up? You're unstoppable. +{xp} XP"
+        "Keep that streak alive. +{xp} XP",
+        "Come back tomorrow. +{xp} XP"
       ],
       "buttons": [
-        "Legendary!! 🏆",
-        "One Month!! 🔥",
-        "Unbreakable!! 👊",
-        "Keep Going!! 💥"
+        "View achievements",
+        "See all"
       ]
     },
-    "dark-horse": {
+    "against-the-grain": {
       "messages": [
-        "💥 FIFTEEN UNDERDOG PICKS!! You trust your gut — that's powerful!!",
-        "👊 Fifteen underdogs backed!! You see potential in everyone!!",
-        "🥊 Dark horse status earned!! You're not afraid to take chances!!",
-        "⚡ Fifteen times you bet on the underdog!! That's instinct!!"
+        "Five underdogs. You root for the ones who need it.",
+        "Backing the underdog. Good instinct."
       ],
       "details": [
-        "Fifteen underdogs. That takes serious guts. +{xp} XP",
-        "You see fighters others overlook. That's talent. +{xp} XP",
-        "Dark horse picks mean you trust yourself. Respect. +{xp} XP"
+        "Somebody's got to back them. +{xp} XP",
+        "Nice taste in fights. +{xp} XP"
       ],
       "buttons": [
-        "Dark Horse!! 🐴",
-        "Gut Instinct!! 👊",
-        "Risk Taker!! 💥",
-        "Underdog Love!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
     "rebel-heart": {
       "messages": [
-        "💢🔥 THIRTY UNDERDOG PICKS?! You've got a REBEL HEART!!",
-        "👊 Thirty times you backed the underdog!! You fight for the little guy!!",
-        "🥊 Rebel heart status EARNED!! You don't follow the crowd!!",
-        "⚡ Thirty underdogs supported!! That's pure fighting spirit!!"
+        "Fifteen underdogs. You've got a rebel streak.",
+        "Fifteen. You don't follow the crowd, do you?"
       ],
       "details": [
-        "Thirty underdog picks. You march to your own beat. +{xp} XP",
-        "You don't need others to validate your choices. Strong. +{xp} XP",
-        "Rebel heart means you fight for what you believe in. +{xp} XP"
+        "Somebody's got to back them. +{xp} XP",
+        "Nice taste in fights. +{xp} XP"
       ],
       "buttons": [
-        "Rebel Heart!! 💢",
-        "Fight On!! 👊",
-        "Own Path!! 💥",
-        "Never Follow!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "trendsetter": {
+    "dark-horse": {
       "messages": [
-        "⚡👊 First ten voters FIFTEEN TIMES?! You're a TRENDSETTER!!",
-        "💥 Fifteen matches you showed up early!! That's leadership!!",
-        "🥊 Trendsetter status earned!! You're always first to the fight!!",
-        "🔥 Fifteen times among the first!! You set the pace!!"
+        "Thirty underdogs. You pick fighters.",
+        "Thirty. You love a long shot."
       ],
       "details": [
-        "Fifteen early votes. You're not following — you're leading. +{xp} XP",
-        "Trendsetters show up before everyone else. That's you. +{xp} XP",
-        "Being first fifteen times? That's dedication. +{xp} XP"
+        "Somebody's got to back them. +{xp} XP",
+        "Nice taste in fights. +{xp} XP"
       ],
       "buttons": [
-        "Trendsetter!! ⚡",
-        "Lead The Way!! 👊",
-        "First Place!! 💥",
-        "Keep Leading!! 🥊"
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene. Five times now.",
+        "You show up early. I like that."
+      ],
+      "details": [
+        "Be there at the start. +{xp} XP",
+        "First in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you got there first.",
+        "Always early. Always first in."
+      ],
+      "details": [
+        "Be there at the start. +{xp} XP",
+        "First in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
       ]
     },
     "nail-biter": {
       "messages": [
-        "😰💥 TEN CLOSE MATCHES!! You live for the nail-biters!!",
-        "👊 Ten matches within 5%!! That's INTENSE voting!!",
-        "🥊 Nail-biter veteran status!! You thrive under pressure!!",
-        "⚡ Ten close fights!! Every vote mattered!!"
+        "Ten close matches. You like a tight fight.",
+        "Close ones. That's where it counts."
       ],
       "details": [
-        "Ten close matches. You're drawn to the intense battles. +{xp} XP",
-        "Nail-biters are where legends are made. +{xp} XP",
-        "Ten tight fights means you've seen real competition. +{xp} XP"
+        "Every vote counts here. +{xp} XP",
+        "Tight fight. +{xp} XP"
       ],
       "buttons": [
-        "Close Fights!! 😰",
-        "Nail-Biter!! 👊",
-        "Intense!! 💥",
-        "Pressure On!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "deciding-vote": {
+    "deciding-voice": {
       "messages": [
-        "⚡💥 TWENTY-FIVE CLOSE MATCHES!! You're the DECIDING VOTE!!",
-        "👊 25 nail-biters!! Your votes carry MASSIVE weight!!",
-        "🥊 Deciding vote status!! You show up when it matters MOST!!",
-        "🔥 Twenty-five close battles!! You're clutch!!"
+        "Twenty-five close matches. Your vote keeps mattering.",
+        "You keep landing on the close ones. Good aim."
       ],
       "details": [
-        "Twenty-five close matches. Your vote is powerful. +{xp} XP",
-        "You show up when every vote counts. That's clutch. +{xp} XP",
-        "Deciding votes in 25 battles? You're essential. +{xp} XP"
+        "Every vote counts here. +{xp} XP",
+        "Tight fight. +{xp} XP"
       ],
       "buttons": [
-        "Deciding Vote!! ⚡",
-        "Clutch Player!! 👊",
-        "Critical!! 💥",
-        "Game Changer!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "true-fan": {
+    "comeback-believer": {
       "messages": [
-        "💙 TRUE FAN!! Voted for the same song THREE times!!",
-        "👊 Three votes for one song!! That's loyalty!!",
-        "🥊 True fan status earned!! You stand by your favorites!!",
-        "⚡ Same song three times!! You know what you like!!"
+        "You backed a comeback five times. Stubborn. I like it.",
+        "Never count a fighter out. You get that."
       ],
       "details": [
-        "Three votes for one song. That's dedication to your pick. +{xp} XP",
-        "True fans don't waver. You're solid. +{xp} XP",
-        "Loyalty like that? That's real. +{xp} XP"
+        "You stick with what you believe in. +{xp} XP",
+        "Loyalty counts. +{xp} XP"
       ],
       "buttons": [
-        "True Fan!! 💙",
-        "Loyal!! 👊",
-        "Stand By It!! 💥",
-        "My Song!! 🥊"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "superfan": {
+    "repeat-favourite": {
       "messages": [
-        "💙🔥 SUPERFAN!! FIVE votes for the same song!!",
-        "👊 Five times you backed the same fighter!! SUPERFAN status!!",
-        "🥊 Five votes, one song!! That's die-hard loyalty!!",
-        "⚡ Superfan achievement unlocked!! You ride or die!!"
+        "Same one three times. You know what you like.",
+        "That one again? Yeah, I get it."
       ],
       "details": [
-        "Five votes for one song. That's superfan territory. +{xp} XP",
-        "You don't just like it — you LOVE it. +{xp} XP",
-        "Die-hard loyalty like that is rare. Respect. +{xp} XP"
+        "You stick with what you believe in. +{xp} XP",
+        "Loyalty counts. +{xp} XP"
       ],
       "buttons": [
-        "Superfan!! 💙",
-        "Die-Hard!! 🔥",
-        "All In!! 👊",
-        "Forever!! 💥"
+        "Next fight",
+        "Keep going"
       ]
     },
-    "ultimate-stan": {
+    "die-hard": {
       "messages": [
-        "💙👑 ULTIMATE STAN!! TEN VOTES FOR ONE SONG!!",
-        "👊 Ten times?! You're the ULTIMATE fan!!",
-        "🥊 STAN STATUS ACHIEVED!! Nobody loves this song more than you!!",
-        "⚡ Ten votes, same song!! You're RIDE OR DIE!!"
+        "Five for the same one. That's loyalty.",
+        "You're riding with that one. Respect."
       ],
       "details": [
-        "Ten votes for one song. Ultimate stan confirmed. +{xp} XP",
-        "This is your anthem and everyone knows it. +{xp} XP",
-        "Ultimate loyalty. Ultimate dedication. Ultimate stan. +{xp} XP"
+        "You stick with what you believe in. +{xp} XP",
+        "Loyalty counts. +{xp} XP"
       ],
       "buttons": [
-        "Ultimate Stan!! 💙",
-        "My Anthem!! 👑",
-        "Forever Love!! 👊",
-        "Ride Or Die!! 💥"
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times. Okay, that's an obsession.",
+        "Ten votes, same pick. You really mean it."
+      ],
+      "details": [
+        "You stick with what you believe in. +{xp} XP",
+        "Loyalty counts. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're following this through.",
+        "You stuck around for round two."
+      ],
+      "details": [
+        "Stay for the whole thing. +{xp} XP",
+        "Rounds don't scare you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds in. You're deep now.",
+        "Four rounds. You don't leave early."
+      ],
+      "details": [
+        "Stay for the whole thing. +{xp} XP",
+        "Rounds don't scare you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All six rounds. You saw it through.",
+        "From start to finish. That's how it's done."
+      ],
+      "details": [
+        "Stay for the whole thing. +{xp} XP",
+        "Rounds don't scare you. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You're checking everything out.",
+        "Ten different matches. Good, look around."
+      ],
+      "details": [
+        "See it all. +{xp} XP",
+        "Plenty more to go. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've seen every corner.",
+        "Twenty-five. You leave nothing out."
+      ],
+      "details": [
+        "See it all. +{xp} XP",
+        "Plenty more to go. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's a veteran.",
+        "Fifty. You know this place now."
+      ],
+      "details": [
+        "See it all. +{xp} XP",
+        "Plenty more to go. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one go. You're on a roll.",
+        "Five matches without stopping."
+      ],
+      "details": [
+        "See it all. +{xp} XP",
+        "Plenty more to go. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one sitting. Take a breather.",
+        "Ten in a row. That's a marathon."
+      ],
+      "details": [
+        "See it all. +{xp} XP",
+        "Plenty more to go. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Get some sleep. After this one.",
+        "Middle of the night and you're still going."
+      ],
+      "details": [
+        "Sleep eventually. +{xp} XP",
+        "The late shift. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people. That helps more than you think.",
+        "Five shares. Keep spreading it."
+      ],
+      "details": [
+        "More voters, better fights. +{xp} XP",
+        "Thanks for the help. +{xp} XP"
+      ],
+      "buttons": [
+        "Next fight",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're basically recruiting.",
+        "Fifteen. Everyone's going to know."
+      ],
+      "details": [
+        "More voters, better fights. +{xp} XP",
+        "Thanks for the help. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
       ]
     },
     "founding-member": {
       "messages": [
-        "🏛️👊 FOUNDING MEMBER!! You voted when there were LESS THAN 1,000 VOTES!!",
-        "💥 Early adopter status!! You were here when the bracket was YOUNG!!",
-        "🥊 OG voter!! You helped BUILD this from the ground up!!",
-        "⚡ Founding member earned!! You believed from the START!!"
+        "You were here before it got loud. Founding member.",
+        "One of the first thousand. That's yours for good."
       ],
       "details": [
-        "You were here before most people knew this existed. OG. +{xp} XP",
-        "Early adopters build the foundation. That's you. +{xp} XP",
-        "Founding members are the backbone. Respect. +{xp} XP"
+        "Yours for good. +{xp} XP",
+        "You were first. +{xp} XP"
       ],
       "buttons": [
-        "Founding Member!! 🏛️",
-        "OG Status!! 👊",
-        "Early Believer!! 💥",
-        "Built This!! 🥊"
-      ]
-    },
-    "quarter-final-supporter": {
-      "messages": [
-        "🏆 QUARTER-FINALS!! You voted in the ELITE EIGHT!!",
-        "👊 Top eight supporter!! That's big-time voting!!",
-        "💥 Quarter-final battles!! You're here for the serious fights!!",
-        "🥊 Elite eight status!! The competition is fierce now!!"
-      ],
-      "details": [
-        "Quarter-finals mean high stakes. You showed up. +{xp} XP",
-        "Elite eight battles are where champions emerge. +{xp} XP",
-        "You're here for the fights that matter most. +{xp} XP"
-      ],
-      "buttons": [
-        "Elite Eight!! 🏆",
-        "Quarter-Finals!! 👊",
-        "Big Time!! 💥",
-        "To Semis!! 🥊"
-      ]
-    },
-    "semi-final-believer": {
-      "messages": [
-        "🔥🏆 SEMI-FINALS!! FINAL FOUR voting!!",
-        "👊 Semi-final believer!! You're here for the BIGGEST fights!!",
-        "💥 Final four supporter!! Championship energy!!",
-        "🥊 Semi-finals!! Only the strongest remain!!"
-      ],
-      "details": [
-        "Semi-finals. Four songs left. Maximum stakes. +{xp} XP",
-        "You're voting in the fights that decide champions. +{xp} XP",
-        "Final four means you're witnessing greatness. +{xp} XP"
-      ],
-      "buttons": [
-        "Final Four!! 🔥",
-        "Semi-Finals!! 🏆",
-        "Almost There!! 👊",
-        "To Finals!! 💥"
-      ]
-    },
-    "championship-supporter": {
-      "messages": [
-        "👑💥 CHAMPIONSHIP!! You voted in the FINALS!!",
-        "🏆 Finals voter!! You witnessed the ULTIMATE battle!!",
-        "👊 Championship supporter!! You were there for the BIGGEST moment!!",
-        "🥊 Finals!! The champion was crowned and you were PART of it!!"
-      ],
-      "details": [
-        "Championship voting. You witnessed history. +{xp} XP",
-        "Finals are where legends are made. You were there. +{xp} XP",
-        "You voted in the biggest fight of them all. +{xp} XP"
-      ],
-      "buttons": [
-        "Champion!! 👑",
-        "Finals Done!! 🏆",
-        "Witnessed It!! 👊",
-        "History Made!! 💥"
-      ]
-    },
-    "tournament-veteran": {
-      "messages": [
-        "🎖️👊 TOURNAMENT VETERAN!! You voted through ALL SIX ROUNDS!!",
-        "💥 Full tournament completion!! Start to finish!!",
-        "🥊 Every round voted!! That's TOTAL dedication!!",
-        "⚡ Veteran status earned!! You saw it ALL!!"
-      ],
-      "details": [
-        "All six rounds. Every stage. Complete dedication. +{xp} XP",
-        "Tournament veterans see the whole story unfold. +{xp} XP",
-        "Start to finish — that's commitment. +{xp} XP"
-      ],
-      "buttons": [
-        "Veteran!! 🎖️",
-        "All Rounds!! 👊",
-        "Complete!! 💥",
-        "Full Tour!! 🥊"
-      ]
-    },
-    "completionist": {
-      "messages": [
-        "✅💥 COMPLETIONIST!! FIFTY UNIQUE MATCHES voted!!",
-        "👊 50 different fights!! You're EVERYWHERE!!",
-        "🥊 Completionist status!! Fifty unique votes!!",
-        "⚡ Fifty different matches!! You don't miss ANYTHING!!"
-      ],
-      "details": [
-        "Fifty unique matches. You spread your votes wide. +{xp} XP",
-        "Voting in fifty different fights shows range. +{xp} XP",
-        "Completionists don't miss opportunities. That's you. +{xp} XP"
-      ],
-      "buttons": [
-        "50 Unique!! ✅",
-        "Completionist!! 👊",
-        "All Matches!! 💥",
-        "Full Coverage!! 🥊"
-      ]
-    },
-    "lightning-fast": {
-      "messages": [
-        "⚡💥 LIGHTNING-FAST!! Voted within ONE MINUTE of match going live!!",
-        "👊 Under sixty seconds!! Your reflexes are UNREAL!!",
-        "🥊 Lightning-fast voter!! You strike IMMEDIATELY!!",
-        "🔥 One-minute vote!! That's speed and dedication!!"
-      ],
-      "details": [
-        "One minute or less. That's lightning reflexes. +{xp} XP",
-        "You don't wait — you strike fast. +{xp} XP",
-        "Speed like that wins fights. +{xp} XP"
-      ],
-      "buttons": [
-        "Lightning!! ⚡",
-        "Speed Demon!! 💥",
-        "Instant!! 👊",
-        "Fast Strike!! 🥊"
-      ]
-    },
-    "prophet": {
-      "messages": [
-        "🔮👊 PROPHET!! You voted for the TOURNAMENT WINNER in ROUND ONE!!",
-        "💥 Called it from the START!! That's VISION!!",
-        "🥊 Prophet status!! You saw the champion coming!!",
-        "⚡ Round one vote for the WINNER?! That's prophetic!!"
-      ],
-      "details": [
-        "You called the winner from day one. Prophet confirmed. +{xp} XP",
-        "Seeing the champion before anyone else? That's talent. +{xp} XP",
-        "Round one instincts that paid off. Legendary. +{xp} XP"
-      ],
-      "buttons": [
-        "Prophet!! 🔮",
-        "Called It!! 👊",
-        "Visionary!! 💥",
-        "I Knew!! 🥊"
-      ]
-    },
-    "taste-maker": {
-      "messages": [
-        "🎵👊 TASTE-MAKER!! Voted for TEN DIFFERENT ARTISTS!!",
-        "💥 Ten artists supported!! Your taste is DIVERSE!!",
-        "🥊 Taste-maker status!! You appreciate all kinds of fighters!!",
-        "⚡ Ten different artists!! You don't play favorites!!"
-      ],
-      "details": [
-        "Ten different artists. That's range and respect. +{xp} XP",
-        "You spread the love across the music world. +{xp} XP",
-        "Diverse taste means you see quality everywhere. +{xp} XP"
-      ],
-      "buttons": [
-        "Taste-Maker!! 🎵",
-        "Ten Artists!! 👊",
-        "Diverse!! 💥",
-        "All Music!! 🥊"
-      ]
-    },
-    "music-historian": {
-      "messages": [
-        "📚🎵 MUSIC HISTORIAN!! Songs from FIVE DIFFERENT YEARS!!",
-        "👊 Five years covered!! You appreciate ALL eras!!",
-        "💥 Historian status!! Your taste spans DECADES!!",
-        "🥊 Five different years!! You're a time traveler!!"
-      ],
-      "details": [
-        "Five different years. You appreciate music across time. +{xp} XP",
-        "Historians understand the full story. That's you. +{xp} XP",
-        "Spanning decades shows real appreciation. +{xp} XP"
-      ],
-      "buttons": [
-        "Historian!! 📚",
-        "Five Years!! 🎵",
-        "All Eras!! 👊",
-        "Time Span!! 💥"
-      ]
-    },
-    "triple-threat": {
-      "messages": [
-        "💥💥💥 TRIPLE THREAT!! THREE matches in ONE SESSION!!",
-        "👊 Three votes, one sitting!! You're on a ROLL!!",
-        "🥊 Triple threat status!! Three fights back-to-back!!",
-        "⚡ Three in one session!! That's momentum!!"
-      ],
-      "details": [
-        "Three matches in one session. That's efficiency. +{xp} XP",
-        "You're not slowing down — you're accelerating. +{xp} XP",
-        "Triple threats keep the energy high. +{xp} XP"
-      ],
-      "buttons": [
-        "Triple Threat!! 💥",
-        "Three Strong!! 👊",
-        "Keep Rolling!! 🥊",
-        "Momentum!! ⚡"
-      ]
-    },
-    "vote-spree": {
-      "messages": [
-        "🔥💥 VOTE SPREE!! FIVE matches in ONE SESSION!!",
-        "👊 Five in a row!! You're on a RAMPAGE!!",
-        "🥊 Vote spree activated!! Five consecutive fights!!",
-        "⚡ Five-vote session!! You're UNSTOPPABLE!!"
-      ],
-      "details": [
-        "Five matches in one session. That's dedication. +{xp} XP",
-        "You're on a spree and nothing's stopping you. +{xp} XP",
-        "Five fights back-to-back? Beast mode. +{xp} XP"
-      ],
-      "buttons": [
-        "Spree Mode!! 🔥",
-        "Five Strong!! 💥",
-        "Rampage!! 👊",
-        "Keep Going!! 🥊"
-      ]
-    },
-    "power-voter": {
-      "messages": [
-        "⚡🔥 POWER VOTER!! TEN matches in ONE SESSION!!",
-        "👊 Ten in one sitting!! You're a VOTING MACHINE!!",
-        "💥 Power voter status!! Ten consecutive fights!!",
-        "🥊 Ten-vote session!! ABSOLUTE DOMINATION!!"
-      ],
-      "details": [
-        "Ten matches in one session. That's power. +{xp} XP",
-        "You're not just voting — you're DOMINATING. +{xp} XP",
-        "Ten fights straight? That's champion energy. +{xp} XP"
-      ],
-      "buttons": [
-        "Power Voter!! ⚡",
-        "Ten Strong!! 🔥",
-        "Dominate!! 👊",
-        "Beast Mode!! 💥"
-      ]
-    },
-    "voting-marathon": {
-      "messages": [
-        "🏃💥 VOTING MARATHON!! TWENTY matches in ONE SESSION!!",
-        "👊 Twenty votes straight!! You're UNSTOPPABLE!!",
-        "🥊 Marathon status!! Twenty consecutive fights!!",
-        "⚡ Twenty in one session!! LEGENDARY ENDURANCE!!"
-      ],
-      "details": [
-        "Twenty matches in one session. That's marathon-level dedication. +{xp} XP",
-        "You don't stop. You don't slow down. Respect. +{xp} XP",
-        "Twenty straight votes? That's legendary. +{xp} XP"
-      ],
-      "buttons": [
-        "Marathon!! 🏃",
-        "Twenty Strong!! 💥",
-        "Endurance!! 👊",
-        "Never Stop!! 🥊"
-      ]
-    },
-    "first-blood": {
-      "messages": [
-        "🩸👊 FIRST BLOOD!! You cast the VERY FIRST VOTE on this site!!",
-        "💥 Site's first voter!! You're LEGENDARY!!",
-        "🥊 First blood status!! You started it ALL!!",
-        "⚡ The very first vote!! You're site HISTORY!!"
-      ],
-      "details": [
-        "First vote ever on this site. You're part of history. +{xp} XP",
-        "Every fight needs someone to throw the first punch. That's you. +{xp} XP",
-        "First blood means you're foundational. +{xp} XP"
-      ],
-      "buttons": [
-        "First Blood!! 🩸",
-        "Site Legend!! 👊",
-        "Started It!! 💥",
-        "History Made!! 🥊"
-      ]
-    },
-    "tournament-first-blood": {
-      "messages": [
-        "🩸🏆 TOURNAMENT FIRST BLOOD!! First vote of the ENTIRE tournament!!",
-        "👊 Tournament's opening vote!! You START the battles!!",
-        "💥 First blood of the tournament!! That's leadership!!",
-        "🥊 First tournament vote!! You kicked it ALL off!!"
-      ],
-      "details": [
-        "First vote of the entire tournament. Leader status. +{xp} XP",
-        "You don't wait for others — you START the fight. +{xp} XP",
-        "Tournament first blood is rare. You earned it. +{xp} XP"
-      ],
-      "buttons": [
-        "Tournament Start!! 🩸",
-        "First Vote!! 🏆",
-        "Leader!! 👊",
-        "Opened It!! 💥"
-      ]
-    },
-    "round-first-blood": {
-      "messages": [
-        "🩸⚡ ROUND FIRST BLOOD!! First vote in a NEW ROUND!!",
-        "👊 Round opener!! You kick off the new battles!!",
-        "💥 First blood in the round!! That's initiative!!",
-        "🥊 New round's first vote!! You're always ready!!"
-      ],
-      "details": [
-        "First vote in a new round. That's readiness. +{xp} XP",
-        "You show up when rounds begin. That's commitment. +{xp} XP",
-        "Round openers set the pace for everyone else. +{xp} XP"
-      ],
-      "buttons": [
-        "Round Start!! 🩸",
-        "First In!! ⚡",
-        "Ready!! 👊",
-        "Let's Go!! 💥"
-      ]
-    },
-    "daily-session-kickoff": {
-      "messages": [
-        "🌅👊 DAILY KICKOFF!! Your first vote of the DAY!!",
-        "💥 Day started right!! First vote down!!",
-        "🥊 Daily session opened!! You're ready to FIGHT!!",
-        "⚡ First vote today!! Let's make it count!!"
-      ],
-      "details": [
-        "Starting your day with a vote. That's dedication. +{xp} XP",
-        "First punch of the day thrown. Good start. +{xp} XP",
-        "Daily kickoffs set the tone for everything after. +{xp} XP"
-      ],
-      "buttons": [
-        "Daily Start!! 🌅",
-        "First Today!! 👊",
-        "Day One!! 💥",
-        "Let's Fight!! 🥊"
-      ]
-    },
-    "daily-comeback": {
-      "messages": [
-        "🔄👊 DAILY COMEBACK!! You returned after THREE DAYS!!",
-        "💥 Welcome back!! You were missed, kid!!",
-        "🥊 Comeback status!! Good to see you back in the ring!!",
-        "⚡ Three days away, now you're BACK!! Let's go!!"
-      ],
-      "details": [
-        "Came back after three days. That's resilience. +{xp} XP",
-        "Taking a break doesn't mean quitting. Welcome back. +{xp} XP",
-        "You stepped away and came back stronger. +{xp} XP"
-      ],
-      "buttons": [
-        "I'm Back!! 🔄",
-        "Comeback!! 👊",
-        "Returned!! 💥",
-        "Let's Fight!! 🥊"
+        "See the badge",
+        "Show me"
       ]
     },
     "level-up": {
       "messages": [
-        "⬆️🔥 LEVEL UP!! You reached a NEW LEVEL!!",
-        "👊 Leveled up!! Your power is GROWING!!",
-        "💥 New level achieved!! You're getting STRONGER!!",
-        "🥊 Level up!! Keep climbing, kid!!"
+        "Level up. You earned that.",
+        "Moved up a rank. Keep going."
       ],
       "details": [
-        "New level reached. Your strength is growing. +{xp} XP",
-        "Every level makes you tougher. Keep going. +{xp} XP",
-        "Leveling up means you're progressing. Good work. +{xp} XP"
+        "{rank}. You earned it.",
+        "You've reached {rank}. +{xp} XP"
       ],
       "buttons": [
-        "Level Up!! ⬆️",
-        "Stronger!! 🔥",
-        "Next Level!! 👊",
-        "Keep Growing!! 💥"
+        "View progress",
+        "Show me"
       ]
     },
-    "community-voice": {
+    "default": {
       "messages": [
-        "📢👊 COMMUNITY VOICE!! FIVE social media shares!!",
-        "💥 Five shares!! You're SPREADING the word!!",
-        "🥊 Community voice status!! You're bringing people IN!!",
-        "⚡ Five shares!! You're building the community!!"
+        "Achievement unlocked: {name}. Nice.",
+        "Another one: {name}."
       ],
       "details": [
-        "Five shares means you're recruiting others. +{xp} XP",
-        "Community voices spread the word. That's you. +{xp} XP",
-        "Sharing five times means you believe in this. +{xp} XP"
+        "{description}. +{xp} XP",
+        "{description}. +{xp} XP"
       ],
       "buttons": [
-        "Five Shares!! 📢",
-        "Spread It!! 👊",
-        "Community!! 💥",
-        "Recruit!! 🥊"
-      ]
-    },
-    "hype-master": {
-      "messages": [
-        "📢🔥 HYPE MASTER!! FIFTEEN social media shares!!",
-        "👊 Fifteen shares!! You're a HYPE MACHINE!!",
-        "💥 Hype master status!! You're bringing EVERYONE in!!",
-        "🥊 Fifteen shares!! The community is GROWING because of you!!"
-      ],
-      "details": [
-        "Fifteen shares. You're a community builder. +{xp} XP",
-        "Hype masters don't just participate — they RECRUIT. +{xp} XP",
-        "Fifteen shares means you're all in on growing this. +{xp} XP"
-      ],
-      "buttons": [
-        "Hype Master!! 📢",
-        "Fifteen Shares!! 🔥",
-        "Build It!! 👊",
-        "Grow It!! 💥"
-      ]
-    },
-    "match-tied": {
-      "messages": [
-        "💥 PERFECT TIE!! 50-50 split — that was CLOSE!!",
-        "👊 Dead even!! Your match ended in a draw!!",
-        "🥊 Tied score!! Doesn't happen often — that was intense!!",
-        "⚡ Split decision!! Both sides fought hard!!"
-      ],
-      "details": [
-        "Perfect tie. Rare as hell. You were part of it. +{xp} XP",
-        "Even split means both songs brought their A-game. +{xp} XP",
-        "Tied matches are the ultimate nail-biters. +{xp} XP"
-      ],
-      "buttons": [
-        "Respect!! 👊",
-        "Even Fight!! 💥",
-        "50-50!! 🥊",
-        "Close One!! ⚡"
+        "View achievements",
+        "See all"
       ]
     }
   }

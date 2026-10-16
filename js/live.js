@@ -5,6 +5,7 @@
 // ========================================
 import { getAllMatches } from './api-client.js';
 import { cleanTitle } from './title-clean.js';
+import { mountSay, pickLiveState, formatLeft } from './champion-says.js';
 
 
 
@@ -483,6 +484,22 @@ async function loadLiveMatches() {
 // ========================================
 // DISPLAY MATCH GRID (SORTED BY VOTED STATUS)
 // ========================================
+// The cup champion's line under the round banner (js/champion-says.js)
+function updateLiveSay(unvotedMatches, votedCount) {
+    const now = Date.now();
+    const ends = unvotedMatches.map(m => (m.endDate ? new Date(m.endDate).getTime() : NaN)).filter(t => Number.isFinite(t) && t > now);
+    const msLeft = ends.length ? Math.min(...ends) - now : null;
+    const state = pickLiveState({ live: allLiveMatches.length, unvoted: unvotedMatches.length, voted: votedCount, msLeft });
+    mountSay({
+        id: 'champion-say-live', state, seed: 'live',
+        vars: { unvoted: unvotedMatches.length, voted: votedCount, live: allLiveMatches.length, timeLeft: msLeft ? formatLeft(msLeft) : '' },
+        place: el => {
+            const section = document.getElementById('unvotedSection');
+            if (section && section.parentNode) section.parentNode.insertBefore(el, section);
+        }
+    }).catch(e => console.warn('champion line skipped:', e));
+}
+
 function displayMatchGrid() {
     const grid = document.getElementById('socialGrid');
     const votedSection = document.getElementById('votedSection');
@@ -535,6 +552,8 @@ function displayMatchGrid() {
     
     // Update progress bar
     updateProgressBar(votedMatches.length, allLiveMatches.length);
+
+    updateLiveSay(unvotedMatches, votedMatches.length);
     
     console.log(`✅ Displayed ${unvotedMatches.length} unvoted, ${votedMatches.length} voted`);
 }
@@ -757,6 +776,10 @@ function showNoMatches() {
     
     if (mainContent) mainContent.style.display = '';
     if (noMatches) noMatches.style.display = 'block';
+    mountSay({
+        id: 'champion-say-none', state: 'live-none', seed: 'none',
+        place: el => { if (noMatches) noMatches.insertBefore(el, noMatches.firstChild); }
+    }).catch(e => console.warn('champion line skipped:', e));
     if (socialGrid) socialGrid.style.display = 'none';
     if (landingFooter) landingFooter.style.display = 'none';
     if (votedSection) votedSection.style.display = 'none';

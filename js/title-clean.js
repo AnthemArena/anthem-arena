@@ -24,3 +24,11 @@ export function cleanTitle(title) {
     t = t.trim();
     return t.length >= 3 ? t : original;
 }
+
+// The first part of a title, for tight spaces (the "Next match" bar, the post-vote modal):
+//   shortTitle('Bro tried to rizz Jinx 💀 - JINX EDIT || Britney Spears - Toxic #jinx')  ->  'Bro tried to rizz Jinx 💀'
+export function shortTitle(title, max = 40) {
+    const clean = cleanTitle(title);
+    const first = clean.split(/\s+[-\u2013\u2014]\s+|\s*\|\|?\s*/)[0].trim() || clean;
+    return first.length > max ? first.slice(0, max - 1).trimEnd() + '\u2026' : first;
+}

@@ -18,6 +18,8 @@ FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
 APP = "export const initializeApp=()=>({});"
 AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
 failed = []
+import base64
+PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
@@ -39,6 +41,7 @@ def load(browser, width, height):
         elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
         elif path.endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
         elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
+        elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
         elif u.startswith('https://img.youtube.com'):
             r.fulfill(body=open('/tmp/cover.jpg', 'rb').read(), content_type='image/jpeg')
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
@@ -72,6 +75,15 @@ with sync_playwright() as p:
         check(f'{tag}: titles are two lines at most', all(x <= lh * 2 + 4 for x in hs), (hs, lh))
         src = pg.get_attribute('#socialGrid .social-match-card img', 'src')
         check(f'{tag}: covers use the sharper 4:3 thumbnail (hqdefault)', 'hqdefault' in src, src)
+        # the cup champion's line sits between the round banner and the matches, and says something that fits
+        check(f'{tag}: the champion line is shown', pg.is_visible('#champion-say-live .cb-text') and len(pg.inner_text('#champion-say-live .cb-text')) > 8, pg.inner_text('#champion-say-live') if pg.query_selector('#champion-say-live') else None)
+        st = pg.get_attribute('#champion-say-live', 'data-state')
+        check(f'{tag}: the line is for the right situation (several matches left to vote in)', st in ('live-some', 'live-closing'), st)
+        sb, ub = rect(pg, '#champion-say-live'), rect(pg, '#unvotedSection')
+        check(f'{tag}: the champion line sits above the matches and inside the screen', sb and ub and sb['y'] < ub['y'] and sb['r'] <= pg.evaluate('innerWidth') + 1, (sb, ub))
+        first_say = pg.inner_text('#champion-say-live .cb-text')
+        pg.click('#champion-say-live .cb-portrait'); pg.wait_for_timeout(200)
+        check(f'{tag}: tapping the portrait gives another line', pg.inner_text('#champion-say-live .cb-text') != first_say, first_say)
         pg.screenshot(path=f'{SHOTS}/live-{tag}.png')
         # the voted section (collapsed by default): open it and look at the pick
         voted = pg.locator('#votedGrid .social-match-card.voted').first

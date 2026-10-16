@@ -88,13 +88,17 @@ export async function awardFoundingMemberBadge(userId) {
     // Show toast if available
     if (typeof window !== 'undefined' && window.showBulletin) {
       setTimeout(() => {
+        const voiced = window.championLoader?.getAchievementMessage(FOUNDING_MEMBER_ACHIEVEMENT_ID, {
+          name: 'Founding Member', description: 'One of the first 1,000 voters', xp: 500, rarity: 'legendary'
+        });
         window.showBulletin({
           priority: 1,
           type: 'achievement',
           matchId: FOUNDING_MEMBER_ACHIEVEMENT_ID,
-          message: '👑 Founding Member Unlocked!',
-          detail: 'You\'re part of the first 1,000 voters - this badge is yours forever! +500 XP',
-          cta: 'View Badge',
+          achievementName: 'Founding Member',
+          message: voiced?.message || '👑 Founding Member Unlocked!',
+          detail: voiced?.detail || 'You\'re part of the first 1,000 voters - this badge is yours forever! +500 XP',
+          cta: voiced?.cta || 'View Badge',
           action: 'navigate',
           targetUrl: '/profile#achievements'
         });

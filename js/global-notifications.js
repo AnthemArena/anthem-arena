@@ -2111,21 +2111,20 @@ function showBulletin(notification) {
 ======================================== */
 
 .achievement-toast {
-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(180, 150, 90, 0.2)) !important;
+    background: transparent;
 }
 
 .achievement-badge-large {
     width: 72px;
     height: 72px;
-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+    background: var(--bulletin-btn-bg);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2.5rem;
-    box-shadow: 0 4px 20px rgba(200, 170, 110, 0.4),
-                0 0 40px rgba(200, 170, 110, 0.2);
-    border: 3px solid rgba(255, 215, 0, 0.3);
+    box-shadow: var(--bulletin-glow);
+    border: 3px solid var(--bulletin-border);
     flex-shrink: 0;
     animation: achievementPulse 2s ease-in-out infinite;
 }
@@ -2133,28 +2132,38 @@ function showBulletin(notification) {
 .achievement-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: #C8AA6E;
+    color: var(--bulletin-title);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.25rem;
 }
 
 .achievement-title {
-    color: #FFD700 !important;
+    color: var(--bulletin-title) !important;
     font-size: 1rem !important;
     font-weight: 700;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: var(--bulletin-text-shadow);
+}
+
+/* the champion's reaction, under the achievement's name */
+.achievement-line {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #fff;
+    margin-bottom: 0.3rem;
+    text-shadow: var(--bulletin-text-shadow);
 }
 
 .achievement-cta {
-    background: linear-gradient(135deg, #FFD700, #C8AA6E) !important;
-    color: #1a1a1a !important;
+    background: var(--bulletin-btn-bg) !important;
+    color: var(--bulletin-btn-text) !important;
 }
 
+/* border and glow come from the champion pack, like every other bulletin */
 .bulletin-banner.achievement {
-    border: 2px solid rgba(255, 215, 0, 0.5) !important;
-    box-shadow: 0 8px 32px rgba(200, 170, 110, 0.4),
-                0 0 40px rgba(255, 215, 0, 0.2) !important;
+    border: 2px solid var(--bulletin-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--bulletin-glow);
 }
 
 @keyframes achievementPop {
@@ -2185,13 +2194,13 @@ function showBulletin(notification) {
 ======================================== */
 
 .level-up-toast {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2)) !important;
+    background: transparent;
 }
 
 .level-badge-large {
     width: 72px;
     height: 72px;
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    background: var(--bulletin-btn-bg);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2199,36 +2208,34 @@ function showBulletin(notification) {
     font-size: 2rem;
     font-weight: 900;
     color: white;
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4),
-                0 0 40px rgba(59, 130, 246, 0.2);
-    border: 3px solid rgba(147, 197, 253, 0.3);
+    box-shadow: var(--bulletin-glow);
+    border: 3px solid var(--bulletin-border);
     flex-shrink: 0;
 }
 
 .level-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: #60A5FA;
+    color: var(--bulletin-title);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.25rem;
 }
 
 .level-title {
-    color: #3B82F6 !important;
+    color: var(--bulletin-title) !important;
     font-size: 1rem !important;
     font-weight: 700;
 }
 
 .level-cta {
-    background: linear-gradient(135deg, #3B82F6, #2563EB) !important;
-    color: white !important;
+    background: var(--bulletin-btn-bg) !important;
+    color: var(--bulletin-btn-text) !important;
 }
 
 .bulletin-banner.level-up {
-    border: 2px solid rgba(59, 130, 246, 0.5) !important;
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4),
-                0 0 40px rgba(59, 130, 246, 0.2) !important;
+    border: 2px solid var(--bulletin-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--bulletin-glow);
 }
 
 @keyframes levelPop {
@@ -2426,7 +2433,7 @@ if (championPack && championPack.theme) {
     // ✅ LEVEL-UP SPECIFIC STYLING
     if (notification.type === 'level-up') {
         const levelMatch = notification.message.match(/Level (\d+)/);
-        const level = levelMatch ? levelMatch[1] : '?';
+        const level = notification.level ?? (levelMatch ? levelMatch[1] : '?');
         
         banner.innerHTML = `
             <div class="bulletin-toast-content level-up-toast">
@@ -2478,7 +2485,8 @@ if (championPack && championPack.theme) {
             </div>
             <div class="bulletin-toast-text">
                 <div class="achievement-label">ACHIEVEMENT UNLOCKED</div>
-                <div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>
+                ${notification.achievementName ? `<div class="bulletin-message achievement-title">${notification.achievementName}</div>
+                <div class="achievement-line">${notification.message}</div>` : `<div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>`}
                 <div class="bulletin-detail">${notification.detail}</div>
             </div>
             <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>

@@ -19,6 +19,8 @@ FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
 APP = "export const initializeApp=()=>({});"
 AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
 failed = []
+import base64
+PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 def check(name, ok, got=None):
     print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
     if not ok: failed.append(name)
@@ -37,6 +39,7 @@ def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=N
         elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
         elif u.split('?')[0].endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
         elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
+        elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
         elif u.startswith('https://img.youtube.com'): r.fulfill(body='', content_type='image/jpeg')
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
         else: r.continue_()
@@ -56,6 +59,10 @@ with sync_playwright() as p:
 
     # ---------- 1. a group cup mid-way ----------
     pg, errs = load(b, 'groups-mid-16')
+    check('champion line: shown under the heading, for the groups stage', vis(pg, '#champion-say-brackets') and pg.get_attribute('#champion-say-brackets', 'data-state') == 'brackets-groups', pg.get_attribute('#champion-say-brackets', 'data-state'))
+    pg.click('.stage-tab[data-stage="knockout"]'); pg.wait_for_timeout(500)
+    check('champion line: the Knockout tab before the knockout exists says it starts later', pg.get_attribute('#champion-say-brackets', 'data-state') == 'brackets-knockout-soon', pg.get_attribute('#champion-say-brackets', 'data-state'))
+    pg.click('.stage-tab[data-stage="groups"]'); pg.wait_for_timeout(300)
     check('groups: tabs shown, Groups tab active', vis(pg, '#stageTabsSection') and 'active' in pg.get_attribute('.stage-tab[data-stage="groups"]', 'class'))
     check('groups: group section visible, bracket hidden', vis(pg, '#groupStageSection') and not vis(pg, '#bracketSection'))
     check('groups: 4 group cards (A-D)', cards(pg) == ['A', 'B', 'C', 'D'], cards(pg))
