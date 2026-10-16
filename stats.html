@@ -3,423 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
-    <title>Tournament Stats & Rankings | LoL Music Tournament | Anthem Arena</title>
-    <meta name="description" content="View comprehensive League of Legends music tournament statistics, song rankings, voting records, upsets, and participation data. Track performance across all rounds.">
-    <link rel="canonical" href="https://anthemarena.com/stats">
-    
+
+    <title>Stats | Arcane Moments</title>
+    <meta name="description" content="Live numbers from the current Arcane Moments cup: votes, edit rankings, group tables and records.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Stats | Arcane Moments">
+    <meta property="og:description" content="Live votes, edit rankings, group tables and records from the current Arcane Moments cup.">
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://anthemarena.com/stats">
-    <meta property="og:title" content="Tournament Stats & Rankings | Anthem Arena">
-    <meta property="og:description" content="Comprehensive LoL music tournament statistics - song rankings, vote counts, upsets, and participation data updated in real-time.">
-    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-    <meta property="og:image:alt" content="Anthem Arena - Tournament Statistics Dashboard">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Tournament Stats & Rankings | Anthem Arena">
-    <meta name="twitter:description" content="View comprehensive LoL music tournament statistics and rankings.">
-    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
-    <meta name="twitter:image:alt" content="Anthem Arena Tournament Stats">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Fonts and icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
-    <link rel="stylesheet" href="/css/stats.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/stats-arcane.css">
+    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 
-    
-    <!-- Schema.org Structured Data - DataCatalog -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "DataCatalog",
-      "name": "Anthem Arena Tournament Statistics",
-      "description": "Real-time statistics dashboard for the League of Legends music tournament including rankings, votes, upsets, and participation metrics",
-      "url": "https://anthemarena.com/stats",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Anthem Arena",
-        "url": "https://anthemarena.com"
-      },
-      "dataset": [
-        {
-          "@type": "Dataset",
-          "name": "Song Rankings",
-          "description": "All-time song rankings by votes and performance"
-        },
-        {
-          "@type": "Dataset",
-          "name": "Tournament Upsets",
-          "description": "Lower seeds that defeated higher seeds"
-        },
-        {
-          "@type": "Dataset",
-          "name": "Voting Participation",
-          "description": "Real-time voting activity and engagement metrics"
-        }
-      ]
+      "@type": "WebPage",
+      "name": "Arcane Moments Stats",
+      "description": "Votes, rankings, group tables and records from the current Arcane Moments cup."
     }
     </script>
 
-     <!-- ✅ CRITICAL: Load global systems FIRST -->
+    <!-- Global systems first -->
     <script type="module" src="/js/firebase-config.js"></script>
     <script type="module" src="/js/notification-storage.js"></script>
     <script type="module" src="/js/notification-center.js"></script>
-
     <script type="module" src="/js/global-notifications.js"></script>
 </head>
-    
+<body class="theme-arcane page-stats">
+
     <div id="nav-placeholder"></div>
-<script type="module" src="/js/navigation.js"></script>
-    
-    <!-- ========================================
-         HERO SECTION
-    ======================================== -->
-    <header class="page-hero stats-hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1 class="hero-title"><i class="fa-solid fa-chart-column"></i> Tournament Statistics</h1>
-            <p class="hero-subtitle">
-                Comprehensive stats, rankings, and records from the tournament
-            </p>
-        </div>
-    </header>
+    <script type="module" src="/js/navigation.js"></script>
 
-     <!-- PAGE INTRO WITH INTERNAL LINKS -->
-    <section class="page-intro">
-        <div class="container">
-            <p>
-                Explore comprehensive tournament statistics for all League of Legends music videos 
-                competing in Anthem Arena. View song rankings by votes and win rates, discover 
-                <a href="/matches.html">recent match results</a>, analyze upset victories, and 
-                track participation trends. See the 
-                <a href="/brackets.html">tournament bracket</a> for visual progression through rounds, 
-                browse the <a href="/music-gallery.html">complete music gallery</a> to preview all 64 
-                competing songs, or check <a href="/profile#votes">your voting history</a> to see 
-                your predictions and achievements.
-            </p>
-        </div>
-    </section>
-    
-    <!-- ========================================
-     AUTO-REFRESH INDICATOR
-======================================== -->
-<div id="autoRefreshIndicator" class="auto-refresh-indicator" style="display: none;">
-    <div class="refresh-icon">
-        <i class="fas fa-sync-alt"></i>
-    </div>
-    <div class="refresh-text">
-        <span class="refresh-status">Live updates active</span>
-        <span class="refresh-timer">Updated just now</span>
-    </div>
-</div>
-    <!-- ========================================
-         MAIN CONTENT
-    ======================================== -->
     <main class="stats-page">
-        
-        <!-- Tab Navigation -->
-        <div class="stats-tabs">
-            <div class="container">
-                <div class="tabs-wrapper">
-                    <button class="tab-btn active" data-tab="overview">
-                        <span class="tab-icon"><i class="fa-solid fa-chart-column"></i></span>
-                        <span class="tab-label">Overview</span>
-                    </button>
-                    <button class="tab-btn" data-tab="rankings">
-                        <span class="tab-icon"><i class="fa-solid fa-trophy"></i></span>
-                        <span class="tab-label">Rankings</span>
-                    </button>
-                    <button class="tab-btn" data-tab="upsets">
-                        <span class="tab-icon"><i class="fa-solid fa-masks-theater"></i></span>
-                        <span class="tab-label">Upsets</span>
-                    </button>
-                    <button class="tab-btn" data-tab="participation">
-                        <span class="tab-icon"><i class="fa-solid fa-users"></i></span>
-                        <span class="tab-label">Participation</span>
-                    </button>
-                    <button class="tab-btn" data-tab="seeds">
-                        <span class="tab-icon"><i class="fa-solid fa-seedling"></i></span>
-                        <span class="tab-label">Seed Performance</span>
-                    </button>
-                    <button class="tab-btn" data-tab="records">
-                        <span class="tab-icon"><i class="fa-solid fa-scroll"></i></span>
-                        <span class="tab-label">Records</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tab Content -->
-        <div class="stats-content">
-            
-        <!-- ========================================
-     OVERVIEW TAB
-======================================== -->
-<div id="overview" class="tab-pane active">
-    <div class="container">
-        <section class="stats-section">
-            <div class="section-header-with-controls">
-                <h2 class="section-title">Tournament Overview</h2>
-            </div>
-            
-            <div class="stats-tip">
-                <i class="fa-solid fa-lightbulb"></i> For visual bracket progression, visit the 
-                <a href="/brackets.html" class="inline-link">tournament bracket page</a>
-            </div>
+        <header class="stats-hero">
+            <h1 class="stats-title">Cup Stats</h1>
+            <p class="stats-subtitle" id="cupSubtitle">Live numbers from the current Arcane Moments cup: votes, rankings, group tables and records.</p>
+            <p class="stats-updated" id="statsUpdated" aria-live="polite"></p>
+        </header>
 
-            <div id="overview-stats">
-                <!-- Populated by JavaScript -->
-            </div>
-        </section>
-    </div>
-</div>
+        <nav class="stats-tabs" role="tablist" aria-label="Stats sections">
+            <button type="button" role="tab" class="stats-tab is-active" id="tab-overview" aria-controls="pane-overview" aria-selected="true" data-tab="overview"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Overview</span></button>
+            <button type="button" role="tab" class="stats-tab" id="tab-edits" aria-controls="pane-edits" aria-selected="false" data-tab="edits" tabindex="-1"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><span>Edits</span></button>
+            <button type="button" role="tab" class="stats-tab" id="tab-groups" aria-controls="pane-groups" aria-selected="false" data-tab="groups" tabindex="-1"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i><span>Groups</span></button>
+            <button type="button" role="tab" class="stats-tab" id="tab-records" aria-controls="pane-records" aria-selected="false" data-tab="records" tabindex="-1"><i class="fa-solid fa-medal" aria-hidden="true"></i><span>Records</span></button>
+        </nav>
 
+        <section class="stats-pane" id="pane-overview" role="tabpanel" aria-labelledby="tab-overview" aria-busy="true">
+            <p class="stats-message">Loading stats&hellip;</p>
+        </section>
+        <section class="stats-pane" id="pane-edits" role="tabpanel" aria-labelledby="tab-edits" hidden></section>
+        <section class="stats-pane" id="pane-groups" role="tabpanel" aria-labelledby="tab-groups" hidden></section>
+        <section class="stats-pane" id="pane-records" role="tabpanel" aria-labelledby="tab-records" hidden></section>
 
-      <!-- ========================================
-     RANKINGS TAB
-======================================== -->
-<div id="rankings" class="tab-pane">
-    <div class="container">
-        <section class="stats-section">
-            <div class="section-header-with-controls">
-                <div>
-                    <h2 class="section-title">All-Time Song Rankings</h2>
-                    <p class="section-description">
-                        Songs ranked by total votes, win rate, and YouTube performance. 
-                        <a href="/music-gallery.html" class="inline-link">Preview all videos</a> 
-                        or <a href="/matches.html" class="inline-link">vote in active matches</a>.
-                    </p>
-                </div>
-                
-                <button class="compare-btn" onclick="showHeadToHead()">
-                    <i class="fas fa-balance-scale"></i> Compare Songs
-                </button>
-            </div>
-            
-            <div id="song-rankings">
-                <!-- Populated by JavaScript -->
-            </div>
+        <section class="stats-next" aria-label="Keep exploring">
+            <a href="/live" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>
+            <a href="/brackets" class="next-link"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>See the bracket</span></a>
+            <a href="/music-gallery" class="next-link"><i class="fa-solid fa-film" aria-hidden="true"></i><span>Edits gallery</span></a>
+            <a href="/profile#votes" class="next-link"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Your votes</span></a>
         </section>
-    </div>
-</div>
-            
-            <!-- ========================================
-                 UPSETS TAB
-            ======================================== -->
-            <div id="upsets" class="tab-pane">
-                <div class="container">
-                    <section class="stats-section">
-                        <h2 class="section-title"><i class="fa-solid fa-masks-theater"></i> Tournament Upsets</h2>
-                        <p class="section-description">
-                            Lower seeds that defeated higher seeds
-                        </p>
-                        <div id="upsets-list">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </section>
-                </div>
-            </div>
-            
-            <!-- ========================================
-                 PARTICIPATION TAB
-            ======================================== -->
-         <!-- ========================================
-     PARTICIPATION TAB
-======================================== -->
-<div id="participation" class="tab-pane">
-    <div class="container">
-        <section class="stats-section">
-            <h2 class="section-title"><i class="fa-solid fa-users"></i> Tournament Engagement</h2>
-            <p class="section-description">
-                Real-time voting activity and tournament progress
-            </p>
-            <div id="participation-stats">
-                <!-- Populated by JavaScript -->
-            </div>
-        </section>
-    </div>
-</div>
-            
-            <!-- ========================================
-                 SEED PERFORMANCE TAB
-            ======================================== -->
-            <div id="seeds" class="tab-pane">
-                <div class="container">
-                    <section class="stats-section">
-                        <h2 class="section-title"><i class="fa-solid fa-seedling"></i> Seed Performance</h2>
-                        <p class="section-description">
-                            How different seed ranges are performing
-                        </p>
-                        <div id="seed-performance">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </section>
-                </div>
-            </div>
-            
-            <!-- ========================================
-                 RECORDS TAB
-            ======================================== -->
-            <div id="records" class="tab-pane">
-                <div class="container">
-                    <section class="stats-section">
-                        <h2 class="section-title"><i class="fa-solid fa-scroll"></i> Tournament Records</h2>
-                        <p class="section-description">
-                            Notable achievements and milestones
-                        </p>
-                        <div id="tournament-records">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </section>
-                </div>
-            </div>
-            
-        </div>
     </main>
-    
-    <!-- ========================================
-         ✨ SONG DETAIL MODAL
-    ======================================== -->
-    <div id="songDetailModal" class="modal" style="display: none;">
-        <div class="modal-overlay" onclick="closeSongDetail()"></div>
-        <div class="modal-content song-detail-modal">
-            <button class="modal-close" onclick="closeSongDetail()">×</button>
-            
-            <div class="song-detail-header" id="songDetailHeader">
-                <!-- Populated by JavaScript -->
-            </div>
-            
-            <div class="song-detail-body" id="songDetailBody">
-                <!-- Populated by JavaScript -->
-            </div>
-        </div>
-    </div>
 
-    <!-- ========================================
-     ✨ HEAD-TO-HEAD COMPARISON MODAL
-======================================== -->
-<div id="headToHeadModal" class="modal" style="display: none;">
-    <div class="modal-overlay" onclick="closeHeadToHead()"></div>
-    <div class="modal-content h2h-modal">
-        <button class="modal-close" onclick="closeHeadToHead()">×</button>
-        
-        <h2 class="modal-title"><i class="fa-solid fa-swords"></i> Head-to-Head Comparison</h2>
-        <p class="modal-subtitle">Compare any two songs directly</p>
-        
-        <div class="h2h-selectors">
-            <div class="h2h-selector-group">
-                <label for="h2h-song1">Song 1:</label>
-                <select id="h2h-song1" class="h2h-select">
-                    <option value="">Select first song...</option>
-                </select>
-            </div>
-            
-            <div class="h2h-vs">VS</div>
-            
-            <div class="h2h-selector-group">
-                <label for="h2h-song2">Song 2:</label>
-                <select id="h2h-song2" class="h2h-select">
-                    <option value="">Select second song...</option>
-                </select>
-            </div>
-        </div>
-        
-        <button class="compare-action-btn" onclick="compareHeadToHead()">
-            Compare →
-        </button>
-        
-        <div id="h2hResults" style="display: none;">
-            <!-- Results populated by JS -->
-        </div>
-    </div>
-</div>
-   
-
-<!-- EXPLORE TOURNAMENT SECTION -->
-    <section class="explore-tournament-stats">
-        <div class="container">
-            <h2 class="section-title">Continue Exploring</h2>
-            <p class="section-subtitle">Dive deeper into the tournament</p>
-            
-            <div class="explore-stats-grid">
-                <a href="/matches.html" class="explore-stats-card">
-                    <div class="stats-card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
-                    <h3>Match Results</h3>
-                    <p>View all completed and active matches with detailed voting breakdowns</p>
-                    <span class="stats-card-arrow">→</span>
-                </a>
-                
-                <a href="/brackets.html" class="explore-stats-card">
-                    <div class="stats-card-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <h3>Tournament Bracket</h3>
-                    <p>Visualize the complete bracket and track song progression through rounds</p>
-                    <span class="stats-card-arrow">→</span>
-                </a>
-                
-                <a href="/music-gallery.html" class="explore-stats-card">
-                    <div class="stats-card-icon"><i class="fa-solid fa-music"></i></div>
-                    <h3>Music Gallery</h3>
-                    <p>Browse all 64 League music videos organized by virtual band and year</p>
-                    <span class="stats-card-arrow">→</span>
-                </a>
-                
-                <a href="/profile#votes" class="explore-stats-card">
-                    <div class="stats-card-icon"><i class="fa-solid fa-circle-check"></i></div>
-                    <h3>Your Votes</h3>
-                    <p>Track your voting history, predictions, and unlock achievements</p>
-                    <span class="stats-card-arrow">→</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Add to matches.html before footer -->
-<div id="loading-overlay" class="loading-overlay" style="display: none;">
-    <div class="spinner-container">
-        <div class="tournament-spinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <i class="fas fa-trophy spinner-icon"></i>
-        </div>
-        <p class="spinner-text" id="spinner-text">Loading statistics...</p>
-    </div>
-</div>
-
-    <!-- ========================================
-         SCRIPTS
-    ======================================== -->
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
- <!-- ✅ Page-specific scripts -->
     <script type="module" src="/js/rank-system.js"></script>
-    <script type="module" src="/js/stats-queries.js"></script>
     <script type="module" src="/js/stats.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
-    
 </body>
 </html>
