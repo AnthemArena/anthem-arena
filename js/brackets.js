@@ -38,11 +38,6 @@ function checkUserVoted(matchId) {
     return !!userVote; // Returns true if user has voted
 }
 
-// Initialize global match database
-if (typeof window.matchDatabase === 'undefined') {
-    window.matchDatabase = {};
-}
-
 // ========================================
 // HELPER FUNCTIONS
 // ========================================
@@ -211,42 +206,6 @@ function showErrorState(error) {
 
 async function generateBracketFromFirebase(firebaseMatches) {
     console.log('🎯 Generating bracket from Firebase data...');
-    
-    // ✨ NEW: Populate window.matchDatabase for modal.js
-    window.matchDatabase = {};
-    firebaseMatches.forEach(match => {
-        // Convert Firebase format to modal format
-        window.matchDatabase[match.matchId] = {
-            id: match.matchId,
-            tournament: bracketInfo.cupName,
-            round: match.stage === 'group' ? `Group ${match.group}` : getRoundName(match.round),
-            date: match.date || 'TBD',
-            status: match.status,
-            competitor1: {
-                name: cleanTitle(match.song1.shortTitle || match.song1.title),
-                seed: match.song1.seed,
-                source: `${match.song1.artist} • ${match.song1.year}`,
-                videoId: match.song1.videoId,
-                votes: match.song1.votes || 0,
-percentage: match.totalVotes > 0 ? Math.round((match.song1.votes / match.totalVotes) * 100) : 50,
-
-                winner: match.winnerId === match.song1.id
-            },
-            competitor2: {
-                name: cleanTitle(match.song2.shortTitle || match.song2.title),
-                seed: match.song2.seed,
-                source: `${match.song2.artist} • ${match.song2.year}`,
-                videoId: match.song2.videoId,
-                votes: match.song2.votes || 0,
-percentage: match.totalVotes > 0 ? Math.round((match.song2.votes / match.totalVotes) * 100) : 50,
-
-                winner: match.winnerId === match.song2.id
-            },
-            totalVotes: match.totalVotes || 0
-        };
-    });
-    
-    console.log(`✅ Populated window.matchDatabase with ${Object.keys(window.matchDatabase).length} matches`);
     
     // Draw one column per round, however many rounds this cup has (a group-stage cup: the knockout rounds only)
     renderRounds(firebaseMatches);
@@ -732,16 +691,6 @@ function updateMatchCard(match) {
     // Update leading class
     competitors[0]?.classList.toggle('leading', song1Votes > song2Votes && totalVotes > 0);
     competitors[1]?.classList.toggle('leading', song2Votes > song1Votes && totalVotes > 0);
-    
-    // Update global database
-    if (window.matchDatabase[match.matchId]) {
-        window.matchDatabase[match.matchId].totalVotes = totalVotes;
-        window.matchDatabase[match.matchId].competitor1.votes = song1Votes;
-        window.matchDatabase[match.matchId].competitor1.percentage = song1Percentage;
-        window.matchDatabase[match.matchId].competitor2.votes = song2Votes;
-        window.matchDatabase[match.matchId].competitor2.percentage = song2Percentage;
-        window.matchDatabase[match.matchId].status = match.status;
-    }
 }
 
 // ========================================
@@ -852,12 +801,7 @@ function setupStageHandlers() {
         const chip = e.target.closest('.gs-chip');
         if (chip) { filterGroups(chip.dataset.filter); return; }
 
-        // a finished group match opens the quick results view, like a bracket card; an open one goes to the vote page (the link)
-        const link = e.target.closest('.gs-match a');
-        if (link && link.dataset.status === 'completed' && typeof window.showMatchDetails === 'function') {
-            e.preventDefault();
-            window.showMatchDetails(link.dataset.matchId);
-        }
+        // every group match row is a plain link to its vote page (finished ones show the result there)
     });
 }
 
@@ -877,20 +821,14 @@ function setupClickHandlers() {
         if (!matchCard) return;
 
         const matchId = matchCard.dataset.matchId;
-        const matchStatus = matchCard.classList.contains('completed') ? 'completed'
-            : matchCard.classList.contains('live') ? 'live' : 'upcoming';
-
         // A slot still waiting for an earlier round has nothing to vote on yet
         if (matchCard.querySelector('.competitor.tbd')) {
             showNotification('This match will be available after the previous round completes', 'info');
             return;
         }
 
-        if (matchStatus === 'completed' && typeof window.showMatchDetails === 'function') {
-            window.showMatchDetails(matchId);          // quick results view
-        } else {
-            window.location.href = `vote?match=${encodeURIComponent(matchId)}`;
-        }
+        // finished or not, the vote page is where a match lives: it shows the result for a closed match
+        window.location.href = `vote?match=${encodeURIComponent(matchId)}`;
     });
 }
 
