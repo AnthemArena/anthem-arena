@@ -7,7 +7,7 @@ let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 const m = (id, status, winner, extra = {}) => ({ matchId: id, roundLabel: 'Group A', status, winnerId: winner, song1: { id: 'a', shortTitle: 'Alpha #jinx' }, song2: { id: 'b', shortTitle: 'Beta #jinx' }, ...extra });
 const cups = [{ id: 'c1', name: 'Cup 1', status: 'complete', startDate: '2026-10-01' }, { id: 'c2', name: 'Cup 2', status: 'active', startDate: '2026-11-01' }];
 const v = (matchId, tournament, choice, ts = 1) => ({ matchId, tournament, choice, timestamp: ts });
-const matchesByCup = { c1: [m('x1', 'completed', 'a'), m('x2', 'completed', 'b'), m('x3', 'upcoming', null)], c2: [m('y1', 'live', null), m('y2', 'upcoming', null)] };
+const matchesByCup = { c1: [m('x1', 'completed', 'a'), m('x2', 'completed', 'b'), m('x3', 'live', null)], c2: [m('y1', 'live', null), m('y2', 'live', null), m('y3', 'upcoming', null)] };
 
 t('empty and null input are safe', () => { assert.deepEqual(buildCupHistory().cups, []); assert.equal(buildCupHistory({ votes: null, cups: null }).lifetime.totalVotes, 0); });
 t('test cups not in cups.json are ignored', () => { const h = buildCupHistory({ votes: [v('t1', 'group-test-01', 'song1')], cups, matchesByCup }); assert.equal(h.lifetime.totalVotes, 0); assert.equal(h.cups.length, 0); });
@@ -22,4 +22,6 @@ t('TBD slots do not inflate the match total', () => { const mm = { c1: [m('x1', 
 t('the active cup is listed in data/cups.json', () => { const f = JSON.parse(fs.readFileSync(new URL('../data/cups.json', import.meta.url))); assert.ok(f.cups.some(c => c.id === ARCANE_CONFIG.tournamentId), 'add the active cup to data/cups.json'); });
 t('html: shows cups, lifetime and escapes names', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups: [{ ...cups[0], name: 'A <b>Cup</b>' }], matchesByCup }); const html = renderCupHistory(h); assert.ok(html.includes('Cup History')); assert.ok(html.includes('A &lt;b&gt;Cup&lt;/b&gt;')); assert.ok(!html.includes('<b>Cup')); assert.ok(html.includes('Votes cast')); assert.ok(html.includes('ch-won')); });
 t('html: empty history explains itself', () => { assert.ok(renderCupHistory(buildCupHistory()).includes('No cup history yet')); });
+t('matches not opened yet do not count against participation', () => { const h = buildCupHistory({ votes: [v('y1', 'c2', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].totalMatches, 2); assert.equal(h.cups[0].participation, 50); });
+t('under 1% shows one decimal, not 0%', () => { const big = { c2: Array.from({ length: 400 }, (_, i) => m('b' + i, 'live', null)) }; const h = buildCupHistory({ votes: [v('b1', 'c2', 'song1')], cups, matchesByCup: big }); assert.equal(h.cups[0].participation, 0.3); assert.equal(h.lifetime.avgParticipation, 0.3); });
 console.log(`${n} passed`);

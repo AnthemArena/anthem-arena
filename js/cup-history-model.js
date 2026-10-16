@@ -6,6 +6,8 @@
 // cups          entries from data/cups.json. Only these cups count, so test cups never appear.
 // matchesByCup  { [cupId]: match[] } as returned by /api/matches?tournament=<cupId>. A cup may be missing (request failed).
 
+// Under 1% would round to a flat 0%, which reads as nothing: show one decimal there.
+const pctOf = (a, b) => { const x = (a / b) * 100; return x > 0 && x < 1 ? Math.max(0.1, Math.round(x * 10) / 10) : Math.round(x); };
 const sideOf = (match, id) => (id && (id === match.song1?.id || id === 'song1') ? 1 : id && (id === match.song2?.id || id === 'song2') ? 2 : 0);
 const cleanTitle = c => String(c?.shortTitle || c?.title || c?.name || '').replace(/\s*#\w+/g, '').trim();
 
@@ -25,7 +27,8 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
         const matches = matchesByCup[cup.id];
         const known = Array.isArray(matches) && matches.length > 0;
         const index = new Map((known ? matches : []).map(m => [m.matchId || m.id, m]));
-        const real = known ? matches.filter(m => m.song1?.id !== 'TBD' && m.song2?.id !== 'TBD') : [];
+        // Matches that have opened: a cup still building its later rounds should not count them against the voter.
+        const real = known ? matches.filter(m => m.song1?.id !== 'TBD' && m.song2?.id !== 'TBD' && m.status !== 'upcoming') : [];
 
         let decided = 0, correct = 0, lastPick = null;
         const picks = [];
@@ -47,7 +50,7 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
             id: cup.id, name: cup.name || cup.id, status: cup.status || 'complete', startDate: cup.startDate || null, champion: cup.champion || null,
             votes: mine.size,
             totalMatches: total || null,
-            participation: total ? Math.min(100, Math.round(mine.size / total * 100)) : null,
+            participation: total ? Math.min(100, pctOf(mine.size, total)) : null,
             decided, correct,
             accuracy: decided ? Math.round(correct / decided * 100) : null,
             picks
@@ -64,7 +67,7 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
         lifetime: {
             totalVotes: rows.reduce((s, r) => s + r.votes, 0),
             cupsEntered: rows.length,
-            avgParticipation: withPct.length ? Math.round(withPct.reduce((s, r) => s + r.participation, 0) / withPct.length) : null,
+            avgParticipation: withPct.length ? pctOf(withPct.reduce((s, r) => s + r.participation, 0), withPct.length * 100) : null,
             accuracy: decided ? Math.round(correct / decided * 100) : null,
             decided
         }

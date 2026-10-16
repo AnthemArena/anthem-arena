@@ -399,3 +399,7 @@ People who vote in more than one cup keep their history. Votes were never delete
 - New record **Biggest upset** (also on the Records tab): the lowest seed to beat a higher seed, by seed gap. Random-draw cups have no seeds, so it is simply absent there.
 - `compareCups()` in `js/stats-model.js`; a cup whose matches fail to load is listed as "Could not load", not fatal.
 - Not included: unique voters per cup. That needs a count of distinct voters from the votes collection, which the match list cannot give. Add it with a small edge endpoint if wanted.
+
+## Participation counts opened matches only
+
+Profile participation (the circle, the round rows and Cup History) is measured against matches that have opened, not every match in the cup. With 384 group matches opening a group at a time, counting all of them left everyone at about 0% for weeks. Matches still `upcoming` are left out. Anything under 1% shows one decimal (0.3%) instead of a flat 0%. The group stage is one row named "Group stage".
