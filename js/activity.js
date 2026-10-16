@@ -3,6 +3,7 @@
 // ========================================
 
 import { getActivityFeed } from './api-client.js';
+import { shortTitle } from './title-clean.js';
 
 let allActivities = [];
 let currentFilter = 'all';
@@ -140,7 +141,7 @@ function getSongTitle(songId, fallbackTitle) {
         console.log(`📝 Using fallback title for ${songId}: ${fallbackTitle}`);
     }
     
-    return song?.shortTitle || song?.title || fallbackTitle || 'Unknown Song';
+    return shortTitle(song?.shortTitle || song?.title || fallbackTitle || 'Unknown Song', 60);
 }
 
 // ========================================
@@ -251,8 +252,8 @@ function renderVoteCard(activity) {
     // Parse match title to get both songs
     const matchTitle = activity.matchTitle || '';
     const songs = matchTitle.split(' vs ');
-    const song1 = songs[0]?.trim() || 'Song 1';
-    const song2 = songs[1]?.trim() || 'Song 2';
+    const song1 = shortTitle(songs[0]?.trim() || 'Song 1', 50);
+    const song2 = shortTitle(songs[1]?.trim() || 'Song 2', 50);
     
     // ✅ USE THE DATABASE FIELD AS SOURCE OF TRUTH
     const votedForSong1 = activity.choice === 'song1';

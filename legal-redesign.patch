@@ -1,0 +1,1422 @@
+From 484ec3011d7e38cef8c5400cbeb4853121ace1e3 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 16 Oct 2026 18:33:58 +0100
+Subject: [PATCH] Rewrite the legal pages for Arcane Moments in the Arcane look
+
+Terms, Privacy and Affiliate Disclosure now describe what the site really does (anonymous sign-in, profiles and
+community posts, no analytics, one footer affiliate link) instead of the old League music tournament.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013psebDbek43PiPjqCtRkhL
+---
+ css/legal-arcane.css        |  34 +++
+ legal/disclosure.html       | 310 +++++++----------------
+ legal/privacy.html          | 415 ++++++++++---------------------
+ legal/terms.html            | 484 ++++++++++--------------------------
+ tools/test-legal-browser.py |  96 +++++++
+ 5 files changed, 480 insertions(+), 859 deletions(-)
+ create mode 100644 css/legal-arcane.css
+ create mode 100644 tools/test-legal-browser.py
+
+diff --git a/css/legal-arcane.css b/css/legal-arcane.css
+new file mode 100644
+index 0000000..5179805
+--- /dev/null
++++ b/css/legal-arcane.css
+@@ -0,0 +1,34 @@
++/* ========================================
++   LEGAL PAGES (legal/terms, privacy, disclosure: body.page-legal)
++   Uses the Arcane theme tokens from arcane-theme.css.
++   ======================================== */
++.page-legal .legal-page { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.25rem 3.5rem; }
++.page-legal .legal-hero { text-align: center; margin-bottom: 1.5rem; }
++.page-legal .legal-title { margin: 0 0 .6rem; font-family: var(--font); font-size: clamp(2rem, 6vw, 3.25rem); font-weight: 800; letter-spacing: -.01em; color: var(--text); }
++.page-legal .legal-subtitle { max-width: 560px; margin: 0 auto; color: var(--muted); font-size: 1.05rem; line-height: 1.55; }
++.page-legal .legal-updated { margin: .7rem 0 0; color: var(--text-faint); font-size: .85rem; }
++
++.page-legal .legal-switch { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-bottom: 1.75rem; }
++.page-legal .legal-switch a { min-height: 44px; display: inline-flex; align-items: center; padding: .5rem 1.1rem; background: var(--card); border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-weight: 600; text-decoration: none; }
++.page-legal .legal-switch a:hover { color: var(--text); background: var(--pink-soft); }
++.page-legal .legal-switch a[aria-current="page"] { color: var(--text); background: var(--pink-soft); border-color: var(--pink-bright); }
++.page-legal .legal-switch a:focus-visible, .page-legal .legal-card a:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
++
++.page-legal .legal-plain { margin-bottom: 1rem; padding: 1.1rem 1.25rem; background: var(--pink-soft); border: 1px solid var(--border); border-left: 3px solid var(--pink-bright); border-radius: 14px; }
++.page-legal .legal-plain strong { color: var(--pink-bright); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
++.page-legal .legal-plain p { margin: .4rem 0 0; color: var(--text); line-height: 1.6; }
++
++.page-legal .legal-card { margin-bottom: 1rem; padding: 1.4rem 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 18px; }
++.page-legal .legal-card h2 { margin: 0 0 .7rem; font-size: 1.2rem; color: var(--text); letter-spacing: -.01em; }
++.page-legal .legal-card p { margin: 0 0 .75rem; color: var(--muted); line-height: 1.7; overflow-wrap: anywhere; }
++.page-legal .legal-card p:last-child, .page-legal .legal-card ul:last-child { margin-bottom: 0; }
++.page-legal .legal-card ul { margin: 0 0 .75rem; padding-left: 1.2rem; color: var(--muted); line-height: 1.7; }
++.page-legal .legal-card li { margin-bottom: .45rem; overflow-wrap: anywhere; }
++.page-legal .legal-card li::marker { color: var(--pink-bright); }
++.page-legal .legal-card strong { color: var(--text); }
++.page-legal .legal-card a { color: var(--pink-bright); text-decoration: underline; text-underline-offset: 2px; }
++
++@media (max-width: 640px) {
++    .page-legal .legal-page { padding: 1.75rem 1rem 2.5rem; }
++    .page-legal .legal-card { padding: 1.15rem 1.1rem; }
++}
+diff --git a/legal/disclosure.html b/legal/disclosure.html
+index 14a3768..da0a543 100644
+--- a/legal/disclosure.html
++++ b/legal/disclosure.html
+@@ -3,234 +3,94 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Affiliate Disclosure - League Music Tournament</title>
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+ 
++    <title>Affiliate Disclosure | Arcane Moments</title>
++    <meta name="description" content="How Arcane Moments earns from one Amazon affiliate link, and why it never affects votes or results.">
++    <meta property="og:type" content="website">
++    <meta property="og:title" content="Affiliate Disclosure | Arcane Moments">
++    <meta property="og:description" content="How Arcane Moments earns from one Amazon affiliate link, and why it never affects votes or results.">
++    <link rel="canonical" href="https://arcanemoments.netlify.app/legal/disclosure">
++
++    <!-- Favicon -->
++    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
++    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
++    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
++    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
++
++    <!-- Fonts and icons -->
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++
++    <!-- Stylesheets -->
++    <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+-
+-
+-    <style>
+-        * {
+-            margin: 0;
+-            padding: 0;
+-            box-sizing: border-box;
+-        }
+-
+-        body {
+-            background: #0a0a0a;
+-            color: #f0f0f0;
+-            font-family: 'Inter', sans-serif;
+-            line-height: 1.6;
+-        }
+-
+-        /* Page Header */
+-        .page-header {
+-            background: linear-gradient(180deg, rgba(200, 155, 60, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+-            padding: 80px 0 60px;
+-            text-align: center;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.2);
+-        }
+-
+-        .page-title {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 3rem;
+-            color: #C89B3C;
+-            letter-spacing: 0.1em;
+-            margin-bottom: 20px;
+-        }
+-
+-        .page-subtitle {
+-            font-size: 1.1rem;
+-            color: #b0b0b0;
+-            max-width: 600px;
+-            margin: 0 auto;
+-        }
+-
+-        /* Content Container */
+-        .content-container {
+-            max-width: 900px;
+-            margin: 80px auto;
+-            padding: 0 40px;
+-        }
+-
+-        .content-box {
+-            background: rgba(0, 0, 0, 0.7);
+-            border: 1px solid rgba(200, 155, 60, 0.2);
+-            padding: 60px;
+-            margin-bottom: 40px;
+-        }
+-
+-        .section-heading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.8rem;
+-            color: #C89B3C;
+-            margin-bottom: 30px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .section-subheading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.3rem;
+-            color: #C89B3C;
+-            margin: 40px 0 20px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .content-text {
+-            font-size: 1.05rem;
+-            line-height: 1.9;
+-            color: #d0d0d0;
+-            margin-bottom: 25px;
+-        }
+-
+-        .content-text strong {
+-            color: #C89B3C;
+-        }
+-
+-        .content-text a {
+-            color: #C89B3C;
+-            text-decoration: none;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.3);
+-            transition: border-color 0.3s ease;
+-        }
+-
+-        .content-text a:hover {
+-            border-bottom-color: #C89B3C;
+-        }
+-
+-        .bullet-list {
+-            margin: 20px 0 25px 30px;
+-            color: #d0d0d0;
+-        }
+-
+-        .bullet-list li {
+-            margin-bottom: 15px;
+-            font-size: 1.05rem;
+-            line-height: 1.8;
+-        }
+-
+-        .highlight-box {
+-            background: rgba(200, 155, 60, 0.1);
+-            border-left: 3px solid #C89B3C;
+-            padding: 25px 30px;
+-            margin: 30px 0;
+-        }
+-
+-        .last-updated {
+-            font-size: 0.9rem;
+-            color: #999;
+-            text-align: center;
+-            margin-top: 40px;
+-            font-style: italic;
+-        }
+-    </style>
++    <link rel="stylesheet" href="/css/settings.css">
++    <link rel="stylesheet" href="/css/legal-arcane.css">
++    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
++
++    <!-- Global systems first -->
++    <script type="module" src="/js/firebase-config.js"></script>
++    <script type="module" src="/js/notification-storage.js"></script>
++    <script type="module" src="/js/notification-center.js"></script>
++    <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
+-
+-   <div id="nav-placeholder"></div>
+-<script type="module" src="/js/navigation.js"></script>
+-
+-    <header class="page-header">
+-        <h1 class="page-title">Affiliate Disclosure</h1>
+-        <p class="page-subtitle">Transparency in how we operate and earn from this site</p>
+-    </header>
+-
+-    <div class="content-container">
+-        <div class="content-box">
+-            <h2 class="section-heading">Our Commitment to Transparency</h2>
+-            
+-            <p class="content-text">
+-                At League Music Tournament, we believe in complete transparency with our visitors. This page explains how we earn revenue through affiliate partnerships and what that means for you.
+-            </p>
+-
+-            <div class="highlight-box">
+-                <p class="content-text" style="margin-bottom: 0;">
+-                    <strong>Bottom Line:</strong> When you purchase products through links on our site, we may earn a small commission at no additional cost to you. This helps us maintain and improve the site while keeping all voting and content free for visitors.
+-                </p>
+-            </div>
+-
+-            <h3 class="section-subheading">Amazon Associates Program</h3>
+-            
+-            <p class="content-text">
+-                League Music Tournament is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>What this means:</strong> When you click on an Amazon link on our site and make a purchase, we receive a small commission from Amazon. This commission comes at no extra cost to you—the price you pay is exactly the same whether you use our link or go directly to Amazon.
+-            </p>
+-
+-            <h3 class="section-subheading">What We Recommend and Why</h3>
+-            
+-            <p class="content-text">
+-                We only recommend products and resources that we believe will genuinely benefit League of Legends fans and music enthusiasts. Our recommendations are based on:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li><strong>Relevance to League Music</strong> - Products that meaningfully contribute to enjoying League of Legends music and culture</li>
+-                <li><strong>Quality of Content</strong> - Official merchandise, music albums, and resources that fans will appreciate</li>
+-                <li><strong>Visitor Value</strong> - Resources that enhance the experience of exploring League's incredible music library</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                <strong>Our editorial independence:</strong> Affiliate commissions never influence tournament results, voting outcomes, or editorial content. Tournament winners are determined entirely by community votes.
+-            </p>
+-
+-            <h3 class="section-subheading">Where You'll See Affiliate Links</h3>
+-
+-<p class="content-text">
+-    We currently feature affiliate links in the following places:
+-</p>
+-
+-<ul class="bullet-list">
+-    <li><strong>Post-Vote Book Recommendations</strong> - After voting in a match, you may see a book recommendation modal featuring League of Legends novels and art books</li>
+-    <li><strong>Music Gallery Cards</strong> - Some music videos in our gallery include relevant book recommendations</li>
+-    <li><strong>Match Pages</strong> - Book recommendations may appear alongside match information when relevant to the featured songs</li>
+-</ul>
+-
+-<p class="content-text">
+-    All affiliate links are clearly marked and directly relevant to the League of Legends music and lore being featured.
+-</p>
+-
+-            <h3 class="section-subheading">Other Affiliate Relationships</h3>
+-            
+-            <p class="content-text">
+-                Currently, Amazon Associates is our primary affiliate partnership. If we establish relationships with other affiliate programs in the future, we will clearly disclose them on this page and mark affiliate links appropriately throughout the site.
+-            </p>
+-
+-            <h3 class="section-subheading">Non-Affiliated Content</h3>
+-            
+-            <p class="content-text">
+-                The majority of our content—including tournament brackets, voting pages, match archives, and music video galleries—contains no affiliate links whatsoever. Our primary mission is to celebrate League of Legends music through community engagement, not to sell products.
+-            </p>
+-
+-            <h3 class="section-subheading">Your Support Matters</h3>
+-            
+-            <p class="content-text">
+-                When you use our affiliate links to purchase products you were already planning to buy, you're directly supporting our ability to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Host and maintain tournament infrastructure</li>
+-                <li>Create engaging voting experiences</li>
+-                <li>Curate comprehensive music video galleries</li>
+-                <li>Keep all voting and tournaments completely free</li>
+-                <li>Improve site features and user experience</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">Questions or Concerns?</h3>
+-            
+-            <p class="content-text">
+-                If you have any questions about our affiliate relationships or how we operate, please don't hesitate to reach out through our <a href="/about.html">contact page</a>. We're committed to maintaining your trust through transparency.
+-            </p>
+-
+-            <p class="last-updated">Last Updated: October 24, 2025</p>
+-        </div>
+-    </div>
+-
+-   <div id="footer-placeholder"></div>
+-   <script src="/js/footer.js"></script>
+-
++<body class="theme-arcane page-legal">
++
++    <div id="nav-placeholder"></div>
++    <script type="module" src="/js/navigation.js"></script>
++
++    <main class="legal-page">
++        <header class="legal-hero">
++            <h1 class="legal-title">Affiliate Disclosure</h1>
++            <p class="legal-subtitle">How the one affiliate link on the site works.</p>
++            <p class="legal-updated">Last updated 16 October 2026</p>
++        </header>
++
++        <nav class="legal-switch" aria-label="Legal pages">
++            <a href="/legal/terms">Terms</a>
++            <a href="/legal/privacy">Privacy</a>
++            <a href="/legal/disclosure" aria-current="page">Affiliate Disclosure</a>
++        </nav>
++
++        <aside class="legal-plain"><strong>In plain English</strong><p>One link on the site, in the footer, is an Amazon affiliate link. If you buy through it we may earn a small commission at no cost to you. It never affects votes or results.</p></aside>
++
++        <section class="legal-card">
++            <h2>Amazon Associates</h2>
++            <p>Arcane Moments is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn fees by linking to Amazon.com. As an Amazon Associate we earn from qualifying purchases.</p>
++            <p>If you click an Amazon link on the site and buy something, we may receive a small commission. The price you pay is the same whether or not you use our link.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Where the links are</h2>
++            <p>Today there is one: the "Ambessa: Chosen of the Wolf" book link in the footer, shown on every page. It is marked as an affiliate link in the footer note beneath it. We will list any others here and mark them wherever they appear.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Votes and results are never for sale</h2>
++            <p>Affiliate commissions never influence cup results, vote counts, which edits enter, or anything else on the site. Winners are decided only by votes.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Supporting the project another way</h2>
++            <p>The site also has a Ko-fi link for voluntary donations. Ko-fi support is not an affiliate arrangement and gives no say in results.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Questions</h2>
++            <p>If you have any question about this page, <a data-contact-mail data-show-address href="/about#contact">email us</a>.</p>
++        </section>
++
++    </main>
++
++    <div id="footer-placeholder"></div>
++    <script src="/js/footer.js"></script>
++
++    <script type="module" src="/js/creator-contact.js"></script>
++    <script type="module" src="/js/rank-system.js"></script>
++    <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/legal/privacy.html b/legal/privacy.html
+index d470da8..b625085 100644
+--- a/legal/privacy.html
++++ b/legal/privacy.html
+@@ -3,296 +3,139 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Privacy Policy - League Music Tournament</title>
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
++
++    <title>Privacy Policy | Arcane Moments</title>
++    <meta name="description" content="What Arcane Moments collects, what is public, which services it uses and how to ask for your data to be deleted.">
++    <meta property="og:type" content="website">
++    <meta property="og:title" content="Privacy Policy | Arcane Moments">
++    <meta property="og:description" content="What Arcane Moments collects, what is public, which services it uses and how to ask for your data to be deleted.">
++    <link rel="canonical" href="https://arcanemoments.netlify.app/legal/privacy">
++
++    <!-- Favicon -->
++    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
++    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
++    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
++    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
++
++    <!-- Fonts and icons -->
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++
++    <!-- Stylesheets -->
++    <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+-
+-    <style>
+-        * {
+-            margin: 0;
+-            padding: 0;
+-            box-sizing: border-box;
+-        }
+-
+-        body {
+-            background: #0a0a0a;
+-            color: #f0f0f0;
+-            font-family: 'Inter', sans-serif;
+-            line-height: 1.6;
+-        }
+-
+-        /* Page Header */
+-        .page-header {
+-            background: linear-gradient(180deg, rgba(200, 155, 60, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+-            padding: 80px 0 60px;
+-            text-align: center;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.2);
+-        }
+-
+-        .page-title {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 3rem;
+-            color: #C89B3C;
+-            letter-spacing: 0.1em;
+-            margin-bottom: 20px;
+-        }
+-
+-        .page-subtitle {
+-            font-size: 1.1rem;
+-            color: #b0b0b0;
+-            max-width: 600px;
+-            margin: 0 auto;
+-        }
+-
+-        /* Content Container */
+-        .content-container {
+-            max-width: 900px;
+-            margin: 80px auto;
+-            padding: 0 40px;
+-        }
+-
+-        .content-box {
+-            background: rgba(0, 0, 0, 0.7);
+-            border: 1px solid rgba(200, 155, 60, 0.2);
+-            padding: 60px;
+-            margin-bottom: 40px;
+-        }
+-
+-        .section-heading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.8rem;
+-            color: #C89B3C;
+-            margin-bottom: 30px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .section-subheading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.3rem;
+-            color: #C89B3C;
+-            margin: 40px 0 20px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .content-text {
+-            font-size: 1.05rem;
+-            line-height: 1.9;
+-            color: #d0d0d0;
+-            margin-bottom: 25px;
+-        }
+-
+-        .content-text strong {
+-            color: #C89B3C;
+-        }
+-
+-        .content-text a {
+-            color: #C89B3C;
+-            text-decoration: none;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.3);
+-            transition: border-color 0.3s ease;
+-        }
+-
+-        .content-text a:hover {
+-            border-bottom-color: #C89B3C;
+-        }
+-
+-        .bullet-list {
+-            margin: 20px 0 25px 30px;
+-            color: #d0d0d0;
+-        }
+-
+-        .bullet-list li {
+-            margin-bottom: 15px;
+-            font-size: 1.05rem;
+-            line-height: 1.8;
+-        }
+-
+-        .highlight-box {
+-            background: rgba(200, 155, 60, 0.1);
+-            border-left: 3px solid #C89B3C;
+-            padding: 25px 30px;
+-            margin: 30px 0;
+-        }
+-
+-        .last-updated {
+-            font-size: 0.9rem;
+-            color: #999;
+-            text-align: center;
+-            margin-top: 40px;
+-            font-style: italic;
+-        }
+-    </style>
++    <link rel="stylesheet" href="/css/settings.css">
++    <link rel="stylesheet" href="/css/legal-arcane.css">
++    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
++
++    <!-- Global systems first -->
++    <script type="module" src="/js/firebase-config.js"></script>
++    <script type="module" src="/js/notification-storage.js"></script>
++    <script type="module" src="/js/notification-center.js"></script>
++    <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
+-
+- <div id="nav-placeholder"></div>
+-<script type="module" src="/js/navigation.js"></script>
+-
+-    <header class="page-header">
+-        <h1 class="page-title">Privacy Policy</h1>
+-        <p class="page-subtitle">How we protect and handle your information</p>
+-    </header>
+-
+-    <div class="content-container">
+-        <div class="content-box">
+-            <h2 class="section-heading">Your Privacy Matters</h2>
+-            
+-            <p class="content-text">
+-                At League Music Tournament, we respect your privacy and are committed to protecting any information you share with us. This Privacy Policy explains what information we collect, how we use it, and your rights regarding that information.
+-            </p>
+-
+-            <div class="highlight-box">
+-                <p class="content-text" style="margin-bottom: 0;">
+-                    <strong>Simple Version:</strong> We collect minimal information, don't sell your data, and use standard analytics to improve the site. You can browse and vote anonymously, and we only collect information if you voluntarily contact us.
+-                </p>
+-            </div>
+-
+-            <h3 class="section-subheading">Information We Collect</h3>
+-            
+-            <p class="content-text">
+-                <strong>Information You Provide:</strong> We only collect personal information that you voluntarily provide to us, such as:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Name and email address if you contact us through our contact form</li>
+-                <li>Email address if you subscribe to tournament notifications</li>
+-                <li>Any information you include in messages you send to us</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                <strong>Voting Data:</strong> When you cast votes in tournaments:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>We use browser localStorage to prevent duplicate voting (stored locally on your device)</li>
+-                <li>We may collect anonymous voting statistics to display tournament results</li>
+-                <li>No personally identifiable information is collected or stored when you vote</li>
++<body class="theme-arcane page-legal">
++
++    <div id="nav-placeholder"></div>
++    <script type="module" src="/js/navigation.js"></script>
++
++    <main class="legal-page">
++        <header class="legal-hero">
++            <h1 class="legal-title">Privacy Policy</h1>
++            <p class="legal-subtitle">What the site collects, what is public and how to ask us to delete it.</p>
++            <p class="legal-updated">Last updated 16 October 2026</p>
++        </header>
++
++        <nav class="legal-switch" aria-label="Legal pages">
++            <a href="/legal/terms">Terms</a>
++            <a href="/legal/privacy" aria-current="page">Privacy</a>
++            <a href="/legal/disclosure">Affiliate Disclosure</a>
++        </nav>
++
++        <aside class="legal-plain"><strong>In plain English</strong><p>There are no ads and no analytics on the site. You are signed in anonymously, so you can vote without giving your name or email. We keep what the site needs to run the cup and your profile, we do not sell it, and you can ask us to delete it.</p></aside>
++
++        <section class="legal-card">
++            <h2>Who we are</h2>
++            <p>Arcane Moments is a small, fan-made project run by an individual. To reach us about anything on this page, <a data-contact-mail data-show-address href="/about#contact">email us</a>.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>What we collect</h2>
++            <p>We only collect what the site needs to work:</p>
++            <ul>
++                <li><strong>An anonymous ID.</strong> When you visit, the site signs you in anonymously (Google Firebase Authentication). That creates a random ID with no name or email attached.</li>
++                <li><strong>Your votes.</strong> Votes are saved against that ID so we can stop duplicate votes, count results, and show you your own votes.</li>
++                <li><strong>Your profile.</strong> A username, avatar and companion you choose, plus levels, XP, streaks and achievements the site calculates from what you do, and your settings.</li>
++                <li><strong>Community activity.</strong> Posts, comments, likes and reactions you make, and activity items such as "voted in a match", saved with your username.</li>
++                <li><strong>Messages you send us.</strong> If you email us, we see your email address and what you write.</li>
++                <li><strong>Technical data.</strong> Our hosting and database providers see technical information such as your IP address, browser type and the pages you request, as any website does.</li>
+             </ul>
+-
+-            <p class="content-text">
+-                <strong>Automatically Collected Information:</strong> Like most websites, we automatically collect certain technical information when you visit:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li><strong>Analytics Data:</strong> We may use analytics services (such as Google Analytics) to understand how visitors use our site. This includes information like pages visited, time spent on the site, browser type, and general location (country/city level, not precise location)</li>
+-                <li><strong>Cookies:</strong> We may use cookies and similar technologies to improve your experience and gather analytics data</li>
+-                <li><strong>Log Data:</strong> Our servers may automatically record information such as IP addresses, browser types, and referring URLs</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">How We Use Your Information</h3>
+-            
+-            <p class="content-text">
+-                We use the information we collect to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Process and display tournament votes and results</li>
+-                <li>Respond to your inquiries and communications</li>
+-                <li>Send tournament notifications (if you've subscribed)</li>
+-                <li>Improve and optimize our website content and user experience</li>
+-                <li>Understand which music videos and tournaments are most popular</li>
+-                <li>Detect and prevent voting fraud or abuse</li>
+-                <li>Comply with legal obligations</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                <strong>We do not:</strong>
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Sell, rent, or trade your personal information to third parties</li>
+-                <li>Use your information for marketing purposes without your consent</li>
+-                <li>Share your information except as described in this policy</li>
+-                <li>Track your personal voting history or preferences</li>
++        </section>
++
++        <section class="legal-card">
++            <h2>What is public</h2>
++            <p>Your username, avatar and level, and your posts, comments, reactions and the activity items above, may be shown to other visitors on the feed, activity and profile pages. Your anonymous ID is not shown. Please do not put your real name or other personal details in your username, avatar or posts.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>What stays on your device</h2>
++            <p>The site keeps small items in your browser's storage so it works without asking you to sign up again: for example your anonymous ID, username, avatar, chosen companion, which alerts you have seen, and your recent votes. We do not set our own cookies for tracking. You can clear this at any time in your browser settings, but you may lose your profile on that device.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Services we use</h2>
++            <p>Some of what you see comes from other companies, who may receive your IP address and device details when your browser loads their content, and who have their own privacy policies:</p>
++            <ul>
++                <li><strong>Google Firebase</strong> for anonymous sign-in and the database that stores votes, profiles and posts</li>
++                <li><strong>Netlify</strong> to host the site and run its servers</li>
++                <li><strong>YouTube</strong> for the embedded edit players and edit thumbnails (it may set cookies when a player loads)</li>
++                <li><strong>Riot Games</strong> for champion images used in avatars and companions</li>
++                <li><strong>Google Fonts and cdnjs</strong> for fonts and icons</li>
++                <li><strong>Ko-fi and Amazon</strong> only if you click a link to them</li>
+             </ul>
+-
+-            <h3 class="section-subheading">Third-Party Services</h3>
+-            
+-            <p class="content-text">
+-                <strong>Amazon Associates:</strong> As an Amazon Associate, when you click affiliate links and make purchases, Amazon may collect information according to their own privacy policy. We do not receive any personally identifiable information about your purchases.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>YouTube:</strong> Embedded YouTube videos may collect information according to Google's privacy policy. We do not control YouTube's data collection practices.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>Analytics Services:</strong> We may use third-party analytics services that collect information about your use of the site. These services have their own privacy policies governing how they use information.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>External Links:</strong> Our site contains links to external websites (including Amazon, YouTube, and other resources). We are not responsible for the privacy practices of these external sites.
+-            </p>
+-
+-            <h3 class="section-subheading">Cookies and Tracking Technologies</h3>
+-            
+-            <p class="content-text">
+-                We may use cookies and similar tracking technologies to improve your experience and collect analytics data. You can control cookies through your browser settings. Note that disabling cookies may affect some site functionality, including the ability to vote.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>Types of cookies we may use:</strong>
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li><strong>Essential Cookies:</strong> Necessary for basic site functionality and voting</li>
+-                <li><strong>Analytics Cookies:</strong> Help us understand how visitors use the site</li>
+-                <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">Data Security</h3>
+-            
+-            <p class="content-text">
+-                We take reasonable measures to protect information from unauthorized access, alteration, or destruction. However, no internet transmission is completely secure, and we cannot guarantee absolute security.
+-            </p>
+-
+-            <h3 class="section-subheading">Children's Privacy</h3>
+-            
+-            <p class="content-text">
+-                Our site is not directed to children under 13, and we do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.
+-            </p>
+-
+-            <h3 class="section-subheading">Your Rights and Choices</h3>
+-            
+-            <p class="content-text">
+-                You have the right to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Browse our site and vote anonymously without providing personal information</li>
+-                <li>Opt out of analytics tracking using browser settings or opt-out tools</li>
+-                <li>Unsubscribe from tournament notifications at any time</li>
+-                <li>Request access to any personal information we have about you</li>
+-                <li>Request correction or deletion of your personal information</li>
+-                <li>Withdraw consent for us to use your information (where applicable)</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">Changes to This Policy</h3>
+-            
+-            <p class="content-text">
+-                We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice on our site or updating the "Last Updated" date below. Your continued use of the site after changes constitutes acceptance of the updated policy.
+-            </p>
+-
+-            <h3 class="section-subheading">International Visitors</h3>
+-            
+-            <p class="content-text">
+-                Our site is hosted in the United States. If you are visiting from outside the United States, please be aware that your information may be transferred to, stored, and processed in the United States where our servers are located.
+-            </p>
+-
+-            <h3 class="section-subheading">Contact Us</h3>
+-            
+-            <p class="content-text">
+-                If you have questions about this Privacy Policy or wish to exercise your rights regarding your personal information, please contact us through our <a href="/about.html">contact page</a>.
+-            </p>
+-
+-            <p class="last-updated">Last Updated: October 24, 2025</p>
+-        </div>
+-    </div>
+-
+- <div id="footer-placeholder"></div>
+- <script src="/js/footer.js"></script>
+-
++        </section>
++
++        <section class="legal-card">
++            <h2>How we use it</h2>
++            <p>To run the cups and show results, to give you a profile and community features, to spot and stop cheating and abuse, to answer you when you write, and to keep the site working. We do not sell your information, do not use it for advertising, and do not use analytics or tracking services at the moment. If that changes we will update this page first.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>How long we keep it</h2>
++            <p>We keep votes and profiles while the site runs, so past cups and your profile stay available. Vote totals are part of the permanent record of a cup.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Your choices and rights</h2>
++            <p>You can browse and vote without giving us any personal details. You can ask us to show you what we hold about you, correct it, or delete your profile, posts and comments; <a data-contact-mail data-show-address href="/about#contact">email us</a> with your username so we can find it. If we delete your profile, votes already counted remain in the cup totals but are no longer linked to a profile. Depending on where you live, you may have further rights under local data protection law, and you may complain to your data protection authority.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Children</h2>
++            <p>The site is not aimed at children under 13 and we do not knowingly collect their personal information. If you think a child has given us any, please tell us and we will remove it.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Security and where data is stored</h2>
++            <p>We rely on our providers' security and take reasonable care, but no service is completely secure. Our providers run servers in several countries, including the United States, so your information may be processed outside your own country.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Changes</h2>
++            <p>We may update this policy. The "last updated" date above shows when. We will say so on the site if a change is significant.</p>
++        </section>
++
++    </main>
++
++    <div id="footer-placeholder"></div>
++    <script src="/js/footer.js"></script>
++
++    <script type="module" src="/js/creator-contact.js"></script>
++    <script type="module" src="/js/rank-system.js"></script>
++    <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/legal/terms.html b/legal/terms.html
+index 79513ed..082efde 100644
+--- a/legal/terms.html
++++ b/legal/terms.html
+@@ -3,359 +3,147 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Terms of Use - League Music Tournament</title>
+-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
++
++    <title>Terms of Use | Arcane Moments</title>
++    <meta name="description" content="The rules for using Arcane Moments: fair voting, creator credit and removal, community posts and how the fan project relates to Riot Games.">
++    <meta property="og:type" content="website">
++    <meta property="og:title" content="Terms of Use | Arcane Moments">
++    <meta property="og:description" content="The rules for using Arcane Moments: fair voting, creator credit and removal, community posts and how the fan project relates to Riot Games.">
++    <link rel="canonical" href="https://arcanemoments.netlify.app/legal/terms">
++
++    <!-- Favicon -->
++    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
++    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
++    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
++    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
++
++    <!-- Fonts and icons -->
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++
++    <!-- Stylesheets -->
++    <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/navigation.css">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/scrollbar.css">
+-
+-    <style>
+-        * {
+-            margin: 0;
+-            padding: 0;
+-            box-sizing: border-box;
+-        }
+-
+-        body {
+-            background: #0a0a0a;
+-            color: #f0f0f0;
+-            font-family: 'Inter', sans-serif;
+-            line-height: 1.6;
+-        }
+-
+-        /* Page Header */
+-        .page-header {
+-            background: linear-gradient(180deg, rgba(200, 155, 60, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+-            padding: 80px 0 60px;
+-            text-align: center;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.2);
+-        }
+-
+-        .page-title {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 3rem;
+-            color: #C89B3C;
+-            letter-spacing: 0.1em;
+-            margin-bottom: 20px;
+-        }
+-
+-        .page-subtitle {
+-            font-size: 1.1rem;
+-            color: #b0b0b0;
+-            max-width: 600px;
+-            margin: 0 auto;
+-        }
+-
+-        /* Content Container */
+-        .content-container {
+-            max-width: 900px;
+-            margin: 80px auto;
+-            padding: 0 40px;
+-        }
+-
+-        .content-box {
+-            background: rgba(0, 0, 0, 0.7);
+-            border: 1px solid rgba(200, 155, 60, 0.2);
+-            padding: 60px;
+-            margin-bottom: 40px;
+-        }
+-
+-        .section-heading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.8rem;
+-            color: #C89B3C;
+-            margin-bottom: 30px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .section-subheading {
+-            font-family: 'Bebas Neue', sans-serif;
+-            font-size: 1.3rem;
+-            color: #C89B3C;
+-            margin: 40px 0 20px;
+-            letter-spacing: 0.05em;
+-        }
+-
+-        .content-text {
+-            font-size: 1.05rem;
+-            line-height: 1.9;
+-            color: #d0d0d0;
+-            margin-bottom: 25px;
+-        }
+-
+-        .content-text strong {
+-            color: #C89B3C;
+-        }
+-
+-        .content-text a {
+-            color: #C89B3C;
+-            text-decoration: none;
+-            border-bottom: 1px solid rgba(200, 155, 60, 0.3);
+-            transition: border-color 0.3s ease;
+-        }
+-
+-        .content-text a:hover {
+-            border-bottom-color: #C89B3C;
+-        }
+-
+-        .bullet-list {
+-            margin: 20px 0 25px 30px;
+-            color: #d0d0d0;
+-        }
+-
+-        .bullet-list li {
+-            margin-bottom: 15px;
+-            font-size: 1.05rem;
+-            line-height: 1.8;
+-        }
+-
+-        .highlight-box {
+-            background: rgba(200, 155, 60, 0.1);
+-            border-left: 3px solid #C89B3C;
+-            padding: 25px 30px;
+-            margin: 30px 0;
+-        }
+-
+-        .last-updated {
+-            font-size: 0.9rem;
+-            color: #999;
+-            text-align: center;
+-            margin-top: 40px;
+-            font-style: italic;
+-        }
+-    </style>
++    <link rel="stylesheet" href="/css/settings.css">
++    <link rel="stylesheet" href="/css/legal-arcane.css">
++    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
++
++    <!-- Global systems first -->
++    <script type="module" src="/js/firebase-config.js"></script>
++    <script type="module" src="/js/notification-storage.js"></script>
++    <script type="module" src="/js/notification-center.js"></script>
++    <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
+-
+- <div id="nav-placeholder"></div>
+-<script type="module" src="/js/navigation.js"></script>
+-
+-    <header class="page-header">
+-        <h1 class="page-title">Terms of Use</h1>
+-        <p class="page-subtitle">Guidelines for using League Music Tournament</p>
+-    </header>
+-
+-    <div class="content-container">
+-        <div class="content-box">
+-            <h2 class="section-heading">Agreement to Terms</h2>
+-            
+-            <p class="content-text">
+-                By accessing and using League Music Tournament ("the Site"), you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use the Site.
+-            </p>
+-
+-            <div class="highlight-box">
+-                <p class="content-text" style="margin-bottom: 0;">
+-                    <strong>In Plain English:</strong> This is a fan site dedicated to celebrating League of Legends music. Please use it respectfully, vote fairly, don't copy our content without permission, and remember that all League of Legends content belongs to Riot Games.
+-                </p>
+-            </div>
+-
+-            <h3 class="section-subheading">Use of the Site</h3>
+-            
+-            <p class="content-text">
+-                <strong>Permitted Use:</strong> You may access and use the Site for personal, non-commercial purposes, including:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Voting in music video tournaments</li>
+-                <li>Browsing the music gallery and match archives</li>
+-                <li>Watching embedded YouTube videos of League music</li>
+-                <li>Sharing links to tournaments and matchups on social media</li>
+-                <li>Using our site as a reference for League of Legends music</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                <strong>Prohibited Activities:</strong> You may not:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Manipulate voting results through automated systems, bots, or multiple accounts</li>
+-                <li>Copy, reproduce, or republish substantial portions of our original content without permission</li>
+-                <li>Use automated systems (bots, scrapers) to access or download content from the Site</li>
+-                <li>Attempt to interfere with the Site's operation, voting system, or security</li>
+-                <li>Use the Site for any illegal or unauthorized purpose</li>
+-                <li>Misrepresent your affiliation with the Site or Riot Games</li>
++<body class="theme-arcane page-legal">
++
++    <div id="nav-placeholder"></div>
++    <script type="module" src="/js/navigation.js"></script>
++
++    <main class="legal-page">
++        <header class="legal-hero">
++            <h1 class="legal-title">Terms of Use</h1>
++            <p class="legal-subtitle">The rules for using the Arcane Moments fan tournament.</p>
++            <p class="legal-updated">Last updated 16 October 2026</p>
++        </header>
++
++        <nav class="legal-switch" aria-label="Legal pages">
++            <a href="/legal/terms" aria-current="page">Terms</a>
++            <a href="/legal/privacy">Privacy</a>
++            <a href="/legal/disclosure">Affiliate Disclosure</a>
++        </nav>
++
++        <aside class="legal-plain"><strong>In plain English</strong><p>Arcane Moments is a free, fan-made tournament for Arcane edits. Vote fairly, be kind, and remember that Arcane belongs to Riot Games and Fortiche and every edit belongs to the person who made it. We only embed videos from YouTube; we do not host them.</p></aside>
++
++        <section class="legal-card">
++            <h2>Agreement to these terms</h2>
++            <p>By using Arcane Moments ("the site") you agree to these terms. If you do not agree, please do not use the site.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>What the site is</h2>
++            <p>Arcane Moments runs fan voting cups for fan-made edits of Arcane. The edits are made and published by creators on YouTube. The site shows them through YouTube's own embedded player and links to the creator's channel. We do not host, copy or re-upload any video, and every edit is credited to its creator.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Using the site</h2>
++            <p>You may use the site for personal, non-commercial purposes: voting, browsing the edits gallery, brackets and stats, watching the embedded edits, sharing links, and using the profile and community features. You must not:</p>
++            <ul>
++                <li>manipulate voting with bots, scripts, repeated sign-ins or fake profiles</li>
++                <li>scrape or bulk download the site, or copy a substantial part of our original content without permission</li>
++                <li>try to interfere with the site, its voting or its security</li>
++                <li>use the site for anything illegal</li>
++                <li>pretend to be someone else, or to be connected to the site, Riot Games, Fortiche or Netflix</li>
+             </ul>
+-
+-            <h3 class="section-subheading">Voting and Tournament Rules</h3>
+-            
+-            <p class="content-text">
+-                <strong>Fair Voting:</strong> By participating in tournaments, you agree to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Cast only one vote per match per person</li>
+-                <li>Not use automated systems or multiple accounts to manipulate results</li>
+-                <li>Not coordinate voting manipulation with others</li>
+-                <li>Respect the integrity of the tournament system</li>
++        </section>
++
++        <section class="legal-card">
++            <h2>Voting and cups</h2>
++            <p>You may cast one vote per match. We try hard to keep voting fair, but no public vote can stop every determined attempt to game it.</p>
++            <ul>
++                <li>we may remove votes, profiles or content that look fraudulent or abusive, and may restrict access</li>
++                <li>we may change cup formats, schedules and rules, add or remove edits, or pause, reopen, reset or cancel a cup if we need to</li>
++                <li>results are final once a match is closed, unless we find fraud or a technical fault</li>
+             </ul>
+-
+-            <p class="content-text">
+-                We reserve the right to invalidate votes, remove fraudulent voting activity, and ban users who violate these rules.
+-            </p>
+-
+-            <h3 class="section-subheading">Intellectual Property Rights</h3>
+-            
+-            <p class="content-text">
+-                <strong>Riot Games Content:</strong> League of Legends, all related music, characters, artwork, logos, and other content are the intellectual property of Riot Games, Inc. We do not claim ownership of any Riot Games content featured on this Site.
+-            </p>
+-
+-            <p class="content-text">
+-                <strong>Our Original Content:</strong> The original writing, tournament structure, website design, and compilation of content on this Site is owned by League Music Tournament and protected by copyright law. This includes:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Tournament brackets and organizational structure</li>
+-                <li>Original commentary and descriptions</li>
+-                <li>Website design and layout</li>
+-                <li>Original graphics and visual elements we create</li>
++        </section>
++
++        <section class="legal-card">
++            <h2>Profiles and community posts</h2>
++            <p>The site gives you an anonymous profile and, in places, lets you post, comment and react. What you post is your responsibility. Please do not post anything unlawful, hateful, harassing or spammy, or anyone's private information.</p>
++            <ul>
++                <li>you keep ownership of what you post, and you give us permission to display it on the site</li>
++                <li>we may remove content or restrict profiles at our discretion</li>
++                <li>see our <a href="/legal/privacy">Privacy Policy</a> for what is public</li>
+             </ul>
+-
+-            <p class="content-text">
+-                <strong>Fair Use:</strong> We believe our use of Riot Games content constitutes fair use for purposes of commentary, criticism, and community engagement. We use official music videos, promotional materials, and game assets to facilitate discussion and celebration of League of Legends music.
+-            </p>
+-
+-            <h3 class="section-subheading">User-Generated Content</h3>
+-            
+-            <p class="content-text">
+-                If we implement features allowing user comments or submissions in the future, by submitting content you grant us a non-exclusive license to use, reproduce, and display that content on the Site. You represent that you own or have rights to any content you submit.
+-            </p>
+-
+-            <h3 class="section-subheading">External Links and Third-Party Content</h3>
+-            
+-            <p class="content-text">
+-                The Site contains links to external websites including YouTube, Amazon, and other resources. We are not responsible for:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>The content, accuracy, or availability of external sites</li>
+-                <li>The privacy practices of external sites</li>
+-                <li>Products or services offered by third parties</li>
+-                <li>Any damages or losses from your use of external sites</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                External links are provided for convenience and do not constitute endorsement (except where we explicitly recommend products through our affiliate program).
+-            </p>
+-
+-            <h3 class="section-subheading">Disclaimer of Warranties</h3>
+-            
+-            <p class="content-text">
+-                The Site and all content are provided "as is" without warranties of any kind. We make no guarantees regarding:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li><strong>Accuracy:</strong> While we strive for accuracy, music video information may contain errors</li>
+-                <li><strong>Completeness:</strong> Our coverage of League music is not exhaustive</li>
+-                <li><strong>Availability:</strong> The Site may be temporarily unavailable due to maintenance or technical issues</li>
+-<li><strong>Voting Results:</strong> While we work to prevent fraud, we cannot guarantee 100% accuracy of voting results</li>
+-                <li><strong>Current Information:</strong> League music catalog evolves; some content may become outdated</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">Limitation of Liability</h3>
+-            
+-            <p class="content-text">
+-                To the maximum extent permitted by law, League Music Tournament and its operators shall not be liable for any indirect, incidental, consequential, or punitive damages arising from your use of the Site or participation in tournaments.
+-            </p>
+-
+-            <h3 class="section-subheading">Tournament Results and Changes</h3>
+-            
+-            <p class="content-text">
+-                We reserve the right to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Modify tournament formats, schedules, or rules at any time</li>
+-                <li>Invalidate votes or results if fraud or manipulation is detected</li>
+-                <li>Cancel, postpone, or restart tournaments if necessary</li>
+-                <li>Add or remove music videos from future tournaments</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                Tournament results are final once officially announced, unless fraud is discovered.
+-            </p>
+-
+-            <h3 class="section-subheading">Copyright Infringement Claims</h3>
+-            
+-            <p class="content-text">
+-                If you believe content on the Site infringes your copyright, please contact us with:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Identification of the copyrighted work</li>
+-                <li>Identification of the allegedly infringing material</li>
+-                <li>Your contact information</li>
+-                <li>A statement of good faith belief that use is not authorized</li>
+-                <li>A statement of accuracy under penalty of perjury</li>
+-            </ul>
+-
+-            <p class="content-text">
+-                We will respond to valid DMCA takedown notices in accordance with applicable law.
+-            </p>
+-
+-            <h3 class="section-subheading">Modifications to Terms</h3>
+-            
+-            <p class="content-text">
+-                We reserve the right to modify these Terms of Use at any time. Changes will be effective when posted to this page with an updated "Last Updated" date. Your continued use of the Site after changes constitutes acceptance of the modified terms.
+-            </p>
+-
+-            <h3 class="section-subheading">Modifications to the Site</h3>
+-            
+-            <p class="content-text">
+-                We reserve the right to modify, suspend, or discontinue any aspect of the Site at any time without notice. We are not liable for any modification, suspension, or discontinuation of the Site or any tournament.
+-            </p>
+-
+-            <h3 class="section-subheading">Community Standards</h3>
+-            
+-            <p class="content-text">
+-                We expect all visitors to:
+-            </p>
+-
+-            <ul class="bullet-list">
+-                <li>Treat other community members with respect</li>
+-                <li>Engage in good-faith discussions about League music</li>
+-                <li>Report suspected voting fraud or abuse</li>
+-                <li>Respect the competitive spirit of tournaments</li>
+-                <li>Not harass, threaten, or abuse others</li>
+-            </ul>
+-
+-            <h3 class="section-subheading">Governing Law</h3>
+-            
+-            <p class="content-text">
+-                These Terms of Use shall be governed by and construed in accordance with the laws of the United States, without regard to conflict of law principles.
+-            </p>
+-
+-            <h3 class="section-subheading">Severability</h3>
+-            
+-            <p class="content-text">
+-                If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.
+-            </p>
+-
+-            <h3 class="section-subheading">Relationship with Riot Games</h3>
+-            
+-            <p class="content-text">
+-                League Music Tournament is an unofficial fan-made project. We are not affiliated with, endorsed by, or sponsored by Riot Games. This site is created by fans, for fans, to celebrate League of Legends music.
+-            </p>
+-
+-            <p class="content-text">
+-                League of Legends® and all related logos, characters, music, and content are trademarks and copyrights of Riot Games, Inc. All rights reserved.
+-            </p>
+-
+-            <h3 class="section-subheading">Contact Information</h3>
+-            
+-            <p class="content-text">
+-                If you have questions about these Terms of Use, please contact us through our <a href="/about.html">contact page</a>.
+-            </p>
+-
+-            <p class="content-text">
+-                For copyright concerns or DMCA notices, please use the same contact method with "Copyright Notice" in the subject line.
+-            </p>
+-
+-            <p class="last-updated">Last Updated: October 24, 2025</p>
+-        </div>
+-    </div>
+-
+-<div id="footer-placeholder"></div>
+-<script src="/js/footer.js"></script>
+-
++        </section>
++
++        <section class="legal-card">
++            <h2>Creators: removal requests</h2>
++            <p>If you made an edit and would rather it was not shown on the site or entered in a cup, <a data-contact-mail data-show-address href="/about#contact">email us</a> with a link to your video. We will remove it, including its title and your name from our pages. Removal is quickest before a cup is drawn.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Ownership</h2>
++            <p>Arcane, League of Legends and everything that belongs to them, including characters, music, artwork and logos, belong to Riot Games, Inc. and the other rights holders. Each edit belongs to its creator. We claim none of these.</p>
++            <p>The site's own design, code, writing and tournament structure belong to Arcane Moments.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Links and third parties</h2>
++            <p>The site links to and embeds other services, including YouTube, Ko-fi and Amazon. We do not control them and are not responsible for their content or privacy practices. Some links to Amazon are affiliate links, explained on our <a href="/legal/disclosure">Affiliate Disclosure</a> page.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>No warranties and limits on liability</h2>
++            <p>The site is a free hobby project, provided "as is". It may have errors, be unavailable, or change. To the extent the law allows, we are not liable for any loss arising from your use of the site. Nothing in these terms limits any rights you have by law that cannot be limited.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Changes</h2>
++            <p>We may update these terms or the site. The "last updated" date above shows when. Using the site after a change means you accept the new terms.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Not affiliated with Riot Games</h2>
++            <p>Arcane Moments is an unofficial fan project. It was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.</p>
++            <p>League of Legends&reg;, Arcane and all related logos, characters, music and content are trademarks or copyrights of Riot Games, Inc. We are also not affiliated with Fortiche or Netflix.</p>
++        </section>
++
++        <section class="legal-card">
++            <h2>Copyright concerns and contact</h2>
++            <p>If you believe something on the site infringes your copyright, <a data-contact-mail data-show-address href="/about#contact">email us</a> with: a link to the page, what you own and how, and how to reach you. We will look at it promptly and remove what should not be there. For anything else about these terms, use the same address.</p>
++        </section>
++
++    </main>
++
++    <div id="footer-placeholder"></div>
++    <script src="/js/footer.js"></script>
++
++    <script type="module" src="/js/creator-contact.js"></script>
++    <script type="module" src="/js/rank-system.js"></script>
++    <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/tools/test-legal-browser.py b/tools/test-legal-browser.py
+new file mode 100644
+index 0000000..2da993a
+--- /dev/null
++++ b/tools/test-legal-browser.py
+@@ -0,0 +1,96 @@
++# Optional browser test of the REAL legal pages (legal/terms, privacy, disclosure) with mocked Firebase and a mocked /api/matches.
++# Needs Python + playwright with chromium:   pip install playwright && playwright install chromium
++#   python3 tools/test-legal-browser.py            (screenshots go to /tmp/legal-shots)
++# Fixtures come from tools/test-support/bracket-fixtures.mjs (the real builders and the real data/edits.json).
++import os, sys, json, subprocess, threading, http.server, socketserver, functools, time
++from playwright.sync_api import sync_playwright
++
++ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++FIX = '/tmp/bracket-fixtures'; SHOTS = '/tmp/legal-shots'
++os.makedirs(SHOTS, exist_ok=True)
++subprocess.run(['node', os.path.join(ROOT, 'tools/test-support/bracket-fixtures.mjs'), FIX], check=True, capture_output=True)
++
++class Q(http.server.SimpleHTTPRequestHandler):
++    def log_message(self, *a): pass
++httpd = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=ROOT)); PORT = httpd.server_address[1]
++threading.Thread(target=httpd.serve_forever, daemon=True).start()
++
++FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
++APP = "export const initializeApp=()=>({});"
++AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
++failed = []
++EDITS = json.dumps([dict(e, tournaments=['jinx-cup-1']) for e in json.load(open(os.path.join(ROOT, 'data/edits.json')))[:30]])
++import base64
++PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
++def check(name, ok, got=None):
++    print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
++    if not ok: failed.append(name)
++
++def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None, path='/'):
++    matches = []
++    if mutate: matches = mutate(matches)
++    ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale)
++    if init: ctx.add_init_script(init)
++    pg = ctx.new_page(); errs = []
++    pg.on('pageerror', lambda e: errs.append(str(e)))
++    def route(r):
++        u = r.request.url
++        if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
++        elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
++        elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
++        elif u.split('?')[0].endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
++        elif u.split('?')[0].endswith('/data/edits.json'): r.fulfill(body=EDITS, content_type='application/json')
++        elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
++        elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
++        elif u.startswith('https://img.youtube.com'): r.fulfill(body='', content_type='image/jpeg')
++        elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
++        else: r.continue_()
++    pg.route('**/*', route)
++    pg.goto(f'http://127.0.0.1:{PORT}{path}')
++    if False: pg.wait_for_function("document.querySelectorAll('.home-pill').length && document.getElementById('homePill').textContent !== 'Loading…'", timeout=15000)
++    pg.wait_for_timeout(300)
++    return pg, errs
++
++vis = lambda pg, sel: pg.evaluate(f"(()=>{{const e=document.querySelector({json.dumps(sel)});return !!e&&getComputedStyle(e).display!=='none'&&e.offsetParent!==null}})()")
++txt = lambda pg, sel: pg.inner_text(sel).strip()
++
++
++
++
++noscroll = lambda pg: pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
++OLD = ('League Music Tournament', 'Anthem Arena', 'anthemarena', 'Google Analytics', 'newsletter', 'subscribe', 'DMCA', 'fair use', 'Bebas')
++PAGES = [('terms', 'Terms of Use'), ('privacy', 'Privacy Policy'), ('disclosure', 'Affiliate Disclosure')]
++MAIL = 'arcanemomentsfanpage@gmail.com'
++
++with sync_playwright() as p:
++    b = p.chromium.launch()
++    for label, w, h in (('desktop', 1280, 900), ('phone', 375, 740)):
++        for slug, title in PAGES:
++            print(f'--- {label}: {slug} ---')
++            pg, errs = load(b, 'none', w, h, path=f'/legal/{slug}.html')
++            pg.wait_for_timeout(500)
++            main = pg.inner_text('main')
++            check('title and heading', title in pg.title() and pg.inner_text('h1').strip() == title, (pg.title(), pg.inner_text('h1')))
++            check('Arcane theme is on', pg.evaluate("document.body.classList.contains('theme-arcane')"))
++            check('no old wording', not [k for k in OLD if k.lower() in main.lower() and k != 'Bebas'], [k for k in OLD if k.lower() in main.lower()])
++            check('has a plain-English summary and 5+ sections', pg.locator('.legal-plain').count() == 1 and pg.locator('.legal-card').count() >= 5, pg.locator('.legal-card').count())
++            check('contact link is wired to the one address', pg.locator('a[data-contact-mail]').first.get_attribute('href') == f'mailto:{MAIL}' and MAIL in pg.locator('a[data-contact-mail]').first.inner_text(), pg.locator('a[data-contact-mail]').first.get_attribute('href'))
++            check('current page is marked in the switcher', pg.locator('.legal-switch a[aria-current="page"]').get_attribute('href') == f'/legal/{slug}')
++            check('switcher links to the other two pages', pg.locator('.legal-switch a').count() == 3)
++            check('no sideways scroll', noscroll(pg))
++            check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
++            if slug == 'privacy':
++                check('privacy says no analytics', 'no analytics' in main.lower())
++                check('privacy covers profiles and anonymous sign-in', 'anonymous' in main.lower() and 'profile' in main.lower())
++            if slug == 'terms':
++                check('terms say videos are not hosted', 'do not host' in main.lower())
++                check('terms explain creator removal', 'removal' in main.lower() or 'removed' in main.lower())
++            if slug == 'disclosure':
++                check('disclosure has the Amazon Associate statement', 'As an Amazon Associate we earn from qualifying purchases' in main)
++            pg.screenshot(path=f'{SHOTS}/{label}-{slug}.png', full_page=True)
++            pg.context.close()
++    b.close()
++
++httpd.shutdown()
++print('FAILED: ' + ', '.join(failed) if failed else 'all legal browser checks passed')
++sys.exit(1 if failed else 0)
+-- 
+2.43.0
+

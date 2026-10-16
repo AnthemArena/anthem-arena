@@ -1,0 +1,5148 @@
+From 3f6550594db0e0b165ab77281d409cb5e5ff9f0c Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 16 Oct 2026 18:16:55 +0100
+Subject: [PATCH] New homepage: live cup status, match of the day, results,
+ popular and new edits
+
+Replaces the Arcane clips page and the retired Anthem Arena homepage files.
+Builds on js/stats-model.js (stats-redesign).
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013psebDbek43PiPjqCtRkhL
+---
+ css/arcane-home.css                  |   56 -
+ css/arcane-player.css                |   61 -
+ css/home-arcane.css                  |   85 ++
+ css/homepage.css                     | 1645 --------------------------
+ css/youtube-playlist.css             |  431 -------
+ index-old.html                       |  510 --------
+ index.html                           |  163 +--
+ js/arcane-home.js                    |  231 ----
+ js/bookMappings.js                   |   89 --
+ js/home-model.js                     |   63 +
+ js/home.js                           |  116 ++
+ js/homepage.js                       | 1092 -----------------
+ js/youtube-playlist.js               |  213 ----
+ netlify/functions/arcane-playlist.js |   69 --
+ tools/test-home-browser.py           |  123 ++
+ tools/test-home-model.mjs            |   38 +
+ 16 files changed, 511 insertions(+), 4474 deletions(-)
+ delete mode 100644 css/arcane-home.css
+ delete mode 100644 css/arcane-player.css
+ create mode 100644 css/home-arcane.css
+ delete mode 100644 css/homepage.css
+ delete mode 100644 css/youtube-playlist.css
+ delete mode 100644 index-old.html
+ delete mode 100644 js/arcane-home.js
+ delete mode 100644 js/bookMappings.js
+ create mode 100644 js/home-model.js
+ create mode 100644 js/home.js
+ delete mode 100644 js/homepage.js
+ delete mode 100644 js/youtube-playlist.js
+ delete mode 100644 netlify/functions/arcane-playlist.js
+ create mode 100644 tools/test-home-browser.py
+ create mode 100644 tools/test-home-model.mjs
+
+diff --git a/css/arcane-home.css b/css/arcane-home.css
+deleted file mode 100644
+index 18c1e6c..0000000
+--- a/css/arcane-home.css
++++ /dev/null
+@@ -1,56 +0,0 @@
+-:root {
+---bg:#06070e; --panel:rgba(11,13,24,.8); --pink:#ff4fb4; --pink-bright:#ff70c3; --pink-soft:rgba(255,79,180,.15);
+---text:#f6f3f7; --muted:#b7b2bc; --border:rgba(255,79,180,.25); --shadow:0 24px 80px rgba(0,0,0,.46); --radius:22px;
+-}
+-*{box-sizing:border-box} html{scroll-behavior:smooth}
+-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+-a{color:inherit}
+-.page-background{position:fixed;inset:0;z-index:-4;background:linear-gradient(180deg,rgba(5,6,14,.57),rgba(5,6,14,.92)),url("/cover.png") center/cover no-repeat;transform:scale(1.035)}
+-.page-background:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 15%,rgba(255,79,180,.11),transparent 42%)}
+-.page-glow{position:fixed;width:420px;height:420px;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:-2;opacity:.14;background:var(--pink)}
+-.page-glow-left{left:-220px;top:34vh}.page-glow-right{right:-260px;top:68vh}
+-.site-shell{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:34px 0 56px}
+-.hero{min-height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:52px 0 82px}
+-.hero-logo-wrap{width:min(390px,72vw);filter:drop-shadow(0 20px 40px rgba(0,0,0,.48));margin-bottom:26px}
+-.hero-logo{display:block;width:100%;height:auto;border-radius:28px}
+-.eyebrow,.section-kicker{margin:0 0 8px;font-size:.75rem;font-weight:800;letter-spacing:.18em;color:var(--pink-bright);text-transform:uppercase}
+-.hero h1{margin:0;font-size:clamp(2.7rem,7vw,5.25rem);line-height:.98;letter-spacing:-.055em}
+-.hero-copy{width:min(680px,100%);margin:22px auto 0;color:#d1ccd3;font-size:clamp(1rem,2.1vw,1.2rem);line-height:1.7}
+-.hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:30px}
+-.primary-button,.secondary-button,.kofi-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:13px 19px;border-radius:999px;text-decoration:none;font-weight:800;transition:transform 180ms ease,box-shadow 180ms ease,border-color 180ms ease,background 180ms ease}
+-.primary-button,.kofi-button{color:#160814;background:linear-gradient(135deg,var(--pink-bright),var(--pink));box-shadow:0 12px 30px rgba(255,79,180,.24)}
+-.secondary-button{border:1px solid rgba(255,255,255,.13);background:rgba(9,10,19,.58);backdrop-filter:blur(8px)}
+-.primary-button:hover,.secondary-button:hover,.kofi-button:hover{transform:translateY(-2px)}
+-.primary-button:hover,.kofi-button:hover{box-shadow:0 18px 36px rgba(255,79,180,.34)}
+-.secondary-button:hover{border-color:var(--border);background:rgba(13,15,27,.84)}
+-.is-disabled{cursor:default;pointer-events:none}
+-.intro-card,.support-section{border:1px solid var(--border);background:var(--panel);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+-.intro-card{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:28px;border-radius:var(--radius)}
+-.intro-card-icon{width:64px;height:64px;display:grid;place-items:center;border-radius:18px;color:var(--pink-bright);background:var(--pink-soft);border:1px solid rgba(255,79,180,.18);font-size:1.45rem}
+-.intro-card h2,.support-section h2,.social-section h2,.section-heading h2{margin:0;font-size:clamp(1.7rem,4vw,2.35rem);letter-spacing:-.04em}
+-.intro-card p:last-child,.support-section p{margin:12px 0 0;color:var(--muted);line-height:1.7}
+-.moments-section{margin-top:72px}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}
+-.text-link{color:#ece8ed;text-decoration:none;font-size:.92rem;font-weight:700}.text-link:hover{color:var(--pink-bright)}
+-.playlist-rows{display:grid;gap:30px}.playlist-row{padding:22px 0 4px}
+-.playlist-row-header{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:14px}
+-.playlist-row-title{margin:0;font-size:1.25rem;letter-spacing:-.02em}.playlist-row-subtitle{margin:4px 0 0;color:#98939d;font-size:.88rem}
+-.playlist-link{color:var(--pink-bright);text-decoration:none;font-size:.82rem;font-weight:800;white-space:nowrap}
+-.video-scroller{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(188px,22vw);gap:14px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:thin;scrollbar-color:rgba(255,79,180,.48) transparent}
+-.video-card{min-width:0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(7,8,15,.85);box-shadow:0 14px 34px rgba(0,0,0,.24);text-decoration:none;transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease}
+-.video-card:hover{transform:translateY(-3px);border-color:rgba(255,79,180,.34);box-shadow:0 20px 44px rgba(0,0,0,.38)}
+-.video-thumb{display:block;width:100%;aspect-ratio:9/16;object-fit:cover;background:#0e1020}
+-.video-card-body{padding:11px 12px 13px}.video-card-title{margin:0;color:#f5f1f5;font-size:.84rem;font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+-.video-card-meta{margin-top:5px;color:#8f8992;font-size:.74rem}
+-.loading-state,.empty-state{min-height:150px;display:grid;place-items:center;border:1px dashed rgba(255,255,255,.12);border-radius:18px;color:#98939d;background:rgba(8,9,16,.52)}
+-.loading-state{display:flex;gap:10px}.loading-dot{width:9px;height:9px;border-radius:50%;background:var(--pink);box-shadow:0 0 16px rgba(255,79,180,.5);animation:pulse 1.1s infinite ease-in-out}
+-@keyframes pulse{0%,100%{transform:scale(.72);opacity:.45}50%{transform:scale(1);opacity:1}}
+-.support-section{margin-top:70px;padding:28px;border-radius:var(--radius)}.support-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
+-.social-section{padding:72px 0 10px;text-align:center}.social-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:22px}
+-.social-link{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(8,9,16,.7);color:#f5f1f5;text-decoration:none;font-size:1.18rem;transition:transform 180ms ease,color 180ms ease,border-color 180ms ease,background 180ms ease}
+-.social-link:hover{transform:translateY(-3px);color:var(--pink-bright);border-color:rgba(255,79,180,.32);background:rgba(13,14,25,.92)}.social-link.is-disabled{opacity:.42;cursor:default}
+-.site-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:34px 0 0;margin-top:40px;border-top:1px solid rgba(255,255,255,.08);color:#8f8992;font-size:.82rem}
+-.footer-brand{display:flex;flex-direction:column;gap:4px}.footer-brand strong{color:#efebef;letter-spacing:.08em;font-size:.78rem}.footer-brand span{color:var(--pink-bright)}.site-footer p{margin:0}
+-@media (max-width:780px){
+-.site-shell{width:min(100% - 20px,1120px);padding-top:18px}.hero{min-height:630px;padding-top:28px}.intro-card{grid-template-columns:1fr;padding:22px}.intro-card-icon{width:54px;height:54px;border-radius:16px}
+-.section-heading,.playlist-row-header,.support-inner,.site-footer{align-items:flex-start;flex-direction:column}.video-scroller{grid-auto-columns:minmax(165px,46vw)}.support-inner{gap:18px}.site-footer{gap:8px}
+-}
+diff --git a/css/arcane-player.css b/css/arcane-player.css
+deleted file mode 100644
+index e7e9feb..0000000
+--- a/css/arcane-player.css
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/* Load AFTER arcane-home.css. Overrides + Shorts-first player. */
+-.hero{min-height:0;padding:40px 0 52px}
+-.hero-logo-wrap{width:min(260px,56vw);margin-bottom:20px}
+-.moments-section{margin-top:40px}
+-
+-/* Background: keep the texture at the edges, hide the cover's wordmark behind content */
+-.page-background{background:radial-gradient(ellipse 62% 75% at 50% 45%,rgba(5,6,14,.93),rgba(5,6,14,.74) 62%,rgba(5,6,14,.5)),url("/cover.png") center/cover no-repeat}
+-
+-/* Shorts rows */
+-.playlist-rows{grid-template-columns:minmax(0,1fr)}
+-.playlist-row{min-width:0}
+-.video-scroller{grid-auto-columns:minmax(150px,170px);scroll-snap-type:x proximity;scroll-padding-left:2px}
+-.video-card{scroll-snap-align:start;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;display:block}
+-.video-card:focus-visible,.player-btn:focus-visible,.player-yt:focus-visible{outline:2px solid var(--pink-bright);outline-offset:3px}
+-.thumb-wrap{position:relative;display:block}
+-.video-card-body,.video-card-meta{display:block}
+-.video-card-title{display:-webkit-box}
+-.play-badge{position:absolute;right:10px;bottom:10px;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(255,79,180,.92);color:#160814;font-size:.8rem;transition:transform 180ms ease}
+-.video-card:hover .play-badge{transform:scale(1.12)}
+-.retry-btn{background:none;border:0;cursor:pointer;font:inherit;font-size:.82rem;font-weight:800}
+-
+-/* Player */
+-body.modal-open{overflow:hidden}
+-.player-modal[hidden]{display:none}
+-.player-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center}
+-.player-backdrop{position:absolute;inset:0;background:rgba(3,4,10,.88);backdrop-filter:blur(6px)}
+-.player-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+-.player-frame{height:min(78dvh,calc((100vw - 32px) * 16 / 9));aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#000;box-shadow:var(--shadow),0 0 0 1px var(--border);animation:pop 200ms ease}
+-.player-frame iframe{width:100%;height:100%;border:0;display:block}
+-@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+-.player-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(9,10,19,.8);color:var(--text);cursor:pointer;font-size:1rem}
+-.player-btn:hover:not(:disabled){border-color:var(--border);color:var(--pink-bright)}
+-.player-btn:disabled{opacity:.3;cursor:default}
+-.player-yt{color:var(--muted);font-size:.82rem;font-weight:700;text-decoration:none}
+-.player-yt:hover{color:var(--pink-bright)}
+-
+-@media (min-width:781px){
+-  .player-close{position:absolute;top:0;right:-56px}
+-  .player-prev,.player-next{position:absolute;right:-56px;top:50%}
+-  .player-prev{transform:translateY(-54px)}
+-  .player-next{transform:translateY(10px)}
+-}
+-@media (max-width:780px){
+-  .hero{padding:24px 0 36px}
+-  .player-stage{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:12px}
+-  .player-frame{order:0;flex-basis:100%;width:auto;height:min(72dvh,calc((100vw - 32px) * 16 / 9));margin:0 auto}
+-  .player-close{position:fixed;top:12px;right:12px;z-index:2}
+-  .player-prev{order:1}
+-  .player-yt{order:2}
+-  .player-next{order:3}
+-  .player-prev i,.player-next i{transform:rotate(-90deg)}
+-}
+-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+-
+-/* Swipe strips (touch devices only) */
+-.player-frame{position:relative}
+-.swipe-zone{display:none}
+-@media (pointer:coarse){
+-  .swipe-zone{display:block;position:absolute;top:0;bottom:64px;width:15%;z-index:2}
+-  .swipe-l{left:0}.swipe-r{right:0}
+-}
+\ No newline at end of file
+diff --git a/css/home-arcane.css b/css/home-arcane.css
+new file mode 100644
+index 0000000..85cf484
+--- /dev/null
++++ b/css/home-arcane.css
+@@ -0,0 +1,85 @@
++/* ========================================
++   HOMEPAGE (index.html, body.page-home)
++   Uses the Arcane theme tokens from arcane-theme.css.
++   ======================================== */
++.page-home .home-page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
++
++/* hero */
++.page-home .home-hero { text-align: center; padding: 1.5rem 0 2.5rem; display: flex; flex-direction: column; align-items: center; }
++.page-home .home-logo { width: min(220px, 52vw); height: auto; border-radius: 26px; filter: drop-shadow(0 18px 36px rgba(0,0,0,.5)); margin-bottom: 1.25rem; }
++.page-home .home-pill { margin: 0 0 .9rem; padding: .4rem .95rem; border: 1px solid var(--border); background: var(--pink-soft); border-radius: 999px; color: var(--pink-bright); font-size: .85rem; font-weight: 700; letter-spacing: .02em; max-width: 100%; overflow-wrap: anywhere; }
++.page-home .home-title { margin: 0; font-family: var(--font); font-size: clamp(2.6rem, 8vw, 4.75rem); font-weight: 800; line-height: 1; letter-spacing: -.04em; color: var(--text); }
++.page-home .home-lead { max-width: 620px; margin: 1.1rem auto 0; color: var(--muted); font-size: clamp(1rem, 2.4vw, 1.2rem); line-height: 1.6; }
++.page-home .home-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-top: 1.6rem; }
++.page-home .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .75rem 1.4rem; border-radius: 999px; font: 700 1rem var(--font); text-decoration: none; border: 1px solid transparent; cursor: pointer; }
++.page-home .btn-primary { color: #160814; background: linear-gradient(135deg, var(--pink-bright), var(--pink)); box-shadow: 0 12px 30px rgba(255,79,180,.24); }
++.page-home .btn-primary:hover { box-shadow: 0 16px 34px rgba(255,79,180,.34); }
++.page-home .btn-ghost { color: var(--text); background: var(--card); border-color: var(--border); }
++.page-home .btn-ghost:hover { background: var(--pink-soft); }
++.page-home .btn:focus-visible, .page-home .edit-card:focus-visible, .page-home .result-list a:focus-visible, .page-home .more:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
++.page-home .home-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin: 2rem 0 0; padding: 0; width: 100%; }
++.page-home .home-stats[hidden] { display: none; }
++.page-home .home-stats div { flex: 1 1 140px; max-width: 220px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: .9rem .8rem; }
++.page-home .home-stats dt { color: var(--muted); font-size: .85rem; order: 2; }
++.page-home .home-stats dd { margin: 0; color: var(--text); font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; }
++.page-home .home-stats div { display: flex; flex-direction: column; }
++
++/* blocks */
++.page-home .home-block { margin-top: 2.5rem; }
++.page-home .home-block[hidden] { display: none; }
++.page-home .block-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
++.page-home .kicker { margin: 0 0 .25rem; color: var(--pink-bright); font-size: .75rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
++.page-home .home-block h2 { margin: 0; font-size: clamp(1.35rem, 3.6vw, 1.9rem); color: var(--text); letter-spacing: -.02em; }
++.page-home .more { color: var(--pink-bright); font-weight: 700; text-decoration: none; white-space: nowrap; }
++.page-home .more:hover { text-decoration: underline; }
++
++/* edit pictures */
++.page-home .mini { display: flex; flex-direction: column; gap: .25rem; min-width: 0; text-align: center; }
++.page-home .mini img { width: 100%; max-width: 150px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px; background: var(--line); margin: 0 auto .35rem; display: block; }
++.page-home .mini b { color: var(--text); line-height: 1.3; overflow-wrap: anywhere; }
++.page-home .mini i { font-style: normal; color: var(--muted); font-size: .85rem; overflow-wrap: anywhere; }
++
++/* match of the day / champion */
++.page-home .match-card, .page-home .champion-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.4rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
++.page-home .match-label { margin: 0; color: var(--muted); font-size: .9rem; }
++.page-home .match-pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: start; width: 100%; max-width: 640px; }
++.page-home .match-vs { align-self: center; color: var(--pink-bright); font-weight: 800; letter-spacing: .1em; }
++.page-home .match-votes { margin: 0; color: var(--text-dim); }
++.page-home .champion-card .mini img { max-width: 180px; }
++
++/* results */
++.page-home .result-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
++.page-home .result-list a { display: grid; grid-template-columns: 7.5rem 1fr auto; gap: .9rem; align-items: center; padding: .85rem 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: var(--muted); text-decoration: none; }
++.page-home .result-list a:hover { background: var(--pink-soft); }
++.page-home .result-label { color: var(--pink-bright); font-weight: 700; font-size: .85rem; }
++.page-home .result-text { overflow-wrap: anywhere; min-width: 0; }
++.page-home .result-text b { color: var(--text); }
++.page-home .result-votes { font-size: .85rem; color: var(--text-dim); white-space: nowrap; }
++
++/* edit rows: swipe sideways on phones */
++.page-home .edit-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 170px); gap: 1rem; overflow-x: auto; padding-bottom: .75rem; scroll-snap-type: x proximity; scrollbar-width: thin; }
++.page-home .edit-card { display: flex; flex-direction: column; gap: .3rem; min-width: 0; padding: .6rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; scroll-snap-align: start; }
++.page-home .edit-card:hover { background: var(--pink-soft); }
++.page-home .edit-card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; background: var(--line); display: block; margin-bottom: .3rem; }
++.page-home .edit-card b { color: var(--text); font-size: .92rem; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
++.page-home .edit-card i { font-style: normal; color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
++.page-home .edit-meta { color: var(--text-dim); font-size: .8rem; margin-top: auto; }
++
++/* how it works */
++.page-home .how { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; }
++.page-home .how-list { margin: 1rem 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
++.page-home .how-list li { counter-increment: s; color: var(--muted); line-height: 1.5; padding-left: 2.6rem; position: relative; }
++.page-home .how-list li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center; background: var(--pink-soft); border: 1px solid var(--border); color: var(--pink-bright); font-weight: 800; }
++.page-home .how-list b { color: var(--text); }
++.page-home .how-more { margin: 1.2rem 0 0; }
++.page-home .how-more a { color: var(--pink-bright); }
++
++@media (max-width: 640px) {
++    .page-home .home-page { padding: 1rem 1rem 2.5rem; }
++    .page-home .btn { flex: 1 1 100%; }
++    .page-home .match-pair { gap: .5rem; }
++    .page-home .result-list a { grid-template-columns: 1fr auto; }
++    .page-home .result-label { grid-column: 1 / -1; }
++    .page-home .block-head { flex-direction: column; align-items: flex-start; gap: .4rem; }
++    .page-home .edit-row { grid-auto-columns: minmax(138px, 150px); margin-right: -1rem; padding-right: 1rem; }
++}
+diff --git a/css/homepage.css b/css/homepage.css
+deleted file mode 100644
+index 82b6e0e..0000000
+--- a/css/homepage.css
++++ /dev/null
+@@ -1,1645 +0,0 @@
+-/* ========================================
+-   HOMEPAGE - LEAGUE MUSIC TOURNAMENT
+-   ======================================== */
+-
+-/* ========================================
+-   HERO SECTION
+-   ======================================== */
+-.hero {
+-    position: relative;
+-    padding: 8rem 0 6rem;
+-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+-    overflow: hidden;
+-}
+-
+-.hero-background {
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    right: 0;
+-    bottom: 0;
+-    background: url('/images/hero-bg.jpg') center/cover;
+-    opacity: 0.15;
+-    z-index: 0;
+-}
+-
+-.hero-overlay {
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    right: 0;
+-    bottom: 0;
+-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.05), transparent);
+-    z-index: 1;
+-}
+-
+-.hero-content {
+-    position: relative;
+-    z-index: 2;
+-    text-align: center;
+-    max-width: 900px;
+-    margin: 0 auto;
+-}
+-
+-/* Tournament Badge */
+-.tournament-badge {
+-    display: inline-flex;
+-    align-items: center;
+-    gap: 0.75rem;
+-    padding: 0.75rem 1.5rem;
+-    background: rgba(200, 170, 110, 0.15);
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    border-radius: 50px;
+-    margin-bottom: 2rem;
+-    animation: badge-glow 3s ease-in-out infinite;
+-}
+-
+-@keyframes badge-glow {
+-    0%, 100% {
+-        box-shadow: 0 0 20px rgba(200, 170, 110, 0.2);
+-    }
+-    50% {
+-        box-shadow: 0 0 30px rgba(200, 170, 110, 0.4);
+-    }
+-}
+-
+-.badge-icon {
+-    font-size: 1.5rem;
+-}
+-
+-.badge-text {
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.95rem;
+-    font-weight: 600;
+-    color: #C8AA6E;
+-    text-transform: uppercase;
+-    letter-spacing: 0.1em;
+-}
+-
+-.badge-status {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.7);
+-}
+-
+-/* Hero Title */
+-.hero-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 3.5rem;
+-    font-weight: 700;
+-    color: #fff;
+-    margin-bottom: 1.5rem;
+-    line-height: 1.2;
+-    letter-spacing: 0.02em;
+-}
+-
+-.hero-subtitle {
+-    font-family: 'Lora', serif;
+-    font-size: 1.25rem;
+-    color: rgba(255, 255, 255, 0.8);
+-    margin-bottom: 3rem;
+-    line-height: 1.6;
+-}
+-
+-/* Hero Stats */
+-.hero-stats {
+-    display: flex;
+-    justify-content: center;
+-    gap: 4rem;
+-    margin-bottom: 3rem;
+-    padding: 2rem 0;
+-}
+-
+-.stat-item {
+-    display: flex;
+-    flex-direction: column;
+-    align-items: center;
+-    gap: 0.5rem;
+-}
+-
+-.stat-number {
+-    font-family: 'Cinzel', serif;
+-    font-size: 3rem;
+-    font-weight: 700;
+-    color: #C8AA6E;
+-    line-height: 1;
+-}
+-
+-.stat-label {
+-    font-family: 'Lora', serif;
+-    font-size: 0.9rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    text-transform: uppercase;
+-    letter-spacing: 0.1em;
+-}
+-
+-/* Hero Actions */
+-.hero-actions {
+-    display: flex;
+-    justify-content: center;
+-    gap: 1.5rem;
+-}
+-
+-.btn-primary,
+-.btn-secondary {
+-    display: inline-flex;
+-    align-items: center;
+-    gap: 0.75rem;
+-    padding: 1rem 2rem;
+-    border-radius: 8px;
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    text-decoration: none;
+-    transition: all 0.3s ease;
+-    cursor: pointer;
+-}
+-
+-.btn-primary {
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    color: #0a0a0a;
+-    border: none;
+-}
+-
+-.btn-primary:hover {
+-    transform: translateY(-2px);
+-    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.4);
+-}
+-
+-.btn-secondary {
+-    background: transparent;
+-    color: #C8AA6E;
+-    border: 2px solid rgba(200, 170, 110, 0.4);
+-}
+-
+-.btn-secondary:hover {
+-    background: rgba(200, 170, 110, 0.1);
+-    border-color: #C8AA6E;
+-}
+-
+-/* ========================================
+-   LOADING STATE
+-   ======================================== */
+-.homepage-loading-state {
+-    padding: 5rem 0;
+-    background: rgba(255, 255, 255, 0.02);
+-    min-height: 60vh;
+-    display: none;
+-    align-items: center;
+-    justify-content: center;
+-}
+-
+-.loading-content {
+-    text-align: center;
+-    max-width: 400px;
+-    margin: 0 auto;
+-}
+-
+-.loader {
+-    width: 60px;
+-    height: 60px;
+-    border: 5px solid rgba(200, 170, 110, 0.2);
+-    border-top-color: #C8AA6E;
+-    border-radius: 50%;
+-    animation: spin 1s linear infinite;
+-    margin: 0 auto 2rem;
+-}
+-
+-@keyframes spin {
+-    to { transform: rotate(360deg); }
+-}
+-
+-.loading-text {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.5rem;
+-    color: #C8AA6E;
+-    margin-bottom: 0.5rem;
+-    font-weight: 600;
+-}
+-
+-.loading-subtext {
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    margin: 0;
+-}
+-
+-/* ========================================
+-   SECTION HEADERS (GLOBAL)
+-   ======================================== */
+-.section-header {
+-    text-align: center;
+-    margin-bottom: 3rem;
+-}
+-
+-.section-label {
+-    display: inline-block;
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.85rem;
+-    font-weight: 600;
+-    color: #C8AA6E;
+-    text-transform: uppercase;
+-    letter-spacing: 0.15em;
+-    margin-bottom: 0.75rem;
+-}
+-
+-.section-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 2.5rem;
+-    font-weight: 700;
+-    color: #fff;
+-    margin-bottom: 0.75rem;
+-    letter-spacing: 0.02em;
+-}
+-
+-.section-subtitle {
+-    font-family: 'Lora', serif;
+-    font-size: 1.1rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    line-height: 1.6;
+-}
+-
+-.view-all-inline {
+-    color: #C8AA6E;
+-    text-decoration: none;
+-    font-weight: 600;
+-    margin-left: 1rem;
+-    font-size: 0.95rem;
+-    transition: color 0.2s ease;
+-}
+-
+-.view-all-inline:hover {
+-    color: #fff;
+-}
+-
+-/* ========================================
+-   FEATURED MATCH SECTION
+-   ======================================== */
+-.featured-matchup {
+-    padding: 5rem 0;
+-    background: linear-gradient(180deg, #0a0a0a, rgba(26, 26, 46, 0.5));
+-}
+-
+-.featured-match-card {
+-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(20, 20, 36, 0.9));
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    border-radius: 16px;
+-    padding: 2.5rem;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-    position: relative;
+-    overflow: hidden;
+-    margin-top: 2rem;
+-}
+-
+-.featured-match-card::before {
+-    content: '';
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    right: 0;
+-    bottom: 0;
+-    background: linear-gradient(135deg, transparent, rgba(200, 170, 110, 0.05));
+-    opacity: 0;
+-    transition: opacity 0.3s ease;
+-    pointer-events: none;
+-}
+-
+-.featured-match-card:hover {
+-    border-color: #C8AA6E;
+-    transform: translateY(-4px);
+-    box-shadow: 0 8px 32px rgba(200, 170, 110, 0.3);
+-}
+-
+-.featured-match-card:hover::before {
+-    opacity: 1;
+-}
+-
+-.featured-match-inner {
+-    display: grid;
+-    grid-template-columns: auto 1fr;
+-    gap: 2.5rem;
+-    align-items: center;
+-}
+-
+-/* Thumbnails Section */
+-.featured-thumbnails {
+-    display: flex;
+-    align-items: center;
+-    gap: 1.5rem;
+-}
+-
+-.thumbnail-wrapper {
+-    position: relative;
+-    width: 200px;
+-    height: 150px;
+-    border-radius: 8px;
+-    overflow: hidden;
+-    border: 2px solid rgba(200, 170, 110, 0.2);
+-    transition: all 0.3s ease;
+-}
+-
+-.thumbnail-wrapper.user-voted {
+-    border-color: #C8AA6E;
+-    box-shadow: 0 0 20px rgba(200, 170, 110, 0.3);
+-}
+-
+-.thumbnail-wrapper img {
+-    width: 100%;
+-    height: 100%;
+-    object-fit: cover;
+-    transition: transform 0.3s ease;
+-}
+-
+-.featured-match-card:hover .thumbnail-wrapper img {
+-    transform: scale(1.05);
+-}
+-
+-.thumbnail-overlay {
+-    position: absolute;
+-    top: 8px;
+-    left: 8px;
+-    display: flex;
+-    flex-direction: column;
+-    gap: 6px;
+-}
+-
+-.seed-badge {
+-    background: rgba(200, 170, 110, 0.95);
+-    color: #0a0a0a;
+-    padding: 0.25rem 0.6rem;
+-    border-radius: 4px;
+-    font-size: 0.75rem;
+-    font-weight: 700;
+-    backdrop-filter: blur(4px);
+-}
+-
+-.voted-badge {
+-    background: rgba(200, 170, 110, 0.95);
+-    color: #0a0a0a;
+-    padding: 0.25rem 0.6rem;
+-    border-radius: 4px;
+-    font-size: 0.7rem;
+-    font-weight: 700;
+-    white-space: nowrap;
+-}
+-
+-.thumbnail-result {
+-    position: absolute;
+-    bottom: 0;
+-    left: 0;
+-    right: 0;
+-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+-    padding: 0.75rem;
+-    display: flex;
+-    justify-content: space-between;
+-    align-items: center;
+-}
+-
+-.result-pct {
+-    font-size: 1.5rem;
+-    font-weight: 700;
+-    color: #C8AA6E;
+-}
+-
+-.result-votes {
+-    font-size: 0.75rem;
+-    color: rgba(255, 255, 255, 0.7);
+-}
+-
+-/* VS Section */
+-.featured-vs {
+-    display: flex;
+-    flex-direction: column;
+-    align-items: center;
+-    gap: 1rem;
+-}
+-
+-.vs-badge {
+-    width: 60px;
+-    height: 60px;
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    border-radius: 50%;
+-    display: flex;
+-    align-items: center;
+-    justify-content: center;
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.1rem;
+-    font-weight: 700;
+-    color: #0a0a0a;
+-    box-shadow: 0 4px 16px rgba(200, 170, 110, 0.4);
+-    transition: all 0.3s ease;
+-}
+-
+-.featured-match-card:hover .vs-badge {
+-    transform: scale(1.1) rotate(5deg);
+-    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.6);
+-}
+-
+-.vs-progress-bar {
+-    width: 4px;
+-    height: 120px;
+-    background: rgba(255, 255, 255, 0.1);
+-    border-radius: 2px;
+-    overflow: hidden;
+-    display: flex;
+-    flex-direction: column;
+-    position: relative;
+-}
+-
+-.bar-fill {
+-    transition: height 0.6s ease;
+-    position: absolute;
+-    width: 100%;
+-}
+-
+-.bar-fill.left {
+-    bottom: 50%;
+-    background: linear-gradient(to top, #667eea, #764ba2);
+-}
+-
+-.bar-fill.right {
+-    top: 50%;
+-    background: linear-gradient(to bottom, #f093fb, #f5576c);
+-}
+-
+-/* Info Section */
+-.featured-info {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 2rem;
+-}
+-
+-.song-pair {
+-    display: grid;
+-    grid-template-columns: 1fr 1fr;
+-    gap: 2rem;
+-}
+-
+-.song-details {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 0.5rem;
+-}
+-
+-.song-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.4rem;
+-    color: #C8AA6E;
+-    margin: 0;
+-    line-height: 1.3;
+-}
+-
+-.song-meta {
+-    font-size: 0.95rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    margin: 0;
+-}
+-
+-/* CTA Button */
+-.featured-cta {
+-    width: 100%;
+-    padding: 1.5rem;
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    border: none;
+-    border-radius: 10px;
+-    color: #0a0a0a;
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.15rem;
+-    font-weight: 700;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-    display: flex;
+-    align-items: center;
+-    justify-content: center;
+-    gap: 1rem;
+-    position: relative;
+-    overflow: hidden;
+-}
+-
+-.featured-cta::before {
+-    content: '';
+-    position: absolute;
+-    top: 0;
+-    left: -100%;
+-    width: 100%;
+-    height: 100%;
+-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+-    transition: left 0.5s ease;
+-}
+-
+-.featured-cta:hover::before {
+-    left: 100%;
+-}
+-
+-.featured-cta:hover {
+-    transform: scale(1.02);
+-    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.5);
+-}
+-
+-.featured-cta:active {
+-    transform: scale(0.98);
+-}
+-
+-.featured-cta.voted {
+-    background: rgba(200, 170, 110, 0.15);
+-    color: #C8AA6E;
+-    border: 2px solid rgba(200, 170, 110, 0.4);
+-}
+-
+-.featured-cta.voted:hover {
+-    background: rgba(200, 170, 110, 0.25);
+-    border-color: #C8AA6E;
+-}
+-
+-.cta-icon {
+-    font-size: 1.5rem;
+-}
+-
+-.cta-text {
+-    font-size: 1.15rem;
+-}
+-
+-.cta-arrow {
+-    font-size: 1.25rem;
+-    transition: transform 0.3s ease;
+-}
+-
+-.featured-cta:hover .cta-arrow {
+-    transform: translateX(6px);
+-}
+-
+-/* ========================================
+-   YOUR ACTIVE VOTES SECTION (NEW)
+-   ======================================== */
+-.your-votes-section {
+-    padding: 5rem 0;
+-    background: linear-gradient(180deg, rgba(26, 26, 46, 0.5), rgba(10, 10, 30, 0.8));
+-}
+-
+-.your-votes-grid {
+-    display: grid;
+-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+-    gap: 2rem;
+-}
+-
+-.your-vote-card {
+-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(20, 20, 36, 0.9));
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    border-radius: 12px;
+-    padding: 2rem;
+-    position: relative;
+-    overflow: hidden;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-}
+-
+-.your-vote-card:hover {
+-    border-color: #C8AA6E;
+-    transform: translateY(-4px);
+-    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.3);
+-}
+-
+-.your-vote-card.winning {
+-    border-color: #10b981;
+-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+-}
+-
+-.your-vote-card.losing {
+-    border-color: rgba(200, 170, 110, 0.2);
+-}
+-
+-.your-pick-badge {
+-    position: absolute;
+-    top: 1rem;
+-    right: 1rem;
+-    background: #C8AA6E;
+-    color: #0a0a0a;
+-    padding: 0.4rem 0.8rem;
+-    border-radius: 4px;
+-    font-size: 0.75rem;
+-    font-weight: 700;
+-}
+-
+-.vote-matchup {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 1rem;
+-    margin-bottom: 1.5rem;
+-}
+-
+-.vote-song {
+-    display: flex;
+-    align-items: center;
+-    gap: 1rem;
+-}
+-
+-.vote-song img {
+-    width: 80px;
+-    height: 60px;
+-    object-fit: cover;
+-    border-radius: 6px;
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-}
+-
+-.vote-song.opponent img {
+-    opacity: 0.6;
+-}
+-
+-.vote-song-info h4 {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.1rem;
+-    color: #fff;
+-    margin: 0 0 0.25rem 0;
+-}
+-
+-.vote-song-info p {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    margin: 0;
+-}
+-
+-.vote-vs {
+-    text-align: center;
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.9rem;
+-    color: #666;
+-    text-transform: uppercase;
+-    letter-spacing: 0.2em;
+-}
+-
+-.vote-status {
+-    display: flex;
+-    align-items: center;
+-    justify-content: space-between;
+-    padding: 1rem;
+-    background: rgba(0, 0, 0, 0.3);
+-    border-radius: 8px;
+-}
+-
+-.vote-status.winning {
+-    background: rgba(16, 185, 129, 0.1);
+-    border: 1px solid rgba(16, 185, 129, 0.3);
+-}
+-
+-.vote-status.losing {
+-    background: rgba(255, 107, 107, 0.1);
+-    border: 1px solid rgba(255, 107, 107, 0.3);
+-}
+-
+-.status-icon {
+-    font-size: 1.5rem;
+-}
+-
+-.status-text {
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    flex: 1;
+-    text-align: center;
+-}
+-
+-.vote-status.winning .status-text {
+-    color: #10b981;
+-}
+-
+-.vote-status.losing .status-text {
+-    color: #ff6b6b;
+-}
+-
+-.status-votes {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.6);
+-}
+-
+-/* ========================================
+-   MATCHES SECTION (LIVE & RECENT)
+-   ======================================== */
+-.matches-section {
+-    padding: 5rem 0;
+-    background: #0a0a0a;
+-}
+-
+-.matches-grid {
+-    display: grid;
+-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+-    gap: 2rem;
+-}
+-
+-/* ========================================
+-   NEXT MATCH COUNTDOWN (NEW)
+-   ======================================== */
+-.next-match-countdown {
+-    padding: 5rem 0;
+-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.05), rgba(26, 26, 46, 0.8));
+-}
+-
+-.countdown-card {
+-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(20, 20, 36, 1));
+-    border: 2px solid rgba(200, 170, 110, 0.4);
+-    border-radius: 16px;
+-    padding: 3rem;
+-    text-align: center;
+-    max-width: 800px;
+-    margin: 0 auto;
+-}
+-
+-.countdown-label {
+-    display: inline-block;
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.85rem;
+-    font-weight: 600;
+-    color: #C8AA6E;
+-    text-transform: uppercase;
+-    letter-spacing: 0.15em;
+-    margin-bottom: 1rem;
+-}
+-
+-.countdown-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 2rem;
+-    color: #fff;
+-    margin-bottom: 2rem;
+-    letter-spacing: 0.02em;
+-}
+-
+-.countdown-timer {
+-    display: flex;
+-    justify-content: center;
+-    gap: 2rem;
+-    margin: 2rem 0;
+-}
+-
+-.timer-segment {
+-    display: flex;
+-    flex-direction: column;
+-    align-items: center;
+-    gap: 0.5rem;
+-}
+-
+-.timer-number {
+-    font-size: 3rem;
+-    font-weight: 700;
+-    font-family: 'Cinzel', serif;
+-    color: #C8AA6E;
+-    line-height: 1;
+-}
+-
+-.timer-label {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    text-transform: uppercase;
+-    letter-spacing: 0.1em;
+-}
+-
+-.countdown-cta {
+-    display: inline-block;
+-    margin-top: 2rem;
+-    padding: 1rem 2rem;
+-    background: transparent;
+-    color: #C8AA6E;
+-    border: 2px solid rgba(200, 170, 110, 0.4);
+-    border-radius: 8px;
+-    text-decoration: none;
+-    font-family: 'Lora', serif;
+-    font-weight: 600;
+-    transition: all 0.3s ease;
+-}
+-
+-.countdown-cta:hover {
+-    background: rgba(200, 170, 110, 0.1);
+-    border-color: #C8AA6E;
+-    transform: translateY(-2px);
+-}
+-
+-/* ========================================
+-   VIEW ALL MATCHES CTA
+-   ======================================== */
+-.matches-cta {
+-    padding: 5rem 0;
+-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.5), #0a0a0a);
+-}
+-
+-.cta-card {
+-    background: linear-gradient(135deg, rgba(200, 170, 110, 0.1), rgba(200, 170, 110, 0.05));
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    border-radius: 16px;
+-    padding: 4rem 3rem;
+-    text-align: center;
+-}
+-
+-.cta-card h3 {
+-    font-family: 'Cinzel', serif;
+-    font-size: 2rem;
+-    color: #fff;
+-    margin-bottom: 1rem;
+-}
+-
+-.cta-card p {
+-    font-family: 'Lora', serif;
+-    font-size: 1.1rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    margin-bottom: 2rem;
+-}
+-
+-.view-details-btn {
+-    display: inline-block;
+-    padding: 1rem 2.5rem;
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    color: #0a0a0a;
+-    border: none;
+-    border-radius: 8px;
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    text-decoration: none;
+-    transition: all 0.3s ease;
+-}
+-
+-.view-details-btn:hover {
+-    transform: translateY(-2px);
+-    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.4);
+-}
+-
+-/* ========================================
+-   FEATURED BOOK SECTION
+-   ======================================== */
+-.featured-book {
+-    padding: 5rem 0;
+-    background: linear-gradient(180deg, #0a0a0a, rgba(26, 26, 46, 0.5));
+-}
+-
+-.featured-book-content {
+-    display: grid;
+-    grid-template-columns: 1fr 1fr;
+-    gap: 4rem;
+-    align-items: center;
+-}
+-
+-.featured-book-video {
+-    position: relative;
+-}
+-
+-.video-container {
+-    position: relative;
+-    padding-bottom: 56.25%;
+-    height: 0;
+-    overflow: hidden;
+-    border-radius: 12px;
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-}
+-
+-.video-wrapper {
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    width: 100%;
+-    height: 100%;
+-}
+-
+-.video-wrapper iframe {
+-    width: 100%;
+-    height: 100%;
+-}
+-
+-.video-caption {
+-    margin-top: 1rem;
+-    text-align: center;
+-}
+-
+-.video-caption h4 {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.2rem;
+-    color: #C8AA6E;
+-    margin-bottom: 0.25rem;
+-}
+-
+-.video-caption p {
+-    font-size: 0.9rem;
+-    color: rgba(255, 255, 255, 0.6);
+-}
+-
+-.featured-book-info {
+-    padding: 2rem;
+-}
+-
+-.book-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 2.2rem;
+-    color: #C8AA6E;
+-    margin-bottom: 0.5rem;
+-}
+-
+-.book-author {
+-    font-family: 'Lora', serif;
+-    font-size: 1.1rem;
+-    color: rgba(255, 255, 255, 0.7);
+-    margin-bottom: 1.5rem;
+-}
+-
+-.book-description {
+-    font-family: 'Lora', serif;
+-    font-size: 1.05rem;
+-    line-height: 1.7;
+-    color: rgba(255, 255, 255, 0.8);
+-    margin-bottom: 1.5rem;
+-}
+-
+-.book-highlights {
+-    list-style: none;
+-    padding: 0;
+-    margin-bottom: 2rem;
+-}
+-
+-.book-highlights li {
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    color: rgba(255, 255, 255, 0.7);
+-    padding: 0.5rem 0;
+-}
+-
+-.featured-book-cta {
+-    display: inline-block;
+-    padding: 1rem 2rem;
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    color: #0a0a0a;
+-    border: none;
+-    border-radius: 8px;
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    text-decoration: none;
+-    transition: all 0.3s ease;
+-    margin-bottom: 1rem;
+-}
+-
+-.featured-book-cta:hover {
+-    transform: translateY(-2px);
+-    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.4);
+-}
+-
+-.book-disclaimer {
+-    font-size: 0.8rem;
+-    color: rgba(255, 255, 255, 0.4);
+-    font-style: italic;
+-}
+-
+-/* ========================================
+-   HOW IT WORKS SECTION
+-   ======================================== */
+-.how-it-works {
+-    padding: 5rem 0;
+-    background: #0a0a0a;
+-}
+-
+-.steps-grid {
+-    display: grid;
+-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+-    gap: 3rem;
+-}
+-
+-.step-card {
+-    background: rgba(26, 26, 46, 0.6);
+-    border: 2px solid rgba(200, 170, 110, 0.2);
+-    border-radius: 12px;
+-    padding: 2.5rem 2rem;
+-    text-align: center;
+-    transition: all 0.3s ease;
+-    position: relative;
+-}
+-
+-.step-card:hover {
+-    border-color: rgba(200, 170, 110, 0.5);
+-    transform: translateY(-4px);
+-    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.2);
+-}
+-
+-.step-number {
+-    position: absolute;
+-    top: -1.5rem;
+-    left: 50%;
+-    transform: translateX(-50%);
+-    width: 3rem;
+-    height: 3rem;
+-    background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+-    border-radius: 50%;
+-    display: flex;
+-    align-items: center;
+-    justify-content: center;
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.5rem;
+-    font-weight: 700;
+-    color: #0a0a0a;
+-    box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
+-}
+-
+-.step-icon {
+-    margin: 1rem 0 1.5rem;
+-    color: #C8AA6E;
+-}
+-
+-.step-icon svg {
+-    width: 48px;
+-    height: 48px;
+-}
+-
+-.step-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.4rem;
+-    color: #fff;
+-    margin-bottom: 1rem;
+-    letter-spacing: 0.02em;
+-}
+-
+-.step-description {
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    line-height: 1.6;
+-    color: rgba(255, 255, 255, 0.7);
+-}
+-
+-/* ========================================
+-   FADE-IN ANIMATIONS
+-   ======================================== */
+-.homepage-fade-in {
+-    animation: fadeInUp 0.6s ease forwards;
+-    opacity: 0;
+-}
+-
+-.stagger-1 { animation-delay: 0.1s; }
+-.stagger-2 { animation-delay: 0.2s; }
+-.stagger-3 { animation-delay: 0.3s; }
+-.stagger-4 { animation-delay: 0.4s; }
+-.stagger-5 { animation-delay: 0.5s; }
+-.stagger-6 { animation-delay: 0.6s; }
+-
+-@keyframes fadeInUp {
+-    from {
+-        opacity: 0;
+-        transform: translateY(30px);
+-    }
+-    to {
+-        opacity: 1;
+-        transform: translateY(0);
+-    }
+-}
+-
+-/* ========================================
+-   RESPONSIVE DESIGN
+-   ======================================== */
+-
+-/* Tablets */
+-@media (max-width: 1024px) {
+-    .hero-title {
+-        font-size: 3rem;
+-    }
+-    
+-    .hero-stats {
+-        gap: 3rem;
+-    }
+-    
+-    .stat-number {
+-        font-size: 2.5rem;
+-    }
+-    
+-    .featured-match-inner {
+-        grid-template-columns: 1fr;
+-        gap: 2rem;
+-    }
+-    
+-    .featured-thumbnails {
+-        justify-content: center;
+-    }
+-    
+-    .featured-book-content {
+-        grid-template-columns: 1fr;
+-        gap: 3rem;
+-    }
+-    
+-    .matches-grid {
+-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+-    }
+-}
+-
+-/* Mobile */
+-@media (max-width: 768px) {
+-    .hero {
+-        padding: 6rem 0 4rem;
+-    }
+-    
+-    .hero-title {
+-        font-size: 2.25rem;
+-    }
+-    
+-    .hero-subtitle {
+-        font-size: 1.1rem;
+-    }
+-    
+-    .hero-stats {
+-        flex-direction: column;
+-        gap: 2rem;
+-    }
+-    
+-    .hero-actions {
+-        flex-direction: column;
+-        gap: 1rem;
+-    }
+-    
+-    .btn-primary,
+-    .btn-secondary {
+-        width: 100%;
+-        justify-content: center;
+-    }
+-    
+-    .section-title {
+-        font-size: 2rem;
+-    }
+-    
+-    .section-subtitle {
+-        font-size: 1rem;
+-    }
+-    
+-    .featured-thumbnails {
+-        flex-direction: column;
+-        gap: 1rem;
+-    }
+-    
+-    .thumbnail-wrapper {
+-        width: 100%;
+-        height: 200px;
+-    }
+-    
+-    .featured-vs {
+-        flex-direction: row;
+-        gap: 1rem;
+-    }
+-    
+-    .vs-progress-bar {
+-        width: 120px;
+-        height: 4px;
+-        flex-direction: row;
+-    }
+-    
+-    .bar-fill.left {
+-        bottom: 0;
+-        left: 0;
+-        height: 100%;
+-    }
+-    
+-    .bar-fill.right {
+-        top: 0;
+-        right: 0;
+-        height: 100%;
+-    }
+-    
+-    .song-pair {
+-        grid-template-columns: 1fr;
+-        gap: 1.5rem;
+-    }
+-    
+-    .your-votes-grid {
+-        grid-template-columns: 1fr;
+-    }
+-    
+-    .matches-grid {
+-        grid-template-columns: 1fr;
+-    }
+-    
+-    .countdown-timer {
+-        gap: 1rem;
+-    }
+-    
+-    .timer-number {
+-        font-size: 2.5rem;
+-    }
+-    
+-    .timer-label {
+-        font-size: 0.75rem;
+-    }
+-    
+-    .steps-grid {
+-        grid-template-columns: 1fr;
+-        gap: 3rem;
+-    }
+-    
+-    .featured-book-content {
+-        gap: 2rem;
+-    }
+-    
+-    .book-title {
+-        font-size: 1.8rem;
+-    }
+-    
+-    .view-all-inline {
+-        display: block;
+-        margin-left: 0;
+-        margin-top: 0.5rem;
+-    }
+-}
+-
+-/* Small Mobile */
+-@media (max-width: 480px) {
+-    .hero-title {
+-        font-size: 1.75rem;
+-    }
+-    
+-    .stat-number {
+-        font-size: 2rem;
+-    }
+-    
+-    .stat-label {
+-        font-size: 0.8rem;
+-    }
+-    
+-    .section-title {
+-        font-size: 1.75rem;
+-    }
+-    
+-    .tournament-badge {
+-        flex-wrap: wrap;
+-        justify-content: center;
+-    }
+-    
+-    .badge-status {
+-        width: 100%;
+-        text-align: center;
+-        margin-top: 0.5rem;
+-    }
+-    
+-    .featured-match-card {
+-        padding: 1.5rem;
+-    }
+-    
+-    .song-title {
+-        font-size: 1.2rem;
+-    }
+-    
+-    .featured-cta {
+-        padding: 1.25rem;
+-        font-size: 1rem;
+-    }
+-    
+-    .countdown-card {
+-        padding: 2rem 1.5rem;
+-    }
+-    
+-    .countdown-title {
+-        font-size: 1.5rem;
+-    }
+-    
+-    .timer-number {
+-        font-size: 2rem;
+-    }
+-    
+-    .cta-card {
+-        padding: 3rem 2rem;
+-    }
+-    
+-    .cta-card h3 {
+-        font-size: 1.5rem;
+-    }
+-}
+-
+-/* ========================================
+-   UTILITY CLASSES
+-   ======================================== */
+-.no-results {
+-    grid-column: 1 / -1;
+-    text-align: center;
+-    padding: 5rem 2rem;
+-}
+-
+-.no-results-icon {
+-    font-size: 5rem;
+-    margin-bottom: 1.5rem;
+-    opacity: 0.5;
+-}
+-
+-.no-results-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 2rem;
+-    color: #C8AA6E;
+-    margin-bottom: 1rem;
+-}
+-
+-.no-results-text {
+-    font-family: 'Lora', serif;
+-    font-size: 1.1rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    line-height: 1.6;
+-    max-width: 600px;
+-    margin: 0 auto;
+-}
+-
+-/* Dark mode support (if needed) */
+-@media (prefers-color-scheme: dark) {
+-    /* Already dark by default */
+-}
+-
+-/* Print styles */
+-@media print {
+-    .hero-background,
+-    .hero-overlay,
+-    .hero-actions,
+-    .featured-cta,
+-    .countdown-cta,
+-    .view-details-btn,
+-    .featured-book-cta {
+-        display: none;
+-    }
+-    
+-    .hero {
+-        padding: 2rem 0;
+-    }
+-    
+-    .featured-match-card,
+-    .your-vote-card,
+-    .countdown-card {
+-        border: 1px solid #ccc;
+-        page-break-inside: avoid;
+-    }
+-}
+-/* ========================================
+-   YOUR ACTIVE VOTES - CUSTOM CARDS
+-   ======================================== */
+-
+-.your-votes-section {
+-    padding: 5rem 0;
+-    background: linear-gradient(180deg, rgba(26, 26, 46, 0.5), rgba(10, 10, 30, 0.8));
+-}
+-
+-.your-votes-grid {
+-    display: grid;
+-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+-    gap: 2rem;
+-}
+-
+-.your-vote-card {
+-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(20, 20, 36, 0.9));
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    border-radius: 12px;
+-    padding: 2rem;
+-    position: relative;
+-    overflow: hidden;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-}
+-
+-.your-vote-card:hover {
+-    border-color: #C8AA6E;
+-    transform: translateY(-4px);
+-    box-shadow: 0 6px 24px rgba(200, 170, 110, 0.3);
+-}
+-
+-.your-vote-card.winning {
+-    border-color: #10b981;
+-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+-}
+-
+-.your-vote-card.losing {
+-    border-color: rgba(200, 170, 110, 0.2);
+-}
+-
+-.your-pick-badge {
+-    position: absolute;
+-    top: 1rem;
+-    right: 1rem;
+-    background: #C8AA6E;
+-    color: #0a0a0a;
+-    padding: 0.4rem 0.8rem;
+-    border-radius: 4px;
+-    font-size: 0.75rem;
+-    font-weight: 700;
+-    z-index: 2;
+-}
+-
+-.vote-matchup {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 1rem;
+-    margin-bottom: 1.5rem;
+-}
+-
+-.vote-song {
+-    display: flex;
+-    align-items: center;
+-    gap: 1rem;
+-}
+-
+-.vote-song-img {
+-    width: 80px;
+-    height: 60px;
+-    object-fit: cover;
+-    border-radius: 6px;
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    transition: all 0.3s ease;
+-}
+-
+-.your-vote-card:hover .vote-song-img {
+-    border-color: rgba(200, 170, 110, 0.6);
+-}
+-
+-.vote-song.opponent .vote-song-img {
+-    opacity: 0.6;
+-    filter: grayscale(20%);
+-}
+-
+-.vote-song-info h4 {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1rem;
+-    color: #fff;
+-    margin: 0 0 0.25rem 0;
+-    line-height: 1.2;
+-}
+-
+-.vote-song-info p {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.6);
+-    margin: 0;
+-}
+-
+-.vote-vs {
+-    text-align: center;
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.9rem;
+-    color: #666;
+-    text-transform: uppercase;
+-    letter-spacing: 0.2em;
+-    padding: 0.5rem 0;
+-}
+-
+-.vote-status {
+-    display: flex;
+-    align-items: center;
+-    justify-content: space-between;
+-    padding: 1rem;
+-    background: rgba(0, 0, 0, 0.3);
+-    border-radius: 8px;
+-    margin-bottom: 1rem;
+-}
+-
+-.vote-status.winning {
+-    background: rgba(16, 185, 129, 0.1);
+-    border: 1px solid rgba(16, 185, 129, 0.3);
+-}
+-
+-.vote-status.losing {
+-    background: rgba(255, 107, 107, 0.1);
+-    border: 1px solid rgba(255, 107, 107, 0.3);
+-}
+-
+-.status-icon {
+-    font-size: 1.5rem;
+-}
+-
+-.status-text {
+-    font-family: 'Lora', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    flex: 1;
+-    text-align: center;
+-}
+-
+-.vote-status.winning .status-text {
+-    color: #10b981;
+-}
+-
+-.vote-status.losing .status-text {
+-    color: #ff6b6b;
+-}
+-
+-.status-votes {
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.6);
+-}
+-
+-.vote-time {
+-    text-align: center;
+-    padding: 0.75rem;
+-    background: rgba(0, 0, 0, 0.3);
+-    border-radius: 6px;
+-    font-size: 0.85rem;
+-    color: rgba(255, 255, 255, 0.7);
+-    font-weight: 600;
+-}
+-
+-/* ========================================
+-   SEO INTRO SECTION
+-   ======================================== */
+-.seo-intro {
+-    padding: 3rem 0 4rem;
+-    background: linear-gradient(180deg, #0a0a0a, rgba(26, 26, 46, 0.5));
+-}
+-
+-.seo-intro-content {
+-    max-width: 900px;
+-    margin: 0 auto;
+-    font-family: 'Lora', serif;
+-    font-size: 1.1rem;
+-    line-height: 1.8;
+-    color: rgba(255, 255, 255, 0.85);
+-    text-align: center;
+-}
+-
+-.seo-intro-content p {
+-    margin-bottom: 1.5rem;
+-}
+-
+-.seo-intro-content p:last-child {
+-    margin-bottom: 0;
+-}
+-
+-.seo-intro-content strong {
+-    color: #C8AA6E;
+-    font-weight: 600;
+-}
+-
+-/* Responsive */
+-@media (max-width: 768px) {
+-    .seo-intro {
+-        padding: 2rem 0 3rem;
+-    }
+-    
+-    .seo-intro-content {
+-        font-size: 1rem;
+-        line-height: 1.7;
+-    }
+-}
+-
+-/* Responsive */
+-@media (max-width: 768px) {
+-    .your-votes-grid {
+-        grid-template-columns: 1fr;
+-    }
+-    
+-    .vote-song-img {
+-        width: 60px;
+-        height: 45px;
+-    }
+-    
+-    .vote-song-info h4 {
+-        font-size: 0.9rem;
+-    }
+-    
+-    .vote-song-info p {
+-        font-size: 0.75rem;
+-    }
+-}
+-/* Gold icon styling for homepage */
+-.badge-icon i {
+-    color: #C8AA6E;
+-    font-size: 1.5rem;
+-    animation: pulse-music 2s ease-in-out infinite;
+-}
+-
+-@keyframes pulse-music {
+-    0%, 100% {
+-        transform: scale(1);
+-    }
+-    50% {
+-        transform: scale(1.1);
+-    }
+-}
+-
+-.section-label i {
+-    color: #C8AA6E;
+-    margin-right: 8px;
+-    filter: drop-shadow(0 0 8px rgba(200, 170, 110, 0.4));
+-}
+-
+-.section-subtitle i {
+-    color: #ff4444;
+-    animation: pulse-live 2s ease-in-out infinite;
+-}
+-
+-@keyframes pulse-live {
+-    0%, 100% {
+-        opacity: 1;
+-    }
+-    50% {
+-        opacity: 0.5;
+-    }
+-}
+-
+-.countdown-label i {
+-    color: #C8AA6E;
+-    margin-right: 8px;
+-}
+-
+-.book-highlights li i {
+-    color: #4aff4a;
+-    margin-right: 8px;
+-}
+-
+-/* Hero badge animation */
+-.hero .badge-icon i {
+-    animation: float-icon 3s ease-in-out infinite;
+-}
+-
+-@keyframes float-icon {
+-    0%, 100% {
+-        transform: translateY(0);
+-    }
+-    50% {
+-        transform: translateY(-5px);
+-    }
+-}
+\ No newline at end of file
+diff --git a/css/youtube-playlist.css b/css/youtube-playlist.css
+deleted file mode 100644
+index dce0136..0000000
+--- a/css/youtube-playlist.css
++++ /dev/null
+@@ -1,431 +0,0 @@
+-/* ========================================
+-   YOUTUBE PLAYLIST SECTION
+-   ======================================== */
+-
+-.youtube-playlist-section {
+-    padding: 5rem 0;
+-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+-    border-top: 1px solid rgba(200, 170, 110, 0.2);
+-}
+-
+-.youtube-playlist-section .section-header {
+-    text-align: center;
+-    margin-bottom: 3rem;
+-}
+-
+-.youtube-playlist-section .section-label {
+-    display: inline-block;
+-    font-family: 'Cinzel', serif;
+-    font-size: 0.85rem;
+-    font-weight: 600;
+-    color: #C8AA6E;
+-    text-transform: uppercase;
+-    letter-spacing: 0.15em;
+-    margin-bottom: 1rem;
+-}
+-
+-.youtube-playlist-section .section-title {
+-    font-family: 'Cinzel', serif;
+-    font-size: 3rem;
+-    font-weight: 700;
+-    color: #fff;
+-    margin: 1rem 0;
+-    letter-spacing: 0.05em;
+-}
+-
+-.youtube-playlist-section .section-subtitle {
+-    font-family: 'Lora', serif;
+-    font-size: 1.2rem;
+-    color: #999;
+-    margin: 0;
+-}
+-
+-/* ========================================
+-   VIDEO CAROUSEL
+-   ======================================== */
+-
+-.video-carousel-wrapper {
+-    position: relative;
+-    margin-bottom: 3rem;
+-    padding: 0 20px;
+-}
+-
+-.video-carousel {
+-    display: flex;
+-    gap: 1.5rem;
+-    overflow-x: auto;
+-    scroll-behavior: smooth;
+-    padding: 1.5rem 0;
+-    -webkit-overflow-scrolling: touch;
+-}
+-
+-/* Scrollbar styling to match theme */
+-.video-carousel::-webkit-scrollbar {
+-    height: 8px;
+-}
+-
+-.video-carousel::-webkit-scrollbar-track {
+-    background: rgba(0, 0, 0, 0.4);
+-    border-radius: 4px;
+-}
+-
+-.video-carousel::-webkit-scrollbar-thumb {
+-    background: rgba(200, 170, 110, 0.4);
+-    border-radius: 4px;
+-    transition: background 0.3s;
+-}
+-
+-.video-carousel::-webkit-scrollbar-thumb:hover {
+-    background: rgba(200, 170, 110, 0.6);
+-}
+-
+-/* ========================================
+-   VIDEO THUMBNAIL CARDS
+-   ======================================== */
+-
+-.video-thumbnail-card {
+-    position: relative;
+-    min-width: 200px;
+-    width: 200px;
+-    height: 280px;
+-    border-radius: 12px;
+-    overflow: hidden;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-    background: rgba(0, 0, 0, 0.6);
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-    flex-shrink: 0;
+-}
+-
+-.video-thumbnail-card:hover {
+-    transform: translateY(-8px);
+-    border-color: rgba(200, 170, 110, 0.6);
+-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+-}
+-
+-.video-thumbnail-card.active {
+-    border-color: #C8AA6E;
+-    box-shadow: 0 8px 24px rgba(200, 170, 110, 0.4);
+-}
+-
+-.video-thumbnail-card img {
+-    width: 100%;
+-    height: 200px;
+-    object-fit: cover;
+-    transition: transform 0.3s ease;
+-}
+-
+-.video-thumbnail-card:hover img {
+-    transform: scale(1.05);
+-}
+-
+-/* Play overlay */
+-.video-card-overlay {
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    right: 0;
+-    height: 200px;
+-    display: flex;
+-    align-items: center;
+-    justify-content: center;
+-    background: rgba(0, 0, 0, 0.5);
+-    opacity: 0;
+-    transition: opacity 0.3s ease;
+-}
+-
+-.video-thumbnail-card:hover .video-card-overlay {
+-    opacity: 1;
+-}
+-
+-.video-card-overlay i {
+-    font-size: 48px;
+-    color: #C8AA6E;
+-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+-}
+-
+-/* Video title */
+-.video-card-title {
+-    padding: 1rem;
+-    font-family: 'Lora', serif;
+-    font-size: 0.9rem;
+-    font-weight: 600;
+-    color: #fff;
+-    line-height: 1.4;
+-    height: 80px;
+-    display: flex;
+-    align-items: center;
+-    background: rgba(0, 0, 0, 0.3);
+-}
+-
+-/* ========================================
+-   VIDEO PLAYER
+-   ======================================== */
+-
+-.youtube-player-container {
+-    max-width: 1000px;
+-    margin: 0 auto 3rem;
+-    padding: 0 20px;
+-}
+-
+-.player-wrapper {
+-    position: relative;
+-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+-    height: 0;
+-    overflow: hidden;
+-    border-radius: 12px;
+-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+-    border: 2px solid rgba(200, 170, 110, 0.3);
+-}
+-
+-.player-wrapper iframe {
+-    position: absolute;
+-    top: 0;
+-    left: 0;
+-    width: 100%;
+-    height: 100%;
+-}
+-
+-/* ========================================
+-   PLAYLIST CTA
+-   ======================================== */
+-
+-.playlist-cta {
+-    text-align: center;
+-    padding: 0 20px;
+-}
+-
+-.playlist-cta .btn {
+-    display: inline-flex;
+-    align-items: center;
+-    justify-content: center;
+-    gap: 0.75rem;
+-    padding: 1rem 2rem;
+-    background: transparent;
+-    border: 2px solid #C8AA6E;
+-    border-radius: 8px;
+-    color: #C8AA6E;
+-    font-family: 'Cinzel', serif;
+-    font-size: 1rem;
+-    font-weight: 600;
+-    text-transform: uppercase;
+-    letter-spacing: 0.1em;
+-    text-decoration: none;
+-    cursor: pointer;
+-    transition: all 0.3s ease;
+-}
+-
+-.playlist-cta .btn:hover {
+-    background: #C8AA6E;
+-    color: #0a0a0a;
+-    transform: translateY(-2px);
+-    box-shadow: 0 8px 20px rgba(200, 170, 110, 0.3);
+-}
+-
+-.playlist-cta .btn i {
+-    font-size: 1.25rem;
+-}
+-
+-/* ========================================
+-   LOADING STATE
+-   ======================================== */
+-
+-.youtube-playlist-section .loading-content {
+-    text-align: center;
+-    padding: 5rem 2rem;
+-}
+-
+-.youtube-playlist-section .loader {
+-    width: 60px;
+-    height: 60px;
+-    border: 5px solid rgba(200, 170, 110, 0.2);
+-    border-top-color: #C8AA6E;
+-    border-radius: 50%;
+-    animation: spin 1s linear infinite;
+-    margin: 0 auto 2rem;
+-}
+-
+-@keyframes spin {
+-    to { transform: rotate(360deg); }
+-}
+-
+-.youtube-playlist-section .loading-text {
+-    font-family: 'Cinzel', serif;
+-    font-size: 1.5rem;
+-    color: #C8AA6E;
+-    margin-bottom: 0.5rem;
+-}
+-
+-/* ========================================
+-   RESPONSIVE DESIGN
+-   ======================================== */
+-
+-@media (max-width: 968px) {
+-    .youtube-playlist-section .section-title {
+-        font-size: 2.5rem;
+-    }
+-    
+-    .youtube-playlist-section .section-subtitle {
+-        font-size: 1.1rem;
+-    }
+-    
+-    .video-thumbnail-card {
+-        min-width: 180px;
+-        width: 180px;
+-        height: 260px;
+-    }
+-    
+-    .video-thumbnail-card img {
+-        height: 180px;
+-    }
+-    
+-    .video-card-overlay {
+-        height: 180px;
+-    }
+-    
+-    .video-card-overlay i {
+-        font-size: 40px;
+-    }
+-}
+-
+-@media (max-width: 768px) {
+-    .youtube-playlist-section {
+-        padding: 4rem 0;
+-    }
+-    
+-    .youtube-playlist-section .section-title {
+-        font-size: 2rem;
+-    }
+-    
+-    .youtube-playlist-section .section-subtitle {
+-        font-size: 1rem;
+-    }
+-    
+-    .video-carousel {
+-        gap: 1rem;
+-    }
+-    
+-    .video-thumbnail-card {
+-        min-width: 160px;
+-        width: 160px;
+-        height: 240px;
+-    }
+-    
+-    .video-thumbnail-card img {
+-        height: 160px;
+-    }
+-    
+-    .video-card-overlay {
+-        height: 160px;
+-    }
+-    
+-    .video-card-overlay i {
+-        font-size: 36px;
+-    }
+-    
+-    .video-card-title {
+-        font-size: 0.85rem;
+-        padding: 0.75rem;
+-    }
+-    
+-    .playlist-cta .btn {
+-        padding: 0.875rem 1.75rem;
+-        font-size: 0.9rem;
+-    }
+-}
+-
+-@media (max-width: 480px) {
+-    .youtube-playlist-section .section-title {
+-        font-size: 1.75rem;
+-    }
+-    
+-    .video-thumbnail-card {
+-        min-width: 140px;
+-        width: 140px;
+-        height: 220px;
+-    }
+-    
+-    .video-thumbnail-card img {
+-        height: 140px;
+-    }
+-    
+-    .video-card-overlay {
+-        height: 140px;
+-    }
+-    
+-    .video-card-overlay i {
+-        font-size: 32px;
+-    }
+-    
+-    .playlist-cta .btn {
+-        width: 100%;
+-        padding: 0.75rem 1.5rem;
+-        font-size: 0.85rem;
+-    }
+-}
+-
+-/* ========================================
+-   FADE IN ANIMATION
+-   ======================================== */
+-
+-.youtube-playlist-section.fade-in {
+-    animation: fadeInUp 0.6s ease;
+-}
+-
+-@keyframes fadeInUp {
+-    from {
+-        opacity: 0;
+-        transform: translateY(20px);
+-    }
+-    to {
+-        opacity: 1;
+-        transform: translateY(0);
+-    }
+-}
+-/* ========================================
+-   VIDEO PLAYER - SMOOTH REVEAL
+-   ======================================== */
+-
+-.youtube-player-container {
+-    max-width: 1000px;
+-    margin: 0 auto 3rem;
+-    padding: 0 20px;
+-    opacity: 0;
+-    transform: translateY(20px);
+-    transition: opacity 0.4s ease, transform 0.4s ease;
+-}
+-
+-/* ✅ Show with animation when display changes */
+-.youtube-player-container[style*="display: block"] {
+-    animation: fadeInUp 0.5s ease forwards;
+-}
+-
+-@keyframes fadeInUp {
+-    from {
+-        opacity: 0;
+-        transform: translateY(20px);
+-    }
+-    to {
+-        opacity: 1;
+-        transform: translateY(0);
+-    }
+-}
+-.player-close-btn {
+-    position: absolute;
+-    top: 10px;
+-    right: 10px;
+-    width: 36px;
+-    height: 36px;
+-    background: rgba(0, 0, 0, 0.8);
+-    border: 1px solid rgba(200, 170, 110, 0.4);
+-    border-radius: 50%;
+-    color: #C8AA6E;
+-    cursor: pointer;
+-    z-index: 10;
+-    transition: all 0.3s ease;
+-}
+-
+-.player-close-btn:hover {
+-    background: rgba(200, 170, 110, 0.2);
+-    border-color: #C8AA6E;
+-}
+\ No newline at end of file
+diff --git a/index-old.html b/index-old.html
+deleted file mode 100644
+index 39b1d35..0000000
+--- a/index-old.html
++++ /dev/null
+@@ -1,510 +0,0 @@
+-<!DOCTYPE html>
+-<html lang="en">
+-<head>
+-    <meta charset="UTF-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-<title>League of Legends Music Tournament | Vote for Best LoL Songs | Anthem Arena</title>
+-<meta name="description" content="Vote for your favorite League of Legends music videos! K/DA, Worlds anthems, Pentakill & more compete in our interactive tournament. No account needed - vote now!">
+-    <!-- Favicon -->
+-    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+-    
+-    <!-- PWA Manifest -->
+-    <link rel="manifest" href="/site.webmanifest">
+-    <meta name="theme-color" content="#c89b3c">
+-    
+-    <!-- Open Graph -->
+-    <meta property="og:type" content="website">
+-    <meta property="og:url" content="https://anthemarena.com/">
+-    <meta property="og:title" content="Anthem Arena - League Music Tournament">
+-    <meta property="og:description" content="Vote for your favorite League of Legends music videos!">
+-    <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Tournament Logo">
+-<meta property="og:image:width" content="1200">
+-<meta property="og:image:height" content="630">
+-    
+-    <!-- Twitter -->
+-    <meta name="twitter:card" content="summary_large_image">
+-    <meta name="twitter:title" content="Anthem Arena - League Music Tournament">
+-    <meta name="twitter:description" content="Vote for your favorite League of Legends music videos!">
+-    <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
+-    <meta name="twitter:image:alt" content="Anthem Arena - League of Legends Music Tournament">
+-
+-    
+-    <!-- Fonts -->
+-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+-    
+-    <!-- Stylesheets -->
+-    <link rel="stylesheet" href="/css/main.css">
+-    <link rel="stylesheet" href="/css/navigation.css">
+-    <link rel="stylesheet" href="/css/vote.css">
+-    <link rel="stylesheet" href="/css/matches.css">
+-    <link rel="stylesheet" href="/css/homepage.css">
+-    <link rel="stylesheet" href="/css/footer.css">
+-    <link rel="stylesheet" href="/css/scrollbar.css">
+-        <link rel="stylesheet" href="/css/internal-links.css">
+-
+-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+-    <link rel="stylesheet" href="/css/youtube-playlist.css">
+-    <link rel="stylesheet" href="/css/settings.css">
+-
+-    <!-- Schema.org Structured Data -->
+-<script type="application/ld+json">
+-{
+-  "@context": "https://schema.org",
+-  "@type": "WebSite",
+-  "name": "Anthem Arena",
+-  "alternateName": "League of Legends Music Tournament",
+-  "url": "https://anthemarena.com",
+-  "description": "Interactive League of Legends music video tournament where fans vote for their favorite LoL songs including K/DA, Pentakill, True Damage, Heartsteel, and Worlds anthems.",
+-  "potentialAction": {
+-    "@type": "VoteAction",
+-    "target": {
+-      "@type": "EntryPoint",
+-      "urlTemplate": "https://anthemarena.com"
+-    }
+-  },
+-  "keywords": "League of Legends music, LoL music tournament, K/DA, Pentakill, Worlds anthem, True Damage, Heartsteel, gaming music"
+-}
+-</script>
+-
+-<script type="application/ld+json">
+-{
+-  "@context": "https://schema.org",
+-  "@type": "FAQPage",
+-  "mainEntity": [
+-    {
+-      "@type": "Question",
+-      "name": "What is Anthem Arena?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "Anthem Arena is an interactive tournament where League of Legends fans vote for their favorite music videos. The platform features all LoL music including virtual bands like K/DA, Pentakill, True Damage, Heartsteel, and Worlds Championship anthems. Fans can watch matchups and vote to determine which song becomes the champion."
+-      }
+-    },
+-    {
+-      "@type": "Question",
+-      "name": "How do I vote in the League of Legends music tournament?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "Voting is simple and free. Watch the two competing music videos in each matchup, then click on your favorite to cast your vote. No account creation or sign-up is required. Each voting period lasts 48 hours, giving you plenty of time to participate."
+-      }
+-    },
+-    {
+-      "@type": "Question",
+-      "name": "Do I need to create an account to vote?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "No! Voting on Anthem Arena is completely free and doesn't require any account creation, registration, or sign-up. Just visit the site, watch the videos, and vote for your favorites."
+-      }
+-    },
+-    {
+-      "@type": "Question",
+-      "name": "What League of Legends music is featured in the tournament?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "The tournament features all official League of Legends music videos including virtual bands (K/DA, Pentakill, True Damage, Heartsteel), Worlds Championship anthems from artists like Imagine Dragons and Lil Nas X, champion theme songs, and cinematic music videos released by Riot Games since 2014."
+-      }
+-    },
+-    {
+-      "@type": "Question",
+-      "name": "How long does each voting round last?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "Each matchup voting period lasts 48 hours. This gives fans around the world time to watch both videos and cast their votes. New matches start regularly as videos advance through the tournament bracket."
+-      }
+-    },
+-    {
+-      "@type": "Question",
+-      "name": "Can I see the tournament bracket?",
+-      "acceptedAnswer": {
+-        "@type": "Answer",
+-        "text": "Yes! You can view the complete tournament bracket showing all matchups, results, and upcoming battles. The bracket shows which videos have advanced and tracks the path to crowning the ultimate champion."
+-      }
+-    }
+-  ]
+-}
+-</script>
+-<meta name="p:domain_verify" content="62697b3c9ef42c0a2961241e1ee4bdca"/>
+-
+-<!-- ✅ CRITICAL: Load global systems FIRST in HEAD -->
+-    <script type="module" src="/js/firebase-config.js"></script>
+-    <script type="module" src="/js/notification-storage.js"></script>
+-    <script type="module" src="/js/notification-center.js"></script>
+-
+-    <script type="module" src="/js/global-notifications.js"></script>
+-
+-</head>
+-
+-
+-
+-<body>
+-    <div id="nav-placeholder"></div>
+-    
+-    <script type="module" src="/js/navigation.js"></script>
+-
+-    <!-- HERO SECTION -->
+-    <section class="hero">
+-        <div class="hero-background"></div>
+-        <div class="hero-overlay"></div>
+-        
+-        <div class="container hero-content">
+-            <div class="tournament-badge">
+-                <span class="badge-icon"><i class="fa-solid fa-music"></i></span>
+-                <span class="badge-text" id="tournamentName">Loading...</span>
+-                <span class="badge-status" id="tournamentStatus">Live</span>
+-            </div>
+-            
+-<h1 class="hero-title">League of Legends Music Video Tournament</h1>
+-
+-            <p class="hero-subtitle">
+-                Which League of Legends music video is the greatest?<br>
+-                Watch, vote for your favorites, and crown the champion.
+-            </p>
+-            
+-            <div class="hero-stats">
+-                <div class="stat-item">
+-                    <span class="stat-number" id="totalVideos">64</span>
+-                    <span class="stat-label">Music Videos</span>
+-                </div>
+-                <div class="stat-item">
+-                    <span class="stat-number" id="totalVotes">0</span>
+-                    <span class="stat-label">Total Votes</span>
+-                </div>
+-                <div class="stat-item">
+-                    <span class="stat-number" id="matchesLeft">0</span>
+-                    <span class="stat-label">Active Matches</span>
+-                </div>
+-            </div>
+-            
+-            <div class="hero-actions">
+-                <a href="#featured-matchup" class="btn-primary">
+-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+-                    </svg>
+-                    Vote Now
+-                </a>
+-                <a href="/brackets.html" class="btn-secondary">
+-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                        <rect x="3" y="3" width="7" height="7"></rect>
+-                        <rect x="14" y="3" width="7" height="7"></rect>
+-                        <rect x="14" y="14" width="7" height="7"></rect>
+-                        <rect x="3" y="14" width="7" height="7"></rect>
+-                    </svg>
+-                    View Bracket
+-                </a>
+-            </div>
+-        </div>
+-    </section>
+-
+-  <!-- SEO CONTENT SECTION -->
+-<section class="seo-intro">
+-    <div class="container">
+-        <div class="seo-intro-content">
+-            <h2>The Ultimate League of Legends Music Tournament</h2>
+-            <p>
+-                Welcome to <strong>Anthem Arena</strong>, where the League of Legends community decides 
+-                which music video reigns supreme! Since 2014, Riot Games has created legendary music 
+-                featuring virtual bands like <strong>K/DA</strong>, <strong>Pentakill</strong>, 
+-                <strong>True Damage</strong>, and <strong>Heartsteel</strong>, plus iconic 
+-                <strong>Worlds Championship anthems</strong> from artists like Imagine Dragons, 
+-                Lil Nas X, and Newjeans.
+-            </p>
+-            <p>
+-                Browse our complete <a href="/music-gallery.html">music gallery</a> featuring all 64 
+-                competing songs, view the <a href="/brackets.html">tournament bracket</a> to see the 
+-                full competition structure, or jump straight to <a href="/matches.html">active voting matches</a> to cast your vote.
+- Check <a href="/stats.html">live statistics</a> to track which songs are dominating, 
+-                or visit your <a href="/my-votes.html">voting history</a> to see your predictions 
+-                and unlock achievements.
+-            </p>
+-            <p>
+-No account required—just <a href="/matches.html">watch, vote, and crown the champion</a>!
+-                New matches every 48 hours. Join thousands of League fans celebrating the best gaming 
+-                music ever created.
+-            </p>
+-        </div>
+-    </div>
+-</section>
+-
+-    <!-- LOADING STATE -->
+-    <section class="homepage-loading-state" id="homepageLoadingState">
+-        <div class="container">
+-            <div class="loading-content">
+-                <div class="loader"></div>
+-                <p class="loading-text">Loading tournament...</p>
+-                <p class="loading-subtext">Fetching latest matches and stats</p>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- FEATURED MATCH -->
+-    <section id="featured-matchup" class="featured-matchup">
+-        <div class="container">
+-            <div class="section-header">
+-                <span class="section-label"><i class="fa-solid fa-fire"></i> Featured Match</span>
+-                <h2 class="section-title">Match of the Day</h2>
+-                <p class="section-subtitle">Most voted match • <i class="fa-solid fa-circle"></i> Live Now</p>
+-            </div>
+-            <div class="competitors-grid">
+-                <!-- Populated by JavaScript -->
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- YOUR ACTIVE VOTES (NEW) -->
+-    <section class="your-votes-section" id="yourVotesSection" style="display: none;">
+-        <div class="container">
+-            <div class="section-header">
+-                <span class="section-label"><i class="fa-solid fa-bullseye"></i> Your Picks</span>
+-                <h2 class="section-title">Your Active Votes</h2>
+-                <p class="section-subtitle">
+-                    Track your predictions in real-time
+-                    <a href="my-votes.html" class="view-all-inline">View All →</a>
+-                </p>
+-            </div>
+-            <div class="your-votes-grid" id="yourVotesGrid">
+-                <!-- Populated by JavaScript -->
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- LIVE MATCHES (LIMITED TO 3) -->
+-    <section class="matches-section live-matches-section">
+-        <div class="container">
+-            <div class="section-header">
+-                <span class="section-label"><i class="fa-solid fa-circle"></i> Live Now</span>
+-                <h2 class="section-title">Current Matches</h2>
+-                <p class="section-subtitle">Cast your votes before they close</p>
+-            </div>
+-            <div class="matches-grid" id="liveMatchesGrid">
+-                <!-- Populated by JavaScript -->
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- YOUTUBE PLAYLIST -->
+-    <div id="youtube-playlist-container"></div>
+-
+-    <!-- RECENT RESULTS (LIMITED TO 6) -->
+-    <section class="matches-section recent-results-section">
+-        <div class="container">
+-            <div class="section-header">
+-                <h2 class="section-title">Recent Results</h2>
+-                <p class="section-subtitle">
+-                    See how the tournament is unfolding
+-                    <a href="matches.html?status=completed" class="view-all-inline">View All →</a>
+-                </p>
+-            </div>
+-            <div class="matches-grid" id="recentResultsGrid">
+-                <!-- Populated by JavaScript -->
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- NEXT MATCH COUNTDOWN (NEW) -->
+-    <section class="next-match-countdown" id="nextMatchCountdown" style="display: none;">
+-        <div class="container">
+-            <div class="countdown-card">
+-                <span class="countdown-label"><i class="fa-solid fa-clock"></i> Next Match</span>
+-                <h3 class="countdown-title" id="nextMatchTitle">Loading...</h3>
+-                <div class="countdown-timer" id="countdownTimer">
+-                    <div class="timer-segment">
+-                        <span class="timer-number" id="countdownDays">00</span>
+-                        <span class="timer-label">Days</span>
+-                    </div>
+-                    <div class="timer-segment">
+-                        <span class="timer-number" id="countdownHours">00</span>
+-                        <span class="timer-label">Hours</span>
+-                    </div>
+-                    <div class="timer-segment">
+-                        <span class="timer-number" id="countdownMinutes">00</span>
+-                        <span class="timer-label">Minutes</span>
+-                    </div>
+-                    <div class="timer-segment">
+-                        <span class="timer-number" id="countdownSeconds">00</span>
+-                        <span class="timer-label">Seconds</span>
+-                    </div>
+-                </div>
+-                <a href="matches.html?status=upcoming" class="countdown-cta">
+-                    View All Upcoming Matches →
+-                </a>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- VIEW ALL MATCHES CTA -->
+-    <section class="matches-cta">
+-        <div class="container">
+-            <div class="cta-card">
+-                <h3>Want to see all matchups?</h3>
+-                <p>View the complete bracket and tournament history</p>
+-                <a href="/matches.html" class="view-details-btn">View All Matches</a>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- FEATURED BOOK SECTION -->
+-    <section class="featured-book">
+-        <div class="container">
+-            <div class="section-header">
+-                <span class="section-label"><i class="fa-solid fa-book"></i> Explore the Lore</span>
+-                <h2 class="section-title">From Music Video to Novel</h2>
+-                <p class="section-subtitle">Dive deeper into the story behind the music</p>
+-            </div>
+-            <div class="featured-book-content">
+-                <div class="featured-book-video">
+-                    <div class="video-container">
+-                        <div class="video-wrapper">
+-                            <iframe 
+-                                src="https://www.youtube.com/embed/rhTZTy1rZhw" 
+-                                title="Blood Sweat & Tears - Ambessa"
+-                                frameborder="0" 
+-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+-                                allowfullscreen>
+-                            </iframe>
+-                        </div>
+-                    </div>
+-                    <div class="video-caption">
+-                        <h4>Blood Sweat & Tears</h4>
+-                        <p>Ambessa's Champion Theme • League of Legends</p>
+-                    </div>
+-                </div>
+-                <div class="featured-book-info">
+-                    <div class="book-text">
+-                        <h3 class="book-title">Ambessa: Chosen of the Wolf</h3>
+-                        <p class="book-author">by Anthony Reynolds & Ian St. Martin</p>
+-                        <p class="book-description">
+-                            Discover the untold origin story of Ambessa Medarda, the ruthless Noxian warlord 
+-                            from Arcane. This gripping novel reveals how she became the warrior feared 
+-                            across Runeterra.
+-                        </p>
+-                        <ul class="book-highlights">
+-                            <li><i class="fa-solid fa-check"></i> Official League of Legends novel</li>
+-                            <li><i class="fa-solid fa-check"></i> Expands the Arcane universe</li>
+-                            <li><i class="fa-solid fa-check"></i> Explores Noxian culture & warfare</li>
+-                            <li><i class="fa-solid fa-check"></i> Perfect for Arcane fans</li>
+-                        </ul>
+-                        <a href="https://amzn.to/4ozvEDP" 
+-                           target="_blank" 
+-                           rel="noopener noreferrer nofollow"
+-                           class="featured-book-cta"
+-                           onclick="trackBookClick('ambessa', 'homepage-featured')">
+-                            Get the Book on Amazon →
+-                        </a>
+-                        <p class="book-disclaimer">
+-                            As an Amazon Associate, we earn from qualifying purchases
+-                        </p>
+-                    </div>
+-                </div>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- HOW IT WORKS -->
+-    <section class="how-it-works">
+-        <div class="container">
+-            <div class="section-header">
+-                <h2 class="section-title">How It Works</h2>
+-                <p class="section-subtitle">Join the tournament in 3 simple steps</p>
+-            </div>
+-            <div class="steps-grid">
+-                <div class="step-card">
+-                    <div class="step-number">1</div>
+-                    <div class="step-icon">
+-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+-                        </svg>
+-                    </div>
+-                    <h3 class="step-title">Watch the Music Videos</h3>
+-                    <p class="step-description">
+-                        See two League music videos go head-to-head. From Worlds anthems to K/DA bangers.
+-                    </p>
+-                </div>
+-                <div class="step-card">
+-                    <div class="step-number">2</div>
+-                    <div class="step-icon">
+-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+-                        </svg>
+-                    </div>
+-                    <h3 class="step-title">Cast Your Vote</h3>
+-                    <p class="step-description">
+-                        Click to vote for your favorite. No account needed. Voting is open for 48 hours per matchup.
+-                    </p>
+-                </div>
+-                <div class="step-card">
+-                    <div class="step-number">3</div>
+-                    <div class="step-icon">
+-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+-                            <path d="M6 9l6 6 6-6"/>
+-                            <path d="M6 2L12 8 18 2"/>
+-                        </svg>
+-                    </div>
+-                    <h3 class="step-title">Follow the Bracket</h3>
+-                    <p class="step-description">
+-                        Watch as videos advance through the rounds. The last one standing becomes the champion.
+-                    </p>
+-                </div>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <!-- EXPLORE MORE SECTION -->
+-    <section class="explore-more">
+-        <div class="container">
+-            <div class="section-header">
+-                <h2 class="section-title">Explore the Arena</h2>
+-                <p class="section-subtitle">Dive deeper into the tournament</p>
+-            </div>
+-            <div class="explore-grid">
+-                <a href="/brackets.html" class="explore-card">
+-                    <div class="explore-icon">
+-                        <i class="fas fa-sitemap"></i>
+-                    </div>
+-                    <h3>Tournament Bracket</h3>
+-                    <p>View the complete bracket showing all matchups, results, and the path to championship</p>
+-                    <span class="explore-arrow">→</span>
+-                </a>
+-                <a href="/stats.html" class="explore-card">
+-                    <div class="explore-icon">
+-                        <i class="fas fa-chart-bar"></i>
+-                    </div>
+-                    <h3>Statistics & Rankings</h3>
+-                    <p>Explore voting trends, upsets, participation rates, and song performance data</p>
+-                    <span class="explore-arrow">→</span>
+-                </a>
+-                <a href="/music-gallery.html" class="explore-card">
+-                    <div class="explore-icon">
+-                        <i class="fas fa-music"></i>
+-                    </div>
+-                    <h3>Full Music Gallery</h3>
+-                    <p>Browse all 64 League music videos organized by virtual band and release year</p>
+-                    <span class="explore-arrow">→</span>
+-                </a>
+-                <a href="/my-votes.html" class="explore-card">
+-                    <div class="explore-icon">
+-                        <i class="fas fa-trophy"></i>
+-                    </div>
+-                    <h3>Your Voting History</h3>
+-                    <p>Track your predictions, earn XP, and unlock achievements as you participate</p>
+-                    <span class="explore-arrow">→</span>
+-                </a>
+-            </div>
+-        </div>
+-    </section>
+-
+-    <div id="footer-placeholder"></div>
+-    <script src="/js/footer.js"></script>
+-  
+-    <script type="module" src="/js/rank-system.js"></script>
+-
+-    <script type="module" src="/js/homepage.js"></script>
+-    <script type="module" src="/js/settings-modal.js"></script>
+-    <!-- Buy Me a Coffee Widget -->
+-<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="anthemarena" data-description="Support me on Buy me a coffee!" data-message="Thanks for visiting! Support the tournament?" data-color="#d4af37" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+-</body>
+-</html>
+\ No newline at end of file
+diff --git a/index.html b/index.html
+index 2c5d06c..618f470 100644
+--- a/index.html
++++ b/index.html
+@@ -1,87 +1,96 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+-<meta charset="UTF-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+-<title>Arcane Moments</title>
+-<meta name="description" content="Arcane moments, one scene at a time. Watch the Arcane Moments Shorts collection and follow the journey toward an Arcane Moments tournament.">
+-<link rel="icon" type="image/png" href="/logo.png">
+-<link rel="manifest" href="/site.webmanifest">
+-<meta name="theme-color" content="#080914">
+-<meta property="og:type" content="website">
+-<meta property="og:url" content="https://arcanemoments.netlify.app/">
+-<meta property="og:title" content="Arcane Moments">
+-<meta property="og:description" content="Arcane moments, one scene at a time.">
+-<meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
+-<meta property="og:image:alt" content="Arcane Moments">
+-<meta name="twitter:card" content="summary_large_image">
+-<meta name="twitter:title" content="Arcane Moments">
+-<meta name="twitter:description" content="Arcane moments, one scene at a time.">
+-<meta name="twitter:image" content="https://arcanemoments.netlify.app/og-image.png">
+-<link rel="preconnect" href="https://fonts.googleapis.com">
+-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+-<link rel="stylesheet" href="/css/arcane-home.css">
+-<link rel="stylesheet" href="/css/arcane-player.css">
++    <meta charset="UTF-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1.0">
++
++    <link rel="canonical" href="https://arcanemoments.netlify.app/">
++    <meta property="og:url" content="https://arcanemoments.netlify.app/">
++    <meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
++    <meta name="twitter:card" content="summary_large_image">
++    <title>Arcane Moments | Vote for the best Arcane fan edits</title>
++    <meta name="description" content="Arcane Moments is a fan-made tournament where you vote for the best Arcane edits. Watch the matches, vote, and follow the bracket.">
++    <meta property="og:type" content="website">
++    <meta property="og:title" content="Arcane Moments | Vote for the best Arcane fan edits">
++    <meta property="og:description" content="Vote for the best Arcane fan edits.">
++
++    <!-- Favicon -->
++    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
++    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
++    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
++    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
++
++    <!-- Fonts and icons -->
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
++    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
++
++    <!-- Stylesheets -->
++    <link rel="stylesheet" href="/css/main.css">
++    <link rel="stylesheet" href="/css/navigation.css">
++    <link rel="stylesheet" href="/css/footer.css">
++    <link rel="stylesheet" href="/css/scrollbar.css">
++    <link rel="stylesheet" href="/css/settings.css">
++    <link rel="stylesheet" href="/css/home-arcane.css">
++    <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
++    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
++    <link rel="stylesheet" href="/css/arcane-theme.css">
++
++    <script type="application/ld+json">
++    {
++      "@context": "https://schema.org",
++      "@type": "WebSite",
++      "name": "Arcane Moments",
++      "description": "A fan-made tournament where you vote for the best Arcane edits."
++    }
++    </script>
++
++    <!-- Global systems first -->
++    <script type="module" src="/js/firebase-config.js"></script>
++    <script type="module" src="/js/notification-storage.js"></script>
++    <script type="module" src="/js/notification-center.js"></script>
++    <script type="module" src="/js/global-notifications.js"></script>
+ </head>
+-<body>
+-<div class="page-background" aria-hidden="true"></div>
+-<div class="page-glow page-glow-left" aria-hidden="true"></div>
+-<div class="page-glow page-glow-right" aria-hidden="true"></div>
+-<main class="site-shell">
+-  <header class="hero">
+-    <div class="hero-logo-wrap"><img src="/logo.png" alt="Arcane Moments" class="hero-logo"></div>
+-    <p class="eyebrow">💙💜 The unforgettable moments from Arcane</p>
+-    <h1>Arcane Moments</h1>
+-    <p class="hero-copy">The scenes, lines and reveals that make Arcane unforgettable, one Short at a time.</p>
+-    <div class="hero-actions">
+-      <a class="primary-button" href="#moments">Start watching <i class="fa-solid fa-play" aria-hidden="true"></i></a>
+-      <a class="secondary-button" id="youtube-cta" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i>Subscribe on YouTube</a>
+-    </div>
+-  </header>
++<body class="theme-arcane page-home">
++
++    <div id="nav-placeholder"></div>
++    <script type="module" src="/js/navigation.js"></script>
+ 
+-  <section id="moments" class="moments-section" aria-labelledby="moments-heading">
+-    <div class="section-heading">
+-      <div><p class="section-kicker">WATCH</p><h2 id="moments-heading">Arcane Moments</h2></div>
+-      <a id="channel-link" class="text-link" href="#" target="_blank" rel="noopener">Visit channel <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+-    </div>
+-    <div id="playlist-rows" class="playlist-rows">
+-      <div class="loading-state"><span class="loading-dot"></span><span>Loading moments…</span></div>
+-    </div>
+-  </section>
++    <main class="home-page">
++        <header class="home-hero">
++            <img src="/logo.png" alt="Arcane Moments" class="home-logo" width="260" height="260">
++            <p class="home-pill" id="homePill" aria-live="polite">Loading&hellip;</p>
++            <h1 class="home-title">Arcane Moments</h1>
++            <p class="home-lead" id="homeLead">A fan-made tournament where you vote for the best Arcane edits.</p>
++            <div class="home-actions" id="homeActions">
++                <a class="btn btn-primary" href="/live">Vote now</a>
++                <a class="btn btn-ghost" href="/brackets">See the bracket</a>
++            </div>
++            <dl class="home-stats" id="homeStats" hidden></dl>
++        </header>
+ 
+-  <section class="intro-card" style="margin-top:72px" aria-labelledby="intro-heading">
+-    <div class="intro-card-icon"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+-    <div>
+-      <p class="section-kicker">COMING SOON</p>
+-      <h2 id="intro-heading">The Arcane Moments tournament</h2>
+-      <p>We're working through Arcane scene by scene, collecting the iconic moments and the small ones that deserve a second look. The goal is a full tournament built around them. Follow along to be there when it opens.</p>
+-    </div>
+-  </section>
++        <section class="home-block" id="champion" hidden aria-labelledby="championHead"></section>
++        <section class="home-block" id="featured" hidden aria-labelledby="featuredHead"></section>
++        <section class="home-block" id="recent" hidden aria-labelledby="recentHead"></section>
++        <section class="home-block" id="popular" hidden aria-labelledby="popularHead"></section>
++        <section class="home-block" id="newest" hidden aria-labelledby="newestHead"></section>
+ 
+-  <section class="support-section" aria-labelledby="support-heading">
+-    <div class="support-inner">
+-      <div>
+-        <p class="section-kicker">SUPPORT</p>
+-        <h2 id="support-heading">Enjoying the project?</h2>
+-        <p>Help keep the Shorts coming and the tournament on track by supporting us on Ko-fi.</p>
+-      </div>
+-      <a id="kofi-link" class="kofi-button" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i>Support on Ko-fi</a>
+-    </div>
+-  </section>
++        <section class="home-block how" id="how" aria-labelledby="howHead">
++            <h2 id="howHead">How it works</h2>
++            <ol class="how-list">
++                <li><b>Edits enter.</b> Fan edits of Arcane, made by creators on YouTube, are drawn into groups of four.</li>
++                <li><b>You vote.</b> Every match is two edits head to head. Watch both, then pick your favourite.</li>
++                <li><b>Two go through.</b> The top two in each group move on to the knockout.</li>
++                <li><b>One is crowned.</b> Knockout rounds run until a single edit is left standing.</li>
++            </ol>
++            <p class="how-more"><a href="/about">More about the cup and how creators are credited</a></p>
++        </section>
++    </main>
+ 
+-  <section class="social-section" aria-labelledby="social-heading">
+-    <p class="section-kicker">FOLLOW</p>
+-    <h2 id="social-heading">Find Arcane Moments elsewhere</h2>
+-    <div class="social-grid" id="social-links"></div>
+-  </section>
++    <div id="footer-placeholder"></div>
++    <script src="/js/footer.js"></script>
+ 
+-  <footer class="site-footer">
+-    <div class="footer-brand"><strong>ARCANE MOMENTS</strong><span>Fan-made</span></div>
+-    <p>An unofficial fan project. Not affiliated with or endorsed by Riot Games, Fortiche or Netflix. Arcane and related marks belong to their owners.</p>
+-  </footer>
+-</main>
+-<script type="module" src="/js/arcane-home.js"></script>
++    <script type="module" src="/js/rank-system.js"></script>
++    <script type="module" src="/js/home.js"></script>
++    <script type="module" src="/js/settings-modal.js"></script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/js/arcane-home.js b/js/arcane-home.js
+deleted file mode 100644
+index 7eb61d4..0000000
+--- a/js/arcane-home.js
++++ /dev/null
+@@ -1,231 +0,0 @@
+-// Keep your REAL, full playlist IDs here (the ones currently in your file).
+-const SITE_CONFIG = {
+-  links: {
+-    youtube: "https://www.youtube.com/@theundercityedit",
+-    kofi: "https://ko-fi.com/arcanemoments",
+-    tiktok: "https://www.tiktok.com/@arcanemoments",
+-    instagram: "https://www.instagram.com/rollingrealm/",
+-    x: "https://x.com/ArcaneMoment",
+-    tumblr: "https://www.tumblr.com/arcanemoments"
+-  },
+-  // Auto-updating row of the newest uploads (set to null to hide)
+-  latest: { title: "Latest Shorts", subtitle: "Fresh from the channel", handle: "theundercityedit", limit: 12 },
+-  playlists: [
+-    { title: "Arcane Moments | Season 1", subtitle: "", id: "PLDWd0_FOU4I0", numbered: true },
+-    { title: "Vi Moments | Arcane", subtitle: "", id: "PLRGGq2SYHtWc" },
+-    { title: "Powder & Jinx Moments", subtitle: "", id: "PLcbksQ4sGEAg" },
+-    { title: "Action Moments", subtitle: "", id: "PLCV9IPghewvY" }
+-  ]
+-};
+-
+-const SOCIALS = [
+-  { key: "youtube", label: "YouTube", icon: "fa-brands fa-youtube" },
+-  { key: "tiktok", label: "TikTok", icon: "fa-brands fa-tiktok" },
+-  { key: "instagram", label: "Instagram", icon: "fa-brands fa-instagram" },
+-  { key: "x", label: "X", icon: "fa-brands fa-x-twitter" },
+-  { key: "tumblr", label: "Tumblr", icon: "fa-brands fa-tumblr" }
+-];
+-
+-const esc = (v) => String(v == null ? "" : v)
+-  .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+-  .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+-
+-const fmtDate = (v) => {
+-  const d = new Date(v);
+-  return v && !Number.isNaN(d.getTime())
+-    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d) : "";
+-};
+-
+-// "Powder's My Problem 💔 | Arcane Moments #10 | ..." -> "Powder's My Problem 💔"
+-const cleanTitle = (t) => {
+-  const head = String(t || "").split("|")[0].trim();
+-  return head || String(t || "").trim() || "Arcane Moment";
+-};
+-// Moment number from the "#10" in the original title (null if none)
+-const momentNumber = (t) => {
+-  const m = /#\s*(\d+)/.exec(String(t || ""));
+-  return m ? Number(m[1]) : null;
+-};
+-
+-function applyConfiguredLinks() {
+-  const L = SITE_CONFIG.links;
+-  [["youtube-cta", L.youtube], ["channel-link", L.youtube], ["kofi-link", L.kofi]].forEach(([id, url]) => {
+-    const el = document.getElementById(id);
+-    if (!el) return;
+-    el.href = url || "#";
+-    if (!url) el.classList.add("is-disabled");
+-  });
+-  document.getElementById("social-links").innerHTML = SOCIALS.map((s) => {
+-    const url = L[s.key];
+-    return `<a class="social-link${url ? "" : " is-disabled"}" href="${url || "#"}" ${url ? 'target="_blank" rel="noopener"' : 'aria-disabled="true"'} aria-label="${s.label}" title="${s.label}"><i class="${s.icon}" aria-hidden="true"></i></a>`;
+-  }).join("");
+-}
+-
+-async function fetchPlaylist(p) {
+-  const q = p.handle
+-    ? "handle=" + encodeURIComponent(p.handle) + "&limit=" + (p.limit || 12)
+-    : "playlistId=" + encodeURIComponent(p.id);
+-  const res = await fetch("/.netlify/functions/arcane-playlist?" + q);
+-  const data = await res.json();
+-  if (!res.ok || data.error) throw new Error(data.error || "Request failed: " + res.status);
+-  return { description: data.description || "", items: Array.isArray(data.items) ? data.items : [] };
+-}
+-
+-/* ---------- Player (vertical Shorts modal) ---------- */
+-let queue = [], idx = -1, lastFocus = null, modal;
+-
+-function buildModal() {
+-  modal = document.createElement("div");
+-  modal.className = "player-modal";
+-  modal.hidden = true;
+-  modal.setAttribute("role", "dialog");
+-  modal.setAttribute("aria-modal", "true");
+-  modal.setAttribute("aria-label", "Video player");
+-  modal.innerHTML =
+-    '<div class="player-backdrop" data-close></div>' +
+-    '<div class="player-stage">' +
+-    '<button class="player-btn player-close" data-close aria-label="Close player"><i class="fa-solid fa-xmark"></i></button>' +
+-    '<button class="player-btn player-prev" aria-label="Previous video"><i class="fa-solid fa-chevron-up"></i></button>' +
+-    '<div class="player-frame"></div>' +
+-    '<button class="player-btn player-next" aria-label="Next video"><i class="fa-solid fa-chevron-down"></i></button>' +
+-    '<a class="player-yt" target="_blank" rel="noopener">Open on YouTube</a></div>';
+-  document.body.appendChild(modal);
+-
+-  modal.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closePlayer(); });
+-  modal.querySelector(".player-prev").addEventListener("click", () => step(-1));
+-  modal.querySelector(".player-next").addEventListener("click", () => step(1));
+-
+-  // Swipe up/down to change video. Touches on the video itself go to YouTube's
+-  // iframe, so this works on the edge strips and the area around the video.
+-  let y0 = null;
+-  modal.addEventListener("touchstart", (e) => { y0 = e.touches[0].clientY; }, { passive: true });
+-  modal.addEventListener("touchend", (e) => {
+-    if (y0 == null) return;
+-    const dy = e.changedTouches[0].clientY - y0;
+-    y0 = null;
+-    if (Math.abs(dy) > 60) step(dy < 0 ? 1 : -1);
+-  }, { passive: true });
+-
+-  document.addEventListener("keydown", (e) => {
+-    if (modal.hidden) return;
+-    if (e.key === "Escape") closePlayer();
+-    else if (e.key === "ArrowDown" || e.key === "ArrowRight") step(1);
+-    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") step(-1);
+-  });
+-}
+-
+-function showVideo() {
+-  const v = queue[idx];
+-  modal.querySelector(".player-frame").innerHTML =
+-    `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.videoId)}?autoplay=1&playsinline=1&rel=0" title="${esc(v.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><span class="swipe-zone swipe-l"></span><span class="swipe-zone swipe-r"></span>`;
+-  modal.querySelector(".player-yt").href = "https://www.youtube.com/shorts/" + encodeURIComponent(v.videoId);
+-  modal.querySelector(".player-prev").disabled = idx === 0;
+-  modal.querySelector(".player-next").disabled = idx === queue.length - 1;
+-  history.replaceState(null, "", "?v=" + encodeURIComponent(v.videoId));
+-}
+-
+-function step(d) {
+-  const n = idx + d;
+-  if (n < 0 || n >= queue.length) return;
+-  idx = n;
+-  showVideo();
+-}
+-
+-function openPlayer(list, i) {
+-  if (!modal) buildModal();
+-  queue = list; idx = i;
+-  lastFocus = document.activeElement;
+-  modal.hidden = false;
+-  document.body.classList.add("modal-open");
+-  showVideo();
+-  modal.querySelector(".player-close").focus();
+-}
+-
+-function closePlayer() {
+-  modal.hidden = true;
+-  modal.querySelector(".player-frame").innerHTML = ""; // stops playback
+-  document.body.classList.remove("modal-open");
+-  history.replaceState(null, "", location.pathname);
+-  if (lastFocus) lastFocus.focus();
+-}
+-
+-/* ---------- Rows ---------- */
+-const allRows = new Map();
+-
+-function renderRow(playlist, data) {
+-  const section = document.createElement("section");
+-  section.className = "playlist-row";
+-  const cards = data.items.map((v, i) =>
+-    `<button type="button" class="video-card" data-i="${i}" aria-label="Play: ${esc(v.title)}">` +
+-    `<span class="thumb-wrap"><img class="video-thumb" src="${esc(v.thumbnail)}" alt="" loading="lazy"><span class="play-badge" aria-hidden="true"><i class="fa-solid fa-play"></i></span></span>` +
+-    `<span class="video-card-body"><span class="video-card-title">${esc(v.title)}</span>` +
+-    `<span class="video-card-meta">${esc(fmtDate(v.publishedAt))}</span></span></button>`
+-  ).join("");
+-  section.innerHTML =
+-    `<div class="playlist-row-header"><div><h3 class="playlist-row-title">${esc(playlist.title)}</h3>` +
+-    `<p class="playlist-row-subtitle">${esc(data.description || playlist.subtitle)}</p></div>` +
+-    `<a class="playlist-link" href="${playlist.handle ? "https://www.youtube.com/@" + encodeURIComponent(playlist.handle) + "/shorts" : "https://www.youtube.com/playlist?list=" + encodeURIComponent(playlist.id)}" target="_blank" rel="noopener">${playlist.handle ? "View all" : "Open playlist"} <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div>` +
+-    `<div class="video-scroller">${cards}</div>`;
+-  section.querySelector(".video-scroller").addEventListener("click", (e) => {
+-    const card = e.target.closest(".video-card");
+-    if (card) openPlayer(data.items, Number(card.dataset.i));
+-  });
+-  return section;
+-}
+-
+-function renderError(playlist, section) {
+-  section.innerHTML =
+-    `<div class="playlist-row-header"><div><h3 class="playlist-row-title">${esc(playlist.title)}</h3>` +
+-    `<p class="playlist-row-subtitle">Couldn't load this playlist.</p></div>` +
+-    `<button type="button" class="playlist-link retry-btn">Try again</button></div>`;
+-  section.querySelector(".retry-btn").addEventListener("click", () => loadRow(playlist, section));
+-}
+-
+-async function loadRow(playlist, section) {
+-  section.innerHTML = '<div class="loading-state"><span class="loading-dot"></span><span>Loading…</span></div>';
+-  try {
+-    const data = await fetchPlaylist(playlist);
+-    if (!data.items.length) return section.remove();
+-    data.items = data.items.map((v) => ({ ...v, rawTitle: v.title, title: cleanTitle(v.title), num: momentNumber(v.title) }));
+-    if (playlist.numbered) {
+-      // Numbered series read best in order; anything without a number goes last
+-      data.items.sort((a, b) => (a.num ?? Infinity) - (b.num ?? Infinity));
+-    }
+-    allRows.set(playlist.id || "latest", data.items);
+-    section.replaceWith(renderRow(playlist, data));
+-  } catch (err) {
+-    console.error("Failed to load " + playlist.title, err);
+-    renderError(playlist, section);
+-  }
+-}
+-
+-async function renderPlaylists() {
+-  const container = document.getElementById("playlist-rows");
+-  const configured = [SITE_CONFIG.latest, ...SITE_CONFIG.playlists].filter((p) => p && (p.id || p.handle));
+-  if (!configured.length) {
+-    container.innerHTML = '<div class="empty-state">Add playlist IDs in <code>/js/arcane-home.js</code>.</div>';
+-    return;
+-  }
+-  container.innerHTML = "";
+-  // Rows are created in config order and loaded in parallel
+-  await Promise.all(configured.map((p) => {
+-    const section = document.createElement("section");
+-    section.className = "playlist-row";
+-    container.appendChild(section);
+-    return loadRow(p, section);
+-  }));
+-
+-  // Deep link: ?v=VIDEOID opens straight into the player
+-  const wanted = new URLSearchParams(location.search).get("v");
+-  if (wanted) {
+-    for (const items of allRows.values()) {
+-      const i = items.findIndex((v) => v.videoId === wanted);
+-      if (i > -1) return openPlayer(items, i);
+-    }
+-  }
+-}
+-
+-document.addEventListener("DOMContentLoaded", () => {
+-  applyConfiguredLinks();
+-  renderPlaylists();
+-});
+\ No newline at end of file
+diff --git a/js/bookMappings.js b/js/bookMappings.js
+deleted file mode 100644
+index 9e8588e..0000000
+--- a/js/bookMappings.js
++++ /dev/null
+@@ -1,89 +0,0 @@
+-// ========================================
+-// BOOK AFFILIATE MAPPINGS - LEAGUE MUSIC TOURNAMENT
+-// ========================================
+-
+-/**
+- * Centralized book definitions
+- * Song → Book mapping is now in music-videos.json via "recommendedBook" field
+- */
+-
+-export const bookMappings = {
+-  
+-  // ============================================
+-  // BOOK DEFINITIONS
+-  // ============================================
+-  
+-  books: {
+-    
+-    // Realms of Runeterra - World-building guide
+-    realmsOfRuneterra: {
+-      id: "realmsOfRuneterra",
+-      title: "League of Legends: Realms of Runeterra",
+-      subtitle: "Official Companion",
+-      amazonLink: "https://amzn.to/48TfGzo",
+-      description: "Explore the world and lore of Runeterra",
+-      fullDescription: "Unlock the mysteries and magic within League of Legends, one of the world's most popular video games, in this encyclopedic and collectible companion book that explores the game's epic lore.",
+-      price: "$39.99",
+-      category: "world-building"
+-    },
+-    
+-    // Ambessa Novel
+-    ambesaNovel: {
+-      id: "ambesaNovel",
+-      title: "Ambessa: Chosen of the Wolf",
+-      subtitle: "A League of Legends Novel",
+-      amazonLink: "https://amzn.to/435C5pn",
+-      description: "Discover Ambessa's origin story",
+-      fullDescription: "Before she was a powerful warlord, Ambessa Medarda was a young woman fighting for survival in the brutal lands of Noxus.",
+-      price: "$17.99",
+-      category: "character-story"
+-    },
+-    
+-    // Arcane Artbook
+-    arcaneArtbook: {
+-      id: "arcaneArtbook",
+-      title: "Arcane: Art & Making Of",
+-      subtitle: "The Official Companion",
+-      amazonLink: "https://amzn.to/3ZQxYzK",
+-      description: "Behind the scenes of the hit Netflix series",
+-      fullDescription: "Immerse yourself in the award-winning series with this official companion book featuring exclusive concept art, storyboards, and commentary from the creators.",
+-      price: "$45.00",
+-      category: "artbook"
+-    },
+-    
+-    // Ruination Novel
+-    ruinationNovel: {
+-      id: "ruinationNovel",
+-      title: "Ruination: A League of Legends Novel",
+-      subtitle: "",
+-      amazonLink: "https://amzn.to/3DCvZJm",
+-      description: "The story of the Ruined King",
+-      fullDescription: "Discover the origins of the Ruined King and the fall of the Blessed Isles in this epic tale of love, betrayal, and dark magic.",
+-      price: "$18.99",
+-      category: "character-story"
+-    }
+-    
+-  }
+-  
+-};
+-
+-/**
+- * Get book data by ID
+- * @param {string} bookId - Book identifier
+- * @returns {object|null} Book object or null
+- */
+-export function getBookById(bookId) {
+-  return bookMappings.books[bookId] || null;
+-}
+-
+-/**
+- * Get book recommendation for a song from JSON data
+- * @param {object} songData - Song object from music-videos.json
+- * @returns {object|null} Book object or null
+- */
+-export function getBookForSong(songData) {
+-  if (!songData || !songData.recommendedBook) {
+-    return null;
+-  }
+-  return getBookById(songData.recommendedBook);
+-}
+\ No newline at end of file
+diff --git a/js/home-model.js b/js/home-model.js
+new file mode 100644
+index 0000000..38c935b
+--- /dev/null
++++ b/js/home-model.js
+@@ -0,0 +1,63 @@
++// ========================================
++// HOME MODEL - pure helpers for the homepage (index.html)
++// ========================================
++import { computeStats } from './stats-model.js';
++import { shortTitle } from './title-clean.js';
++
++// the same rule as the gallery: an edit that has entered a cup and may be embedded
++export const isEntered = e => !!e && Array.isArray(e.tournaments) && e.tournaments.length > 0
++    && e.status !== 'removed' && e.status !== 'blocked' && e.embedAllowed !== false;
++
++export const editCard = e => ({ id: e.id || e.videoId, videoId: e.videoId || '', title: shortTitle(e.shortTitle || e.title || '', 60),
++    creator: e.artist || '', uploadDate: e.uploadDate || '', views: e.views || 0, likes: e.likes || 0 });
++
++export function newestEdits(edits = [], n = 6) {
++    return edits.filter(isEntered).sort((a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || ''))).slice(0, n).map(editCard);
++}
++export function mostWatched(edits = [], n = 6) {
++    return edits.filter(isEntered).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, n).map(editCard);
++}
++
++const side = m => (m.winnerId && (m.winnerId === m.song1?.id || m.winnerId === 'song1') ? 1 : m.winnerId && (m.winnerId === m.song2?.id || m.winnerId === 'song2') ? 2 : 0);
++const comp = c => ({ id: c?.id || '', videoId: c?.videoId || '', title: shortTitle(c?.shortTitle || c?.title || '', 60), creator: c?.artist || '' });
++const votesOf = m => (m.song1?.votes || 0) + (m.song2?.votes || 0);
++const endMs = m => { const t = Date.parse(m.endDate || m.endTime || ''); return Number.isFinite(t) ? t : null; };
++
++// matches -> everything the homepage shows about the cup
++export function homeState(matches = [], now = Date.now()) {
++    const list = (Array.isArray(matches) ? matches : []).filter(m => m && m.song1 && m.song2);
++    const stats = computeStats(list);
++    const live = list.filter(m => m.status === 'live');
++    const completed = list.filter(m => m.status === 'completed');
++    const final = completed.find(m => /^final$/i.test(m.roundLabel || '') && side(m));
++
++    const featuredRaw = [...live].sort((a, b) => votesOf(b) - votesOf(a))[0] || null;
++    const future = live.map(endMs).filter(t => t && t > now).sort((a, b) => a - b);
++
++    const recent = completed.map((m, i) => ({ m, i, t: endMs(m) ?? 0 }))
++        .sort((a, b) => b.t - a.t || b.i - a.i).slice(0, 4)
++        .map(({ m }) => { const w = side(m); return { matchId: m.matchId, label: m.roundLabel || '', total: votesOf(m),
++            winner: w ? comp(w === 1 ? m.song1 : m.song2) : null, loser: w ? comp(w === 1 ? m.song2 : m.song1) : null }; });
++
++    const topVoted = stats.rows.filter(r => r.votes > 0).sort((a, b) => b.votes - a.votes).slice(0, 6)
++        .map(r => ({ id: r.id, videoId: r.videoId, title: r.title, creator: r.creator, votes: r.votes }));
++
++    return {
++        phase: !list.length ? 'soon' : final ? 'finished' : live.length ? 'live' : completed.length ? 'between' : 'upcoming',
++        liveCount: live.length, completed: completed.length, total: list.length,
++        votes: stats.totalVotes, editCount: stats.editCount,
++        featured: featuredRaw ? { matchId: featuredRaw.matchId, label: featuredRaw.roundLabel || '', total: votesOf(featuredRaw),
++            a: comp(featuredRaw.song1), b: comp(featuredRaw.song2), closesAt: endMs(featuredRaw) } : null,
++        closesAt: future[0] || null,
++        recent, topVoted,
++        champion: final ? comp(side(final) === 1 ? final.song1 : final.song2) : null
++    };
++}
++
++export function countdownText(targetMs, now = Date.now()) {
++    if (!targetMs) return '';
++    const s = Math.floor((targetMs - now) / 1000);
++    if (s <= 0) return 'closing now';
++    const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
++    return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${Math.max(m, 1)}m`;
++}
+diff --git a/js/home.js b/js/home.js
+new file mode 100644
+index 0000000..918fa38
+--- /dev/null
++++ b/js/home.js
+@@ -0,0 +1,116 @@
++// ========================================
++// HOMEPAGE (index.html, body.page-home)
++// What is on right now, then new and popular edits. Everything is worked out in js/home-model.js.
++// ========================================
++import { getAllMatches } from './api-client.js';
++import { cupDisplayName } from './bracket-builder.js';
++import { homeState, newestEdits, mostWatched, countdownText } from './home-model.js';
++
++const REFRESH_MS = 60000;
++const $ = id => document.getElementById(id);
++const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
++const n = x => Number(x || 0).toLocaleString();
++const plural = (k, one, many = one + 's') => `${n(k)} ${k === 1 ? one : many}`;
++const thumb = id => `https://img.youtube.com/vi/${esc(id)}/hqdefault.jpg`;
++const when = d => { const t = new Date(d); return d && !Number.isNaN(t.getTime()) ? new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(t) : ''; };
++
++let edits = [], state = null, cupName = '';
++
++const mini = (c) => `<span class="mini"><img src="${thumb(c.videoId)}" alt="" loading="lazy" decoding="async"><b>${esc(c.title)}</b><i>${esc(c.creator)}</i></span>`;
++
++function editCard(e, meta) {
++    return `<a class="edit-card" href="/music-gallery"><img src="${thumb(e.videoId)}" alt="" loading="lazy" decoding="async">
++        <b>${esc(e.title)}</b><i>${esc(e.creator)}</i><span class="edit-meta">${esc(meta)}</span></a>`;
++}
++
++function section(id, kicker, title, body, more) {
++    const el = $(id);
++    if (!body) { el.hidden = true; el.innerHTML = ''; return; }
++    el.innerHTML = `<div class="block-head"><div><p class="kicker">${esc(kicker)}</p><h2 id="${id}Head">${esc(title)}</h2></div>${more || ''}</div>${body}`;
++    el.hidden = false;
++}
++
++function hero(s) {
++    const pill = $('homePill'), lead = $('homeLead'), actions = $('homeActions'), stats = $('homeStats');
++    const vote = '<a class="btn btn-primary" href="/live">Vote now</a>', bracket = '<a class="btn btn-ghost" href="/brackets">See the bracket</a>', gallery = '<a class="btn btn-ghost" href="/music-gallery">Browse the edits</a>';
++    const cup = cupName || 'Arcane Moments';
++    if (s.phase === 'live') {
++        pill.textContent = `${cup}: ${plural(s.liveCount, 'match', 'matches')} live now`;
++        lead.textContent = 'Watch two edits head to head and vote for your favourite.';
++        actions.innerHTML = vote + bracket;
++    } else if (s.phase === 'between') {
++        pill.textContent = `${cup}: next matches open soon`;
++        lead.textContent = 'The latest round is done. See how it went while the next one is set up.';
++        actions.innerHTML = bracket + gallery;
++    } else if (s.phase === 'upcoming') {
++        pill.textContent = `${cup}: voting opens soon`;
++        lead.textContent = 'The groups are drawn. See who is in and get ready to vote.';
++        actions.innerHTML = bracket + gallery;
++    } else if (s.phase === 'finished') {
++        pill.textContent = `${cup}: complete`;
++        lead.textContent = 'The cup has a champion. Revisit the bracket and the edits that got there.';
++        actions.innerHTML = bracket + gallery;
++    } else {
++        pill.textContent = 'Opening soon';
++        lead.textContent = 'A fan-made tournament where you vote for the best Arcane edits. The first cup is being prepared.';
++        actions.innerHTML = gallery + '<a class="btn btn-ghost" href="#how">How it works</a>';
++    }
++    const items = s.phase === 'soon' ? [] : [[n(s.votes), 'votes cast'], [n(s.editCount), 'edits'], [n(s.liveCount), 'live now']];
++    stats.innerHTML = items.map(([v, l]) => `<div><dt>${l}</dt><dd>${v}</dd></div>`).join('');
++    stats.hidden = !items.length;
++}
++
++function render() {
++    if (!state) return;
++    const s = state, now = Date.now();
++    hero(s);
++
++    section('champion', 'Champion', 'Your Arcane Moments champion',
++        s.champion ? `<div class="champion-card">${mini(s.champion)}<a class="btn btn-primary" href="/brackets">See the bracket</a></div>` : '');
++
++    const f = s.featured;
++    section('featured', 'Match of the day', 'The most voted match right now',
++        f ? `<div class="match-card"><p class="match-label">${esc(f.label)}${f.closesAt ? ` &middot; closes in ${esc(countdownText(f.closesAt, now))}` : ''}</p>
++            <div class="match-pair">${mini(f.a)}<span class="match-vs">vs</span>${mini(f.b)}</div>
++            <p class="match-votes">${plural(f.total, 'vote')} so far</p>
++            <a class="btn btn-primary" href="/vote?match=${encodeURIComponent(f.matchId)}">Vote on this match</a></div>` : '');
++
++    section('recent', 'Results', 'Latest results',
++        s.recent.length ? `<ul class="result-list">${s.recent.map(r => r.winner ? `<li><a href="/vote?match=${encodeURIComponent(r.matchId)}"><span class="result-label">${esc(r.label)}</span>
++            <span class="result-text"><b>${esc(r.winner.title)}</b> beat ${esc(r.loser.title)}</span><span class="result-votes">${plural(r.total, 'vote')}</span></a></li>` : '').join('')}</ul>` : '',
++        '<a class="more" href="/matches">All matches</a>');
++
++    const voted = s.topVoted;
++    const pop = voted.length ? voted.map(e => editCard(e, plural(e.votes, 'vote'))) : mostWatched(edits).map(e => editCard(e, `${n(e.views)} views on YouTube`));
++    section('popular', voted.length ? 'Popular' : 'Popular on YouTube', voted.length ? 'Most voted edits' : 'Most watched edits',
++        pop.length ? `<div class="edit-row">${pop.join('')}</div>` : '', '<a class="more" href="/music-gallery">Edits gallery</a>');
++
++    const fresh = newestEdits(edits).map(e => editCard(e, e.uploadDate ? `Uploaded ${when(e.uploadDate)}` : ''));
++    section('newest', 'New', 'New edits', fresh.length ? `<div class="edit-row">${fresh.join('')}</div>` : '', '<a class="more" href="/music-gallery">Edits gallery</a>');
++}
++
++async function loadEdits() {
++    try {
++        const res = await fetch('/data/edits.json', { cache: 'no-cache' });
++        const list = JSON.parse(await res.text());   // unknown paths return the homepage with status 200, so read as text and check
++        edits = Array.isArray(list) ? list : [];
++    } catch { edits = []; }
++}
++
++async function loadMatches() {
++    try {
++        const matches = await getAllMatches();
++        const named = matches.find(m => m.tournamentName)?.tournamentName || (matches[0]?.tournament ? cupDisplayName(matches[0].tournament) : '');
++        cupName = named || '';
++        state = homeState(matches);
++    } catch (err) {
++        console.error('Homepage matches failed to load', err);
++        state = state || homeState([]);
++    }
++    render();
++}
++
++document.addEventListener('DOMContentLoaded', async () => {
++    await Promise.all([loadEdits(), loadMatches()]);
++    setInterval(() => { if (!document.hidden) loadMatches(); }, REFRESH_MS);
++});
+diff --git a/js/homepage.js b/js/homepage.js
+deleted file mode 100644
+index 5508ec6..0000000
+--- a/js/homepage.js
++++ /dev/null
+@@ -1,1092 +0,0 @@
+-// ========================================
+-// IMPORTS
+-// ========================================
+-import { getBookForSong } from './bookMappings.js';
+-import { getAllMatches } from './api-client.js';
+-import './youtube-playlist.js';
+-
+-import { db } from './firebase-config.js';
+-import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+-import { createMatchCard } from './match-card-renderer.js';
+-
+-const ACTIVE_TOURNAMENT = '2025-worlds-anthems';
+-
+-// ========================================
+-// STATE
+-// ========================================
+-let currentMatch = null;
+-let voteState = {
+-    leftVotes: 0,
+-    rightVotes: 0,
+-    totalVotes: 0,
+-    userVote: null
+-};
+-let musicVideos = [];
+-let countdownInterval = null;
+-
+-// ========================================
+-// INITIALIZE ON PAGE LOAD
+-// ========================================
+-document.addEventListener('DOMContentLoaded', async () => {
+-    console.time('⏱️ Total Homepage Load');
+-    console.log('🎵 League Music Tournament loaded');
+-    
+-    try {
+-        showHomepageLoading();
+-        
+-        console.time('⏱️ Music Videos');
+-        await loadMusicVideos();
+-        console.timeEnd('⏱️ Music Videos');
+-        
+-        console.time('⏱️ Fetch All Matches');
+-        const allMatches = await getAllMatches();
+-        console.timeEnd('⏱️ Fetch All Matches');
+-        
+-        console.time('⏱️ Tournament Info');
+-        await loadTournamentInfo(allMatches);
+-        console.timeEnd('⏱️ Tournament Info');
+-        
+-        console.time('⏱️ Featured Match');
+-        await loadFeaturedMatch(allMatches);
+-        console.timeEnd('⏱️ Featured Match');
+-        
+-        // ✅ ADD THIS:
+-        console.time('⏱️ Your Active Votes');
+-        await loadYourActiveVotes(allMatches);
+-        console.timeEnd('⏱️ Your Active Votes');
+-        
+-        console.time('⏱️ Live Matches');
+-        await loadLiveMatches(allMatches);
+-        console.timeEnd('⏱️ Live Matches');
+-        
+-        console.time('⏱️ Recent Results');
+-        await loadRecentResults(allMatches);
+-        console.timeEnd('⏱️ Recent Results');
+-        
+-        console.time('⏱️ Next Match Countdown');
+-        await loadNextMatchCountdown(allMatches);
+-        console.timeEnd('⏱️ Next Match Countdown');
+-        
+-        console.time('⏱️ Hero Stats');
+-        await updateHeroStats(allMatches);
+-        console.timeEnd('⏱️ Hero Stats');
+-        
+-        hideChampionsSection();
+-        hideHomepageLoading();
+-        showHomepageSections();
+-        
+-        console.timeEnd('⏱️ Total Homepage Load');
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading homepage:', error);
+-        hideHomepageLoading();
+-        showHomepageError(error);
+-    }
+-});
+-
+-// ========================================
+-// VOTE TRACKING HELPERS
+-// ========================================
+-function hasUserVoted(matchId) {
+-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+-    return !!userVotes[matchId];
+-}
+-
+-function getUserVotedSongId(matchId) {
+-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+-    return userVotes[matchId]?.songId || null;
+-}
+-
+-// ========================================
+-// LOAD MUSIC VIDEOS DATA
+-// ========================================
+-async function loadMusicVideos() {
+-    try {
+-        const response = await fetch('/data/music-videos.json');
+-        musicVideos = await response.json();
+-        console.log('✅ Music videos loaded:', musicVideos.length);
+-    } catch (error) {
+-        console.error('❌ Error loading music videos:', error);
+-    }
+-}
+-
+-// ========================================
+-// UPDATE HERO STATS
+-// ========================================
+-async function updateHeroStats(allMatches) {
+-    try {
+-        const totalVideosEl = document.getElementById('totalVideos');
+-        if (totalVideosEl) {
+-            totalVideosEl.textContent = musicVideos.length;
+-        }
+-        
+-        let totalVotes = 0;
+-        let activeMatches = 0;
+-        
+-        allMatches.forEach(match => {
+-            totalVotes += (match.totalVotes || 0);
+-            if (match.status === 'live') activeMatches++;
+-        });
+-        
+-        const totalVotesEl = document.getElementById('totalVotes');
+-        const matchesLeftEl = document.getElementById('matchesLeft');
+-        
+-        if (totalVotesEl) {
+-            totalVotesEl.textContent = totalVotes.toLocaleString();
+-        }
+-        
+-        if (matchesLeftEl) {
+-            matchesLeftEl.textContent = activeMatches;
+-        }
+-        
+-        console.log('✅ Hero stats updated:', { totalVotes, activeMatches });
+-        
+-    } catch (error) {
+-        console.error('❌ Error updating hero stats:', error);
+-    }
+-}
+-
+-// ========================================
+-// LOAD TOURNAMENT INFO (BADGE)
+-// ========================================
+-async function loadTournamentInfo(allMatches) {
+-    try {
+-        const liveMatches = allMatches.filter(m => m.status === 'live');
+-        const upcomingMatches = allMatches.filter(m => m.status === 'upcoming');
+-        
+-        const tournamentNameEl = document.getElementById('tournamentName');
+-        const tournamentStatusEl = document.getElementById('tournamentStatus');
+-        const badgeIcon = document.querySelector('.tournament-badge .badge-icon');
+-        
+-        if (!tournamentNameEl || !tournamentStatusEl) return;
+-        
+-        // SCENARIO 1: Live matches exist
+-        if (liveMatches.length > 0) {
+-            const actualLiveMatches = liveMatches.filter(match => {
+-                const isTBD = !match.song1?.id || !match.song2?.id ||
+-                             String(match.song1.id).includes('TBD') ||
+-                             String(match.song2.id).includes('TBD');
+-                return !isTBD;
+-            });
+-            
+-            if (actualLiveMatches.length === 1) {
+-                const liveMatch = actualLiveMatches[0];
+-                const song1 = liveMatch.song1.shortTitle || liveMatch.song1.title;
+-                const song2 = liveMatch.song2.shortTitle || liveMatch.song2.title;
+-                
+-                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
+-                tournamentNameEl.textContent = 'Live Now';
+-                tournamentStatusEl.textContent = `${song1} vs ${song2}`;
+-                tournamentStatusEl.style.maxWidth = '400px';
+-                tournamentStatusEl.style.overflow = 'hidden';
+-                tournamentStatusEl.style.textOverflow = 'ellipsis';
+-                tournamentStatusEl.style.whiteSpace = 'nowrap';
+-                
+-                console.log(`✅ Tournament badge: ${song1} vs ${song2}`);
+-                return;
+-            } else if (actualLiveMatches.length > 1) {
+-                const currentRound = actualLiveMatches[0].round || 1;
+-                
+-                badgeIcon.innerHTML = '<i class="fa-solid fa-circle"></i>'; // ✅ Changed
+-                tournamentNameEl.textContent = 'Live Now';
+-                tournamentStatusEl.textContent = `${actualLiveMatches.length} matches • ${getRoundDisplayName(currentRound)}`;
+-                
+-                console.log(`✅ Tournament badge: ${actualLiveMatches.length} live matches`);
+-                return;
+-            }
+-        }
+-        
+-        // SCENARIO 2: No live matches - show next upcoming match
+-        if (upcomingMatches.length > 0) {
+-            const validUpcomingMatches = upcomingMatches.filter(match => {
+-                const isTBD = !match.song1?.id || !match.song2?.id ||
+-                             String(match.song1.id).includes('TBD') ||
+-                             String(match.song2.id).includes('TBD');
+-                return !isTBD && match.date;
+-            });
+-            
+-            if (validUpcomingMatches.length > 0) {
+-                validUpcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+-                
+-                const nextMatch = validUpcomingMatches[0];
+-                const song1 = nextMatch.song1.shortTitle || nextMatch.song1.title;
+-                const song2 = nextMatch.song2.shortTitle || nextMatch.song2.title;
+-                const roundName = getRoundDisplayName(nextMatch.round);
+-                const timeUntil = getTimeUntilMatch(nextMatch.date);
+-                
+-                badgeIcon.innerHTML = '<i class="fa-solid fa-clock"></i>'; // ✅ Changed
+-                tournamentNameEl.textContent = `${song1} vs ${song2}`;
+-                tournamentStatusEl.textContent = `${roundName} • Starts ${timeUntil}`;
+-                tournamentStatusEl.style.maxWidth = '500px';
+-                tournamentStatusEl.style.overflow = 'hidden';
+-                tournamentStatusEl.style.textOverflow = 'ellipsis';
+-                tournamentStatusEl.style.whiteSpace = 'nowrap';
+-                
+-                console.log(`✅ Tournament badge: Next match - ${song1} vs ${song2}`);
+-                return;
+-            }
+-        }
+-        
+-        // SCENARIO 3: Fallback
+-        badgeIcon.innerHTML = '<i class="fa-solid fa-music"></i>'; // ✅ Changed
+-        tournamentNameEl.textContent = 'Music Tournament';
+-        tournamentStatusEl.textContent = 'Season 1';
+-        
+-        console.log('✅ Tournament badge: Fallback');
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading tournament info:', error);
+-        const tournamentNameEl = document.getElementById('tournamentName');
+-        const tournamentStatusEl = document.getElementById('tournamentStatus');
+-        if (tournamentNameEl) tournamentNameEl.textContent = 'Music Tournament';
+-        if (tournamentStatusEl) tournamentStatusEl.textContent = 'Season 1';
+-    }
+-}
+-
+-function getRoundDisplayName(roundNumber) {
+-    const roundNames = {
+-        1: 'Round 1',
+-        2: 'Round 2',
+-        3: 'Sweet 16',
+-        4: 'Quarterfinals',
+-        5: 'Semifinals',
+-        6: 'Finals'
+-    };
+-    return roundNames[roundNumber] || `Round ${roundNumber}`;
+-}
+-
+-function getTimeUntilMatch(dateString) {
+-    if (!dateString) return 'soon';
+-    
+-    const matchDate = new Date(dateString);
+-    const now = new Date();
+-    const diff = matchDate - now;
+-    
+-    if (diff < 0) return 'soon';
+-    
+-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+-    
+-    if (days > 0) return `in ${days}d ${hours}h`;
+-    if (hours > 0) return `in ${hours}h ${minutes}m`;
+-    if (minutes > 0) return `in ${minutes}m`;
+-    return 'soon';
+-}
+-
+-// ========================================
+-// LOAD FEATURED MATCH (DAILY ROTATION)
+-// ========================================
+-async function loadFeaturedMatch(allMatches) {
+-    try {
+-        console.log('🔍 Searching for live matches...');
+-        
+-        let liveMatches = allMatches.filter(m => {
+-            if (m.status !== 'live') return false;
+-            const isTBD = !m.song1?.id || !m.song2?.id ||
+-                         String(m.song1.id).includes('TBD') ||
+-                         String(m.song2.id).includes('TBD');
+-            return !isTBD;
+-        });
+-        
+-        if (liveMatches.length === 0) {
+-            console.log('❌ No live matches found');
+-            hideFeaturedSection();
+-            return;
+-        }
+-        
+-        currentMatch = selectDailyFeaturedMatch(liveMatches);
+-        
+-        console.log(`✅ Featured match of the day: ${currentMatch.matchId}`);
+-        console.log(`   ${liveMatches.length} total live matches rotating daily`);
+-        
+-        await displayFeaturedMatch();
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading featured match:', error);
+-        hideFeaturedSection();
+-    }
+-}
+-
+-function selectDailyFeaturedMatch(liveMatches) {
+-    if (liveMatches.length === 0) return null;
+-    if (liveMatches.length === 1) return liveMatches[0];
+-    
+-    const today = new Date().toISOString().split('T')[0];
+-    const dateSeed = hashString(today);
+-    const index = dateSeed % liveMatches.length;
+-    
+-    console.log(`🎲 Daily featured rotation: match ${index + 1} of ${liveMatches.length}`);
+-    
+-    return liveMatches[index];
+-}
+-
+-function hashString(str) {
+-    let hash = 0;
+-    for (let i = 0; i < str.length; i++) {
+-        const char = str.charCodeAt(i);
+-        hash = ((hash << 5) - hash) + char;
+-        hash = hash & hash;
+-    }
+-    return Math.abs(hash);
+-}
+-
+-function hideFeaturedSection() {
+-    const section = document.getElementById('featured-matchup');
+-    if (section) section.style.display = 'none';
+-}
+-
+-function displayFeaturedMatch() {
+-    if (!currentMatch) return;
+-    
+-    const featuredSection = document.getElementById('featured-matchup');
+-    if (!featuredSection) return;
+-    
+-    const container = featuredSection.querySelector('.container');
+-    if (!container) return;
+-    
+-    const matchId = currentMatch.matchId || currentMatch.id;
+-    const userHasVoted = hasUserVoted(matchId);
+-    const userVotedSongId = userHasVoted ? getUserVotedSongId(matchId) : null;
+-    
+-    const totalVotes = currentMatch.totalVotes || 0;
+-    const song1Votes = currentMatch.song1?.votes || 0;
+-    const song2Votes = currentMatch.song2?.votes || 0;
+-    
+-    const song1Pct = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+-    const song2Pct = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+-    
+-    const timeLeftInfo = getTimeLeftForMatch(currentMatch.endDate);
+-    
+-    container.innerHTML = `
+-        <div class="section-header">
+-            <span class="section-label">🔥 Featured Match</span>
+-            <h2 class="section-title">Match of the Day</h2>
+-            <p class="section-subtitle">
+-                ${userHasVoted 
+-                    ? `${totalVotes.toLocaleString()} votes • ${timeLeftInfo}` 
+-                    : `${timeLeftInfo}`
+-                }
+-            </p>
+-        </div>
+-        
+-        <div class="featured-match-card" onclick="voteNow('${matchId}')">
+-            <div class="featured-match-inner">
+-                <div class="featured-thumbnails">
+-                    <div class="thumbnail-wrapper ${userVotedSongId === 'song1' ? 'user-voted' : ''}">
+-                        <img src="https://img.youtube.com/vi/${currentMatch.song1.videoId}/mqdefault.jpg" 
+-                             alt="${currentMatch.song1.shortTitle || currentMatch.song1.title}">
+-                        <div class="thumbnail-overlay">
+-                            <span class="seed-badge">#${currentMatch.song1.seed}</span>
+-                            ${userVotedSongId === 'song1' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+-                        </div>
+-                        ${userHasVoted ? `
+-                            <div class="thumbnail-result">
+-                                <span class="result-pct">${song1Pct}%</span>
+-                                <span class="result-votes">${song1Votes.toLocaleString()}</span>
+-                            </div>
+-                        ` : ''}
+-                    </div>
+-                    
+-                    <div class="featured-vs">
+-                        <span class="vs-badge">VS</span>
+-                        ${userHasVoted ? `
+-                            <div class="vs-progress-bar">
+-                                <div class="bar-fill left" style="height: ${song1Pct}%"></div>
+-                                <div class="bar-fill right" style="height: ${song2Pct}%"></div>
+-                            </div>
+-                        ` : ''}
+-                    </div>
+-                    
+-                    <div class="thumbnail-wrapper ${userVotedSongId === 'song2' ? 'user-voted' : ''}">
+-                        <img src="https://img.youtube.com/vi/${currentMatch.song2.videoId}/mqdefault.jpg" 
+-                             alt="${currentMatch.song2.shortTitle || currentMatch.song2.title}">
+-                        <div class="thumbnail-overlay">
+-                            <span class="seed-badge">#${currentMatch.song2.seed}</span>
+-                            ${userVotedSongId === 'song2' ? '<span class="voted-badge">✓ Your Pick</span>' : ''}
+-                        </div>
+-                        ${userHasVoted ? `
+-                            <div class="thumbnail-result">
+-                                <span class="result-pct">${song2Pct}%</span>
+-                                <span class="result-votes">${song2Votes.toLocaleString()}</span>
+-                            </div>
+-                        ` : ''}
+-                    </div>
+-                </div>
+-                
+-                <div class="featured-info">
+-                    <div class="song-pair">
+-                        <div class="song-details">
+-                            <h3 class="song-title">${currentMatch.song1.shortTitle || currentMatch.song1.title}</h3>
+-                            <p class="song-meta">${currentMatch.song1.artist} • ${currentMatch.song1.year}</p>
+-                        </div>
+-                        
+-                        <div class="song-details">
+-                            <h3 class="song-title">${currentMatch.song2.shortTitle || currentMatch.song2.title}</h3>
+-                            <p class="song-meta">${currentMatch.song2.artist} • ${currentMatch.song2.year}</p>
+-                        </div>
+-                    </div>
+-                    
+-                    ${userHasVoted ? `
+-                        <button class="featured-cta voted" onclick="voteNow('${matchId}'); event.stopPropagation();">
+-                            <span class="cta-icon">📊</span>
+-                            <span class="cta-text">View Full Results</span>
+-                            <span class="cta-arrow">→</span>
+-                        </button>
+-                    ` : `
+-                        <button class="featured-cta" onclick="voteNow('${matchId}'); event.stopPropagation();">
+-                            <span class="cta-icon">🎵</span>
+-                            <span class="cta-text">Vote Now</span>
+-                            <span class="cta-arrow">→</span>
+-                        </button>
+-                    `}
+-                </div>
+-            </div>
+-        </div>
+-    `;
+-    
+-    featuredSection.style.display = 'block';
+-    console.log('✅ Featured match rendered:', matchId);
+-}
+-
+-function getTimeLeftForMatch(endDate) {
+-    if (!endDate) return '<i class="fa-solid fa-circle"></i> Live Now'; // ✅ Changed
+-    
+-    const end = new Date(endDate);
+-    const now = new Date();
+-    const diff = end - now;
+-    
+-    if (diff <= 0) return '⏱️ Voting Closed';
+-    
+-    const hours = Math.floor(diff / (1000 * 60 * 60));
+-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+-    
+-    if (hours > 24) {
+-        const days = Math.floor(hours / 24);
+-        return `<i class="fa-solid fa-clock"></i> ${days}d ${hours % 24}h left`; // ✅ Changed
+-    } else if (hours > 0) {
+-        return `<i class="fa-solid fa-clock"></i> ${hours}h ${minutes}m left`; // ✅ Changed
+-    } else if (minutes > 5) {
+-        return `<i class="fa-solid fa-clock"></i> ${minutes}m left`; // ✅ Changed
+-    } else {
+-        return `<i class="fa-solid fa-triangle-exclamation"></i> ${minutes}m left - Vote now!`; // ✅ Changed
+-    }
+-}
+-
+-// ========================================
+-// NEW: LOAD YOUR ACTIVE VOTES
+-// ========================================
+-async function loadYourActiveVotes(allMatches) {
+-    try {
+-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+-        const votedMatchIds = Object.keys(userVotes);
+-        
+-        if (votedMatchIds.length === 0) {
+-            hideYourVotesSection();
+-            return;
+-        }
+-        
+-        const activeVotedMatches = allMatches.filter(m => 
+-            m.status === 'live' && votedMatchIds.includes(m.matchId)
+-        ).slice(0, 4);
+-        
+-        if (activeVotedMatches.length === 0) {
+-            hideYourVotesSection();
+-            return;
+-        }
+-        
+-        console.log(`✅ Found ${activeVotedMatches.length} active votes for user`);
+-        displayYourActiveVotes(activeVotedMatches);
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading your active votes:', error);
+-        hideYourVotesSection();
+-    }
+-}
+-
+-function hideYourVotesSection() {
+-    const section = document.getElementById('yourVotesSection');
+-    if (section) section.style.display = 'none';
+-}
+-
+-function displayYourActiveVotes(matches) {
+-    const section = document.getElementById('yourVotesSection');
+-    const grid = document.getElementById('yourVotesGrid');
+-    
+-    if (!section || !grid) return;
+-    
+-    grid.innerHTML = '';
+-    
+-    matches.forEach(match => {
+-        const userVotedSongId = getUserVotedSongId(match.matchId);
+-        const totalVotes = match.totalVotes || 0;
+-        
+-        let userSong, opponentSong, userVotes, opponentVotes;
+-        
+-        if (userVotedSongId === 'song1') {
+-            userSong = match.song1;
+-            opponentSong = match.song2;
+-            userVotes = match.song1.votes || 0;
+-            opponentVotes = match.song2.votes || 0;
+-        } else {
+-            userSong = match.song2;
+-            opponentSong = match.song1;
+-            userVotes = match.song2.votes || 0;
+-            opponentVotes = match.song1.votes || 0;
+-        }
+-        
+-        const userPct = totalVotes > 0 ? Math.round((userVotes / totalVotes) * 100) : 50;
+-        const isWinning = userVotes > opponentVotes;
+-        
+-        const card = document.createElement('div');
+-        card.className = `your-vote-card ${isWinning ? 'winning' : 'losing'}`;
+-        card.onclick = () => voteNow(match.matchId);
+-        
+-        card.innerHTML = `
+-            <div class="your-pick-badge"><i class="fa-solid fa-check"></i> Your Pick</div>
+-            <div class="vote-matchup">
+-                <div class="vote-song">
+-                    <img src="https://img.youtube.com/vi/${userSong.videoId}/mqdefault.jpg" 
+-                         alt="${userSong.shortTitle || userSong.title}">
+-                    <div class="vote-song-info">
+-                        <h4>${userSong.shortTitle || userSong.title}</h4>
+-                        <p>${userSong.artist}</p>
+-                    </div>
+-                </div>
+-                <div class="vote-vs">VS</div>
+-                <div class="vote-song opponent">
+-                    <img src="https://img.youtube.com/vi/${opponentSong.videoId}/mqdefault.jpg" 
+-                         alt="${opponentSong.shortTitle || opponentSong.title}">
+-                    <div class="vote-song-info">
+-                        <h4>${opponentSong.shortTitle || opponentSong.title}</h4>
+-                        <p>${opponentSong.artist}</p>
+-                    </div>
+-                </div>
+-            </div>
+-            <div class="vote-status ${isWinning ? 'winning' : 'losing'}">
+-<span class="status-icon">${isWinning ? '<i class="fa-solid fa-fire"></i>' : '<i class="fa-solid fa-arrow-down"></i>'}</span>
+-                <span class="status-text">
+-                    ${isWinning ? 'Leading' : 'Trailing'} at ${userPct}%
+-                </span>
+-                <span class="status-votes">${userVotes.toLocaleString()} votes</span>
+-            </div>
+-        `;
+-        
+-        grid.appendChild(card);
+-    });
+-    
+-    section.style.display = 'block';
+-    console.log('✅ Your active votes displayed');
+-}
+-
+-// ========================================
+-// LOAD LIVE MATCHES (LIMITED TO 3)
+-// ========================================
+-async function loadLiveMatches(allMatches) {
+-    try {
+-        let liveMatches = allMatches.filter(m => {
+-            if (m.status !== 'live') return false;
+-            if (m.matchId === currentMatch?.matchId) return false;
+-            const isTBD = !m.song1?.id || !m.song2?.id ||
+-                         String(m.song1.id).includes('TBD') ||
+-                         String(m.song2.id).includes('TBD');
+-            return !isTBD;
+-        });
+-        
+-        if (liveMatches.length === 0) {
+-            hideLiveMatchesSection();
+-            return;
+-        }
+-        
+-        const topLiveMatches = liveMatches
+-            .sort((a, b) => (b.totalVotes || 0) - (a.totalVotes || 0))
+-            .slice(0, 4);
+-        
+-        console.log(`✅ Showing top ${topLiveMatches.length} live matches`);
+-        displayLiveMatchesGrid(topLiveMatches);
+-        
+-        if (liveMatches.length > 3) {
+-            addViewAllLiveLink(liveMatches.length);
+-        }
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading live matches:', error);
+-    }
+-}
+-
+-function displayLiveMatchesGrid(matches) {
+-    const grid = document.getElementById('liveMatchesGrid');
+-    if (!grid) return;
+-    
+-    grid.innerHTML = '';
+-    
+-    matches.forEach(m => {
+-        const hasVoted = hasUserVoted(m.matchId);
+-        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+-        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+-        const card = createMatchCard(matchData);
+-        grid.appendChild(card);
+-    });
+-}
+-
+-function hideLiveMatchesSection() {
+-    const section = document.querySelector('.live-matches-section');
+-    if (section) section.style.display = 'none';
+-}
+-
+-function addViewAllLiveLink(totalCount) {
+-    const section = document.querySelector('.live-matches-section .section-header');
+-    if (section) {
+-        const subtitle = section.querySelector('.section-subtitle');
+-        if (subtitle) {
+-            subtitle.innerHTML = `
+-                Showing 4 of ${totalCount} live matches
+-                <a href="matches.html?status=live" class="view-all-inline">View All →</a>
+-            `;
+-        }
+-    }
+-}
+-
+-// ========================================
+-// LOAD RECENT RESULTS (LIMITED TO 6)
+-// ========================================
+-async function loadRecentResults(allMatches) {
+-    try {
+-        let results = allMatches.filter(m => m.status === 'completed');
+-        
+-        if (results.length === 0) {
+-            showNoResultsMessage();
+-            return;
+-        }
+-        
+-        results.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+-        
+-        const recentResults = results.slice(0, 6);
+-        
+-        console.log(`✅ Showing ${recentResults.length} recent results`);
+-        displayRecentResultsGrid(recentResults);
+-        
+-        if (results.length > 6) {
+-            addViewAllResultsLink(results.length);
+-        }
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading recent results:', error);
+-    }
+-}
+-
+-
+-
+-function displayRecentResultsGrid(matches) {
+-    const grid = document.getElementById('recentResultsGrid');
+-    if (!grid) return;
+-    
+-    grid.innerHTML = '';
+-    
+-    matches.forEach(m => {
+-        const hasVoted = hasUserVoted(m.matchId);
+-        const userVotedSongId = hasVoted ? getUserVotedSongId(m.matchId) : null;
+-        const matchData = convertFirebaseMatchToDisplayFormat(m, hasVoted, userVotedSongId);
+-        const card = createMatchCard(matchData);
+-        grid.appendChild(card);
+-    });
+-}
+-
+-function showNoResultsMessage() {
+-    const grid = document.getElementById('recentResultsGrid');
+-    if (!grid) return;
+-    
+-    grid.innerHTML = `
+-        <div class="no-results">
+-            <div class="no-results-icon">⏳</div>
+-            <h3 class="no-results-title">No Results Yet</h3>
+-            <p class="no-results-text">
+-                The tournament hasn't started or matches are still in progress.<br>
+-                Results will appear here as winners are decided. Check back soon! 🏆
+-            </p>
+-        </div>
+-    `;
+-}
+-
+-function addViewAllResultsLink(totalCount) {
+-    const section = document.querySelector('.recent-results-section .section-header');
+-    if (section) {
+-        const subtitle = section.querySelector('.section-subtitle');
+-        if (subtitle) {
+-            subtitle.innerHTML = `
+-                Showing 6 of ${totalCount} completed matches
+-                <a href="matches.html?status=completed" class="view-all-inline">View All →</a>
+-            `;
+-        }
+-    }
+-}
+-
+-// ========================================
+-// NEW: LOAD NEXT MATCH COUNTDOWN
+-// ========================================
+-async function loadNextMatchCountdown(allMatches) {
+-    try {
+-        const upcomingMatches = allMatches.filter(m => {
+-            if (m.status !== 'upcoming') return false;
+-            const isTBD = !m.song1?.id || !m.song2?.id ||
+-                         String(m.song1.id).includes('TBD') ||
+-                         String(m.song2.id).includes('TBD');
+-            return !isTBD && m.date;
+-        });
+-        
+-        if (upcomingMatches.length === 0) {
+-            hideNextMatchCountdown();
+-            return;
+-        }
+-        
+-        upcomingMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+-        
+-        const nextMatch = upcomingMatches[0];
+-        
+-        console.log('✅ Next match countdown:', nextMatch.matchId);
+-        displayNextMatchCountdown(nextMatch);
+-        startCountdown(nextMatch.date);
+-        
+-    } catch (error) {
+-        console.error('❌ Error loading next match countdown:', error);
+-        hideNextMatchCountdown();
+-    }
+-}
+-
+-function hideNextMatchCountdown() {
+-    const section = document.getElementById('nextMatchCountdown');
+-    if (section) section.style.display = 'none';
+-}
+-
+-function displayNextMatchCountdown(match) {
+-    const section = document.getElementById('nextMatchCountdown');
+-    const titleEl = document.getElementById('nextMatchTitle');
+-    
+-    if (!section || !titleEl) return;
+-    
+-    const song1 = match.song1.shortTitle || match.song1.title;
+-    const song2 = match.song2.shortTitle || match.song2.title;
+-    
+-    titleEl.textContent = `${song1} vs ${song2}`;
+-    section.style.display = 'block';
+-}
+-
+-function startCountdown(targetDate) {
+-    if (countdownInterval) {
+-        clearInterval(countdownInterval);
+-    }
+-    
+-    const target = new Date(targetDate).getTime();
+-    
+-    const updateCountdown = () => {
+-        const now = new Date().getTime();
+-        const diff = target - now;
+-        
+-        if (diff <= 0) {
+-            clearInterval(countdownInterval);
+-            
+-            document.getElementById('countdownDays').textContent = '00';
+-            document.getElementById('countdownHours').textContent = '00';
+-            document.getElementById('countdownMinutes').textContent = '00';
+-            document.getElementById('countdownSeconds').textContent = '00';
+-            
+-            setTimeout(() => {
+-                location.reload();
+-            }, 2000);
+-            return;
+-        }
+-        
+-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+-        
+-        document.getElementById('countdownDays').textContent = String(days).padStart(2, '0');
+-        document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
+-        document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
+-        document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+-    };
+-    
+-    updateCountdown();
+-    countdownInterval = setInterval(updateCountdown, 1000);
+-}
+-
+-// ========================================
+-// CONVERT FIREBASE MATCH TO DISPLAY FORMAT
+-// ========================================
+-function convertFirebaseMatchToDisplayFormat(firebaseMatch, hasVoted = false, userVotedSongId = null) {
+-    const totalVotes = firebaseMatch.totalVotes || 0;
+-    const song1Votes = firebaseMatch.song1?.votes || 0;
+-    const song2Votes = firebaseMatch.song2?.votes || 0;
+-    
+-    const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+-    const song2Percentage = totalVotes > 0 ? Math.round((song2Votes / totalVotes) * 100) : 50;
+-    
+-    if (!userVotedSongId && hasVoted) {
+-        userVotedSongId = getUserVotedSongId(firebaseMatch.matchId);
+-    }
+-    
+-    return {
+-        id: firebaseMatch.matchId || firebaseMatch.id,
+-        tournament: 'Anthems Arena Championship',
+-        round: getRoundName(firebaseMatch.round),
+-        status: firebaseMatch.status || 'upcoming',
+-        date: firebaseMatch.date || '2025-11-01',
+-        endDate: firebaseMatch.endDate || null,
+-        totalVotes: totalVotes,
+-        timeLeft: firebaseMatch.status === 'live' ? 'Voting Open' : 'Not Started',
+-        hasVoted: hasVoted,
+-        competitor1: {
+-            seed: firebaseMatch.song1.seed,
+-            name: firebaseMatch.song1.shortTitle || firebaseMatch.song1.title,
+-            source: `${firebaseMatch.song1.artist} • ${firebaseMatch.song1.year || '2025'}`,
+-            videoId: firebaseMatch.song1.videoId,
+-            votes: song1Votes,
+-            percentage: song1Percentage,
+-            winner: firebaseMatch.winnerId === firebaseMatch.song1.id,
+-            leading: userVotedSongId === 'song1',
+-            userVoted: userVotedSongId === 'song1'
+-        },
+-        competitor2: {
+-            seed: firebaseMatch.song2.seed,
+-            name: firebaseMatch.song2.shortTitle || firebaseMatch.song2.title,
+-            source: `${firebaseMatch.song2.artist} • ${firebaseMatch.song2.year || '2025'}`,
+-            videoId: firebaseMatch.song2.videoId,
+-            votes: song2Votes,
+-            percentage: song2Percentage,
+-            winner: firebaseMatch.winnerId === firebaseMatch.song2.id,
+-            leading: userVotedSongId === 'song2',
+-            userVoted: userVotedSongId === 'song2'
+-        }
+-    };
+-}
+-
+-function getRoundName(roundNumber) {
+-    const roundNames = {
+-        1: 'round-1',
+-        2: 'round-2',
+-        3: 'round-3',
+-        4: 'quarterfinals',
+-        5: 'semifinals',
+-        6: 'finals'
+-    };
+-    return roundNames[roundNumber] || `round-${roundNumber}`;
+-}
+-
+-// ========================================
+-// VOTE NOW NAVIGATION
+-// ========================================
+-window.voteNow = function(matchId) {
+-    if (!matchId) {
+-        console.error('❌ voteNow: No match ID provided');
+-        showNotification('Unable to load match. Please try again.', 'error');
+-        return;
+-    }
+-    
+-    console.log(`✅ Navigating to vote page for match: ${matchId}`);
+-    window.location.href = `vote?match=${matchId}`;
+-};
+-
+-// ========================================
+-// LOADING STATE HELPERS
+-// ========================================
+-function showHomepageLoading() {
+-    const loadingState = document.getElementById('homepageLoadingState');
+-    if (loadingState) {
+-        loadingState.style.display = 'block';
+-    }
+-    hideHomepageSections();
+-    console.log('⏳ Showing homepage loading state');
+-}
+-
+-function hideHomepageLoading() {
+-    const loadingState = document.getElementById('homepageLoadingState');
+-    if (loadingState) {
+-        loadingState.style.display = 'none';
+-    }
+-    console.log('✅ Hiding homepage loading state');
+-}
+-
+-function showHomepageSections() {
+-    const sections = [
+-        { id: 'heroSection', stagger: 1 },
+-        { id: 'featured-matchup', stagger: 2 },
+-        { id: 'yourVotesSection', stagger: 3 },
+-        { id: 'liveMatchesSection', stagger: 4 },
+-        { id: 'recentResultsSection', stagger: 5 },
+-        { id: 'nextMatchCountdown', stagger: 6 }
+-    ];
+-    
+-    sections.forEach(({ id, stagger }) => {
+-        const section = document.getElementById(id);
+-        if (section && section.style.display !== 'none') {
+-            section.style.display = 'block';
+-            section.classList.add('homepage-fade-in', `stagger-${stagger}`);
+-        }
+-    });
+-    
+-    console.log('✅ Homepage sections visible with stagger animation');
+-}
+-
+-function hideHomepageSections() {
+-    const sectionIds = [
+-        'heroSection',
+-        'featured-matchup',
+-        'yourVotesSection',
+-        'liveMatchesSection',
+-        'recentResultsSection',
+-        'nextMatchCountdown'
+-    ];
+-    
+-    sectionIds.forEach(id => {
+-        const section = document.getElementById(id);
+-        if (section) {
+-            section.style.display = 'none';
+-            section.classList.remove('homepage-fade-in');
+-        }
+-    });
+-}
+-
+-function showHomepageError(error) {
+-    const heroSection = document.getElementById('heroSection');
+-    if (heroSection) {
+-        heroSection.style.display = 'block';
+-        heroSection.innerHTML = `
+-            <div class="container">
+-                <div style="text-align: center; padding: 5rem 2rem;">
+-                    <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.5;">⚠️</div>
+-                    <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: #C8AA6E; margin-bottom: 1rem;">
+-                        Error Loading Tournament
+-                    </h2>
+-                    <p style="font-family: 'Lora', serif; font-size: 1.1rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 2rem;">
+-                        Could not load tournament data. Please try refreshing the page.
+-                    </p>
+-                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">
+-                        Error: ${error.message}
+-                    </p>
+-                    <button onclick="location.reload()" style="margin-top: 2rem; padding: 1rem 2rem; background: linear-gradient(135deg, #C8AA6E, #b49a5e); border: none; color: #1a1a2e; font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer;">
+-                        Retry
+-                    </button>
+-                </div>
+-            </div>
+-        `;
+-    }
+-}
+-
+-// ========================================
+-// HIDE CHAMPIONS SECTION
+-// ========================================
+-function hideChampionsSection() {
+-    const championsSection = document.querySelector('.champions');
+-    if (championsSection) {
+-        championsSection.style.display = 'none';
+-        console.log('✅ Hall of Champions hidden (no champions yet)');
+-    }
+-}
+-
+-// ========================================
+-// VIDEO PLAYER
+-// ========================================
+-function playVideo(momentId) {
+-    const videoWrapper = event.currentTarget.closest('.video-wrapper');
+-    const thumbnail = videoWrapper.querySelector('.video-thumbnail');
+-    const playButton = videoWrapper.querySelector('.play-button');
+-    
+-    const thumbnailSrc = thumbnail.src;
+-    const videoIdMatch = thumbnailSrc.match(/vi\/([^\/]+)\//);
+-    
+-    if (!videoIdMatch) {
+-        console.error('Could not extract video ID');
+-        return;
+-    }
+-    
+-    const videoId = videoIdMatch[1];
+-    
+-    const iframe = document.createElement('iframe');
+-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+-    iframe.frameBorder = '0';
+-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+-    iframe.allowFullscreen = true;
+-    iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;';
+-    
+-    thumbnail.style.display = 'none';
+-    playButton.style.display = 'none';
+-    videoWrapper.appendChild(iframe);
+-}
+-
+-window.playVideo = playVideo;
+-
+-// ========================================
+-// BOOK LINK TRACKING
+-// ========================================
+-window.trackBookClick = function(songSlug, location) {
+-    console.log(`📊 Book clicked: ${songSlug} from ${location}`);
+-    
+-    if (typeof gtag !== 'undefined') {
+-        gtag('event', 'book_click', {
+-            song: songSlug,
+-            location: location
+-        });
+-    }
+-};
+-
+-// ========================================
+-// NOTIFICATION HELPER
+-// ========================================
+-function showNotification(message, type = 'success') {
+-    const notification = document.createElement('div');
+-    notification.className = `notification ${type}`;
+-    notification.textContent = message;
+-    
+-    const bgColor = {
+-        'success': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+-        'error': 'linear-gradient(135deg, rgba(220, 50, 50, 0.95), rgba(200, 30, 30, 0.95))',
+-        'info': 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))',
+-    }[type] || 'linear-gradient(135deg, rgba(200, 170, 110, 0.95), rgba(180, 150, 90, 0.95))';
+-    
+-    notification.style.cssText = `
+-        position: fixed;
+-        bottom: 2rem;
+-        right: 2rem;
+-        background: ${bgColor};
+-        color: white;
+-        padding: 1rem 1.5rem;
+-        border-radius: 8px;
+-        font-family: 'Lora', serif;
+-        font-size: 0.95rem;
+-        font-weight: 600;
+-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+-        z-index: 10000;
+-        animation: slideIn 0.3s ease;
+-        border: 1px solid rgba(255, 255, 255, 0.2);
+-    `;
+-    
+-    document.body.appendChild(notification);
+-    
+-    setTimeout(() => {
+-        notification.style.animation = 'slideOut 0.3s ease';
+-        setTimeout(() => {
+-            if (notification.parentNode) {
+-                document.body.removeChild(notification);
+-            }
+-        }, 300);
+-    }, 3000);
+-}
+-
+-// ========================================
+-// CLEANUP ON PAGE UNLOAD
+-// ========================================
+-window.addEventListener('beforeunload', () => {
+-    if (countdownInterval) {
+-        clearInterval(countdownInterval);
+-    }
+-});
+-
+-// ========================================
+-// CONSOLE BRANDING
+-// ========================================
+-console.log(
+-    '%c🎵 League Music Tournament %c- Powered by the Lore',
+-    'color: #C8AA6E; font-size: 20px; font-weight: bold; font-family: Cinzel, serif;',
+-    'color: #888; font-size: 14px; font-family: Lora, serif;'
+-);
+\ No newline at end of file
+diff --git a/js/youtube-playlist.js b/js/youtube-playlist.js
+deleted file mode 100644
+index 360035d..0000000
+--- a/js/youtube-playlist.js
++++ /dev/null
+@@ -1,213 +0,0 @@
+-// ========================================
+-// YOUTUBE PLAYLIST CAROUSEL
+-// ========================================
+-
+-const PLAYLIST_ID = 'PLlU9fZcbJfgtSQuaJlo1BmSjwDVQb2kgY';
+-const MAX_RESULTS = 50;
+-const PLAYLIST_NAME = 'Anthem Arena Season 1';
+-
+-let currentVideoId = null;
+-let playlistVideos = [];
+-
+-// ========================================
+-// FETCH PLAYLIST VIDEOS
+-// ========================================
+-// ========================================
+-// FETCH PLAYLIST VIDEOS
+-// ========================================
+-async function fetchPlaylistVideos() {
+-    try {
+-        const response = await fetch('/.netlify/functions/youtube');
+-        const data = await response.json();
+-
+-        // ✅ ADD: Log the response to see actual structure
+-        console.log('YouTube API Response:', data);
+-
+-        if (data.error) {
+-            console.error('YouTube API Error:', data.error);
+-            return [];
+-        }
+-
+-        // ✅ ADD: Check if items exist
+-        if (!data.items || data.items.length === 0) {
+-            console.error('No playlist items found');
+-            return [];
+-        }
+-
+-        playlistVideos = data.items.map(item => {
+-            // ✅ ADD: Log individual item to debug
+-            console.log('Processing item:', item);
+-            
+-            // ✅ FIX: Safe access with fallback
+-            const snippet = item.snippet || {};
+-            const thumbnails = snippet.thumbnails || {};
+-            const medium = thumbnails.medium || thumbnails.default || thumbnails.high || {};
+-            
+-            return {
+-                videoId: snippet.resourceId?.videoId || '',
+-                title: snippet.title || 'Untitled',
+-                thumbnail: medium.url || 'https://via.placeholder.com/320x180?text=No+Thumbnail',
+-                publishedAt: snippet.publishedAt || ''
+-            };
+-        });
+-
+-        console.log('✅ Processed videos:', playlistVideos.length);
+-        return playlistVideos;
+-        
+-    } catch (error) {
+-        console.error('Error fetching playlist:', error);
+-        return [];
+-    }
+-}
+-
+-
+-// ========================================
+-// RENDER PLAYLIST CAROUSEL
+-// ========================================
+-async function renderPlaylistCarousel() {
+-    const container = document.getElementById('youtube-playlist-container');
+-    if (!container) return;
+-    
+-    const videos = await fetchPlaylistVideos();
+-    
+-    if (videos.length === 0) {
+-        container.innerHTML = `
+-            <div class="youtube-playlist-section">
+-                <div class="section-header">
+-                    <p style="color: #999; text-align: center;">Unable to load videos. Please check back later.</p>
+-                </div>
+-            </div>
+-        `;
+-        return;
+-    }
+-        // ✅ NO default video - player starts hidden
+-    currentVideoId = null;
+-    
+-    const carouselHTML = `
+-        <div class="youtube-playlist-section">
+-            <div class="container">
+-                <div class="section-header">
+-                    <span class="section-label">🎬 Match Highlights</span>
+-                    <h2 class="section-title">${PLAYLIST_NAME}</h2>
+-                    <p class="section-subtitle">Follow the action and watch the H2H matches on Youtube! • ${videos.length} videos</p>
+-                </div>
+-                
+-                <!-- Video Thumbnails Carousel -->
+-                <div class="video-carousel-wrapper">
+-                    <div class="video-carousel">
+-                        ${videos.map((video, index) => `
+-                            <div class="video-thumbnail-card" 
+-                                 data-video-id="${video.videoId}"
+-                                 onclick="loadVideo('${video.videoId}')">
+-                                <img src="${video.thumbnail}" 
+-                                     alt="${video.title}"
+-                                     loading="lazy">
+-                                <div class="video-card-overlay">
+-                                    <i class="fas fa-play-circle"></i>
+-                                </div>
+-                                <div class="video-card-title">${truncateTitle(video.title)}</div>
+-                            </div>
+-                        `).join('')}
+-                    </div>
+-                </div>
+-                
+-                <!-- ✅ Active Video Player - HIDDEN BY DEFAULT with Close Button -->
+-                <div class="youtube-player-container" id="youtube-player-container" style="display: none;">
+-                    <button class="player-close-btn" onclick="closePlayer()" aria-label="Close video player">
+-                        <i class="fas fa-times"></i>
+-                    </button>
+-                    <div class="player-wrapper">
+-                        <iframe id="youtube-playlist-player"
+-                                src=""
+-                                frameborder="0"
+-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+-                                allowfullscreen>
+-                        </iframe>
+-                    </div>
+-                </div>
+-                
+-                <!-- Playlist CTA -->
+-                <div class="playlist-cta">
+-                    <a href="https://www.youtube.com/playlist?list=${PLAYLIST_ID}" 
+-                       target="_blank" 
+-                       class="btn btn-primary">
+-                        <i class="fab fa-youtube"></i>
+-                        Watch Full Playlist on YouTube
+-                    </a>
+-                </div>
+-            </div>
+-        </div>
+-    `;
+-    
+-    container.innerHTML = carouselHTML;
+-}
+-
+-// ========================================
+-// LOAD VIDEO IN PLAYER
+-// ========================================
+-window.loadVideo = function(videoId) {
+-    currentVideoId = videoId;
+-    
+-    // ✅ Show player container with smooth reveal
+-    const playerContainer = document.getElementById('youtube-player-container');
+-    if (playerContainer && playerContainer.style.display === 'none') {
+-        playerContainer.style.display = 'block';
+-        // Smooth scroll to player
+-        setTimeout(() => {
+-            playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+-        }, 100);
+-    }
+-    
+-    // Update player iframe
+-    const player = document.getElementById('youtube-playlist-player');
+-    if (player) {
+-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+-    }
+-    
+-    // Update active thumbnail
+-    document.querySelectorAll('.video-thumbnail-card').forEach(card => {
+-        card.classList.remove('active');
+-        if (card.dataset.videoId === videoId) {
+-            card.classList.add('active');
+-        }
+-    });
+-};
+-
+-// ========================================
+-// CLOSE VIDEO PLAYER
+-// ========================================
+-window.closePlayer = function() {
+-    const playerContainer = document.getElementById('youtube-player-container');
+-    if (playerContainer) {
+-        playerContainer.style.display = 'none';
+-        
+-        // Stop video playback
+-        const player = document.getElementById('youtube-playlist-player');
+-        if (player) {
+-            player.src = '';
+-        }
+-        
+-        // Clear active states
+-        document.querySelectorAll('.video-thumbnail-card').forEach(card => {
+-            card.classList.remove('active');
+-        });
+-        
+-        // Reset current video
+-        currentVideoId = null;
+-    }
+-};
+-
+-// ========================================
+-// HELPER: TRUNCATE TITLE
+-// ========================================
+-function truncateTitle(title) {
+-    const maxLength = 40;
+-    return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
+-}
+-
+-// ========================================
+-// INITIALIZE ON PAGE LOAD
+-// ========================================
+-document.addEventListener('DOMContentLoaded', () => {
+-    renderPlaylistCarousel();
+-});
+\ No newline at end of file
+diff --git a/netlify/functions/arcane-playlist.js b/netlify/functions/arcane-playlist.js
+deleted file mode 100644
+index 4c1b23a..0000000
+--- a/netlify/functions/arcane-playlist.js
++++ /dev/null
+@@ -1,69 +0,0 @@
+-const YT = "https://www.googleapis.com/youtube/v3/";
+-const json = (statusCode, body, headers = {}) => ({
+-  statusCode,
+-  headers: { "Content-Type": "application/json", ...headers },
+-  body: JSON.stringify(body)
+-});
+-
+-// Usage: ?playlistId=PL...   or   ?handle=theundercityedit&limit=12 (channel uploads)
+-export async function handler(event) {
+-  const apiKey = process.env.YOUTUBE_API_KEY_SERVER;
+-  const qs = event.queryStringParameters || {};
+-  let playlistId = qs.playlistId;
+-  const handle = (qs.handle || "").replace(/^@/, "");
+-  const limit = Math.min(Number(qs.limit) || 0, 200);
+-  if (!apiKey) return json(500, { error: "YouTube API key is not configured." });
+-  if (!playlistId && !handle) return json(400, { error: "playlistId or handle is required." });
+-
+-  try {
+-    const call = async (path, params) => {
+-      const res = await fetch(YT + path + "?" + new URLSearchParams({ ...params, key: apiKey }));
+-      const data = await res.json();
+-      if (!res.ok || data.error) {
+-        const err = new Error(data.error?.message || "YouTube request failed.");
+-        err.status = res.status || 500;
+-        throw err;
+-      }
+-      return data;
+-    };
+-
+-    let description = "";
+-    if (handle) {
+-      const ch = (await call("channels", { part: "contentDetails", forHandle: handle })).items?.[0];
+-      if (!ch) return json(404, { error: "YouTube channel not found." });
+-      playlistId = ch.contentDetails.relatedPlaylists.uploads;
+-    } else {
+-      const pl = (await call("playlists", { part: "snippet", id: playlistId })).items?.[0];
+-      if (!pl) return json(404, { error: "YouTube playlist not found." });
+-      description = pl.snippet?.description || "";
+-    }
+-
+-    const items = [];
+-    let pageToken = "";
+-    do {
+-      const params = { part: "snippet", playlistId, maxResults: "50" };
+-      if (pageToken) params.pageToken = pageToken;
+-      const data = await call("playlistItems", params);
+-      for (const item of data.items || []) {
+-        const s = item.snippet || {};
+-        const title = s.title || "";
+-        // Skip private/deleted entries
+-        if (!s.resourceId?.videoId || title === "Private video" || title === "Deleted video") continue;
+-        const t = s.thumbnails || {};
+-        items.push({
+-          videoId: s.resourceId.videoId,
+-          title: title || "Arcane Moment",
+-          thumbnail: (t.high || t.medium || t.default || {}).url || "",
+-          publishedAt: s.publishedAt || ""
+-        });
+-      }
+-      pageToken = limit && items.length >= limit ? "" : data.nextPageToken || "";
+-    } while (pageToken);
+-
+-    return json(200, { description, items: limit ? items.slice(0, limit) : items }, {
+-      "Cache-Control": "public, max-age=300, s-maxage=900"
+-    });
+-  } catch (e) {
+-    return json(e.status || 500, { error: e.message || "Unexpected error." });
+-  }
+-}
+\ No newline at end of file
+diff --git a/tools/test-home-browser.py b/tools/test-home-browser.py
+new file mode 100644
+index 0000000..ff831c1
+--- /dev/null
++++ b/tools/test-home-browser.py
+@@ -0,0 +1,123 @@
++# Optional browser test of the REAL homepage (index.html + js/home.js) with mocked Firebase and a mocked /api/matches.
++# Needs Python + playwright with chromium:   pip install playwright && playwright install chromium
++#   python3 tools/test-home-browser.py            (screenshots go to /tmp/home-shots)
++# Fixtures come from tools/test-support/bracket-fixtures.mjs (the real builders and the real data/edits.json).
++import os, sys, json, subprocess, threading, http.server, socketserver, functools, time
++from playwright.sync_api import sync_playwright
++
++ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++FIX = '/tmp/bracket-fixtures'; SHOTS = '/tmp/home-shots'
++os.makedirs(SHOTS, exist_ok=True)
++subprocess.run(['node', os.path.join(ROOT, 'tools/test-support/bracket-fixtures.mjs'), FIX], check=True, capture_output=True)
++
++class Q(http.server.SimpleHTTPRequestHandler):
++    def log_message(self, *a): pass
++httpd = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=ROOT)); PORT = httpd.server_address[1]
++threading.Thread(target=httpd.serve_forever, daemon=True).start()
++
++FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
++APP = "export const initializeApp=()=>({});"
++AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
++failed = []
++EDITS = json.dumps([dict(e, tournaments=['jinx-cup-1']) for e in json.load(open(os.path.join(ROOT, 'data/edits.json')))[:30]])
++import base64
++PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
++def check(name, ok, got=None):
++    print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
++    if not ok: failed.append(name)
++
++def load(browser, scenario, width=1280, height=900, mutate=None, scale=1, init=None):
++    matches = [] if scenario == 'none' else json.load(open(f'{FIX}/{scenario}.json'))
++    if mutate: matches = mutate(matches)
++    ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale)
++    if init: ctx.add_init_script(init)
++    pg = ctx.new_page(); errs = []
++    pg.on('pageerror', lambda e: errs.append(str(e)))
++    def route(r):
++        u = r.request.url
++        if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
++        elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
++        elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
++        elif u.split('?')[0].endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
++        elif u.split('?')[0].endswith('/data/edits.json'): r.fulfill(body=EDITS, content_type='application/json')
++        elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
++        elif u.startswith('https://ddragon.leagueoflegends.com'): r.fulfill(body=PNG, content_type='image/png')
++        elif u.startswith('https://img.youtube.com'): r.fulfill(body='', content_type='image/jpeg')
++        elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
++        else: r.continue_()
++    pg.route('**/*', route)
++    pg.goto(f'http://127.0.0.1:{PORT}/')
++    pg.wait_for_function("document.querySelectorAll('.home-pill').length && document.getElementById('homePill').textContent !== 'Loading…'", timeout=15000)
++    pg.wait_for_timeout(300)
++    return pg, errs
++
++vis = lambda pg, sel: pg.evaluate(f"(()=>{{const e=document.querySelector({json.dumps(sel)});return !!e&&getComputedStyle(e).display!=='none'&&e.offsetParent!==null}})()")
++txt = lambda pg, sel: pg.inner_text(sel).strip()
++
++
++
++noscroll = lambda pg: pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
++shown = lambda pg, sel: pg.evaluate(f"(()=>{{const e=document.querySelector({json.dumps(sel)});return !!e&&!e.hidden}})()")
++OLD = ('Anthem Arena', 'League of Legends Music', 'Music Video', 'Coming soon')
++
++with sync_playwright() as p:
++    b = p.chromium.launch()
++    for label, w, h in (('desktop', 1280, 900), ('phone', 375, 740)):
++        print(f'--- {label}: live cup ---')
++        pg, errs = load(b, 'groups-mid-16', w, h)
++        check('pill says matches are live', 'live now' in txt(pg, '#homePill'), txt(pg, '#homePill'))
++        check('Vote now goes to /live', pg.locator('#homeActions a').first.get_attribute('href') == '/live')
++        check('stats strip shows', shown(pg, '#homeStats') and pg.locator('#homeStats div').count() == 3)
++        check('match of the day shows with a vote link', shown(pg, '#featured') and pg.locator('#featured a.btn-primary').get_attribute('href').startswith('/vote?match='))
++        check('latest results show', shown(pg, '#recent') and pg.locator('#recent li').count() >= 1)
++        check('most voted edits shown once votes exist', 'Most voted' in txt(pg, '#popular') and pg.locator('#popular .edit-card').count() >= 1, txt(pg, '#popular')[:60])
++        check('new edits shows 6', pg.locator('#newest .edit-card').count() == 6, pg.locator('#newest .edit-card').count())
++        check('no hashtags in any name', '#' not in pg.inner_text('main'))
++        check('no old wording', not any(k in pg.inner_text('main') for k in OLD), pg.inner_text('main')[:150])
++        check('title is Arcane Moments', 'Arcane Moments' in pg.title(), pg.title())
++        check('no sideways scroll', noscroll(pg))
++        check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
++        pg.screenshot(path=f'{SHOTS}/{label}-live.png', full_page=True)
++        pg.context.close()
++
++    print('--- no matches built yet ---')
++    pg, errs = load(b, 'none')
++    check('says opening soon', 'Opening soon' in txt(pg, '#homePill'), txt(pg, '#homePill'))
++    check('no stats strip, no match blocks', not shown(pg, '#homeStats') and not shown(pg, '#featured') and not shown(pg, '#recent'))
++    check('popular falls back to YouTube views', 'Most watched' in txt(pg, '#popular') and 'views on YouTube' in txt(pg, '#popular'), txt(pg, '#popular')[:80])
++    check('How it works is always there', shown(pg, '#how') and pg.locator('.how-list li').count() == 4)
++    check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
++    pg.context.close()
++
++    print('--- drawn, nothing played ---')
++    pg, errs = load(b, 'groups-upcoming-16')
++    check('says voting opens soon', 'voting opens soon' in txt(pg, '#homePill'), txt(pg, '#homePill'))
++    check('no match of the day', not shown(pg, '#featured'))
++    pg.context.close()
++
++    print('--- groups finished, knockout not open ---')
++    pg, errs = load(b, 'groups-done-16')
++    check('between rounds message', 'next matches open soon' in txt(pg, '#homePill'), txt(pg, '#homePill'))
++    check('results listed', shown(pg, '#recent'))
++    pg.context.close()
++
++    print('--- cup finished ---')
++    def finished(ms):
++        out = []
++        for m in ms:
++            if m.get('roundLabel') == 'Final':
++                m = dict(m, status='completed', winnerId=m['song1']['id'])
++            elif m.get('stage') != 'group' and m['status'] != 'completed':
++                m = dict(m, status='completed', winnerId=m['song1']['id'])
++            out.append(m)
++        return out
++    pg, errs = load(b, 'knockout-live-16', mutate=finished)
++    check('champion block shows', shown(pg, '#champion') and 'complete' in txt(pg, '#homePill'), txt(pg, '#homePill'))
++    check('no live "Vote now" button when finished', 'Vote now' not in pg.inner_text('#homeActions'))
++    pg.screenshot(path=f'{SHOTS}/desktop-finished.png', full_page=True)
++    pg.context.close()
++    b.close()
++
++httpd.shutdown()
++print('FAILED: ' + ', '.join(failed) if failed else 'all homepage browser checks passed')
++sys.exit(1 if failed else 0)
+diff --git a/tools/test-home-model.mjs b/tools/test-home-model.mjs
+new file mode 100644
+index 0000000..7170bc5
+--- /dev/null
++++ b/tools/test-home-model.mjs
+@@ -0,0 +1,38 @@
++import assert from 'node:assert/strict';
++import { homeState, newestEdits, mostWatched, countdownText, isEntered } from '../js/home-model.js';
++let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
++const c = (id, votes = 0) => ({ id, videoId: 'v' + id, shortTitle: `Edit ${id} #jinx`, artist: 'Maker ' + id, votes });
++const m = (id, a, b, status, winner, extra = {}) => ({ matchId: id, roundLabel: 'Group A', status, winnerId: winner, song1: a, song2: b, ...extra });
++const ed = (id, up, views, extra = {}) => ({ id, videoId: id, title: `Title ${id} #x`, artist: 'A', uploadDate: up, views, tournaments: ['c'], status: 'ok', ...extra });
++
++t('no matches means "soon"', () => { const s = homeState([]); assert.equal(s.phase, 'soon'); assert.equal(s.featured, null); assert.equal(s.closesAt, null); });
++t('live cup: featured is the live match with most votes', () => {
++    const s = homeState([m('1', c('a', 5), c('b', 5), 'live', null), m('2', c('c', 30), c('d', 1), 'live', null), m('3', c('e', 99), c('f', 0), 'completed', 'e')]);
++    assert.equal(s.phase, 'live'); assert.equal(s.featured.matchId, '2'); assert.equal(s.liveCount, 2); assert.equal(s.votes, 140);
++    assert.ok(!s.featured.a.title.includes('#'));
++});
++t('countdown uses the earliest future close time', () => {
++    const now = Date.parse('2026-10-16T12:00:00Z');
++    const s = homeState([m('1', c('a'), c('b'), 'live', null, { endDate: '2026-10-18T20:00:00Z' }), m('2', c('c'), c('d'), 'live', null, { endDate: '2026-10-17T20:00:00Z' }), m('3', c('e'), c('f'), 'live', null, { endDate: '2026-10-10T20:00:00Z' })], now);
++    assert.equal(s.closesAt, Date.parse('2026-10-17T20:00:00Z'));
++});
++t('drawn but not started: upcoming', () => { assert.equal(homeState([m('1', c('a'), c('b'), 'upcoming', null)]).phase, 'upcoming'); });
++t('between rounds: nothing live', () => { assert.equal(homeState([m('1', c('a'), c('b'), 'completed', 'a'), m('2', c('c'), c('d'), 'upcoming', null)]).phase, 'between'); });
++t('final decided: finished with a champion', () => {
++    const s = homeState([m('f', c('a', 9), c('b', 3), 'completed', 'a', { roundLabel: 'Final' })]);
++    assert.equal(s.phase, 'finished'); assert.equal(s.champion.id, 'a');
++});
++t('recent results: newest first, winner and loser', () => {
++    const s = homeState([m('1', c('a', 9), c('b', 3), 'completed', 'a', { endDate: '2026-10-01T00:00:00Z' }), m('2', c('c', 2), c('d', 8), 'completed', 'd', { endDate: '2026-10-02T00:00:00Z' })]);
++    assert.equal(s.recent[0].matchId, '2'); assert.equal(s.recent[0].winner.id, 'd'); assert.equal(s.recent[0].loser.id, 'c');
++});
++t('top voted edits', () => { const s = homeState([m('1', c('a', 9), c('b', 3), 'completed', 'a')]); assert.equal(s.topVoted[0].id, 'a'); assert.equal(homeState([m('1', c('a'), c('b'), 'upcoming', null)]).topVoted.length, 0); });
++t('newest and most watched', () => {
++    const e = [ed('1', '2025-01-01', 50), ed('2', '2026-05-01', 10), ed('3', '2024-01-01', 900), ed('4', '2026-09-01', 5, { tournaments: [] }), ed('5', '2026-07-01', 1, { status: 'removed' })];
++    assert.deepEqual(newestEdits(e, 2).map(x => x.id), ['2', '1']);
++    assert.deepEqual(mostWatched(e, 2).map(x => x.id), ['3', '1']);
++    assert.ok(!newestEdits(e)[0].title.includes('#'));
++});
++t('isEntered mirrors the gallery rule', () => { assert.ok(isEntered(ed('1', 'x', 1))); assert.ok(!isEntered(ed('1', 'x', 1, { embedAllowed: false }))); assert.ok(!isEntered(null)); });
++t('countdown text', () => { const now = 0; assert.equal(countdownText(2 * 86400e3 + 4 * 3600e3, now), '2d 4h'); assert.equal(countdownText(5 * 3600e3 + 12 * 60e3, now), '5h 12m'); assert.equal(countdownText(30e3, now), '1m'); assert.equal(countdownText(-5, now), 'closing now'); assert.equal(countdownText(null), ''); });
++console.log(`${n} passed`);
+-- 
+2.43.0
+

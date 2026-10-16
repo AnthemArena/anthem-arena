@@ -1,0 +1,150 @@
+diff --git a/about.html b/about.html
+index 8e66091..07d7731 100644
+--- a/about.html
++++ b/about.html
+@@ -60,7 +60,7 @@
+       "foundingDate": "2024",
+       "contactPoint": {
+         "@type": "ContactPoint",
+-        "email": "anthemarena@outlook.com",
++        "url": "https://anthemarena.com/about#contact",
+         "contactType": "Customer Service"
+       },
+       "sameAs": []
+@@ -558,8 +558,10 @@
+                     </div>
+                     <div class="content-text">
+                         <p>
+-                            Arcane Moments is a fan project that celebrates the edits the community makes. Every edit is shown with
+-                            your name and a link to your channel, and the video plays from YouTube, so views and likes go to you.
++                            Arcane Moments is a fan project that celebrates the edits the community makes. We do not host, copy or
++                            re-upload any video: every edit is embedded straight from YouTube, so it plays from your own channel and
++                            the views and likes go to you. If you delete it, make it private or turn off embedding, it stops playing here.
++                            Each edit is shown with your name and a link to your channel.
+                         </p>
+                         <p>
+                             If you would rather your edit was not shown on the site or entered in a tournament, email
+@@ -584,17 +586,17 @@
+                         <div class="contact-methods">
+                             <div class="contact-method">
+                                 <h4><i class="fa-solid fa-at"></i> Email</h4>
+-                                <p>anthemarena@outlook.com</p>
++                                <p><a data-contact-mail data-show-address href="/about#contact">Email us</a></p>
+                                 <p class="contact-note">For general inquiries, song suggestions for future seasons, and feedback</p>
+                             </div>
+                             <div class="contact-method">
+                                 <h4><i class="fa-solid fa-bug"></i> Report Issues</h4>
+-                                <p>anthemarena@outlook.com</p>
++                                <p><a data-contact-mail data-show-address href="/about#contact">Email us</a></p>
+                                 <p class="contact-note">Found a bug? Voting not working? Let us know!</p>
+                             </div>
+                             <div class="contact-method">
+                                 <h4><i class="fa-solid fa-gavel"></i> Legal / Copyright</h4>
+-                                <p>anthemarena@outlook.com</p>
++                                <p><a data-contact-mail data-show-address href="/about#contact">Email us</a></p>
+                                 <p class="contact-note">For copyright concerns or DMCA notices</p>
+                             </div>
+                         </div>
+diff --git a/js/creator-contact.js b/js/creator-contact.js
+index 4ebdbb5..c9c1546 100644
+--- a/js/creator-contact.js
++++ b/js/creator-contact.js
+@@ -1,5 +1,5 @@
+ // Where creators write if they want their edit left out or removed. One place, so the address is changed here only.
+-// Any link with  data-creator-mail  gets its mailto: (with a subject) and, if it has data-show-address, the address as its text.
++// Any link with  data-creator-mail  (or data-contact-mail)  gets its mailto: (with a subject) and, if it has data-show-address, the address as its text.
+ // Without JavaScript the link text still says to email Arcane Moments, so nothing breaks. Building the address here instead of
+ // writing it into every page also keeps it out of the simplest address-harvesting bots.
+ export const CREATOR_EMAIL = 'arcanemomentsfanpage@gmail.com';
+@@ -11,10 +11,12 @@ export function removalMailto(editTitle = '') {
+     return `mailto:${CREATOR_EMAIL}?subject=${encodeURIComponent(REMOVAL_SUBJECT)}&body=${encodeURIComponent(body)}`;
+ }
+ 
++// data-creator-mail  -> removal request (subject and starter message).   data-contact-mail -> a plain email to the same address.
++// data-show-address  -> also write the address as the link text (into a [data-address] child if there is one).
+ export function wireCreatorLinks(root = document) {
+-    root.querySelectorAll('a[data-creator-mail]').forEach(a => {
+-        a.href = removalMailto();
+-        if (a.hasAttribute('data-show-address')) a.textContent = CREATOR_EMAIL;
++    root.querySelectorAll('a[data-creator-mail], a[data-contact-mail]').forEach(a => {
++        a.href = a.hasAttribute('data-creator-mail') ? removalMailto() : `mailto:${CREATOR_EMAIL}`;
++        if (a.hasAttribute('data-show-address')) (a.querySelector('[data-address]') || a).textContent = CREATOR_EMAIL;
+     });
+ }
+ 
+diff --git a/js/footer.js b/js/footer.js
+index 1eba698..446eada 100644
+--- a/js/footer.js
++++ b/js/footer.js
+@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
+ </div>
+ 
+                 <div class="footer-contact">
+-                    <a href="mailto:anthemarena@outlook.com" class="footer-email-link">
++                    <a href="/about#contact" data-contact-mail data-show-address class="footer-email-link">
+                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                             <polyline points="22,6 12,13 2,6"></polyline>
+                         </svg>
+-                        <span>anthemarena@outlook.com</span>
++                        <span data-address>Email us</span>
+                     </a>
+                 </div>
+ 
+@@ -219,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
+     
+     // Insert footer into the page
+     document.getElementById('footer-placeholder').innerHTML = footerHTML;
++    // the contact address lives in one file (js/creator-contact.js); this fills in the footer link once the footer exists
++    import('/js/creator-contact.js').then(m => m.wireCreatorLinks()).catch(() => {});
+     
+     // ========================================
+     // ATTACH EVENT LISTENERS (After HTML is inserted)
+diff --git a/music-gallery.html b/music-gallery.html
+index 143fdd5..b379edb 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -102,7 +102,7 @@
+         <section class="gallery-creators" aria-labelledby="creatorsHeading">
+             <div>
+                 <h2 id="creatorsHeading">Made one of these edits?</h2>
+-                <p>Every edit is shown with your name and a link to your channel, so voters can find more of your work. If you would rather not be included, email us and we will take it out. The sooner the better: an edit can be removed any time before a cup is drawn.</p>
++                <p>We do not host or copy any video: every edit plays straight from YouTube, shown with your name and a link to your channel, so the views and likes go to you. If you would rather not be included, email us and we will take it out. The sooner the better: an edit is easiest to remove before a cup is drawn.</p>
+             </div>
+             <a class="creators-btn" data-creator-mail href="/about#creators"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Request removal</a>
+         </section>
+diff --git a/tools/test-creator-contact.mjs b/tools/test-creator-contact.mjs
+index 39b2b13..ead12d2 100644
+--- a/tools/test-creator-contact.mjs
++++ b/tools/test-creator-contact.mjs
+@@ -19,6 +19,17 @@ test('an edit title is quoted in the message and survives odd characters', () =>
+ test('the address is written in one file only (js/creator-contact.js), not in the pages', () => {
+     for (const f of ['../music-gallery.html', '../about.html', '../js/footer.js', '../js/music-gallery.js']) assert.ok(!read(f).includes(CREATOR_EMAIL), f);
+ });
++test('the old Anthem Arena address is gone everywhere', () => {
++    for (const f of ['../music-gallery.html', '../about.html', '../js/footer.js', '../js/creator-contact.js']) assert.ok(!read(f).includes('anthemarena@outlook.com'), f);
++});
++test('plain contact links get a plain mailto, removal links get the subject', () => {
++    const src = read('../js/creator-contact.js');
++    assert.match(src, /data-contact-mail/); assert.match(src, /mailto:\$\{CREATOR_EMAIL\}/);
++});
++test('the pages say the video is embedded from YouTube, not hosted here', () => {
++    assert.match(read('../music-gallery.html'), /do not host or copy any video/);
++    assert.match(read('../about.html'), /do not host, copy or\s+re-upload any video/);
++});
+ test('the gallery, the About page and the footer all link creators to the right place', () => {
+     assert.match(read('../music-gallery.html'), /data-creator-mail/); assert.match(read('../music-gallery.html'), /js\/creator-contact\.js/);
+     assert.match(read('../about.html'), /id="creators"/); assert.match(read('../about.html'), /js\/creator-contact\.js/);
+diff --git a/tools/test-gallery-browser.py b/tools/test-gallery-browser.py
+index 9577d5b..08878ec 100644
+--- a/tools/test-gallery-browser.py
++++ b/tools/test-gallery-browser.py
+@@ -73,6 +73,8 @@ with sync_playwright() as p:
+         check(f'{tag}: status filter says "Finished their run", not "Eliminated"', 'Finished their run' in opts and 'Eliminated' not in opts, opts)
+         href = pg.get_attribute('a[data-creator-mail]', 'href') or ''
+         check(f'{tag}: the creator removal link is a mailto to the right address with a subject', href.startswith('mailto:arcanemomentsfanpage@gmail.com?subject=Edit%20removal%20request'), href)
++        fl = pg.locator('.footer-email-link')
++        check(f'{tag}: the footer email link points to the new address (filled in after the footer loads)', fl.count() == 1 and fl.get_attribute('href') == 'mailto:arcanemomentsfanpage@gmail.com' and 'arcanemomentsfanpage@gmail.com' in fl.inner_text(), (fl.get_attribute('href'), fl.inner_text()) if fl.count() else 'no footer link')
+         cta = rect(pg, '.creators-btn')
+         check(f'{tag}: the removal button is visible and fits the screen', cta and cta['x'] >= 0 and cta['r'] <= w, cta)
+         pg.select_option('#statusFilter', 'eliminated'); pg.wait_for_timeout(300)

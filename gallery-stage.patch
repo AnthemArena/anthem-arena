@@ -1,0 +1,382 @@
+diff --git a/css/edits-gallery.css b/css/edits-gallery.css
+index 3a959cd..c3a5218 100644
+--- a/css/edits-gallery.css
++++ b/css/edits-gallery.css
+@@ -202,7 +202,7 @@
+ .page-gallery .edit-stats {
+     margin-top: auto;           /* stats sit at the bottom of the card, so they line up even when one title wraps */
+     display: grid;
+-    grid-template-columns: repeat(4, 1fr);
++    grid-template-columns: repeat(3, 1fr);
+     gap: .4rem;
+     padding: .6rem 0;
+     border-top: 1px solid var(--line);
+@@ -291,7 +291,6 @@
+ @media (max-width: 560px) {
+     .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
+     .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+-    .page-gallery .edit-stats { grid-template-columns: repeat(2, 1fr); }   /* four stats do not fit one row on a 2-up phone card */
+     /* compact toolbar: search on its own row, status / cup / sort share the next one */
+     .page-gallery .gallery-toolbar { padding: .8rem; margin-bottom: 1.1rem; }
+     .page-gallery .toolbar-row { gap: .6rem; }
+diff --git a/js/edit-standing.js b/js/edit-standing.js
+new file mode 100644
+index 0000000..bd41b1b
+--- /dev/null
++++ b/js/edit-standing.js
+@@ -0,0 +1,67 @@
++// What one edit has done in the active cup, worked out from the cup's matches. Pure (no DOM), unit-tested in Node:
++//   node tools/test-edit-standing.mjs
++//
++// The gallery shows this as a small badge. The words are about PROGRESS, not losing: "Group stage", "Reached the Round of 16",
++// "Finalist". The win-loss record is not shown on the gallery (it stays on the bracket pages).
++//
++// Group cups: one lost match in a group does NOT end an edit's run. It is out only when its group is finished and it did not
++// finish in the top two. (The old code called any edit with a single loss "out", which was wrong for a group cup.)
++import { allGroupStandings } from './group-builder.js';
++
++const isFinal = m => /-finals$/.test(m.matchId || '') || m.roundLabel === 'Final';
++const winnerOf = m => m.winnerId || m.winner;
++const inMatch = (m, id) => m.song1?.id === id || m.song2?.id === id;
++
++// "Quarter-finals" -> "Quarter-finalist", "Round of 16" -> "Reached the Round of 16"
++export function reachedLabel(roundLabel) {
++    if (!roundLabel) return 'Finished their run';
++    if (roundLabel === 'Final') return 'Finalist';
++    if (roundLabel === 'Semi-finals') return 'Semi-finalist';
++    if (roundLabel === 'Quarter-finals') return 'Quarter-finalist';
++    return `Reached the ${roundLabel}`;
++}
++
++export function standingFor(edit, matches) {
++    const mine = (matches || []).filter(m => inMatch(m, edit.id)).sort((a, b) => (a.round || 0) - (b.round || 0));
++    if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
++
++    let wins = 0, losses = 0, champion = false, knockoutLoss = null;
++    for (const m of mine) {
++        if (m.status !== 'completed') continue;
++        const winner = winnerOf(m);
++        if (winner === edit.id) { wins++; if (isFinal(m)) champion = true; }
++        else if (winner) { losses++; if (m.stage !== 'group') knockoutLoss = m; }
++    }
++    const liveMatch = mine.find(m => m.status === 'live') || null;
++    const last = mine[mine.length - 1];
++    const reached = (liveMatch || last).roundLabel || '';
++    const base = { wins, losses, reached, liveMatch };
++
++    if (champion) return { ...base, kind: 'champion', label: 'Champion', reached: 'Champion', liveMatch: null };
++    if (knockoutLoss) return { ...base, kind: 'eliminated', label: reachedLabel(knockoutLoss.roundLabel), reached: knockoutLoss.roundLabel || '', liveMatch: null };
++
++    const groupMatch = mine.find(m => m.stage === 'group');
++    if (groupMatch) {
++        const inKnockout = mine.some(m => m.stage !== 'group');
++        if (!inKnockout) {
++            const g = allGroupStandings(matches).find(x => x.name === groupMatch.group);
++            const row = g?.rows.find(r => r.id === edit.id);
++            if (g?.complete && row) {
++                if (row.rank > 2) return { ...base, kind: 'eliminated', label: 'Group stage', reached: groupMatch.roundLabel || '', liveMatch: null };
++                if (!liveMatch) return { ...base, kind: 'bracket', label: 'Through to the knockout', liveMatch: null };
++            }
++            if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
++            return { ...base, kind: 'bracket', label: groupMatch.roundLabel || 'In the groups', liveMatch: null };
++        }
++        if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
++        return { ...base, kind: 'bracket', label: 'In the knockout', liveMatch: null };
++    }
++
++    // a plain knockout cup: one lost match ends the run
++    if (losses) {
++        const lostIn = [...mine].reverse().find(m => m.status === 'completed' && winnerOf(m) && winnerOf(m) !== edit.id);
++        return { ...base, kind: 'eliminated', label: reachedLabel(lostIn?.roundLabel), reached: lostIn?.roundLabel || '', liveMatch: null };
++    }
++    if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
++    return { ...base, kind: 'bracket', label: 'In the bracket', liveMatch: null };
++}
+diff --git a/js/music-gallery.js b/js/music-gallery.js
+index bf9c579..5b8e1aa 100644
+--- a/js/music-gallery.js
++++ b/js/music-gallery.js
+@@ -1,11 +1,13 @@
+ // music-gallery.js: the Arcane Moments EDITS GALLERY (page: /music-gallery, file name kept so nav and footer links still work).
+ // Lists every edit that has been entered in a cup (data/edits.json, "tournaments" list not empty), with creator credit,
+-// record, standing and a click-to-play Short. Records and standing come from the active cup's matches (/api/matches).
++// standing and a click-to-play Short. Standing comes from the active cup's matches (/api/matches) via js/edit-standing.js.
++// The cards show progress ("Group stage", "Finalist"), not a win-loss record.
+ //
+ // getAllTournamentStats() is also imported by js/vote.js, so it stays exported and unchanged.
+ import { getAllMatches } from './api-client.js';
+ import { cupDisplayName } from './bracket-builder.js';
+ import { cleanTitle } from './title-clean.js';
++import { standingFor } from './edit-standing.js';
+ 
+ // Use shared cache if available (set by vote.js)
+ window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
+@@ -87,32 +89,8 @@ let lastFocus = null;
+ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+ const fmtViews = n => !n ? '0' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n);
+ const fmtDuration = s => s == null ? '' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+-const isFinal = m => /-finals$/.test(m.matchId || '') || m.roundLabel === 'Final';
+ const safeUrl = u => /^https:\/\//i.test(u || '') ? u : '';
+ 
+-// What this edit has done in the active cup, worked out from its matches.
+-function standingFor(edit, matches) {
+-    const mine = matches.filter(m => m.song1?.id === edit.id || m.song2?.id === edit.id)
+-        .sort((a, b) => (a.round || 0) - (b.round || 0));
+-    if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
+-
+-    let wins = 0, losses = 0, lostIn = null, champion = false;
+-    for (const m of mine) {
+-        if (m.status !== 'completed') continue;
+-        const winner = m.winnerId || m.winner;
+-        if (winner === edit.id) { wins++; if (isFinal(m)) champion = true; }
+-        else if (winner) { losses++; lostIn = m; }
+-    }
+-    const liveMatch = mine.find(m => m.status === 'live') || null;
+-    const last = mine[mine.length - 1];
+-    const reached = (liveMatch || last).roundLabel || '';
+-
+-    if (champion) return { kind: 'champion', label: 'Champion', wins, losses, reached: 'Champion', liveMatch: null };
+-    if (lostIn) return { kind: 'eliminated', label: 'Out in ' + (lostIn.roundLabel || 'the cup'), wins, losses, reached: lostIn.roundLabel || '', liveMatch: null };
+-    if (liveMatch) return { kind: 'live', label: 'Live now', wins, losses, reached, liveMatch };
+-    return { kind: 'bracket', label: 'In the bracket', wins, losses, reached, liveMatch: null };
+-}
+-
+ async function loadGallery() {
+     grid.setAttribute('aria-busy', 'true');
+     try {
+@@ -176,7 +154,6 @@ function visible() {
+ function cardHTML(e) {
+     const s = e.standing;
+     const title = cleanTitle(e.shortTitle || e.title || 'Untitled edit');
+-    const record = s.wins + s.losses ? `${s.wins}\u2013${s.losses}` : '\u2013';
+     const creatorUrl = safeUrl(e.creatorUrl);
+     const creator = creatorUrl
+         ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
+@@ -198,7 +175,6 @@ function cardHTML(e) {
+             <h3 class="edit-title">${esc(title)}</h3>
+             ${creator}
+             <dl class="edit-stats">
+-                <div><dt>Record</dt><dd>${record}</dd></div>
+                 <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
+                 <div><dt>Likes</dt><dd>${e.likes == null ? '\u2013' : fmtViews(e.likes)}</dd></div>
+                 <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
+diff --git a/music-gallery.html b/music-gallery.html
+index 32f9198..df1493b 100644
+--- a/music-gallery.html
++++ b/music-gallery.html
+@@ -5,10 +5,10 @@
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+     <title>Edits Gallery | Arcane Moments</title>
+-    <meta name="description" content="Every fan edit that has entered an Arcane Moments cup: creators, records, results and a one-tap player.">
++    <meta name="description" content="Every fan edit that has entered an Arcane Moments cup: creators, results and a one-tap player.">
+     <meta property="og:type" content="website">
+     <meta property="og:title" content="Edits Gallery | Arcane Moments">
+-    <meta property="og:description" content="Every fan edit that has entered an Arcane Moments cup: creators, records and results.">
++    <meta property="og:description" content="Every fan edit that has entered an Arcane Moments cup: creators and results.">
+ 
+     <!-- Favicon -->
+     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+@@ -36,7 +36,7 @@
+       "@context": "https://schema.org",
+       "@type": "CollectionPage",
+       "name": "Arcane Moments Edits Gallery",
+-      "description": "Fan edits that have entered an Arcane Moments cup, with creator credit, records and results."
++      "description": "Fan edits that have entered an Arcane Moments cup, with creator credit and results."
+     }
+     </script>
+ 
+@@ -54,7 +54,7 @@
+     <main class="gallery-page">
+         <header class="gallery-hero">
+             <h1 class="gallery-title">Edits Gallery</h1>
+-            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup, with its creator, record and result. Tap one to watch it.</p>
++            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup, with its creator and result. Tap one to watch it.</p>
+         </header>
+ 
+         <section class="gallery-toolbar" aria-label="Search and filter edits">
+@@ -69,7 +69,7 @@
+                         <option value="">All</option>
+                         <option value="live">Live now</option>
+                         <option value="bracket">In the bracket</option>
+-                        <option value="eliminated">Eliminated</option>
++                        <option value="eliminated">Finished their run</option>
+                         <option value="champion">Champions</option>
+                         <option value="entered">Entered</option>
+                     </select>
+@@ -84,7 +84,7 @@
+                         <option value="standing">Standing</option>
+                         <option value="views">Most views</option>
+                         <option value="likes">Most likes</option>
+-                        <option value="wins">Most wins</option>
++                        <option value="wins">Furthest run</option>
+                         <option value="newest">Newest</option>
+                         <option value="title">Title A-Z</option>
+                         <option value="creator">Creator A-Z</option>
+diff --git a/tools/test-edit-standing.mjs b/tools/test-edit-standing.mjs
+new file mode 100644
+index 0000000..8d3a839
+--- /dev/null
++++ b/tools/test-edit-standing.mjs
+@@ -0,0 +1,74 @@
++// Gallery badge wording and group-cup logic.   node tools/test-edit-standing.mjs
++import assert from 'node:assert/strict';
++import { standingFor, reachedLabel } from '../js/edit-standing.js';
++
++let passed = 0;
++const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
++
++const song = (id, votes = 0) => ({ id, votes });
++const gm = (n, a, b, winner, va, vb) => ({
++    matchId: `c-group-A-match-${n}`, stage: 'group', group: 'A', groupIndex: 1, round: 1, roundLabel: 'Group A',
++    status: winner ? 'completed' : 'upcoming', winnerId: winner || null, song1: song(a, va), song2: song(b, vb)
++});
++// group A: a beats b, c, d; b beats c, d; c beats d  -> a, b through; c, d out
++const fullGroup = () => [gm(1, 'a', 'b', 'a', 9, 1), gm(2, 'c', 'd', 'c', 5, 4), gm(3, 'a', 'c', 'a', 8, 2), gm(4, 'b', 'd', 'b', 7, 3), gm(5, 'a', 'd', 'a', 6, 4), gm(6, 'b', 'c', 'b', 6, 5)];
++
++test('an edit that is not in any match is just "Entered"', () => {
++    assert.equal(standingFor({ id: 'z' }, fullGroup()).label, 'Entered');
++});
++
++test('REGRESSION: one lost group match does not make an edit "out" while its group is still open', () => {
++    const open = fullGroup().map((m, i) => i >= 3 ? { ...m, status: 'upcoming', winnerId: null } : m);   // only 3 of 6 played
++    const s = standingFor({ id: 'c' }, open);        // c lost to a, beat d: not out yet
++    assert.notEqual(s.kind, 'eliminated');
++    assert.equal(s.label, 'Group A');
++});
++
++test('finished group: top two are "Through to the knockout", the rest "Group stage" (no "Out in")', () => {
++    const m = fullGroup();
++    assert.equal(standingFor({ id: 'a' }, m).label, 'Through to the knockout');
++    assert.equal(standingFor({ id: 'b' }, m).label, 'Through to the knockout');
++    assert.equal(standingFor({ id: 'c' }, m).label, 'Group stage');
++    assert.equal(standingFor({ id: 'd' }, m).kind, 'eliminated');
++    assert.ok(!/out/i.test(standingFor({ id: 'd' }, m).label));
++});
++
++test('a 2-1 edit in a finished group is through, not out (the case seen on the real gallery)', () => {
++    const s = standingFor({ id: 'b' }, fullGroup());
++    assert.equal(s.wins, 2); assert.equal(s.losses, 1); assert.equal(s.kind, 'bracket');
++});
++
++test('knockout: a loss names the round reached, in progress words', () => {
++    const ko = (round, label, winner) => ({ matchId: `c-r${round}`, stage: 'knockout', round, roundLabel: label, status: 'completed', winnerId: winner, song1: song('a'), song2: song('x') });
++    const base = fullGroup();
++    assert.equal(standingFor({ id: 'a' }, [...base, ko(2, 'Round of 16', 'x')]).label, 'Reached the Round of 16');
++    assert.equal(standingFor({ id: 'a' }, [...base, ko(2, 'Round of 16', 'a'), ko(3, 'Quarter-finals', 'x')]).label, 'Quarter-finalist');
++    assert.equal(standingFor({ id: 'a' }, [...base, ko(2, 'Semi-finals', 'x')]).label, 'Semi-finalist');
++    assert.equal(standingFor({ id: 'a' }, [...base, { ...ko(9, 'Final', 'x'), matchId: 'c-finals' }]).label, 'Finalist');
++});
++
++test('winning the final is "Champion"; an edit still alive in the knockout is "In the knockout"', () => {
++    const base = fullGroup();
++    const fin = { matchId: 'c-finals', stage: 'knockout', round: 9, roundLabel: 'Final', status: 'completed', winnerId: 'a', song1: song('a'), song2: song('x') };
++    assert.equal(standingFor({ id: 'a' }, [...base, fin]).kind, 'champion');
++    const r2 = { matchId: 'c-r2', stage: 'knockout', round: 2, roundLabel: 'Round of 16', status: 'upcoming', winnerId: null, song1: song('a'), song2: song('x') };
++    assert.equal(standingFor({ id: 'a' }, [...base, r2]).label, 'In the knockout');
++});
++
++test('a live match shows "Live now" with the match to vote in', () => {
++    const live = { ...gm(1, 'p', 'q'), status: 'live' };
++    const s = standingFor({ id: 'p' }, [live]);
++    assert.equal(s.kind, 'live'); assert.equal(s.liveMatch, live);
++});
++
++test('a plain knockout cup (no groups): one loss ends the run, worded as progress', () => {
++    const m = { matchId: 'c-r1', round: 1, roundLabel: 'Round of 32', status: 'completed', winnerId: 'x', song1: song('a'), song2: song('x') };
++    assert.equal(standingFor({ id: 'a' }, [m]).label, 'Reached the Round of 32');
++    assert.equal(standingFor({ id: 'x' }, [m]).label, 'In the bracket');
++});
++
++test('no label says "Out", "Eliminated" or shows a record', () => {
++    for (const l of ['Round of 16', 'Quarter-finals', 'Semi-finals', 'Final', '', 'Round of 128']) assert.ok(!/out|elimin|\d\s*[-–]\s*\d/i.test(reachedLabel(l)), l);
++});
++
++console.log(`\n${passed} tests passed`);
+diff --git a/tools/test-gallery-browser.py b/tools/test-gallery-browser.py
+new file mode 100644
+index 0000000..c6e678f
+--- /dev/null
++++ b/tools/test-gallery-browser.py
+@@ -0,0 +1,81 @@
++# Optional browser test of the REAL edits gallery (music-gallery.html + js/music-gallery.js) with mocked /api/matches and edits.json.
++#   python3 tools/test-gallery-browser.py            (screenshots go to /tmp/gallery-shots)
++import os, sys, json, subprocess, threading, http.server, socketserver, functools, re, base64
++from urllib.parse import urlparse
++from playwright.sync_api import sync_playwright
++
++ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++FIX = '/tmp/bracket-fixtures'; SHOTS = '/tmp/gallery-shots'
++os.makedirs(SHOTS, exist_ok=True)
++subprocess.run(['node', os.path.join(ROOT, 'tools/test-support/bracket-fixtures.mjs'), FIX], check=True, capture_output=True)
++
++class Q(http.server.SimpleHTTPRequestHandler):
++    def log_message(self, *a): pass
++httpd = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=ROOT)); PORT = httpd.server_address[1]
++threading.Thread(target=httpd.serve_forever, daemon=True).start()
++
++FS = open(os.path.join(ROOT, 'tools/test-support/browser-firestore.js')).read()
++APP = "export const initializeApp=()=>({});"
++AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
++PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
++failed = []
++def check(name, ok, got=None):
++    print(('  ok  ' if ok else 'FAIL  ') + name + ('' if ok else f'   got: {got}'))
++    if not ok: failed.append(name)
++
++matches = json.load(open(f'{FIX}/groups-mid-16.json'))
++songs = {}
++for m in matches:
++    for k in ('song1', 'song2'):
++        s = m[k]
++        if s['id'] not in songs: songs[s['id']] = s
++edits = [{'id': s['id'], 'videoId': s['videoId'], 'title': s['title'], 'shortTitle': s.get('shortTitle') or s['title'], 'artist': s['artist'],
++          'creatorUrl': '', 'channelId': s.get('channelId', ''), 'characters': ['Jinx'], 'tournaments': ['group-test-01'], 'views': 1000 * (i + 1),
++          'likes': 100 * (i + 1), 'year': 2025, 'duration': 30, 'aspect': '9:16', 'status': 'ok', 'embedAllowed': True}
++         for i, s in enumerate(songs.values())]
++
++def load(browser, width, height):
++    ctx = browser.new_context(viewport={'width': width, 'height': height})
++    pg = ctx.new_page(); errs = []
++    pg.on('pageerror', lambda e: errs.append(str(e)))
++    def route(r):
++        u = r.request.url; path = urlparse(u).path
++        if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
++        elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
++        elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
++        elif path.endswith('/api/matches'): r.fulfill(body=json.dumps(matches), content_type='application/json', headers={'X-Cache': 'MOCK'})
++        elif path.endswith('/data/edits.json'): r.fulfill(body=json.dumps(edits), content_type='application/json')
++        elif '/api/' in u: r.fulfill(body='[]', content_type='application/json')
++        elif u.startswith('https://ddragon.leagueoflegends.com') or u.startswith('https://img.youtube.com'): r.fulfill(body=PNG, content_type='image/png')
++        elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
++        else: r.continue_()
++    pg.route('**/*', route)
++    pg.goto(f'http://127.0.0.1:{PORT}/music-gallery.html')
++    pg.wait_for_timeout(3000)
++    return pg, errs
++
++with sync_playwright() as p:
++    b = p.chromium.launch()
++    for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
++        pg, errs = load(b, w, h)
++        n = pg.locator('.edit-card').count()
++        check(f'{tag}: every entered edit has a card ({len(edits)})', n == len(edits), n)
++        badges = pg.eval_on_selector_all('.edit-badge', 'els=>els.map(e=>e.textContent.trim())')
++        check(f'{tag}: no badge says "Out"', all(not re.search(r'\bout\b', t, re.I) for t in badges), badges)
++        check(f'{tag}: a finished group shows "Through to the knockout" and "Group stage"', 'Through to the knockout' in badges and 'Group stage' in badges, sorted(set(badges)))
++        check(f'{tag}: no win-loss record on any card', pg.locator('.edit-stats dt', has_text='Record').count() == 0)
++        check(f'{tag}: card stats are Views, Likes, Year', pg.eval_on_selector_all('.edit-card:first-child .edit-stats dt', 'els=>els.map(e=>e.textContent.trim())') == ['Views', 'Likes', 'Year'])
++        txt = pg.inner_text('.edit-grid')
++        check(f'{tag}: no "1-2" style records anywhere in the grid', not re.search(r'(?<![\d:])\d\s*[–-]\s*\d(?![\d:])', txt), re.findall(r'.{0,12}\d\s*[–-]\s*\d.{0,12}', txt)[:3])
++        opts = pg.eval_on_selector_all('#statusFilter option', 'els=>els.map(e=>e.textContent.trim())')
++        check(f'{tag}: status filter says "Finished their run", not "Eliminated"', 'Finished their run' in opts and 'Eliminated' not in opts, opts)
++        pg.select_option('#statusFilter', 'eliminated'); pg.wait_for_timeout(300)
++        only = pg.eval_on_selector_all('.edit-badge', 'els=>els.map(e=>e.textContent.trim())')
++        check(f'{tag}: the "Finished their run" filter keeps only edits whose group is over and who did not go through', only and set(only) == {'Group stage'}, only)
++        pg.select_option('#statusFilter', '')
++        check(f'{tag}: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
++        check(f'{tag}: no page errors', not errs, errs)
++        pg.screenshot(path=f'{SHOTS}/{tag}.png')
++    b.close()
++print('\nALL CHECKS PASSED' if not failed else f'\n{len(failed)} FAILED')
++sys.exit(1 if failed else 0)

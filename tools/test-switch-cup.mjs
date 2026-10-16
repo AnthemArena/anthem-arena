@@ -9,6 +9,8 @@ import { TARGETS, inspect, plan, isValidCupId } from './switch-cup.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tool = path.join(repo, 'tools/switch-cup.mjs');
+// whatever cup the real repo has active right now (the tests switch a COPY away from it to jinx-cup-1)
+const ACTIVE = inspect(repo).rows.find(r => r.file === 'js/arcane-config.js').current;
 const FILES = [...TARGETS.map(t => t.file), 'data/edits.json'];
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
@@ -40,7 +42,7 @@ test('switching changes ONLY the one line in each of the four files', () => {
         assert.equal(a.length, b.length, t.file);
         const diff = a.map((l, i) => [l, b[i]]).filter(([x, y]) => x !== y);
         assert.equal(diff.length, 1, `${t.file}: ${diff.length} lines changed`);
-        assert.ok(diff[0][1].includes('jinx-cup-1') && !diff[0][1].includes(diff[0][0].match(/arcane-test-01/)?.[0] ?? '\u0000'), diff[0][1]);
+        assert.ok(diff[0][1].includes('jinx-cup-1') && !diff[0][1].includes(diff[0][0].match(new RegExp(ACTIVE))?.[0] ?? '\u0000'), diff[0][1]);
     }
     assert.equal(read(dir, 'data/edits.json'), before['data/edits.json']);                  // data is never touched
 });
@@ -66,7 +68,7 @@ test('running it twice is harmless', () => {
 
 test('--dry-run shows the change and writes nothing', () => {
     const dir = fresh(), before = snapshot(dir), r = run(dir, 'jinx-cup-1', '--dry-run');
-    assert.equal(r.status, 0); assert.match(r.stdout, /dry run/); assert.match(r.stdout, /arcane-test-01\s+->\s+jinx-cup-1/); assert.deepEqual(snapshot(dir), before);
+    assert.equal(r.status, 0); assert.match(r.stdout, /dry run/); assert.match(r.stdout, new RegExp(ACTIVE + '\\s+->\\s+jinx-cup-1')); assert.deepEqual(snapshot(dir), before);
 });
 
 test('bad cup ids are refused and nothing changes', () => {
@@ -97,14 +99,14 @@ test('a missing file is reported, not crashed on', () => {
 
 test('--check catches a half-done switch (the mistake this tool exists to prevent)', () => {
     const dir = fresh(), f = path.join(dir, 'netlify/edge-functions/live-matches.js');
-    fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace('arcane-test-01', 'jinx-cup-1'));
+    fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace(ACTIVE, 'jinx-cup-1'));
     const r = run(dir, '--check');
-    assert.equal(r.status, 1); assert.match(r.stderr, /DISAGREE/); assert.match(r.stdout, /live-matches\.js\s+jinx-cup-1/); assert.match(r.stdout, /firebase-cache\.js\s+arcane-test-01/);
+    assert.equal(r.status, 1); assert.match(r.stderr, /DISAGREE/); assert.match(r.stdout, /live-matches\.js\s+jinx-cup-1/); assert.match(r.stdout, new RegExp('firebase-cache\\.js\\s+' + ACTIVE));
 });
 
 test('plan() is pure: it returns the new text and writes nothing', () => {
     const dir = fresh(), before = snapshot(dir), p = plan(dir, 'jinx-cup-1');
-    assert.equal(p.changes.length, 4); assert.ok(p.changes.every(c => c.text.includes('jinx-cup-1') && c.from === 'arcane-test-01')); assert.deepEqual(snapshot(dir), before);
+    assert.equal(p.changes.length, 4); assert.ok(p.changes.every(c => c.text.includes('jinx-cup-1') && c.from === ACTIVE)); assert.deepEqual(snapshot(dir), before);
 });
 
 test('with entries listed, the entry count is reported instead of the warning', () => {

@@ -3,627 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
-    <title>About Anthem Arena | League of Legends Music Tournament</title>
-    <meta name="description" content="Learn about Anthem Arena, the interactive tournament where fans vote for their favorite League of Legends music. Discover our mission and how to participate.">
+
+    <title>About Arcane Moments | A Fan-Voted Arcane Edits Tournament</title>
+    <meta name="description" content="Arcane Moments is a fan-voted tournament of Arcane edits. See how a cup works, how votes are counted, and how creators are credited.">
     <link rel="canonical" href="https://anthemarena.com/about">
-    
-    <!-- Favicon -->
+
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-    
-    <!-- Open Graph -->
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://anthemarena.com/about">
-    <meta property="og:title" content="About Anthem Arena | LoL Music Tournament">
-    <meta property="og:description" content="Learn about Anthem Arena - a community-driven celebration of League of Legends' incredible music legacy through head-to-head matchups and voting.">
+    <meta property="og:title" content="About Arcane Moments">
+    <meta property="og:description" content="A fan-voted tournament of Arcane edits. You pick the winners.">
     <meta property="og:image" content="https://anthemarena.com/images/og-image.png">
-    <meta property="og:image:alt" content="Anthem Arena - League of Legends Music Tournament">
+    <meta property="og:image:alt" content="Arcane Moments - About">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="About Anthem Arena">
-    <meta name="twitter:description" content="A community-driven celebration of League of Legends music through interactive tournaments.">
+    <meta name="twitter:title" content="About Arcane Moments">
+    <meta name="twitter:description" content="A fan-voted tournament of Arcane edits. You pick the winners.">
     <meta name="twitter:image" content="https://anthemarena.com/images/og-image.png">
-    <meta name="twitter:image:alt" content="Anthem Arena - League of Legends Music Tournament">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Stylesheets -->
+    <meta name="twitter:image:alt" content="Arcane Moments - About">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/navigation.css">
-    <link rel="stylesheet" href="/css/about.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/about-arcane.css">
+    <!-- Arcane look (opt-in via <body class="theme-arcane page-about">): load after every other stylesheet -->
+    <link rel="stylesheet" href="/css/arcane-theme.generated.css">
+    <link rel="stylesheet" href="/css/arcane-theme.css">
 
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Schema.org Structured Data - Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Anthem Arena",
-      "alternateName": "League of Legends Music Tournament",
-      "url": "https://anthemarena.com",
-      "logo": "https://anthemarena.com/images/logo-header.png",
-      "description": "A community-driven platform where League of Legends fans vote for their favorite music videos through interactive tournaments.",
-      "foundingDate": "2024",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "anthemarena@outlook.com",
-        "contactType": "Customer Service"
-      },
-      "sameAs": []
+      "@type": "AboutPage",
+      "name": "About Arcane Moments",
+      "description": "Arcane Moments is a fan-voted tournament of Arcane edits.",
+      "url": "https://anthemarena.com/about",
+      "about": { "@type": "Organization", "name": "Arcane Moments", "url": "https://anthemarena.com" }
     }
     </script>
+
+    <script type="module" src="/js/notification-storage.js"></script>
+    <script type="module" src="/js/notification-center.js"></script>
+    <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body>
+<body class="theme-arcane page-about">
 
     <div id="nav-placeholder"></div>
     <script type="module" src="/js/navigation.js"></script>
 
-    <!-- ABOUT HERO -->
-    <section class="about-hero">
-        <div class="hero-background"></div>
-        <div class="container">
-            <h1 class="page-title">About Anthem Arena</h1>
-            <p class="page-subtitle">
-                A community-driven celebration of League of Legends' incredible music legacy
-            </p>
-        </div>
-    </section>
+    <main class="about-page">
 
-    <!-- MAIN CONTENT -->
-    <section class="about-content">
-        <div class="container">
-            
-            <!-- SEASON 1 - NOW LIVE -->
-            <div class="content-section">
-                <div class="content-box highlight">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-fire"></i></div>
-                        <h2 class="section-title">Season 1: Now Live!</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            <strong>Anthems Arena Championship (Season 1)</strong> is currently underway! 
-                            64 iconic League of Legends songs are battling in a single-elimination bracket 
-                            to determine the ultimate champion.
-                        </p>
-                        <p>
-                            This season includes EVERYTHING: Worlds anthems (Warriors, RISE, GODS), virtual bands 
-                            (K/DA, Pentakill, Heartsteel), Arcane soundtrack, champion themes, cinematics, and more. 
-                            No categories, no restrictions — just pure community voting to crown the best League song ever made.
-                        </p>
-                        <div class="season-stats">
-                            <div class="stat-item">
-                                <span class="stat-number">64</span>
-                                <span class="stat-label">Songs Competing</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number">Round 2</span>
-                                <span class="stat-label">Current Stage</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number votes-count">---</span>
-                                <span class="stat-label">Total Votes Cast</span>
-                            </div>
-                        </div>
-                        <a href="/live" class="cta-button">Vote Now →</a>
-                    </div>
-                </div>
+        <header class="about-hero">
+            <h1 class="about-title">About Arcane Moments</h1>
+            <p class="about-subtitle">A fan-voted tournament of the best Arcane edits. You pick the winners, one match at a time.</p>
+        </header>
+
+        <!-- RIGHT NOW: filled in from the live matches; shows dashes if they cannot be loaded -->
+        <section class="about-live" id="aboutLive" aria-label="The current cup">
+            <p class="live-kicker">The current cup</p>
+            <dl class="live-stats">
+                <div><dt>Edits</dt><dd data-stat="edits">&ndash;</dd></div>
+                <div><dt>Matches</dt><dd data-stat="matches">&ndash;</dd></div>
+                <div><dt>Votes cast</dt><dd data-stat="votes">&ndash;</dd></div>
+            </dl>
+            <div class="live-actions">
+                <a class="about-btn about-btn--primary" href="/live">Vote in live matches</a>
+                <a class="about-btn" href="/brackets">See the bracket</a>
+                <a class="about-btn" href="/music-gallery">Browse the edits</a>
             </div>
+        </section>
 
-            <!-- What We Are -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-music"></i></div>
-                        <h2 class="section-title">What We Are</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            Anthems Arena is a fan-created platform where the League of Legends 
-                            community comes together to celebrate, compare, and crown the greatest music 
-                            in the game's history through bracket-style tournaments.
-                        </p>
-                        <p>
-                            From legendary Worlds anthems like <strong>Warriors</strong> and <strong>RISE</strong> 
-                            to cultural phenomena like <strong>K/DA - POP/STARS</strong>, from stunning cinematics 
-                            like <strong>Awaken</strong> to virtual bands like <strong>Pentakill</strong> and 
-                            <strong>Heartsteel</strong> — every song gets its moment in the spotlight.
-                        </p>
-                        <p>
-                            We're not affiliated with Riot Games, but we're huge fans of what they've created. 
-                            This is our way of celebrating the incredible artistry, production quality, and 
-                            cultural impact of League's music legacy.
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <section class="about-card" id="what">
+            <h2>What it is</h2>
+            <p>Arcane Moments is a fan project that celebrates the edits the community makes of Arcane. Fans vote on short head-to-head matches, and the edits that win the most votes move on until one is left standing.</p>
+            <p>Every edit is made by a fan. We show it with the creator's name and a link to their channel, and the video plays from YouTube, so the views and likes go to them.</p>
+        </section>
 
-            <!-- Our Mission -->
-            <div class="content-section">
-                <div class="content-box highlight">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-bullseye"></i></div>
-                        <h2 class="section-title">Our Mission</h2>
-                    </div>
-                    <div class="mission-points">
-                        <div class="mission-item">
-                            <div class="mission-icon"><i class="fa-solid fa-sparkles"></i></div>
-                            <div class="mission-content">
-                                <h3>Celebrate Excellence</h3>
-                                <p>Showcase the incredible music videos that have defined League of Legends' cultural identity</p>
-                            </div>
-                        </div>
-                        <div class="mission-item">
-                            <div class="mission-icon"><i class="fa-solid fa-users"></i></div>
-                            <div class="mission-content">
-                                <h3>Unite the Community</h3>
-                                <p>Bring fans together through friendly competition and shared appreciation for great music</p>
-                            </div>
-                        </div>
-                        <div class="mission-item">
-                            <div class="mission-icon"><i class="fa-solid fa-chart-column"></i></div>
-                            <div class="mission-content">
-                                <h3>Let Fans Decide</h3>
-                                <p>Give the community a voice in determining which music videos are truly the greatest</p>
-                            </div>
-                        </div>
-                        <div class="mission-item">
-                            <div class="mission-icon"><i class="fa-solid fa-palette"></i></div>
-                            <div class="mission-content">
-                                <h3>Preserve History</h3>
-                                <p>Document and celebrate over a decade of incredible League music productions</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <section class="about-card" id="how">
+            <h2>How a cup works</h2>
+            <ol class="about-steps">
+                <li>
+                    <h3>Edits enter</h3>
+                    <p>A set of fan edits is chosen for the cup. You can see all of them in the <a href="/music-gallery">gallery</a>.</p>
+                </li>
+                <li>
+                    <h3>The draw</h3>
+                    <p>Edits are ranked by views and likes into four pots, and each group of four gets one edit from every pot. The strongest edits can't knock each other out in the groups.</p>
+                </li>
+                <li>
+                    <h3>You vote</h3>
+                    <p>Each match is two edits side by side. Watch both and vote for the one you like more. You get one vote per match, and the live split appears once you have voted.</p>
+                </li>
+                <li>
+                    <h3>Top two go through</h3>
+                    <p>In each group, the two edits with the most wins advance. If wins are level, the share of the votes decides.</p>
+                </li>
+                <li>
+                    <h3>Knockout to champion</h3>
+                    <p>From there it's single elimination: win and you go on, lose and your run ends. The last edit standing is the champion.</p>
+                </li>
+            </ol>
+        </section>
 
-            <!-- How It Works -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-gear"></i></div>
-                        <h2 class="section-title">How It Works</h2>
-                    </div>
-                    
-                    <div class="how-it-works-grid">
-                        
-                        <div class="step-card">
-                            <div class="step-number">1</div>
-                            <h3 class="step-title">Tournament Selection</h3>
-                            <p class="step-description">
-                                Season 1 features all 64 League music videos competing together in one ultimate 
-                                championship. Future seasons may focus on specific categories based on community 
-                                feedback and interest.
-                            </p>
-                        </div>
+        <section class="about-card" id="fair">
+            <h2>Fair play</h2>
+            <ul class="about-list">
+                <li><strong>One vote per match.</strong> It is enforced by the database rules, not just by the page.</li>
+                <li><strong>Public counts.</strong> Vote totals for every match are shown on the bracket, so anyone can check them.</li>
+                <li><strong>The draw is by numbers.</strong> Seeding comes from views and likes, then the groups are drawn automatically.</li>
+                <li><strong>Honest limit.</strong> No public vote can stop every determined attempt to game it. If you see something that looks wrong, <a data-contact-mail data-show-address href="/about#contact">tell us</a>.</li>
+            </ul>
+        </section>
 
-                        <div class="step-card">
-                            <div class="step-number">2</div>
-                            <h3 class="step-title">Seeding & Brackets</h3>
-                            <p class="step-description">
-                                Music videos are seeded based on YouTube views to ensure fair, competitive matchups. 
-                                We use single-elimination brackets to create dramatic, high-stakes battles from 
-                                Round 1 through the Finals.
-                            </p>
-                        </div>
+        <section class="about-card" id="companions">
+            <h2>Your companion</h2>
+            <p>Pick an Arcane character in your settings and they will react to your votes, your achievements and your level-ups, in their own voice.</p>
+            <ul class="companion-grid" id="companionGrid" aria-label="Companions"></ul>
+        </section>
 
-                        <div class="step-card">
-                            <div class="step-number">3</div>
-                            <h3 class="step-title">Community Voting</h3>
-                            <p class="step-description">
-                                Watch both videos side-by-side and vote for your favorite. No account 
-                                required — just click to vote. Voting windows vary by round, with 
-                                live vote counts displayed throughout.
-                            </p>
-                        </div>
+        <section class="about-card" id="creators">
+            <h2>For creators</h2>
+            <p>We do not host, copy or re-upload any video. Every edit is embedded straight from YouTube, so it plays from your own channel and the views and likes go to you. If you delete it, make it private or turn off embedding, it stops playing here. Each edit is shown with your name and a link to your channel.</p>
+            <p>If you would rather your edit was not shown on the site or entered in a tournament, email <a data-creator-mail data-show-address href="mailto:">us</a> with a link to your video and we will remove it, including its title and your name from our pages. Removal is quickest before a cup is drawn.</p>
+        </section>
 
-                        <div class="step-card">
-                            <div class="step-number">4</div>
-                            <h3 class="step-title">Bracket Advancement</h3>
-                            <p class="step-description">
-                                Winners advance through Round 1, Round 2, Quarterfinals, Semifinals, and Finals. 
-                                Close matchups create intense drama, while blowouts demonstrate clear 
-                                community favorites. Upsets and Cinderella runs make every round exciting!
-                            </p>
-                        </div>
+        <section class="about-card" id="involved">
+            <h2>Get involved</h2>
+            <ul class="about-list">
+                <li><a href="/live"><strong>Vote</strong></a> in the matches that are open now.</li>
+                <li><strong>Share</strong> a match you care about. Every vote page has share buttons.</li>
+                <li><a href="/feed"><strong>Join the community</strong></a> feed to see what others are voting for.</li>
+                <li><strong>Tell the creators.</strong> Let them know their edit is in a cup. It means a lot to them.</li>
+            </ul>
+        </section>
 
-                        <div class="step-card">
-                            <div class="step-number">5</div>
-                            <h3 class="step-title">Champion Crowned</h3>
-                            <p class="step-description">
-                                The last music video standing becomes Season 1 champion and enters 
-                                the Hall of Champions. The winner will get special recognition and may 
-                                receive advantages in future all-star tournaments.
-                            </p>
-                        </div>
+        <section class="about-card" id="legal">
+            <h2>Legal &amp; attribution</h2>
+            <p class="about-notice">Arcane Moments is an unofficial fan project. It was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.</p>
+            <p><strong>Trademarks and artwork.</strong> Arcane, League of Legends and all related names, characters, logos, music and artwork are trademarks and copyrights of Riot Games, Inc. Arcane was made by Riot Games and Fortiche Production.</p>
+            <p><strong>Videos.</strong> Every video is embedded from YouTube. We do not host or redistribute video content, and each edit stays the work of its creator.</p>
+            <p><strong>Our content.</strong> The tournament structure, the voting system, the site design and the written text are our own work.</p>
+            <p>For more, see the <a href="/legal/terms.html">Terms of Use</a>, <a href="/legal/privacy.html">Privacy Policy</a> and <a href="/legal/disclosure.html">Affiliate Disclosure</a>.</p>
+        </section>
 
-                        <div class="step-card">
-                            <div class="step-number">6</div>
-                            <h3 class="step-title">Future Seasons</h3>
-                            <p class="step-description">
-                                After Season 1 crowns an all-time champion, we'll run future tournaments 
-                                with different formats based on community feedback. Category-specific tournaments, 
-                                redemption brackets, and special events are all on the table!
-                            </p>
-                        </div>
+        <section class="about-card" id="contact">
+            <h2>Contact</h2>
+            <p class="about-email"><a data-contact-mail data-show-address href="/about#contact">Email us</a></p>
+            <ul class="about-contact">
+                <li>
+                    <h3><i class="fa-solid fa-at" aria-hidden="true"></i> General</h3>
+                    <p class="about-note">Questions, ideas for future cups and feedback.</p>
+                </li>
+                <li>
+                    <h3><i class="fa-solid fa-bug" aria-hidden="true"></i> Report a problem</h3>
+                    <p class="about-note">Voting not working, something looks wrong, or you found a bug.</p>
+                </li>
+                <li>
+                    <h3><i class="fa-solid fa-gavel" aria-hidden="true"></i> Copyright</h3>
+                    <p class="about-note">Copyright concerns or takedown requests.</p>
+                </li>
+            </ul>
+            <p class="about-note">One address for all of them. Put the topic in the subject line and we usually reply within two to three working days.</p>
+        </section>
 
-                    </div>
-                </div>
-            </div>
+        <section class="about-card" id="credits">
+            <h2>Credits &amp; thanks</h2>
+            <p><strong>Riot Games and Fortiche Production</strong> for Arcane, and for letting fan projects like this exist.</p>
+            <p><strong>The creators</strong> whose edits fill every cup. This site is only here to show them off.</p>
+            <p><strong>The community.</strong> Every vote, share and conversation is what makes a cup worth running.</p>
+        </section>
 
-            <!-- What Makes Us Different -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-bolt"></i></div>
-                        <h2 class="section-title">What Makes Us Different</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            Anthems Arena isn't just another poll or ranking list. We've built a complete 
-                            tournament experience with features that make every vote count:
-                        </p>
-                        <ul class="feature-list">
-                            <li><strong>Real Tournament Drama</strong> — Upsets, Cinderella runs, and nail-biter finishes create genuine excitement</li>
-                            <li><strong>Progression System</strong> — Earn XP, unlock 50+ achievements, and level up your profile as you vote</li>
-                            <li><strong>Live Results</strong> — Watch vote counts update in real-time and see how close the race is</li>
-                            <li><strong>No Login Required</strong> — Vote instantly on any match without creating an account</li>
-                            <li><strong>Community-Driven</strong> — YOUR votes determine the winner, not algorithms or editorial picks</li>
-                            <li><strong>Fair Seeding</strong> — Songs seeded by YouTube views ensure competitive matchups from Round 1</li>
-                            <li><strong>Transparent Brackets</strong> — See the full bracket, past results, and upcoming matchups at any time</li>
-                            <li><strong>Mobile-Optimized</strong> — Vote seamlessly on desktop or mobile with a smooth, fast interface</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tournament Categories -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-trophy"></i></div>
-                        <h2 class="section-title">Potential Future Seasons</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            Season 1 is an all-inclusive championship featuring every type of League music. 
-                            Future seasons might focus on specific categories to give different genres their 
-                            moment to shine. Here are some ideas we're considering:
-                        </p>
-                    </div>
-                    
-                    <div class="categories-grid">
-                        
-                        <div class="category-card">
-                            <div class="category-icon"><i class="fa-solid fa-earth-americas"></i></div>
-                            <h3 class="category-title">Worlds Anthems</h3>
-                            <p class="category-description">
-                                The legendary songs that define each World Championship. From Warriors 
-                                to GODS, these anthems capture the spirit of competitive League.
-                            </p>
-                            <div class="category-examples">
-                                Warriors • RISE • Phoenix • Burn It All Down
-                            </div>
-                        </div>
-
-                        <div class="category-card">
-                            <div class="category-icon"><i class="fa-solid fa-microphone"></i></div>
-                            <h3 class="category-title">Virtual Groups</h3>
-                            <p class="category-description">
-                                The virtual bands that became real pop sensations. K/DA, Pentakill, 
-                                True Damage, and Heartsteel compete for musical supremacy.
-                            </p>
-                            <div class="category-examples">
-                                K/DA - POP/STARS • Pentakill - Mortal Reminder • GIANTS
-                            </div>
-                        </div>
-
-                        <div class="category-card">
-                            <div class="category-icon"><i class="fa-solid fa-film"></i></div>
-                            <h3 class="category-title">Cinematics</h3>
-                            <p class="category-description">
-                                Breathtaking animated cinematics that tell stories through stunning 
-                                visuals and epic orchestral scores.
-                            </p>
-                            <div class="category-examples">
-                                Awaken • The Call • Warriors • Still Here
-                            </div>
-                        </div>
-
-                        <div class="category-card">
-                            <div class="category-icon"><i class="fa-solid fa-tv"></i></div>
-                            <h3 class="category-title">Arcane Soundtrack</h3>
-                            <p class="category-description">
-                                Songs from the Netflix series that brought League's story to millions 
-                                of new fans worldwide.
-                            </p>
-                            <div class="category-examples">
-                                Enemy • Playground • Guns for Hire • Ma Meilleure Ennemie
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Why We Love League Music -->
-            <div class="content-section">
-                <div class="content-box highlight">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-heart"></i></div>
-                        <h2 class="section-title">Why We Love League Music</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            League of Legends didn't just create a game — they created a musical universe. 
-                            Over the past decade, Riot Games has partnered with world-class artists, 
-                            composed stunning orchestral scores, and produced music videos that rival 
-                            anything in the mainstream music industry.
-                        </p>
-                        <p>
-                            <strong>The Impact:</strong> These aren't just video game songs. K/DA - POP/STARS 
-                            has over 600 million views and spawned real-world concerts. Warriors introduced 
-                            millions to League through mainstream radio play. Pentakill released actual albums 
-                            that charted on Billboard. Awaken showcased animation quality that set new standards 
-                            for the industry.
-                        </p>
-                        <p>
-                            <strong>The Evolution:</strong> From early champion login themes to full-fledged 
-                            music videos with narrative arcs, League's music has evolved alongside the game. 
-                            Each year brings new innovations — virtual bands, animated cinematics, live 
-                            orchestral performances, and collaborations with top-tier artists.
-                        </p>
-                        <p>
-                            <strong>The Community:</strong> League's music transcends the game. Fans who've 
-                            never played League discovered it through music videos. Players bond over favorite 
-                            songs. Worlds anthems become yearly traditions. This music has become part of 
-                            gaming culture itself.
-                        </p>
-                        <p>
-                            We created this tournament to celebrate all of that — and to give the community 
-                            a fun way to engage with this incredible musical legacy.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fair Play & Integrity -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-scale-balanced"></i></div>
-                        <h2 class="section-title">Fair Play & Integrity</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            We're committed to maintaining fair, legitimate tournaments that reflect 
-                            genuine community preferences.
-                        </p>
-                    </div>
-                    <div class="fair-play-list">
-                        <div class="fair-play-item">
-                            <div class="fp-icon"><i class="fa-solid fa-check"></i></div>
-                            <div class="fp-content">
-                                <h4>One Vote Per Person</h4>
-                                <p>We use browser-based tracking to prevent duplicate voting on the same matchup</p>
-                            </div>
-                        </div>
-                        <div class="fair-play-item">
-                            <div class="fp-icon"><i class="fa-solid fa-check"></i></div>
-                            <div class="fp-content">
-                                <h4>Fraud Detection</h4>
-                                <p>We monitor for suspicious voting patterns and automated bots</p>
-                            </div>
-                        </div>
-                        <div class="fair-play-item">
-                            <div class="fp-icon"><i class="fa-solid fa-check"></i></div>
-                            <div class="fp-content">
-                                <h4>Transparent Results</h4>
-                                <p>All vote counts and percentages are displayed publicly in real-time</p>
-                            </div>
-                        </div>
-                        <div class="fair-play-item">
-                            <div class="fp-icon"><i class="fa-solid fa-check"></i></div>
-                            <div class="fp-content">
-                                <h4>No Bias</h4>
-                                <p>Tournament seeding is based on objective metrics, not our personal preferences</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Legal & Attribution -->
-            <div class="content-section">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-scroll"></i></div>
-                        <h2 class="section-title">Legal & Attribution</h2>
-                    </div>
-                    <div class="content-text">
-                        <div class="legal-notice">
-                            <p>
-                                Anthem Arena was created under Riot Games' "Legal Jibber Jabber" 
-                                policy using assets owned by Riot Games. Riot Games does not endorse or 
-                                sponsor this project.
-                            </p>
-                        </div>
-                        <p>
-                            <strong>Copyright:</strong> All League of Legends music, videos, artwork, 
-                            character names, and trademarks are the property of Riot Games, Inc. We use 
-                            this content under fair use for purposes of commentary, community engagement, 
-                            and celebration of League's musical legacy.
-                        </p>
-                        <p>
-                            <strong>YouTube Content:</strong> All music videos are embedded from official 
-                            Riot Games YouTube channels. We do not host or redistribute any video content — 
-                            we simply provide a platform for community discussion and voting.
-                        </p>
-                        <p>
-                            <strong>Our Content:</strong> The tournament structure, voting system, website 
-                            design, and original written commentary are created by Anthem Arena 
-                            and are our own work.
-                        </p>
-                        <p>
-                            For more information, see our <a href="/legal/terms.html">Terms of Use</a>, 
-                            <a href="/legal/privacy.html">Privacy Policy</a>, and 
-                            <a href="/legal/disclosure.html">Affiliate Disclosure</a>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Get Involved -->
-            <div class="content-section">
-                <div class="content-box cta-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-rocket"></i></div>
-                        <h2 class="section-title">Get Involved</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            Anthem Arena is built by fans, for fans. Here's how you can participate:
-                        </p>
-                    </div>
-                    <div class="involvement-grid">
-                        <div class="involvement-card">
-                            <h4><i class="fa-solid fa-check-to-slot"></i> Vote in Tournaments</h4>
-                            <p>Every vote matters! Participate in matchups and help decide the champions.</p>
-                            <a href="/live" class="involvement-link">See Live Matches →</a>
-                        </div>
-                        <div class="involvement-card">
-                            <h4><i class="fa-solid fa-bullhorn"></i> Share & Discuss</h4>
-                            <p>Share matchups on social media and discuss your favorite music videos with friends.</p>
-                        </div>
-                        <div class="involvement-card">
-                            <h4><i class="fa-solid fa-envelope"></i> Subscribe</h4>
-                            <p>Get notified when new tournaments start and when your favorite videos compete.</p>
-                            <a href="#newsletter" class="involvement-link">Subscribe →</a>
-                        </div>
-                        <div class="involvement-card">
-                            <h4><i class="fa-solid fa-comments"></i> Give Feedback</h4>
-                            <p>Have suggestions? Want to see a specific tournament category? Let us know!</p>
-                            <a href="#contact" class="involvement-link">Contact Us →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Newsletter Signup -->
-            <div class="content-section" id="newsletter">
-                <div class="newsletter-box">
-                    <h3 class="newsletter-title">Stay Updated</h3>
-                    <p class="newsletter-text">
-                        Get notified when new tournaments start and when your favorite music videos are competing.
-                    </p>
-                    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
-                        <input 
-                            type="email" 
-                            placeholder="Enter your email" 
-                            class="newsletter-input"
-                            required
-                        >
-                        <button type="submit" class="newsletter-btn">
-                            Subscribe
-                        </button>
-                    </form>
-                    <p class="newsletter-disclaimer">
-                        We'll only email you about tournament updates. No spam, ever. 
-                        See our <a href="/legal/privacy.html">Privacy Policy</a>.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Contact Section -->
-            <div class="content-section" id="contact">
-                <div class="content-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-envelope"></i></div>
-                        <h2 class="section-title">Contact Us</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            Have questions, suggestions, or feedback? We'd love to hear from you!
-                        </p>
-                        <div class="contact-methods">
-                            <div class="contact-method">
-                                <h4><i class="fa-solid fa-at"></i> Email</h4>
-                                <p>anthemarena@outlook.com</p>
-                                <p class="contact-note">For general inquiries, song suggestions for future seasons, and feedback</p>
-                            </div>
-                            <div class="contact-method">
-                                <h4><i class="fa-solid fa-bug"></i> Report Issues</h4>
-                                <p>anthemarena@outlook.com</p>
-                                <p class="contact-note">Found a bug? Voting not working? Let us know!</p>
-                            </div>
-                            <div class="contact-method">
-                                <h4><i class="fa-solid fa-gavel"></i> Legal / Copyright</h4>
-                                <p>anthemarena@outlook.com</p>
-                                <p class="contact-note">For copyright concerns or DMCA notices</p>
-                            </div>
-                        </div>
-                        <p class="response-time">
-                            <strong>Response Time:</strong> We typically respond within 2-3 business days.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Credits -->
-            <div class="content-section">
-                <div class="content-box credits-box">
-                    <div class="content-header">
-                        <div class="icon-circle"><i class="fa-solid fa-hands-praying"></i></div>
-                        <h2 class="section-title">Credits & Thanks</h2>
-                    </div>
-                    <div class="content-text">
-                        <p>
-                            <strong>Riot Games</strong> — For creating incredible music that inspires millions 
-                            and for allowing fan projects like ours to exist.
-                        </p>
-                        <p>
-                            <strong>The Artists</strong> — Imagine Dragons, The Glitch Mob, Against the Current, 
-                            Chrissy Costanza, and countless other talented musicians who've contributed to 
-                            League's musical legacy.
-                        </p>
-                        <p>
-                            <strong>The Community</strong> — Every voter, every share, every discussion makes 
-                            this project worthwhile. Thank you for celebrating League's music with us.
-                        </p>
-                        <p>
-                            <strong>You</strong> — For visiting and participating. Your votes matter, and your 
-                            passion for League's music is what makes tournaments exciting.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
+    </main>
 
     <div id="footer-placeholder"></div>
     <script src="/js/footer.js"></script>
 
-    <script type="module" src="js/notification-storage.js"></script>
-<script type="module" src="js/notification-center.js"></script>
-    <script type="module" src="/js/global-notifications.js"></script>
-
-    <script src="/js/about.js"></script>
+    <script type="module" src="/js/about.js"></script>
+    <script type="module" src="/js/creator-contact.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
 </body>
 </html>
