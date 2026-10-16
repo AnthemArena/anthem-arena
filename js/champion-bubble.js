@@ -178,3 +178,4 @@ export async function renderChampionBubble(ctx) {
         });
     }
 }
+export const loadChampionPack = fetchPack;

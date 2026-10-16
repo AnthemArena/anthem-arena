@@ -1611,5 +1611,47 @@
       "Voting's over. You missed this one. There's always another.",
       "All done here. {winner} took it. Next time, say something."
     ]
+  },
+  "modal": {
+    "first-vote": [
+      "First one's always the scariest. Now you're in. Welcome.",
+      "That's your first. Funny how small it feels, right before it stops feeling small.",
+      "You're one of us now. Try not to make it weird."
+    ],
+    "streak": [
+      "Again? You keep showing up. I'm not complaining.",
+      "{streak} days running. Okay. Now I'm paying attention.",
+      "Back again. People stick around when you let them. Stay."
+    ],
+    "underdog": [
+      "Backing the one nobody's backing? Yeah. I see you.",
+      "Bold. Everyone else is looking the other way. I like that.",
+      "Underdog, huh. Takes a certain kind of person. I get it."
+    ],
+    "early": [
+      "Early. You get to shape this before anyone else does. Don't waste it.",
+      "Hardly anyone's here yet. Your vote's doing a lot of heavy lifting.",
+      "First through the door. I'll pretend I'm not impressed."
+    ],
+    "close": [
+      "That vote just tipped something. Feel it? Everything's close right now.",
+      "It's razor thin. One more person and the whole thing flips.",
+      "Close one. Your vote counts here. Really counts."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't over. Go get your friends.",
+      "Not winning yet. Good. Means there's still something to fight for.",
+      "Behind, but it's not done. Not even close."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Things turn around fast.",
+      "Winning, for now. Enjoy it. Quietly.",
+      "Look at that. Good pick. Obviously."
+    ],
+    "default": [
+      "Noted. I'm not going to change your mind. Not yet.",
+      "Done. That one's on you now.",
+      "Your vote's in. Go see what else is out there."
+    ]
   }
 }
