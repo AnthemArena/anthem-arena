@@ -6,6 +6,7 @@ import path from 'node:path';
 
 const file = process.argv[2] ? path.resolve(process.argv[2]) : new URL('../netlify/edge-functions/firebase-cache.js', import.meta.url).pathname;
 const handler = (await import(pathToFileURL(file).href)).default;
+globalThis.Deno = { env: { get: n => (n === 'FIREBASE_WEB_API_KEY' ? 'test-key-123' : undefined) } };   // what Netlify provides
 const quiet = () => { for (const k of ['log', 'warn', 'error', 'info']) console[k] = () => {}; };
 quiet();
 
@@ -121,7 +122,14 @@ await test('429 with nothing cached is still an honest error', async () => {
 await test('every Firestore request carries the project key (anonymous calls were being throttled)', async () => {
     const log = fakeFirestore(5);
     await call('&tournament=key-cup');
-    assert.ok(log.length > 0 && log.every(r => r.search.includes('key=AIza')), JSON.stringify(log));
+    assert.ok(log.length > 0 && log.every(r => r.search.includes('key=test-key-123')), JSON.stringify(log));
+});
+
+await test('with no key configured, requests go out without one (as before)', async () => {
+    const saved = globalThis.Deno; globalThis.Deno = { env: { get: () => undefined } };
+    const log = fakeFirestore(5); const res = await call('&tournament=nokey-cup');
+    globalThis.Deno = saved;
+    assert.equal(res.status, 200); assert.ok(log.every(r => !r.search.includes('key=')), JSON.stringify(log));
 });
 
 await test('if the key is refused (403) the same request is repeated without it', async () => {

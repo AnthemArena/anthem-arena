@@ -10,12 +10,16 @@ const FIREBASE_PROJECT = "arcane-moments";
 // ---- Firestore REST access --------------------------------------------------------------------------------------
 // Requests with no API key are anonymous: Google throttles them per source address, and Netlify's edge servers share
 // addresses with many other sites, which is how /api/matches began answering 429 Too Many Requests while the site's own
-// reads (and the daily quota) were fine. Sending the project's public web key makes the call count against this project.
+// reads (and the daily quota) were fine. Sending the project's web key makes the call count against this project.
 // If the key were ever blocked (403), the call is repeated without it, so this can only help, never break reads.
-const FIRESTORE_WEB_KEY = "AIzaSyCApnc605mPNOEsAcVnKeXbBTokk7iZP5E";
+// Read from the Netlify environment variable FIREBASE_WEB_API_KEY (Site configuration > Environment variables), not hardcoded.
+// If it is not set, requests go out without a key, exactly as before.
+const firestoreKey = () => (typeof Deno !== "undefined" && Deno.env?.get("FIREBASE_WEB_API_KEY")) || "";
 const SITE_ORIGIN = "https://arcanemoments.netlify.app/";
 async function fsFetch(url, init = {}) {
-  const keyed = url + (url.includes("?") ? "&" : "?") + "key=" + FIRESTORE_WEB_KEY;
+  const key = firestoreKey();
+  if (!key) return fetch(url, init);
+  const keyed = url + (url.includes("?") ? "&" : "?") + "key=" + encodeURIComponent(key);
   const headers = { ...(init.headers || {}), Referer: SITE_ORIGIN };
   const response = await fetch(keyed, { ...init, headers });
   if (response.status === 403) return fetch(url, init);
