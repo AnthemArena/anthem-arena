@@ -1,0 +1,160 @@
+From ab09de6741bf26675c3a2204f5d2e8332b1afdd9 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 16 Oct 2026 20:49:58 +0100
+Subject: [PATCH] Participation counts opened matches only; sub-1% shows a
+ decimal; name the group stage row
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013psebDbek43PiPjqCtRkhL
+---
+ docs/arcane_moments.md           |  4 ++++
+ js/cup-history-model.js          |  9 ++++++---
+ js/profile-page.js               | 31 ++++++++++++++++++++-----------
+ tools/test-cup-history-model.mjs |  4 +++-
+ 4 files changed, 33 insertions(+), 15 deletions(-)
+
+diff --git a/docs/arcane_moments.md b/docs/arcane_moments.md
+index cd65e20..5ed93ab 100644
+--- a/docs/arcane_moments.md
++++ b/docs/arcane_moments.md
+@@ -399,3 +399,7 @@ People who vote in more than one cup keep their history. Votes were never delete
+ - New record **Biggest upset** (also on the Records tab): the lowest seed to beat a higher seed, by seed gap. Random-draw cups have no seeds, so it is simply absent there.
+ - `compareCups()` in `js/stats-model.js`; a cup whose matches fail to load is listed as "Could not load", not fatal.
+ - Not included: unique voters per cup. That needs a count of distinct voters from the votes collection, which the match list cannot give. Add it with a small edge endpoint if wanted.
++
++## Participation counts opened matches only
++
++Profile participation (the circle, the round rows and Cup History) is measured against matches that have opened, not every match in the cup. With 384 group matches opening a group at a time, counting all of them left everyone at about 0% for weeks. Matches still `upcoming` are left out. Anything under 1% shows one decimal (0.3%) instead of a flat 0%. The group stage is one row named "Group stage".
+diff --git a/js/cup-history-model.js b/js/cup-history-model.js
+index aeb65bd..9b0a6a2 100644
+--- a/js/cup-history-model.js
++++ b/js/cup-history-model.js
+@@ -6,6 +6,8 @@
+ // cups          entries from data/cups.json. Only these cups count, so test cups never appear.
+ // matchesByCup  { [cupId]: match[] } as returned by /api/matches?tournament=<cupId>. A cup may be missing (request failed).
+ 
++// Under 1% would round to a flat 0%, which reads as nothing: show one decimal there.
++const pctOf = (a, b) => { const x = (a / b) * 100; return x > 0 && x < 1 ? Math.max(0.1, Math.round(x * 10) / 10) : Math.round(x); };
+ const sideOf = (match, id) => (id && (id === match.song1?.id || id === 'song1') ? 1 : id && (id === match.song2?.id || id === 'song2') ? 2 : 0);
+ const cleanTitle = c => String(c?.shortTitle || c?.title || c?.name || '').replace(/\s*#\w+/g, '').trim();
+ 
+@@ -25,7 +27,8 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
+         const matches = matchesByCup[cup.id];
+         const known = Array.isArray(matches) && matches.length > 0;
+         const index = new Map((known ? matches : []).map(m => [m.matchId || m.id, m]));
+-        const real = known ? matches.filter(m => m.song1?.id !== 'TBD' && m.song2?.id !== 'TBD') : [];
++        // Matches that have opened: a cup still building its later rounds should not count them against the voter.
++        const real = known ? matches.filter(m => m.song1?.id !== 'TBD' && m.song2?.id !== 'TBD' && m.status !== 'upcoming') : [];
+ 
+         let decided = 0, correct = 0, lastPick = null;
+         const picks = [];
+@@ -47,7 +50,7 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
+             id: cup.id, name: cup.name || cup.id, status: cup.status || 'complete', startDate: cup.startDate || null, champion: cup.champion || null,
+             votes: mine.size,
+             totalMatches: total || null,
+-            participation: total ? Math.min(100, Math.round(mine.size / total * 100)) : null,
++            participation: total ? Math.min(100, pctOf(mine.size, total)) : null,
+             decided, correct,
+             accuracy: decided ? Math.round(correct / decided * 100) : null,
+             picks
+@@ -64,7 +67,7 @@ export function buildCupHistory({ votes = [], cups = [], matchesByCup = {} } = {
+         lifetime: {
+             totalVotes: rows.reduce((s, r) => s + r.votes, 0),
+             cupsEntered: rows.length,
+-            avgParticipation: withPct.length ? Math.round(withPct.reduce((s, r) => s + r.participation, 0) / withPct.length) : null,
++            avgParticipation: withPct.length ? pctOf(withPct.reduce((s, r) => s + r.participation, 0), withPct.length * 100) : null,
+             accuracy: decided ? Math.round(correct / decided * 100) : null,
+             decided
+         }
+diff --git a/js/profile-page.js b/js/profile-page.js
+index 03c7dd9..ccf66d9 100644
+--- a/js/profile-page.js
++++ b/js/profile-page.js
+@@ -2500,10 +2500,25 @@ async function calculateTournamentParticipation(userId) {
+         const { getAllMatches } = await import('./api-client.js');
+         const allMatches = await getAllMatches();
+ 
++        // Only matches that have opened can be voted on, so only those count. Measuring against all 384 group
++        // matches would leave everyone near 0% while the groups open one at a time.
+         const tournamentMatches = allMatches.filter(
+-            match => match.tournament === CURRENT_TOURNAMENT
++            match => match.tournament === CURRENT_TOURNAMENT && match.status !== 'upcoming'
+         );
+ 
++        // Group stage matches all share round 1, so name that row from the matches themselves.
++        const roundLabels = {};
++        tournamentMatches.forEach(match => {
++            const num = parseInt(String(match.round ?? 1).replace(/\D/g, ''), 10) || 1;
++            if (!roundLabels[num]) roundLabels[num] = match.stage === 'group' ? 'Group stage' : (match.roundLabel || '');
++        });
++        // Under 1% would round to a flat 0%, which reads as "nothing". Show one decimal there instead.
++        const pctOf = (a, b) => {
++            if (!b) return 0;
++            const x = (a / b) * 100;
++            return x > 0 && x < 1 ? Math.max(0.1, Math.round(x * 10) / 10) : Math.round(x);
++        };
++
+         console.log(
+             `📊 Found ${tournamentMatches.length} matches in ${TOURNAMENT_NAME}`
+         );
+@@ -2571,14 +2586,11 @@ async function calculateTournamentParticipation(userId) {
+             .map(roundNumber => {
+                 const total = matchesByRound[roundNumber];
+                 const voted = votesByRound[roundNumber] || 0;
+-                const percentage =
+-                    total > 0
+-                        ? Math.round((voted / total) * 100)
+-                        : 0;
++                const percentage = pctOf(voted, total);
+ 
+                 return {
+                     round: roundNumber,
+-                    roundName: getRoundName(roundNumber),
++                    roundName: roundLabels[roundNumber] || getRoundName(roundNumber),
+                     voted,
+                     total,
+                     percentage
+@@ -2588,10 +2600,7 @@ async function calculateTournamentParticipation(userId) {
+         const totalPossible = tournamentMatches.length;
+         const totalVotes = votedMatchIds.size;
+ 
+-        const overallPercentage =
+-            totalPossible > 0
+-                ? Math.round((totalVotes / totalPossible) * 100)
+-                : 0;
++        const overallPercentage = pctOf(totalVotes, totalPossible);
+ 
+         return {
+             tournamentId: CURRENT_TOURNAMENT,
+@@ -2756,7 +2765,7 @@ function renderParticipationTab() {
+     🎬 ${participation.tournamentName}
+ </strong>
+         </div>
+-        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches in this tournament.</p>
++        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches open so far.</p>
+     `;
+     
+     // Render rounds breakdown
+diff --git a/tools/test-cup-history-model.mjs b/tools/test-cup-history-model.mjs
+index 200fa67..4b2ed10 100644
+--- a/tools/test-cup-history-model.mjs
++++ b/tools/test-cup-history-model.mjs
+@@ -7,7 +7,7 @@ let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
+ const m = (id, status, winner, extra = {}) => ({ matchId: id, roundLabel: 'Group A', status, winnerId: winner, song1: { id: 'a', shortTitle: 'Alpha #jinx' }, song2: { id: 'b', shortTitle: 'Beta #jinx' }, ...extra });
+ const cups = [{ id: 'c1', name: 'Cup 1', status: 'complete', startDate: '2026-10-01' }, { id: 'c2', name: 'Cup 2', status: 'active', startDate: '2026-11-01' }];
+ const v = (matchId, tournament, choice, ts = 1) => ({ matchId, tournament, choice, timestamp: ts });
+-const matchesByCup = { c1: [m('x1', 'completed', 'a'), m('x2', 'completed', 'b'), m('x3', 'upcoming', null)], c2: [m('y1', 'live', null), m('y2', 'upcoming', null)] };
++const matchesByCup = { c1: [m('x1', 'completed', 'a'), m('x2', 'completed', 'b'), m('x3', 'live', null)], c2: [m('y1', 'live', null), m('y2', 'live', null), m('y3', 'upcoming', null)] };
+ 
+ t('empty and null input are safe', () => { assert.deepEqual(buildCupHistory().cups, []); assert.equal(buildCupHistory({ votes: null, cups: null }).lifetime.totalVotes, 0); });
+ t('test cups not in cups.json are ignored', () => { const h = buildCupHistory({ votes: [v('t1', 'group-test-01', 'song1')], cups, matchesByCup }); assert.equal(h.lifetime.totalVotes, 0); assert.equal(h.cups.length, 0); });
+@@ -22,4 +22,6 @@ t('TBD slots do not inflate the match total', () => { const mm = { c1: [m('x1',
+ t('the active cup is listed in data/cups.json', () => { const f = JSON.parse(fs.readFileSync(new URL('../data/cups.json', import.meta.url))); assert.ok(f.cups.some(c => c.id === ARCANE_CONFIG.tournamentId), 'add the active cup to data/cups.json'); });
+ t('html: shows cups, lifetime and escapes names', () => { const h = buildCupHistory({ votes: [v('x1', 'c1', 'song1')], cups: [{ ...cups[0], name: 'A <b>Cup</b>' }], matchesByCup }); const html = renderCupHistory(h); assert.ok(html.includes('Cup History')); assert.ok(html.includes('A &lt;b&gt;Cup&lt;/b&gt;')); assert.ok(!html.includes('<b>Cup')); assert.ok(html.includes('Votes cast')); assert.ok(html.includes('ch-won')); });
+ t('html: empty history explains itself', () => { assert.ok(renderCupHistory(buildCupHistory()).includes('No cup history yet')); });
++t('matches not opened yet do not count against participation', () => { const h = buildCupHistory({ votes: [v('y1', 'c2', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].totalMatches, 2); assert.equal(h.cups[0].participation, 50); });
++t('under 1% shows one decimal, not 0%', () => { const big = { c2: Array.from({ length: 400 }, (_, i) => m('b' + i, 'live', null)) }; const h = buildCupHistory({ votes: [v('b1', 'c2', 'song1')], cups, matchesByCup: big }); assert.equal(h.cups[0].participation, 0.3); assert.equal(h.lifetime.avgParticipation, 0.3); });
+ console.log(`${n} passed`);
+-- 
+2.43.0
+
