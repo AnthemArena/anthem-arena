@@ -403,3 +403,11 @@ People who vote in more than one cup keep their history. Votes were never delete
 ## Participation counts opened matches only
 
 Profile participation (the circle, the round rows and Cup History) is measured against matches that have opened, not every match in the cup. With 384 group matches opening a group at a time, counting all of them left everyone at about 0% for weeks. Matches still `upcoming` are left out. Anything under 1% shows one decimal (0.3%) instead of a flat 0%. The group stage is one row named "Group stage".
+
+## Match list no longer queries votes per match (429 fix)
+
+On 16 Oct the site lost all its matches: `/api/matches` returned `Firebase error: 429 Too Many Requests`. The match list used to run one votes query per match (384 for a full group stage) on every cache refresh; Firestore rate-limited the burst and the pages showed "Match data not found".
+
+- The list now reads the vote counters stored on each match document (every vote increments them in the same batch), so one list request replaces about 385. A single match (`?matchId=`) still counts its votes exactly.
+- If Firestore refuses a request, the edge function retries 429/503 twice, then serves its last good copy (up to 10 minutes old, header `X-Cache: STALE`) instead of an error.
+- Still heavy, worth fixing later: `/api/total-votes` (founding member threshold) reads every vote document each refresh. It should read the match counters or a single counter document. `/api/live-matches` queries votes per live match, which is fine while few matches are live.

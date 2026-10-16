@@ -4,6 +4,7 @@
 // ========================================
 
 const CACHE_DURATION = 30; // 30 seconds
+const STALE_OK_MS = 10 * 60 * 1000; // serve a copy up to 10 minutes old if Firestore refuses
 const FIREBASE_PROJECT = "arcane-moments";
 const TOURNAMENT = "jinx-cup-1";
 
@@ -134,7 +135,14 @@ export default async (request, context) => {
     
     // ✅ NEW: Fetch and attach vote counts if needed
     if (fetchVotes) {
-      transformed = await attachVoteCounts(transformed, matchId);
+      if (isMatchList) {
+        // The match list used to run one votes query per match (384 queries per refresh for a full group stage), which made
+        // Firestore answer 429 Too Many Requests and the whole site lost its matches. Every vote already increments the
+        // counters on the match document in the same batch, so the list reads those instead: zero extra requests.
+        transformed = Array.isArray(transformed) ? transformed.map(addStoredCountsToMatch) : transformed;
+      } else {
+        transformed = await attachVoteCounts(transformed, matchId);   // one match: one exact count is cheap
+      }
     }
     
     // Store in edge cache
@@ -154,7 +162,17 @@ export default async (request, context) => {
     
   } catch (error) {
     console.error("❌ Edge function error:", error);
-    
+
+    // Firestore can answer 429/5xx for a moment. A copy that is a few minutes old beats an error page for every visitor.
+    const stale = edgeCache.get(cacheKey);
+    if (stale && (Date.now() - stale.timestamp) < STALE_OK_MS) {
+      console.warn(`⚠️ Serving stale ${cacheKey} (${Math.round((Date.now() - stale.timestamp) / 1000)}s old)`);
+      return new Response(JSON.stringify(stale.data), {
+        status: 200,
+        headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=10", "X-Cache": "STALE", "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
     return new Response(JSON.stringify({ 
       error: error.message,
       endpoint: pathname,
@@ -183,7 +201,11 @@ async function fetchAllPages(baseUrl) {
   do {
     const separator = baseUrl.includes("?") ? "&" : "?";
     const url = `${baseUrl}${separator}pageSize=${PAGE_SIZE}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}`;
-    const response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+    let response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+    for (let attempt = 0; !response.ok && (response.status === 429 || response.status === 503) && attempt < 2; attempt++) {
+      await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+      response = await fetch(url, { headers: { "Content-Type": "application/json" } });
+    }
 
     if (!response.ok) {
       throw new Error(`Firebase error: ${response.status} ${response.statusText}`);
@@ -625,6 +647,21 @@ async function fetchVotesForMatch(matchId) {
     console.error(`❌ Error fetching votes for ${matchId}:`, error);
     return [];
   }
+}
+
+// Builds the same fields as addVoteCountsToMatch, from the counters stored on the match document.
+function addStoredCountsToMatch(match) {
+  const song1Votes = Number(match.song1?.votes) || 0;
+  const song2Votes = Number(match.song2?.votes) || 0;
+  const totalVotes = song1Votes + song2Votes;
+  const song1Percentage = totalVotes > 0 ? Math.round((song1Votes / totalVotes) * 100) : 50;
+  const song2Percentage = totalVotes > 0 ? 100 - song1Percentage : 50;
+  return {
+    ...match,
+    totalVotes,
+    song1: { ...(match.song1 || {}), votes: song1Votes, percentage: song1Percentage },
+    song2: { ...(match.song2 || {}), votes: song2Votes, percentage: song2Percentage }
+  };
 }
 
 function addVoteCountsToMatch(match, votes) {
