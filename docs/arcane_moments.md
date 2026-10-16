@@ -207,7 +207,7 @@ Ordered by what helps most right now. "You" = needs your input or action; "Me" =
 **Then (the tournament migration)**
 9. **Labels object** in `arcane-config.js`, plus `vote.html` + `vote.js` wording. *(Me)*
 10. `matches`, `my-votes`, then `brackets` and `live`. *(Me)*
-11. `stats`, `profile`, `feed`, `activity`, then `about`, legal pages and blog. *(Me, with your review of the legal text)*
+11. `stats`, `profile`, `feed`, `activity`, then `about`, legal pages. *(Me, with your review of the legal text)*
 
 **When the content is ready**
 12. **Landing page rows:** episode playlists when episode 2 starts, then one arc row as a test. *(You create the playlists, I check the config)*
@@ -322,7 +322,7 @@ The scan found song-era wording across many files: about 119 string hits in `vot
 2. `vote.html` + `vote.js`, then `matches`, then `my-votes`.
 3. `brackets` and `live`.
 4. `stats`, `profile`, `feed`, `activity`.
-5. `about.html`, legal pages (`terms`, `privacy`, `disclosure`) and blog. These need proper rewriting. Read the legal text carefully (not a lawyer).
+5. `about.html`, legal pages (`terms`, `privacy`, `disclosure`). These need proper rewriting. Read the legal text carefully (not a lawyer).
 
 **Leave alone:** internal names, and the retiring files `homepage.js`, `music-gallery.js`, `init-firebase.js`.
 
