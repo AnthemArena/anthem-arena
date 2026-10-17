@@ -1,4 +1,5 @@
-import { mixFeed, digestSummary, rankTrending, findPostById, RUN_MIN } from '../js/feed-mix-model.js';
+import fs from 'node:fs';
+import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, RUN_MIN } from '../js/feed-mix-model.js';
 let pass = 0, fail = 0;
 const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
 const vote = (i, u = 'u' + i) => ({ type: 'vote', postId: 'v' + i, username: u, timestamp: 1000 - i });
@@ -34,5 +35,13 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
     t('findPostById finds a top-level post', findPostById(posts, 'p1')?.postId === 'p1');
     t('findPostById finds a vote inside a digest (its owner is the voter)', findPostById(posts, 'v3')?.userId === 'voter3');
     t('findPostById: unknown id and empty list give null', findPostById(posts, 'nope') === null && findPostById(null, 'x') === null);
+}
+{
+    const users = [{ userId: 'u1', username: 'FierceWatcher229' }, { userId: 'u2', username: 'Kai' }, { userId: 'u3', username: null }];
+    const m = extractMentions('hey @fierceWATCHER229 and @Kai, again @Kai! @nobody', users);
+    t('mentions: case-insensitive, each person once, unknown names ignored', m.length === 2 && m[0].userId === 'u1' && m[0].username === 'FierceWatcher229' && m[1].userId === 'u2');
+    t('mentions: empty, no @, no users', extractMentions('', users).length === 0 && extractMentions('no at signs', users).length === 0 && extractMentions('@Kai', []).length === 0 && extractMentions(null, users).length === 0);
+    const src = fs.readFileSync(new URL('../js/feed-page.js', import.meta.url), 'utf8');
+    t('feed-page imports saveNotification at the top (mention alerts call it directly)', /^import \{ saveNotification \} from '\.\/notification-storage\.js';/m.test(src));
 }
 console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);
