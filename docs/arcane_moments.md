@@ -424,3 +424,33 @@ The 429s were `RESOURCE_EXHAUSTED / Quota exceeded`: the Spark plan's 50,000 rea
 - **Total votes** (`/api/total-votes`): one COUNT aggregation (about 1 read per 1,000 votes) instead of reading every vote. It now counts the **active cup only**. Before, it counted votes in every cup including the test cups, so test votes counted towards the Founding Member 1,000. (An earlier note here said it was per cup; it was not.) It falls back to the old full read if the aggregation is unavailable.
 - Both fall back to a stale copy (up to 10 minutes old) when Firestore answers 429.
 - Still to watch: every page that calls `/api/matches` shares this budget; Blaze plan costs about $0.06 per 100,000 reads, so a budget alert of a few dollars is plenty.
+
+## Feed sidebar widgets (cup-aware)
+- **Tournament Progress** (`loadRoundProgress`): built by `js/participation-model.js` (`buildParticipation`), same rule as the profile: only matches that have opened count, stage by stage (Groups, R64…). The old hard-coded 29/16/8/4/2/1 bracket is gone.
+- **Recent Activity**: reads the newest 40 `activity` docs, keeps only the current cup (`tournamentId` or `matchId` prefix), shows 5. Thumbnails come from `activity.songId` (the video id), no `music-videos.json` fetch.
+- **Tournament Stats**: Total Votes = sum of match counters, Matches Live, Matches Completed. It no longer reads the whole `votes` collection (that was thousands of reads per visit and counted voters from test cups). "Active Voters" was removed; a per-cup unique-voters counter could bring it back.
+- **Your Top Moment**: thumbnail from `videoId`, Arcane styling scoped to `#topSongWidget` in `css/arcane-theme.css`.
+- Widgets share one matches fetch and one "my votes" query per page load.
+- Avatars: new users get an Arcane champion (`getChampionImageUrl`, no 'Lee Sin'); `feed-page.js` handles `champion` avatars, encodes emoji SVGs, and swaps any failing avatar image for an emoji tile.
+- Tests: `node tools/test-participation-model.mjs` (10).
+
+## Feed mix, strips and filters
+- **Automatic vote posts can't bury written posts** (`js/feed-mix-model.js`, `mixFeed`): in All Activity, written posts are never truncated by votes (votes are capped at 100 on their own), and runs of 4+ vote posts in a row collapse into one expandable digest row ("A, B and 7 others cast 9 votes"). New **Posts** tab = written posts only. The vote posts shown are still the 100 newest activity docs.
+- **Posts index:** `getFeed('all')` in `js/social-feed.js` now asks for the newest 100 public posts (`where privacy == public`, `orderBy timestamp desc`). That needs a composite index on `posts` (privacy Ascending, timestamp Descending). Until it exists the query is refused and the code falls back to the old unordered read (console warning "posts index missing"). To create it: open the feed, copy the link from that Firestore error in the console (or Firebase console > Firestore > Indexes > Add: collection `posts`, fields privacy asc + timestamp desc), wait for Enabled.
+- **Strips above the tabs** (`js/feed-strip-model.js`, `loadFeedStrips`): pinned announcement from `data/announcement.json` (`enabled`, `id`, `text`, `linkText`, `linkUrl`, `expires`; only `/path` or https links; a new `id` shows again for people who dismissed the old one), and "You haven't voted in N open matches · next closes in 2d 3h" linking to the soonest one (logged out: "N matches are open").
+- Tests: `node tools/test-feed-mix-model.mjs` (12), `test-feed-strip-model.mjs` (15), `python3 tools/test-feed-digest-browser.py`.
+
+## Share menu and Trending
+- **Share** (`js/share-model.js`, `sharePost` in `js/feed-page.js`): the share button opens a menu: native share sheet (where the device has one), Copy link, Copy as message, X, Reddit, WhatsApp. A vote post shares `/vote?match=<id>` (so the recipient can vote); a written post shares `/feed.html?post=<id>`. Opening that link scrolls to the post, loads more of the feed if needed, and flashes it (old `#post-<id>` links work too).
+- Not done: rich link previews. Every shared link shows the site's generic og-image; a per-match preview needs an edge function that renders the og tags for `/vote?match=...`.
+- **Trending** (`rankTrending` in `js/feed-mix-model.js`): this week only, score = likes + 2 x comments, written posts and vote posts together. Vote posts are loaded by the shared `loadVotePosts()` helper (also used by All Activity).
+- Tests: `node tools/test-share-model.mjs` (10), `test-feed-mix-model.mjs` (15), `python3 tools/test-feed-browser.py` (share menu, copy link, trending tab).
+
+## Link previews for shared matches
+- A shared `/vote?match=<id>` link now unfurls (Discord, X, Slack, WhatsApp, Facebook ...) with the match title, a description (cup, round, votes so far, time left) and a generated 1200x630 image: both edits' thumbnails, "VS", creators, vote count, status.
+- `netlify/edge-functions/vote-meta.js` (paths `/vote`, `/vote.html`): ONLY for preview bots (user-agent list in `netlify/shared/og-model.js`) and only with `?match=`; it rewrites the title/description/og:*/twitter:* tags of vote.html using the cached `/api/matches` list. Real visitors are untouched. Any failure serves the normal page.
+- `netlify/functions/og-match.js` (served at `/og/match.png?match=<id>`): fetches the match list and both YouTube thumbnails, draws with satori + resvg (`netlify/shared/og-card.js`), PNG cached 1h at the edge. Unknown match or any error: redirect to `/og-image.png`. Fonts: `netlify/functions/assets/inter-700.woff`, `inter-800.woff` (Inter, OFL licence). Emoji and non-Latin characters are dropped from names (the font has Latin only).
+- New dependencies: `satori`, `@resvg/resvg-js` (package.json + package-lock.json; netlify.toml keeps resvg external and includes the font files).
+- Fixed: the default og:image on about, brackets, matches and vote pointed to `/images/og-image.png`, which does not exist; the file is `/og-image.png`.
+- Test: `node tools/test-og-preview.mjs [--save out.png]` (14 checks, includes the edge function and a real render). Not testable here: Netlify's bundling and the live YouTube thumbnail fetch, so check after deploy (below).
+- To check after deploy: open `https://<site>/og/match.png?match=<a real match id>` in a browser (should show the card); paste a `/vote?match=` link into a Discord message; if a platform shows an old preview, re-scrape it (Facebook sharing debugger, X card validator) since they cache.

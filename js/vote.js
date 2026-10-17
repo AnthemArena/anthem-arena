@@ -25,16 +25,13 @@ import { cleanTitle, shortTitle } from './title-clean.js';
 import { votingState, closedButton } from './vote-closed.js';
 import { renderChampionBubble, loadChampionPack } from './champion-bubble.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, TAG_FOR_KEY } from './champion-modal.js';
-import { getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
+import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
 
-const CHAMPIONS = [
-    'Aatrox', 'Ahri', 'Akali', 'Ashe', 'Ezreal', 'Jinx', 'Yasuo', 'Zed',
-    'Lux', 'Vi', 'Caitlyn', 'Jhin', 'Thresh', 'Lee Sin', 'Senna', 'Aphelios'
-    // ... add more as needed
-];
+// Default avatars: Arcane characters, by Data Dragon id (ids with spaces like 'Lee Sin' 404 there).
+const CHAMPIONS = ['Jinx', 'Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerdinger'];
 
 // ========================================
 // 🆕 PAGE-LEVEL MATCHES CACHE
@@ -1069,7 +1066,7 @@ if (profileDoc.exists()) {
         const randomChampion = CHAMPIONS[Math.floor(Math.random() * CHAMPIONS.length)];
         const avatar = {
             type: 'url',
-            value: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${randomChampion}.png`,
+            value: getChampionImageUrl(randomChampion),
             name: randomChampion
         };
 

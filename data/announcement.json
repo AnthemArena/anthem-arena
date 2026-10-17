@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "id": "group-a-open",
+  "text": "Group A is open: vote in every match before the deadline.",
+  "linkText": "Go to matches",
+  "linkUrl": "/matches",
+  "expires": "2026-10-23T20:00:00Z"
+}

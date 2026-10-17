@@ -7,6 +7,8 @@ import { ARCANE_CONFIG } from './arcane-config.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { getAllMatches } from './api-client.js';
 import { shortTitle } from './title-clean.js';
+import { buildParticipation } from './participation-model.js';
+import { closingSoon, announcementToShow, formatLeft } from './feed-strip-model.js';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
 
@@ -14,6 +16,12 @@ import { getFollowerCount, getFollowingCount } from './follow-system.js';
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
+
+// Several widgets need the same matches and the same user votes: ask once per page load.
+const once = (() => { const memo = new Map(); return (key, fn) => { if (!memo.has(key)) memo.set(key, fn()); return memo.get(key); }; })();
+const matchesOnce = () => once('matches', () => getAllMatches());
+const myVotesOnce = userId => once('votes:' + userId, async () => (await getDocs(query(collection(db, 'votes'), where('userId', '==', userId)))).docs.map(d => d.data()));
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // ========================================
 // INITIALIZE ALL WIDGETS
@@ -27,6 +35,7 @@ export async function initializeFeedWidgets() {
         // ✅ NEW: Personal widgets
         loadPersonalRankCard(),
         loadRoundProgress(),
+        loadFeedStrips(),
         loadFeaturedAchievement(),
         loadTopMoment(),
         // Existing widgets
@@ -214,265 +223,101 @@ async function loadPersonalRankCard() {
 // ✅ FIXED: ROUND PROGRESS WIDGET
 // ========================================
 
+// ========================================
+// TOP-OF-FEED STRIPS: pinned announcement (data/announcement.json) and "closing soon" reminder
+// ========================================
+async function loadFeedStrips() {
+    const box = document.getElementById('feedStrips');
+    if (!box) return;
+    box.innerHTML = '';
+
+    // Announcement: edit data/announcement.json (enabled, id, text, link, expires) and deploy. A new id shows again for people who dismissed the old one.
+    try {
+        const cfg = await (await fetch('/data/announcement.json', { cache: 'no-cache' })).json();
+        let dismissed = null;
+        try { dismissed = localStorage.getItem('dismissedAnnouncement'); } catch (e) {}
+        const a = announcementToShow(cfg, Date.now(), dismissed);
+        if (a) {
+            const el = document.createElement('div');
+            el.className = 'feed-strip feed-announcement';
+            el.innerHTML = `<i class="fa-solid fa-thumbtack"></i><span class="strip-text">${esc(a.text)}${a.linkUrl ? ` <a href="${esc(a.linkUrl)}">${esc(a.linkText)} →</a>` : ''}</span>
+                <button type="button" class="strip-close" aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button>`;
+            el.querySelector('.strip-close').addEventListener('click', () => {
+                try { localStorage.setItem('dismissedAnnouncement', a.id); } catch (e) {}
+                el.remove();
+            });
+            box.appendChild(el);
+        }
+    } catch (e) { /* no announcement file: nothing to show */ }
+
+    // Closing soon: live matches this user has not voted on, soonest deadline first
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        const [matches, votes] = await Promise.all([matchesOnce(), userId ? myVotesOnce(userId) : Promise.resolve(null)]);
+        const c = closingSoon({ matches, votes, cupId: ARCANE_CONFIG.tournamentId });
+        if (c.count > 0) {
+            const el = document.createElement('a');
+            el.className = 'feed-strip feed-closing';
+            el.href = c.nextId ? `/vote?match=${encodeURIComponent(c.nextId)}` : '/matches';
+            const left = c.msLeft !== null ? ` · next closes in ${formatLeft(c.msLeft)}` : '';
+            el.innerHTML = `<i class="fa-solid fa-hourglass-half"></i><span class="strip-text">${votes ? `You haven't voted in ${c.count} open ${c.count === 1 ? 'match' : 'matches'}` : `${c.count} ${c.count === 1 ? 'match is' : 'matches are'} open for voting`}${left}</span><span class="strip-cta">Vote →</span>`;
+            box.appendChild(el);
+        }
+    } catch (e) { console.error('❌ Error loading closing-soon strip:', e); }
+}
+
 async function loadRoundProgress() {
     const container = document.getElementById('roundProgressWidget');
     if (!container) return;
-    
+
     try {
         const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
-        
-        if (!userId) {
-            container.style.display = 'none';
-            return;
-        }
-        
-        // Get participation data
-        const participation = await calculateTournamentParticipation(userId);
-        
-        if (participation.totalVotes === 0) {
-            container.style.display = 'none';
-            return;
-        }
-        
-        // ✅ FIX: Find CURRENT ACTIVE round (not just incomplete)
-        // Get all matches to see which rounds are actually open
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const CURRENT_TOURNAMENT = ARCANE_CONFIG.tournamentId;
-        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
-        
-        // Find which rounds have live/active matches
-        const activeRounds = new Set();
-        tournamentMatches.forEach(match => {
-            if (match.status === 'live' || match.status === 'active') {
-                activeRounds.add(match.round);
-            }
-        });
-        
-        // Get current active round (lowest round number that's active)
-        const currentActiveRound = activeRounds.size > 0 
-            ? Math.min(...Array.from(activeRounds))
-            : null;
-        
-        // Find the round to show CTA for
-        let ctaRound = null;
-        let ctaMessage = '';
-        
-        if (currentActiveRound) {
-            // Show CTA for current active round if incomplete
-            const roundData = participation.byRound.find(r => r.round === currentActiveRound);
-            if (roundData && roundData.percentage < 100) {
-                ctaRound = roundData;
-                ctaMessage = `🎯 ${roundData.total - roundData.voted} left in ${roundData.roundName}!`;
-            } else if (roundData && roundData.percentage === 100) {
-                ctaMessage = `✅ ${roundData.roundName} complete! Waiting for next round...`;
-            }
-        } else {
-            // No active rounds - check if user has any incomplete rounds
-            const incompleteRound = participation.byRound.find(r => r.percentage > 0 && r.percentage < 100);
-            if (incompleteRound) {
-                ctaRound = incompleteRound;
-                ctaMessage = `⏳ ${incompleteRound.roundName} closed - ${incompleteRound.total - incompleteRound.voted} missed`;
-            }
-        }
-        
-        // Check if 100% complete
-        const isComplete = participation.overallPercentage === 100;
-        
+        if (!userId) { container.style.display = 'none'; return; }
+
+        // Same numbers as the profile: only matches that have opened count, stage by stage (js/participation-model.js).
+        const [matches, votes] = await Promise.all([matchesOnce(), myVotesOnce(userId)]);
+        const p = buildParticipation({ matches, votes, cupId: ARCANE_CONFIG.tournamentId });
+
+        if (p.totalVotes === 0 || p.totalPossible === 0) { container.style.display = 'none'; return; }
+
+        let cta;
+        if (p.overallPercentage === 100) cta = '<div class="progress-cta complete">✅ Every open match voted! More coming soon.</div>';
+        else if (p.current) cta = `<div class="progress-cta">🎯 ${p.current.total - p.current.voted} left in ${esc(p.current.label)}!</div>`;
+        else cta = '<div class="progress-cta"><a href="/matches.html">View Matches →</a></div>';
+
         container.innerHTML = `
             <div class="round-progress-card">
                 <div class="progress-header">
                     <i class="fa-solid fa-trophy"></i>
                     <span>Tournament Progress</span>
                 </div>
-                
                 <div class="overall-progress">
                     <div class="progress-circle-mini">
                         <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" 
-                                stroke="rgba(255, 79, 180, 0.2)" 
-                                stroke-width="4" 
-                                fill="none"/>
-                            <circle cx="30" cy="30" r="25" 
-                                stroke="#ff4fb4" 
-                                stroke-width="4" 
-                                fill="none"
-                                stroke-dasharray="157"
-                                stroke-dashoffset="${157 - (157 * participation.overallPercentage / 100)}"
-                                transform="rotate(-90 30 30)"
-                                style="transition: stroke-dashoffset 0.5s ease;"/>
+                            <circle cx="30" cy="30" r="25" stroke="rgba(255, 79, 180, 0.2)" stroke-width="4" fill="none"/>
+                            <circle cx="30" cy="30" r="25" stroke="#ff4fb4" stroke-width="4" fill="none"
+                                stroke-dasharray="157" stroke-dashoffset="${157 - (157 * p.overallPercentage / 100)}"
+                                transform="rotate(-90 30 30)" style="transition: stroke-dashoffset 0.5s ease;"/>
                         </svg>
-                        <div class="progress-value">${participation.overallPercentage}%</div>
+                        <div class="progress-value">${p.overallPercentage}%</div>
                     </div>
-                    <div class="progress-label">
-                        ${participation.totalVotes} / ${participation.totalPossible} matches
-                    </div>
+                    <div class="progress-label">${p.totalVotes} / ${p.totalPossible} open matches</div>
                 </div>
-                
                 <div class="rounds-breakdown-mini">
-                    ${participation.byRound.map(round => {
-                        const isActiveRound = activeRounds.has(round.round);
-                        return `
-                            <div class="round-row-mini ${round.percentage === 100 ? 'complete' : ''} ${isActiveRound ? 'active-round' : ''}">
-                                <span class="round-name">${getRoundShortName(round.round)}</span>
-                                <div class="round-bar-mini">
-                                    <div class="round-bar-fill" style="width: ${round.percentage}%"></div>
-                                </div>
-                                <span class="round-votes">${round.voted}/${round.total}</span>
-                            </div>
-                        `;
-                    }).join('')}
+                    ${p.byStage.map(r => `
+                        <div class="round-row-mini ${r.percentage === 100 ? 'complete' : ''} ${r.live ? 'active-round' : ''}">
+                            <span class="round-name" title="${esc(r.label)}">${esc(r.short)}</span>
+                            <div class="round-bar-mini"><div class="round-bar-fill" style="width: ${r.percentage}%"></div></div>
+                            <span class="round-votes">${r.voted}/${r.total}</span>
+                        </div>`).join('')}
                 </div>
-                
-                ${isComplete ? `
-                    <div class="progress-cta complete">
-                        🏆 100% Complete! 🎉
-                    </div>
-                ` : ctaMessage ? `
-                    <div class="progress-cta ${ctaMessage.includes('complete') ? 'complete' : ''}">
-                        ${ctaMessage}
-                    </div>
-                ` : `
-                    <div class="progress-cta">
-                        <a href="/matches.html">View Matches →</a>
-                    </div>
-                `}
+                ${cta}
             </div>
         `;
-        
-        console.log('✅ Round progress loaded:', {
-            activeRounds: Array.from(activeRounds),
-            currentActiveRound,
-            ctaMessage
-        });
-        
     } catch (error) {
         console.error('❌ Error loading round progress:', error);
         container.style.display = 'none';
     }
-}
-
-// Helper: Calculate tournament participation (from profile.js)
-async function calculateTournamentParticipation(userId) {
-    try {
-        const CURRENT_TOURNAMENT = ARCANE_CONFIG.tournamentId;
-        
-        const TOTAL_MATCHES_BY_ROUND = {
-            1: 29,
-            2: 16,
-            3: 8,
-            4: 4,
-            5: 2,
-            6: 1
-        };
-        
-        // Get ALL matches to filter by tournament
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
-        const tournamentMatches = allMatches.filter(m => m.tournament === CURRENT_TOURNAMENT);
-        
-        // Get user's votes
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId)
-        );
-        
-        const snapshot = await getDocs(votesQuery);
-        
-        if (snapshot.empty) {
-            return {
-                overallPercentage: 0,
-                byRound: Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => ({
-                    round: parseInt(round),
-                    roundName: getRoundName(parseInt(round)),
-                    voted: 0,
-                    total,
-                    percentage: 0
-                })),
-                totalVotes: 0,
-                totalPossible: 60
-            };
-        }
-        
-        // Filter votes to only include current tournament matches
-        const tournamentVotes = snapshot.docs
-            .map(doc => doc.data())
-            .filter(vote => {
-                const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
-                return match !== undefined;
-            });
-        
-        // Count votes by round
-        const votesByRound = {};
-        tournamentVotes.forEach(vote => {
-            const match = tournamentMatches.find(m => m.matchId === vote.matchId || m.id === vote.matchId);
-            if (match) {
-                const round = match.round || vote.round || 1;
-                votesByRound[round] = (votesByRound[round] || 0) + 1;
-            }
-        });
-        
-        // Calculate participation by round
-        const byRound = Object.entries(TOTAL_MATCHES_BY_ROUND).map(([round, total]) => {
-            const voted = votesByRound[round] || 0;
-            const percentage = total > 0 ? Math.round((voted / total) * 100) : 0;
-            
-            return {
-                round: parseInt(round),
-                roundName: getRoundName(parseInt(round)),
-                voted,
-                total,
-                percentage
-            };
-        });
-        
-        // Calculate overall
-        const totalPossible = Object.values(TOTAL_MATCHES_BY_ROUND).reduce((a, b) => a + b, 0);
-        const totalVotes = tournamentVotes.length;
-        const overallPercentage = Math.round((totalVotes / totalPossible) * 100);
-        
-        return {
-            overallPercentage,
-            byRound,
-            totalVotes,
-            totalPossible
-        };
-        
-    } catch (error) {
-        console.error('❌ Error calculating participation:', error);
-        return {
-            overallPercentage: 0,
-            byRound: [],
-            totalVotes: 0,
-            totalPossible: 60
-        };
-    }
-}
-
-// Helper: Get round name
-function getRoundName(roundNumber) {
-    const roundNames = {
-        1: 'Round 1',
-        2: 'Round 2',
-        3: 'Sweet 16',
-        4: 'Quarterfinals',
-        5: 'Semifinals',
-        6: 'Finals'
-    };
-    return roundNames[roundNumber] || `Round ${roundNumber}`;
-}
-
-// Helper: Get short round name
-function getRoundShortName(roundNumber) {
-    const roundNames = {
-        1: 'R1',
-        2: 'R2',
-        3: 'R3',
-        4: 'QF',
-        5: 'SF',
-        6: 'F'
-    };
-    return roundNames[roundNumber] || `R${roundNumber}`;
 }
 
 // ========================================
@@ -553,112 +398,48 @@ async function loadFeaturedAchievement() {
 async function loadTopMoment() {
     const container = document.getElementById('topSongWidget');
     if (!container) return;
-    
+
     try {
         const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
-        
-        if (!userId) {
-            container.style.display = 'none';
-            return;
-        }
-        
-        // Get all user votes
-        const votesQuery = query(
-            collection(db, 'votes'),
-            where('userId', '==', userId)
-        );
-        
-        const snapshot = await getDocs(votesQuery);
-        
-        if (snapshot.empty) {
-            container.style.display = 'none';
-            return;
-        }
-        
-        // Load music data for thumbnails
-        let momentData = [];
-        try {
-            const response = await fetch('/data/music-videos.json');
-            momentData = await response.json();
-        } catch (error) {
-            console.warn('⚠️ Could not load moment data:', error);
-        }
-        
-        // Get matches for moment data
-        const { getAllMatches } = await import('./api-client.js');
-        const allMatches = await getAllMatches();
+        if (!userId) { container.style.display = 'none'; return; }
+
+        const [votes, allMatches] = await Promise.all([myVotesOnce(userId), matchesOnce()]);
+        if (!votes.length) { container.style.display = 'none'; return; }
         const matchMap = new Map(allMatches.map(m => [m.matchId || m.id, m]));
-        
-        // Count moment votes
-        const momentCounts = {};
-        
-        snapshot.docs.forEach(docSnap => {
-            const vote = docSnap.data();
+
+        // Count votes per edit, only for matches of the current cup
+        const counts = {};
+        for (const vote of votes) {
             const match = matchMap.get(vote.matchId);
-            
-            if (!match) return;
-            
-            const votedMoment = vote.choice === 'song1' ? match.song1 : match.song2;
-            if (!votedMoment) return;
-            
-            const momentId = votedMoment.id;
-            
-            if (!momentCounts[momentId]) {
-                const data = momentData.find(v => v.id === momentId || v.videoId === votedMoment.videoId);
-                
-                momentCounts[momentId] = {
-                    id: momentId,
-                    name: votedMoment.shortTitle || votedMoment.title,
-                    character: votedMoment.artist || votedMoment.character,
-                    videoId: votedMoment.videoId,
-                    thumbnail: data?.videoId 
-                        ? `https://img.youtube.com/vi/${data.videoId}/mqdefault.jpg`
-                        : null,
-                    count: 0
-                };
-            }
-            
-            momentCounts[momentId].count++;
-        });
-        
-        // Get top moment
-        const topMoment = Object.values(momentCounts)
-            .sort((a, b) => b.count - a.count)[0];
-        
-        if (!topMoment) {
-            container.style.display = 'none';
-            return;
+            if (!match) continue;
+            const edit = vote.choice === 'song1' ? match.song1 : match.song2;
+            if (!edit || !edit.id) continue;
+            if (!counts[edit.id]) counts[edit.id] = { name: shortTitle(edit.shortTitle || edit.title || '', 60), creator: edit.artist || '', videoId: edit.videoId || '', count: 0 };
+            counts[edit.id].count++;
         }
-        
+
+        const top = Object.values(counts).sort((a, b) => b.count - a.count)[0];
+        if (!top) { container.style.display = 'none'; return; }
+
+        const watch = top.videoId ? `https://youtube.com/watch?v=${encodeURIComponent(top.videoId)}` : null;
         container.innerHTML = `
-            <div class="top-song-card" onclick="window.open('https://youtube.com/watch?v=${topMoment.videoId}', '_blank')">
-                <div class="song-widget-header">
-                    <i class="fa-solid fa-film"></i>
-                    <span>Your Top Moment</span>
-                </div>
-                ${topMoment.thumbnail ? `
-                    <div class="song-thumbnail-container">
-                        <img src="${topMoment.thumbnail}" alt="${topMoment.name}" class="song-thumbnail">
-                        <div class="play-overlay">
-                            <i class="fa-solid fa-play"></i>
-                        </div>
-                    </div>
-                ` : ''}
+            <div class="top-song-card" ${watch ? `data-watch="${esc(watch)}"` : ''}>
+                <div class="song-widget-header"><i class="fa-solid fa-film"></i><span>Your Top Moment</span></div>
+                ${top.videoId ? `<div class="song-thumbnail-container">
+                    <img src="https://img.youtube.com/vi/${encodeURIComponent(top.videoId)}/mqdefault.jpg" alt="${esc(top.name)}" class="song-thumbnail" loading="lazy">
+                    <div class="play-overlay"><i class="fa-solid fa-play"></i></div></div>` : ''}
                 <div class="song-info">
                     <div class="song-medal">🥇</div>
                     <div class="song-details">
-                        <div class="song-title">${topMoment.name}</div>
-                        <div class="song-artist">${topMoment.character}</div>
-                        <div class="song-votes">${topMoment.count} ${topMoment.count === 1 ? 'vote' : 'votes'}</div>
+                        <div class="song-title">${esc(top.name)}</div>
+                        <div class="song-artist">${esc(top.creator)}</div>
+                        <div class="song-votes">${top.count} ${top.count === 1 ? 'vote' : 'votes'}</div>
                     </div>
                 </div>
-            </div>
-        `;
-        
-        console.log('✅ Top moment loaded');
-        
+            </div>`;
+        container.querySelector('.top-song-card[data-watch]')?.addEventListener('click', e => window.open(e.currentTarget.dataset.watch, '_blank', 'noopener'));
     } catch (error) {
-        console.error('❌ Error loading top song:', error);
+        console.error('❌ Error loading top moment:', error);
         container.style.display = 'none';
     }
 }
@@ -672,7 +453,7 @@ async function loadLiveMatches() {
     
     try {
         // Match documents carry the real vote counts (see note above), so read them via /api/matches
-        const allMatches = await getAllMatches();
+        const allMatches = await matchesOnce();
         const liveMatches = allMatches.filter(m => m.status === 'live');
         
         if (liveMatches.length === 0) {
@@ -761,68 +542,38 @@ function transformToMatchCardFormat(apiMatch) {
 
 async function loadRecentActivity() {
     const container = document.getElementById('recentActivityWidget');
-    
+
     try {
-        // ✅ Fetch recent activity without composite index requirement
-        // Query by timestamp only, filter private entries client-side
-        const activityQuery = query(
-            collection(db, 'activity'),
-            orderBy('timestamp', 'desc'),
-            limit(10)
-        );
-        
-        const snapshot = await getDocs(activityQuery);
+        // Newest first, a few extra so that votes from earlier (test) cups can be dropped and still leave five.
+        const snapshot = await getDocs(query(collection(db, 'activity'), orderBy('timestamp', 'desc'), limit(40)));
+        const cup = ARCANE_CONFIG.tournamentId;
         const activities = snapshot.docs
             .map(doc => doc.data())
             .filter(a => a.isPublic !== false)
+            // this cup only: new votes carry tournamentId, and every match id starts with its cup id
+            .filter(a => a.tournamentId === cup || String(a.matchId || '').startsWith(cup + '-'))
             .slice(0, 5);
-        
+
         if (activities.length === 0) {
             container.innerHTML = '<p class="widget-loading">No recent activity</p>';
             return;
         }
-        
-        // Load music videos data for thumbnails
-        let musicVideos = [];
-        try {
-            const response = await fetch('/data/music-videos.json');
-            musicVideos = await response.json();
-        } catch (error) {
-            console.warn('⚠️ Could not load music videos data:', error);
-        }
-        
-        // Render activities with thumbnails
+
         container.innerHTML = activities.map(activity => {
-            const avatarUrl = getAvatarUrl(activity.avatar);
-            const timeAgo = getTimeAgo(activity.timestamp);
-            const action = `voted for`;
-            
-            // Find thumbnail for the song
-            const songVideo = musicVideos.find(v => v.id === activity.songId);
-            const thumbnailUrl = songVideo?.videoId 
-                ? `https://img.youtube.com/vi/${songVideo.videoId}/mqdefault.jpg`
-                : null;
-            
+            const title = truncate(shortTitle(activity.songTitle || '', 40), 18);
+            // songId on an activity is the video id of the edit that was voted for
+            const thumb = activity.songId ? `https://img.youtube.com/vi/${encodeURIComponent(activity.songId)}/mqdefault.jpg` : null;
             return `
-                <div class="activity-item-mini" onclick="window.location.href='/vote?match=${activity.matchId}'">
-                    <img src="${avatarUrl}" alt="${activity.username}" class="activity-avatar-mini">
+                <a class="activity-item-mini" href="/vote?match=${encodeURIComponent(activity.matchId)}">
+                    <img src="${esc(getAvatarUrl(activity.avatar))}" alt="" class="activity-avatar-mini">
                     <div class="activity-info-mini">
-                        <div class="activity-username">${activity.username}</div>
-                        <div class="activity-action">${action} ${truncate(shortTitle(activity.songTitle, 40), 18)}</div>
-                        <div class="activity-time">${timeAgo}</div>
+                        <div class="activity-username">${esc(activity.username)}</div>
+                        <div class="activity-action">voted for ${esc(title)}</div>
+                        <div class="activity-time">${getTimeAgo(activity.timestamp)}</div>
                     </div>
-                    ${thumbnailUrl ? `
-                        <img src="${thumbnailUrl}" 
-                             alt="${shortTitle(activity.songTitle, 40)}" 
-                             class="activity-song-thumbnail"
-                             loading="lazy">
-                    ` : ''}
-                </div>
-            `;
+                    ${thumb ? `<img src="${thumb}" alt="" class="activity-song-thumbnail" loading="lazy">` : ''}
+                </a>`;
         }).join('');
-        
-        console.log('✅ Recent activity loaded');
-        
     } catch (error) {
         console.error('❌ Error loading recent activity:', error);
         container.innerHTML = '<p class="widget-loading">Failed to load activity</p>';
@@ -835,23 +586,16 @@ async function loadRecentActivity() {
 
 async function loadTournamentStats() {
     try {
-        // Fetch matches for stats
-        const response = await fetch('/api/matches');
-        const allMatches = await response.json();
-        
+        // Everything comes from the match list (its vote counters). The old version also read EVERY vote document in the
+        // database to count voters: thousands of reads for every visitor, and it counted voters from earlier test cups.
+        const allMatches = await matchesOnce();
         const totalVotes = allMatches.reduce((sum, m) => sum + (m.totalVotes || 0), 0);
-        const completedMatches = allMatches.filter(m => m.status === 'completed').length;
-        
-        // Get unique voters
-        const votesSnapshot = await getDocs(collection(db, 'votes'));
-        const uniqueVoters = new Set(votesSnapshot.docs.map(doc => doc.data().userId)).size;
-        
+        const live = allMatches.filter(m => m.status === 'live').length;
+        const completed = allMatches.filter(m => m.status === 'completed').length;
+
         document.getElementById('widgetTotalVotes').textContent = totalVotes.toLocaleString();
-        document.getElementById('widgetActiveVoters').textContent = uniqueVoters.toLocaleString();
-        document.getElementById('widgetCompletedMatches').textContent = completedMatches;
-        
-        console.log('✅ Tournament stats loaded');
-        
+        document.getElementById('widgetLiveMatches').textContent = live.toLocaleString();
+        document.getElementById('widgetCompletedMatches').textContent = completed.toLocaleString();
     } catch (error) {
         console.error('❌ Error loading tournament stats:', error);
     }

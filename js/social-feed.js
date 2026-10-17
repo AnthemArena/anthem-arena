@@ -533,13 +533,24 @@ export async function getFeed(feedType = 'following', limitCount = 50) {
                } else {
             // Get all public posts (global feed)
             // Sort client-side to avoid requiring a composite Firestore index.
-            const postsQuery = query(
-                collection(db, 'posts'),
-                where('privacy', '==', 'public'),
-                limit(limitCount)
-            );
-
-            const snapshot = await getDocs(postsQuery);
+            // Newest first needs a composite index (privacy ASC, timestamp DESC). Until it exists Firestore refuses the
+            // query (the console error contains a link that creates it): fall back to the unordered read.
+            let snapshot;
+            try {
+                snapshot = await getDocs(query(
+                    collection(db, 'posts'),
+                    where('privacy', '==', 'public'),
+                    orderBy('timestamp', 'desc'),
+                    limit(limitCount)
+                ));
+            } catch (indexError) {
+                console.warn('⚠️ posts index missing, reading unordered. Open the link in this message to create it:', indexError.message);
+                snapshot = await getDocs(query(
+                    collection(db, 'posts'),
+                    where('privacy', '==', 'public'),
+                    limit(limitCount)
+                ));
+            }
 
             posts = snapshot.docs
                 .map(doc => doc.data())

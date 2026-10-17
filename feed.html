@@ -99,10 +99,16 @@ placeholder="Search posts, users, moments..."
     </div>
 </div>
                 
+                <!-- Pinned announcement + closing-soon reminder (js/feed-widgets.js) -->
+                <div id="feedStrips" class="feed-strips"></div>
+
                 <!-- Filter Tabs -->
                 <div class="feed-filters">
                  <button class="filter-btn active" data-filter="all">
     <i class="fa-solid fa-globe"></i> All Activity
+</button>
+<button class="filter-btn" data-filter="posts">
+    <i class="fa-solid fa-pen-to-square"></i> Posts
 </button>
 <button class="filter-btn" data-filter="my-posts">
     <i class="fa-solid fa-user"></i> My Activity
@@ -194,8 +200,8 @@ placeholder="Search posts, users, moments..."
                         <span class="stat-value" id="widgetTotalVotes">-</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Active Voters</span>
-                        <span class="stat-value" id="widgetActiveVoters">-</span>
+                        <span class="stat-label">Matches Live</span>
+                        <span class="stat-value" id="widgetLiveMatches">-</span>
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">Matches Completed</span>
