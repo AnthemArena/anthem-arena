@@ -2868,14 +2868,6 @@ function setupCreatePost() {
     submitBtn.disabled = length === 0 || remaining < 0;
 });
 
-      // Submit post
-    submitBtn.addEventListener('click', async () => {
-        await createUserPost();
-        
-        // ✅ Reset textarea height after posting
-        postInput.style.height = 'auto';
-    });
-    
     postInput.addEventListener('input', () => {
         const length = postInput.value.length;
         
@@ -2925,12 +2917,15 @@ postInput.addEventListener('keypress', async (e) => {
 });
 }
 
+let postingNow = false;      // a second click / Enter while a post is being saved must not create a second copy
+
 async function createUserPost() {
     const postInput = document.getElementById('postInput');
     const submitBtn = document.getElementById('submitPostBtn');
     const content = postInput.value.trim();
     
-    if (!content) return;
+    if (!content || postingNow) return;
+    postingNow = true;
     
     // Disable submit while posting
     submitBtn.disabled = true;
@@ -3092,6 +3087,7 @@ async function createUserPost() {
             window.showNotification('Failed to post. Try again.', 'error');
         }
     } finally {
+        postingNow = false;
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post';
         

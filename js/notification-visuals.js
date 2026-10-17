@@ -191,7 +191,7 @@ export function followRowHtml(n, { headline, quip, timeAgo, championPack, theirS
         ? `<button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, #ff1493); border: 0; color: #fff;" data-id="${idList}" data-action="navigate" data-url="${escapeHtml(url)}">View profile</button>`
         : `<button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, #ff1493); border: 0; color: #fff;" data-id="${idList}" data-action="follow-back" data-user-id="${escapeHtml(n.triggerUserId || '')}" data-username="${escapeHtml(name)}" data-url="${escapeHtml(url)}">Follow back</button>`;
     return `
-        <div class="notification-item nv-row follow ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
+        <div class="notification-item nv-row nv-follow-row ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
              title="Open ${escapeHtml(name)}'s profile"
              style="--nv-accent:${accent}; --nv-line:rgba(255,105,180,0.35); --nv-accent-text:#ff9bd6">
             <button class="notification-item-dismiss" data-id="${idList}" aria-label="Dismiss">×</button>
@@ -233,7 +233,7 @@ export function contentRowHtml(n, { parts, quote, icon, cta, timeAgo, championPa
     const face = crowd ? stackHtml(srcs, names, 34, accent) : circleHtml(srcs[0], names[0] || n.triggerUsername, 40, { accent });
     const sub = [timeAgo, parts.names].filter(Boolean).map(escapeHtml).join(' · ');
     return `
-        <div class="notification-item nv-row content ${escapeHtml(n.type)} ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
+        <div class="notification-item nv-row nv-content-row nv-kind-${escapeHtml(n.type)} ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
              style="--nv-accent:${accent}; --nv-line:rgba(255,105,180,0.35); --nv-accent-text:#ff9bd6">
             <button class="notification-item-dismiss" data-id="${idList}" aria-label="Dismiss">×</button>
             <div class="nv-top">
