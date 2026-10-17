@@ -28,8 +28,9 @@ const page = `<html><head>
 </head><body>vote</body></html>`;
 
 await t('bots are recognised, browsers are not', () => {
-    for (const ua of ['Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)', 'Twitterbot/1.0', 'facebookexternalhit/1.1', 'WhatsApp/2.23', 'Slackbot-LinkExpanding 1.0']) assert.ok(isPreviewBot(ua), ua);
-    for (const ua of ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/118 Safari/537.36', '', null]) assert.ok(!isPreviewBot(ua), String(ua));
+    for (const ua of ['Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)', 'Twitterbot/1.0', 'facebookexternalhit/1.1', 'WhatsApp/2.23', 'Slackbot-LinkExpanding 1.0', 'Tumblr/14.0.835.186', 'Viber', 'curl/8.4.0', 'Mozilla/5.0 (compatible; SomeNewPreviewer/1.0)']) assert.ok(isPreviewBot(ua), ua);
+    for (const ua of ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.46', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1', 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/118.0']) assert.ok(!isPreviewBot(ua), ua);
+    for (const ua of ['', null, undefined]) assert.ok(isPreviewBot(ua), 'no user-agent: treated as a fetcher');
 });
 await t('names lose hashtags and the song-credit tail, keep the edit name', () => {
     assert.equal(previewName(match.song1.shortTitle), 'Them... - Jinx & Ekko Edit ("Arcane Season 2")');
@@ -77,7 +78,7 @@ const run = async ({ ua = BOT, query = `?match=${match.matchId}`, matches = [mat
     const res = await voteMeta(new Request(`https://anthemarena.com/vote${query}`, { headers: { 'user-agent': ua } }), { next });
     return res === undefined ? { passedThrough: true } : { text: await res.text(), headers: res.headers, status: res.status };
 };
-await t('edge: a browser is not touched', async () => assert.ok((await run({ ua: 'Mozilla/5.0 Chrome/118' })).passedThrough));
+await t('edge: a browser is not touched', async () => assert.ok((await run({ ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/118 Safari/537.36' })).passedThrough));
 await t('edge: no ?match= is not touched', async () => assert.ok((await run({ query: '' })).passedThrough));
 await t('edge: a bot gets the match tags and image link', async () => {
     const r = await run();
