@@ -552,3 +552,7 @@ Match song objects don't reliably carry the YouTube id under `videoId`. `songThu
 ### Settings: notification section fixes
 
 The Match alerts switch was missing the `toggle-input` class, so the browser's native checkbox showed beside the switch and the switch's on/off look didn't follow it. It now uses the same markup as the other switches. The Notifications section also got the same heading style, a one-line description ("saved on this browser") and emoji labels like the Privacy section.
+
+### VS pair: no avatars on the thumbnails
+
+With real thumbnails the round avatars on the pictures were cluttered (and the voter's face is already in the headline). The two edits now carry only the ring colours (their pick in the accent colour, yours in white, a shared pick green); no avatars and no labels.
