@@ -37,26 +37,64 @@ export function viewerAvatarSrc(storage = globalThis.localStorage) {
     try { return avatarSrc(storage?.getItem('avatar')); } catch { return null; }
 }
 
-// The companion's face: the pack's chosen skin tile (Jinx skin 37), else the pack icon.
+// The companion's face: the pack's icon. (The Arcane skin tile is a dark picture; at 24-60 px it reads as a dark blob.)
 export function championBadgeUrl(pack) {
-    if (!pack) return null;
-    const m = /\/champion\/([A-Za-z]+)\.png/.exec(pack.icon || '');
-    if (m) return `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${m[1]}_${pack.portrait?.skin ?? 0}.jpg`;
-    return pack.icon || null;
+    return pack?.icon || null;
+}
+
+// Someone with no picture gets a stable Arcane champion (same pick every time for the same name), like new accounts do.
+const FALLBACK_CHAMPIONS = ['Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerdinger', 'Jinx'];
+export function fallbackAvatarFor(name) {
+    const s = String(name || '?');
+    let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`;
+}
+
+// The two edits of a match as pictures, in match order (song1 left, song2 right), plus which side each person picked.
+// yourKey = 'song1' | 'song2'; a rival picked the other edit, an ally the same one. null when we can't tell.
+export const videoThumb = id => (id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null);
+export function matchEdits(match, yourKey, relationship) {
+    if (!match || (yourKey !== 'song1' && yourKey !== 'song2')) return null;
+    const idOf = s => s?.videoId || s?.id || null;
+    const l = videoThumb(idOf(match.song1)), r = videoThumb(idOf(match.song2));
+    if (!l && !r) return null;
+    const other = yourKey === 'song1' ? 'song2' : 'song1';
+    return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey, theirKey: relationship === 'ally' ? yourKey : other };
 }
 
 export const accentFor = (relationship, pack) => (relationship === 'ally' ? ALLY_ACCENT : (pack?.color || DEFAULT_ACCENT));
 export const markFor = relationship => (relationship === 'ally' ? '=' : 'VS');
 
 // ---------- html builders ----------
-export function circleHtml(src, name, size, { accent = DEFAULT_ACCENT, cls = '' } = {}) {
+export function circleHtml(src, name, size, { accent = DEFAULT_ACCENT, cls = '', badge = null, badgeSide = 'right' } = {}) {
     const initial = escapeHtml((name || '?').trim().charAt(0).toUpperCase() || '?');
-    return `<span class="nv-circle ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${initial}${src ? `<img src="${escapeHtml(src)}" alt="" onerror="this.remove()">` : ''}</span>`;
+    const b = Math.max(16, Math.round(size * 0.5));
+    return `<span class="nv-av"><span class="nv-circle ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${initial}${src ? `<img src="${escapeHtml(src)}" alt="" onerror="this.remove()">` : ''}</span>${badge ? `<img class="nv-badge ${badgeSide === 'left' ? 'nv-badge-left' : ''}" src="${escapeHtml(badge)}" alt="" style="width:${b}px;height:${b}px" onerror="this.remove()">` : ''}</span>`;
 }
 
-export function pairHtml({ theirSrc, theirName, yourSrc, relationship, size = 44, accent }) {
+export function pairHtml({ theirSrc, theirName, yourSrc, relationship, size = 44, accent, theirBadge = null, yourBadge = null }) {
     const you = relationship === 'ally' ? '' : 'nv-you-rival';
-    return `<div class="nv-pair" style="--nv-accent:${accent}">${circleHtml(theirSrc, theirName, size, { accent })}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">${markFor(relationship)}</span>${circleHtml(yourSrc, 'You', size, { accent, cls: you })}</div>`;
+    return `<div class="nv-pair" style="--nv-accent:${accent}">${circleHtml(theirSrc, theirName, size, { accent, badge: theirBadge, badgeSide: 'left' })}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">${markFor(relationship)}</span>${circleHtml(yourSrc, 'You', size, { accent, cls: you, badge: yourBadge })}</div>`;
+}
+
+// The match itself: [edit A] VS [edit B]. A pick is ringed (their pick in the accent colour, yours in white, a shared pick in
+// green); the other edit is dimmed. Their avatar sits on the edit they picked (bottom-left), yours on yours (bottom-right).
+export function editsPairHtml({ edits, theirSrc, theirName, yourSrc, relationship, size = 44, accent }) {
+    const w = Math.round(size * 1.5);
+    const av = Math.max(18, Math.round(size * 0.5));
+    const side = (s, outer) => {
+        const theirs = s.key === edits.theirKey, yours = s.key === edits.yourKey;
+        const ring = theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
+        const cls = (theirs || yours) ? 'nv-pick' : 'nv-dim';
+        // Badges hug the outer edge of the thumbnail so they never cover the VS marker; when both people picked the same
+        // edit the second badge tucks in beside the first.
+        const o = outer === 'left' ? 'nv-who-left' : 'nv-who-right';
+        const inset = outer === 'left' ? 'nv-who-inset-left' : 'nv-who-inset-right';
+        const badges = (theirs ? circleHtml(theirSrc, theirName, av, { accent, cls: `nv-who ${o}` }) : '')
+            + (yours ? circleHtml(yourSrc, 'You', av, { accent: 'rgba(255,255,255,0.7)', cls: `nv-who ${theirs ? inset : o}` }) : '');
+        return `<span class="nv-edit ${cls}" style="width:${w}px;height:${size}px;--nv-ring:${ring}">${s.thumb ? `<img src="${escapeHtml(s.thumb)}" alt="" onerror="this.remove()">` : ''}${badges}</span>`;
+    };
+    return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">VS</span>${side(edits.right, 'right')}</div>`;
 }
 
 export function headlineHtml(text, src, name, accent, size = 22) {
@@ -72,7 +110,7 @@ export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, qui
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        ${pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
+        ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
         ${headlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent, 26)}
         ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 62, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
     </div>
@@ -88,14 +126,15 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
     const crowd = n.groupKind === 'match' && n.count > 1;
     const idList = n.ids ? n.ids.join(',') : n.id;
     const headText = headline ? headline.message : socialHeadlineFor(n);
-    const theirSrc = avatarSrc(n.thumbnailUrl);
-    const yourSrc = viewerAvatarSrc();
+    const nv = n.nv || {};
+    const theirSrc = nv.theirSrc || avatarSrc(n.thumbnailUrl) || fallbackAvatarFor(n.triggerUsername);
+    const yourSrc = nv.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(globalThis.localStorage?.getItem?.('username'));
     const jinxSrc = championBadgeUrl(championPack);
     const perPersonGroup = !crowd && n.count > 1;
 
     const leading = crowd
-        ? stackHtml((n.avatars || []).map(avatarSrc), n.users || [], 34, accent)
-        : pairHtml({ theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent });
+        ? stackHtml((nv.avatars || n.avatars || []).map((a, i) => avatarSrc(a) || fallbackAvatarFor((n.users || [])[i])), n.users || [], 34, accent)
+        : (nv.edits ? editsPairHtml({ edits: nv.edits, theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent }));
     const names = crowd ? (headline?.detail || '') : '';
     const sub = [timeAgo, names].filter(Boolean).map(escapeHtml).join(' · ')
         + (perPersonGroup ? ` · <a class="nv-link" href="#" onclick="expandGroupedNotification('${idList}', event); return false;">All ${n.count} matches</a>` : '');
@@ -141,6 +180,9 @@ export function ensureVersusStyles() {
     const s = document.createElement('style');
     s.id = 'versus-styles';
     s.textContent = `
+.nv-av{position:relative;display:inline-flex;flex-shrink:0}
+.nv-badge-left{right:auto !important;left:-6px}
+.nv-badge{position:absolute;right:-6px;bottom:-6px;z-index:3;border-radius:6px;object-fit:cover;border:2px solid #1a1226;box-shadow:0 2px 6px rgba(0,0,0,.5);background:#2b1747}
 .nv-circle{position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#3a2760;color:#fff;font-weight:700;border:2px solid var(--nv-accent,#ff69b4)}
 .nv-circle img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .nv-you-rival{border-color:rgba(255,255,255,.5)}
@@ -149,9 +191,20 @@ export function ensureVersusStyles() {
 .nv-mark.ally{color:#86efac;font-size:18px}
 .nv-headline{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;color:#fff}
 .nv-headline-text{min-width:0}
+/* match pair: two edit pictures */
+.nv-edit{position:relative;display:inline-block;flex-shrink:0;box-sizing:border-box;border-radius:10px;background:#2b1747;border:2px solid var(--nv-ring)}
+.nv-edit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px}
+.nv-edit.nv-dim>img{opacity:.4;filter:grayscale(.7)}
+.nv-edit.nv-pick{box-shadow:0 0 10px var(--nv-ring)}
+.nv-who{position:absolute !important;bottom:-8px;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.nv-who-left{left:-6px}
+.nv-who-right{right:-6px}
+.nv-who-inset-left{left:calc(50% - 4px)}
+.nv-who-inset-right{right:calc(50% - 4px)}
+.nv-edits .nv-mark{margin:0 -8px}
 .nv-stack{display:flex;flex-shrink:0}
 .nv-stacked{border:2px solid #1a1226}
-.nv-stacked+.nv-stacked{margin-left:-10px}
+.nv-stack .nv-av+.nv-av{margin-left:-10px}
 
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}

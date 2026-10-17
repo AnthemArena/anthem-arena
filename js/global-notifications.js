@@ -7,7 +7,8 @@ import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
 import { socialHeadline } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, championBadgeUrl, accentFor, toastHtml, ensureVersusStyles } from './notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, ensureVersusStyles } from './notification-visuals.js';
+import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
     saveNotification, 
@@ -1223,7 +1224,9 @@ const savedId = await saveNotification(userId, {
                 // to the bell but nothing ever showed the toast while the page was open.
                 if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden && shouldToastSocial(prefs, followed)) {
                     toastShown = true;
+                    const nv = await socialContextFor(notificationData);     // avatars + edit pictures (never blocks long)
                     showBulletin({
+                        nv,
                         priority: notificationData.priority || 7,
                         type: notificationData.type,
                         matchId: notificationData.matchId,
@@ -2710,8 +2713,8 @@ else {
         banner.style.setProperty('--nv-glow', notification.relationship === 'ally' ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', notification.relationship === 'ally' ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.innerHTML = toastHtml(notification, {
-            theirSrc: avatarSrc(notification.thumbnailUrl),
-            yourSrc: viewerAvatarSrc(),
+            theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
+            yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),
             jinxSrc: championBadgeUrl(pack),
             accent,
             headline: socialHeadline({ triggerUsername: notification.triggerUsername || notification.username, relationship: notification.relationship }),
@@ -3764,7 +3767,7 @@ async function checkMissedNotifications() {
     console.log(`🔔 Showing ${uniqueNotifications.length} grouped toast notifications`);
 
     uniqueNotifications.forEach((notification, i) => {
-        setTimeout(() => {
+        setTimeout(async () => {
             const minsAgo = Math.floor((now - notification.timestamp) / 60000);
             const timeAgo = minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo / 60)}h ago`;
 
@@ -3779,7 +3782,9 @@ async function checkMissedNotifications() {
                 detail = detail ? `${detail} • ${timeAgo}` : timeAgo;
             }
 
+            const nv = (notification.relationship === 'ally' || notification.relationship === 'opponent') ? await socialContextFor(notification) : undefined;
             showBulletin({
+                nv,
                 priority: notification.priority || 5,
                 type: notification.type,
                 matchId: notification.matchId,
