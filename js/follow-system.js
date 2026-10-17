@@ -234,3 +234,22 @@ export async function getMutualFollows(userId) {
         return [];
     }
 }
+
+// ========================================
+// IDS OF EVERYONE I FOLLOW (for notification filtering; one equality filter, no composite index)
+// ========================================
+let followingIdsCache = { userId: null, at: 0, ids: new Set() };
+
+export async function getFollowingIds(userId, maxAgeMs = 5 * 60 * 1000) {
+    if (!userId || userId === 'anonymous') return new Set();
+    if (followingIdsCache.userId === userId && Date.now() - followingIdsCache.at < maxAgeMs) return followingIdsCache.ids;
+    try {
+        const snap = await getDocs(query(collection(db, 'follows'), where('followerId', '==', userId), firestoreLimit(500)));
+        const ids = new Set(snap.docs.map(d => d.data().followingId).filter(Boolean));
+        followingIdsCache = { userId, at: Date.now(), ids };
+        return ids;
+    } catch (error) {
+        console.error('❌ Error getting following ids:', error);
+        return followingIdsCache.userId === userId ? followingIdsCache.ids : new Set();
+    }
+}
