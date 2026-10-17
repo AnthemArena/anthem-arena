@@ -38,3 +38,19 @@ export const writeBatch = () => {
         }
     };
 };
+
+// --- added for the emote/notification tests ---
+const hasUndefined = o => Object.values(o).some(v => v === undefined || (v && typeof v === 'object' && !Array.isArray(v) && hasUndefined(v)));
+let autoId = 0;
+export const addDoc = async (col, data) => {
+    // the real SDK refuses undefined field values
+    if (hasUndefined(data)) throw new Error('Function addDoc() called with invalid data. Unsupported field value: undefined');
+    const id = `auto${++autoId}`;
+    store.set(`${col.path}/${id}`, clone(data));
+    return { id };
+};
+export const updateDoc = async (ref, data) => { store.set(ref.path, { ...clone(store.get(ref.path)), ...clone(data) }); };
+export const query = (col) => col;
+export const where = () => ({});
+export const orderBy = () => ({});
+export const limit = () => ({});

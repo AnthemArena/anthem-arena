@@ -1,0 +1,53 @@
+// js/emote-system.js sendEmoteReaction against the in-memory fake Firestore (which refuses undefined fields like the real SDK).
+//   node tools/test-emote-send.mjs
+import assert from 'node:assert/strict';
+import { register } from 'node:module';
+register('./test-support/hooks.mjs', import.meta.url);
+const { store } = await import('./test-support/fake-firestore.mjs');
+const ls = new Map();
+globalThis.localStorage = { getItem: k => (ls.has(k) ? ls.get(k) : null), setItem: (k, v) => ls.set(k, String(v)), removeItem: k => ls.delete(k) };
+for (const k of ['log', 'warn', 'error']) console[k] = () => {};
+const { sendEmoteReaction } = await import('../js/emote-system.js');
+
+let pass = 0, fail = 0;
+const t = async (n, f) => { store.clear(); ls.clear(); ls.set('tournamentUserId', 'uidA'); ls.set('tournamentUsername', 'Kai'); try { await f(); process.stdout.write(`  ok   ${n}\n`); pass++; } catch (e) { process.stdout.write(`  FAIL ${n}\n       ${e.message}\n`); fail++; } };
+const sent = () => [...store.entries()].filter(([k]) => k.startsWith('user-reactions/')).map(([, v]) => v);
+
+await t('a normal emote is stored', async () => {
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'props', { matchId: 'm1', matchTitle: 'A vs B', songTitle: 'A' }), true);
+    const r = sent()[0];
+    assert.equal(r.fromUserId, 'uidA'); assert.equal(r.toUserId, 'uidB'); assert.equal(r.seen, false); assert.equal(r.type, 'props'); assert.ok(r.message.length > 0 && r.message.length <= 200);
+});
+await t('missing match details no longer make Firestore reject it', async () => {
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'hype', { matchId: 'm1' }), true);
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'hype', undefined), true);
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'hype', { matchId: 'm1', matchTitle: undefined, songTitle: null }), true);
+    assert.equal(sent().length, 3);
+    for (const r of sent()) assert.ok(!Object.values(r).includes(undefined));
+});
+await t('only fields the security rules allow are sent', async () => {
+    await sendEmoteReaction('Mia', 'uidB', 'thanks', { matchId: 'm1', matchTitle: 't', songTitle: 's', extra: 'x' });
+    const allowed = ['fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'type', 'matchId', 'matchTitle', 'songTitle', 'message', 'timestamp', 'seen'];
+    assert.deepEqual(Object.keys(sent()[0]).filter(k => !allowed.includes(k)), []);
+});
+await t('long values are cut to the lengths the rules allow', async () => {
+    await sendEmoteReaction('Mia', 'uidB', 'props', { matchId: 'm1' }, 'x'.repeat(500));
+    assert.equal(sent()[0].message.length, 200);
+});
+await t('not to yourself, not to nobody, not anonymous', async () => {
+    assert.equal(await sendEmoteReaction('Kai', 'uidA', 'props', {}), false);
+    assert.equal(await sendEmoteReaction('Mia', '', 'props', {}), false);
+    ls.set('tournamentUsername', 'Anonymous'); ls.delete('username');
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'props', {}), false);
+    assert.equal(sent().length, 0);
+});
+await t('username falls back to the "username" key', async () => {
+    ls.delete('tournamentUsername'); ls.set('username', 'Kai2');
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'props', {}), true);
+    assert.equal(sent()[0].fromUsername, 'Kai2');
+});
+await t('an unknown type is refused instead of crashing', async () => {
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'nonsense', {}), false);
+    assert.equal(await sendEmoteReaction('Mia', 'uidB', 'custom', {}, 'hello'), true);
+});
+console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);
