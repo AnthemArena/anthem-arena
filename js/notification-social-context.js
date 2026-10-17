@@ -3,7 +3,7 @@
 import { db } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAllMatches } from './api-client.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, pickThumbs } from './notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits } from './notification-visuals.js';
 
 const avatarCache = new Map();          // userId -> url | null
 let matchesCache = { at: 0, list: [] };
@@ -31,15 +31,14 @@ async function matchById(matchId) {
 
 // n: an ally/rival notification (or group). Returns what the renderers read as n.nv
 export async function socialContextFor(n) {
-    const out = { theirSrc: null, yourSrc: viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')), theirThumb: null, yourThumb: null, avatars: null };
+    const out = { theirSrc: null, yourSrc: viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')), edits: null, avatars: null };
     try {
         out.theirSrc = avatarSrc(n.thumbnailUrl) || await profileAvatar(n.triggerUserId) || fallbackAvatarFor(n.triggerUsername);
         if (n.userIds && n.userIds.length > 1) {
             out.avatars = await Promise.all(n.userIds.map(async (id, i) => (id && await profileAvatar(id)) || avatarSrc((n.avatars || [])[i]) || fallbackAvatarFor((n.users || [])[i])));
         }
         const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
-        const { yourThumb, theirThumb } = pickThumbs(await matchById(n.matchId), yourKey, n.relationship);
-        out.yourThumb = yourThumb; out.theirThumb = theirThumb;
+        out.edits = matchEdits(await matchById(n.matchId), yourKey, n.relationship);
     } catch (e) { console.warn('social context failed', e); }
     return out;
 }

@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, pickThumbs, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -27,12 +27,22 @@ t('fallback avatar is stable per name and always an Arcane champion icon', () =>
     assert.match(fallbackAvatarFor(undefined), /champion\//);
     const seen = new Set(['a', 'bb', 'Kai', 'Mia', 'Zed', 'Rook', 'Nova', 'Vex', 'Lux2'].map(fallbackAvatarFor)); assert.ok(seen.size >= 3);
 });
-t('edit pictures: rival sees the other edit, ally the same one', () => {
+t('match edits: song order kept, rival picked the other side, ally the same', () => {
     const m = { song1: { videoId: 'AAA' }, song2: { id: 'BBB' } };
-    assert.deepEqual(pickThumbs(m, 'song1', 'opponent'), { yourThumb: 'https://img.youtube.com/vi/AAA/mqdefault.jpg', theirThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg' });
-    assert.deepEqual(pickThumbs(m, 'song2', 'ally'), { yourThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg', theirThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg' });
-    assert.deepEqual(pickThumbs(m, undefined, 'ally'), { yourThumb: null, theirThumb: null });
-    assert.deepEqual(pickThumbs(null, 'song1', 'ally'), { yourThumb: null, theirThumb: null });
+    const r = matchEdits(m, 'song1', 'opponent');
+    assert.equal(r.left.thumb, 'https://img.youtube.com/vi/AAA/mqdefault.jpg'); assert.equal(r.right.thumb, 'https://img.youtube.com/vi/BBB/mqdefault.jpg');
+    assert.equal(r.yourKey, 'song1'); assert.equal(r.theirKey, 'song2');
+    const a = matchEdits(m, 'song2', 'ally'); assert.equal(a.yourKey, 'song2'); assert.equal(a.theirKey, 'song2');
+    assert.equal(matchEdits(m, undefined, 'ally'), null); assert.equal(matchEdits(null, 'song1', 'ally'), null); assert.equal(matchEdits({ song1: {}, song2: {} }, 'song1', 'ally'), null);
+});
+t('edits pair: picks ringed, other dimmed, avatars on the picked edits', () => {
+    const m = { song1: { videoId: 'AAA' }, song2: { videoId: 'BBB' } };
+    const rival = editsPairHtml({ edits: matchEdits(m, 'song1', 'opponent'), theirSrc: 'https://x/t.png', theirName: 'Kai', yourSrc: 'https://x/y.png', relationship: 'opponent', size: 40, accent: '#ff69b4' });
+    assert.equal((rival.match(/nv-pick/g) || []).length, 2); assert.ok(!rival.includes('nv-dim')); assert.ok(rival.includes('VS'));
+    assert.ok(rival.indexOf('nv-who-left') > rival.indexOf('BBB') || rival.indexOf('nv-who-left') > rival.indexOf('mqdefault'));
+    const ally = editsPairHtml({ edits: matchEdits(m, 'song2', 'ally'), theirSrc: null, theirName: 'Kai', yourSrc: null, relationship: 'ally', size: 40, accent: '#4ade80' });
+    assert.equal((ally.match(/nv-pick/g) || []).length, 1); assert.equal((ally.match(/nv-dim/g) || []).length, 1);
+    assert.equal((ally.match(/nv-who-left/g) || []).length, 0); assert.equal((ally.match(/nv-who-right/g) || []).length, 1); assert.equal((ally.match(/nv-who-inset-right/g) || []).length, 1);
 });
 t('a badge picture sits on the avatar', () => {
     const h = circleHtml('https://x/a.png', 'Kai', 40, { badge: 'https://x/thumb.jpg' });

@@ -50,15 +50,16 @@ export function fallbackAvatarFor(name) {
     return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`;
 }
 
-// The two edits of a match as small pictures. yourKey = 'song1' | 'song2' (what you voted for);
-// they voted the same side as you (ally) or the other one (rival).
+// The two edits of a match as pictures, in match order (song1 left, song2 right), plus which side each person picked.
+// yourKey = 'song1' | 'song2'; a rival picked the other edit, an ally the same one. null when we can't tell.
 export const videoThumb = id => (id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null);
-export function pickThumbs(match, yourKey, relationship) {
-    if (!match || (yourKey !== 'song1' && yourKey !== 'song2')) return { yourThumb: null, theirThumb: null };
+export function matchEdits(match, yourKey, relationship) {
+    if (!match || (yourKey !== 'song1' && yourKey !== 'song2')) return null;
     const idOf = s => s?.videoId || s?.id || null;
-    const mine = idOf(match[yourKey]);
-    const other = idOf(match[yourKey === 'song1' ? 'song2' : 'song1']);
-    return { yourThumb: videoThumb(mine), theirThumb: videoThumb(relationship === 'ally' ? mine : other) };
+    const l = videoThumb(idOf(match.song1)), r = videoThumb(idOf(match.song2));
+    if (!l && !r) return null;
+    const other = yourKey === 'song1' ? 'song2' : 'song1';
+    return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey, theirKey: relationship === 'ally' ? yourKey : other };
 }
 
 export const accentFor = (relationship, pack) => (relationship === 'ally' ? ALLY_ACCENT : (pack?.color || DEFAULT_ACCENT));
@@ -76,6 +77,26 @@ export function pairHtml({ theirSrc, theirName, yourSrc, relationship, size = 44
     return `<div class="nv-pair" style="--nv-accent:${accent}">${circleHtml(theirSrc, theirName, size, { accent, badge: theirBadge, badgeSide: 'left' })}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">${markFor(relationship)}</span>${circleHtml(yourSrc, 'You', size, { accent, cls: you, badge: yourBadge })}</div>`;
 }
 
+// The match itself: [edit A] VS [edit B]. A pick is ringed (their pick in the accent colour, yours in white, a shared pick in
+// green); the other edit is dimmed. Their avatar sits on the edit they picked (bottom-left), yours on yours (bottom-right).
+export function editsPairHtml({ edits, theirSrc, theirName, yourSrc, relationship, size = 44, accent }) {
+    const w = Math.round(size * 1.5);
+    const av = Math.max(18, Math.round(size * 0.5));
+    const side = (s, outer) => {
+        const theirs = s.key === edits.theirKey, yours = s.key === edits.yourKey;
+        const ring = theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
+        const cls = (theirs || yours) ? 'nv-pick' : 'nv-dim';
+        // Badges hug the outer edge of the thumbnail so they never cover the VS marker; when both people picked the same
+        // edit the second badge tucks in beside the first.
+        const o = outer === 'left' ? 'nv-who-left' : 'nv-who-right';
+        const inset = outer === 'left' ? 'nv-who-inset-left' : 'nv-who-inset-right';
+        const badges = (theirs ? circleHtml(theirSrc, theirName, av, { accent, cls: `nv-who ${o}` }) : '')
+            + (yours ? circleHtml(yourSrc, 'You', av, { accent: 'rgba(255,255,255,0.7)', cls: `nv-who ${theirs ? inset : o}` }) : '');
+        return `<span class="nv-edit ${cls}" style="width:${w}px;height:${size}px;--nv-ring:${ring}">${s.thumb ? `<img src="${escapeHtml(s.thumb)}" alt="" onerror="this.remove()">` : ''}${badges}</span>`;
+    };
+    return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">VS</span>${side(edits.right, 'right')}</div>`;
+}
+
 export function headlineHtml(text, src, name, accent, size = 22) {
     return `<div class="nv-headline">${circleHtml(src, name, size, { accent })}<span class="nv-headline-text">${escapeHtml(text)}</span></div>`;
 }
@@ -89,7 +110,7 @@ export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, qui
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        ${pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent, theirBadge: n.nv?.theirThumb, yourBadge: n.nv?.yourThumb })}
+        ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
         ${headlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent, 26)}
         ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 62, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
     </div>
@@ -113,7 +134,7 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
 
     const leading = crowd
         ? stackHtml((nv.avatars || n.avatars || []).map((a, i) => avatarSrc(a) || fallbackAvatarFor((n.users || [])[i])), n.users || [], 34, accent)
-        : pairHtml({ theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent, theirBadge: nv.theirThumb, yourBadge: nv.yourThumb });
+        : (nv.edits ? editsPairHtml({ edits: nv.edits, theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername, yourSrc, relationship: n.relationship, size: 40, accent }));
     const names = crowd ? (headline?.detail || '') : '';
     const sub = [timeAgo, names].filter(Boolean).map(escapeHtml).join(' · ')
         + (perPersonGroup ? ` · <a class="nv-link" href="#" onclick="expandGroupedNotification('${idList}', event); return false;">All ${n.count} matches</a>` : '');
@@ -170,6 +191,17 @@ export function ensureVersusStyles() {
 .nv-mark.ally{color:#86efac;font-size:18px}
 .nv-headline{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;color:#fff}
 .nv-headline-text{min-width:0}
+/* match pair: two edit pictures */
+.nv-edit{position:relative;display:inline-block;flex-shrink:0;box-sizing:border-box;border-radius:10px;background:#2b1747;border:2px solid var(--nv-ring)}
+.nv-edit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px}
+.nv-edit.nv-dim>img{opacity:.4;filter:grayscale(.7)}
+.nv-edit.nv-pick{box-shadow:0 0 10px var(--nv-ring)}
+.nv-who{position:absolute !important;bottom:-8px;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.nv-who-left{left:-6px}
+.nv-who-right{right:-6px}
+.nv-who-inset-left{left:calc(50% - 4px)}
+.nv-who-inset-right{right:calc(50% - 4px)}
+.nv-edits .nv-mark{margin:0 -8px}
 .nv-stack{display:flex;flex-shrink:0}
 .nv-stacked{border:2px solid #1a1226}
 .nv-stack .nv-av+.nv-av{margin-left:-10px}
