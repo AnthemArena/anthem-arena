@@ -2,7 +2,10 @@
 // FEED PAGE - UI CONTROLLER
 // Arcane Moments Community
 // ========================================
-import { mixFeed, digestSummary, rankTrending, findPostById } from './feed-mix-model.js';
+import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions } from './feed-mix-model.js';
+// Mention alerts call this directly (it used to be imported only inside some helpers, so every mention alert failed with a ReferenceError)
+import { saveNotification } from './notification-storage.js';
+import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { buildShare, postIdFromLink } from './share-model.js';
 import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
@@ -149,33 +152,28 @@ async function loadAllUsers(forceRefresh = false) {
             
             if (!profile.username || profile.username === 'Anonymous') return;
             
-            // ✅ For current user, prefer localStorage (most up-to-date)
+            // ✅ For current user, prefer what this browser knows (most up-to-date). Level and rank come from the same
+            // XP the nav bar uses (the saved "stats" object can lag behind: it showed Level 1 / 0 votes for a Level 5 user).
             if (userId === currentUserId) {
-                const statsJson = localStorage.getItem('stats');
-                let stats = { level: 1, votes: 0 };
-                
+                let level = profile.level || 1, rank = profile.rank || getRankTitle(profile.level || 1), votes = profile.totalVotes || 0;
                 try {
-                    stats = JSON.parse(statsJson) || stats;
-                } catch (e) {
-                    // Fallback to synced profile data
-                    stats = {
-                        level: profile.level || 1,
-                        votes: profile.totalVotes || 0
-                    };
-                }
+                    const info = getUserRank(getUserXPFromStorage());
+                    level = info.currentLevel.level;
+                    rank = info.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
+                } catch (e) { /* keep the synced profile values */ }
+                try {
+                    const savedVotes = Object.keys(JSON.parse(localStorage.getItem('userVotes') || '{}')).length;
+                    const statsVotes = Number((JSON.parse(localStorage.getItem('stats') || 'null') || {}).votes) || 0;
+                    votes = Math.max(votes, savedVotes, statsVotes);
+                } catch (e) { /* keep the synced profile value */ }
                 
                 allUsers.push({
                     userId: userId,
                     username: profile.username,
                     avatar: profile.avatar,
-                    level: stats.level,
-                    rank: profile.rank || getRankTitle(stats.level),
-                    totalVotes: stats.votes
-                });
-                
-                console.log('👤 Your mention data (from localStorage):', {
-                    level: stats.level,
-                    totalVotes: stats.votes
+                    level: level,
+                    rank: rank,
+                    totalVotes: votes
                 });
                 
             } else {
@@ -329,27 +327,20 @@ function parseMentionsHTML(html) {
     return result;
 }
 
+// The user list is cached for up to 10 minutes, so someone who joined since is not in it yet. Before sending mention alerts,
+// if the text has an @name we do not know, reload the list once (at most once a minute) so a new user still gets their alert.
+async function ensureMentionUsers(text) {
+    const names = String(text || '').match(/@\w+/g);
+    if (!names) return;
+    const known = new Set(allUsers.map(u => (u.username || '').toLowerCase()));
+    if (names.every(n => known.has(n.slice(1).toLowerCase()))) return;
+    if (Date.now() - lastUserLoad < 60000) return;
+    await loadAllUsers(true);
+}
+
 // Extract mentioned user IDs from text (for notifications)
 function extractMentionedUsers(text) {
-    if (!text) return [];
-    
-    const mentionRegex = /@(\w+)/g;
-    const mentions = [];
-    let match;
-    
-    while ((match = mentionRegex.exec(text)) !== null) {
-        const username = match[1];
-        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
-        
-        if (user) {
-            mentions.push({
-                userId: user.userId,
-                username: user.username
-            });
-        }
-    }
-    
-    return mentions;
+    return extractMentions(text, allUsers);
 }
 
 // ========================================
@@ -1959,6 +1950,7 @@ async function postReply(postId, parentCommentId, inputElement) {
         }
         
         // 2. Notify mentioned users
+        await ensureMentionUsers(content);
         const mentionedUsers = extractMentionedUsers(content);
         
         if (mentionedUsers.length > 0) {
@@ -2136,6 +2128,7 @@ async function postComment(postId, inputElement) {
         }
         
         // 2. Notify mentioned users
+        await ensureMentionUsers(content);
         const mentionedUsers = extractMentionedUsers(content);
         
         if (mentionedUsers.length > 0) {
@@ -3014,6 +3007,7 @@ async function createUserPost() {
         // ✅ SEND MENTION NOTIFICATIONS
         // ========================================
         
+        await ensureMentionUsers(content);
         const mentionedUsers = extractMentionedUsers(content);
         
         if (mentionedUsers.length > 0) {

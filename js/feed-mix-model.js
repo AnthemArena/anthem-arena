@@ -70,3 +70,14 @@ export function findPostById(posts, postId) {
     }
     return null;
 }
+
+// @names in a piece of text that match a known user (users: [{ userId, username }]), each person once, in order of appearance.
+export function extractMentions(text, users) {
+    if (!text) return [];
+    const out = [], seen = new Set();
+    for (const m of String(text).matchAll(/@(\w+)/g)) {
+        const user = (users || []).find(u => u.username && u.username.toLowerCase() === m[1].toLowerCase());
+        if (user && !seen.has(user.userId)) { seen.add(user.userId); out.push({ userId: user.userId, username: user.username }); }
+    }
+    return out;
+}
