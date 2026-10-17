@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 import { isPreviewBot, previewName, renderable, describeMatch, rewriteHeadMeta, findMatch, timeLeft } from '../netlify/shared/og-model.js';
-import { renderCard } from '../netlify/shared/og-card.js';
+import { renderCard, contentRect } from '../netlify/shared/og-card.js';
+import jpeg from 'jpeg-js';
 import voteMeta from '../netlify/edge-functions/vote-meta.js';
 
 let pass = 0, fail = 0;
@@ -90,9 +91,28 @@ await t('edge: unknown match / list error / non-html => plain page', async () =>
 
 // --- image ---
 const fonts = await Promise.all([700, 800].map(async weight => ({ weight, data: await readFile(new URL(`../netlify/functions/assets/inter-${weight}.woff`, import.meta.url)) })));
-const fakeThumb = (c1, c2) => `data:image/png;base64,${Buffer.from(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360"><defs><linearGradient id="g"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="480" height="360" fill="url(#g)"/></svg>`).render().asPng()).toString('base64')}`;
+// a 480x360 JPEG like YouTube's: a picture with black bars (pillarbox: bars left/right, letterbox: bars top/bottom)
+const makeJpeg = (box, c1 = [58, 134, 255], c2 = [255, 0, 110]) => {
+    const w = 480, hh = 360, data = Buffer.alloc(w * hh * 4);
+    for (let y = 0; y < hh; y++) for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4, inside = x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
+        const k = inside ? (x - box.x) / box.w : 0;
+        data[i] = inside ? c1[0] + (c2[0] - c1[0]) * k : 0; data[i + 1] = inside ? c1[1] + (c2[1] - c1[1]) * k : 0; data[i + 2] = inside ? c1[2] + (c2[2] - c1[2]) * k : 0; data[i + 3] = 255;
+    }
+    return Buffer.from(jpeg.encode({ data, width: w, height: hh }, 92).data);
+};
+const asThumb = (buf, mime = 'image/jpeg') => ({ uri: `data:${mime};base64,${buf.toString('base64')}`, rect: mime === 'image/jpeg' ? contentRect(buf) : null });
+const PILLAR = { x: 60, y: 0, w: 360, h: 360 }, LETTER = { x: 0, y: 45, w: 480, h: 270 };
+const fakeThumb = () => asThumb(makeJpeg(PILLAR));
+await t('thumbnail bars: pillarbox is found', () => { const r = contentRect(makeJpeg(PILLAR)); assert.ok(Math.abs(r.x - 60) <= 3 && Math.abs(r.w - 360) <= 6 && r.y === 0 && r.h === 360, JSON.stringify(r)); });
+await t('thumbnail bars: letterbox is found', () => { const r = contentRect(makeJpeg(LETTER)); assert.ok(Math.abs(r.y - 45) <= 3 && Math.abs(r.h - 270) <= 6 && r.x === 0 && r.w === 480, JSON.stringify(r)); });
+await t('thumbnail bars: a picture with no bars is left whole, a black one too, junk gives null', () => {
+    const full = contentRect(makeJpeg({ x: 0, y: 0, w: 480, h: 360 })); assert.deepEqual([full.x, full.y, full.w, full.h], [0, 0, 480, 360]);
+    const black = contentRect(makeJpeg({ x: 0, y: 0, w: 0, h: 0 })); assert.deepEqual([black.x, black.y, black.w, black.h], [0, 0, 480, 360]);
+    assert.equal(contentRect(Buffer.from('nope')), null);
+});
 await t('image: 1200x630 PNG with and without thumbnails', async () => {
-    for (const thumbs of [{ a: fakeThumb('#3a86ff', '#8338ec'), b: fakeThumb('#ff006e', '#fb5607') }, {}]) {
+    for (const thumbs of [{ a: asThumb(makeJpeg(PILLAR)), b: asThumb(makeJpeg(LETTER, [255, 0, 110], [251, 86, 7])) }, {}]) {
         const png = await renderCard(match, { fonts, thumbs, host: 'anthemarena.com', now: NOW });
         assert.equal(png.subarray(1, 4).toString(), 'PNG');
         assert.equal(png.readUInt32BE(16), 1200); assert.equal(png.readUInt32BE(20), 630);
@@ -109,7 +129,7 @@ const callHandler = async (qs, { matches = [match], thumbs = true } = {}) => {
     globalThis.fetch = async u => {
         u = String(u);
         if (u.endsWith('/api/matches')) return { ok: true, json: async () => matches };
-        if (u.includes('img.youtube.com')) return thumbs ? { ok: true, arrayBuffer: async () => Buffer.from(fakeThumb('#111', '#999').split(',')[1], 'base64') } : { ok: false };
+        if (u.includes('img.youtube.com')) return thumbs ? { ok: true, arrayBuffer: async () => makeJpeg(PILLAR) } : { ok: false };
         throw new Error('unexpected fetch ' + u);
     };
     return handler({ rawUrl: 'https://arcanemoments.netlify.app/og/match.png?' + qs, queryStringParameters: Object.fromEntries(new URLSearchParams(qs)) });

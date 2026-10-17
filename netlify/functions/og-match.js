@@ -1,6 +1,6 @@
 // /og/match.png?match=<matchId>  ->  1200x630 preview image of that match, used as og:image by the vote-meta edge function.
 import { findMatch } from '../shared/og-model.js';
-import { renderCard } from '../shared/og-card.js';
+import { renderCard, contentRect } from '../shared/og-card.js';
 import { INTER_700, INTER_800 } from '../shared/og-fonts.js';
 
 // Fonts are embedded in the bundle (reading ./assets/*.woff failed once the function was bundled: the path moves).
@@ -12,8 +12,9 @@ async function thumb(videoId) {
         const res = await fetch(`https://img.youtube.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`, { signal: AbortSignal.timeout(3000) });
         if (!res.ok) return null;
         const buf = Buffer.from(await res.arrayBuffer());
-        const mime = buf.subarray(1, 4).toString() === 'PNG' ? 'image/png' : buf[0] === 0xff && buf[1] === 0xd8 ? 'image/jpeg' : null;   // satori reads the bytes by this type
-        return mime ? `data:${mime};base64,${buf.toString('base64')}` : null;
+        const isPng = buf.subarray(1, 4).toString() === 'PNG', isJpeg = buf[0] === 0xff && buf[1] === 0xd8;   // satori reads the bytes by type
+        if (!isPng && !isJpeg) return null;
+        return { uri: `data:${isPng ? 'image/png' : 'image/jpeg'};base64,${buf.toString('base64')}`, rect: isJpeg ? contentRect(buf) : null };
     } catch (e) { return null; }
 }
 
