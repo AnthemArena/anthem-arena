@@ -1177,6 +1177,13 @@ async function checkRecentVotes() {
                 continue;
             }
             
+            // They voted BEFORE you did: nothing to react to ("just voted" would be false). Skip it; the taste profile
+            // is the place for "you and X voted differently here".
+            if (userVoteData.timestamp && activity.timestamp < userVoteData.timestamp) {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+
       // ✅ CORRECT (comparing "song1"/"song2" to "song1"/"song2"):
 const isAlly = userVoteData.songId === activity.choice;
 
@@ -1185,10 +1192,33 @@ const isAlly = userVoteData.songId === activity.choice;
             
             // ✅ ALWAYS save to Firestore (within 72-hour window)
             try {
-await saveNotification(userId, {
+const savedId = await saveNotification(userId, {
     ...notificationData,
     timestamp: activity.timestamp  // ← THIS IS THE CRUCIAL FIX
 });                savedCount++;
+                // Pop the toast too (one per check, only for votes from the last hour). This was missing: the row was saved
+                // to the bell but nothing ever showed the toast while the page was open.
+                if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden) {
+                    toastShown = true;
+                    showBulletin({
+                        priority: notificationData.priority || 7,
+                        type: notificationData.type,
+                        matchId: notificationData.matchId,
+                        matchTitle: notificationData.matchTitle,
+                        username: notificationData.triggerUsername,
+                        triggerUserId: notificationData.triggerUserId,
+                        thumbnailUrl: notificationData.thumbnailUrl,
+                        message: notificationData.message,
+                        detail: notificationData.detail,
+                        icon: notificationData.icon,
+                        ctaText: notificationData.ctaText,
+                        ctaAction: notificationData.ctaAction,
+                        ctaData: notificationData.ctaData,
+                        targetUrl: notificationData.targetUrl,
+                        relationship: notificationData.relationship
+                    });
+                    markNotificationShown(savedId);
+                }
                 console.log(`💾 Saved ${isAlly ? '🤝 ally' : '⚔️ rival'} notification: ${activity.username} in ${activity.matchTitle}`);
             } catch (error) {
                 console.error('Failed to save notification:', error);
@@ -3691,7 +3721,7 @@ async function checkMissedNotifications() {
             
             if (notification.count > 1) {
                 message = `${notification.triggerUsername || 'Someone'} voted in ${notification.count} matches`;
-                detail = `Including ${notification.matches.slice(0, 2).join(', ')}${notification.count > 2 ? ` +${notification.count - 2} more` : ''} • ${timeAgo}`;
+                detail = `Including ${notification.matches.slice(0, 2).filter(Boolean).join(', ')}${notification.count > 2 ? ` +${notification.count - 2} more` : ''} • ${timeAgo}`;
             } else {
                 detail = detail ? `${detail} • ${timeAgo}` : timeAgo;
             }
@@ -3708,8 +3738,10 @@ async function checkMissedNotifications() {
                 detail: detail,
                 icon: notification.icon || '🔔',
                 ctaText: notification.ctaText || 'View Profile',
-                ctaAction: 'navigate',
-                targetUrl: `/profile?user=${notification.triggerUsername}`,
+                // a single ally/rival keeps its emote button; a group of several opens the voter's profile
+                ctaAction: notification.count === 1 && notification.ctaAction === 'send-emote' ? 'send-emote' : 'navigate',
+                ctaData: notification.count === 1 ? notification.ctaData : undefined,
+                targetUrl: notification.count === 1 && notification.targetUrl ? notification.targetUrl : `/profile?user=${notification.triggerUsername}`,
                 relationship: notification.relationship,
             });
 

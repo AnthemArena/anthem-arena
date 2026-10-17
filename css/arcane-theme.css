@@ -1875,3 +1875,8 @@ body.theme-arcane.page-feed .feed-post.post-linked { box-shadow: 0 0 0 2px var(-
 body.theme-arcane .notification-item-link { color: var(--pink-bright); text-decoration: none; font-weight: 600; }
 body.theme-arcane .notification-item-link:hover { text-decoration: underline; }
 body.theme-arcane .notification-item[data-from-champion] .notification-item-message { color: #fff; font-weight: 600; }
+
+/* compact rows: detail is two lines at most (a grouped row shows its matches on one line, full list is behind "All N matches") */
+body.theme-arcane .notification-item-detail-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* each kind has its own accent bar: ally green, rival pink (pack colour) */
+body.theme-arcane .notification-item[data-relationship="ally"]::before { background: linear-gradient(180deg, #4ade80, #22c55e); box-shadow: 0 0 8px rgba(74, 222, 128, 0.6); }
