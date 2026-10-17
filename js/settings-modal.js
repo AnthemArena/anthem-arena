@@ -392,11 +392,12 @@ Your companion can react to matches, achievements, and other site activity
 
 <!-- Notification preferences (js/notification-prefs.js; saved on this browser) -->
 <div class="settings-section">
-    <h3 class="section-title">🔔 Notifications</h3>
+    <h3><i class="fas fa-bell"></i> Notifications</h3>
+    <p class="section-description">Choose which alerts you get (saved on this browser)</p>
     <div class="privacy-settings">
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
-                <strong>Votes in my matches</strong>
+                <strong>🗳️ Votes in my matches</strong>
                 <p>Alerts when someone votes with you or against you in a match you voted in</p>
                 <select id="notifyFromSelect" class="privacy-select">
                     <option value="everyone">From everyone</option>
@@ -407,7 +408,7 @@ Your companion can react to matches, achievements, and other site activity
         </div>
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
-                <strong>Pop-up alerts</strong>
+                <strong>💬 Pop-up alerts</strong>
                 <p>Which of those also pop up while you're on the site (the rest wait in your bell)</p>
                 <select id="toastFromSelect" class="privacy-select">
                     <option value="everyone">From everyone</option>
@@ -417,7 +418,7 @@ Your companion can react to matches, achievements, and other site activity
             </div>
         </div>
         <label class="toggle-label">
-            <input type="checkbox" id="matchAlertsToggle" checked>
+            <input type="checkbox" id="matchAlertsToggle" class="toggle-input" checked />
             <span class="toggle-slider"></span>
             <div class="toggle-info">
                 <strong>🎯 Match alerts</strong>
