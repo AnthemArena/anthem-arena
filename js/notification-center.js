@@ -587,7 +587,8 @@ function renderNotificationItem(notification) {
                                    notification.type === 'comeback' ||
                                    notification.type === 'winning';
     
-    const championAttr = isChampionNotification && championPack 
+    const isSocial = notification.relationship === 'ally' || notification.relationship === 'opponent';   // vote-with / vote-against
+    const championAttr = (isChampionNotification || isSocial) && championPack 
         ? `data-from-champion="${championPack.id}"` 
         : '';
 
@@ -646,10 +647,26 @@ function renderNotificationItem(notification) {
             : matchTitles;
     }
     
-    // Image logic (unchanged)
+    // Image logic
     let imageHtml = '';
-    
-    if (notification.thumbnailUrl) {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    if (isSocial && championPack?.icon) {
+        // Same idea as the toast: the other voter's face, with the champion who is reacting pinned to the corner,
+        // ringed in the pack colour (green-ish for an ally, the pack accent for a rival).
+        const ring = notification.relationship === 'ally' ? '#4ade80' : (championPack.color || '#ff69b4');
+        const name = notification.triggerUsername || '?';
+        const face = notification.thumbnailUrl
+            ? `<img src="${esc(notification.thumbnailUrl)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid ${ring};">`
+            : `<div style="width:100%;height:100%;border-radius:50%;background:#2a2342;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:2px solid ${ring};">${esc(name.charAt(0).toUpperCase())}</div>`;
+        imageHtml = `
+            <div style="position:relative;width:44px;height:44px;flex-shrink:0;margin-right:10px;">
+                ${face}
+                <img src="${esc(championPack.icon)}" alt="${esc(championPack.name)}" title="${esc(championPack.name)}"
+                     style="position:absolute;bottom:-4px;right:-6px;width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid ${championPack.color || '#ff69b4'};background:#14101f;">
+            </div>
+        `;
+    } else if (notification.thumbnailUrl) {
         imageHtml = `
             <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; margin-right: 8px;">
                 <img src="${notification.thumbnailUrl}" 
@@ -740,7 +757,7 @@ function renderNotificationItem(notification) {
             ` : ''}
             
             <div class="notification-item-footer">
-                <span class="notification-item-time">${timeAgo}</span>
+                <span class="notification-item-time">${timeAgo}${isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : ''}</span>
                 ${ctaHtml}
             </div>
         </div>

@@ -6,7 +6,7 @@ import { isPreviewBot, findMatch, describeMatch, rewriteHeadMeta, IMAGE_VERSION 
 
 export default async (request, context) => {
     const url = new URL(request.url);
-    const matchId = url.searchParams.get('match');
+    const matchId = url.searchParams.get('match') || url.searchParams.get('id');
     if (!matchId || !isPreviewBot(request.headers.get('user-agent'))) return;   // no return value = carry on as normal
 
     const response = await context.next();

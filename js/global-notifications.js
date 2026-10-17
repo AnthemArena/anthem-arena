@@ -1282,10 +1282,19 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     });
     message = championMessage.message;
     detail = championMessage.detail;
-    cta = championMessage.cta;
+    cta = `Challenge: ${championMessage.cta}`;
         icon = '⚔️';
-        ctaAction = 'navigate';
-        ctaData = {};
+        ctaAction = 'send-emote';
+        ctaData = {
+            targetUsername: activity.username,
+            targetUserId: activity.userId,
+            emoteType: 'rivalry',
+            matchData: {
+                matchId: activity.matchId,
+                matchTitle: activity.matchTitle,
+                songTitle: activity.songTitle
+            }
+        };
     }
 
     // SINGLE, CORRECT RETURN
@@ -3613,14 +3622,8 @@ async function checkMissedNotifications() {
     console.log(`⏰ User was away for ${Math.floor(timeSinceLastVisit / 60000)} minutes, checking for missed notifications...`);
 
     // ✅ Only look for notifications from WHILE THEY WERE AWAY (max 2 hours)
-    const maxLookbackMinutes = Math.min(Math.floor(timeSinceLastVisit / 60000), 120); // Max 2 hours
-    
-    if (maxLookbackMinutes < 5) {
-        console.log('⏭️ Away time too short, skipping');
-        localStorage.setItem('lastVisitTimestamp', now.toString());
-        sessionStorage.setItem('missedNotificationsChecked', 'true');
-        return;
-    }
+    // At least 10 minutes back: a notification saved a minute or two before the page opened still counts.
+    const maxLookbackMinutes = Math.max(10, Math.min(Math.floor(timeSinceLastVisit / 60000), 120)); // 10 min .. 2 hours
 
     const missed = await getRecentUnshownNotifications(userId, maxLookbackMinutes);
 

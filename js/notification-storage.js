@@ -3,6 +3,7 @@ console.log('🔔 notification-storage.js loaded');
 import { db } from './firebase-config.js';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, deleteDoc,     writeBatch  // ✅ Add this if missing
  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { pickUnshown } from './notification-model.js';
 
 // ========================================
 // FIRESTORE COLLECTION: user-notifications
@@ -147,26 +148,12 @@ export async function getRecentUnshownNotifications(userId, maxAgeMinutes = 15) 
     const cutoffTime = Date.now() - (maxAgeMinutes * 60 * 1000);
     
     try {
-        const q = query(
-            collection(db, 'user-notifications'),
-            where('userId', '==', userId),
-            where('shownAsToast', '==', false),
-            where('timestamp', '>', cutoffTime),
-            where('expiresAt', '>', Date.now()),
-            orderBy('timestamp', 'desc'),
-            orderBy('expiresAt', 'desc'),
-            limit(50) // Get up to 50 to group them
-        );
-        
-        const snapshot = await getDocs(q);
-        const notifications = [];
-        
-        snapshot.forEach(doc => {
-            notifications.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
+        // One equality filter only: the old 4-filter query needed a composite index that was never built, so it failed
+        // silently and "missed" toasts never appeared. The rest is filtered here (see notification-model.js).
+        const snapshot = await getDocs(query(collection(db, 'user-notifications'), where('userId', '==', userId), limit(100)));
+        const all = [];
+        snapshot.forEach(doc => all.push({ id: doc.id, ...doc.data() }));
+        const notifications = pickUnshown(all, cutoffTime, Date.now());
         
         console.log(`🔔 Found ${notifications.length} unshown notifications from last ${maxAgeMinutes}min`);
         return notifications;
