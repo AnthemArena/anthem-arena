@@ -81,7 +81,7 @@ export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed 
 // ---- Likes, comments, replies and mentions (the "content" notifications) ----
 export const CONTENT_TYPES = ['like', 'comment', 'reply', 'mention', 'emote-received'];     // emote-received: a reaction someone sent you (eventType = thanks / props / rivalry / hype)
 export const isContentNotification = n => CONTENT_TYPES.includes(n?.type);
-const CONTENT_ICONS = { like: '❤️', comment: '💬', reply: '↩️', mention: '📢' };
+const CONTENT_ICONS = { like: '❤️', comment: '💬', reply: '💬', mention: '📢' };      // (↩️ drew as a blue box on Windows)
 const EMOTE_ICONS = { thanks: '🤝', props: '👊', rivalry: '⚔️', hype: '🔥' };
 export const contentIcon = n => (n?.type === 'emote-received' ? (EMOTE_ICONS[n.eventType] || '✨') : CONTENT_ICONS[n?.type]) || '🔔';
 const EMOTE_ACTIONS = { thanks: 'sent you thanks', props: 'gave you props', rivalry: 'challenged you', hype: 'sent you hype' };
@@ -102,8 +102,9 @@ export function contentHeadline(g) {
     const count = g?.count || 1;
     const who = people === 1 ? (users[0] || 'Someone') : people === 2 ? `${users[0]} and ${users[1]}` : `${people} people`;
     let action;
-    if (g?.type === 'like') action = 'liked your post';
-    else if (g?.type === 'comment') action = people === 1 && count > 1 ? `commented ${count} times on your post` : 'commented on your post';
+    const thing = g?.eventType === 'vote' ? 'pick' : 'post';       // a like / comment on an auto vote post is on the voter's pick
+    if (g?.type === 'like') action = `liked your ${thing}`;
+    else if (g?.type === 'comment') action = people === 1 && count > 1 ? `commented ${count} times on your ${thing}` : `commented on your ${thing}`;
     else if (g?.type === 'reply') action = people === 1 && count > 1 ? `replied ${count} times to your comment` : 'replied to your comment';
     else if (g?.type === 'emote-received') action = EMOTE_ACTIONS[g.eventType] || 'sent you a reaction';
     else if (g?.type === 'mention') action = people >= 3 ? 'mentioned you' : `mentioned you in a ${mentionWhere(g)}`;
@@ -120,4 +121,4 @@ export function contentQuote(g, max = 110) {
     return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
 }
 // One consistent wording whatever older notifications saved ("View Comment" vs "View comment").
-export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');
+export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: g?.eventType === 'vote' ? 'View pick' : 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');
