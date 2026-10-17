@@ -6,6 +6,8 @@ import './champion-loader.js';
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
+import { socialHeadline } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, championBadgeUrl, accentFor, toastHtml, ensureVersusStyles } from './notification-visuals.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
     saveNotification, 
@@ -1291,7 +1293,7 @@ const savedId = await saveNotification(userId, {
 // ========================================
 
 function buildSocialNotification(activity, isAlly, currentUserId) {
-    const avatarUrl = activity.avatarUrl || activity.avatar || null;
+    const avatarUrl = avatarSrc(activity.avatarUrl || activity.avatar);   // always a plain url (a raw avatar object used to end up as "[object Object]")
     const songThumbnailUrl = activity.songId 
         ? `https://img.youtube.com/vi/${activity.songId}/mqdefault.jpg`
         : null;
@@ -2698,6 +2700,26 @@ else {
         `;
     }
     
+    if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
+        // Ally / rival: the shared "versus" look (js/notification-visuals.js), same as the bell-list row
+        ensureVersusStyles();
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = accentFor(notification.relationship, pack);
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', notification.relationship === 'ally' ? '#22c55e' : '#ff1493');
+        banner.style.setProperty('--nv-glow', notification.relationship === 'ally' ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
+        banner.style.setProperty('--nv-tint', notification.relationship === 'ally' ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
+        banner.innerHTML = toastHtml(notification, {
+            theirSrc: avatarSrc(notification.thumbnailUrl),
+            yourSrc: viewerAvatarSrc(),
+            jinxSrc: championBadgeUrl(pack),
+            accent,
+            headline: socialHeadline({ triggerUsername: notification.triggerUsername || notification.username, relationship: notification.relationship }),
+            quip: notification.detail,
+            cta: notification.ctaText || notification.cta || 'View match'
+        });
+        banner.className = `bulletin-banner versus-toast ${notification.relationship}`;
+    } else {
     banner.innerHTML = `
         <div class="bulletin-toast-content">
             ${thumbnailHtml}
@@ -2711,6 +2733,7 @@ else {
     `;
     
     banner.className = `bulletin-banner ${notification.type}`;
+    }
 }
 
 setTimeout(() => banner.classList.add('show'), 10);
@@ -2782,6 +2805,14 @@ window.dismissBulletin = function() {
     
     hideBulletin();
     currentBulletin = null;
+};
+
+// Clicking the body of a versus toast opens its match (the button still sends the emote).
+window.openBulletinMatch = function() {
+    const b = currentBulletin;
+    if (!b || !b.targetUrl) return;
+    hideBulletin();
+    window.location.href = b.targetUrl;
 };
 
 window.handleBulletinCTA = function() {

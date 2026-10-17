@@ -9,6 +9,7 @@ import {
 import { sendMessage } from './message-system.js';
 import { groupNotifications, groupHeadline, socialHeadline } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
+import { socialRowHtml } from './notification-visuals.js';
 
 // ✅ GUARD: Prevent duplicate initialization
 let isInitialized = false;
@@ -661,6 +662,8 @@ function renderNotificationItem(notification) {
             : matchTitles;
     }
     
+    if (isSocial) return socialRowHtml(notification, { headline, timeAgo, championPack });
+
     // Image logic
     let imageHtml = '';
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -938,7 +941,7 @@ function attachNotificationListeners() {
             e.stopPropagation();
             const id = btn.dataset.id;
             
-            await dismissNotification(id);
+            for (const one of id.split(',')) await dismissNotification(one);   // a grouped row carries several ids
             
             const item = btn.closest('.notification-item');
             item.style.opacity = '0';
@@ -955,11 +958,16 @@ function attachNotificationListeners() {
     });
     
     document.querySelectorAll('.notification-item').forEach(item => {
-        item.addEventListener('click', async () => {
+        item.addEventListener('click', async (e) => {
             const id = item.dataset.id;
-            await markNotificationRead(id);
+            for (const one of id.split(',')) await markNotificationRead(one);
             item.classList.remove('unread');
             await updateBadgeCount();
+            // ally / rival rows: the row itself opens the match (a per-person group opens its list)
+            if (item.classList.contains('nv-row') && !e.target.closest('button, a')) {
+                if (item.dataset.group) window.expandGroupedNotification?.(item.dataset.group, e);
+                else if (item.dataset.url) window.location.href = item.dataset.url;
+            }
         });
     });
 }
