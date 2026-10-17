@@ -1,4 +1,6 @@
 // Draws the 1200x630 preview image of a match (satori: layout -> SVG, resvg: SVG -> PNG).
+// SPEED: never use box-shadow / blur / filter here. Each becomes an SVG blur filter and made the render take 6-13 s instead of 0.4 s
+// (link-preview bots give up after a few seconds). tools/test-og-preview.mjs fails if the SVG contains a <filter> or the render is slow.
 // Colours, panel look and radius follow css/arcane-theme.css (--bg, --pink, --card, --border, --radius ...).
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
@@ -47,7 +49,7 @@ function frame(thumb) {
 }
 
 function side(name, creator, thumb) {
-    return h('div', { flexDirection: 'column', width: 500, padding: 16, background: CARD, border: `1px solid ${BORDER}`, borderRadius: RADIUS, boxShadow: '0 24px 80px rgba(0, 0, 0, 0.46)' }, [
+    return h('div', { flexDirection: 'column', width: 500, padding: 16, background: CARD, border: `1px solid ${BORDER}`, borderRadius: RADIUS }, [
         h('div', { position: 'relative', width: BOX_W, height: BOX_H, borderRadius: RADIUS - 8, overflow: 'hidden', background: '#000', alignItems: 'center', justifyContent: 'center' }, frame(thumb)),
         h('div', { fontSize: 28, fontWeight: 800, color: TEXT, marginTop: 16, lineHeight: 1.2, height: 68, overflow: 'hidden', letterSpacing: -0.5 }, renderable(name) || 'Edit'),
         h('div', { fontSize: 21, fontWeight: 700, color: MUTED, marginTop: 6 }, renderable(creator) ? `by ${renderable(creator)}` : ' ')
@@ -66,7 +68,9 @@ export function cardTree(d, thumbs = {}, host = 'anthemarena.com') {
         ]),
         h('div', { flex: 1, alignItems: 'center', justifyContent: 'space-between', marginTop: 18 }, [
             side(d.a, d.creatorA, thumbs.a),
-            h('div', { width: 84, height: 84, borderRadius: 42, background: PINK, color: BG, fontSize: 34, fontWeight: 800, alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 40px rgba(255, 79, 180, 0.7)' }, 'VS'),
+            // the glow is a radial gradient: a CSS box-shadow becomes an SVG blur filter, and resvg needs ~5 seconds for those (X gives up waiting)
+            h('div', { width: 150, height: 150, margin: '0 -33px', alignItems: 'center', justifyContent: 'center', backgroundImage: 'radial-gradient(circle, rgba(255, 79, 180, 0.6) 0%, rgba(255, 79, 180, 0.25) 35%, rgba(255, 79, 180, 0) 70%)' },
+                h('div', { width: 84, height: 84, borderRadius: 42, background: PINK, color: BG, fontSize: 34, fontWeight: 800, alignItems: 'center', justifyContent: 'center' }, 'VS')),
             side(d.b, d.creatorB, thumbs.b)
         ]),
         h('div', { justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }, [
@@ -77,11 +81,15 @@ export function cardTree(d, thumbs = {}, host = 'anthemarena.com') {
 }
 
 // fonts: [{ weight, data }]; thumbs: { a, b } as { uri (data URI), rect (from contentRect) } or missing
-export async function renderCard(match, { fonts, thumbs = {}, host, now } = {}) {
-    const d = describeMatch(match, now);
-    const svg = await satori(cardTree(d, thumbs, host), {
+export async function cardSvg(match, { fonts, thumbs = {}, host, now } = {}) {
+    return satori(cardTree(describeMatch(match, now), thumbs, host), {
         width: W, height: H,
         fonts: fonts.map(f => ({ name: 'Inter', data: f.data, weight: f.weight, style: 'normal' }))
     });
-    return new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
+}
+
+export async function renderCard(match, opts = {}) {
+    const svg = await cardSvg(match, opts);
+    // satori already turned the text into paths, so resvg needs no fonts: skip scanning the system for them
+    return new Resvg(svg, { fitTo: { mode: 'width', value: W }, font: { loadSystemFonts: false } }).render().asPng();
 }

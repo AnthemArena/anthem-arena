@@ -458,3 +458,8 @@ The 429s were `RESOURCE_EXHAUSTED / Quota exceeded`: the Spark plan's 50,000 rea
 ### Preview card styling (follow-up)
 - `netlify/shared/og-card.js` uses the theme's own values (`--bg #06070e`, `--pink`, `--pink-bright`, `--card`, `--border`, `--radius 22px`, text `#f6f3f7` / muted `#b7b2bc`, the pink glows of the page background). It cannot load `arcane-theme.css` (satori draws from a small CSS subset), so if the theme colours change, update the constants at the top of that file. The cover image is deliberately not used as a backdrop (3 MB, and its logo sits mid-picture).
 - YouTube thumbnails of vertical videos come with black bars. `contentRect()` (jpeg-js) measures the picture inside the bars and the card scales it to fill the frame; a thumbnail without bars, or a black/unreadable one, is shown whole. `jpeg-js` moved from devDependencies to dependencies.
+
+### Preview image speed (do not add shadows)
+- The first live version took 13 s (Netlify log: "Duration: 13124 ms"), so X's crawler gave up and showed the default logo. Cause: CSS `box-shadow` becomes an SVG blur filter and resvg needs ~5-6 s per card for it. Fixed by dropping the panel shadows and drawing the VS glow as a radial gradient: render ~0.45 s locally. `loadSystemFonts: false` is also set (satori already turns text into paths).
+- Rule for `netlify/shared/og-card.js`: no `box-shadow`, `filter` or blur. `node tools/test-og-preview.mjs` fails if the SVG has a `<filter>` or a warm render takes over 1.5 s.
+- Link-preview bots wait only a few seconds, so the first fetch also needs the match list and two YouTube thumbnails (3 s timeouts each, in parallel). If X still shows the logo, test with a new URL (`&v=2`: X caches cards per URL) and check the function Duration in Netlify's log.

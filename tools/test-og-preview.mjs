@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 import { isPreviewBot, previewName, renderable, describeMatch, rewriteHeadMeta, findMatch, timeLeft } from '../netlify/shared/og-model.js';
-import { renderCard, contentRect } from '../netlify/shared/og-card.js';
+import { renderCard, cardSvg, contentRect } from '../netlify/shared/og-card.js';
 import jpeg from 'jpeg-js';
 import voteMeta from '../netlify/edge-functions/vote-meta.js';
 
@@ -118,6 +118,13 @@ await t('image: 1200x630 PNG with and without thumbnails', async () => {
         assert.equal(png.readUInt32BE(16), 1200); assert.equal(png.readUInt32BE(20), 630);
         if (process.argv.includes('--save') && thumbs.a) await writeFile(process.argv[process.argv.indexOf('--save') + 1], png);
     }
+});
+await t('image: no blur filters in the SVG, and the render is fast', async () => {
+    const opts = { fonts, thumbs: { a: asThumb(makeJpeg(PILLAR)), b: asThumb(makeJpeg(LETTER)) }, host: 'anthemarena.com', now: NOW };
+    assert.ok(!/<filter/.test(await cardSvg(match, opts)), 'a box-shadow/blur crept back in: resvg takes seconds for it');
+    await renderCard(match, opts);                                   // warm up
+    const t0 = Date.now(); await renderCard(match, opts); const ms = Date.now() - t0;
+    assert.ok(ms < 1500, `render took ${ms} ms (was 6000 with blur filters)`);
 });
 await t('image: long names, empty creator and emoji do not break it', async () => {
     const m = { ...match, song1: { ...match.song1, shortTitle: 'x'.repeat(300), artist: '' }, song2: { ...match.song2, shortTitle: '💀💀💀 全部' } };
