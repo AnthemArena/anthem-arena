@@ -20,10 +20,10 @@ export function groupNotifications(list, followingIds = new Set()) {
         const key = stranger ? `m|${n.matchId}|${n.relationship}` : `u|${n.triggerUserId || 'system'}|${n.relationship || n.type}`;
         const entry = { matchId: n.matchId, matchTitle: n.matchTitle, detail: n.detail };
         const g = groups.get(key);
-        if (!g) groups.set(key, { ...n, groupKind: stranger ? 'match' : 'user', count: 1, matches: [entry], ids: [n.id], users: [n.triggerUsername].filter(Boolean), avatars: n.triggerUsername ? [n.thumbnailUrl || null] : [] });
+        if (!g) groups.set(key, { ...n, groupKind: stranger ? 'match' : 'user', count: 1, matches: [entry], ids: [n.id], users: [n.triggerUsername].filter(Boolean), avatars: n.triggerUsername ? [n.thumbnailUrl || null] : [], userIds: n.triggerUsername ? [n.triggerUserId || null] : [] });
         else {
             g.count++; g.matches.push(entry); g.ids.push(n.id);
-            if (n.triggerUsername && !g.users.includes(n.triggerUsername)) { g.users.push(n.triggerUsername); g.avatars.push(n.thumbnailUrl || null); }
+            if (n.triggerUsername && !g.users.includes(n.triggerUsername)) { g.users.push(n.triggerUsername); g.avatars.push(n.thumbnailUrl || null); g.userIds.push(n.triggerUserId || null); }
             if (n.timestamp > g.timestamp) g.timestamp = n.timestamp;
         }
     }
