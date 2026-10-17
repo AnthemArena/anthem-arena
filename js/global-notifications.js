@@ -6,8 +6,8 @@ import './champion-loader.js';
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, ensureVersusStyles } from './notification-visuals.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -1906,7 +1906,7 @@ function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower'];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower', ...CONTENT_TYPES];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -2724,6 +2724,20 @@ else {
             headline: followHeadline(notification),
             cta: notification.ctaText || 'Follow back'
         });
+        banner.className = 'bulletin-banner versus-toast opponent';
+    } else if (notification.contentGroup && isContentNotification(notification.contentGroup)) {
+        // Like / comment / reply / mention (possibly a crowd): same card family, shows the words, opens the post
+        ensureVersusStyles();
+        const g = notification.contentGroup;
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = pack?.color || '#ff69b4';
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', '#ff1493');
+        banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
+        banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
+        const names = g.users?.length ? g.users : [g.triggerUsername].filter(Boolean);
+        const srcs = names.map((nm, i) => (names.length > 1 ? notification.nv?.avatars?.[i] : notification.nv?.theirSrc) || avatarSrc((g.avatars || [])[i]) || fallbackAvatarFor(nm));
+        banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
         banner.className = 'bulletin-banner versus-toast opponent';
     } else if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
         // Ally / rival: the shared "versus" look (js/notification-visuals.js), same as the bell-list row
@@ -3744,8 +3758,8 @@ async function checkMissedNotifications() {
     // At least 10 minutes back: a notification saved a minute or two before the page opened still counts.
     const maxLookbackMinutes = Math.max(10, Math.min(Math.floor(timeSinceLastVisit / 60000), 120)); // 10 min .. 2 hours
 
-    // New-follower toasts have their own live listener (setupFollowListener), so they are not repeated here.
-    const missed = (await getRecentUnshownNotifications(userId, maxLookbackMinutes)).filter(n => n.type !== 'new-follower');
+    // New-follower and like / comment / reply / mention toasts have their own live listeners, so they are not repeated here.
+    const missed = (await getRecentUnshownNotifications(userId, maxLookbackMinutes)).filter(n => n.type !== 'new-follower' && !isContentNotification(n));
 
     if (missed.length === 0) {
         console.log('✅ No missed notifications');
@@ -4030,7 +4044,69 @@ async function setupFollowListener() {
     }
 }
 
-setTimeout(() => { setupFollowListener(); }, 3500);
+// ========================================
+// LIKES / COMMENTS / REPLIES / MENTIONS LISTENER
+// Same idea as the follower listener: one equality-only query per kind on this user's own unshown rows (a handful of reads).
+// A short collection window lets a burst become one toast ("3 people liked your post"); the most direct kind is shown first.
+// Nothing is marked shown until a visible tab handles it; everything else waits in the bell.
+// ========================================
+let contentListeners = [];
+const contentSeen = new Set();
+let contentPending = [];
+let contentTimer = null;
+
+function scheduleContentFlush(userId, delay = 2500) {
+    if (contentTimer || !contentPending.length) return;
+    contentTimer = setTimeout(() => { contentTimer = null; flushContentToasts(userId); }, delay);
+}
+
+async function flushContentToasts(userId) {
+    if (!contentPending.length) return;
+    if (document.hidden) { console.log(`💬 ${contentPending.length} new like/comment/reply/mention(s) waiting - tab hidden, toast will show when you return`); return; }
+    const batch = contentPending; contentPending = [];
+    batch.forEach(n => markNotificationShown(n.id));
+    const now = Date.now();
+    const fresh = batch.filter(n => n.timestamp > now - 2 * 60 * 60 * 1000 && (!n.expiresAt || n.expiresAt > now));
+    if (!fresh.length) { console.log('💬 New social activity is older than 2 hours - bell only'); return; }
+    const following = await getFollowingIds(userId).catch(() => new Set());
+    const groups = groupNotifications(fresh, following).filter(g => g.groupKind === 'content')
+        .sort((a, b) => (CONTENT_PRIORITY[b.type] || 0) - (CONTENT_PRIORITY[a.type] || 0) || b.timestamp - a.timestamp);
+    const g = groups[0];
+    if (!g) return;
+    // "Only people I follow" looks at who did it; a crowd counts if anyone in it is followed
+    const anyFollowed = (g.userIds || []).some(id => id && following.has(id));
+    if (!shouldToastSocial(readNotificationPrefs(), anyFollowed)) { console.log('💬 Social toast skipped - Pop-up alerts setting'); return; }
+    const nv = await socialContextFor(g);
+    showBulletin({
+        nv, contentGroup: g, id: g.id, priority: CONTENT_PRIORITY[g.type] || 6, type: g.type,
+        triggerUserId: g.triggerUserId, triggerUsername: g.triggerUsername, username: g.triggerUsername,
+        message: g.message, detail: g.detail || '', icon: g.icon,
+        targetUrl: g.targetUrl || '/feed.html', action: 'navigate', ctaText: contentCta(g), ctaAction: 'navigate'
+    });
+}
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) scheduleContentFlush(localStorage.getItem('tournamentUserId'), 800);
+});
+
+function setupContentListeners() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') return;
+    contentListeners.forEach(unsub => unsub());
+    contentListeners = CONTENT_TYPES.map(type => {
+        const q = query(collection(db, 'user-notifications'), where('userId', '==', userId), where('type', '==', type), where('shownAsToast', '==', false), limit(10));
+        return onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().filter(c => c.type === 'added').forEach(c => {
+                if (contentSeen.has(c.doc.id)) return;
+                contentSeen.add(c.doc.id);
+                contentPending.push({ id: c.doc.id, ...c.doc.data() });
+            });
+            scheduleContentFlush(userId);
+        }, (error) => console.error(`❌ ${type} listener error:`, error));
+    });
+    console.log('👂 Like / comment / reply / mention listeners active');
+}
+
+setTimeout(() => { setupFollowListener(); setupContentListeners(); }, 3500);
 
 // ✅ Cleanup on page unload
 window.addEventListener('beforeunload', () => {
@@ -4039,6 +4115,7 @@ window.addEventListener('beforeunload', () => {
         console.log('🔌 Emote listener disconnected');
     }
     if (followListener) followListener();
+    contentListeners.forEach(unsub => unsub());
 });
 
 // ✅ Expose function to restart listener after vote

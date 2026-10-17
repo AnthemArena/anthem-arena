@@ -220,6 +220,50 @@ export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headl
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
 }
 
+// Likes / comments / replies / mentions. One card for all four: face (or stacked faces for a crowd), "who + action", the words
+// that were liked or written, and one button that opens the post. Same family as the follow and ally / rival cards.
+// parts = { who, action, headline, names } from contentHeadline(); quote = contentQuote() text ('' for none).
+export function contentRowHtml(n, { parts, quote, icon, cta, timeAgo, championPack, srcs = [], names = [] }) {
+    ensureVersusStyles();
+    const accent = championPack?.color || DEFAULT_ACCENT;
+    const idList = n.ids ? n.ids.join(',') : n.id;
+    const unread = !n.read && !n.dismissed ? 'unread' : '';
+    const url = n.targetUrl || '/feed.html';
+    const crowd = names.length > 1;
+    const face = crowd ? stackHtml(srcs, names, 34, accent) : circleHtml(srcs[0], names[0] || n.triggerUsername, 40, { accent });
+    const sub = [timeAgo, parts.names].filter(Boolean).map(escapeHtml).join(' · ');
+    return `
+        <div class="notification-item nv-row content ${escapeHtml(n.type)} ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
+             style="--nv-accent:${accent}; --nv-line:rgba(255,105,180,0.35); --nv-accent-text:#ff9bd6">
+            <button class="notification-item-dismiss" data-id="${idList}" aria-label="Dismiss">×</button>
+            <div class="nv-top">
+                ${face}
+                <div class="nv-text">
+                    <div class="nv-headline"><span class="nv-headline-text"><span class="nv-kind">${escapeHtml(icon || '')}</span>${escapeHtml(parts.headline)}</span></div>
+                    <div class="nv-sub">${sub}</div>
+                </div>
+            </div>
+            ${quote ? `<div class="nv-content">${escapeHtml(quote)}</div>` : ''}
+            <div class="notification-item-footer">
+                <button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, #ff1493); border: 0; color: #fff;" data-id="${idList}" data-action="navigate" data-url="${escapeHtml(url)}">${escapeHtml(cta || 'View')}</button>
+            </div>
+        </div>`;
+}
+
+// The pop-up version of the same card.
+export function contentToastHtml(n, { parts, quote, icon, cta, accent, srcs = [], names = [] }) {
+    const crowd = names.length > 1;
+    const face = crowd ? stackHtml(srcs, names, 52, accent) : circleHtml(srcs[0], names[0] || n.triggerUsername, 64, { accent });
+    return `
+    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
+        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        <div class="nv-follow-face">${face}</div>
+        ${toastHeadlineHtml(parts.headline, null, parts.who, accent, { avatar: false })}
+        ${quote ? `<div class="nv-content nv-content-toast"><span class="nv-kind">${escapeHtml(icon || '')}</span>${escapeHtml(quote)}</div>` : ''}
+    </div>
+    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View')}</button>`;
+}
+
 function socialHeadlineFor(n) {
     return `${n.triggerUsername || 'Someone'} voted ${n.relationship === 'ally' ? 'with' : 'against'} you`;
 }
@@ -286,6 +330,11 @@ export function ensureVersusStyles() {
 .nv-row .notification-item-footer{display:block;margin:0}
 .nv-row .notification-item-cta{display:block;width:100%;text-align:center;white-space:normal;border-radius:8px;padding:9px;font-weight:700;font-size:12.5px;letter-spacing:.03em}
 .nv-row.ally .notification-item-cta{color:#0f0b18}
+.nv-kind{margin-right:6px}
+.nv-row .nv-top + .notification-item-footer{margin-top:10px}
+.nv-row .nv-content{margin:8px 0;padding:6px 10px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.05);border-radius:0 8px 8px 0;font-size:12.5px;color:rgba(255,255,255,.82);font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.versus-toast .nv-content-toast{margin:2px 0 4px;padding:8px 12px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.07);border-radius:0 10px 10px 0;font-size:14px;line-height:1.35;color:#fff;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.versus-toast .nv-follow-face .nv-stack{justify-content:center}
 `;
     document.head.appendChild(s);
 }

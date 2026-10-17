@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -77,5 +77,17 @@ t('follow row and toast: name, quip, right button, safe text', () => {
     assert.ok(already.includes('data-action="navigate"') && already.includes('View profile') && !already.includes('follow-back'));
     const toast = followToastHtml(n, { theirSrc: null, jinxSrc: 'https://x/j.png', accent: '#ff69b4', quip: 'Another one joins the chaos!', cta: 'Follow back', headline: 'Kai followed you back' });
     assert.ok(toast.includes('handleBulletinCTA') && toast.includes('followed you back') && toast.includes('Another one joins the chaos!') && toast.includes('nv-follow-face'));
+});
+t('content row and toast: faces, headline, quote escaped, one button that opens the post', () => {
+    const n = { id: 'a', ids: ['a', 'b', 'c'], type: 'like', triggerUsername: 'Kai', targetUrl: '/feed.html#post-1', read: false };
+    const parts = { who: '3 people', action: 'liked your post', headline: '3 people liked your post', names: 'Kai, Rex, Mia' };
+    const row = contentRowHtml(n, { parts, quote: 'my <b>edit</b>', icon: '❤️', cta: 'View post', timeAgo: '5m ago', championPack: { id: 'jinx', color: '#ff69b4' }, srcs: [null, null, null], names: ['Kai', 'Rex', 'Mia'] });
+    assert.ok(row.includes('3 people liked your post') && row.includes('Kai, Rex, Mia') && row.includes('nv-stack') && row.includes('unread'));
+    assert.ok(row.includes('data-id="a,b,c"') && row.includes('data-action="navigate"') && row.includes('data-url="/feed.html#post-1"') && row.includes('View post'));
+    assert.ok(row.includes('my &lt;b&gt;edit&lt;/b&gt;') && !row.includes('<b>edit'));
+    const solo = contentRowHtml({ ...n, ids: ['a'] }, { parts: { who: 'Kai', action: 'liked your post', headline: 'Kai liked your post', names: '' }, quote: '', icon: '❤️', cta: 'View post', timeAgo: '', championPack: null, srcs: [null], names: ['Kai'] });
+    assert.ok(!solo.includes('nv-stack') && !solo.includes('class="nv-content"'));
+    const toast = contentToastHtml(n, { parts, quote: 'Great <i>edit</i>', icon: '❤️', cta: 'View post', accent: '#ff69b4', srcs: [null, null, null], names: ['Kai', 'Rex', 'Mia'] });
+    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('3 people') && toast.includes('liked your post') && toast.includes('Great &lt;i&gt;edit&lt;/i&gt;') && toast.includes('View post'));
 });
 console.log(`${pass} passed`);
