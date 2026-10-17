@@ -1177,6 +1177,13 @@ async function checkRecentVotes() {
                 continue;
             }
             
+            // They voted BEFORE you did: nothing to react to ("just voted" would be false). Skip it; the taste profile
+            // is the place for "you and X voted differently here".
+            if (userVoteData.timestamp && activity.timestamp < userVoteData.timestamp) {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+
       // ✅ CORRECT (comparing "song1"/"song2" to "song1"/"song2"):
 const isAlly = userVoteData.songId === activity.choice;
 
