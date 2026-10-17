@@ -2,7 +2,7 @@
 // Only for link-preview bots (Discord, X, Slack, WhatsApp, Facebook ...): they do not run JavaScript, so they would otherwise
 // all see the generic vote.html tags. For them the title, description and og:image are rewritten for that match, with the image
 // drawn by netlify/functions/og-match.js. Real visitors get vote.html untouched and are not slowed down.
-import { isPreviewBot, findMatch, describeMatch, rewriteHeadMeta } from '../shared/og-model.js';
+import { isPreviewBot, findMatch, describeMatch, rewriteHeadMeta, IMAGE_VERSION } from '../shared/og-model.js';
 
 export default async (request, context) => {
     const url = new URL(request.url);
@@ -24,7 +24,7 @@ export default async (request, context) => {
         const html = rewriteHeadMeta(await response.clone().text(), {
             title: d.title,
             description: d.description,
-            imageUrl: `${url.origin}/og/match.png?match=${encodeURIComponent(matchId)}`,
+            imageUrl: `${url.origin}/og/match.png?match=${encodeURIComponent(matchId)}&v=${IMAGE_VERSION}`,
             pageUrl,
             imageAlt: `${d.a} versus ${d.b}`
         });

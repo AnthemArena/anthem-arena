@@ -466,3 +466,6 @@ The 429s were `RESOURCE_EXHAUSTED / Quota exceeded`: the Spark plan's 50,000 rea
 
 ### Who counts as a preview bot
 `isPreviewBot` (netlify/shared/og-model.js) is true for the named bots, for any user-agent that looks automated (bot, crawl, preview, fetch, tumblr ...) and for any user-agent that does NOT start with "Mozilla/" (every real browser does; many link fetchers, e.g. Tumblr's, do not). To see exactly what a bot receives: PowerShell `curl.exe -A "Twitterbot/1.0" "https://<site>/vote.html?match=<id>"` and look at the og: / twitter: lines.
+
+### Preview image cache (X)
+X (and others) remember the preview image per address, including a failed fetch: while the image still took 13 s, X cached the logo for `/og/match.png?match=<id>`. The og:image address now carries `&v=<IMAGE_VERSION>` (`netlify/shared/og-model.js`); raise the number whenever a platform is stuck on an old image. Tumblr, which had never cached it, showed the card correctly.
