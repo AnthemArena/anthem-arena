@@ -1,6 +1,10 @@
 // Pure helpers for link previews of a match (used by the vote-meta edge function and the og-match image function).
 // Self-contained on purpose: no imports, so both the Deno edge bundler and the Node function bundler can load it.
 
+// Part of the og:image address (?v=). Platforms remember a preview image per address, including a FAILED fetch (X kept the logo for the
+// address it fetched while the image still took 13 s). Raise this number to make every platform treat the image as a new one.
+export const IMAGE_VERSION = '2';
+
 export const PREVIEW_BOT = /(discordbot|twitterbot|facebookexternalhit|facebot|slackbot|slack-imgproxy|whatsapp|telegrambot|linkedinbot|redditbot|applebot|googlebot|bingbot|skypeuripreview|embedly|pinterest|mastodon|bluesky|iframely|signal)/i;
 // Known preview bots, PLUS anything that does not identify as a normal browser: every real browser's user-agent starts "Mozilla/5.0",
 // while many link fetchers do not (Tumblr, Facebook, Viber, Line ...), and a list of names always misses some.

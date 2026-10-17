@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
-import { isPreviewBot, previewName, renderable, describeMatch, rewriteHeadMeta, findMatch, timeLeft } from '../netlify/shared/og-model.js';
+import { IMAGE_VERSION, isPreviewBot, previewName, renderable, describeMatch, rewriteHeadMeta, findMatch, timeLeft } from '../netlify/shared/og-model.js';
 import { renderCard, cardSvg, contentRect } from '../netlify/shared/og-card.js';
 import jpeg from 'jpeg-js';
 import voteMeta from '../netlify/edge-functions/vote-meta.js';
@@ -83,7 +83,7 @@ await t('edge: no ?match= is not touched', async () => assert.ok((await run({ qu
 await t('edge: a bot gets the match tags and image link', async () => {
     const r = await run();
     assert.ok(r.text.includes('Jinx &amp; Ekko Edit'));
-    assert.ok(r.text.includes('https://anthemarena.com/og/match.png?match=jinx-cup-1-group-C-match-1'));
+    assert.ok(r.text.includes(`https://anthemarena.com/og/match.png?match=jinx-cup-1-group-C-match-1&amp;v=${IMAGE_VERSION}`) || r.text.includes(`https://anthemarena.com/og/match.png?match=jinx-cup-1-group-C-match-1&v=${IMAGE_VERSION}`));
     assert.ok(!r.headers.get('content-length'));
 });
 await t('edge: unknown match / list error / non-html => plain page', async () => {
