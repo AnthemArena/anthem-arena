@@ -518,3 +518,12 @@ Ally/rival toasts and bell rows now show the match's two edit thumbnails as `[ed
 ## Champion avatar urls repaired (`js/avatar-url.js`)
 
 Some saved avatars point at `…/champion/Lee Sin.png` (display name, with a space). Data Dragon's file is `LeeSin.png`, so the picture 404ed and the site fell back to the 🎵 tile. `fixAvatarUrl` repairs these where avatars are drawn (nav, feed, widgets, profile, settings preview, notifications) and the nav rewrites the repaired url into `localStorage`. Other urls are returned unchanged.
+
+## Taste match on profiles (`js/taste-match.js`)
+
+On another person's profile, a card under the header reads "You and X agree on N of M matches" with a bar, a label (Kindred spirits 80%+, Similar taste 60%+, Mixed opinions 40%+, Natural rivals below; "Just getting started" under 3 shared matches) and two tabs: matches you voted differently in (default) and matches with the same pick, each linking to the match.
+
+- Compares the matches both people voted in (`compareVotes`, pure and tested in `tools/test-taste-match.mjs`).
+- Uses the shared, cached `fetchUserVotes` in `profile-page.js`: the profile's votes are already loaded, so the only extra read is your own vote list, once per page load.
+- Hidden on your own profile, when you have no votes, and when you have no matches in common. Any failure just leaves the card hidden.
+- Votes are publicly readable and the profile already lists them, so nothing new is exposed. The feed tag ("agrees with you" on vote posts) is not built yet.
