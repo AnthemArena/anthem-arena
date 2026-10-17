@@ -33,6 +33,10 @@ export async function followUser(targetUserId, targetUsername) {
     }
     
     try {
+        // Do they already follow me? Then this follow is a "follow back" and the notification says so.
+        let followsMe = false;
+        try { followsMe = (await getDoc(doc(db, 'follows', `${targetUserId}_${currentUserId}`))).exists(); } catch (e) { /* plain follow */ }
+
         // Create follow relationship (using composite key for easy lookup)
         const followId = `${currentUserId}_${targetUserId}`;
         
@@ -50,7 +54,7 @@ export async function followUser(targetUserId, targetUsername) {
         const { saveNotification } = await import('./notification-storage.js');
         await saveNotification(targetUserId, {
     type: 'new-follower',
-    message: `${currentUsername} started following you`,
+    message: followsMe ? `${currentUsername} followed you back` : `${currentUsername} started following you`,
     triggerUserId: currentUserId,
     triggerUsername: currentUsername,
     targetUrl: `/profile.html?user=${currentUsername}`,

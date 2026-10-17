@@ -208,13 +208,13 @@ export function followRowHtml(n, { headline, quip, timeAgo, championPack, theirS
 }
 
 // The pop-up version: their face large, name + action, Jinx's line, and the button bar.
-export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta }) {
+export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headline }) {
     const name = n.triggerUsername || n.username || 'Someone';
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         <div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
-        ${toastHeadlineHtml(`${name} followed you`, null, name, accent, { avatar: false })}
+        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}
         ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
     </div>
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;

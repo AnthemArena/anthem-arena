@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS } from '../js/notification-model.js';
+import { pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -20,6 +20,13 @@ t('Social tab: follows (new-follower), likes, comments, mentions, replies and al
     for (const type of ['achievement', 'live-activity', 'causal-event']) assert.ok(!isSocialTabItem({ type }), type);
     assert.ok(!isSocialTabItem(null));
 });
+t('follow back: message detected, headline says "followed you back", own quip pool', () => {
+    const fb = { id: 'x1', triggerUsername: 'Kai', message: 'Kai followed you back' };
+    assert.ok(isFollowBack(fb)); assert.ok(!isFollowBack({ message: 'Kai started following you' })); assert.ok(!isFollowBack(null));
+    assert.equal(followHeadline(fb), 'Kai followed you back');
+    assert.ok(FOLLOW_BACK_QUIPS.includes(followQuip(fb))); assert.ok(!FOLLOW_QUIPS.includes(followQuip(fb)));
+});
+
 t('follow notifications: type check, headline, stable quip', () => {
     assert.ok(isFollowNotification({ type: 'new-follower' })); assert.ok(isFollowNotification({ type: 'follow' })); assert.ok(!isFollowNotification({ type: 'like' }));
     assert.equal(followHeadline({ triggerUsername: 'Kai' }), 'Kai followed you'); assert.equal(followHeadline({}), 'Someone followed you');
