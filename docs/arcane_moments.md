@@ -607,3 +607,6 @@ To bring them back, set the flag to `true`. A possible future use mentioned: one
 ## Bell card squashed + double posting (fix)
 - **Bell card tall/truncated:** the bell rows used bare class names (`comment`, `follow`, `content`) that `feed.css` also styles (`.comment{display:flex…}`), so on the feed page the card was squashed. Rows now use prefixed classes only (`nv-follow-row`, `nv-content-row nv-kind-<type>`). Test guards against bare names.
 - **Deleted post "came back":** the Post button had its click handler registered twice, so one click created two identical posts; deleting one left the other. Removed the duplicate handler and added an in-flight guard (`postingNow`, reset in `finally`). Existing duplicates must be deleted one by one.
+
+## Tooltip votes still 0 for another account (fix)
+Tooltips for other people read their saved profile. The refresh of our own profile only ran when the user list was freshly loaded, so a cached list skipped it and the profile stayed at 0 votes. The feed now calls `publishOwnProfileStats()` on every load; it syncs only when votes/XP changed since last published (`profileStatsPublished` in localStorage) and clears the mention cache afterwards.

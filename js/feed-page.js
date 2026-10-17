@@ -111,6 +111,21 @@ async function getYouTubeMetadata(videoId) {
 let allUsers = [];
 let lastUserLoad = 0;
 let ownProfileRefreshed = false;
+
+// Other people's tooltips read OUR saved profile, so make sure it matches this browser. Runs on every feed load
+// (the user list can come from a saved copy, which skips the check inside loadAllUsers); one read + one write, and
+// only when the vote count or XP changed since the last time it was saved from this browser.
+function publishOwnProfileStats() {
+    try {
+        const key = `${localVoteCount()}|${getUserXPFromStorage()}`;
+        if (localStorage.getItem('profileStatsPublished') === key) return;
+        import('./rank-system.js').then(async m => {
+            await m.syncProfileStatsToFirestore();
+            try { localStorage.setItem('profileStatsPublished', key); } catch { /* ignore */ }
+            lastUserLoad = 0; try { localStorage.removeItem('mentionUsersCache'); } catch { /* ignore */ }
+        }).catch(() => {});
+    } catch { /* never block the feed */ }
+}
 const USER_CACHE_DURATION = 300000; // 5 minutes
 
 async function loadAllUsers(forceRefresh = false) {
@@ -497,6 +512,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
          // ✅ Load users for mentions
     await loadAllUsers();
+    publishOwnProfileStats();
 
           // ✅ Load music videos data
     await loadMusicVideos();
