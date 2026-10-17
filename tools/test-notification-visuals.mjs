@@ -90,4 +90,17 @@ t('content row and toast: faces, headline, quote escaped, one button that opens 
     const toast = contentToastHtml(n, { parts, quote: 'Great <i>edit</i>', icon: '❤️', cta: 'View post', accent: '#ff69b4', srcs: [null, null, null], names: ['Kai', 'Rex', 'Mia'] });
     assert.ok(toast.includes('handleBulletinCTA') && toast.includes('3 people') && toast.includes('liked your post') && toast.includes('Great &lt;i&gt;edit&lt;/i&gt;') && toast.includes('View post'));
 });
+t('rows never use bare class names the feed stylesheet styles (a "comment" class turned the bell row into a flex row)', () => {
+    const tokens = html => new Set([...html.matchAll(/class="([^"]*)"/g)].flatMap(m => m[1].split(/\s+/)));
+    const bad = ['comment', 'like', 'reply', 'mention', 'content', 'follow', 'emote-received'];
+    const n = { id: 'a', ids: ['a'], triggerUsername: 'Kai', targetUrl: '/feed.html#post-1' };
+    const parts = { who: 'Kai', action: 'x', headline: 'Kai x', names: '' };
+    for (const type of ['like', 'comment', 'reply', 'mention', 'emote-received']) {
+        const row = tokens(contentRowHtml({ ...n, type }, { parts, quote: 'q', icon: '💬', cta: 'View', timeAgo: '', championPack: null, srcs: [null], names: ['Kai'] }));
+        for (const b of bad) assert.ok(!row.has(b), `${type} row has bare class "${b}"`);
+        assert.ok(row.has('nv-row') && row.has(`nv-kind-${type}`));
+    }
+    const follow = tokens(followRowHtml(n, { headline: 'h', quip: '', timeAgo: '', championPack: null }));
+    for (const b of bad) assert.ok(!follow.has(b), `follow row has bare class "${b}"`);
+});
 console.log(`${pass} passed`);

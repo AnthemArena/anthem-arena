@@ -243,6 +243,14 @@ cta: voiced?.cta || 'View Progress',
 // ✅ SYNC PROFILE STATS TO FIRESTORE
 // ========================================
 
+// How many votes this browser knows about: the larger of the saved "stats" number and the saved votes themselves.
+export function localVoteCount(storage = globalThis.localStorage) {
+    let fromStats = 0, fromVotes = 0;
+    try { fromStats = Number((JSON.parse(storage.getItem('stats') || 'null') || {}).votes) || 0; } catch { /* no stats */ }
+    try { fromVotes = Object.keys(JSON.parse(storage.getItem('userVotes') || '{}')).length; } catch { /* no saved votes */ }
+    return Math.max(fromStats, fromVotes);
+}
+
 export async function syncProfileStatsToFirestore() {
     try {
         const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
@@ -255,16 +263,8 @@ export async function syncProfileStatsToFirestore() {
         const totalXP = getUserXPFromStorage();
         const rank = getUserRank(totalXP);
         
-        // Get vote count from stats
-        const statsJson = localStorage.getItem('stats');
-        let voteCount = 0;
-        
-        try {
-            const stats = JSON.parse(statsJson);
-            voteCount = stats.votes || 0;
-        } catch {
-            console.warn('⚠️ No stats found in localStorage');
-        }
+        // Vote count: the saved "stats" object can lag (it left other people's tooltips at 0 votes), so also count saved votes
+        const voteCount = localVoteCount();
         
         const { db } = await import('./firebase-config.js');
         const { doc, updateDoc, setDoc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
