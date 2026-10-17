@@ -1,4 +1,4 @@
-import { mixFeed, digestSummary, rankTrending, RUN_MIN } from '../js/feed-mix-model.js';
+import { mixFeed, digestSummary, rankTrending, findPostById, RUN_MIN } from '../js/feed-mix-model.js';
 let pass = 0, fail = 0;
 const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
 const vote = (i, u = 'u' + i) => ({ type: 'vote', postId: 'v' + i, username: u, timestamp: 1000 - i });
@@ -29,4 +29,10 @@ r = rankTrending({ posts: [tp('a', 1, 0, 1), tp('b', 0, 2, 2), tp('c', 5, 0, 8),
 t('trending: window, engagement, score order (comment = 2 likes)', r.map(x => x.postId).join() === 'b,e,a');
 t('trending: ties go to the newer', rankTrending({ posts: [tp('x', 2, 0, 3), tp('y', 2, 0, 1)], now: NOW }).map(x => x.postId).join() === 'y,x');
 t('trending: includes vote posts', r.some(x => x.type === 'vote'));
+{
+    const posts = mixFeed({ votes: [1, 2, 3, 4, 5].map(i => ({ ...vote(i), userId: 'voter' + i })), posts: [post(1, 5000)] });
+    t('findPostById finds a top-level post', findPostById(posts, 'p1')?.postId === 'p1');
+    t('findPostById finds a vote inside a digest (its owner is the voter)', findPostById(posts, 'v3')?.userId === 'voter3');
+    t('findPostById: unknown id and empty list give null', findPostById(posts, 'nope') === null && findPostById(null, 'x') === null);
+}
 console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);
