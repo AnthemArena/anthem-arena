@@ -4,6 +4,7 @@ import { db } from './firebase-config.js';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, deleteDoc,     writeBatch  // ✅ Add this if missing
  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { pickUnshown } from './notification-model.js';
+import { EMOTES_ENABLED } from './features.js';
 
 // ========================================
 // FIRESTORE COLLECTION: user-notifications
@@ -126,7 +127,8 @@ export async function getUnreadNotifications(userId, maxAgeHours = 72) {  // ✅
         });
         
         console.log(`📬 Found ${notifications.length} notifications from last ${maxAgeHours}h for ${userId}`);
-        return notifications;
+        // Emotes are switched off (js/features.js): ones already received are hidden, not deleted
+        return EMOTES_ENABLED ? notifications : notifications.filter(n => n.type !== 'emote-received');
         
     } catch (error) {
         console.error('❌ Error getting notifications:', error);

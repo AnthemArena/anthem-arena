@@ -7,6 +7,7 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
+import { withoutEmoteCta } from './features.js';
 import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
 import { socialRowHtml, followRowHtml, contentRowHtml, avatarSrc, fallbackAvatarFor } from './notification-visuals.js';
@@ -584,6 +585,7 @@ function closePanel() {
 let followingNow = new Set();          // who the viewer follows right now (the bell shows "View profile" instead of "Follow back")
 
 function renderNotificationItem(notification) {
+    notification = withoutEmoteCta(notification);      // emotes are off: a thanks / challenge button becomes "View match"
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
     
