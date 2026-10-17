@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { avatarSrc, viewerAvatarSrc, championBadgeUrl, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, pickThumbs, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -17,11 +17,27 @@ t('viewer avatar comes from storage', () => {
     const st = { getItem: k => (k === 'avatar' ? JSON.stringify({ type: 'url', value: 'https://x/me.png' }) : null) };
     assert.equal(viewerAvatarSrc(st), 'https://x/me.png'); assert.equal(viewerAvatarSrc({ getItem: () => null }), null);
 });
-t('champion badge: skin tile for a champion pack, icon otherwise', () => {
-    assert.equal(championBadgeUrl({ icon: 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png', portrait: { skin: 37 } }), 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Jinx_37.jpg');
-    assert.equal(championBadgeUrl({ icon: 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Vi.png' }), 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Vi_0.jpg');
-    assert.equal(championBadgeUrl({ icon: 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png' }), 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png');
+t('champion badge is the pack icon', () => {
+    assert.equal(championBadgeUrl({ icon: 'https://x/Jinx.png', portrait: { skin: 37 } }), 'https://x/Jinx.png');
     assert.equal(championBadgeUrl(null), null);
+});
+t('fallback avatar is stable per name and always an Arcane champion icon', () => {
+    assert.equal(fallbackAvatarFor('FierceWatcher229'), fallbackAvatarFor('FierceWatcher229'));
+    assert.match(fallbackAvatarFor('Kai'), /img\/champion\/(Vi|Caitlyn|Ekko|Jayce|Viktor|Heimerdinger|Jinx)\.png$/);
+    assert.match(fallbackAvatarFor(undefined), /champion\//);
+    const seen = new Set(['a', 'bb', 'Kai', 'Mia', 'Zed', 'Rook', 'Nova', 'Vex', 'Lux2'].map(fallbackAvatarFor)); assert.ok(seen.size >= 3);
+});
+t('edit pictures: rival sees the other edit, ally the same one', () => {
+    const m = { song1: { videoId: 'AAA' }, song2: { id: 'BBB' } };
+    assert.deepEqual(pickThumbs(m, 'song1', 'opponent'), { yourThumb: 'https://img.youtube.com/vi/AAA/mqdefault.jpg', theirThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg' });
+    assert.deepEqual(pickThumbs(m, 'song2', 'ally'), { yourThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg', theirThumb: 'https://img.youtube.com/vi/BBB/mqdefault.jpg' });
+    assert.deepEqual(pickThumbs(m, undefined, 'ally'), { yourThumb: null, theirThumb: null });
+    assert.deepEqual(pickThumbs(null, 'song1', 'ally'), { yourThumb: null, theirThumb: null });
+});
+t('a badge picture sits on the avatar', () => {
+    const h = circleHtml('https://x/a.png', 'Kai', 40, { badge: 'https://x/thumb.jpg' });
+    assert.ok(h.includes('nv-badge') && h.includes('https://x/thumb.jpg'));
+    assert.ok(!circleHtml('https://x/a.png', 'Kai', 40).includes('nv-badge'));
 });
 t('accent and marker', () => { assert.equal(accentFor('ally', { color: '#fff' }), '#4ade80'); assert.equal(accentFor('opponent', { color: '#e91e63' }), '#e91e63'); assert.equal(accentFor('opponent', null), '#ff69b4'); assert.equal(markFor('ally'), '='); assert.equal(markFor('opponent'), 'VS'); });
 t('names and text are escaped', () => {

@@ -10,6 +10,7 @@ import { sendMessage } from './message-system.js';
 import { groupNotifications, groupHeadline, socialHeadline } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
 import { socialRowHtml } from './notification-visuals.js';
+import { enrichSocial } from './notification-social-context.js';
 
 // ✅ GUARD: Prevent duplicate initialization
 let isInitialized = false;
@@ -356,6 +357,7 @@ async function loadNotificationsTab(content, userId, tab) {
     // ✅ NEW: Group notifications by user + event type
     const followingIds = await getFollowingIds(localStorage.getItem('tournamentUserId'));
     const grouped = groupNotifications(filtered, followingIds);
+    await enrichSocial(grouped);        // voter avatars + the two edits' pictures for ally/rival rows
     
     content.innerHTML = grouped.map(notification => {
         return renderNotificationItem(notification);
