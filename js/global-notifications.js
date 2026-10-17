@@ -6,7 +6,7 @@ import './champion-loader.js';
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialHeadline, isFollowNotification, followQuip } from './notification-model.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip } from './notification-model.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
@@ -2721,6 +2721,7 @@ else {
             jinxSrc: championBadgeUrl(pack),
             accent,
             quip: followQuip(notification),
+            headline: followHeadline(notification),
             cta: notification.ctaText || 'Follow back'
         });
         banner.className = 'bulletin-banner versus-toast opponent';
@@ -3971,6 +3972,37 @@ setTimeout(() => {
 // reads per page load. Rows are marked shown right away; the newest fresh one pops up (if the pop-up setting allows it).
 // ========================================
 let followListener = null;
+const followSeen = new Set();       // notification ids this page has already taken in
+let followPending = [];             // new follows waiting for the tab to be visible
+
+// Shows the newest fresh follow as a toast. Nothing is marked "shown" until this runs with a visible tab, so a follow that
+// arrives while the window is in the background still pops up when the person comes back to it.
+async function flushFollowToasts(userId) {
+    if (!followPending.length) return;
+    if (document.hidden) { console.log(`👤 ${followPending.length} new follower(s) waiting - tab hidden, toast will show when you return`); return; }
+    const batch = followPending; followPending = [];
+    batch.forEach(n => markNotificationShown(n.id));
+    const now = Date.now();
+    const fresh = batch.filter(n => n.timestamp > now - 2 * 60 * 60 * 1000 && (!n.expiresAt || n.expiresAt > now)).sort((a, b) => b.timestamp - a.timestamp);
+    if (!fresh.length) { console.log('👤 New follower(s) are older than 2 hours - bell only'); return; }
+    const n = fresh[0];
+    const following = await getFollowingIds(userId).catch(() => new Set());
+    const already = following.has(n.triggerUserId) || isFollowBack(n);
+    if (!shouldToastSocial(readNotificationPrefs(), following.has(n.triggerUserId))) { console.log('👤 New follower toast skipped - Pop-up alerts setting'); return; }
+    const nv = await socialContextFor(n);
+    showBulletin({
+        nv, id: n.id, priority: 6, type: 'new-follower', message: n.message, detail: '', icon: n.icon,
+        triggerUserId: n.triggerUserId, triggerUsername: n.triggerUsername, username: n.triggerUsername,
+        thumbnailUrl: n.thumbnailUrl,
+        targetUrl: n.targetUrl || `/profile.html?user=${encodeURIComponent(n.triggerUsername || '')}`,
+        action: 'navigate',
+        ctaText: already ? 'View profile' : 'Follow back',
+        ctaAction: already ? 'navigate' : 'follow-back'
+    });
+}
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) flushFollowToasts(localStorage.getItem('tournamentUserId'));
+});
 
 async function setupFollowListener() {
     const userId = localStorage.getItem('tournamentUserId');
@@ -3984,28 +4016,15 @@ async function setupFollowListener() {
             where('shownAsToast', '==', false),
             limit(10)
         );
-        followListener = onSnapshot(q, async (snapshot) => {
-            const added = snapshot.docChanges().filter(c => c.type === 'added').map(c => ({ id: c.doc.id, ...c.doc.data() }));
-            if (!added.length) return;
-            added.forEach(n => markNotificationShown(n.id));
-            const now = Date.now();
-            const fresh = added.filter(n => n.timestamp > now - 2 * 60 * 60 * 1000 && (!n.expiresAt || n.expiresAt > now)).sort((a, b) => b.timestamp - a.timestamp);
-            if (!fresh.length || document.hidden) return;        // old ones just wait in the bell
-            const n = fresh[0];
-            const following = await getFollowingIds(userId).catch(() => new Set());
-            if (!shouldToastSocial(readNotificationPrefs(), following.has(n.triggerUserId))) return;
-            const nv = await socialContextFor(n);
-            const already = following.has(n.triggerUserId);
-            showBulletin({
-                nv, id: n.id, priority: 6, type: 'new-follower',
-                triggerUserId: n.triggerUserId, triggerUsername: n.triggerUsername, username: n.triggerUsername,
-                thumbnailUrl: n.thumbnailUrl, message: n.message, detail: '', icon: n.icon,
-                targetUrl: n.targetUrl || `/profile.html?user=${encodeURIComponent(n.triggerUsername || '')}`,
-                action: 'navigate',
-                ctaText: already ? 'View profile' : 'Follow back',
-                ctaAction: already ? 'navigate' : 'follow-back'
+        followListener = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().filter(c => c.type === 'added').forEach(c => {
+                if (followSeen.has(c.doc.id)) return;
+                followSeen.add(c.doc.id);
+                followPending.push({ id: c.doc.id, ...c.doc.data() });
             });
+            flushFollowToasts(userId);
         }, (error) => console.error('❌ Follower listener error:', error));
+        console.log('👂 New-follower listener active');
     } catch (error) {
         console.error('❌ Failed to setup follower listener:', error);
     }

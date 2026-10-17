@@ -56,10 +56,17 @@ export const FOLLOW_QUIPS = [
     'Looks like you made an impression.'
 ];
 // Stable per notification (same row always shows the same line), spread by a simple hash of the id/username.
-export function followQuip(n, quips = FOLLOW_QUIPS) {
+export function followQuip(n, quips = isFollowBack(n) ? FOLLOW_BACK_QUIPS : FOLLOW_QUIPS) {
     const key = String(n?.id || n?.triggerUserId || n?.triggerUsername || '');
     let h = 0;
     for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
     return quips[h % quips.length];
 }
-export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed you`;
+// A follow that reciprocates one of yours is saved with the message "<name> followed you back" (see follow-system.js).
+export const isFollowBack = n => /followed you back/i.test(n?.message || '');
+export const FOLLOW_BACK_QUIPS = [
+    "It's mutual. Now we're talking!",
+    'Two of you now. Double the chaos!',
+    'They followed you back. Go cause some trouble together!'
+];
+export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed you${isFollowBack(n) ? ' back' : ''}`;
