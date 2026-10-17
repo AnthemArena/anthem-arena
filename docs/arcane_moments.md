@@ -548,3 +548,7 @@ Rows show the two edit thumbnails and titles in aligned columns with a VS betwee
 ### Edit thumbnails: one shared lookup (`js/song-thumb.js`)
 
 Match song objects don't reliably carry the YouTube id under `videoId`. `songThumb(song, lookup?)` tries `videoId`, then `id` (only a real 11-character YouTube id counts), then the music list (id/seed → video, profile page only), then a ready-made `thumbnail` url. Used by the taste-match rows and the notification VS pair.
+
+### Settings: notification section fixes
+
+The Match alerts switch was missing the `toggle-input` class, so the browser's native checkbox showed beside the switch and the switch's on/off look didn't follow it. It now uses the same markup as the other switches. The Notifications section also got the same heading style, a one-line description ("saved on this browser") and emoji labels like the Privacy section.
