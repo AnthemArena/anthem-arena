@@ -115,6 +115,21 @@
                 </div>
             </section>
             
+            <!-- Taste match (other people's profiles only; filled in by profile-page.js) -->
+            <section class="taste-match" id="tasteMatch" hidden>
+                <div class="taste-head">
+                    <div class="taste-title" id="tasteTitle"></div>
+                    <div class="taste-label" id="tasteLabel"></div>
+                </div>
+                <div class="taste-bar" id="tasteBar" role="img"><span class="taste-bar-agree" id="tasteBarAgree"></span></div>
+                <div class="taste-counts" id="tasteCounts"></div>
+                <div class="taste-tabs" id="tasteTabs">
+                    <button type="button" class="taste-tab active" data-which="disagree"></button>
+                    <button type="button" class="taste-tab" data-which="agree"></button>
+                </div>
+                <ul class="taste-list" id="tasteList"></ul>
+            </section>
+
             <!-- Stats Grid (4 cards) -->
             <section class="profile-stats-grid">
                 

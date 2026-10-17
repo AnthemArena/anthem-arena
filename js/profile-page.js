@@ -22,6 +22,7 @@ import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
 
 import { fixAvatarUrl } from './avatar-url.js';
+import { compareVotes, pickTitle } from './taste-match.js';
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
 // ========================================
@@ -206,6 +207,7 @@ async function loadProfile(username) {
 
         // Owner-only voting style + share image, then honour #votes etc.
         await loadOwnerInsights(profile.userId);
+        loadTasteMatch(profile);          // not awaited: appears once both vote lists are in
         loadCupHistory(profile.userId);   // not awaited: the history fills in when it is ready
         openTabFromHash();
         
@@ -2176,6 +2178,48 @@ function renderPostCard(post) {
     `;
 }
 
+
+// ========================================
+// TASTE MATCH ("You and X agree on N of M matches")
+// Both vote lists come from the shared, cached fetchUserVotes (votes are public, and this profile already shows them), so the
+// only extra read is your own vote list, once per page load.
+// ========================================
+
+async function loadTasteMatch(profile) {
+    try {
+        const section = document.getElementById('tasteMatch');
+        const me = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        if (!section || !profile?.userId || !me || me === 'anonymous' || me === profile.userId || isOwnProfile) return;
+
+        const [{ votes: mine }, { votes: theirs }] = await Promise.all([fetchUserVotes(me), fetchUserVotes(profile.userId)]);
+        const r = compareVotes(mine, theirs);
+        if (!r.shared) return;
+
+        const name = escapeHtml(profile.username || 'them');
+        document.getElementById('tasteTitle').innerHTML = `You and <strong>${name}</strong> agree on <strong>${r.agreeCount} of ${r.shared}</strong> match${r.shared === 1 ? '' : 'es'}`;
+        document.getElementById('tasteLabel').textContent = r.label ? `${r.label} · ${r.pct}%` : '';
+        document.getElementById('tasteBar').setAttribute('aria-label', `${r.pct}% agreement`);
+        document.getElementById('tasteBarAgree').style.width = `${r.pct}%`;
+        document.getElementById('tasteCounts').innerHTML = `<span class="taste-agree">${r.agreeCount} same pick${r.agreeCount === 1 ? '' : 's'}</span><span class="taste-disagree">${r.disagreeCount} voted differently</span>`;
+
+        const tabs = section.querySelectorAll('.taste-tab');
+        tabs[0].textContent = `Voted differently (${r.disagreeCount})`;
+        tabs[1].textContent = `Same pick (${r.agreeCount})`;
+        const draw = which => {
+            const rows = (which === 'agree' ? r.agree : r.disagree).slice(0, 8);
+            document.getElementById('tasteList').innerHTML = rows.length ? rows.map(row => which === 'agree'
+                ? `<li><a href="/vote.html?id=${encodeURIComponent(row.matchId)}"><span class="taste-pick both">${escapeHtml(pickTitle(row, 'yours'))}</span></a></li>`
+                : `<li><a href="/vote.html?id=${encodeURIComponent(row.matchId)}"><span class="taste-pick you"><em>You</em> ${escapeHtml(pickTitle(row, 'yours'))}</span><span class="taste-pick them"><em>${name}</em> ${escapeHtml(pickTitle(row, 'theirs'))}</span></a></li>`).join('')
+                : '<li class="taste-empty">Nothing here yet.</li>';
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.which === which));
+        };
+        tabs.forEach(t => t.addEventListener('click', () => draw(t.dataset.which)));
+        draw(r.disagreeCount ? 'disagree' : 'agree');
+        section.hidden = false;
+    } catch (error) {
+        console.warn('Taste match unavailable:', error);   // optional extra: never breaks the profile
+    }
+}
 
 // ========================================
 // SHARED VOTE LOOKUP
