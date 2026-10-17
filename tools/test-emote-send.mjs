@@ -25,6 +25,16 @@ await t('missing match details no longer make Firestore reject it', async () => 
     assert.equal(sent().length, 3);
     for (const r of sent()) assert.ok(!Object.values(r).includes(undefined));
 });
+await t('the receiver also gets a bell note (already shown as a toast), with only fields the rules allow', async () => {
+    await sendEmoteReaction('Mia', 'uidB', 'rivalry', { matchId: 'm1', matchTitle: 'A vs B' });
+    const notes = [...store.entries()].filter(([k]) => k.startsWith('user-notifications/')).map(([, v]) => v);
+    assert.equal(notes.length, 1);
+    const n = notes[0];
+    assert.equal(n.userId, 'uidB'); assert.equal(n.type, 'emote-received'); assert.equal(n.eventType, 'rivalry'); assert.equal(n.triggerUserId, 'uidA');
+    assert.equal(n.shownAsToast, true); assert.equal(n.read, false); assert.equal(n.targetUrl, '/vote.html?match=m1'); assert.ok(n.message.length <= 500);
+    const allowed = ['userId', 'type', 'priority', 'message', 'detail', 'icon', 'matchId', 'matchTitle', 'triggerUsername', 'triggerUserId', 'eventType', 'relationship', 'ctaText', 'ctaAction', 'ctaData', 'targetUrl', 'timestamp', 'read', 'dismissed', 'shownAsToast', 'expiresAt'];
+    for (const k of Object.keys(n)) assert.ok(allowed.includes(k), k);
+});
 await t('only fields the security rules allow are sent', async () => {
     await sendEmoteReaction('Mia', 'uidB', 'thanks', { matchId: 'm1', matchTitle: 't', songTitle: 's', extra: 'x' });
     const allowed = ['fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'type', 'matchId', 'matchTitle', 'songTitle', 'message', 'timestamp', 'seen'];

@@ -57,7 +57,20 @@ export async function sendEmoteReaction(targetUsername, targetUserId, type, matc
         
         const docRef = await addDoc(collection(db, 'user-reactions'), reactionData);
         console.log(`✅ Emote sent to ${targetUsername}:`, type, message);
-        
+
+        // Also leave a note in their bell (already "shown": the live emote listener pops the toast), so it is not lost
+        try {
+            const { saveNotification } = await import('./notification-storage.js');
+            await saveNotification(targetUserId, {
+                type: 'emote-received', eventType: reactionData.type, priority: 8,
+                message: `${currentUsername} sent you ${reactionData.type}`, detail: reactionData.message,
+                matchId: reactionData.matchId, matchTitle: reactionData.matchTitle,
+                triggerUsername: reactionData.fromUsername, triggerUserId: currentUserId,
+                targetUrl: reactionData.matchId ? `/vote.html?match=${encodeURIComponent(reactionData.matchId)}` : null,
+                ctaText: 'View match', shownAsToast: true
+            });
+        } catch (e) { console.warn('Emote bell note not saved:', e); }
+
         return true;
     } catch (error) {
         console.error('❌ Error sending emote:', error);

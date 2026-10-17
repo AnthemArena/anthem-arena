@@ -3935,28 +3935,21 @@ async function setupRealtimeEmoteListener() {
                     
                     const icon = emoteIcons[reaction.type] || '✨';
                     
-                    showBulletin({
-                        priority: 8,
-                        type: 'emote-received',
-                        reactionId: reaction.id,
-                        matchId: reaction.matchId,
-                        matchTitle: reaction.matchTitle,
-                        fromUsername: reaction.fromUsername,
-                        triggerUserId: reaction.fromUserId,
-                        triggerUsername: reaction.fromUsername,
-                        emoteType: reaction.type,
-                        icon: icon,
-                        message: `${icon} ${reaction.fromUsername} sent you ${reaction.type}!`,
-                        detail: `"${reaction.message}" • ${reaction.matchTitle}`,
-                        cta: 'View Match',
-                        ctaAction: 'navigate',
-                        targetUrl: `/vote.html?match=${reaction.matchId}`,
-                        secondaryCta: {
-                            text: `View ${reaction.fromUsername}'s Profile`,
-                            action: 'navigate',
-                            url: `/profile?user=${reaction.fromUsername}`
-                        }
-                    });
+                    // Same card as the other social alerts (face, "challenged you", their message, View match)
+                    const g = {
+                        id: reaction.id, ids: [reaction.id], type: 'emote-received', eventType: reaction.type, count: 1,
+                        users: [reaction.fromUsername], userIds: [reaction.fromUserId], avatars: [null],
+                        triggerUserId: reaction.fromUserId, triggerUsername: reaction.fromUsername,
+                        detail: reaction.message, matchId: reaction.matchId, matchTitle: reaction.matchTitle,
+                        targetUrl: reaction.matchId ? `/vote.html?match=${encodeURIComponent(reaction.matchId)}` : '/'
+                    };
+                    socialContextFor(g).then(nv => showBulletin({
+                        nv, contentGroup: g, id: reaction.id, priority: 8, type: 'emote-received',
+                        matchId: reaction.matchId, matchTitle: reaction.matchTitle,
+                        triggerUserId: reaction.fromUserId, triggerUsername: reaction.fromUsername, username: reaction.fromUsername,
+                        emoteType: reaction.type, icon, message: `${icon} ${reaction.fromUsername} sent you ${reaction.type}!`, detail: reaction.message,
+                        action: 'navigate', ctaText: 'View match', ctaAction: 'navigate', targetUrl: g.targetUrl
+                    }));
                     
                     // ✅ Mark as seen
                     markReactionSeen(reaction.id);
@@ -4092,7 +4085,7 @@ function setupContentListeners() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') return;
     contentListeners.forEach(unsub => unsub());
-    contentListeners = CONTENT_TYPES.map(type => {
+    contentListeners = CONTENT_TYPES.filter(t => t !== 'emote-received').map(type => {
         const q = query(collection(db, 'user-notifications'), where('userId', '==', userId), where('type', '==', type), where('shownAsToast', '==', false), limit(10));
         return onSnapshot(q, (snapshot) => {
             snapshot.docChanges().filter(c => c.type === 'added').forEach(c => {

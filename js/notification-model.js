@@ -19,7 +19,7 @@ export function groupNotifications(list, followingIds = new Set()) {
         const content = isContentNotification(n);
         const stranger = isSocialNotification(n) && !followingIds.has(n.triggerUserId);
         // Likes / comments / replies / mentions group per POST and kind, whoever did them ("3 people liked your post").
-        const key = content ? `c|${n.type}|${n.targetUrl || n.matchId || ''}`
+        const key = content ? `c|${n.type}|${n.eventType || ''}|${n.targetUrl || n.matchId || ''}`
             : stranger ? `m|${n.matchId}|${n.relationship}` : `u|${n.triggerUserId || 'system'}|${n.relationship || n.type}`;
         const entry = { matchId: n.matchId, matchTitle: n.matchTitle, detail: n.detail };
         const g = groups.get(key);
@@ -51,7 +51,7 @@ export function groupHeadline(g) {
 
 // ---- Social tab and follow notifications ----
 // Types shown under the bell's Social tab. Follows are saved as 'new-follower' (older code looked for 'follow', so they never matched).
-export const SOCIAL_TAB_TYPES = ['like', 'comment', 'new-follower', 'follow', 'mention', 'reply'];
+export const SOCIAL_TAB_TYPES = ['like', 'comment', 'new-follower', 'follow', 'mention', 'reply', 'emote-received'];
 export const isFollowNotification = n => n?.type === 'new-follower' || n?.type === 'follow';
 export const isSocialTabItem = n => !!n && (SOCIAL_TAB_TYPES.includes(n.type) || isSocialNotification(n));
 
@@ -79,12 +79,14 @@ export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed 
 
 
 // ---- Likes, comments, replies and mentions (the "content" notifications) ----
-export const CONTENT_TYPES = ['like', 'comment', 'reply', 'mention'];
+export const CONTENT_TYPES = ['like', 'comment', 'reply', 'mention', 'emote-received'];     // emote-received: a reaction someone sent you (eventType = thanks / props / rivalry / hype)
 export const isContentNotification = n => CONTENT_TYPES.includes(n?.type);
 const CONTENT_ICONS = { like: '❤️', comment: '💬', reply: '↩️', mention: '📢' };
-export const contentIcon = n => CONTENT_ICONS[n?.type] || '🔔';
+const EMOTE_ICONS = { thanks: '🤝', props: '👊', rivalry: '⚔️', hype: '🔥' };
+export const contentIcon = n => (n?.type === 'emote-received' ? (EMOTE_ICONS[n.eventType] || '✨') : CONTENT_ICONS[n?.type]) || '🔔';
+const EMOTE_ACTIONS = { thanks: 'sent you thanks', props: 'gave you props', rivalry: 'challenged you', hype: 'sent you hype' };
 // Most direct first: a reply to you beats a comment or mention, which beat a like. Used to pick the one toast to show.
-export const CONTENT_PRIORITY = { reply: 8, comment: 7, mention: 7, like: 6 };
+export const CONTENT_PRIORITY = { 'emote-received': 8, reply: 8, comment: 7, mention: 7, like: 6 };
 
 // Where a mention happened ("in a post / comment / reply"), read from the saved wording.
 export function mentionWhere(n) {
@@ -103,6 +105,7 @@ export function contentHeadline(g) {
     if (g?.type === 'like') action = 'liked your post';
     else if (g?.type === 'comment') action = people === 1 && count > 1 ? `commented ${count} times on your post` : 'commented on your post';
     else if (g?.type === 'reply') action = people === 1 && count > 1 ? `replied ${count} times to your comment` : 'replied to your comment';
+    else if (g?.type === 'emote-received') action = EMOTE_ACTIONS[g.eventType] || 'sent you a reaction';
     else if (g?.type === 'mention') action = people >= 3 ? 'mentioned you' : `mentioned you in a ${mentionWhere(g)}`;
     else action = 'sent you something';
     const names = people >= 3 ? users.slice(0, 3).join(', ') + (people > 3 ? ` +${people - 3} more` : '') : '';
@@ -117,4 +120,4 @@ export function contentQuote(g, max = 110) {
     return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
 }
 // One consistent wording whatever older notifications saved ("View Comment" vs "View comment").
-export const contentCta = g => g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');
+export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');

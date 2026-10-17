@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -49,6 +49,19 @@ t('content quote: strips quotes, trims, skips placeholders; button text; priorit
     const q = contentQuote({ detail: 'x'.repeat(300) }); assert.ok(q.length === 110 && q.endsWith('…'));
     assert.equal(contentCta({ type: 'like' }), 'View post'); assert.equal(contentCta({ type: 'comment', ctaText: 'View Comment' }), 'View comment'); assert.equal(contentCta({ type: 'mention', ctaText: 'View Reply' }), 'View reply'); assert.equal(contentCta({ type: 'mention' }), 'View post');
     assert.ok(CONTENT_PRIORITY.reply > CONTENT_PRIORITY.comment && CONTENT_PRIORITY.comment > CONTENT_PRIORITY.like);
+});
+
+t('emote notifications: grouped per match and kind, headline by emote type, icon, button, Social tab', () => {
+    const E = (id, who, ts, eventType) => ({ id, type: 'emote-received', eventType, triggerUsername: who, triggerUserId: who.toLowerCase(), targetUrl: '/vote.html?match=m1', detail: 'Game on! 🎮', timestamp: ts });
+    const g = groupNotifications([E('a', 'Kai', 1, 'rivalry'), E('b', 'Rex', 2, 'rivalry'), E('c', 'Kai', 3, 'props')]);
+    assert.equal(g.length, 2);
+    const riv = g.find(x => x.eventType === 'rivalry');
+    assert.equal(contentHeadline(riv).headline, 'Kai and Rex challenged you');
+    assert.equal(contentHeadline(g.find(x => x.eventType === 'props')).headline, 'Kai gave you props');
+    assert.equal(contentHeadline({ type: 'emote-received', eventType: 'thanks', users: ['Kai'] }).headline, 'Kai sent you thanks');
+    assert.equal(contentHeadline({ type: 'emote-received', eventType: 'hype', users: ['A', 'B', 'C'], count: 3 }).headline, '3 people sent you hype');
+    assert.equal(contentIcon(riv), '⚔️'); assert.equal(contentCta(riv), 'View match'); assert.equal(contentQuote(riv), 'Game on! 🎮');
+    assert.ok(isSocialTabItem({ type: 'emote-received' })); assert.ok(CONTENT_PRIORITY['emote-received'] >= CONTENT_PRIORITY.reply);
 });
 
 t('follow back: message detected, headline says "followed you back", own quip pool', () => {

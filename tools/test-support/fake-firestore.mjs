@@ -54,3 +54,4 @@ export const query = (col) => col;
 export const where = () => ({});
 export const orderBy = () => ({});
 export const limit = () => ({});
+export const deleteDoc = async ref => { store.delete(ref.path); };
