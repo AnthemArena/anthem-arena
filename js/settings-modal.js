@@ -7,6 +7,7 @@ import { readNotificationPrefs } from './notification-prefs.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+import { fixAvatarUrl } from './avatar-url.js';
 // Champion list (same as username-system.js)
 const CHAMPIONS = [
     'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Aphelios',
@@ -566,7 +567,7 @@ function updatePreviewCard(username, avatar, rank, xp) {
 
     // Update avatar
     if (avatar && avatar.type === 'url') {
-        previewAvatar.innerHTML = `<img src="${avatar.value}" alt="Avatar" class="preview-avatar-img" />`;
+        previewAvatar.innerHTML = `<img src="${fixAvatarUrl(avatar.value)}" alt="Avatar" class="preview-avatar-img" />`;
     } else {
         previewAvatar.textContent = avatar?.value || '🎵';
     }

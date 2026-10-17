@@ -514,3 +514,7 @@ Ally/rival toasts and bell rows now show the match's two edit thumbnails as `[ed
 - Activity check for ally/rival alerts: every 60 s (was 30), skipped while the tab is hidden (the return-to-tab check catches up), and after a failed read it waits 5 minutes before trying again.
 - Notification context lookups share one matches request per open bell; a failure is remembered for a minute instead of retried per row.
 - The @mention user list (whole `profiles` collection) is saved in `localStorage` (`mentionUsersCache`, about 10 minutes) so each page load doesn't re-read it.
+
+## Champion avatar urls repaired (`js/avatar-url.js`)
+
+Some saved avatars point at `…/champion/Lee Sin.png` (display name, with a space). Data Dragon's file is `LeeSin.png`, so the picture 404ed and the site fell back to the 🎵 tile. `fixAvatarUrl` repairs these where avatars are drawn (nav, feed, widgets, profile, settings preview, notifications) and the nav rewrites the repaired url into `localStorage`. Other urls are returned unchanged.
