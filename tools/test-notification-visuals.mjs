@@ -39,10 +39,10 @@ t('edits pair: picks ringed, other dimmed, avatars on the picked edits', () => {
     const m = { song1: { videoId: 'AAAAAAAAAAA' }, song2: { videoId: 'BBBBBBBBBBB' } };
     const rival = editsPairHtml({ edits: matchEdits(m, 'song1', 'opponent'), theirSrc: 'https://x/t.png', theirName: 'Kai', yourSrc: 'https://x/y.png', relationship: 'opponent', size: 40, accent: '#ff69b4' });
     assert.equal((rival.match(/nv-pick/g) || []).length, 2); assert.ok(!rival.includes('nv-dim')); assert.ok(rival.includes('VS'));
-    assert.ok(rival.indexOf('nv-who-left') > rival.indexOf('BBBBBBBBBBB') || rival.indexOf('nv-who-left') > rival.indexOf('mqdefault'));
+    assert.ok(!rival.includes('nv-who') && !rival.includes('nv-you>'));
     const ally = editsPairHtml({ edits: matchEdits(m, 'song2', 'ally'), theirSrc: null, theirName: 'Kai', yourSrc: null, relationship: 'ally', size: 40, accent: '#4ade80' });
     assert.equal((ally.match(/nv-pick/g) || []).length, 1); assert.equal((ally.match(/nv-dim/g) || []).length, 1);
-    assert.equal((ally.match(/nv-who-left/g) || []).length, 0); assert.equal((ally.match(/nv-who-right/g) || []).length, 1); assert.equal((ally.match(/nv-who-inset-right/g) || []).length, 1);
+    assert.ok(!ally.includes('YOU'));
 });
 t('a badge picture sits on the avatar', () => {
     const h = circleHtml('https://x/a.png', 'Kai', 40, { badge: 'https://x/thumb.jpg' });
