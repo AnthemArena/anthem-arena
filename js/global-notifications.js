@@ -6,6 +6,7 @@ import './champion-loader.js';
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
+import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
 import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY } from './notification-model.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
@@ -1359,7 +1360,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
     }
 
     // SINGLE, CORRECT RETURN
-    return {
+    return withoutEmoteCta({
         priority: 7,
         type: 'live-activity',
         matchId: activity.matchId,
@@ -1386,7 +1387,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
             action: 'navigate',
             url: `/profile?user=${activity.username}`
         }
-    };
+    });
 }
 
 // ========================================
@@ -1903,6 +1904,7 @@ async function checkForClosingMatches() {
 }
 
 function showBulletin(notification) {
+    notification = withoutEmoteCta(notification);      // emotes are off: a thanks / challenge button becomes "View match"
 
     // ✅ Final safety net
     if (!notification.matchId) {
@@ -3890,6 +3892,7 @@ document.addEventListener('visibilitychange', () => {
 let emoteListener = null;
 
 async function setupRealtimeEmoteListener() {
+    if (!EMOTES_ENABLED) { console.log('⏸️ Emotes are switched off (js/features.js)'); return; }
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId || userId === 'anonymous') {
         console.log('⏸️ Emote listener disabled - anonymous user');

@@ -576,5 +576,18 @@ Ally/rival toast: avatar and name on one line with "voted against you" underneat
 - **Wording helpers** (pure, tested in `tools/test-notification-model.mjs`): `contentHeadline`, `contentQuote`, `contentCta`, `mentionWhere` (post / comment / reply, read from the saved message).
 - **Live toast** (`setupContentListeners` in `js/global-notifications.js`): one equality-only `onSnapshot` per kind on this user's own unshown rows. New rows are collected for ~2.5 s so a burst becomes one toast, and the most direct kind wins (reply > comment/mention > like). Nothing is marked shown until a visible tab handles it; older than 2 hours or blocked by the Pop-up alerts setting means bell only. For "only people I follow", a crowd counts if anyone in it is followed. These kinds are excluded from the "missed while away" path so they never show twice. Console lines: `👂 Like / comment / reply / mention listeners active`, hidden/waiting, too old, skipped by setting.
 - **Feed links:** a notification link to a post while already on the feed only changes the `#hash`, so `feed-page.js` now also scrolls to the post on `hashchange`.
+- **STATUS: emotes are switched off** (`EMOTES_ENABLED = false` in `js/features.js`; see "Emotes switched off" below). The notes in this bullet describe the code that is still there for when they come back.
 - **Emotes ("X challenged you / gave you props / sent you thanks / hype")** use the same card. `sendEmoteReaction` (`js/emote-system.js`) now also saves a `user-notifications` row (`type: 'emote-received'`, `eventType` = the emote kind, `shownAsToast: true`, only fields the rules allow) so the receiver keeps it in the bell (Social tab); the live emote listener still pops the toast, now drawn with `contentToastHtml` (their face, their message, "View match") instead of the old plain banner. The emote row is excluded from the content listeners (it is already shown). The old "View X's profile" second link on that toast is gone. Emotes sent before this change have no bell row. `deleteDoc` was added to the fake Firestore in `tools/test-support` so `notification-storage.js` can load in tests.
 - Avatars come from `enrichSocial` / `socialContextFor` (profile lookup, cached); only ally/rival rows load the two edit pictures now.
+
+
+## Emotes switched off (feature flag)
+
+Emotes (Say thanks / Challenge between voters) felt too PvP, so they are off for now. One switch, `EMOTES_ENABLED` in `js/features.js` (currently `false`); nothing was deleted.
+
+With it off:
+- Ally / rival alerts ("X voted with / against you") stay, but their button is a plain "View match" (`withoutEmoteCta`, applied when the alert is built, in `showBulletin` and in the bell renderer, so alerts saved earlier are fixed too).
+- `sendEmoteReaction` refuses to send, `setupRealtimeEmoteListener` does not start (no `user-reactions` reads), and received `emote-received` notifications are filtered out of `getUnreadNotifications` (hidden, not deleted).
+- The "Who can send you emotes" privacy setting is hidden in the settings modal (the stored value is untouched).
+
+To bring them back, set the flag to `true`. A possible future use mentioned: one user awarding another something (kudos), which would be a new design rather than the current preset messages.

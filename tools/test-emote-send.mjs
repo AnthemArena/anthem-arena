@@ -8,6 +8,8 @@ const ls = new Map();
 globalThis.localStorage = { getItem: k => (ls.has(k) ? ls.get(k) : null), setItem: (k, v) => ls.set(k, String(v)), removeItem: k => ls.delete(k) };
 for (const k of ['log', 'warn', 'error']) console[k] = () => {};
 const { sendEmoteReaction } = await import('../js/emote-system.js');
+const features = await import('../js/features.js');
+features.__setEmotesEnabledForTests(true);      // the sending code itself is still tested; the switch-off is tested below
 
 let pass = 0, fail = 0;
 const t = async (n, f) => { store.clear(); ls.clear(); ls.set('tournamentUserId', 'uidA'); ls.set('tournamentUsername', 'Kai'); try { await f(); process.stdout.write(`  ok   ${n}\n`); pass++; } catch (e) { process.stdout.write(`  FAIL ${n}\n       ${e.message}\n`); fail++; } };
@@ -59,5 +61,19 @@ await t('username falls back to the "username" key', async () => {
 await t('an unknown type is refused instead of crashing', async () => {
     assert.equal(await sendEmoteReaction('Mia', 'uidB', 'nonsense', {}), false);
     assert.equal(await sendEmoteReaction('Mia', 'uidB', 'custom', {}, 'hello'), true);
+});
+await t('with emotes switched off nothing is sent, and an emote button becomes View match', async () => {
+    features.__setEmotesEnabledForTests(false);
+    try {
+        assert.equal(await sendEmoteReaction('Mia', 'uidB', 'props', { matchId: 'm1' }), false);
+        assert.equal(sent().length, 0);
+        const n = features.withoutEmoteCta({ ctaAction: 'send-emote', ctaText: 'Challenge: Boom', cta: 'Challenge: Boom', ctaData: { x: 1 }, matchId: 'm1', message: 'hi' });
+        assert.equal(n.ctaAction, 'navigate'); assert.equal(n.action, 'navigate'); assert.equal(n.ctaText, 'View match'); assert.equal(n.ctaData, undefined); assert.equal(n.targetUrl, '/vote.html?match=m1'); assert.equal(n.message, 'hi');
+        const plain = { ctaAction: 'navigate', ctaText: 'View post' };
+        assert.equal(features.withoutEmoteCta(plain), plain);
+        features.__setEmotesEnabledForTests(true);
+        const kept = { ctaAction: 'send-emote', ctaText: 'Boom' };
+        assert.equal(features.withoutEmoteCta(kept), kept);
+    } finally { features.__setEmotesEnabledForTests(true); }
 });
 console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);

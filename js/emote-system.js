@@ -1,6 +1,7 @@
 console.log('🎭 emote-system.js loaded');
 
 import { db } from './firebase-config.js';
+import { EMOTES_ENABLED } from './features.js';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // ========================================
@@ -8,6 +9,7 @@ import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, lim
 // ========================================
 
 export async function sendEmoteReaction(targetUsername, targetUserId, type, matchData, customMessage = null) {
+    if (!EMOTES_ENABLED) { console.log('⏸️ Emotes are switched off (js/features.js)'); return false; }
     const currentUserId = localStorage.getItem('tournamentUserId');
     const currentUsername = localStorage.getItem('tournamentUsername') || localStorage.getItem('username') || 'Anonymous';
     

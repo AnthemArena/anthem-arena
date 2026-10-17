@@ -4,6 +4,7 @@
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { readNotificationPrefs } from './notification-prefs.js';
+import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -376,8 +377,8 @@ Your companion can react to matches, achievements, and other site activity
             </div>
         </label>
 
-        <!-- Emote Privacy -->
-        <div class="toggle-label select-wrapper">
+        <!-- Emote Privacy (hidden while emotes are switched off, see js/features.js) -->
+        <div class="toggle-label select-wrapper" ${EMOTES_ENABLED ? '' : 'style="display:none"'}>
             <div class="toggle-info" style="flex: 1;">
                 <strong>🎭 Who Can Send You Emotes?</strong>
                 <select id="emotePrivacySelect" class="privacy-select">
