@@ -482,3 +482,5 @@ X (and others) remember the preview image per address, including a failed fetch:
 - Missed toasts: `getRecentUnshownNotifications` used a 4-filter query needing a composite index that was never built, so it failed silently and returning visitors never got the toast. It now queries by `userId` only and filters in code (`pickUnshown`). The "away at least 5 min" rule is now a 10 min look-back minimum. Still only fires when the last visit was over 2 min ago, once per browser session.
 - Link previews (`vote-meta`) accept `?id=` as well as `?match=`.
 - Test: `node tools/test-notification-model.mjs`.
+- Live toast: `checkRecentVotes` saved ally/rival rows but never showed a toast while the page was open (only the on-return "missed" path did). It now shows one toast per check for votes from the last hour (page visible), with the emote button, and marks that row as shown.
+- Grouped rows ("X voted in 2 matches"): the emote button looked up the notification by the joined id string, so it showed generic "Send Emote" and did nothing on click. It now uses the first id and clears every id in the group. "Show all matches" popup restyled to Arcane.
