@@ -7,9 +7,9 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
-import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialRowHtml, followRowHtml } from './notification-visuals.js';
+import { socialRowHtml, followRowHtml, contentRowHtml, avatarSrc, fallbackAvatarFor } from './notification-visuals.js';
 import { enrichSocial } from './notification-social-context.js';
 
 // ✅ GUARD: Prevent duplicate initialization
@@ -668,6 +668,13 @@ function renderNotificationItem(notification) {
     if (isSocial) return socialRowHtml(notification, { headline, timeAgo, championPack });
     if (isFollowNotification(notification)) {
         return followRowHtml(notification, { headline: followHeadline(notification), quip: followQuip(notification), timeAgo, championPack, theirSrc: notification.nv?.theirSrc, alreadyFollowing: followingNow.has(notification.triggerUserId) || isFollowBack(notification) });
+    }
+
+    if (isContentNotification(notification)) {
+        // like / comment / reply / mention: grouped per post ("3 people liked your post"), shows the words, opens the post
+        const names = notification.users?.length ? notification.users : [notification.triggerUsername].filter(Boolean);
+        const srcs = names.map((nm, i) => (names.length > 1 ? notification.nv?.avatars?.[i] : notification.nv?.theirSrc) || avatarSrc(notification.avatars?.[i]) || fallbackAvatarFor(nm));
+        return contentRowHtml(notification, { parts: contentHeadline(notification), quote: contentQuote(notification), icon: contentIcon(notification), cta: contentCta(notification), timeAgo, championPack, srcs, names });
     }
 
     // Image logic
