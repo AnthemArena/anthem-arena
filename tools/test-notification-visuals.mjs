@@ -75,7 +75,7 @@ t('follow row and toast: name, quip, right button, safe text', () => {
     assert.ok(!row.includes('Kai<b>') && row.includes('Kai&lt;b&gt;'));
     const already = followRowHtml(n, { headline: 'Kai followed you', quip: '', timeAgo: '', championPack: null, alreadyFollowing: true });
     assert.ok(already.includes('data-action="navigate"') && already.includes('View profile') && !already.includes('follow-back'));
-    const toast = followToastHtml(n, { theirSrc: null, jinxSrc: 'https://x/j.png', accent: '#ff69b4', quip: 'Another one joins the chaos!', cta: 'Follow back' });
-    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('followed you') && toast.includes('Another one joins the chaos!') && toast.includes('nv-follow-face'));
+    const toast = followToastHtml(n, { theirSrc: null, jinxSrc: 'https://x/j.png', accent: '#ff69b4', quip: 'Another one joins the chaos!', cta: 'Follow back', headline: 'Kai followed you back' });
+    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('followed you back') && toast.includes('Another one joins the chaos!') && toast.includes('nv-follow-face'));
 });
 console.log(`${pass} passed`);

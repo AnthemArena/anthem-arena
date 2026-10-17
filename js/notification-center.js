@@ -7,7 +7,7 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
-import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, followHeadline, followQuip } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
 import { socialRowHtml, followRowHtml } from './notification-visuals.js';
 import { enrichSocial } from './notification-social-context.js';
@@ -667,7 +667,7 @@ function renderNotificationItem(notification) {
     
     if (isSocial) return socialRowHtml(notification, { headline, timeAgo, championPack });
     if (isFollowNotification(notification)) {
-        return followRowHtml(notification, { headline: followHeadline(notification), quip: followQuip(notification), timeAgo, championPack, theirSrc: notification.nv?.theirSrc, alreadyFollowing: followingNow.has(notification.triggerUserId) });
+        return followRowHtml(notification, { headline: followHeadline(notification), quip: followQuip(notification), timeAgo, championPack, theirSrc: notification.nv?.theirSrc, alreadyFollowing: followingNow.has(notification.triggerUserId) || isFollowBack(notification) });
     }
 
     // Image logic
