@@ -5,6 +5,7 @@
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 
 import { ARCANE_CONFIG } from './arcane-config.js';
+import { fixAvatarUrl } from './avatar-url.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // Bell icon: inline SVG so it takes the theme colour (the old 🔔 emoji was always yellow)
@@ -222,6 +223,12 @@ async function updateNavProfile() {
             }
         }
         
+        // Repair a saved champion picture url that points at a missing file (e.g. "Lee Sin.png" -> "LeeSin.png")
+        if (avatar && avatar.type === 'url' && fixAvatarUrl(avatar.value) !== avatar.value) {
+            avatar = { ...avatar, value: fixAvatarUrl(avatar.value) };
+            try { localStorage.setItem('avatar', JSON.stringify(avatar)); } catch { /* ignore */ }
+        }
+
         // Check if user has voted (check BOTH localStorage AND Firebase)
         const userVotesLocal = JSON.parse(localStorage.getItem('userVotes') || '{}');
         const hasVotedLocal = Object.keys(userVotesLocal).length > 0;
@@ -334,7 +341,7 @@ async function updateNavProfile() {
     <a href="/profile?user=${username}" class="nav-profile-link" title="View Your Profile">
         <div class="profile-avatar" id="navProfileAvatar">
             ${avatar && avatar.type === 'url' 
-                ? `<img src="${avatar.value}" alt="Avatar" class="nav-avatar-img" 
+                ? `<img src="${fixAvatarUrl(avatar.value)}" alt="Avatar" class="nav-avatar-img" 
                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="nav-avatar-fallback" style="display: none;">🎵</span>`
                 : `<span class="nav-avatar-emoji">${avatar?.value || '🎵'}</span>`

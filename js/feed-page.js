@@ -22,6 +22,7 @@ import { shortTitle } from './title-clean.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
+import { fixAvatarUrl } from './avatar-url.js';
 // ========================================
 // SONG DATA
 // ========================================
@@ -3172,8 +3173,8 @@ function getTimeAgo(timestamp) {
 
 function getAvatarUrl(avatar) {
     if (!avatar) return createEmojiAvatar('🎵');
-    if (avatar.type === 'url') return avatar.value;
-    if (avatar.type === 'champion') return avatar.imageUrl || avatar.value || createEmojiAvatar('🎵');
+    if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
+    if (avatar.type === 'champion') return fixAvatarUrl(avatar.imageUrl || avatar.value) || createEmojiAvatar('🎵');
     return createEmojiAvatar(avatar.value || '🎵');
 }
 

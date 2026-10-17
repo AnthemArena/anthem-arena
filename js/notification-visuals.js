@@ -1,3 +1,4 @@
+import { fixAvatarUrl } from './avatar-url.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -21,13 +22,13 @@ export function avatarSrc(raw) {
     if (raw == null || raw === '') return null;
     if (typeof raw === 'string') {
         const s = raw.trim();
-        if (/^(https?:|data:|\/)/.test(s)) return s;
+        if (/^(https?:|data:|\/)/.test(s)) return fixAvatarUrl(s);
         if (s.startsWith('{')) { try { return avatarSrc(JSON.parse(s)); } catch { return null; } }
         return emojiAvatar(s);
     }
     if (typeof raw === 'object') {
-        if (raw.type === 'url') return raw.value || null;
-        if (raw.type === 'champion') return raw.imageUrl || raw.value || null;
+        if (raw.type === 'url') return fixAvatarUrl(raw.value) || null;
+        if (raw.type === 'champion') return fixAvatarUrl(raw.imageUrl || raw.value) || null;
         if (raw.type === 'emoji') return raw.value ? emojiAvatar(raw.value) : null;
     }
     return null;
