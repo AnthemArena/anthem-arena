@@ -7,6 +7,8 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
+import { groupNotifications, groupHeadline } from './notification-model.js';
+import { getFollowingIds } from './follow-system.js';
 
 // ✅ GUARD: Prevent duplicate initialization
 let isInitialized = false;
@@ -351,7 +353,8 @@ async function loadNotificationsTab(content, userId, tab) {
     }
     
     // ✅ NEW: Group notifications by user + event type
-    const grouped = groupNotificationsByUser(filtered);
+    const followingIds = await getFollowingIds(localStorage.getItem('tournamentUserId'));
+    const grouped = groupNotifications(filtered, followingIds);
     
     content.innerHTML = grouped.map(notification => {
         return renderNotificationItem(notification);
@@ -633,7 +636,16 @@ function renderNotificationItem(notification) {
     let displayMessage = notification.message;
     let displayDetail = notification.detail || '';
     
-    if (notification.count > 1) {
+    const headline = groupHeadline(notification);
+    if (headline) {
+        // ally / rival group: say what it is ("3 people voted against you in X", "Kai voted against you in 2 matches")
+        displayMessage = headline.message;
+        displayDetail = headline.detail || displayDetail;
+        if (notification.groupKind === 'match') {      // a crowd: no single person to emote, so just open the match
+            notification = { ...notification, ctaAction: 'navigate', ctaText: 'View match' };
+        }
+    }
+    if (!headline && notification.count > 1) {
         displayMessage = `${notification.triggerUsername} voted in ${notification.count} matches`;
         
         // Show first 2 match titles
@@ -739,7 +751,7 @@ function renderNotificationItem(notification) {
 
             
             <div class="notification-item-footer">
-                <span class="notification-item-time">${timeAgo}${notification.count > 1 ? ` · <a class="notification-item-link" href="#" onclick="expandGroupedNotification('${notification.ids.join(',')}', event); return false;">All ${notification.count} matches</a>` : (isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : '')}</span>
+                <span class="notification-item-time">${timeAgo}${notification.count > 1 && notification.groupKind !== 'match' ? ` · <a class="notification-item-link" href="#" onclick="expandGroupedNotification('${notification.ids.join(',')}', event); return false;">All ${notification.count} matches</a>` : (isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : '')}</span>
                 ${ctaHtml}
             </div>
         </div>
