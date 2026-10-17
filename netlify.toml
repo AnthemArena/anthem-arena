@@ -12,12 +12,29 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
+# Link-preview image (netlify/functions/og-match.js): bundled with the font files; resvg is a native module, so it stays external.
+[functions]
+  external_node_modules = ["@resvg/resvg-js"]
+  node_bundler = "esbuild"
+
+[functions."og-match"]
+  included_files = ["netlify/functions/assets/**"]
+
 # Firebase credentials are set securely in Netlify UI (All scopes)
 # No secrets in this file
 
 # ========================================
 # EDGE FUNCTIONS
 # ========================================
+
+# Link previews for shared match links: only rewrites the page for preview bots (Discord, X, WhatsApp ...)
+[[edge_functions]]
+  path = "/vote"
+  function = "vote-meta"
+
+[[edge_functions]]
+  path = "/vote.html"
+  function = "vote-meta"
 
 [[edge_functions]]
   path = "/api/matches"
@@ -111,6 +128,12 @@
 [[redirects]]
   from = "/feed"
   to = "/feed.html"
+  status = 200
+
+# Preview image of a match (see netlify/functions/og-match.js)
+[[redirects]]
+  from = "/og/match.png"
+  to = "/.netlify/functions/og-match"
   status = 200
 
 # Existing routes

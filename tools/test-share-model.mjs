@@ -1,0 +1,17 @@
+import { buildShare, postIdFromLink } from '../js/share-model.js';
+let pass = 0, fail = 0;
+const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
+const O = 'https://anthemarena.com/';
+const v = buildShare({ type: 'vote', postId: 'activity_1', matchId: 'jinx-cup-1-group-1-match-2', username: 'Kai', votedMomentName: 'Jinx lost her finger', opponentMomentName: 'Roses' }, O);
+t('vote post links to the match', v.url === 'https://anthemarena.com/vote?match=jinx-cup-1-group-1-match-2');
+t('vote text names both edits', v.text === 'Kai chose Jinx lost her finger over Roses in Arcane Moments. Who gets your vote?');
+const p = buildShare({ postId: 'p 1', username: 'Mia', text: 'x'.repeat(300) }, O);
+t('written post links to the feed with ?post=', p.url === 'https://anthemarena.com/feed.html?post=p%201');
+t('long text is cut with an ellipsis', p.text.length < 160 && p.text.includes('…'));
+t('empty text still has a sentence', buildShare({ postId: 'p', username: 'Mia' }, O).text === 'A post by Mia on Arcane Moments');
+t('targets are encoded', v.targets.x.startsWith('https://twitter.com/intent/tweet?text=') && !v.targets.x.includes(' ') && v.targets.reddit.includes('reddit.com/submit') && v.targets.whatsapp.startsWith('https://wa.me/?text='));
+t('copy text has the link', v.copyText.endsWith(v.url));
+t('link: ?post=', postIdFromLink('?post=abc', '') === 'abc');
+t('link: old #post-', postIdFromLink('', '#post-abc%20d') === 'abc d');
+t('link: none', postIdFromLink('', '') === null && postIdFromLink('?x=1', '#top') === null);
+console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);

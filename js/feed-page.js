@@ -2,6 +2,8 @@
 // FEED PAGE - UI CONTROLLER
 // Arcane Moments Community
 // ========================================
+import { mixFeed, digestSummary, rankTrending } from './feed-mix-model.js';
+import { buildShare, postIdFromLink } from './share-model.js';
 import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
 import { 
@@ -518,6 +520,7 @@ setupSearch();
         
         // Load initial feed
         await loadFeed();
+        await scrollToLinkedPost();
         
         // Setup load more button
         setupLoadMore();
@@ -782,6 +785,38 @@ async function performSearch(query) {
 // LOAD FEED
 // ========================================
 
+// Vote activity as feed posts: current cup's public votes whose match still exists, with like/comment counts.
+async function loadVotePosts() {
+    const [activities, matches] = await Promise.all([getActivityFeed(100), getAllMatches()]);
+
+    const matchMap = new Map(matches.map(match => [match.matchId || match.id, match]));
+
+    // Votes whose match no longer exists (old test rounds) are hidden, as on profiles.
+    // Fail open: if the match list is empty (request failed) hide nothing, and keep very
+    // recent votes in case the cached match list has not caught up yet.
+    const RECENT_MS = 10 * 60 * 1000;
+    const matchStillExists = activity =>
+        matchMap.size === 0 ||
+        matchMap.has(activity.matchId) ||
+        (Date.now() - (activity.timestamp || 0)) < RECENT_MS;
+
+    const activityPosts = activities
+        .filter(activity => activity.isPublic !== false)
+        .filter(matchStillExists)
+        .map(activity => convertActivityToFeedPost(activity, matchMap));
+
+    // Vote activity has no post document, so read its like and comment counts from the likes / comments collections.
+    const engagement = await getActivityEngagementCounts(activityPosts.map(post => post.postId));
+    activityPosts.forEach(post => {
+        const counts = engagement.get(post.postId);
+        if (counts) {
+            post.likeCount = counts.likeCount;
+            post.commentCount = counts.commentCount;
+        }
+    });
+    return activityPosts;
+}
+
 async function loadFeed() {
     const feedContainer = document.getElementById('feedPosts');
     const loadingState = document.getElementById('loadingState');
@@ -836,20 +871,15 @@ async function loadFeed() {
             
             currentPosts = await getFeed('following', 100);
             
+        } else if (currentFilter === 'posts') {
+            // ✅ POSTS: what people wrote, with the automatic vote posts left out
+            currentPosts = mixFeed({ posts: await getFeed('all', 100), mode: 'posts' });
+
         } else if (currentFilter === 'trending') {
-            // ✅ TRENDING: Most engagement (likes + comments * 2)
-            currentPosts = await getFeed('all', 100);
-            currentPosts.sort((a, b) => {
-                const engagementA = (a.likeCount || 0) + (a.commentCount || 0) * 2;
-                const engagementB = (b.likeCount || 0) + (b.commentCount || 0) * 2;
-                return engagementB - engagementA;
-            });
-            
-            // Only show posts with at least 1 engagement
-            currentPosts = currentPosts.filter(post => 
-                (post.likeCount || 0) + (post.commentCount || 0) > 0
-            );
-            
+            // ✅ TRENDING: this week's most liked and commented (likes + comments x 2), written posts and votes together
+            const [socialPosts, votePosts] = await Promise.all([getFeed('all', 100), loadVotePosts()]);
+            currentPosts = rankTrending({ posts: [...socialPosts.filter(p => p.type !== 'vote'), ...votePosts] });
+
                 } else {
             // ========================================
             // ALL ACTIVITY
@@ -858,54 +888,16 @@ async function loadFeed() {
             // 2. Genuine user-created posts
             // ========================================
 
-            const [activities, matches, socialPosts] = await Promise.all([
-                getActivityFeed(100),
-                getAllMatches(),
+            const [activityPosts, socialPosts] = await Promise.all([
+                loadVotePosts(),
                 getFeed('all', 100)
             ]);
 
-            const matchMap = new Map(
-                matches.map(match => [match.matchId || match.id, match])
-            );
+            // Old automatic vote-post duplicates in the social feed are dropped (votes come from the activity collection).
+            const userPosts = socialPosts.filter(post => post.type !== 'vote');
 
-            // Vote activity is represented by the activity collection.
-            // Remove old automatic vote-post duplicates from the social feed.
-            const userPosts = socialPosts.filter(
-                post => post.type !== 'vote'
-            );
-
-            // Votes whose match no longer exists (old test rounds) are hidden, as on profiles.
-            // Fail open: if the match list is empty (request failed) hide nothing, and keep very
-            // recent votes in case the cached match list has not caught up yet.
-            const RECENT_MS = 10 * 60 * 1000;
-            const matchStillExists = activity =>
-                matchMap.size === 0 ||
-                matchMap.has(activity.matchId) ||
-                (Date.now() - (activity.timestamp || 0)) < RECENT_MS;
-
-            const activityPosts = activities
-                .filter(activity => activity.isPublic !== false)
-                .filter(matchStillExists)
-                .map(activity =>
-                    convertActivityToFeedPost(activity, matchMap)
-                );
-
-            // Vote activity has no post document, so read its like and
-            // comment counts from the likes / comments collections.
-            const engagement = await getActivityEngagementCounts(
-                activityPosts.map(post => post.postId)
-            );
-            activityPosts.forEach(post => {
-                const counts = engagement.get(post.postId);
-                if (counts) {
-                    post.likeCount = counts.likeCount;
-                    post.commentCount = counts.commentCount;
-                }
-            });
-
-            currentPosts = [...activityPosts, ...userPosts]
-                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-                .slice(0, 100);
+            // Written posts are never pushed out by votes; long runs of votes collapse into one expandable row.
+            currentPosts = mixFeed({ votes: activityPosts, posts: userPosts, mode: 'all' });
 
             console.log(
                 `✅ Community activity loaded: ${activityPosts.length} vote activities + ${userPosts.length} user posts`
@@ -938,12 +930,20 @@ async function loadFeed() {
                         <p>Follow other users to see their posts here</p>
                     </div>
                 `;
+            } else if (currentFilter === 'posts') {
+                emptyMessage = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-pen" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h3>No Posts Yet</h3>
+                        <p>Nobody has written a post yet. Be the first!</p>
+                    </div>
+                `;
             } else if (currentFilter === 'trending') {
                 emptyMessage = `
                     <div class="empty-state">
                         <i class="fa-solid fa-fire" style="font-size: 3rem; opacity: 0.3;"></i>
-                        <h3>No Trending Posts</h3>
-                        <p>Be the first to create popular content!</p>
+                        <h3>Nothing trending this week</h3>
+                        <p>Like or comment on a post and it will show up here.</p>
                     </div>
                 `;
             } else {
@@ -981,7 +981,7 @@ function renderPosts(startIndex, count) {
     
     // Render each post
     postsToRender.forEach(post => {
-        const postElement = createPostElement(post);
+        const postElement = post.type === 'vote-digest' ? createDigestElement(post) : createPostElement(post);
         feedContainer.appendChild(postElement);
     });
     
@@ -998,6 +998,33 @@ function renderPosts(startIndex, count) {
     } else {
         loadMoreContainer.style.display = 'none';
     }
+}
+
+// A run of automatic vote posts, collapsed. Click to show the votes in place.
+function createDigestElement(digest) {
+    const row = document.createElement('div');
+    row.className = 'feed-vote-digest';
+    row.innerHTML = `
+        <button type="button" class="vote-digest-toggle" aria-expanded="false">
+            <i class="fa-solid fa-check-to-slot"></i>
+            <span class="vote-digest-text">${escapeHtml(digestSummary(digest))}</span>
+            <span class="vote-digest-time">${getTimeAgo(digest.timestamp)}</span>
+            <i class="fa-solid fa-chevron-down vote-digest-chevron"></i>
+        </button>
+        <div class="vote-digest-items" hidden></div>`;
+    const toggle = row.querySelector('.vote-digest-toggle');
+    const items = row.querySelector('.vote-digest-items');
+    toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        items.hidden = open;
+        if (!open && !items.childElementCount) {
+            digest.votes.forEach(v => items.appendChild(createPostElement(v)));
+            setupSongTooltips();
+            setupMentionTooltips();
+        }
+    });
+    return row;
 }
 
 function renderPostContent(post) {
@@ -1499,7 +1526,7 @@ setupMentionAutocomplete(commentInput);
     // Share button
     const shareBtn = postElement.querySelector('.share-btn');
     shareBtn.addEventListener('click', () => {
-        sharePost(post);
+        sharePost(post, shareBtn);
     });
 }
 
@@ -3054,36 +3081,62 @@ async function createUserPost() {
 // SHARE POST
 // ========================================
 
-function sharePost(post) {
-    const shareUrl = `${window.location.origin}/feed.html#post-${post.postId}`;
-    const shareText = `Check out this post from ${post.username} on League Music Tournament!`;
-    
-    // Check if Web Share API is available
-    if (navigator.share) {
-        navigator.share({
-            title: 'League Music Tournament',
-            text: shareText,
-            url: shareUrl
-        }).then(() => {
-            console.log('✅ Post shared');
-        }).catch((error) => {
-            console.log('Share cancelled:', error);
-        });
-    } else {
-        // Fallback: Copy link to clipboard
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            if (window.showNotification) {
-                window.showNotification('Link copied to clipboard!', 'success');
-            }
-        }).catch((error) => {
-            console.error('❌ Copy failed:', error);
-        });
-    }
+// Share menu: native share sheet where the device has one, plus copy link / copy as message / X / Reddit / WhatsApp.
+function sharePost(post, anchor) {
+    document.querySelectorAll('.share-menu').forEach(m => m.remove());
+    const share = buildShare(post, window.location.origin);
+
+    const menu = document.createElement('div');
+    menu.className = 'share-menu';
+    menu.setAttribute('role', 'menu');
+    const item = (id, icon, label) => `<button type="button" class="share-menu-item" data-act="${id}" role="menuitem"><i class="${icon}"></i><span>${label}</span></button>`;
+    menu.innerHTML = [
+        navigator.share ? item('native', 'fa-solid fa-share-nodes', 'Share…') : '',
+        item('link', 'fa-solid fa-link', 'Copy link'),
+        item('message', 'fa-regular fa-comment-dots', 'Copy as message'),
+        item('x', 'fa-brands fa-twitter', 'Post on X'),
+        item('reddit', 'fa-brands fa-reddit-alien', 'Share on Reddit'),
+        item('whatsapp', 'fa-brands fa-whatsapp', 'Send on WhatsApp')
+    ].join('');
+
+    const copy = async (text, btn) => {
+        try { await navigator.clipboard.writeText(text); } catch (e) {
+            const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (e2) {} ta.remove();
+        }
+        const label = btn.querySelector('span'); const old = label.textContent;
+        label.textContent = 'Copied!'; setTimeout(() => menu.remove(), 900);
+    };
+
+    menu.addEventListener('click', e => {
+        const btn = e.target.closest('.share-menu-item'); if (!btn) return;
+        const act = btn.dataset.act;
+        if (act === 'native') { navigator.share({ title: share.title, text: share.text, url: share.url }).catch(() => {}); menu.remove(); }
+        else if (act === 'link') copy(share.url, btn);
+        else if (act === 'message') copy(share.copyText, btn);
+        else { window.open(share.targets[act], '_blank', 'noopener'); menu.remove(); }
+    });
+
+    (anchor.closest('.post-actions-bar') || anchor.parentElement).appendChild(menu);
+    const close = e => { if (!menu.contains(e.target) && e.target !== anchor) { menu.remove(); document.removeEventListener('click', close, true); } };
+    setTimeout(() => document.addEventListener('click', close, true), 0);
 }
 
-// ========================================
-// UTILITIES
-// ========================================
+// Opening feed.html?post=<id> scrolls to that post (loading more of the feed if it is further down) and flashes it.
+async function scrollToLinkedPost() {
+    const id = postIdFromLink(window.location.search, window.location.hash);
+    if (!id) return;
+    const idx = currentPosts.findIndex(p => p.postId === id || (p.type === 'vote-digest' && p.votes.some(v => v.postId === id)));
+    if (idx === -1) return;
+    while (lastLoadedIndex <= idx && lastLoadedIndex < currentPosts.length) renderPosts(lastLoadedIndex, POSTS_PER_PAGE);
+    const owner = currentPosts[idx];
+    if (owner.type === 'vote-digest') document.querySelectorAll('.vote-digest-toggle[aria-expanded="false"]').forEach(b => { if (b.closest('.feed-vote-digest')?.querySelector('.vote-digest-text')?.textContent === digestSummary(owner)) b.click(); });
+    const el = [...document.querySelectorAll('.feed-post')].find(n => n.dataset.postId === id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('post-linked');
+    setTimeout(() => el.classList.remove('post-linked'), 2500);
+}
 
 function getTimeAgo(timestamp) {
     const now = Date.now();
@@ -3105,21 +3158,25 @@ function getTimeAgo(timestamp) {
 }
 
 function getAvatarUrl(avatar) {
-    if (!avatar) {
-        return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect fill="%23ff4fb4"/><text x="25" y="35" text-anchor="middle" fill="black" font-size="30">🎵</text></svg>';
-    }
-    
-    if (avatar.type === 'url') {
-        return avatar.value;
-    } else {
-        // Emoji avatar - create data URL
-        return createEmojiAvatar(avatar.value);
-    }
+    if (!avatar) return createEmojiAvatar('🎵');
+    if (avatar.type === 'url') return avatar.value;
+    if (avatar.type === 'champion') return avatar.imageUrl || avatar.value || createEmojiAvatar('🎵');
+    return createEmojiAvatar(avatar.value || '🎵');
 }
 
 function createEmojiAvatar(emoji) {
-    return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%23ff4fb4"/><text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="#ff4fb4"/><text x="25" y="35" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
+
+// An avatar picture that fails to load (old champion urls) falls back to the emoji tile instead of a broken icon.
+document.addEventListener('error', e => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || img.dataset.avatarFallback) return;
+    if (!/avatar/i.test(img.className + ' ' + img.id)) return;
+    img.dataset.avatarFallback = '1';
+    img.src = createEmojiAvatar('🎵');
+}, true);
 
 function escapeHtml(text) {
     const div = document.createElement('div');
