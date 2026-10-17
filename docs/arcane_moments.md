@@ -469,3 +469,9 @@ The 429s were `RESOURCE_EXHAUSTED / Quota exceeded`: the Spark plan's 50,000 rea
 
 ### Preview image cache (X)
 X (and others) remember the preview image per address, including a failed fetch: while the image still took 13 s, X cached the logo for `/og/match.png?match=<id>`. The og:image address now carries `&v=<IMAGE_VERSION>` (`netlify/shared/og-model.js`); raise the number whenever a platform is stuck on an old image. Tumblr, which had never cached it, showed the card correctly.
+
+## Emotes: sender hardening (notifications review, part 1)
+- `sendEmoteReaction` (js/emote-system.js) built its document with whatever `matchData` it was given. Firestore refuses a document with an `undefined` field, so an emote whose match title or song title was missing failed silently ("Error sending emote" in the console, the sender saw a failure). It now sends only the fields that exist, cuts values to the lengths the security rules allow (message 200, type 30), refuses an unknown emote type instead of crashing, and falls back to the `username` key when `tournamentUsername` is not set.
+- Test: `node tools/test-emote-send.mjs` (7 checks; the in-memory fake Firestore in tools/test-support now has addDoc/updateDoc/query helpers and refuses undefined fields like the real SDK).
+- Still to check (needs the live site): the composite indexes the notification queries need (unread count, notification list, emote listener). Console snippet in the chat history; any failed-precondition error contains a create-index link.
+- Note for testing as a normal visitor: the admin sign-in has a different Firebase user than the saved voter id, so notifications/emotes read as "permission denied" while signed in as admin. Test from a private window (visitor) instead.

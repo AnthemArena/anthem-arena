@@ -9,15 +9,15 @@ import { collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, lim
 
 export async function sendEmoteReaction(targetUsername, targetUserId, type, matchData, customMessage = null) {
     const currentUserId = localStorage.getItem('tournamentUserId');
-    const currentUsername = localStorage.getItem('tournamentUsername') || 'Anonymous';
+    const currentUsername = localStorage.getItem('tournamentUsername') || localStorage.getItem('username') || 'Anonymous';
     
     if (!currentUserId || currentUsername === 'Anonymous') {
         console.log('⚠️ Anonymous users cannot send reactions');
         return false;
     }
     
-    if (currentUserId === targetUserId) {
-        console.log('⚠️ Cannot send reaction to yourself');
+    if (!targetUserId || currentUserId === targetUserId) {
+        console.log('⚠️ Cannot send reaction to yourself (or nobody)');
         return false;
     }
     
@@ -29,22 +29,31 @@ export async function sendEmoteReaction(targetUsername, targetUserId, type, matc
         'hype': ['This match is fire! 🔥', 'Epic battle! ⚡', 'What a matchup! 🎬']
     };
     
-    const message = customMessage || presetMessages[type][Math.floor(Math.random() * presetMessages[type].length)];
+    const presets = presetMessages[type];
+    if (!presets && !customMessage) {
+        console.error(`❌ Unknown emote type "${type}"`);
+        return false;
+    }
+    const message = customMessage || presets[Math.floor(Math.random() * presets.length)];
     
     try {
+        matchData = matchData || {};
+        // Firestore refuses a document with an undefined field, and the security rules cap the lengths: send only what exists.
+        const text = (v, max) => (v === undefined || v === null || v === '' ? undefined : String(v).slice(0, max));
         const reactionData = {
             fromUserId: currentUserId,
-            fromUsername: currentUsername,
+            fromUsername: text(currentUsername, 60),
             toUserId: targetUserId,
-            toUsername: targetUsername,
-            type: type,
-            matchId: matchData.matchId,
-            matchTitle: matchData.matchTitle,
-            songTitle: matchData.songTitle,
-            message: message,
+            toUsername: text(targetUsername, 60) || 'Unknown',
+            type: String(type).slice(0, 30),
+            matchId: text(matchData.matchId, 200),
+            matchTitle: text(matchData.matchTitle, 300),
+            songTitle: text(matchData.songTitle, 300),
+            message: String(message).slice(0, 200),
             timestamp: Date.now(),
             seen: false
         };
+        Object.keys(reactionData).forEach(k => reactionData[k] === undefined && delete reactionData[k]);
         
         const docRef = await addDoc(collection(db, 'user-reactions'), reactionData);
         console.log(`✅ Emote sent to ${targetUsername}:`, type, message);
