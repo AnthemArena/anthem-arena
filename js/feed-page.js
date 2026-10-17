@@ -535,6 +535,8 @@ setupSearch();
         // Load initial feed
         await loadFeed();
         await scrollToLinkedPost();
+        // A notification link to a post on the page you are already on only changes the #hash: scroll to it then too
+        window.addEventListener('hashchange', () => { scrollToLinkedPost(); });
         
         // Setup load more button
         setupLoadMore();

@@ -16,15 +16,21 @@ export const isSocialNotification = n => n?.relationship === 'ally' || n?.relati
 export function groupNotifications(list, followingIds = new Set()) {
     const groups = new Map();
     for (const n of list || []) {
+        const content = isContentNotification(n);
         const stranger = isSocialNotification(n) && !followingIds.has(n.triggerUserId);
-        const key = stranger ? `m|${n.matchId}|${n.relationship}` : `u|${n.triggerUserId || 'system'}|${n.relationship || n.type}`;
+        // Likes / comments / replies / mentions group per POST and kind, whoever did them ("3 people liked your post").
+        const key = content ? `c|${n.type}|${n.targetUrl || n.matchId || ''}`
+            : stranger ? `m|${n.matchId}|${n.relationship}` : `u|${n.triggerUserId || 'system'}|${n.relationship || n.type}`;
         const entry = { matchId: n.matchId, matchTitle: n.matchTitle, detail: n.detail };
         const g = groups.get(key);
-        if (!g) groups.set(key, { ...n, groupKind: stranger ? 'match' : 'user', count: 1, matches: [entry], ids: [n.id], users: [n.triggerUsername].filter(Boolean), avatars: n.triggerUsername ? [n.thumbnailUrl || null] : [], userIds: n.triggerUsername ? [n.triggerUserId || null] : [] });
+        if (!g) groups.set(key, { ...n, groupKind: content ? 'content' : stranger ? 'match' : 'user', count: 1, matches: [entry], ids: [n.id], users: [n.triggerUsername].filter(Boolean), avatars: n.triggerUsername ? [n.thumbnailUrl || null] : [], userIds: n.triggerUsername ? [n.triggerUserId || null] : [] });
         else {
             g.count++; g.matches.push(entry); g.ids.push(n.id);
             if (n.triggerUsername && !g.users.includes(n.triggerUsername)) { g.users.push(n.triggerUsername); g.avatars.push(n.thumbnailUrl || null); g.userIds.push(n.triggerUserId || null); }
-            if (n.timestamp > g.timestamp) g.timestamp = n.timestamp;
+            if (n.timestamp > g.timestamp) {
+                g.timestamp = n.timestamp;
+                if (content) { if (n.detail) g.detail = n.detail; g.triggerUsername = n.triggerUsername; g.triggerUserId = n.triggerUserId; }   // the row quotes the newest one
+            }
         }
     }
     return [...groups.values()].sort((a, b) => b.timestamp - a.timestamp);
@@ -70,3 +76,45 @@ export const FOLLOW_BACK_QUIPS = [
     'They followed you back. Go cause some trouble together!'
 ];
 export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed you${isFollowBack(n) ? ' back' : ''}`;
+
+
+// ---- Likes, comments, replies and mentions (the "content" notifications) ----
+export const CONTENT_TYPES = ['like', 'comment', 'reply', 'mention'];
+export const isContentNotification = n => CONTENT_TYPES.includes(n?.type);
+const CONTENT_ICONS = { like: '❤️', comment: '💬', reply: '↩️', mention: '📢' };
+export const contentIcon = n => CONTENT_ICONS[n?.type] || '🔔';
+// Most direct first: a reply to you beats a comment or mention, which beat a like. Used to pick the one toast to show.
+export const CONTENT_PRIORITY = { reply: 8, comment: 7, mention: 7, like: 6 };
+
+// Where a mention happened ("in a post / comment / reply"), read from the saved wording.
+export function mentionWhere(n) {
+    const m = /\bin an? (post|comment|reply)\b/i.exec(n?.message || '') || /View (Post|Comment|Reply)/i.exec(n?.ctaText || '');
+    return m ? m[1].toLowerCase() : 'post';
+}
+
+// "Kai liked your post" / "Kai and Rex liked your post" / "3 people liked your post". who + action are split so the toast
+// can put the name on its own line.
+export function contentHeadline(g) {
+    const users = g?.users?.length ? g.users : [g?.triggerUsername].filter(Boolean);
+    const people = users.length || 1;
+    const count = g?.count || 1;
+    const who = people === 1 ? (users[0] || 'Someone') : people === 2 ? `${users[0]} and ${users[1]}` : `${people} people`;
+    let action;
+    if (g?.type === 'like') action = 'liked your post';
+    else if (g?.type === 'comment') action = people === 1 && count > 1 ? `commented ${count} times on your post` : 'commented on your post';
+    else if (g?.type === 'reply') action = people === 1 && count > 1 ? `replied ${count} times to your comment` : 'replied to your comment';
+    else if (g?.type === 'mention') action = people >= 3 ? 'mentioned you' : `mentioned you in a ${mentionWhere(g)}`;
+    else action = 'sent you something';
+    const names = people >= 3 ? users.slice(0, 3).join(', ') + (people > 3 ? ` +${people - 3} more` : '') : '';
+    return { who, action, headline: `${who} ${action}`, names };
+}
+
+// The words to show under the headline: the post that was liked, or what they wrote. Empty when there is nothing real to quote.
+export function contentQuote(g, max = 110) {
+    let t = String(g?.detail || '').trim();
+    if (!t || t === 'your post') return '';
+    t = t.replace(/^["“](.*)["”]$/s, '$1').replace(/\s+/g, ' ').trim();
+    return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
+}
+// One consistent wording whatever older notifications saved ("View Comment" vs "View comment").
+export const contentCta = g => g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');

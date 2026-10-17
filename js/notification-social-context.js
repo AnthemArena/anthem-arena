@@ -4,6 +4,7 @@ import { db } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAllMatches } from './api-client.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits } from './notification-visuals.js';
+import { isContentNotification } from './notification-model.js';
 
 const avatarCache = new Map();          // userId -> url | null
 let matchesCache = { at: 0, list: [] };
@@ -43,13 +44,15 @@ export async function socialContextFor(n) {
         if (n.userIds && n.userIds.length > 1) {
             out.avatars = await Promise.all(n.userIds.map(async (id, i) => (id && await profileAvatar(id)) || avatarSrc((n.avatars || [])[i]) || fallbackAvatarFor((n.users || [])[i])));
         }
-        const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
-        out.edits = matchEdits(await matchById(n.matchId), yourKey, n.relationship);
+        if (n.relationship === 'ally' || n.relationship === 'opponent') {      // only vote alerts draw the two edits
+            const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+            out.edits = matchEdits(await matchById(n.matchId), yourKey, n.relationship);
+        }
     } catch (e) { console.warn('social context failed', e); }
     return out;
 }
 
 export async function enrichSocial(list) {
-    await Promise.all((list || []).filter(n => n.relationship === 'ally' || n.relationship === 'opponent' || n.type === 'new-follower' || n.type === 'follow').map(async n => { n.nv = await socialContextFor(n); }));
+    await Promise.all((list || []).filter(n => n.relationship === 'ally' || n.relationship === 'opponent' || n.type === 'new-follower' || n.type === 'follow' || isContentNotification(n)).map(async n => { n.nv = await socialContextFor(n); }));
     return list;
 }
