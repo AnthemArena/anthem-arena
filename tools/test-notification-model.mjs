@@ -64,6 +64,18 @@ t('emote notifications: grouped per match and kind, headline by emote type, icon
     assert.ok(isSocialTabItem({ type: 'emote-received' })); assert.ok(CONTENT_PRIORITY['emote-received'] >= CONTENT_PRIORITY.reply);
 });
 
+t('likes / comments on an auto vote post say "pick" and open "View pick"', () => {
+    const v = (id, who, type, ts) => ({ id, type, eventType: 'vote', triggerUsername: who, triggerUserId: who.toLowerCase(), targetUrl: '/feed.html#post-activity_1', detail: 'Main Attraction over Jinx Edit', timestamp: ts });
+    const like = groupNotifications([v('a', 'Kai', 'like', 1)])[0];
+    assert.equal(contentHeadline(like).headline, 'Kai liked your pick'); assert.equal(contentCta(like), 'View pick'); assert.equal(contentQuote(like), 'Main Attraction over Jinx Edit');
+    const crowd = groupNotifications([v('a', 'Kai', 'like', 1), v('b', 'Rex', 'like', 2), v('c', 'Mia', 'like', 3)])[0];
+    assert.equal(contentHeadline(crowd).headline, '3 people liked your pick');
+    assert.equal(contentHeadline(groupNotifications([v('a', 'Kai', 'comment', 1)])[0]).headline, 'Kai commented on your pick');
+    assert.equal(contentHeadline(groupNotifications([v('a', 'Kai', 'comment', 1), v('b', 'Kai', 'comment', 2)])[0]).headline, 'Kai commented 2 times on your pick');
+    // a like on a normal post and one on a vote post of the same id never merge
+    assert.equal(groupNotifications([v('a', 'Kai', 'like', 1), { ...v('b', 'Rex', 'like', 2), eventType: null }]).length, 2);
+});
+
 t('follow back: message detected, headline says "followed you back", own quip pool', () => {
     const fb = { id: 'x1', triggerUsername: 'Kai', message: 'Kai followed you back' };
     assert.ok(isFollowBack(fb)); assert.ok(!isFollowBack({ message: 'Kai started following you' })); assert.ok(!isFollowBack(null));

@@ -58,3 +58,15 @@ export function rankTrending({ posts = [], now = Date.now(), windowMs = 7 * 24 *
         .filter(p => score(p) > 0 && now - (p.timestamp || 0) <= windowMs)
         .sort((a, b) => score(b) - score(a) || (b.timestamp || 0) - (a.timestamp || 0));
 }
+
+// A post by id, including the vote posts tucked inside a collapsed "X cast N votes" digest (they are not top-level items).
+export function findPostById(posts, postId) {
+    for (const p of posts || []) {
+        if (p.postId === postId) return p;
+        if (p.type === 'vote-digest') {
+            const v = (p.votes || []).find(x => x.postId === postId);
+            if (v) return v;
+        }
+    }
+    return null;
+}

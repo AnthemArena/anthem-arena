@@ -2,7 +2,7 @@
 // FEED PAGE - UI CONTROLLER
 // Arcane Moments Community
 // ========================================
-import { mixFeed, digestSummary, rankTrending } from './feed-mix-model.js';
+import { mixFeed, digestSummary, rankTrending, findPostById } from './feed-mix-model.js';
 import { buildShare, postIdFromLink } from './share-model.js';
 import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
@@ -2125,11 +2125,13 @@ async function postComment(postId, inputElement) {
         // ========================================
         
         // 1. Notify post author
-        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-        if (postElement) {
-            const post = currentPosts.find(p => p.postId === postId);
+        // (the post may sit inside a collapsed vote digest, so look there too: a vote post's owner is the voter)
+        {
+            const post = findPostById(currentPosts, postId);
             if (post && post.userId !== userId) {
                 await sendCommentNotification(post.userId, post, content);
+            } else if (!post) {
+                console.warn('⚠️ Comment saved, but the post was not found to notify its author:', postId);
             }
         }
         
@@ -2141,7 +2143,7 @@ async function postComment(postId, inputElement) {
             
             for (const mention of mentionedUsers) {
                 // Don't notify yourself or the post author (they already got notified)
-                const post = currentPosts.find(p => p.postId === postId);
+                const post = findPostById(currentPosts, postId);
                 if (mention.userId === userId || mention.userId === post?.userId) continue;
                 
                 try {
@@ -2248,6 +2250,13 @@ async function deleteComment(commentId, postId, commentElement) {
 // ✅ UPDATED: NOTIFICATION SYSTEM (INTEGRATED)
 // ========================================
 
+// "Main Attraction over Jinx Edit": what a vote post says, short enough to quote in an alert
+function votePostSummary(post) {
+    const voted = shortTitle(post.votedMomentName || post.votedSongName || post.songTitle || '', 50);
+    const other = shortTitle(post.opponentMomentName || post.opponentSongName || '', 50);
+    return voted && other ? `${voted} over ${other}` : (voted || post.content || 'your pick');
+}
+
 async function sendLikeNotification(recipientUserId, post) {
     try {
         const currentUserId = localStorage.getItem('tournamentUserId');
@@ -2259,11 +2268,14 @@ async function sendLikeNotification(recipientUserId, post) {
         // ✅ Use your existing notification system
         const { saveNotification } = await import('./notification-storage.js');
         
+        // A vote post is the voter's pick: "liked your pick", quoting what they voted for
+        const isVote = post.type === 'vote';
         await saveNotification(recipientUserId, {
             type: 'like',
+            eventType: isVote ? 'vote' : null,
             priority: 6,
-            message: `❤️ ${currentUsername} liked your post`,
-            detail: post.content || post.text || 'your post',
+            message: `❤️ ${currentUsername} liked your ${isVote ? 'pick' : 'post'}`,
+            detail: isVote ? votePostSummary(post) : (post.content || post.text || 'your post'),
             icon: '❤️',
             
             // Sender info
@@ -2302,10 +2314,12 @@ async function sendCommentNotification(recipientUserId, post, commentContent) {
             ? commentContent.substring(0, 50) + '...' 
             : commentContent;
         
+        const isVote = post.type === 'vote';
         await saveNotification(recipientUserId, {
             type: 'comment',
+            eventType: isVote ? 'vote' : null,
             priority: 7,
-            message: `💬 ${currentUsername} commented on your post`,
+            message: `💬 ${currentUsername} commented on your ${isVote ? 'pick' : 'post'}`,
             detail: `"${preview}"`,
             icon: '💬',
             
