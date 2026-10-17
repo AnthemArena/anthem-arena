@@ -722,7 +722,7 @@ function renderNotificationItem(notification) {
     return `
         <div class="notification-item ${unreadClass}" 
              data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
-             ${championAttr}>
+             ${championAttr} ${notification.relationship ? `data-relationship="${esc(notification.relationship)}"` : ''}>
             <div class="notification-item-header" style="display: flex; align-items: center;">
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
@@ -734,30 +734,12 @@ function renderNotificationItem(notification) {
                 </button>
             </div>
             
-            ${displayDetail ? `<div class="notification-item-detail">${displayDetail}</div>` : ''}
+            ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${displayDetail}</div>` : ''}
             
-            ${notification.count > 1 ? `
-                <button class="notification-expand" 
-                        onclick="expandGroupedNotification('${notification.ids.join(',')}', event)"
-                        style="
-                            margin: 8px 0;
-                            background: rgba(200, 170, 110, 0.15);
-                            border: 1px solid rgba(200, 170, 110, 0.3);
-                            color: #C8AA6E;
-                            padding: 6px 12px;
-                            border-radius: 4px;
-                            font-size: 0.75rem;
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                        "
-                        onmouseover="this.style.background='rgba(200, 170, 110, 0.25)'"
-                        onmouseout="this.style.background='rgba(200, 170, 110, 0.15)'">
-                    Show all ${notification.count} matches
-                </button>
-            ` : ''}
+
             
             <div class="notification-item-footer">
-                <span class="notification-item-time">${timeAgo}${isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : ''}</span>
+                <span class="notification-item-time">${timeAgo}${notification.count > 1 ? ` · <a class="notification-item-link" href="#" onclick="expandGroupedNotification('${notification.ids.join(',')}', event); return false;">All ${notification.count} matches</a>` : (isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : '')}</span>
                 ${ctaHtml}
             </div>
         </div>
@@ -786,7 +768,7 @@ async function updateCtaButtonsWithPrivacy() {
             // Get notification data for context
             const userId = localStorage.getItem('tournamentUserId');
             const notifications = await getUnreadNotifications(userId);
-            const notification = notifications.find(n => n.id === notifId);
+            const notification = notifications.find(n => n.id === notifId.split(',')[0]);   // grouped rows carry several ids
             
             if (action === 'send-emote') {
                 if (permissions.canEmote) {
@@ -837,7 +819,8 @@ function attachNotificationListeners() {
             if (action === 'send-emote') {
                 const userId = localStorage.getItem('tournamentUserId');
                 const notifications = await getUnreadNotifications(userId);
-                const notification = notifications.find(n => n.id === id);
+                const ids = id.split(',');                       // a grouped row ("voted in 2 matches") has several ids
+                const notification = notifications.find(n => n.id === ids[0]);
                 
                 if (notification && notification.ctaData) {
                     // Show loading state
@@ -865,8 +848,7 @@ function attachNotificationListeners() {
                         btn.style.background = '#27ae60';
                         btn.style.opacity = '1';
                         
-                        await markNotificationRead(id);
-                        await dismissNotification(id);
+                        for (const one of ids) { await markNotificationRead(one); await dismissNotification(one); }
                         
                         // Remove from UI
                         setTimeout(() => {
@@ -1342,8 +1324,8 @@ window.expandGroupedNotification = async function(idString, event) {
     
     modal.innerHTML = `
         <div style="
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid rgba(200, 170, 110, 0.3);
+            background: linear-gradient(160deg, #1c0f26 0%, #120a1c 100%);
+            border: 2px solid rgba(255, 105, 180, 0.6); box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
             border-radius: 12px;
             padding: 24px;
             max-width: 600px;
@@ -1351,21 +1333,21 @@ window.expandGroupedNotification = async function(idString, event) {
             max-height: 80vh;
             overflow-y: auto;
         ">
-            <h3 style="margin: 0 0 16px 0; color: #C8AA6E;">
+            <h3 style="margin: 0 0 16px 0; color: #ff69b4;">
                 All Matches (${groupNotifications.length})
             </h3>
             ${groupNotifications.map(n => `
                 <div style="
-                    background: rgba(200, 170, 110, 0.05);
-                    border: 1px solid rgba(200, 170, 110, 0.2);
+                    background: rgba(255, 105, 180, 0.07);
+                    border: 1px solid rgba(255, 105, 180, 0.25);
                     border-radius: 8px;
                     padding: 12px;
                     margin-bottom: 12px;
                 ">
-                    <div style="font-weight: 600; color: #C8AA6E; margin-bottom: 4px;">
+                    <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">
                         ${n.matchTitle}
                     </div>
-                    <div style="font-size: 0.85rem; color: #888;">
+                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">
                         ${n.detail}
                     </div>
                 </div>
@@ -1373,9 +1355,9 @@ window.expandGroupedNotification = async function(idString, event) {
             <button onclick="this.closest('div[style*=fixed]').remove()" style="
                 width: 100%;
                 margin-top: 16px;
-                background: linear-gradient(135deg, #C8AA6E, #B89A5E);
+                background: linear-gradient(135deg, #ff69b4, #ff1493);
                 border: none;
-                color: #1a1a2e;
+                color: #fff;
                 padding: 12px;
                 border-radius: 8px;
                 cursor: pointer;
