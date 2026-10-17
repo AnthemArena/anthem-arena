@@ -2211,7 +2211,7 @@ async function loadTasteMatch(profile) {
         const tabs = section.querySelectorAll('.taste-tab');
         tabs[0].textContent = `Voted differently (${r.disagreeCount})`;
         tabs[1].textContent = `Same pick (${r.agreeCount})`;
-        const thumb = (row, side) => { const u = pickThumb(row, side); return u ? `<img src="${escapeHtml(u)}" alt="" loading="lazy" onerror="this.remove()">` : ''; };
+        const thumb = (row, side) => { const u = pickThumb(row, side, id => musicData[id]?.videoId); return u ? `<img src="${escapeHtml(u)}" alt="" loading="lazy" onerror="this.remove()">` : ''; };
         const pick = (row, side, who, cls) => `<span class="taste-pick ${cls}">${thumb(row, side)}<span class="taste-pick-text"><em>${who}</em><span>${escapeHtml(pickTitle(row, side))}</span></span></span>`;
         let showAll = false, current = r.disagreeCount ? 'disagree' : 'agree';
         const draw = which => {
