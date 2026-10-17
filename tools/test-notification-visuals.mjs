@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -67,5 +67,15 @@ t('toast headline puts the name on one line and the action under it', () => {
     const h = toastHeadlineHtml('FierceWatcher229 voted against you', 'https://x/a.png', 'FierceWatcher229', '#ff69b4');
     assert.ok(h.includes('nv-toast-name">FierceWatcher229<') && h.includes('nv-toast-action">voted against you<'));
     assert.ok(toastHeadlineHtml('Someone voted with you', null, 'Kai', '#fff').includes('Someone voted with you'));   // name not at the start: whole text kept
+});
+t('follow row and toast: name, quip, right button, safe text', () => {
+    const n = { id: 'x1', type: 'new-follower', triggerUserId: 'u9', triggerUsername: 'Kai<b>', targetUrl: '/profile.html?user=Kai' };
+    const row = followRowHtml(n, { headline: 'Kai<b> followed you', quip: 'New fan detected.', timeAgo: '5m ago', championPack: { id: 'jinx', color: '#ff69b4', icon: 'https://x/j.png' }, theirSrc: null });
+    assert.ok(row.includes('data-action="follow-back"') && row.includes('data-user-id="u9"') && row.includes('Follow back') && row.includes('New fan detected.'));
+    assert.ok(!row.includes('Kai<b>') && row.includes('Kai&lt;b&gt;'));
+    const already = followRowHtml(n, { headline: 'Kai followed you', quip: '', timeAgo: '', championPack: null, alreadyFollowing: true });
+    assert.ok(already.includes('data-action="navigate"') && already.includes('View profile') && !already.includes('follow-back'));
+    const toast = followToastHtml(n, { theirSrc: null, jinxSrc: 'https://x/j.png', accent: '#ff69b4', quip: 'Another one joins the chaos!', cta: 'Follow back' });
+    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('followed you') && toast.includes('Another one joins the chaos!') && toast.includes('nv-follow-face'));
 });
 console.log(`${pass} passed`);

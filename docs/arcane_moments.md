@@ -560,3 +560,11 @@ With real thumbnails the round avatars on the pictures were cluttered (and the v
 ### Toast polish
 
 Ally/rival toast: avatar and name on one line with "voted against you" underneath (a long name ellipsises instead of wrapping the sentence), padding trimmed, Jinx portrait 62 -> 52 px, speech bubble and button a little tighter, and the close button is a small dark translucent circle instead of the white one. Bell rows are unchanged.
+
+## New-follower notifications (champion style)
+
+- **Social tab fix:** follows are saved as `new-follower`, but the Social tab only looked for `follow`, so they never appeared there. The tab now lists follows, likes, comments, mentions, replies and the ally/rival alerts (`isSocialTabItem` in `js/notification-model.js`).
+- **Bell row** (`followRowHtml`): their avatar, "X followed you", a Jinx line (stable per row, `followQuip`) and one button: "Follow back" (follows them from the bell, then shows "✓ Following") or "View profile" if you already follow them. The whole row opens their profile.
+- **Toast** (`followToastHtml`): their face, name, "followed you", Jinx's line, the same button on the bar. Only while the tab is visible, and it follows the existing "Pop-up alerts" setting (everyone / people I follow / off).
+- **Live listener** (`setupFollowListener` in `js/global-notifications.js`): `onSnapshot` on this user's own unshown `new-follower` rows (equality filters only, no composite index needed). Rows are marked shown straight away; the newest one under 2 hours old may pop up; older ones just wait in the bell. New-follower rows are excluded from the "missed while away" toasts so they are not shown twice.
+- Likes / comments / mentions / replies still use the plain row. Next: the same card style, grouped ("3 people liked your post").

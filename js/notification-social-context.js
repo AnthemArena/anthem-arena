@@ -50,6 +50,6 @@ export async function socialContextFor(n) {
 }
 
 export async function enrichSocial(list) {
-    await Promise.all((list || []).filter(n => n.relationship === 'ally' || n.relationship === 'opponent').map(async n => { n.nv = await socialContextFor(n); }));
+    await Promise.all((list || []).filter(n => n.relationship === 'ally' || n.relationship === 'opponent' || n.type === 'new-follower' || n.type === 'follow').map(async n => { n.nv = await socialContextFor(n); }));
     return list;
 }
