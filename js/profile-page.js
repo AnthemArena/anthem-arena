@@ -22,7 +22,7 @@ import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
 
 import { fixAvatarUrl } from './avatar-url.js';
-import { compareVotes, pickTitle } from './taste-match.js';
+import { compareVotes, pickTitle, pickThumb } from './taste-match.js';
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
 // ========================================
@@ -2196,25 +2196,40 @@ async function loadTasteMatch(profile) {
         if (!r.shared) return;
 
         const name = escapeHtml(profile.username || 'them');
-        document.getElementById('tasteTitle').innerHTML = `You and <strong>${name}</strong> agree on <strong>${r.agreeCount} of ${r.shared}</strong> match${r.shared === 1 ? '' : 'es'}`;
-        document.getElementById('tasteLabel').textContent = r.label ? `${r.label} · ${r.pct}%` : '';
-        document.getElementById('tasteBar').setAttribute('aria-label', `${r.pct}% agreement`);
+        const tier = r.tier;
+        section.dataset.tone = tier.tone;
+        document.getElementById('tasteTitle').innerHTML = tier.showPct
+            ? `You and <strong>${name}</strong> agree on <strong>${r.agreeCount} of ${r.shared}</strong> matches`
+            : `You and <strong>${name}</strong> have voted in <strong>${r.shared}</strong> of the same match${r.shared === 1 ? '' : 'es'}`;
+        document.getElementById('tasteLabel').textContent = tier.showPct ? `${tier.label} · ${r.pct}%` : (r.shared === 1 ? 'Keep voting to compare more' : 'A few more votes will tell');
+        const bar = document.getElementById('tasteBar');
+        bar.hidden = !tier.showPct;
+        bar.setAttribute('aria-label', `${r.pct}% agreement`);
         document.getElementById('tasteBarAgree').style.width = `${r.pct}%`;
         document.getElementById('tasteCounts').innerHTML = `<span class="taste-agree">${r.agreeCount} same pick${r.agreeCount === 1 ? '' : 's'}</span><span class="taste-disagree">${r.disagreeCount} voted differently</span>`;
 
         const tabs = section.querySelectorAll('.taste-tab');
         tabs[0].textContent = `Voted differently (${r.disagreeCount})`;
         tabs[1].textContent = `Same pick (${r.agreeCount})`;
+        const thumb = (row, side) => { const u = pickThumb(row, side); return u ? `<img src="${escapeHtml(u)}" alt="" loading="lazy" onerror="this.remove()">` : ''; };
+        const pick = (row, side, who, cls) => `<span class="taste-pick ${cls}">${thumb(row, side)}<span class="taste-pick-text"><em>${who}</em><span>${escapeHtml(pickTitle(row, side))}</span></span></span>`;
+        let showAll = false, current = r.disagreeCount ? 'disagree' : 'agree';
         const draw = which => {
-            const rows = (which === 'agree' ? r.agree : r.disagree).slice(0, 8);
-            document.getElementById('tasteList').innerHTML = rows.length ? rows.map(row => which === 'agree'
-                ? `<li><a href="/vote.html?id=${encodeURIComponent(row.matchId)}"><span class="taste-pick both">${escapeHtml(pickTitle(row, 'yours'))}</span></a></li>`
-                : `<li><a href="/vote.html?id=${encodeURIComponent(row.matchId)}"><span class="taste-pick you"><em>You</em> ${escapeHtml(pickTitle(row, 'yours'))}</span><span class="taste-pick them"><em>${name}</em> ${escapeHtml(pickTitle(row, 'theirs'))}</span></a></li>`).join('')
-                : '<li class="taste-empty">Nothing here yet.</li>';
+            current = which;
+            const all = which === 'agree' ? r.agree : r.disagree;
+            const rows = showAll ? all : all.slice(0, 3);
+            document.getElementById('tasteList').innerHTML = (rows.length ? rows.map(row => {
+                const href = `/vote.html?id=${encodeURIComponent(row.matchId)}`;
+                return which === 'agree'
+                    ? `<li><a href="${href}">${pick(row, 'yours', 'You both', 'both')}</a></li>`
+                    : `<li><a href="${href}">${pick(row, 'yours', 'You', 'you')}<span class="taste-vs">VS</span>${pick(row, 'theirs', name, 'them')}</a></li>`;
+            }).join('') : '<li class="taste-empty">Nothing here yet.</li>')
+                + (all.length > 3 ? `<li class="taste-more"><button type="button" id="tasteMore">${showAll ? 'Show fewer' : `Show all ${all.length}`}</button></li>` : '');
+            document.getElementById('tasteMore')?.addEventListener('click', () => { showAll = !showAll; draw(current); });
             tabs.forEach(t => t.classList.toggle('active', t.dataset.which === which));
         };
-        tabs.forEach(t => t.addEventListener('click', () => draw(t.dataset.which)));
-        draw(r.disagreeCount ? 'disagree' : 'agree');
+        tabs.forEach(t => t.addEventListener('click', () => { showAll = false; draw(t.dataset.which); }));
+        draw(current);
         section.hidden = false;
     } catch (error) {
         console.warn('Taste match unavailable:', error);   // optional extra: never breaks the profile

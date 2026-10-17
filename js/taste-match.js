@@ -19,17 +19,32 @@ export function compareVotes(mine = [], theirs = []) {
     agree.sort(byNewest); disagree.sort(byNewest);
     const shared = agree.length + disagree.length;
     const pct = shared ? Math.round((agree.length / shared) * 100) : null;
-    return { shared, agreeCount: agree.length, disagreeCount: disagree.length, pct, agree, disagree, label: tasteLabel(pct, shared) };
+    return { shared, agreeCount: agree.length, disagreeCount: disagree.length, pct, agree, disagree, label: tasteLabel(pct, shared), tier: tasteTier(pct, shared) };
 }
 
-// Few shared matches say little, so the label stays neutral until there are at least 3.
-export function tasteLabel(pct, shared) {
+// Label tiers. Under 3 shared matches a percentage is mostly luck, so no label or percent is shown. The two extremes need 5+
+// shared matches ("Soul mates" at 100%, "Arch-rivals" at 0%); with 3-4 they read as Kindred spirits / Rivals instead.
+// tone: 'agree' (green), 'mixed' (amber), 'differ' (pink), 'none' (neutral).
+export function tasteTier(pct, shared) {
     if (!shared) return null;
-    if (shared < 3) return 'Just getting started';
-    if (pct >= 80) return 'Kindred spirits';
-    if (pct >= 60) return 'Similar taste';
-    if (pct >= 40) return 'Mixed opinions';
-    return 'Natural rivals';
+    if (shared < 3) return { label: `${shared} match${shared === 1 ? '' : 'es'} in common`, tone: 'none', showPct: false };
+    const strong = shared >= 5;
+    if (pct === 100 && strong) return { label: 'Soul mates', tone: 'agree', showPct: true };
+    if (pct >= 90) return { label: 'Kindred spirits', tone: 'agree', showPct: true };
+    if (pct >= 75) return { label: 'Same wavelength', tone: 'agree', showPct: true };
+    if (pct >= 60) return { label: 'Similar taste', tone: 'agree', showPct: true };
+    if (pct >= 40) return { label: 'Split decision', tone: 'mixed', showPct: true };
+    if (pct >= 25) return { label: 'Different tastes', tone: 'differ', showPct: true };
+    if (pct === 0 && strong) return { label: 'Arch-rivals', tone: 'differ', showPct: true };
+    return { label: 'Rivals', tone: 'differ', showPct: true };
+}
+
+export function tasteLabel(pct, shared) { return tasteTier(pct, shared)?.label ?? null; }
+
+export function pickThumb(row, side) {
+    const key = side === 'yours' ? row.yourChoice : row.theirChoice;
+    const id = row.match?.[key]?.videoId;
+    return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
 }
 
 export function pickTitle(row, side) {
