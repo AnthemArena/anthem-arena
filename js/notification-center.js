@@ -722,7 +722,7 @@ function renderNotificationItem(notification) {
     return `
         <div class="notification-item ${unreadClass}" 
              data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
-             ${championAttr}>
+             ${championAttr} ${notification.relationship ? `data-relationship="${esc(notification.relationship)}"` : ''}>
             <div class="notification-item-header" style="display: flex; align-items: center;">
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
@@ -734,30 +734,12 @@ function renderNotificationItem(notification) {
                 </button>
             </div>
             
-            ${displayDetail ? `<div class="notification-item-detail">${displayDetail}</div>` : ''}
+            ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${displayDetail}</div>` : ''}
             
-            ${notification.count > 1 ? `
-                <button class="notification-expand" 
-                        onclick="expandGroupedNotification('${notification.ids.join(',')}', event)"
-                        style="
-                            margin: 8px 0;
-                            background: rgba(255, 105, 180, 0.12);
-                            border: 1px solid rgba(255, 105, 180, 0.4);
-                            color: #ff9bd6;
-                            padding: 6px 12px;
-                            border-radius: 4px;
-                            font-size: 0.75rem;
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                        "
-                        onmouseover="this.style.background='rgba(255, 105, 180, 0.25)'"
-                        onmouseout="this.style.background='rgba(255, 105, 180, 0.12)'">
-                    Show all ${notification.count} matches
-                </button>
-            ` : ''}
+
             
             <div class="notification-item-footer">
-                <span class="notification-item-time">${timeAgo}${isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : ''}</span>
+                <span class="notification-item-time">${timeAgo}${notification.count > 1 ? ` · <a class="notification-item-link" href="#" onclick="expandGroupedNotification('${notification.ids.join(',')}', event); return false;">All ${notification.count} matches</a>` : (isSocial && notification.targetUrl ? ` · <a class="notification-item-link" href="${esc(notification.targetUrl)}">View match</a>` : '')}</span>
                 ${ctaHtml}
             </div>
         </div>
