@@ -1,3 +1,4 @@
+import { songThumb } from './song-thumb.js';
 // "Taste match": how often two people picked the same edit in the matches they both voted in.
 // Pure (no Firebase): profile-page.js hands it the two vote lists it already loads.
 
@@ -41,10 +42,9 @@ export function tasteTier(pct, shared) {
 
 export function tasteLabel(pct, shared) { return tasteTier(pct, shared)?.label ?? null; }
 
-export function pickThumb(row, side) {
+export function pickThumb(row, side, lookup = null) {
     const key = side === 'yours' ? row.yourChoice : row.theirChoice;
-    const id = row.match?.[key]?.videoId;
-    return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
+    return songThumb(row.match?.[key], lookup);
 }
 
 export function pickTitle(row, side) {

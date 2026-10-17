@@ -544,3 +544,7 @@ Labels (`tasteTier` in `js/taste-match.js`). Fewer than 3 shared matches: neutra
 | 0% (5+ shared) | Arch-rivals | pink |
 
 Rows show the two edit thumbnails and titles in aligned columns with a VS between (your pick white, theirs pink, shared green); the first 3 rows show with "Show all N" to expand.
+
+### Edit thumbnails: one shared lookup (`js/song-thumb.js`)
+
+Match song objects don't reliably carry the YouTube id under `videoId`. `songThumb(song, lookup?)` tries `videoId`, then `id` (only a real 11-character YouTube id counts), then the music list (id/seed → video, profile page only), then a ready-made `thumbnail` url. Used by the taste-match rows and the notification VS pair.

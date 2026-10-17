@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { songThumb } from '../js/song-thumb.js';
 import { compareVotes, tasteLabel, tasteTier, pickTitle, pickThumb } from '../js/taste-match.js';
 const t = (n, f) => { f(); console.log('  ok  ', n); };
 const v = (matchId, choice, ts = 0, extra = {}) => ({ matchId, choice, timestamp: ts, ...extra });
@@ -30,7 +31,15 @@ t('tones: green for agreement, amber for split, pink for differing', () => {
 });
 t('edit thumbnails come from the match videoId', () => {
     const row = { yourChoice: 'song1', theirChoice: 'song2', match: { song1: { videoId: 'AAA' }, song2: {} } };
-    assert.equal(pickThumb(row, 'yours'), 'https://img.youtube.com/vi/AAA/mqdefault.jpg'); assert.equal(pickThumb(row, 'theirs'), null);
+    assert.equal(pickThumb(row, 'yours'), null);   // 'AAA' is not an 11-character YouTube id
+    const ok = { yourChoice: 'song1', theirChoice: 'song2', match: { song1: { videoId: 'UOxkGD8qRB4' }, song2: { id: 'abcdefghijk' } } };
+    assert.equal(pickThumb(ok, 'yours'), 'https://img.youtube.com/vi/UOxkGD8qRB4/mqdefault.jpg'); assert.equal(pickThumb(ok, 'theirs'), 'https://img.youtube.com/vi/abcdefghijk/mqdefault.jpg');
+});
+t('thumbnails fall back to the music list and then to a ready-made url', () => {
+    const lookup = id => ({ 2: 'UOxkGD8qRB4' })[id];
+    assert.equal(songThumb({ id: 2 }, lookup), 'https://img.youtube.com/vi/UOxkGD8qRB4/mqdefault.jpg');
+    assert.equal(songThumb({ id: 7, thumbnail: 'https://x/t.jpg' }, lookup), 'https://x/t.jpg');
+    assert.equal(songThumb({ id: 7 }, lookup), null); assert.equal(songThumb(null), null);
 });
 t('lists are newest first and titles come from the match', () => {
     const m = { song1: { title: 'A' }, song2: { title: 'B' } };
@@ -38,4 +47,4 @@ t('lists are newest first and titles come from the match', () => {
     assert.deepEqual(r.disagree.map(x => x.matchId), ['b', 'a']);
     assert.equal(pickTitle(r.disagree[0], 'yours'), 'A'); assert.equal(pickTitle(r.disagree[0], 'theirs'), 'B');
 });
-console.log('7 passed');
+console.log('8 passed');

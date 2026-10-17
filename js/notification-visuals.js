@@ -1,4 +1,5 @@
 import { fixAvatarUrl } from './avatar-url.js';
+import { songThumb } from './song-thumb.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -56,8 +57,7 @@ export function fallbackAvatarFor(name) {
 export const videoThumb = id => (id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null);
 export function matchEdits(match, yourKey, relationship) {
     if (!match || (yourKey !== 'song1' && yourKey !== 'song2')) return null;
-    const idOf = s => s?.videoId || s?.id || null;
-    const l = videoThumb(idOf(match.song1)), r = videoThumb(idOf(match.song2));
+    const l = songThumb(match.song1), r = songThumb(match.song2);
     if (!l && !r) return null;
     const other = yourKey === 'song1' ? 'song2' : 'song1';
     return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey, theirKey: relationship === 'ally' ? yourKey : other };
