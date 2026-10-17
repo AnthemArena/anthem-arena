@@ -7,8 +7,9 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
-import { groupNotifications, groupHeadline } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
+import { socialRowHtml } from './notification-visuals.js';
 
 // ✅ GUARD: Prevent duplicate initialization
 let isInitialized = false;
@@ -645,6 +646,8 @@ function renderNotificationItem(notification) {
             notification = { ...notification, ctaAction: 'navigate', ctaText: 'View match' };
         }
     }
+    // Single ally/rival rows (including ones saved before this wording): always the short headline
+    if (!headline && isSocial && !(notification.count > 1)) displayMessage = socialHeadline(notification);
     if (!headline && notification.count > 1) {
         displayMessage = `${notification.triggerUsername} voted in ${notification.count} matches`;
         
@@ -659,6 +662,8 @@ function renderNotificationItem(notification) {
             : matchTitles;
     }
     
+    if (isSocial) return socialRowHtml(notification, { headline, timeAgo, championPack });
+
     // Image logic
     let imageHtml = '';
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -747,6 +752,7 @@ function renderNotificationItem(notification) {
             </div>
             
             ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${displayDetail}</div>` : ''}
+            ${isSocial && notification.matchTitle && (!(notification.count > 1) || notification.groupKind === 'match') ? `<div class="notification-item-match" title="${esc(notification.matchTitle)}">in ${esc(notification.matchTitle)}</div>` : ''}
             
 
             
@@ -935,7 +941,7 @@ function attachNotificationListeners() {
             e.stopPropagation();
             const id = btn.dataset.id;
             
-            await dismissNotification(id);
+            for (const one of id.split(',')) await dismissNotification(one);   // a grouped row carries several ids
             
             const item = btn.closest('.notification-item');
             item.style.opacity = '0';
@@ -952,11 +958,16 @@ function attachNotificationListeners() {
     });
     
     document.querySelectorAll('.notification-item').forEach(item => {
-        item.addEventListener('click', async () => {
+        item.addEventListener('click', async (e) => {
             const id = item.dataset.id;
-            await markNotificationRead(id);
+            for (const one of id.split(',')) await markNotificationRead(one);
             item.classList.remove('unread');
             await updateBadgeCount();
+            // ally / rival rows: the row itself opens the match (a per-person group opens its list)
+            if (item.classList.contains('nv-row') && !e.target.closest('button, a')) {
+                if (item.dataset.group) window.expandGroupedNotification?.(item.dataset.group, e);
+                else if (item.dataset.url) window.location.href = item.dataset.url;
+            }
         });
     });
 }
