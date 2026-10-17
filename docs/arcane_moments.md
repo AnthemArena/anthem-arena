@@ -527,3 +527,20 @@ On another person's profile, a card under the header reads "You and X agree on N
 - Uses the shared, cached `fetchUserVotes` in `profile-page.js`: the profile's votes are already loaded, so the only extra read is your own vote list, once per page load.
 - Hidden on your own profile, when you have no votes, and when you have no matches in common. Any failure just leaves the card hidden.
 - Votes are publicly readable and the profile already lists them, so nothing new is exposed. The feed tag ("agrees with you" on vote posts) is not built yet.
+
+### Taste match: labels and layout (polish)
+
+Labels (`tasteTier` in `js/taste-match.js`). Fewer than 3 shared matches: neutral "N matches in common", no percent, no bar. From 3 shared:
+
+| Agreement | Label | Colour |
+|---|---|---|
+| 100% (5+ shared) | Soul mates | green |
+| 90-100% | Kindred spirits | green |
+| 75-89% | Same wavelength | green |
+| 60-74% | Similar taste | green |
+| 40-59% | Split decision | amber |
+| 25-39% | Different tastes | pink |
+| 1-24% | Rivals | pink |
+| 0% (5+ shared) | Arch-rivals | pink |
+
+Rows show the two edit thumbnails and titles in aligned columns with a VS between (your pick white, theirs pink, shared green); the first 3 rows show with "Show all N" to expand.

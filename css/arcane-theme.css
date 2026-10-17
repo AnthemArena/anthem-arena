@@ -1890,26 +1890,37 @@ body.theme-arcane .notification-item[data-relationship] .notification-item-cta {
 body.theme-arcane .notification-item-match { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---- Taste match (profile of another person) ---- */
-.taste-match { margin: 18px 0; padding: 16px 18px; border-radius: 16px; background: rgba(26, 18, 38, 0.85); border: 1px solid rgba(255, 105, 180, 0.35); box-shadow: 0 0 22px rgba(255, 105, 180, 0.12); }
-.taste-match[hidden] { display: none; }
+.taste-match { --tm: #86efac; margin: 18px 0; padding: 14px 18px; border-radius: 16px; background: rgba(26, 18, 38, 0.85); border: 1px solid rgba(255, 105, 180, 0.35); box-shadow: 0 0 22px rgba(255, 105, 180, 0.12); }
+.taste-match[data-tone="mixed"] { --tm: #fbbf24; }
+.taste-match[data-tone="differ"] { --tm: #ff9bd6; }
+.taste-match[data-tone="none"] { --tm: rgba(255, 255, 255, 0.6); }
+.taste-match[hidden], .taste-bar[hidden] { display: none; }
 .taste-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
 .taste-title { font-size: 1.05rem; color: #fff; }
 .taste-title strong { color: #ff9bd6; }
-.taste-label { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #86efac; }
+.taste-label { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--tm); }
 .taste-bar { height: 10px; border-radius: 999px; background: rgba(255, 105, 180, 0.28); overflow: hidden; }
 .taste-bar-agree { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4ade80, #22c55e); }
-.taste-counts { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 12px; font-size: 0.85rem; }
+.taste-counts { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 10px; font-size: 0.85rem; }
 .taste-agree { color: #86efac; }
 .taste-disagree { color: #ff9bd6; }
 .taste-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .taste-tab { padding: 6px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: rgba(255, 255, 255, 0.75); background: transparent; border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer; }
 .taste-tab.active { color: #fff; border-color: #ff69b4; background: rgba(255, 105, 180, 0.2); }
 .taste-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.taste-list a { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); text-decoration: none; color: #fff; font-size: 0.85rem; }
+.taste-list a { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); text-decoration: none; color: #fff; font-size: 0.85rem; }
 .taste-list a:hover { background: rgba(255, 105, 180, 0.15); }
-.taste-pick { flex: 1 1 200px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.taste-pick em { font-style: normal; font-weight: 700; margin-right: 4px; }
-.taste-pick.you em { color: #fff; }
+.taste-pick { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.taste-pick img { width: 56px; height: 32px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 2px solid rgba(255, 255, 255, 0.5); }
+.taste-pick.them img { border-color: #ff69b4; }
+.taste-pick.both img { border-color: #4ade80; }
+.taste-pick-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.taste-pick-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.taste-pick em { font-style: normal; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.7); }
 .taste-pick.them em { color: #ff9bd6; }
-.taste-pick.both { color: #86efac; }
+.taste-pick.both em { color: #86efac; }
+.taste-vs { font-size: 0.7rem; font-weight: 800; color: #ff69b4; }
+.taste-more { text-align: center; }
+.taste-more button { background: none; border: none; color: #ff9bd6; font-weight: 600; font-size: 0.8rem; cursor: pointer; padding: 4px; }
 .taste-empty { color: rgba(255, 255, 255, 0.55); font-size: 0.85rem; padding: 6px 2px; }
+@media (max-width: 560px) { .taste-list a { grid-template-columns: 1fr; } .taste-vs { justify-self: center; } }
