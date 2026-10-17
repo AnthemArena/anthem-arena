@@ -2,7 +2,14 @@
 // Self-contained on purpose: no imports, so both the Deno edge bundler and the Node function bundler can load it.
 
 export const PREVIEW_BOT = /(discordbot|twitterbot|facebookexternalhit|facebot|slackbot|slack-imgproxy|whatsapp|telegrambot|linkedinbot|redditbot|applebot|googlebot|bingbot|skypeuripreview|embedly|pinterest|mastodon|bluesky|iframely|signal)/i;
-export const isPreviewBot = ua => PREVIEW_BOT.test(String(ua || ''));
+// Known preview bots, PLUS anything that does not identify as a normal browser: every real browser's user-agent starts "Mozilla/5.0",
+// while many link fetchers do not (Tumblr, Facebook, Viber, Line ...), and a list of names always misses some.
+const LOOKS_AUTOMATED = /(bot|crawl|spider|preview|unfurl|fetch|scrape|fetcher|tumblr|vkshare|viber|line\/|kakaotalk)/i;
+export const isPreviewBot = ua => {
+    ua = String(ua || '');
+    if (PREVIEW_BOT.test(ua) || LOOKS_AUTOMATED.test(ua)) return true;
+    return !/^mozilla\//i.test(ua);   // empty or non-browser user-agent
+};
 
 // same idea as js/title-clean.js: drop trailing hashtags and everything after the first " - " / "||"
 const TRAILING_TAGS = /(?:[\s ]*#(?=[\p{N}_]*\p{L})[\p{L}\p{N}_]+)+[\s ]*$/u;
