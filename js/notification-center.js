@@ -1344,11 +1344,12 @@ window.expandGroupedNotification = async function(idString, event) {
                     padding: 12px;
                     margin-bottom: 12px;
                 ">
-                    <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">
+                    <a href="${n.targetUrl || '#'}" style="display: block; font-weight: 600; color: #fff; margin-bottom: 4px; text-decoration: none;">
                         ${n.matchTitle}
-                    </div>
+                    </a>
                     <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">
-                        ${n.detail}
+                        ${n.relationship === 'ally' ? '🤝 Same pick as you' : n.relationship === 'opponent' ? '⚔️ Voted against you' : ''}
+                        ${n.targetUrl ? ' · <a href="' + n.targetUrl + '" style="color: #ff9bd6;">View match</a>' : ''}
                     </div>
                 </div>
             `).join('')}
