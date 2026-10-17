@@ -1115,7 +1115,8 @@ let lastSeenActivityIds = new Set(
     JSON.parse(localStorage.getItem('lastSeenActivityIds') || '[]')
 );
 
-const ACTIVITY_CHECK_INTERVAL = 30000; // Check every 30 seconds
+const ACTIVITY_CHECK_INTERVAL = 60000; // Check every 60 seconds (and never while the tab is hidden: it catches up on return)
+const ACTIVITY_BACKOFF = 5 * 60 * 1000; // after a failed read (quota, offline) wait this long before trying again
 
 // ✅ NEW: Configurable time windows
 const TOAST_WINDOW_MINUTES = 60;  // Show toasts for votes in last 60 minutes
@@ -1127,11 +1128,14 @@ async function checkRecentVotes() {
     try {
         // Throttle checks
         const now = Date.now();
+        if (document.hidden) return;
         if (now - lastActivityCheck < ACTIVITY_CHECK_INTERVAL) return;
         lastActivityCheck = now;
         
         // Get recent activity (increased from 10 to 50)
-        const activities = await getActivityFeed(50);
+        let activities;
+        try { activities = await getActivityFeed(50); }
+        catch (e) { lastActivityCheck = Date.now() + ACTIVITY_BACKOFF - ACTIVITY_CHECK_INTERVAL; throw e; }
         
         if (!activities || activities.length === 0) return;
         
@@ -2971,7 +2975,7 @@ function initBulletinSystem() {
     
     // ✅ START SOCIAL ACTIVITY CHECKING (ally/rival notifications)
     checkRecentVotes(); // Run once immediately
-    setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL); // Then every 30 seconds
+    setInterval(checkRecentVotes, ACTIVITY_CHECK_INTERVAL); // Then every 60 seconds
     
     console.log('✅ Bulletin system initialized with live activity');
 }

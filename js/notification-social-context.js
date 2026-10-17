@@ -21,10 +21,16 @@ async function profileAvatar(userId) {
     return src;
 }
 
+let matchesInflight = null;
 async function matchById(matchId) {
     if (!matchId) return null;
     if (Date.now() - matchesCache.at > 5 * 60 * 1000) {
-        try { const list = await withTimeout(getAllMatches(), 3000); if (Array.isArray(list)) matchesCache = { at: Date.now(), list }; } catch { /* keep the old list */ }
+        // One request shared by every row; a failure is remembered for a minute so a bad API is not retried per row
+        matchesInflight = matchesInflight || (async () => {
+            try { const list = await withTimeout(getAllMatches(), 3000); if (Array.isArray(list)) { matchesCache = { at: Date.now(), list }; return; } } catch { /* keep the old list */ }
+            matchesCache = { at: Date.now() - 4 * 60 * 1000, list: matchesCache.list };
+        })().finally(() => { matchesInflight = null; });
+        await matchesInflight;
     }
     return matchesCache.list.find(m => (m.matchId || m.id) === matchId) || null;
 }

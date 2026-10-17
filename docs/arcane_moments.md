@@ -508,3 +508,9 @@ X (and others) remember the preview image per address, including a failed fetch:
 ## Notifications: VS pair shows the match's two edits
 
 Ally/rival toasts and bell rows now show the match's two edit thumbnails as `[edit A] VS [edit B]`. Picks are ringed (theirs in the accent colour, yours in white, a shared pick in green) and the other edit is dimmed. The voter's avatar and yours sit on the outer edge of the edit each picked (the second tucks in beside the first when you both picked the same edit). Thumbnails come from the match data and your stored `userVotes` at render time (`matchEdits` in `js/notification-visuals.js`, lookups in `js/notification-social-context.js`). If the match or your vote cannot be found, it falls back to the avatar pair.
+
+## Fewer Firestore reads
+
+- Activity check for ally/rival alerts: every 60 s (was 30), skipped while the tab is hidden (the return-to-tab check catches up), and after a failed read it waits 5 minutes before trying again.
+- Notification context lookups share one matches request per open bell; a failure is remembered for a minute instead of retried per row.
+- The @mention user list (whole `profiles` collection) is saved in `localStorage` (`mentionUsersCache`, about 10 minutes) so each page load doesn't re-read it.
