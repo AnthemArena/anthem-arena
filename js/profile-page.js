@@ -21,6 +21,7 @@ import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
 
+import { fixAvatarUrl } from './avatar-url.js';
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
 // ========================================
@@ -420,7 +421,7 @@ async function renderProfile(profile) {
     // Avatar
     const avatarEl = document.getElementById('profileAvatar');
     if (profile.avatar.type === 'url') {
-        avatarEl.innerHTML = `<img src="${profile.avatar.value}" alt="${profile.username}" />`;
+        avatarEl.innerHTML = `<img src="${fixAvatarUrl(profile.avatar.value)}" alt="${profile.username}" />`;
     } else {
         avatarEl.textContent = profile.avatar.value;
     }
@@ -2145,7 +2146,7 @@ function setupVoteFilters() {
 
 function renderPostCard(post) {
     const avatar = post.avatar?.type === 'url' 
-        ? `<img src="${post.avatar.value}" alt="${post.username}" />`
+        ? `<img src="${fixAvatarUrl(post.avatar.value)}" alt="${post.username}" />`
         : post.avatar?.value || '🎵';
     
     const timestamp = new Date(post.timestamp);
@@ -3601,7 +3602,7 @@ function getAvatarUrl(avatar) {
         return createEmojiAvatar('🎵');
     }
     
-    if (avatar.type === 'url') return avatar.value;
+    if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
     if (avatar.type === 'champion') return avatar.imageUrl;
     if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
     

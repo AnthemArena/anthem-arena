@@ -17,6 +17,7 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
 
+import { fixAvatarUrl } from './avatar-url.js';
 // Several widgets need the same matches and the same user votes: ask once per page load.
 const once = (() => { const memo = new Map(); return (key, fn) => { if (!memo.has(key)) memo.set(key, fn()); return memo.get(key); }; })();
 const matchesOnce = () => once('matches', () => getAllMatches());
@@ -708,8 +709,8 @@ function getAvatarUrl(avatar) {
         return createEmojiAvatar('🎵');
     }
     
-    if (avatar.type === 'url') return avatar.value;
-    if (avatar.type === 'champion') return avatar.imageUrl;
+    if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
+    if (avatar.type === 'champion') return fixAvatarUrl(avatar.imageUrl);
     if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
     
     return createEmojiAvatar('🎵');
