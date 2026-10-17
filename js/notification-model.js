@@ -42,3 +42,24 @@ export function groupHeadline(g) {
     if (g.groupKind === 'match') return { message: `${g.count} people ${what}`, detail: g.users.slice(0, 3).join(', ') + (g.users.length > 3 ? ` +${g.users.length - 3} more` : '') };
     return { message: `${g.triggerUsername || 'Someone'} ${what} in ${g.count} matches`, detail: null };
 }
+
+// ---- Social tab and follow notifications ----
+// Types shown under the bell's Social tab. Follows are saved as 'new-follower' (older code looked for 'follow', so they never matched).
+export const SOCIAL_TAB_TYPES = ['like', 'comment', 'new-follower', 'follow', 'mention', 'reply'];
+export const isFollowNotification = n => n?.type === 'new-follower' || n?.type === 'follow';
+export const isSocialTabItem = n => !!n && (SOCIAL_TAB_TYPES.includes(n.type) || isSocialNotification(n));
+
+export const FOLLOW_QUIPS = [
+    'New fan detected. Try to keep up!',
+    'Someone is watching. Good. Make it a show!',
+    'Another one joins the chaos!',
+    'Looks like you made an impression.'
+];
+// Stable per notification (same row always shows the same line), spread by a simple hash of the id/username.
+export function followQuip(n, quips = FOLLOW_QUIPS) {
+    const key = String(n?.id || n?.triggerUserId || n?.triggerUsername || '');
+    let h = 0;
+    for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+    return quips[h % quips.length];
+}
+export const followHeadline = n => `${n?.triggerUsername || 'Someone'} followed you`;

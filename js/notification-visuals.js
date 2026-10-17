@@ -107,11 +107,11 @@ export function stackHtml(srcs, names, size = 34, accent = DEFAULT_ACCENT) {
 }
 
 // Toast headline: avatar + name on one line, the action ("voted against you") underneath, so a long name wraps cleanly.
-export function toastHeadlineHtml(headline, src, name, accent) {
+export function toastHeadlineHtml(headline, src, name, accent, { avatar = true } = {}) {
     const text = String(headline || '');
     const who = String(name || '');
     const action = who && text.startsWith(who) ? text.slice(who.length).trim() : text;
-    return `<div class="nv-headline nv-toast-headline">${circleHtml(src, name, 34, { accent })}<span class="nv-headline-text"><span class="nv-toast-name">${escapeHtml(who)}</span><span class="nv-toast-action">${escapeHtml(action)}</span></span></div>`;
+    return `<div class="nv-headline nv-toast-headline">${avatar ? circleHtml(src, name, 34, { accent }) : ''}<span class="nv-headline-text"><span class="nv-toast-name">${escapeHtml(who)}</span><span class="nv-toast-action">${escapeHtml(action)}</span></span></div>`;
 }
 
 export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, quip, cta }) {
@@ -176,6 +176,50 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
         </div>`;
 }
 
+// New follower: avatar + name, a Jinx line and one button ("Follow back", or "View profile" when you already follow them).
+// The whole row opens their profile (data-url). Same card family as the ally / rival rows, in the pack's accent colour.
+export function followRowHtml(n, { headline, quip, timeAgo, championPack, theirSrc, alreadyFollowing = false }) {
+    ensureVersusStyles();
+    const accent = championPack?.color || DEFAULT_ACCENT;
+    const jinxSrc = championBadgeUrl(championPack);
+    const name = n.triggerUsername || 'Someone';
+    const src = theirSrc || avatarSrc(n.thumbnailUrl) || fallbackAvatarFor(name);
+    const idList = n.ids ? n.ids.join(',') : n.id;
+    const unread = !n.read && !n.dismissed ? 'unread' : '';
+    const url = n.targetUrl || `/profile.html?user=${encodeURIComponent(name)}`;
+    const button = alreadyFollowing
+        ? `<button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, #ff1493); border: 0; color: #fff;" data-id="${idList}" data-action="navigate" data-url="${escapeHtml(url)}">View profile</button>`
+        : `<button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, #ff1493); border: 0; color: #fff;" data-id="${idList}" data-action="follow-back" data-user-id="${escapeHtml(n.triggerUserId || '')}" data-username="${escapeHtml(name)}" data-url="${escapeHtml(url)}">Follow back</button>`;
+    return `
+        <div class="notification-item nv-row follow ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url)}"
+             title="Open ${escapeHtml(name)}'s profile"
+             style="--nv-accent:${accent}; --nv-line:rgba(255,105,180,0.35); --nv-accent-text:#ff9bd6">
+            <button class="notification-item-dismiss" data-id="${idList}" aria-label="Dismiss">×</button>
+            <div class="nv-top">
+                ${circleHtml(src, name, 40, { accent })}
+                <div class="nv-text">
+                    <div class="nv-headline"><span class="nv-headline-text">${escapeHtml(headline)}</span></div>
+                    <div class="nv-sub">${escapeHtml(timeAgo || '')}</div>
+                </div>
+            </div>
+            ${quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : ''}
+            <div class="notification-item-footer">${button}</div>
+        </div>`;
+}
+
+// The pop-up version: their face large, name + action, Jinx's line, and the button bar.
+export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta }) {
+    const name = n.triggerUsername || n.username || 'Someone';
+    return `
+    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
+        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        <div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
+        ${toastHeadlineHtml(`${name} followed you`, null, name, accent, { avatar: false })}
+        ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
+    </div>
+    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
+}
+
 function socialHeadlineFor(n) {
     return `${n.triggerUsername || 'Someone'} voted ${n.relationship === 'ally' ? 'with' : 'against'} you`;
 }
@@ -225,6 +269,8 @@ export function ensureVersusStyles() {
 .versus-toast .nv-bubble{flex:1;background:#fff;color:#1a1226;border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:14px;font-weight:600;line-height:1.3;margin-bottom:4px}
 .versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:11px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
 .versus-toast .nv-cta.ally{color:#0f0b18}
+.versus-toast .nv-follow-face{display:flex;justify-content:center;padding-top:2px}
+.versus-toast .nv-follow-face + .nv-toast-headline{justify-content:center;text-align:center}
 
 /* bell-list row */
 .notification-item.nv-row{position:relative;cursor:pointer;background:#1a1226;border:1px solid var(--nv-line);border-radius:14px;padding:12px 14px 12px 18px}
