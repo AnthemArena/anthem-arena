@@ -610,3 +610,6 @@ To bring them back, set the flag to `true`. A possible future use mentioned: one
 
 ## Tooltip votes still 0 for another account (fix)
 Tooltips for other people read their saved profile. The refresh of our own profile only ran when the user list was freshly loaded, so a cached list skipped it and the profile stayed at 0 votes. The feed now calls `publishOwnProfileStats()` on every load; it syncs only when votes/XP changed since last published (`profileStatsPublished` in localStorage) and clears the mention cache afterwards.
+
+## Tooltip vote count = saved votes (fix)
+The saved profile vote count now comes from the votes stored in Firestore, counting only votes whose match still exists (`countLiveVotes`, same rule as the profile page). Previously it used this browser's copy, which included a vote from a deleted test match (3 vs 2 on the profile page). `profileStatsPublished` key bumped to `v2|…` so every account re-publishes once.

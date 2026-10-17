@@ -117,7 +117,7 @@ let ownProfileRefreshed = false;
 // only when the vote count or XP changed since the last time it was saved from this browser.
 function publishOwnProfileStats() {
     try {
-        const key = `${localVoteCount()}|${getUserXPFromStorage()}`;
+        const key = `v2|${localVoteCount()}|${getUserXPFromStorage()}`;
         if (localStorage.getItem('profileStatsPublished') === key) return;
         import('./rank-system.js').then(async m => {
             await m.syncProfileStatsToFirestore();

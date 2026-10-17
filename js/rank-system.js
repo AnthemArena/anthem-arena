@@ -251,6 +251,15 @@ export function localVoteCount(storage = globalThis.localStorage) {
     return Math.max(fromStats, fromVotes);
 }
 
+// Counts only votes whose match still exists (same rule as the profile page, which hides votes from deleted or old
+// tournaments). Pure so it can be tested.
+export function countLiveVotes(votes, matches) {
+    const list = Array.isArray(votes) ? votes : [];
+    if (!Array.isArray(matches) || !matches.length) return list.length;   // can't tell which are old: count them all
+    const ids = new Set(matches.map(m => m.matchId || m.id));
+    return list.filter(v => ids.has(v.matchId)).length;
+}
+
 export async function syncProfileStatsToFirestore() {
     try {
         const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
@@ -264,10 +273,19 @@ export async function syncProfileStatsToFirestore() {
         const rank = getUserRank(totalXP);
         
         // Vote count: the saved "stats" object can lag (it left other people's tooltips at 0 votes), so also count saved votes
-        const voteCount = localVoteCount();
+        let voteCount = localVoteCount();
         
         const { db } = await import('./firebase-config.js');
-        const { doc, updateDoc, setDoc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        const { doc, updateDoc, setDoc, getDoc, collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+        // The saved votes are the truth (this browser's copy can include a vote from a deleted tournament, which made
+        // tooltips say 3 while the profile page said 2). Fall back to the local number if the lookup fails.
+        try {
+            const snap = await getDocs(query(collection(db, 'votes'), where('userId', '==', userId)));
+            let matches = [];
+            try { matches = await (await import('./api-client.js')).getAllMatches(); } catch (e) { /* count all */ }
+            voteCount = countLiveVotes(snap.docs.map(d => d.data()), matches);
+        } catch (e) { console.warn('⚠️ Could not count saved votes, using this browser\'s count', e); }
         
         const profileRef = doc(db, 'profiles', userId);
         
