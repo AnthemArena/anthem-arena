@@ -592,3 +592,12 @@ With it off:
 - The "Who can send you emotes" privacy setting is hidden in the settings modal (the stored value is untouched).
 
 To bring them back, set the flag to `true`. A possible future use mentioned: one user awarding another something (kudos), which would be a new design rather than the current preset messages.
+
+
+## Mentions fix and profile tooltip
+
+- **Mention alerts never worked** (post, comment or reply): `js/feed-page.js` called `saveNotification` directly but only imported it inside some helper functions, so each call threw a ReferenceError that the per-mention try/catch swallowed (console: "Error sending mention notification"). It is now imported at the top; `tools/test-feed-mix-model.mjs` checks the import stays.
+- `extractMentions(text, users)` (in `js/feed-mix-model.js`, tested) replaces the inline loop: case-insensitive, each person once (`@kai @kai` no longer sends two alerts), unknown names ignored.
+- `ensureMentionUsers`: the user list is cached for up to 10 minutes (the "fewer reads" change), so a user who joined since was invisible to mentions. If the text has an @name that is not in the list, it reloads the list once (at most once a minute) before sending alerts.
+- **Tooltip** (`.mention-tooltip` in `css/feed.css`): it sits inside `.post-text`, which has `white-space: pre-wrap`, so the line breaks and indents in the tooltip's template rendered as big blank gaps (432px tall instead of ~139px); it also inherited the mention's hover underline. Now `white-space: normal`, no underline, and restyled to the pink card look (name in white, rank in pink, pink stats).
+- Own-account tooltip stats: the saved `stats` object could say Level 1 / 0 votes for a Level 5 user; level and rank now come from `getUserRank(getUserXPFromStorage())` (same as the nav bar) and votes from the larger of the synced profile, saved votes and stats. Other people's tooltips still show what their profile document last synced (updated after each of their votes).
