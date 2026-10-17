@@ -5,7 +5,7 @@
 import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions } from './feed-mix-model.js';
 // Mention alerts call this directly (it used to be imported only inside some helpers, so every mention alert failed with a ReferenceError)
 import { saveNotification } from './notification-storage.js';
-import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { getUserXPFromStorage, getUserRank, localVoteCount } from './rank-system.js';
 import { buildShare, postIdFromLink } from './share-model.js';
 import { initializeFeedWidgets, setupSidebarInteractions  } from './feed-widgets.js';
 
@@ -110,6 +110,7 @@ async function getYouTubeMetadata(videoId) {
 
 let allUsers = [];
 let lastUserLoad = 0;
+let ownProfileRefreshed = false;
 const USER_CACHE_DURATION = 300000; // 5 minutes
 
 async function loadAllUsers(forceRefresh = false) {
@@ -161,11 +162,12 @@ async function loadAllUsers(forceRefresh = false) {
                     level = info.currentLevel.level;
                     rank = info.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
                 } catch (e) { /* keep the synced profile values */ }
-                try {
-                    const savedVotes = Object.keys(JSON.parse(localStorage.getItem('userVotes') || '{}')).length;
-                    const statsVotes = Number((JSON.parse(localStorage.getItem('stats') || 'null') || {}).votes) || 0;
-                    votes = Math.max(votes, savedVotes, statsVotes);
-                } catch (e) { /* keep the synced profile value */ }
+                votes = Math.max(votes, localVoteCount());
+                // Our synced profile is out of date (others see it in tooltips): refresh it once, in the background
+                if (!ownProfileRefreshed && (votes !== (profile.totalVotes || 0) || level !== (profile.level || 1))) {
+                    ownProfileRefreshed = true;
+                    import('./rank-system.js').then(m => m.syncProfileStatsToFirestore()).catch(() => {});
+                }
                 
                 allUsers.push({
                     userId: userId,
@@ -2866,14 +2868,6 @@ function setupCreatePost() {
     submitBtn.disabled = length === 0 || remaining < 0;
 });
 
-      // Submit post
-    submitBtn.addEventListener('click', async () => {
-        await createUserPost();
-        
-        // ✅ Reset textarea height after posting
-        postInput.style.height = 'auto';
-    });
-    
     postInput.addEventListener('input', () => {
         const length = postInput.value.length;
         
@@ -2923,12 +2917,15 @@ postInput.addEventListener('keypress', async (e) => {
 });
 }
 
+let postingNow = false;      // a second click / Enter while a post is being saved must not create a second copy
+
 async function createUserPost() {
     const postInput = document.getElementById('postInput');
     const submitBtn = document.getElementById('submitPostBtn');
     const content = postInput.value.trim();
     
-    if (!content) return;
+    if (!content || postingNow) return;
+    postingNow = true;
     
     // Disable submit while posting
     submitBtn.disabled = true;
@@ -3090,6 +3087,7 @@ async function createUserPost() {
             window.showNotification('Failed to post. Try again.', 'error');
         }
     } finally {
+        postingNow = false;
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post';
         
