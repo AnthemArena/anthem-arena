@@ -475,3 +475,10 @@ X (and others) remember the preview image per address, including a failed fetch:
 - Test: `node tools/test-emote-send.mjs` (7 checks; the in-memory fake Firestore in tools/test-support now has addDoc/updateDoc/query helpers and refuses undefined fields like the real SDK).
 - Still to check (needs the live site): the composite indexes the notification queries need (unread count, notification list, emote listener). Console snippet in the chat history; any failed-precondition error contains a create-index link.
 - Note for testing as a normal visitor: the admin sign-in has a different Firebase user than the saved voter id, so notifications/emotes read as "permission denied" while signed in as admin. Test from a private window (visitor) instead.
+
+## Notifications: ally / rival rows, rival emote, missed toasts
+- Ally ("voted the same") and rival ("voted against you") notifications now look like their toast: the other voter's face with the active champion pack's portrait pinned to the corner (ring = green for ally, pack colour for rival), pack-coloured row via `data-from-champion`. Logic in `renderNotificationItem` (js/notification-center.js); `isSocialNotification` in js/notification-model.js.
+- Rival button now sends a `rivalry` emote ("Challenge: …") instead of just opening the match; a small "View match" link sits next to the time. Ally button still sends `thanks`.
+- Missed toasts: `getRecentUnshownNotifications` used a 4-filter query needing a composite index that was never built, so it failed silently and returning visitors never got the toast. It now queries by `userId` only and filters in code (`pickUnshown`). The "away at least 5 min" rule is now a 10 min look-back minimum. Still only fires when the last visit was over 2 min ago, once per browser session.
+- Link previews (`vote-meta`) accept `?id=` as well as `?match=`.
+- Test: `node tools/test-notification-model.mjs`.

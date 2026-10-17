@@ -1870,3 +1870,8 @@ body.theme-arcane.page-feed .share-menu-item {
 body.theme-arcane.page-feed .share-menu-item:hover { background: rgba(255, 79, 180, .12); }
 body.theme-arcane.page-feed .share-menu-item i { width: 18px; text-align: center; color: var(--pink-bright); }
 body.theme-arcane.page-feed .feed-post.post-linked { box-shadow: 0 0 0 2px var(--pink), 0 0 24px rgba(255, 79, 180, .35); transition: box-shadow .3s; }
+
+/* Ally / rival notification rows: "View match" link next to the time (the button now sends the emote) */
+body.theme-arcane .notification-item-link { color: var(--pink-bright); text-decoration: none; font-weight: 600; }
+body.theme-arcane .notification-item-link:hover { text-decoration: underline; }
+body.theme-arcane .notification-item[data-from-champion] .notification-item-message { color: #fff; font-weight: 600; }
