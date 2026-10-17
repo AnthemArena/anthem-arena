@@ -106,13 +106,21 @@ export function stackHtml(srcs, names, size = 34, accent = DEFAULT_ACCENT) {
     return `<div class="nv-stack">${names.slice(0, 3).map((n, i) => circleHtml(srcs[i], n, size, { accent, cls: 'nv-stacked' })).join('')}</div>`;
 }
 
+// Toast headline: avatar + name on one line, the action ("voted against you") underneath, so a long name wraps cleanly.
+export function toastHeadlineHtml(headline, src, name, accent) {
+    const text = String(headline || '');
+    const who = String(name || '');
+    const action = who && text.startsWith(who) ? text.slice(who.length).trim() : text;
+    return `<div class="nv-headline nv-toast-headline">${circleHtml(src, name, 34, { accent })}<span class="nv-headline-text"><span class="nv-toast-name">${escapeHtml(who)}</span><span class="nv-toast-action">${escapeHtml(action)}</span></span></div>`;
+}
+
 export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, quip, cta }) {
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
-        ${headlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent, 26)}
-        ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 62, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
+        ${toastHeadlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent)}
+        ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
     </div>
     <button class="bulletin-toast-cta nv-cta ${n.relationship}" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
 }
@@ -204,13 +212,18 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-.versus-toast .nv-body{position:relative;cursor:pointer;padding:18px 18px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
-.versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3}
+.versus-toast .nv-body{position:relative;cursor:pointer;padding:14px 16px 12px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
+.versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.22);box-shadow:none}
+.versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
+.versus-toast .nv-toast-headline{justify-content:flex-start;gap:10px;text-align:left}
+.versus-toast .nv-toast-headline .nv-headline-text{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.versus-toast .nv-toast-name{font-size:18px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-accent);letter-spacing:.03em}
 .versus-toast .nv-jinx{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
 .versus-toast .nv-jinx-face{box-shadow:0 0 18px var(--nv-glow)}
-.versus-toast .nv-bubble{flex:1;background:#fff;color:#1a1226;border-radius:14px 14px 14px 4px;padding:10px 13px;font-size:15px;font-weight:600;line-height:1.3;margin-bottom:4px}
-.versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:13px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
+.versus-toast .nv-bubble{flex:1;background:#fff;color:#1a1226;border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:14px;font-weight:600;line-height:1.3;margin-bottom:4px}
+.versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:11px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
 .versus-toast .nv-cta.ally{color:#0f0b18}
 
 /* bell-list row */
