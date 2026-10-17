@@ -556,3 +556,7 @@ The Match alerts switch was missing the `toggle-input` class, so the browser's n
 ### VS pair: no avatars on the thumbnails
 
 With real thumbnails the round avatars on the pictures were cluttered (and the voter's face is already in the headline). The two edits now carry only the ring colours (their pick in the accent colour, yours in white, a shared pick green); no avatars and no labels.
+
+### Toast polish
+
+Ally/rival toast: avatar and name on one line with "voted against you" underneath (a long name ellipsises instead of wrapping the sentence), padding trimmed, Jinx portrait 62 -> 52 px, speech bubble and button a little tighter, and the close button is a small dark translucent circle instead of the white one. Bell rows are unchanged.

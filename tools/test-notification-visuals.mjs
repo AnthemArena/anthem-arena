@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -61,6 +61,11 @@ t('pair, stack and toast render the pieces', () => {
     assert.ok(pairHtml({ theirSrc: null, theirName: 'Kai', yourSrc: null, relationship: 'ally', size: 40, accent: '#4ade80' }).includes('>=<'));
     assert.equal((stackHtml([null, null, null, null], ['A', 'B', 'C', 'D']).match(/nv-stacked/g) || []).length, 3);
     const t1 = toastHtml({ relationship: 'opponent', triggerUsername: 'Kai' }, { theirSrc: null, yourSrc: null, jinxSrc: 'https://x/j.jpg', accent: '#ff69b4', headline: 'Kai voted against you', quip: 'Boom <3', cta: 'Challenge' });
-    assert.ok(t1.includes('Kai voted against you') && t1.includes('Boom &lt;3') && t1.includes('handleBulletinCTA') && t1.includes('openBulletinMatch'));
+    assert.ok(t1.includes('Kai') && t1.includes('voted against you') && t1.includes('Boom &lt;3') && t1.includes('handleBulletinCTA') && t1.includes('openBulletinMatch'));
+});
+t('toast headline puts the name on one line and the action under it', () => {
+    const h = toastHeadlineHtml('FierceWatcher229 voted against you', 'https://x/a.png', 'FierceWatcher229', '#ff69b4');
+    assert.ok(h.includes('nv-toast-name">FierceWatcher229<') && h.includes('nv-toast-action">voted against you<'));
+    assert.ok(toastHeadlineHtml('Someone voted with you', null, 'Kai', '#fff').includes('Someone voted with you'));   // name not at the start: whole text kept
 });
 console.log(`${pass} passed`);
