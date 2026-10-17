@@ -3,6 +3,7 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { readNotificationPrefs } from './notification-prefs.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -388,6 +389,43 @@ Your companion can react to matches, achievements, and other site activity
     </div>
 </div>
 
+<!-- Notification preferences (js/notification-prefs.js; saved on this browser) -->
+<div class="settings-section">
+    <h3 class="section-title">🔔 Notifications</h3>
+    <div class="privacy-settings">
+        <div class="toggle-label select-wrapper">
+            <div class="toggle-info" style="flex: 1;">
+                <strong>Votes in my matches</strong>
+                <p>Alerts when someone votes with you or against you in a match you voted in</p>
+                <select id="notifyFromSelect" class="privacy-select">
+                    <option value="everyone">From everyone</option>
+                    <option value="following">Only people I follow</option>
+                    <option value="nobody">Off</option>
+                </select>
+            </div>
+        </div>
+        <div class="toggle-label select-wrapper">
+            <div class="toggle-info" style="flex: 1;">
+                <strong>Pop-up alerts</strong>
+                <p>Which of those also pop up while you're on the site (the rest wait in your bell)</p>
+                <select id="toastFromSelect" class="privacy-select">
+                    <option value="everyone">From everyone</option>
+                    <option value="following">Only people I follow</option>
+                    <option value="off">Off</option>
+                </select>
+            </div>
+        </div>
+        <label class="toggle-label">
+            <input type="checkbox" id="matchAlertsToggle" checked>
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>🎯 Match alerts</strong>
+                <p>"You're behind", nail-biter and comeback alerts for matches you voted in</p>
+            </div>
+        </label>
+    </div>
+</div>
+
                         <!-- Form Actions -->
                         <div class="form-actions">
                             <button type="submit" class="btn-save">
@@ -491,6 +529,12 @@ document.getElementById('publicToggle').checked = isPublic;
 document.getElementById('messagePrivacySelect').value = messagePrivacy;
 document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
 document.getElementById('emotePrivacySelect').value = emotePrivacy;
+    {   // notification preferences
+        const np = readNotificationPrefs();
+        document.getElementById('notifyFromSelect').value = np.notifyFrom;
+        document.getElementById('toastFromSelect').value = np.toastFrom;
+        document.getElementById('matchAlertsToggle').checked = np.matchAlerts;
+    }
 
     // Show selected avatar if exists
     if (avatar && avatar.type === 'url') {
@@ -641,7 +685,10 @@ function setupEventListeners() {
         'publicToggle',
         'messagePrivacySelect',
         'showOnlineStatusToggle',
-        'emotePrivacySelect'
+        'emotePrivacySelect',
+        'notifyFromSelect',
+        'toastFromSelect',
+        'matchAlertsToggle'
     ];
 
     trackableInputs.forEach(id => {
@@ -897,6 +944,13 @@ if (bannerValue === 'default') {
         localStorage.setItem('banner', JSON.stringify(banner)); // ✅ NEW: Save banner
         // ✅ NEW: Save social links to localStorage
 localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
+
+        // Notification preferences: this browser only (not part of the public profile document)
+        try {
+            localStorage.setItem('notifyFrom', document.getElementById('notifyFromSelect')?.value ?? 'everyone');
+            localStorage.setItem('toastFrom', document.getElementById('toastFromSelect')?.value ?? 'everyone');
+            localStorage.setItem('matchAlerts', document.getElementById('matchAlertsToggle')?.checked === false ? 'false' : 'true');
+        } catch (e) { console.warn('Could not save notification preferences', e); }
 
         // Save all privacy settings
         Object.keys(privacySettings).forEach(key => {

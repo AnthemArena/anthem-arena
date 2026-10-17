@@ -4,6 +4,8 @@ console.log('🔔 global-notifications.js loaded');
 import './champion-loader.js';
 
 import { getActivityFeed } from './api-client.js';
+import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
+import { getFollowingIds } from './follow-system.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
     saveNotification, 
@@ -436,6 +438,11 @@ async function checkAndShowBulletin() {
             console.error('⚠️ Error checking round openings:', error);
         }
         
+        // ========================================
+        // Settings > "Match alerts": off = no "you're behind / nailbiter / comeback" alerts
+        // ========================================
+        if (!readNotificationPrefs().matchAlerts) return;
+
         // ========================================
         // CONTINUE WITH USER ID CHECK
         // ========================================
@@ -1139,6 +1146,13 @@ async function checkRecentVotes() {
         const saveCutoff = now - saveWindowMs;
         
         let toastShown = false; // Only show one toast per check
+        const prefs = readNotificationPrefs();                       // Settings > notifications
+        if (prefs.notifyFrom === 'nobody') {                         // nothing to save or show: just remember we looked
+            activities.forEach(a => lastSeenActivityIds.add(a.activityId));
+            localStorage.setItem('lastSeenActivityIds', JSON.stringify(Array.from(lastSeenActivityIds)));
+            return;
+        }
+        const followingIds = await getFollowingIds(userId);
         let savedCount = 0;
         let skippedCount = 0;
         
@@ -1187,6 +1201,13 @@ async function checkRecentVotes() {
       // ✅ CORRECT (comparing "song1"/"song2" to "song1"/"song2"):
 const isAlly = userVoteData.songId === activity.choice;
 
+            // Settings: only people I follow?
+            const followed = followingIds.has(activity.userId);
+            if (!shouldSaveSocial(prefs, followed)) {
+                lastSeenActivityIds.add(activity.activityId);
+                continue;
+            }
+
             // ✅ Build notification data
             const notificationData = buildSocialNotification(activity, isAlly, userId);
             
@@ -1198,7 +1219,7 @@ const savedId = await saveNotification(userId, {
 });                savedCount++;
                 // Pop the toast too (one per check, only for votes from the last hour). This was missing: the row was saved
                 // to the bell but nothing ever showed the toast while the page was open.
-                if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden) {
+                if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden && shouldToastSocial(prefs, followed)) {
                     toastShown = true;
                     showBulletin({
                         priority: notificationData.priority || 7,

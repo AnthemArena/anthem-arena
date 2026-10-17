@@ -486,3 +486,10 @@ X (and others) remember the preview image per address, including a failed fetch:
 - Grouped rows ("X voted in 2 matches"): the emote button looked up the notification by the joined id string, so it showed generic "Send Emote" and did nothing on click. It now uses the first id and clears every id in the group. "Show all matches" popup restyled to Arcane.
 - Ally/rival only for votes cast AFTER yours: a vote that predates your own vote in that match is skipped (it used to fire a "just voted" rival line for someone who voted hours earlier). Compared with `userVotes[matchId].timestamp`.
 - Compact notification rows: detail clamps to two lines, the "Show all N matches" button became an "All N matches" link beside the time, and ally rows get a green accent bar (`data-relationship`).
+- Ally/rival rows: footer is time + link on one line with the action as a full-width bar below; the "All N matches" popup lists each match as a link with a "Same pick as you / Voted against you" tag instead of repeating the champion line.
+
+## Notification preferences + relationship-aware grouping
+- Settings modal > "🔔 Notifications" (stored per browser in localStorage: `notifyFrom` everyone|following|nobody, `toastFrom` everyone|following|off, `matchAlerts` true|false; js/notification-prefs.js). Defaults: everyone / everyone / on. They cover ally/rival vote alerts and the "you're behind / nailbiter / comeback" match alerts; likes, comments, follows and emotes are not filtered (emotes already have "Who can send you emotes").
+- Follow lookup: `getFollowingIds(userId)` in js/follow-system.js (one equality query on `follows.followerId`, no index, cached 5 min). `checkRecentVotes` skips (and remembers) votes the prefs exclude; a toast only shows for something that is also saved.
+- Bell grouping (js/notification-model.js `groupNotifications` / `groupHeadline`): ally/rival from people you follow = one row per person ("Kai voted against you in 2 matches"); from strangers = one row per match ("3 people voted against you in <match>", names in the detail, button = View match). Other types group per person as before.
+- Tests: `node tools/test-notification-prefs.mjs`.

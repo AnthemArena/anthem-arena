@@ -1880,3 +1880,8 @@ body.theme-arcane .notification-item[data-from-champion] .notification-item-mess
 body.theme-arcane .notification-item-detail-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 /* each kind has its own accent bar: ally green, rival pink (pack colour) */
 body.theme-arcane .notification-item[data-relationship="ally"]::before { background: linear-gradient(180deg, #4ade80, #22c55e); box-shadow: 0 0 8px rgba(74, 222, 128, 0.6); }
+
+/* ally / rival rows: time + link on one line, the action as a full-width bar underneath (like the toast's bottom button) */
+body.theme-arcane .notification-item[data-relationship] .notification-item-footer { flex-direction: column; align-items: stretch; gap: 8px; }
+body.theme-arcane .notification-item[data-relationship] .notification-item-time { white-space: nowrap; }
+body.theme-arcane .notification-item[data-relationship] .notification-item-cta { width: 100%; text-align: center; white-space: normal; }
