@@ -103,4 +103,31 @@ await t('image: long names, empty creator and emoji do not break it', async () =
     const m = { ...match, song1: { ...match.song1, shortTitle: 'x'.repeat(300), artist: '' }, song2: { ...match.song2, shortTitle: '💀💀💀 全部' } };
     assert.equal((await renderCard(m, { fonts, host: 'a.b' })).subarray(1, 4).toString(), 'PNG');
 });
+// --- the real function handler, as Netlify calls it ---
+const { handler } = await import('../netlify/functions/og-match.js');
+const callHandler = async (qs, { matches = [match], thumbs = true } = {}) => {
+    globalThis.fetch = async u => {
+        u = String(u);
+        if (u.endsWith('/api/matches')) return { ok: true, json: async () => matches };
+        if (u.includes('img.youtube.com')) return thumbs ? { ok: true, arrayBuffer: async () => Buffer.from(fakeThumb('#111', '#999').split(',')[1], 'base64') } : { ok: false };
+        throw new Error('unexpected fetch ' + u);
+    };
+    return handler({ rawUrl: 'https://arcanemoments.netlify.app/og/match.png?' + qs, queryStringParameters: Object.fromEntries(new URLSearchParams(qs)) });
+};
+await t('handler: returns the PNG as base64 with caching headers', async () => {
+    const r = await callHandler(`match=${match.matchId}`);
+    assert.equal(r.statusCode, 200); assert.equal(r.isBase64Encoded, true);
+    assert.equal(r.headers['Content-Type'], 'image/png'); assert.ok(r.headers['Cache-Control'].includes('s-maxage'));
+    assert.equal(Buffer.from(r.body, 'base64').subarray(1, 4).toString(), 'PNG');
+});
+await t('handler: thumbnails failing still gives an image', async () => assert.equal((await callHandler(`match=${match.matchId}`, { thumbs: false })).statusCode, 200));
+await t('handler: a thumbnail that is not a real image is skipped, not fatal', async () => {
+    const orig = globalThis.fetch; const r0 = await callHandler(`match=${match.matchId}`);
+    globalThis.fetch = async u => String(u).endsWith('/api/matches') ? { ok: true, json: async () => [match] } : { ok: true, arrayBuffer: async () => Buffer.from('<html>not an image</html>') };
+    const r = await handler({ rawUrl: 'https://x.test/og/match.png?match=' + match.matchId, queryStringParameters: { match: match.matchId } });
+    assert.equal(r.statusCode, 200); assert.ok(r0.statusCode === 200); globalThis.fetch = orig;
+});
+await t('handler: unknown match or no id redirects to the default image', async () => {
+    for (const qs of ['match=nope', '']) { const r = await callHandler(qs); assert.equal(r.statusCode, 302); assert.equal(r.headers.Location, 'https://arcanemoments.netlify.app/og-image.png'); }
+});
 console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);

@@ -12,13 +12,10 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
-# Link-preview image (netlify/functions/og-match.js): bundled with the font files; resvg is a native module, so it stays external.
+# Link-preview image (netlify/functions/og-match.js): resvg is a native module, so it stays external. Fonts are embedded (netlify/shared/og-fonts.js).
 [functions]
   external_node_modules = ["@resvg/resvg-js"]
   node_bundler = "esbuild"
-
-[functions."og-match"]
-  included_files = ["netlify/functions/assets/**"]
 
 # Firebase credentials are set securely in Netlify UI (All scopes)
 # No secrets in this file
