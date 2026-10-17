@@ -116,6 +116,18 @@ async function loadAllUsers(forceRefresh = false) {
         return;
     }
     
+    // Shared across pages and reloads (the memory cache above is lost on every navigation)
+    if (!forceRefresh) {
+        try {
+            const saved = JSON.parse(localStorage.getItem('mentionUsersCache') || 'null');
+            if (saved && Array.isArray(saved.users) && saved.users.length && (now - saved.at) < USER_CACHE_DURATION * 2) {
+                allUsers = saved.users; lastUserLoad = saved.at;
+                console.log('✅ Using saved user list (no Firebase reads)');
+                return;
+            }
+        } catch { /* ignore */ }
+    }
+
     try {
         const { db } = await import('./firebase-config.js');
         const { collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -179,6 +191,7 @@ async function loadAllUsers(forceRefresh = false) {
         });
         
         lastUserLoad = now;
+        try { localStorage.setItem('mentionUsersCache', JSON.stringify({ at: now, users: allUsers })); } catch { /* storage full or blocked */ }
         
         console.log(`✅ Loaded ${allUsers.length} users (${snapshot.size} Firebase reads)`);
         

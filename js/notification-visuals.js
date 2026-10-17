@@ -69,7 +69,13 @@ export const markFor = relationship => (relationship === 'ally' ? '=' : 'VS');
 export function circleHtml(src, name, size, { accent = DEFAULT_ACCENT, cls = '', badge = null, badgeSide = 'right' } = {}) {
     const initial = escapeHtml((name || '?').trim().charAt(0).toUpperCase() || '?');
     const b = Math.max(16, Math.round(size * 0.5));
-    return `<span class="nv-av"><span class="nv-circle ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${initial}${src ? `<img src="${escapeHtml(src)}" alt="" onerror="this.remove()">` : ''}</span>${badge ? `<img class="nv-badge ${badgeSide === 'left' ? 'nv-badge-left' : ''}" src="${escapeHtml(badge)}" alt="" style="width:${b}px;height:${b}px" onerror="this.remove()">` : ''}</span>`;
+    return `<span class="nv-av"><span class="nv-circle ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${initial}${src ? `<img src="${escapeHtml(src)}" alt="" onerror="${avatarErr(name)}">` : ''}</span>${badge ? `<img class="nv-badge ${badgeSide === 'left' ? 'nv-badge-left' : ''}" src="${escapeHtml(badge)}" alt="" style="width:${b}px;height:${b}px" onerror="this.remove()">` : ''}</span>`;
+}
+
+// A broken avatar picture swaps to the person's stable fallback champion icon once (then gives up and shows the initial).
+function avatarErr(name) {
+    const fb = fallbackAvatarFor(name);
+    return `if(!this.dataset.fb){this.dataset.fb=1;this.src='${escapeHtml(fb)}'}else{this.remove()}`;
 }
 
 export function pairHtml({ theirSrc, theirName, yourSrc, relationship, size = 44, accent, theirBadge = null, yourBadge = null }) {
