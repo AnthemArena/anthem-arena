@@ -7,9 +7,9 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
-import { groupNotifications, groupHeadline, socialHeadline } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, followHeadline, followQuip } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialRowHtml } from './notification-visuals.js';
+import { socialRowHtml, followRowHtml } from './notification-visuals.js';
 import { enrichSocial } from './notification-social-context.js';
 
 // ✅ GUARD: Prevent duplicate initialization
@@ -339,9 +339,7 @@ async function loadNotificationsTab(content, userId, tab) {
     } else if (tab === 'achievements') {
         filtered = notifications.filter(n => n.type === 'achievement');
     } else if (tab === 'social') {
-        filtered = notifications.filter(n => 
-            n.type === 'like' || n.type === 'comment' || n.type === 'follow'
-        );
+        filtered = notifications.filter(isSocialTabItem);
     }
     
     if (filtered.length === 0) {
@@ -357,6 +355,7 @@ async function loadNotificationsTab(content, userId, tab) {
     // ✅ NEW: Group notifications by user + event type
     const followingIds = await getFollowingIds(localStorage.getItem('tournamentUserId'));
     const grouped = groupNotifications(filtered, followingIds);
+    followingNow = followingIds;
     await enrichSocial(grouped);        // voter avatars + the two edits' pictures for ally/rival rows
     
     content.innerHTML = grouped.map(notification => {
@@ -582,6 +581,8 @@ function closePanel() {
 
 
 
+let followingNow = new Set();          // who the viewer follows right now (the bell shows "View profile" instead of "Follow back")
+
 function renderNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     const unreadClass = !notification.read && !notification.dismissed ? 'unread' : '';
@@ -665,6 +666,9 @@ function renderNotificationItem(notification) {
     }
     
     if (isSocial) return socialRowHtml(notification, { headline, timeAgo, championPack });
+    if (isFollowNotification(notification)) {
+        return followRowHtml(notification, { headline: followHeadline(notification), quip: followQuip(notification), timeAgo, championPack, theirSrc: notification.nv?.theirSrc, alreadyFollowing: followingNow.has(notification.triggerUserId) });
+    }
 
     // Image logic
     let imageHtml = '';
@@ -835,6 +839,27 @@ function attachNotificationListeners() {
             const action = btn.dataset.action;
             const url = btn.dataset.url;
             
+            // New follower: follow them back right from the bell
+            if (action === 'follow-back') {
+                const original = btn.textContent;
+                btn.textContent = 'Following...'; btn.disabled = true;
+                try {
+                    const { followUser } = await import('./follow-system.js');
+                    const result = await followUser(btn.dataset.userId, btn.dataset.username);
+                    if (result?.success) {
+                        btn.textContent = '✓ Following';
+                        for (const one of id.split(',')) await markNotificationRead(one);
+                        await updateBadgeCount();
+                    } else {
+                        btn.textContent = original; btn.disabled = false;
+                    }
+                } catch (err) {
+                    console.warn('Follow back failed', err);
+                    btn.textContent = original; btn.disabled = false;
+                }
+                return;
+            }
+
             // ✅ HANDLE EMOTE ACTIONS
             if (action === 'send-emote') {
                 const userId = localStorage.getItem('tournamentUserId');

@@ -6,8 +6,8 @@ import './champion-loader.js';
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialHeadline } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, ensureVersusStyles } from './notification-visuals.js';
+import { socialHeadline, isFollowNotification, followQuip } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -1906,7 +1906,7 @@ function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up'];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower'];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -2707,7 +2707,24 @@ else {
         `;
     }
     
-    if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
+    if (notification.type === 'new-follower') {
+        // New follower: their face, Jinx's line, and a Follow back / View profile button (js/notification-visuals.js)
+        ensureVersusStyles();
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = pack?.color || '#ff69b4';
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', '#ff1493');
+        banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
+        banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
+        banner.innerHTML = followToastHtml(notification, {
+            theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
+            jinxSrc: championBadgeUrl(pack),
+            accent,
+            quip: followQuip(notification),
+            cta: notification.ctaText || 'Follow back'
+        });
+        banner.className = 'bulletin-banner versus-toast opponent';
+    } else if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
         // Ally / rival: the shared "versus" look (js/notification-visuals.js), same as the bell-list row
         ensureVersusStyles();
         const pack = window.championLoader?.getCurrentPack();
@@ -2834,6 +2851,17 @@ window.handleBulletinCTA = function() {
         return;
     }
     
+    // New follower toast: "Follow back" follows them right here; "View profile" (already following) navigates.
+    if (currentBulletin.ctaAction === 'follow-back' && currentBulletin.triggerUserId) {
+        const b = currentBulletin;
+        import('./follow-system.js').then(({ followUser }) => followUser(b.triggerUserId, b.triggerUsername || b.username)).then(r => {
+            const btn = document.querySelector('#bulletin-banner .nv-cta');
+            if (btn && r?.success) btn.textContent = '✓ Following';
+            setTimeout(hideBulletin, 1200);
+        }).catch(() => hideBulletin());
+        return;
+    }
+
     // ✅ PRIORITY 2a: Ally bulletins ("X also voted for Y") carry ctaAction + ctaData.
     // Send the emote instead of navigating. handleEmoteClick shows "Sending...",
     // "Sent!" on the button and hides the bulletin itself, so don't hide here.
@@ -3715,7 +3743,8 @@ async function checkMissedNotifications() {
     // At least 10 minutes back: a notification saved a minute or two before the page opened still counts.
     const maxLookbackMinutes = Math.max(10, Math.min(Math.floor(timeSinceLastVisit / 60000), 120)); // 10 min .. 2 hours
 
-    const missed = await getRecentUnshownNotifications(userId, maxLookbackMinutes);
+    // New-follower toasts have their own live listener (setupFollowListener), so they are not repeated here.
+    const missed = (await getRecentUnshownNotifications(userId, maxLookbackMinutes)).filter(n => n.type !== 'new-follower');
 
     if (missed.length === 0) {
         console.log('✅ No missed notifications');
@@ -3936,12 +3965,61 @@ setTimeout(() => {
     setupRealtimeEmoteListener();
 }, 3000);
 
+// ========================================
+// NEW FOLLOWER LISTENER
+// Equality filters only (no composite index), and it only ever reads this user's UNSHOWN follower rows, so it is a handful of
+// reads per page load. Rows are marked shown right away; the newest fresh one pops up (if the pop-up setting allows it).
+// ========================================
+let followListener = null;
+
+async function setupFollowListener() {
+    const userId = localStorage.getItem('tournamentUserId');
+    if (!userId || userId === 'anonymous') return;
+    if (followListener) followListener();
+    try {
+        const q = query(
+            collection(db, 'user-notifications'),
+            where('userId', '==', userId),
+            where('type', '==', 'new-follower'),
+            where('shownAsToast', '==', false),
+            limit(10)
+        );
+        followListener = onSnapshot(q, async (snapshot) => {
+            const added = snapshot.docChanges().filter(c => c.type === 'added').map(c => ({ id: c.doc.id, ...c.doc.data() }));
+            if (!added.length) return;
+            added.forEach(n => markNotificationShown(n.id));
+            const now = Date.now();
+            const fresh = added.filter(n => n.timestamp > now - 2 * 60 * 60 * 1000 && (!n.expiresAt || n.expiresAt > now)).sort((a, b) => b.timestamp - a.timestamp);
+            if (!fresh.length || document.hidden) return;        // old ones just wait in the bell
+            const n = fresh[0];
+            const following = await getFollowingIds(userId).catch(() => new Set());
+            if (!shouldToastSocial(readNotificationPrefs(), following.has(n.triggerUserId))) return;
+            const nv = await socialContextFor(n);
+            const already = following.has(n.triggerUserId);
+            showBulletin({
+                nv, id: n.id, priority: 6, type: 'new-follower',
+                triggerUserId: n.triggerUserId, triggerUsername: n.triggerUsername, username: n.triggerUsername,
+                thumbnailUrl: n.thumbnailUrl, message: n.message, detail: '', icon: n.icon,
+                targetUrl: n.targetUrl || `/profile.html?user=${encodeURIComponent(n.triggerUsername || '')}`,
+                action: 'navigate',
+                ctaText: already ? 'View profile' : 'Follow back',
+                ctaAction: already ? 'navigate' : 'follow-back'
+            });
+        }, (error) => console.error('❌ Follower listener error:', error));
+    } catch (error) {
+        console.error('❌ Failed to setup follower listener:', error);
+    }
+}
+
+setTimeout(() => { setupFollowListener(); }, 3500);
+
 // ✅ Cleanup on page unload
 window.addEventListener('beforeunload', () => {
     if (emoteListener) {
         emoteListener();
         console.log('🔌 Emote listener disconnected');
     }
+    if (followListener) followListener();
 });
 
 // ✅ Expose function to restart listener after vote
