@@ -31,9 +31,14 @@ export function groupNotifications(list, followingIds = new Set()) {
 }
 
 // The headline of a grouped social row. null = not a social group (caller keeps its own wording).
+export function socialHeadline(n) {
+    const name = n.triggerUsername || 'Someone';
+    return `${name} voted ${n.relationship === 'ally' ? 'with' : 'against'} you`;
+}
+
 export function groupHeadline(g) {
     if (!isSocialNotification(g) || g.count < 2) return null;
     const what = g.relationship === 'ally' ? 'picked the same as you' : 'voted against you';
-    if (g.groupKind === 'match') return { message: `${g.count} people ${what} in ${g.matchTitle || 'a match'}`, detail: g.users.slice(0, 3).join(', ') + (g.users.length > 3 ? ` +${g.users.length - 3} more` : '') };
+    if (g.groupKind === 'match') return { message: `${g.count} people ${what}`, detail: g.users.slice(0, 3).join(', ') + (g.users.length > 3 ? ` +${g.users.length - 3} more` : '') };
     return { message: `${g.triggerUsername || 'Someone'} ${what} in ${g.count} matches`, detail: null };
 }

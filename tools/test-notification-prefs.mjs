@@ -1,7 +1,7 @@
 // node tools/test-notification-prefs.mjs   (prefs + relationship-aware grouping)
 import assert from 'node:assert/strict';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from '../js/notification-prefs.js';
-import { groupNotifications, groupHeadline } from '../js/notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const store = o => ({ getItem: k => (k in o ? o[k] : null) });
 
@@ -36,9 +36,14 @@ t('headlines say what the row is about', () => {
     const list = [n('1', 'Kai', 'k', 'm1', 'opponent', 5), n('2', 'Mia', 'm', 'm1', 'opponent', 4), n('3', 'Zed', 'z', 'm2', 'ally', 3), n('4', 'Zed', 'z', 'm3', 'ally', 2)];
     const g = groupNotifications(list, new Set(['z']));
     const crowd = g.find(x => x.groupKind === 'match'), person = g.find(x => x.groupKind === 'user');
-    assert.deepEqual(groupHeadline(crowd), { message: '2 people voted against you in T-m1', detail: 'Kai, Mia' });
+    assert.deepEqual(groupHeadline(crowd), { message: '2 people voted against you', detail: 'Kai, Mia' });
     assert.deepEqual(groupHeadline(person), { message: 'Zed picked the same as you in 2 matches', detail: null });
     assert.equal(groupHeadline(g.find(x => x.count === 1) || { relationship: 'ally', count: 1 }), null);
+});
+t('single ally/rival headline is short', () => {
+    assert.equal(socialHeadline({ triggerUsername: 'FireReaper', relationship: 'opponent' }), 'FireReaper voted against you');
+    assert.equal(socialHeadline({ triggerUsername: 'FireReaper', relationship: 'ally' }), 'FireReaper voted with you');
+    assert.equal(socialHeadline({ relationship: 'ally' }), 'Someone voted with you');
 });
 t('non-social rows still group per person', () => {
     const l = [{ id: 'a', type: 'like', triggerUserId: 'u', timestamp: 2 }, { id: 'b', type: 'like', triggerUserId: 'u', timestamp: 1 }];

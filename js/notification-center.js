@@ -7,7 +7,7 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { sendMessage } from './message-system.js';
-import { groupNotifications, groupHeadline } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
 
 // ✅ GUARD: Prevent duplicate initialization
@@ -645,6 +645,8 @@ function renderNotificationItem(notification) {
             notification = { ...notification, ctaAction: 'navigate', ctaText: 'View match' };
         }
     }
+    // Single ally/rival rows (including ones saved before this wording): always the short headline
+    if (!headline && isSocial && !(notification.count > 1)) displayMessage = socialHeadline(notification);
     if (!headline && notification.count > 1) {
         displayMessage = `${notification.triggerUsername} voted in ${notification.count} matches`;
         
@@ -747,6 +749,7 @@ function renderNotificationItem(notification) {
             </div>
             
             ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${displayDetail}</div>` : ''}
+            ${isSocial && notification.matchTitle && (!(notification.count > 1) || notification.groupKind === 'match') ? `<div class="notification-item-match" title="${esc(notification.matchTitle)}">in ${esc(notification.matchTitle)}</div>` : ''}
             
 
             

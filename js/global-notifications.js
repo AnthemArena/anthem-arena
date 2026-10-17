@@ -1308,7 +1308,8 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         songTitle: activity.songTitle,
         matchTitle: activity.matchTitle
     });
-    message = championMessage.message;
+    // Clean headline (edit titles are long and messy); Jinx's personality is the detail line, the match is shown separately.
+    message = `${activity.username} voted with you`;
     detail = championMessage.detail;
     // Lead with the real action: pack button labels are playful ("Glitter Bomb!!") but vague.
     cta = `Say thanks: ${championMessage.cta}`;
@@ -1331,7 +1332,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         yourSong: userSongTitle,
         matchTitle: activity.matchTitle
     });
-    message = championMessage.message;
+    message = `${activity.username} voted against you`;
     detail = championMessage.detail;
     cta = `Challenge: ${championMessage.cta}`;
         icon = '⚔️';
