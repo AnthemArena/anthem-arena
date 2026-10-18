@@ -755,3 +755,7 @@ How a tie is settled when a match closes level: the admin close (`js/admin.js`) 
 ## Welcome lines fix
 
 The welcome alert asked the pack for `welcomeDialogs`, a section the Jinx, Vi and Caitlyn packs no longer have (their welcome lines are under `alerts.welcome`), so the real daily welcome found no lines and stayed silent for anyone on those packs. `js/champion-lines.js` (`dialogFor`, tested by `tools/test-champion-lines.mjs`) now looks in `welcomeDialogs`, then `alerts.welcome`, then `alerts.encouragement` for "still deciding?", and a pack with no streak / comeback welcome (the default pack) uses its "welcome back" lines. Vi's duplicate `alerts.welcome.encouragement` is removed. Not done: Vi and Caitlyn have no `portrait.skin` (Jinx uses skin 37), so their speech-bubble portrait is the base skin; add one per pack if you want a specific Arcane skin.
+
+## Affiliate wording removed
+
+The Amazon affiliate link is gone (footer link earlier, now also the "As an Amazon Associate" note, the footer's Affiliate Disclosure link, and `legal/disclosure.html`). Terms, Privacy and About no longer mention Amazon; Terms say Ko-fi donations are voluntary and give no say in votes or results. `/legal/disclosure` redirects to `/legal/terms` (netlify.toml). Money plan: donations first (Ko-fi); a supporter membership is a possible later step and, per Riot's General Policies, needs the product registered on the Developer Portal (see the notes on registration and monetization).

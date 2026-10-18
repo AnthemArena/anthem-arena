@@ -1,4 +1,4 @@
-# Optional browser test of the REAL legal pages (legal/terms, privacy, disclosure) with mocked Firebase and a mocked /api/matches.
+# Optional browser test of the REAL legal pages (legal/terms, privacy) with mocked Firebase and a mocked /api/matches.
 # Needs Python + playwright with chromium:   pip install playwright && playwright install chromium
 #   python3 tools/test-legal-browser.py            (screenshots go to /tmp/legal-shots)
 # Fixtures come from tools/test-support/bracket-fixtures.mjs (the real builders and the real data/edits.json).
@@ -59,7 +59,7 @@ txt = lambda pg, sel: pg.inner_text(sel).strip()
 
 noscroll = lambda pg: pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
 OLD = ('League Music Tournament', 'Anthem Arena', 'anthemarena', 'Google Analytics', 'newsletter', 'subscribe', 'DMCA', 'fair use', 'Bebas')
-PAGES = [('terms', 'Terms of Use'), ('privacy', 'Privacy Policy'), ('disclosure', 'Affiliate Disclosure')]
+PAGES = [('terms', 'Terms of Use'), ('privacy', 'Privacy Policy')]
 MAIL = 'arcanemomentsfanpage@gmail.com'
 
 with sync_playwright() as p:
@@ -76,7 +76,7 @@ with sync_playwright() as p:
             check('has a plain-English summary and 5+ sections', pg.locator('.legal-plain').count() == 1 and pg.locator('.legal-card').count() >= 5, pg.locator('.legal-card').count())
             check('contact link is wired to the one address', pg.locator('a[data-contact-mail]').first.get_attribute('href') == f'mailto:{MAIL}' and MAIL in pg.locator('a[data-contact-mail]').first.inner_text(), pg.locator('a[data-contact-mail]').first.get_attribute('href'))
             check('current page is marked in the switcher', pg.locator('.legal-switch a[aria-current="page"]').get_attribute('href') == f'/legal/{slug}')
-            check('switcher links to the other two pages', pg.locator('.legal-switch a').count() == 3)
+            check('switcher links to the other page', pg.locator('.legal-switch a').count() == 2)
             check('no sideways scroll', noscroll(pg))
             check('no JS errors', not [e for e in errs if 'docChanges' not in e], errs)
             if slug == 'privacy':
@@ -85,8 +85,7 @@ with sync_playwright() as p:
             if slug == 'terms':
                 check('terms say videos are not hosted', 'do not host' in main.lower())
                 check('terms explain creator removal', 'removal' in main.lower() or 'removed' in main.lower())
-            if slug == 'disclosure':
-                check('disclosure has the Amazon Associate statement', 'As an Amazon Associate we earn from qualifying purchases' in main)
+            check('no affiliate or Amazon wording left', 'amazon' not in main.lower() and 'affiliate' not in main.lower().replace('not affiliated', ''), None)
             pg.screenshot(path=f'{SHOTS}/{label}-{slug}.png', full_page=True)
             pg.context.close()
     b.close()
