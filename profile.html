@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="/css/arcane-theme.generated.css">
     <link rel="stylesheet" href="/css/arcane-theme.css">
     <link rel="stylesheet" href="/css/cup-history.css">
+    <link rel="stylesheet" href="/css/champions.css">
 
     
     <!-- Firebase -->
@@ -193,6 +194,10 @@
                     </button>
                    <button class="tab-btn" data-tab="participation">
     <i class="fas fa-chart-bar"></i> Journey
+</button>
+
+<button class="tab-btn" data-tab="champions">
+    <i class="fas fa-shield-halved"></i> Champions
 </button>
 
 <button class="tab-btn" data-tab="achievements">
@@ -369,6 +374,11 @@
                     <!-- ========================================
                          ACHIEVEMENTS TAB
                          ======================================== -->
+                    <div class="tab-panel" id="tab-champions">
+                        <!-- Vote spread across the companions, mastery and skins (js/champions-tab.js) -->
+                        <div id="championsContent" class="champions-content"></div>
+                    </div>
+
                     <div class="tab-panel" id="tab-achievements">
                         <div id="allAchievements" class="achievements-grid">
                             <div class="no-content">

@@ -3,6 +3,10 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { readPackXp } from './xp-ledger.js';
+import { ddragonUrl } from './arcane-config.js';
+import { CHAMPIONS, championSearchText } from './champion-list.js';
+import { masteryChipHtml } from './champions-tab-model.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
@@ -10,29 +14,9 @@ import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-
 
 import { fixAvatarUrl } from './avatar-url.js';
 // Champion list (same as username-system.js)
-const CHAMPIONS = [
-    'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Aphelios',
-    'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Belveth', 'Blitzcrank', 'Brand', 'Braum', 'Briar',
-    'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki', 'Darius', 'Diana', 'Draven',
-    'DrMundo', 'Ekko', 'Elise', 'Evelynn', 'Ezreal', 'Fiddlesticks', 'Fiora', 'Fizz',
-    'Galio', 'Gangplank', 'Garen', 'Gnar', 'Gragas', 'Graves', 'Gwen', 'Hecarim', 'Heimerdinger',
-    'Hwei', 'Illaoi', 'Irelia', 'Ivern', 'Janna', 'JarvanIV', 'Jax', 'Jayce', 'Jhin', 'Jinx',
-    'Kaisa', 'Kalista', 'Karma', 'Karthus', 'Kassadin', 'Katarina', 'Kayle', 'Kayn', 'Kennen',
-    'Khazix', 'Kindred', 'Kled', 'KogMaw', 'KSante', 'Leblanc', 'LeeSin', 'Leona', 'Lillia',
-    'Lissandra', 'Lucian', 'Lulu', 'Lux', 'Malphite', 'Malzahar', 'Maokai', 'MasterYi',
-    'Milio', 'MissFortune', 'Mordekaiser', 'Morgana', 'Naafiri', 'Nami', 'Nasus', 'Nautilus',
-    'Neeko', 'Nidalee', 'Nilah', 'Nocturne', 'Nunu', 'Olaf', 'Orianna', 'Ornn', 'Pantheon',
-    'Poppy', 'Pyke', 'Qiyana', 'Quinn', 'Rakan', 'Rammus', 'RekSai', 'Rell', 'Renata', 'Renekton',
-    'Rengar', 'Riven', 'Rumble', 'Ryze', 'Samira', 'Sejuani', 'Senna', 'Seraphine', 'Sett',
-    'Shaco', 'Shen', 'Shyvana', 'Singed', 'Sion', 'Sivir', 'Skarner', 'Smolder', 'Sona', 'Soraka',
-    'Swain', 'Sylas', 'Syndra', 'TahmKench', 'Taliyah', 'Talon', 'Taric', 'Teemo', 'Thresh',
-    'Tristana', 'Trundle', 'Tryndamere', 'TwistedFate', 'Twitch', 'Udyr', 'Urgot', 'Varus',
-    'Vayne', 'Veigar', 'Velkoz', 'Vex', 'Vi', 'Viego', 'Viktor', 'Vladimir', 'Volibear',
-    'Warwick', 'Wukong', 'Xayah', 'Xerath', 'XinZhao', 'Yasuo', 'Yone', 'Yorick', 'Yuumi',
-    'Zac', 'Zed', 'Zeri', 'Ziggs', 'Zilean', 'Zoe', 'Zyra'
-];
 
-const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
+
+const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;
@@ -586,7 +570,7 @@ function renderChampionGrid() {
     const html = CHAMPIONS.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
         return `
-            <div class="champion-avatar-option" data-champion="${champion}" data-search="${displayName.toLowerCase()}" title="${displayName}">
+            <div class="champion-avatar-option" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}">
                 <img src="${CHAMPION_CDN}${champion}.png" alt="${displayName}" loading="lazy" />
             </div>
         `;
@@ -1361,6 +1345,7 @@ async function loadChampionPackSelector() {
         const manifest = await window.championLoader.getManifest();
         const currentPack = window.championLoader.getCurrentPack();
 
+        const packXp = readPackXp();
         container.innerHTML = manifest.packs.map(pack => {
             const isActive = pack.id === currentPack.id;
             const isDisabled = !pack.enabled || pack.comingSoon;
@@ -1390,6 +1375,7 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
                     <div class="champion-pack-team">${pack.emoji} Team ${pack.name}</div>
                     <div class="champion-pack-name">${pack.name}</div>
                     <div class="champion-pack-description">${pack.description}</div>
+                    ${masteryChipHtml(pack.id, packXp[pack.id])}
 
                     ${!isDisabled ? `
                         <button class="champion-preview-btn"

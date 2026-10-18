@@ -7,7 +7,7 @@ import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
@@ -126,11 +126,13 @@ const COOLDOWN_MINUTES = {
     comeback: 10,        // 🔽 Reduce from 15 - exciting news!
     winning: 20,         // 🔽 Reduce from 30 - users like wins
     lowvotes: 15,        // ✅ Keep - moderate urgency
+    tiebreaker: 60,      // each step (tied / last hours) is also shown once per match per device
     closing: 60,         // each step (24h / 3h / final) also has its own key
     welcome: 720,        // ✅ Keep - 12 hours is right
     encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
     achievement: 0,      // ✅ Keep - one-time
     'level-up': 0,       // ✅ Keep - one-time
+    'mastery-up': 0,     // a companion reached a new mastery level
     votesurge: 30,       // ✅ Keep
         'live-activity': 5,  // ✅ NEW: Show live votes every 5 minutes max
             streak: 30  // ✅ NEW: Show streak alerts max every 30 minutes
@@ -374,6 +376,35 @@ function buildClosingNotification(items) {
         cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
         action: 'navigate',
         targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/#vote'
+    };
+}
+
+// A match you have not voted in is level: the one alert where your vote is the deciding one.
+// item = { match, matchId, msLeft, tier: 'tied' | 'final', score }. Lines come from the pack (tiebreaker / tiebreaker-final).
+const TIEBREAKER_MIN_VOTES = 10;                  // a 1-1 tie on day one is not worth an alert
+const TIEBREAKER_FINAL_MS = 3 * 60 * 60 * 1000;   // inside the last 3 hours the wording becomes "last chance"
+function buildTieBreakerNotification(item) {
+    const s1 = item.match.song1?.shortTitle || item.match.song1?.title || 'Edit 1';
+    const s2 = item.match.song2?.shortTitle || item.match.song2?.title || 'Edit 2';
+    const title = `${s1} vs ${s2}`;
+    const hoursLeft = Math.max(1, Math.floor(item.msLeft / 3600000));
+    const voice = getPackVoice(item.tier === 'final' ? 'tiebreaker-final' : 'tiebreaker', { matchTitle: title, moment1: s1, moment2: s2, hoursLeft });
+    return {
+        priority: 2,
+        type: 'tiebreaker',
+        severityTier: item.tier,
+        matchId: item.matchId,
+        song: s1,
+        opponent: s2,
+        thumbnailUrl: getThumbnailUrl(item.match.song1?.youtubeUrl) || getThumbnailUrl(item.match.song2?.youtubeUrl),
+        voteDiff: 0,
+        score: `${item.score}–${item.score}`,
+        hoursLeft,
+        message: voice?.message || (item.tier === 'final' ? `${title} is still tied and closing soon. Last chance to break it.` : `${title} is tied right now. Your vote would break it.`),
+        detail: '',
+        cta: voice?.cta || 'Break the tie',
+        action: 'navigate',
+        targetUrl: `/vote.html?match=${item.matchId}`
     };
 }
 
@@ -930,6 +961,23 @@ async function checkAndShowBulletin() {
         }
         
         // ========================================
+        // PRIORITY 3a: TIE-BREAKER (a match you have not voted in is exactly level)
+        // ========================================
+        // Shown once per match per step (tied, then again in the last hours) per device. If a match gets one, it does not
+        // also get the generic closing alert below.
+        let tieBreakerIds = new Set();
+        try {
+            const { ties, covered } = tieBreakerCandidates(liveMatches, {
+                userVotes, seen: JSON.parse(localStorage.getItem('tiebreakerShown') || '{}'),
+                msLeftOf: m => getMsUntilClose(m, true), minVotes: TIEBREAKER_MIN_VOTES, finalMs: TIEBREAKER_FINAL_MS
+            });
+            tieBreakerIds = covered;                                     // tied and open: leave it to this alert
+            if (ties.length > 0) notifications.push(buildTieBreakerNotification(ties[0]));
+        } catch (error) {
+            console.error('⚠️ Error checking tied matches:', error);
+        }
+
+        // ========================================
         // PRIORITY 3b: CLOSING SOON (matches the user has NOT voted in)
         // ========================================
         // Steps: within 24h, within 3h, final 30 minutes. Each step has its own
@@ -940,6 +988,7 @@ async function checkAndShowBulletin() {
             for (const match of liveMatches) {
                 const matchId = getMatchId(match);
                 if (userVotes[matchId]) continue;
+                if (tieBreakerIds.has(matchId)) continue;                // the tie-breaker alert covers this one
                 
                 const msLeft = getMsUntilClose(match, true);
                 if (msLeft === null) continue;
@@ -989,6 +1038,13 @@ async function checkAndShowBulletin() {
             
             showBulletin(notification);
             recentlyShownBulletins.set(bulletinKey, Date.now());
+            if (notification.type === 'tiebreaker') {
+                try {   // once per match per step on this device
+                    const seen = JSON.parse(localStorage.getItem('tiebreakerShown') || '{}');
+                    seen[`${notification.matchId}:${notification.severityTier}`] = Date.now();
+                    localStorage.setItem('tiebreakerShown', JSON.stringify(seen));
+                } catch (e) { /* storage unavailable: the cooldown still applies */ }
+            }
             
             // Save to Firestore
 // Save to Firestore
@@ -1680,7 +1736,7 @@ async function showWelcomeToast() {
             ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
             : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
         
-        const isOnVotePage = window.location.pathname.includes('vote.html');
+        const isOnMatchesPage = /\/matches(\.html)?\/?$/.test(window.location.pathname);
         
         showBulletin({
             priority: 1,
@@ -1691,8 +1747,8 @@ async function showWelcomeToast() {
             message: welcomeData.message,
             detail: welcomeData.detail,
             cta: welcomeData.cta,
-            action: isOnVotePage ? 'dismiss' : 'navigate',
-            targetUrl: '/vote.html',
+            action: isOnMatchesPage ? 'dismiss' : 'navigate',
+            targetUrl: '/matches.html',
             duration: 5000
         });
         
@@ -1836,7 +1892,7 @@ function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower', 'round-opening', 'new-matches', ...CONTENT_TYPES];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'mastery-up', 'new-follower', 'round-opening', 'new-matches', ...CONTENT_TYPES];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -2417,6 +2473,7 @@ if (championPack && championPack.theme) {
         winning: '🎯',
         comeback: '🎉',
         lowvotes: '⚠️',
+        tiebreaker: '⚖️',
         closing: '⏳',
         'close-match': '🔥',
         'new-match': '🆕',
@@ -2425,14 +2482,15 @@ if (championPack && championPack.theme) {
         encouragement: '👀',
         'return-voter': '👋',
         achievement: '🏆',
-        'level-up': '⬆️'
+        'level-up': '⬆️',
+        'mastery-up': '⬆️'
     };
     
     const icon = icons[notification.type] || '📢';
     
     // ✅ LEVEL-UP SPECIFIC STYLING
-    if (notification.type === 'level-up') {
-        // Level up: the same card family as the other alerts (big level number, tag, the champion's words, one button)
+    if (notification.type === 'level-up' || notification.type === 'mastery-up') {
+        // Level up (account) and mastery up (a companion; its unlocked skins show as a strip of splash art): the same card family as the other alerts (big level number, tag, the champion's words, one button)
         ensureVersusStyles();
         const levelMatch = String(notification.message || '').match(/Level (\d+)/);
         const level = notification.level ?? (levelMatch ? levelMatch[1] : '?');
@@ -2445,8 +2503,9 @@ if (championPack && championPack.theme) {
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
         banner.innerHTML = eventToastHtml(notification, {
-            tag: 'Level up', accent, jinxSrc: championBadgeUrl(pack), leadHtml: levelBadgeHtml(level, accent),
-            quip: notification.message, detail: notification.detail, cta: notification.cta || 'View progress'
+            tag: notification.type === 'mastery-up' ? 'Mastery up' : 'Level up', accent, jinxSrc: championBadgeUrl(pack), leadHtml: levelBadgeHtml(level, accent),
+            strip: notification.strip || null,
+            quip: notification.message, detail: notification.detail, cta: notification.cta || (notification.type === 'mastery-up' ? 'View champions' : 'View progress')
         });
         banner.className = 'bulletin-banner versus-toast event level-up-card';
     } 
@@ -2676,17 +2735,17 @@ else {
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
         const drawEvent = () => {
             banner.innerHTML = eventToastHtml(notification, {
-                tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(pack),
-                quip: notification.message, detail: notification.detail, chips: eventChips(notification),
+                tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(pack),
+                quip: notification.message, detail: eventKind(notification).quiet ? '' : notification.detail, chips: eventChips(notification),
                 cta: notification.ctaText || notification.cta || 'View match'
             });
         };
         drawEvent();
         banner.className = 'bulletin-banner versus-toast event';
-        if (!notification.nv && notification.matchId) {
+        if (!notification.nv && (notification.matchId || isStripAlert(notification))) {
             eventContextFor(notification).then(nv => {
                 notification.nv = nv;
-                if (nv.edits && currentBulletin === notification) drawEvent();
+                if ((nv.edits || nv.strip) && currentBulletin === notification) drawEvent();
             }).catch(() => {});
         }
     } else if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
@@ -2764,7 +2823,7 @@ window.dismissBulletin = function() {
             dismissalKeys.push(`danger-repeat-${matchId}`);
         }
     } 
-    else if (type === 'comeback' || type === 'nailbiter' || type === 'winning') {
+    else if (type === 'comeback' || type === 'nailbiter' || type === 'winning' || type === 'tiebreaker') {
         // ✅ Include severity tier for other match alerts too
         if (severityTier) {
             dismissalKeys.push(`${type}-${matchId}-${severityTier}`);
@@ -2864,6 +2923,8 @@ window.handleBulletinCTA = function() {
 
     // Match-event alerts (new design): the button and the card both open the match (with the share panel for a match you voted in)
     if (isEventNotification(currentBulletin) && currentBulletin.matchId !== 'test-match' && currentBulletin.action !== 'dismiss') {
+        // Alerts with a strip of edits open the matches list; when you are already on it, the button just closes the alert
+        if (isStripAlert(currentBulletin) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
         window.location.href = eventUrl(currentBulletin);
         return;
     }

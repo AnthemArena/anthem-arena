@@ -482,42 +482,6 @@
         "Review the result"
       ]
     },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "A dead tie, and your pick takes it on seeding. A win by procedure.",
-            "Level on votes. {winner} advances on seed, as the rules provide."
-          ],
-          "detail": [
-            "A tie resolved in your favour. I will accept it.",
-            "Legitimate, though unspectacular."
-          ],
-          "cta": [
-            "Rules upheld",
-            "Noted"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "A dead tie, and {winner} advances on seeding. Those are the rules.",
-            "Level on votes. {winner} takes it on seed. Unsatisfying, but fair."
-          ],
-          "detail": [
-            "The rules decided it. Fair is fair.",
-            "Lost on a technicality, though a proper one."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
-      ]
-    },
     "welcome": {
       "welcome-first-time": {
         "messages": [
@@ -594,6 +558,33 @@
         "Add your vote",
         "Weigh in",
         "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is level at present. A single vote would settle it.",
+        "A perfect tie on {matchTitle}. You have not yet voted. I suggest you do.",
+        "The result stands level. Your vote would be decisive.",
+        "{moment1} and {moment2} are tied. The matter is yours to resolve."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Cast the deciding vote",
+        "Resolve it",
+        "Vote now"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} remains tied with little time left. This is the last opportunity to resolve it.",
+        "Level, and closing soon. Your vote would decide it.",
+        "A tied match, nearly out of time. I would not wait."
+      ],
+      "buttons": [
+        "Resolve it",
+        "Cast the vote",
+        "Decide it",
+        "Vote now"
       ]
     },
     "encouragement": {
@@ -1107,6 +1098,76 @@
         "View achievements",
         "See all"
       ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Well earned.",
+        "Your mastery grows. Noted."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "You have reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs with Jinx. Reckless. Somehow it works.",
+        "Ten long shots, none of them careless. Impressive."
+      ],
+      "details": [
+        "Ten against the odds. +{xp} XP",
+        "Measured risks pay off. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close matches with me. Steady hands.",
+        "Ten tight finishes. We make a good team."
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady under pressure. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days at my side. Consistency is underrated.",
+        "A week without a miss. Noted."
+      ],
+      "details": [
+        "A week together. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "A tied match, and you cast the deciding vote. Textbook.",
+        "You broke the tie. A clean shot."
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
     }
   },
   "bubble": {
@@ -1340,5 +1401,8 @@
       "{pct}% for {pick}. {other} is a long way behind.",
       "{pick} leads {other} decisively, at {pct}%. Cast your own vote."
     ]
+  },
+  "portrait": {
+    "skin": 28
   }
 }

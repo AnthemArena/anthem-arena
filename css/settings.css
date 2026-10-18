@@ -1250,3 +1250,9 @@
     font-weight: 700;
     color: var(--text-primary);
 }
+/* Companion cards: mastery level, progress and next reward (js/champions-tab-model.js masteryChipHtml) */
+.champion-mastery { margin-top: 8px; text-align: left; }
+.champion-mastery-level { display: block; font-size: .78rem; font-weight: 700; color: var(--pink-bright, #ff69b4); }
+.champion-mastery-bar { display: block; height: 5px; margin: 5px 0 4px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
+.champion-mastery-bar > span { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ff2d95, var(--pink-bright, #ff69b4)); }
+.champion-mastery-next { display: block; font-size: .68rem; color: rgba(255,255,255,.6); line-height: 1.3; }

@@ -210,17 +210,6 @@
       "buttons": [
         "View Bracket"
       ]
-    },
-    "match-tied": {
-      "messages": [
-        "Perfect tie!"
-      ],
-      "details": [
-        "\"{songTitle}\" ended 50-50"
-      ],
-      "buttons": [
-        "View Results"
-      ]
     }
   },
   "achievements": {

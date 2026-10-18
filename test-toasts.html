@@ -399,6 +399,18 @@
                 <strong>Low Votes</strong>
                 <span class="test-btn-label">Only a few votes</span>
             </button>
+
+            <button class="test-btn" onclick="testTieBreaker()">
+                <span class="test-btn-icon">⚖️</span>
+                <strong>Tie-breaker</strong>
+                <span class="test-btn-label">Level, and you haven't voted</span>
+            </button>
+
+            <button class="test-btn" onclick="testTieBreaker(true)">
+                <span class="test-btn-icon">⏳</span>
+                <strong>Tie-breaker (last hours)</strong>
+                <span class="test-btn-label">Still level, closing soon</span>
+            </button>
         </div>
     </div>
 
@@ -416,12 +428,6 @@
             <span class="test-btn-icon">😢</span>
             <strong>Match Lost</strong>
             <span class="test-btn-label">Your pick lost</span>
-        </button>
-        
-        <button class="test-btn" onclick="testMatchTied()">
-            <span class="test-btn-icon">⚖️</span>
-            <strong>Match Tied</strong>
-            <span class="test-btn-label">Perfect tie at close</span>
         </button>
     </div>
 </div>
@@ -478,22 +484,34 @@
     <div class="test-section">
         <h2><i class="fas fa-trophy"></i> Achievements</h2>
         <div class="test-grid">
-            <button class="test-btn" onclick="testAchievement('opening-act')">
-                <span class="test-btn-icon">🎤</span>
-                <strong>Opening Act</strong>
-                <span class="test-btn-label">First vote</span>
+            <button class="test-btn" onclick="testAchievement('first-choice')">
+                <span class="test-btn-icon">🏆</span>
+                <strong>First Choice</strong>
+                <span class="test-btn-label">First vote (common)</span>
             </button>
             
-            <button class="test-btn" onclick="testAchievement('pentakill')">
-                <span class="test-btn-icon">💀</span>
-                <strong>Pentakill</strong>
-                <span class="test-btn-label">50 votes</span>
+            <button class="test-btn" onclick="testAchievement('arcane-legend')">
+                <span class="test-btn-icon">⭐</span>
+                <strong>Arcane Legend</strong>
+                <span class="test-btn-label">250 votes (legendary)</span>
             </button>
             
             <button class="test-btn" onclick="testLevelUp(5)">
                 <span class="test-btn-icon">⬆️</span>
                 <strong>Level Up</strong>
                 <span class="test-btn-label">Reached level 5</span>
+            </button>
+
+            <button class="test-btn" onclick="testMasteryUp(2)">
+                <span class="test-btn-icon">🎖️</span>
+                <strong>Mastery Up</strong>
+                <span class="test-btn-label">Mastery 2 (Arcane skin unlocked)</span>
+            </button>
+
+            <button class="test-btn" onclick="testMasteryUp(3)">
+                <span class="test-btn-icon">🎖️</span>
+                <strong>Mastery Up (two skins)</strong>
+                <span class="test-btn-label">Mastery 3</span>
             </button>
         </div>
     </div>
@@ -782,6 +800,25 @@ action: 'dismiss'
         });
     }
     
+    function testTieBreaker(final = false) {
+        const msg = window.championLoader?.getChampionMessage(final ? 'tiebreaker-final' : 'tiebreaker', { matchTitle: 'GODS vs RISE', moment1: 'GODS', moment2: 'RISE', hoursLeft: final ? 2 : 14 });
+        window.showBulletin?.({
+            priority: 2,
+            type: 'tiebreaker',
+            severityTier: final ? 'final' : 'tied',
+            matchId: 'test-tiebreaker',
+            song: 'GODS',
+            opponent: 'RISE',
+            voteDiff: 0,
+            score: '24–24',
+            hoursLeft: final ? 2 : 14,
+            message: msg?.message || 'GODS vs RISE is tied right now. Your vote would break it.',
+            cta: msg?.cta || 'Break the tie',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=test-tiebreaker'
+        });
+    }
+
     // ========================================
     // WELCOME TESTS
     // ========================================
@@ -800,6 +837,7 @@ action: 'dismiss'
         window.showBulletin?.({
             priority: 5,
             type: 'welcome',
+            welcomeType: type,
             matchId: 'welcome',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
             message: msg?.message || `${config.icon} ${config.default}`,
@@ -858,28 +896,6 @@ function testMatchLost() {
     });
 }
 
-function testMatchTied() {
-    const msg = window.championLoader?.getChampionMessage('match-tied', {  // Changed from 'match-tied-alert'
-        songTitle: 'GODS',
-        song1: 'GODS',
-        song2: 'RISE',
-        finalScore: '150-150'
-    });
-    
-    window.showBulletin?.({
-        priority: 2,
-        type: 'match-tied',
-        matchId: 'test-match-tied',
-        song: 'GODS',
-        opponent: 'RISE',
-        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-        finalScore: '150-150',
-        message: msg?.message || '⚖️ Perfect tie!',
-        detail: msg?.detail || 'GODS vs RISE ended 150-150',
-        cta: msg?.cta || 'View Tiebreaker'
-    });
-}
-
 // ========================================
 // TOURNAMENT EVENT TESTS
 // ========================================
@@ -909,6 +925,7 @@ function testWelcomeBack() {
     window.showBulletin?.({
         priority: 5,
         type: 'welcome',
+        welcomeType: 'back',
         matchId: 'welcome-back',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
         message: msg?.message || '👋 Welcome back!',
@@ -924,6 +941,7 @@ function testEncouragement() {
     window.showBulletin?.({
         priority: 5,
         type: 'encouragement',
+        encouragementType: 'gentle',
         matchId: 'encouragement',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
         message: msg?.message || '👀 Still deciding?',
@@ -938,47 +956,62 @@ function testEncouragement() {
     // ACHIEVEMENT TESTS
     // ========================================
     
-    function testAchievement(achievementId = 'opening-act') {
+    function testAchievement(achievementId = 'first-choice') {
+        // Same shape as the real unlock (js/achievement-tracker.js showAchievementUnlock), using ids that exist in the packs
         const achievements = {
-            'opening-act': {
-                icon: '🎤',
-                title: 'Opening Act',
-                description: 'Cast your first vote!'
-            },
-            'pentakill': {
-                icon: '💀',
-                title: 'Pentakill',
-                description: '50 votes - you\'re a natural disaster!'
-            }
+            'first-choice':  { name: 'First Choice',  description: 'Cast your first vote', xp: 25,  rarity: 'common' },
+            'arcane-legend': { name: 'Arcane Legend', description: 'Cast 250 votes',       xp: 250, rarity: 'legendary' }
         };
-        
-        const achievement = achievements[achievementId] || achievements['opening-act'];
-        const msg = window.championLoader?.getAchievementMessage(achievementId);
-        
+        const real = achievements[achievementId] ? achievementId : 'first-choice';
+        const a = achievements[real];
+        const msg = window.championLoader?.getAchievementMessage(real, { name: a.name, description: a.description, xp: a.xp, rarity: a.rarity });
+
         window.showBulletin?.({
-            priority: 1,
+            priority: 2,
             type: 'achievement',
-            matchId: 'achievement',
-            icon: achievement.icon,
-            thumbnailUrl: achievement.icon,
-            message: msg?.message || `🏆 Achievement Unlocked: ${achievement.title}`,
-            detail: msg?.detail || achievement.description,
-            cta: msg?.cta || 'View Achievements'
+            matchId: 'achievement-' + real,
+            thumbnailUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3041.png',
+            icon: a.rarity === 'legendary' ? '⭐' : '🏆',
+            achievementName: a.name,
+            rarity: a.rarity,
+            message: msg?.message || `Achievement unlocked: ${a.name}`,
+            detail: msg?.detail || `${a.description} • +${a.xp} XP • ${a.rarity}`,
+            cta: msg?.cta || 'View Achievements',
+            action: 'navigate',
+            targetUrl: '/profile#achievements'
         });
     }
-    
-    function testLevelUp(level = 5) {
-        const msg = window.championLoader?.getAchievementMessage('level-up', { level });
-        
+
+    function testMasteryUp(level = 2) {
+        // Same shape as the real alert (js/rank-system.js announceMastery): type 'mastery-up' with a strip of the unlocked skins' splash art
+        const skins = level === 2 ? [['Arcane Enemy', 37]] : [['Crime City', 1], ['Firecracker', 2]];
+        const rank = `Jinx Mastery ${level}`, xp = 100;
+        const msg = window.championLoader?.getAchievementMessage('mastery-up', { rank, xp });
         window.showBulletin?.({
-            priority: 1,
-            type: 'levelup',
-            matchId: 'levelup',
-            icon: '⬆️',
+            type: 'mastery-up',
+            level,
+            message: msg?.message || `${rank}!`,
+            detail: `Unlocked: ${skins.map(x => x[0]).join(', ')}`,
+            strip: { thumbs: skins.map(x => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_${x[1]}.jpg`), more: 0 },
+            cta: msg?.cta || 'View champions',
+            ctaAction: () => { window.location.href = '/profile#champions'; },
+            duration: 8000
+        });
+    }
+
+    function testLevelUp(level = 5) {
+        // Same shape as the real level-up (js/rank-system.js): type 'level-up', with the rank title and XP filled in
+        const rank = 'Hextech Adept', xp = 100;
+        const msg = window.championLoader?.getAchievementMessage('level-up', { level, rank, xp });
+
+        window.showBulletin?.({
+            type: 'level-up',
             level: level,
-            message: msg?.message || `⬆️ Level Up! You're now Level ${level}!`,
-            detail: msg?.detail || `Keep voting to reach Level ${level + 1}`,
-            cta: msg?.cta || 'Continue Voting'
+            message: msg?.message || 'New Arcane rank!',
+            detail: msg?.detail || `You've reached ${rank}! +${xp} XP earned`,
+            cta: msg?.cta || 'View progress',
+            ctaAction: () => { window.location.href = '/profile#votes'; },
+            duration: 8000
         });
     }
     
@@ -1000,7 +1033,7 @@ function testEncouragement() {
         { fn: () => testMatchWon(), delay: 42000, name: 'Match Won' },
         { fn: () => testMatchLost(), delay: 48000, name: 'Match Lost' },
         { fn: () => testRoundOpening(), delay: 54000, name: 'Round Opening' },
-        { fn: () => testAchievement('opening-act'), delay: 60000, name: 'Achievement' }
+        { fn: () => testAchievement('first-choice'), delay: 60000, name: 'Achievement' }
     ];
     
     tests.forEach(test => {

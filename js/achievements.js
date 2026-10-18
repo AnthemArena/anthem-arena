@@ -625,6 +625,67 @@ export const ACHIEVEMENTS = {
     rarity: 'rare',
     condition: (stats) => stats.sharesCount >= 15,
     progress: (stats) => ({ current: stats.sharesCount, target: 15 })
+  },
+
+  // ========================================
+  // COMPANIONS (votes counted for the companion that was active when they were cast)
+  // Each one unlocks a Prestige skin (js/champion-unlocks.js)
+  // ========================================
+
+  'jinx-loose-cannon': {
+    id: 'jinx-loose-cannon',
+    name: 'Loose Cannon',
+    description: 'Vote for 10 underdogs with Jinx as your companion',
+    icon: '💣',
+    xp: 200,
+    category: 'companions',
+    hidden: false,
+    tier: 'gold',
+    rarity: 'epic',
+    condition: (stats) => stats.jinxUnderdogVotes >= 10,
+    progress: (stats) => ({ current: stats.jinxUnderdogVotes, target: 10 })
+  },
+
+  'caitlyn-close-calls': {
+    id: 'caitlyn-close-calls',
+    name: 'Close Calls',
+    description: 'Vote in 10 close matches with Caitlyn as your companion',
+    icon: '🔎',
+    xp: 250,
+    category: 'companions',
+    hidden: false,
+    tier: 'gold',
+    rarity: 'epic',
+    condition: (stats) => stats.caitlynCloseVotes >= 10,
+    progress: (stats) => ({ current: stats.caitlynCloseVotes, target: 10 })
+  },
+
+  'caitlyn-steady-aim': {
+    id: 'caitlyn-steady-aim',
+    name: 'Steady Aim',
+    description: 'Vote 7 days in a row with Caitlyn as your companion',
+    icon: '🏹',
+    xp: 250,
+    category: 'companions',
+    hidden: false,
+    tier: 'gold',
+    rarity: 'epic',
+    condition: (stats) => stats.caitlynStreak >= 7,
+    progress: (stats) => ({ current: stats.caitlynStreak, target: 7 })
+  },
+
+  'caitlyn-deciding-shot': {
+    id: 'caitlyn-deciding-shot',
+    name: 'Deciding Shot',
+    description: 'Cast the vote that breaks a tie, with Caitlyn as your companion',
+    icon: '🔫',
+    xp: 500,
+    category: 'companions',
+    hidden: false,
+    tier: 'legendary',
+    rarity: 'legendary',
+    condition: (stats) => stats.caitlynDecidingVotes >= 1,
+    progress: (stats) => ({ current: stats.caitlynDecidingVotes, target: 1 })
   }
 };
 
@@ -694,6 +755,13 @@ export const ACHIEVEMENT_CATEGORIES = {
     icon: '<i class="fa-solid fa-star"></i>',
     color: '#ffd700',
     description: 'Unusual and memorable accomplishments'
+  },
+
+  companions: {
+    name: 'Companions',
+    icon: '<i class="fa-solid fa-shield-halved"></i>',
+    color: '#ff69b4',
+    description: 'Earned with a companion by your side. Each unlocks a Prestige skin'
   },
 
   social: {

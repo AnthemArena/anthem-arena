@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { EVENT_KINDS, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -111,9 +111,10 @@ t('event links: matches you voted in open with the share panel, others do not', 
     assert.equal(eventUrl({ type: 'winning', matchId: 'm1', targetUrl: '/vote.html?match=m1&share=1' }), '/vote.html?match=m1&share=1');
     assert.equal(eventUrl({ type: 'match-won', matchId: 'm1', targetUrl: '/vote.html?match=m1' }), '/vote.html?match=m1');
     assert.equal(eventUrl({ type: 'novotes', matchId: 'm1' }), '/vote.html?match=m1');
-    assert.equal(eventUrl({ type: 'round-opening', targetUrl: '/vote.html' }), '/vote.html');
+    assert.equal(eventUrl({ type: 'round-opening', targetUrl: '/vote.html' }), '/matches.html');
+    assert.equal(eventUrl({ type: 'welcome', targetUrl: '/vote.html' }), '/matches.html'); assert.equal(eventUrl({ type: 'encouragement' }), '/matches.html');
     assert.equal(eventUrl({ type: 'closing', targetUrl: '/#vote' }), '/#vote');
-    assert.equal(eventUrl({ type: 'round-opening' }), '/vote.html');
+    assert.equal(eventUrl({ type: 'round-opening' }), '/matches.html');
 });
 t('event chips: percentages for a voted match, match count for a new round', () => {
     assert.deepEqual(eventChips({ type: 'danger', userPct: 38, opponentPct: 62 }), ['38% vs 62%']);
@@ -123,6 +124,13 @@ t('event chips: percentages for a voted match, match count for a new round', () 
     assert.deepEqual(eventChips({ type: 'closing', severityTier: 'final' }), ['Last chance']);
     assert.deepEqual(eventChips({ type: 'round-opening', round: 2, matchCount: 8 }), ['Round 2', '8 matches']);
     assert.deepEqual(eventChips({ type: 'encouragement', encouragementType: 'urgent' }), ['Closing soon']);
+    assert.deepEqual(eventChips({ type: 'danger', voteDiff: 15, userPct: 43, opponentPct: 57 }), ['Behind by 15', '43% vs 57%']);
+    assert.deepEqual(eventChips({ type: 'comeback', voteDiff: 5 }), ['Ahead by 5']);
+    assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 1 }), ['1 vote apart']);
+    assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 0, userPct: 50, opponentPct: 50 }), ['50% vs 50%']);
+    assert.ok(isStripAlert({ type: 'welcome' }) && isStripAlert({ type: 'encouragement' }) && isStripAlert({ type: 'round-opening' }) && !isStripAlert({ type: 'danger' }));
+    for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
+    for (const k of ['closing', 'novotes', 'lowvotes']) assert.ok(!EVENT_KINDS[k].quiet, k);
     for (const k of Object.keys(EVENT_KINDS)) assert.ok(eventGlyph({ type: k }), k);
     assert.equal(eventGlyph({ type: 'danger' }), '▼'); assert.equal(eventGlyph({ type: 'winning' }), '▲'); assert.equal(eventGlyph({ type: 'match-lost' }), '✕'); assert.equal(eventGlyph({ type: 'nope' }), 'VS');
 });
@@ -142,5 +150,28 @@ t('streaks: recognised, drawn as ally / rival, headline names the person and the
     assert.equal(streakView({ ...a, relationship: 'rival-streak', streakCount: 20 }).headline, 'Mia Lee has voted against you 20 matches in a row');
     assert.equal(streakView({ ...a, relationship: 'rival-streak' }).relationship, 'opponent');
     assert.equal(streakView({ relationship: 'ally-streak' }).headline, 'Someone has voted with you again and again');
+});
+t('tie-breaker: only exact ties in matches you have not voted in, open, with enough votes; once per step', () => {
+    const H = 3600000;
+    const m = (id, a, b) => ({ matchId: id, song1: { votes: a }, song2: { votes: b } });
+    const left = { A: 20 * H, B: 2 * H, C: 5 * H, D: 4 * H, E: 3 * H, F: -1, G: 9 * H, H: null };
+    const msLeftOf = x => left[x.matchId];
+    const matches = [m('A', 12, 12), m('B', 11, 11), m('C', 12, 11), m('D', 3, 3), m('E', 10, 10), m('F', 20, 20), m('G', 15, 15), m('H', 15, 15)];
+    let r = tieBreakerCandidates(matches, { userVotes: { G: { songId: 'song1' } }, seen: {}, msLeftOf });
+    assert.deepEqual(r.ties.map(x => [x.matchId, x.tier, x.score]), [['B', 'final', 11], ['E', 'final', 10], ['A', 'tied', 12]], 'soonest first; the last 3 hours is the final step');
+    assert.deepEqual([...r.covered].sort(), ['A', 'B', 'E'], 'covered = every open tie you could vote in (not voted-in G, not 1 apart C, not low D, not closed F, not unknown H)');
+    r = tieBreakerCandidates(matches, { userVotes: {}, seen: { 'B:final': 1, 'A:tied': 1 }, msLeftOf });
+    assert.deepEqual(r.ties.map(x => x.matchId), ['E', 'G'], 'announced steps are skipped (G is now open to vote in)');
+    assert.ok(r.covered.has('B') && r.covered.has('A'), 'but stay covered, so the closing alert leaves them alone');
+    assert.deepEqual(tieBreakerCandidates([], { msLeftOf }).ties, []);
+});
+t('tie-breaker alert: tag, symbol, chips, link, both edits', () => {
+    const n = { type: 'tiebreaker', matchId: 'm9', severityTier: 'tied', score: '24–24' };
+    assert.ok(!isEventNotification({ type: 'match-tied' }), 'a match can no longer close level, so there is no tied-result alert');
+    assert.ok(isEventNotification(n) && EVENT_KINDS.tiebreaker.both && EVENT_KINDS.tiebreaker.quiet);
+    assert.equal(eventTag(n), 'Tie-breaker needed'); assert.equal(eventTag({ ...n, severityTier: 'final' }), 'Last chance to break the tie');
+    assert.equal(eventGlyph(n), '=');
+    assert.deepEqual(eventChips(n), ['Level at 24–24']); assert.deepEqual(eventChips({ ...n, severityTier: 'final' }), ['Level at 24–24', 'Last chance']);
+    assert.equal(eventUrl(n), '/vote.html?match=m9');
 });
 console.log(`${pass} passed`);

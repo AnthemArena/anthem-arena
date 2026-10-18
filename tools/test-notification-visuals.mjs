@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { eventLeadHtml, eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
+import { withoutLeadingGlyph, eventLeadHtml, eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -18,7 +18,11 @@ t('viewer avatar comes from storage', () => {
     assert.equal(viewerAvatarSrc(st), 'https://x/me.png'); assert.equal(viewerAvatarSrc({ getItem: () => null }), null);
 });
 t('champion badge is the pack icon', () => {
-    assert.equal(championBadgeUrl({ icon: 'https://x/Jinx.png', portrait: { skin: 37 } }), 'https://x/Jinx.png');
+    const st = o => ({ getItem: k => (k in o ? o[k] : null) });
+    assert.match(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({ userPackXP: '{"jinx":150}' })), /Jinx_37\.jpg$/);   // Arcane once mastery 2
+    assert.equal(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({})), 'https://x/Jinx.png');                        // classic (the plain icon) before that
+    assert.equal(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({ userPackXP: '{"jinx":150}', companionSkins: '{"jinx":0}' })), 'https://x/Jinx.png');   // a chosen look wins
+    assert.equal(championBadgeUrl({ id: 'caitlyn', icon: 'https://x/Caitlyn.png' }), 'https://x/Caitlyn.png');
     assert.equal(championBadgeUrl(null), null);
 });
 t('fallback avatar is stable per name and always an Arcane champion icon', () => {
@@ -147,6 +151,16 @@ t('event toast: tag, bubble, chips, one button; the whole card and the button bo
     assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button/g) || []).length, 2);
     const bare = eventToastHtml({ type: 'round-opening' }, { tag: 'Round 2 is open', edits: null, accent: '#ff69b4', jinxSrc: null, quip: 'Go', cta: 'Start' });
     assert.ok(!bare.includes('nv-edits') && bare.includes('nv-glyph'), 'no match: the symbol alone in a circle');
+});
+t('the champion line drops a symbol the picture already shows', () => {
+    assert.equal(withoutLeadingGlyph('👋 Welcome back!', '👋'), 'Welcome back!');
+    assert.equal(withoutLeadingGlyph('👀 Still deciding?', '👀'), 'Still deciding?');
+    assert.equal(withoutLeadingGlyph('▼ Down 12', '▼'), 'Down 12');
+    assert.equal(withoutLeadingGlyph('🚨 In danger', '▼'), '🚨 In danger');
+    assert.equal(withoutLeadingGlyph('Welcome back!', '👋'), 'Welcome back!');
+    assert.equal(withoutLeadingGlyph('👋', '👋'), '👋');
+    assert.equal(withoutLeadingGlyph('Plain', 'VS'), 'Plain');
+    assert.ok(!eventToastHtml({ type: 'welcome' }, { tag: 'Welcome back', glyph: '👋', accent: '#f0f', jinxSrc: null, quip: '👋 Hi again', cta: 'Go' }).includes('👋 Hi again'));
 });
 t('event lead: symbol between the edits, or alone; VS stays plain', () => {
     const e = eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song2');

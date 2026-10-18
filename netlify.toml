@@ -110,6 +110,19 @@
   to = "/feed"
   status = 301
 
+# The affiliate disclosure page was removed with the affiliate link: send old links to the terms
+[[redirects]]
+  from = "/legal/disclosure"
+  to = "/legal/terms"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/legal/disclosure.html"
+  to = "/legal/terms"
+  status = 301
+  force = true
+
 # live.html was merged into the homepage (the open matches are the first thing under the hero)
 [[redirects]]
   from = "/live"
