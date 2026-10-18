@@ -8,13 +8,13 @@ import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
 import { masteryChipHtml, skinAvatar } from './champions-tab-model.js';
 import { lookSkin } from './companion-look.js';
+import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-import { fixAvatarUrl } from './avatar-url.js';
 // Champion list (same as username-system.js)
 
 
@@ -126,12 +126,52 @@ function createModalHTML() {
                             </div>
                         </div>
 
+                        <!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
+<div class="settings-section">
+   <h3><i class="fas fa-user-astronaut"></i> Your Champion</h3>
+<p class="section-description">
+    Pick your champion. They become your profile picture and cover art, give personality-driven notifications,
+    react to tournament activity and earn your XP. Choose their skin on the Champions tab of your profile.
+</p>
+
+    <div id="championPackSelector" class="champion-pack-grid">
+        <!-- Champion pack options will be populated here with avatars -->
+    </div>
+
+    <div class="team-identity-preview" id="teamPreview" style="
+        margin-top: 16px;
+        padding: 16px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        display: none;
+        border-left: 4px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    ">
+        <img id="teamAvatar" src="" alt="Team Avatar" style="
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-gold);
+        ">
+        <div>
+            <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
+Your Champion: <span id="teamName">Jinx</span>
+            </div>
+            <small style="opacity: 0.7; font-size: 0.85em;">
+Your companion can react to matches, achievements, and other site activity
+            </small>
+        </div>
+    </div>
+</div>
+
                   <!-- Avatar Section -->
                         <div class="settings-section">
-                            <h3><i class="fas fa-image"></i> Avatar</h3>
+                            <h3><i class="fas fa-image"></i> Other Profile Pictures</h3>
 <p class="section-description">
-    Choose your profile avatar from League of Legends characters. Jinx, Vi and Caitlyn are champions you can level up:
-    picking one also makes them your champion, so your XP, skins and alerts follow them.
+    Prefer a different face? Any other champion works as a plain picture (no levels or skins). Your champion above
+    keeps earning your XP and sending your alerts.
 </p>
 
                             <div class="avatar-search-wrapper">
@@ -177,47 +217,7 @@ function createModalHTML() {
                         </div>
 
 
-<!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
-<div class="settings-section">
-   <h3><i class="fas fa-user-astronaut"></i> Your Champion</h3>
-<p class="section-description">
-    Choose your champion. They’ll be your profile picture, give personality-driven notifications,
-    react to tournament activity and earn your XP. Your skins are on the Champions tab of your profile.
-</p>
-
-    <div id="championPackSelector" class="champion-pack-grid">
-        <!-- Champion pack options will be populated here with avatars -->
-    </div>
-
-    <div class="team-identity-preview" id="teamPreview" style="
-        margin-top: 16px;
-        padding: 16px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        display: none;
-        border-left: 4px solid var(--accent-gold);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    ">
-        <img id="teamAvatar" src="" alt="Team Avatar" style="
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            border: 2px solid var(--accent-gold);
-        ">
-        <div>
-            <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
-Your Champion: <span id="teamName">Jinx</span>
-            </div>
-            <small style="opacity: 0.7; font-size: 0.85em;">
-Your companion can react to matches, achievements, and other site activity
-            </small>
-        </div>
-    </div>
-</div>
-
-                        <!-- Social Media Links -->
+<!-- Social Media Links -->
 <div class="setting-group">
     <label>
         <i class="fas fa-share-nodes"></i> Social Media
@@ -570,7 +570,7 @@ function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
     if (!grid) return;
 
-    const html = CHAMPIONS.map(champion => {
+    const html = CHAMPIONS.filter(c => !PACK_IDS.includes(c.toLowerCase())).map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
         return `
             <div class="champion-avatar-option" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}">
@@ -750,6 +750,9 @@ function handleChampionClick(e) {
     option.classList.add('selected');
 
     console.log('✅ Champion selected:', displayName);
+
+    const coverSelect = document.getElementById('bannerSelect');
+    if (coverSelect && (coverSelect.value === 'auto' || !coverSelect.value)) updateBannerPreview('auto');
 
     // Jinx, Vi and Caitlyn are more than a picture: they become your champion (and wear your chosen skin)
     const packId = champion.toLowerCase();
@@ -1093,7 +1096,7 @@ function updateBannerPreview(selection) {
             const championId = currentAvatar.championId || (currentAvatar.name ? currentAvatar.name.replace(/['\s]/g, '') : null);
 
             if (championId) {
-                const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+                const splashUrl = currentAvatar.splash || `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
                 bannerPreview.style.backgroundImage = `
                     linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
                     url('${splashUrl}')
@@ -1137,13 +1140,14 @@ function updateBannerPreview(selection) {
 
 function getCurrentAvatarSelection() {
     // Check if user selected a champion in this session
-    if (window.selectedChampion) {
+    if (selectedChampion) {
         // Extract championId from the champion name
-        const championId = window.selectedChampion.name ? window.selectedChampion.name.replace(/['\s]/g, '') : null;
+        const championId = selectedChampion.name ? selectedChampion.name.replace(/['\s]/g, '') : null;
         return {
             type: 'champion',
             championId: championId,
-            name: window.selectedChampion.name
+            name: selectedChampion.name,
+            splash: splashFromAvatar({ type: 'url', value: selectedChampion.url, name: selectedChampion.name })
         };
     }
 
@@ -1157,7 +1161,8 @@ function getCurrentAvatarSelection() {
             return {
                 type: 'champion',
                 championId: championId,
-                name: avatar.name
+                name: avatar.name,
+                splash: splashFromAvatar(avatar)
             };
         }
 
@@ -1356,6 +1361,8 @@ async function loadChampionPackSelector() {
         container.innerHTML = manifest.packs.map(pack => {
             const isActive = pack.id === currentPack.id;
             const isDisabled = !pack.enabled || pack.comingSoon;
+            // the card shows the skin this champion currently wears
+            const art = PACK_IDS.includes(pack.id) ? skinAvatar(pack.id, lookSkin({ id: pack.id }, localStorage)).value : pack.icon;
 
             return `
                 <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}"
@@ -1367,8 +1374,8 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
 
                     <!-- ✅ Champion Avatar from Data Dragon -->
                     <div class="champion-pack-avatar">
-                        ${pack.icon
-                            ? `<img src="${pack.icon}"
+                        ${art
+                            ? `<img src="${art}"
                                     alt="${pack.name}"
                                     class="champion-avatar-img"
                                     loading="lazy"
@@ -1459,7 +1466,8 @@ showNotification(`${pack.emoji} ${pack.name} is now your champion!`, 'success');
         const skin = skinAvatar(packId, lookSkin({ id: packId }, localStorage));
         selectedChampion = { name: skin.name, displayName: pack.name, url: skin.value };
         showSelectedAvatar();
-        document.querySelectorAll('.champion-avatar-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.champion?.toLowerCase() === packId));
+        const cover = document.getElementById('bannerSelect');
+        if (cover && (cover.value === 'auto' || !cover.value)) updateBannerPreview('auto');   // an automatic cover follows the skin
     }
 
     // Mark as changed

@@ -26,7 +26,7 @@ import { shortTitle } from './title-clean.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
-import { fixAvatarUrl } from './avatar-url.js';
+import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 // ========================================
 // SONG DATA
 // ========================================
@@ -2424,9 +2424,8 @@ async function updateFeedHeaderBanner() {
             
         } else {
             // Auto-match avatar
-            if (avatar && avatar.type === 'url' && avatar.name) {
-                const championId = avatar.name.replace(/['\s]/g, '');
-                const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+            const splashUrl = splashFromAvatar(avatar);   // same champion and skin as the picture
+            if (splashUrl) {
                 
                 headerBg.style.backgroundImage = `
                     linear-gradient(to bottom, 
