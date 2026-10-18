@@ -53,7 +53,7 @@ export function profileSplashUrl(pack, storage = globalThis.localStorage) {
     const read = k => { try { return JSON.parse(storage.getItem(k) || 'null'); } catch { return null; } };
     const banner = read('banner') || { type: 'auto' };
     const avatar = read('avatar');
-    const clean = v => String(v || '').replace(/['\s]/g, '');
+    const clean = v => { const c = String(v || '').replace(/['\s]/g, ''); return c.toLowerCase() === 'wukong' ? 'MonkeyKing' : c; };
     if (banner.type === 'champion' && banner.championId) return getChampionSplashUrl(clean(banner.championId), banner.skinNumber || 0);
     if (banner.type !== 'default' && avatar?.type === 'url' && avatar.name) return getChampionSplashUrl(clean(avatar.name));
     return toastSplashUrl(pack);

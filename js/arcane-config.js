@@ -5,7 +5,7 @@
 // THE one place the Data Dragon version lives. Only the versioned assets use it (champion squares, profile icons, spells, items,
 // runes); splash and tile art are unversioned. To update: node tools/check-ddragon.mjs shows the newest version and checks that
 // our icons exist there, then change this one line.
-export const DATA_DRAGON_VERSION = '14.24.1';
+export const DATA_DRAGON_VERSION = '16.20.1';
 export const ddragonUrl = path => `https://ddragon.leagueoflegends.com/cdn/${DATA_DRAGON_VERSION}/${path}`;
 // Any versioned Data Dragon url (saved in a pack file, say) with the current version in it; other urls come back unchanged.
 export const withCurrentVersion = url => (typeof url === 'string' ? url.replace(/^(https:\/\/ddragon\.leagueoflegends\.com\/cdn\/)\d+\.\d+\.\d+(\/)/, `$1${DATA_DRAGON_VERSION}$2`) : url);

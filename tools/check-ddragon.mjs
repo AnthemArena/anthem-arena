@@ -10,8 +10,7 @@ const cfg = read('../js/arcane-config.js');
 const current = /DATA_DRAGON_VERSION = '([\d.]+)'/.exec(cfg)?.[1];
 const arcaneTags = /characters: \[([\s\S]*?)\]/.exec(cfg)?.[1];
 const usedChampions = [...new Set([
-    ...listIn(read('../js/username-system.js'), 'CHAMPIONS'),   // the avatar pick list
-    ...listIn(read('../js/settings-modal.js'), 'CHAMPIONS'),
+    ...listIn(read('../js/champion-list.js'), 'CHAMPIONS'),   // the avatar pick list
     ...quoted(arcaneTags || ''), 'Jinx', 'Vi', 'Caitlyn'
 ])];
 
@@ -51,7 +50,7 @@ const missing = (await allSettled(icons, async id => ((await call(`https://ddrag
 // the skin art we use is not versioned: spot-check it too
 const art = ['splash/Jinx_37.jpg', 'splash/Vi_29.jpg', 'splash/Caitlyn_28.jpg', 'tiles/Jinx_37.jpg'];
 missing.push(...(await allSettled(art, async u => ((await call(`https://ddragon.leagueoflegends.com/cdn/img/champion/${u}`, 'HEAD')).ok ? null : u))).filter(Boolean));
-const pickList = new Set(listIn(read('../js/username-system.js'), 'CHAMPIONS'));
+const pickList = new Set(listIn(read('../js/champion-list.js'), 'CHAMPIONS'));
 const newer = [...real].filter(id => !pickList.has(id));
 
 console.log(missing.length ? `MISSING at ${target}: ${missing.join(', ')}` : `all ${usedChampions.length - notChampions.length} champion icons we use and the Arcane skin art exist at ${target}`);
