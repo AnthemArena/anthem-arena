@@ -1102,6 +1102,20 @@
         "Next match",
         "Keep going"
       ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me? Good choice. Bad idea. Great choice.",
+        "Team Jinx. Try to keep up."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
     }
   },
   "portrait": {

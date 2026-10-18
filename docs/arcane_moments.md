@@ -849,3 +849,7 @@ First run on 18 Oct 2026 (newest was 16.20.1): every real champion icon and the 
 - The settings modal now opens with **Your Champion** (Jinx, Vi, Caitlyn as cards showing the skin each one currently wears, with mastery). Choosing one sets the picture, the cover, the voice and the XP target together.
 - **Other Profile Pictures** (the old avatar grid) no longer lists the three champions; everyone else is a plain picture with no level.
 - An automatic cover (the default) now uses the splash of the skin in the avatar picture (`splashFromAvatar` in `js/avatar-url.js`), on the profile, the feed header and the settings preview. A cover chosen by hand is unchanged.
+
+### champion-selected alert (18 Oct 2026, evening)
+
+Picking a champion (Settings card, or Use on a different champion on the Champions tab) shows the standard event card instead of the small notification: tag "Your champion", a star, the champion's own line (`champion-selected` in each pack), "Name · Skin · Mastery N" and the skin's splash art. Changing only the skin of the current champion keeps the small "Skin updated" notice. Code: `js/champion-selected.js`; test button on `test-toasts.html`.

@@ -8,6 +8,7 @@ import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
 import { masteryChipHtml, skinAvatar } from './champions-tab-model.js';
 import { lookSkin } from './companion-look.js';
+import { announceChampionSelected } from './champion-selected.js';
 import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { readNotificationPrefs } from './notification-prefs.js';
@@ -1416,6 +1417,7 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
 
 async function selectChampionPack(packId) {
     console.log(`🎭 User selected: ${packId}`);
+    const previousPack = window.championLoader?.getCurrentPack?.()?.id;
 
     // Update UI immediately
     document.querySelectorAll('.champion-pack-card').forEach(card => {
@@ -1457,7 +1459,7 @@ async function selectChampionPack(packId) {
 
     // Show confirmation
     const pack = await window.championLoader.loadChampionPack(packId);
-showNotification(`${pack.emoji} ${pack.name} is now your champion!`, 'success');
+if (previousPack !== packId) announceChampionSelected(packId, PACK_IDS.includes(packId) ? lookSkin({ id: packId }, localStorage) : 0);
     // ✅ Update team preview
     updateTeamPreview(pack.id, pack.name, pack.icon, pack.emoji);
 
