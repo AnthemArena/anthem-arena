@@ -1168,6 +1168,20 @@
         "Next match",
         "Keep going"
       ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Good. I've got your back.",
+        "Vi's in. Don't make me regret it."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
     }
   },
   "bubble": {

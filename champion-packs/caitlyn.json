@@ -1168,6 +1168,20 @@
         "Next match",
         "Continue"
       ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Understood. I'll keep you informed.",
+        "A sensible choice. Let's begin."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Continue"
+      ]
     }
   },
   "bubble": {
