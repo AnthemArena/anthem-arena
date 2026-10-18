@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml } from '../js/notification-visuals.js';
+import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -102,5 +102,13 @@ t('rows never use bare class names the feed stylesheet styles (a "comment" class
     }
     const follow = tokens(followRowHtml(n, { headline: 'h', quip: '', timeAgo: '', championPack: null }));
     for (const b of bad) assert.ok(!follow.has(b), `follow row has bare class "${b}"`);
+});
+t('profile splash: chosen champion, auto-match avatar, default gradient falls back to the cup champion', () => {
+    const store = o => ({ getItem: k => (k in o ? o[k] : null) });
+    const J = { id: 'jinx' };
+    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'champion', championId: 'Vi' }) })), /Vi_0\.jpg$/);
+    assert.match(profileSplashUrl(J, store({ avatar: JSON.stringify({ type: 'url', name: "Kai'Sa" }) })), /KaiSa_0\.jpg$/);
+    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'default' }), avatar: JSON.stringify({ type: 'url', name: 'Vi' }) })), /Jinx_0\.jpg$/);
+    assert.match(profileSplashUrl(J, store({})), /Jinx_0\.jpg$/);
 });
 console.log(`${pass} passed`);

@@ -8,7 +8,7 @@ import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './no
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
 import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, toastSplashUrl, ensureVersusStyles } from './notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, toastSplashUrl, profileSplashUrl, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -2738,7 +2738,8 @@ else {
         banner.style.setProperty('--nv-accent-dark', '#ff1493');
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
-        banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        // No champion speaking here: use the viewer's own profile banner
+        banner.style.setProperty('--nv-splash', `url("${profileSplashUrl(pack)}")`);
         const names = g.users?.length ? g.users : [g.triggerUsername].filter(Boolean);
         const srcs = names.map((nm, i) => (names.length > 1 ? notification.nv?.avatars?.[i] : notification.nv?.theirSrc) || avatarSrc((g.avatars || [])[i]) || fallbackAvatarFor(nm));
         banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
