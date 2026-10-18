@@ -130,26 +130,16 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                        <!-- Choose your champion: the grid of every champion; Jinx, Vi and Caitlyn come first and have levels -->
+                        <!-- Choose your champion: the champions that are finished (levels, skins and a voice). More are added as they are ready. -->
                         <div class="settings-section">
                             <h3><i class="fas fa-user-astronaut"></i> Choose Your Champion</h3>
                             <p class="section-description">
-                                Your champion is your profile picture and cover art. Champions marked ★ also have levels, skins and a voice:
-                                they send your alerts and earn your XP. More are coming.
+                                Your champion is your profile picture and cover art. They send your alerts, speak in their own voice
+                                and earn your XP. More champions are coming.
                             </p>
 
-                            <div class="avatar-search-wrapper">
-                                <input
-                                    type="text"
-                                    id="avatarSearch"
-                                    placeholder="Search champions..."
-                                    autocomplete="off"
-                                />
-                                <span class="search-icon">🔍</span>
-                            </div>
-
-                            <div class="avatar-grid" id="avatarGrid">
-                                <!-- Champion grid will be inserted here -->
+                            <div class="avatar-grid few" id="avatarGrid">
+                                <!-- Champions are inserted here -->
                             </div>
                         </div>
 
@@ -487,14 +477,15 @@ function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
     if (!grid) return;
 
-    const rankOf = c => { const i = PACK_IDS.indexOf(c.toLowerCase()); return i < 0 ? PACK_IDS.length : i; };
-    const ordered = [...CHAMPIONS].sort((a, b) => rankOf(a) - rankOf(b));   // Jinx, Vi, Caitlyn first, the rest as listed
-    const html = ordered.map(champion => {
+    // Only the champions that are finished (they have levels, skins and a voice): PACK_IDS, the same list the XP and unlock
+    // tables use. Adding a champion there adds them here.
+    const finished = PACK_IDS.map(id => CHAMPIONS.find(c => c.toLowerCase() === id)).filter(Boolean);
+    const html = finished.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
-        const levels = PACK_IDS.includes(champion.toLowerCase());
         return `
-            <div class="champion-avatar-option${levels ? ' has-levels' : ''}" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}${levels ? ' ★ levels, skins and a voice' : ''}">
+            <div class="champion-avatar-option" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}" role="button" tabindex="0">
                 <img src="${CHAMPION_CDN}${champion}.png" alt="${displayName}" loading="lazy" />
+                <span class="cao-name">${displayName}</span>
             </div>
         `;
     }).join('');
@@ -559,6 +550,7 @@ function setupEventListeners() {
     if (avatarGrid) {
         avatarGrid.removeEventListener('click', handleChampionClick);
         avatarGrid.addEventListener('click', handleChampionClick);
+        avatarGrid.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.champion-avatar-option')) { e.preventDefault(); e.target.closest('.champion-avatar-option').click(); } };
     }
 
        // ✅ ADD BIO INPUT TRACKING

@@ -864,3 +864,11 @@ Picking a champion (Settings card, or Use on a different champion on the Champio
 ### champion-selected after Save (18 Oct 2026, night)
 
 Picking a champion in Settings no longer shows the card straight away. Save leaves a note (`sessionStorage.championSelectedPending`, only when the champion differs from the one when the window opened); the next page load (`js/navigation.js`) or, on pages that do not reload, the end of the save shows the card once. The card is held for 6 seconds so a routine alert on the same page load cannot replace it. Preview still shows it at once. The "out of focus" preview before this was the alert sitting behind the settings window's blurred overlay (alert z-index is now above it).
+
+### Champion picker shows only finished champions (18 Oct 2026, night)
+
+Choose Your Champion lists only the champions that are finished (`PACK_IDS` in `js/xp-ledger.js`, the same list the XP and unlock tables use): Jinx, Vi and Caitlyn, as big portraits with names (no search box while the list is this short). A champion is added by adding them to that list together with their skin table, voice pack and unlock rule. Someone who earlier picked another champion as a plain picture keeps it (Your Champion explains that it has no levels yet), but can no longer pick new ones.
+
+### Roadmap: voices per skin (idea, not built)
+
+Each champion has a default voice plus optional voice sets attached to skins (Sheriff Caitlyn: stricter, law-and-order; Jinx: the original loud voice on Classic and non-Arcane skins, the current Arcane voice on the Arcane skins). Alerts use the voice for the worn skin and fall back to the champion's default. A set can be partial. The old Jinx lines are in `docs/jinx-voice-review.md` ("before"). The voice tests' "no !!" rule must apply per voice set, not per champion. Later ideas: customising your own voice (overrides per event), export/import as a file, and only after that, a moderated public gallery.
