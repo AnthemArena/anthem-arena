@@ -851,6 +851,7 @@ if (window.invalidateProfileCache) {
 if (window.updateNavProfile) {
     window.updateNavProfile();
 }
+window.dispatchEvent(new CustomEvent('profile-settings-saved'));   // pages with their own profile card (the feed) redraw it
 
 // Show success state
 if (saveBtn) {

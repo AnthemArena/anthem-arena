@@ -872,3 +872,5 @@ Choose Your Champion lists only the champions that are finished (`PACK_IDS` in `
 ### Roadmap: voices per skin (idea, not built)
 
 Each champion has a default voice plus optional voice sets attached to skins (Sheriff Caitlyn: stricter, law-and-order; Jinx: the original loud voice on Classic and non-Arcane skins, the current Arcane voice on the Arcane skins). Alerts use the voice for the worn skin and fall back to the champion's default. A set can be partial. The old Jinx lines are in `docs/jinx-voice-review.md` ("before"). The voice tests' "no !!" rule must apply per voice set, not per champion. Later ideas: customising your own voice (overrides per event), export/import as a file, and only after that, a moderated public gallery.
+
+Saving settings now also fires a `profile-settings-saved` event. The feed page listens and redraws its left-hand profile card (picture, name, bio, cover) so it matches the nav without a reload; the profile page still reloads after a save.
