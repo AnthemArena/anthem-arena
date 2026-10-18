@@ -784,3 +784,14 @@ The Amazon affiliate link is gone (footer link earlier, now also the "As an Amaz
 
 ## Arcane art in alerts (18 October 2026)
 Toast backdrops and the champion's face in toasts and bell rows now use the pack's Arcane skin (`portrait.skin`): splash via `toastSplashUrl`, face via `championBadgeUrl` (tile `<Id>_<skin>.jpg`, plain icon when no skin is set). Jinx 37, Vi 29 (Arcane Undercity; Arcane Brawler is 48). Caitlyn 28 (Arcane Enforcer; Arcane Commander is 50). Change `portrait.skin` in a pack to switch the look everywhere.
+
+## Progression audit (18 October 2026)
+**What exists:** 10 levels (`js/rank-system.js`, 0 to 12,000 XP, tiers Bronze 1-3, Silver 4-6, Gold 7-8, Legend 9-10); XP per vote 10, +20 first vote of the day, +5 first 10 voters, +10 close match, +5 underdog, +10 per streak day (capped at 10 days); 33 achievements (`js/achievements.js`, 6,850 XP in total, 10 categories, 23 of them hidden, tiers bronze to legendary, rarities common to legendary).
+
+**Problems found**
+1. Two different XP numbers. Your own level reads `localStorage.userTotalXP` (votes + achievement XP added as they unlock); other people's profiles recompute XP from their votes only, so achievement XP is missing and the same person shows a different level to you than to others.
+2. Own XP lives only in the browser (synced to `profiles/<uid>.xp`, never read back), so clearing site data or a new device resets the level.
+3. XP rules are written in several places (`rank-system.js`, `match-card-renderer.js`, `matches.js`, `vote.js` use their own numbers), and `xpSources.share` is defined but never paid.
+4. Level-up toast carries no unlock info; `showBulletin` for achievements the same.
+5. Two copies of `unlockAchievementInFirebase` (`achievements.js` and `achievement-tracker.js`).
+6. Votes in old cups still count towards XP, which is fine, but nothing records which cup an achievement came from.
