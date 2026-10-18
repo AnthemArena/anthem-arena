@@ -1,4 +1,4 @@
-import { fixAvatarUrl } from './avatar-url.js';
+import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
 import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
@@ -47,16 +47,12 @@ export function toastSplashUrl(pack, storage = globalThis.localStorage) {
     return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1), lookSkin(pack, storage));   // the skin this companion wears (chosen, or Arcane once unlocked)
 }
 
-// The viewer's own profile banner as a pop-up backdrop (same choice as the profile card: a chosen champion, "auto" = the
-// champion of their avatar, or the default gradient, which has no art). Falls back to the cup champion's splash.
+// The viewer's own cover as a pop-up backdrop: the splash of the champion in their avatar, in the skin they wear (the profile
+// cover works the same way). Falls back to the cup champion's splash when the avatar is not a champion picture.
 export function profileSplashUrl(pack, storage = globalThis.localStorage) {
-    const read = k => { try { return JSON.parse(storage.getItem(k) || 'null'); } catch { return null; } };
-    const banner = read('banner') || { type: 'auto' };
-    const avatar = read('avatar');
-    const clean = v => { const c = String(v || '').replace(/['\s]/g, ''); return c.toLowerCase() === 'wukong' ? 'MonkeyKing' : c; };
-    if (banner.type === 'champion' && banner.championId) return getChampionSplashUrl(clean(banner.championId), banner.skinNumber || 0);
-    if (banner.type !== 'default' && avatar?.type === 'url' && avatar.name) return getChampionSplashUrl(clean(avatar.name));
-    return toastSplashUrl(pack);
+    let avatar = null;
+    try { avatar = JSON.parse(storage.getItem('avatar') || 'null'); } catch { /* none */ }
+    return splashFromAvatar(avatar) || toastSplashUrl(pack, storage);
 }
 
 // Splash art that matches a person's champion avatar, worked out from the picture's own address
