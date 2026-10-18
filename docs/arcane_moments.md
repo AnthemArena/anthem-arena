@@ -878,3 +878,10 @@ Saving settings now also fires a `profile-settings-saved` event. The feed page l
 ### Preview cycles through alerts (18 Oct 2026, night)
 
 Settings > Your Champion > the preview button now cycles through sample alerts in the champion's voice: nail-biter, winning, comeback, welcome back, achievement (Spark), level up and mastery up, then round again. The button says which one is next. The samples use made-up songs, and their buttons only close the card (they never open a page). The champion-selected card is no longer used for Preview; it is shown once after Save. Code: `js/champion-preview.js`.
+
+## Skins are changed in Settings only
+The Champions tab shows the whole collection (All is the default filter) but never changes anything itself. Unlocked skins on your own
+profile have a **Wear** button that opens Settings on that champion and skin (`openSettingsModal({ champion, skin })`); the worn skin shows
+"Wearing". The mastery-up alert's button reads "Wear it now" and does the same for the newest skin it unlocked. Nothing is saved until
+Save; choosing a champion in Settings no longer writes to the profile straight away, and closing with "discard" puts the previous
+champion back.

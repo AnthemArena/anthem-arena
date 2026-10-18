@@ -62,7 +62,7 @@ export function buildChampionsView({ votes = [], packXp = {}, achievements = [],
     return { total: shares.reduce((s, r) => s + r.votes, 0), shares, rows };
 }
 
-export const FILTERS = [['unlocked', 'Unlocked'], ['locked', 'Locked'], ['all', 'All']];
+export const FILTERS = [['all', 'All'], ['unlocked', 'Unlocked'], ['locked', 'Locked']];
 
 // Unlocked skins first (lowest mastery first), then the locked ones in the order they will be earned (achievements last).
 const earnOrder = s => (s.achievement ? 99 : s.mastery) * 1000 + s.num;
@@ -76,16 +76,16 @@ export function championsHtml(view, { own = false, filters = {} } = {}) {
     const cards = view.rows.map(r => {
         const m = r.mastery;
         const next = r.next ? `Next: ${r.next.skins.map(s => escapeHtml(s.name)).join(' + ')} at Mastery ${r.next.mastery}` : 'Every mastery skin unlocked';
-        const filter = FILTERS.some(([k]) => k === filters[r.packId]) ? filters[r.packId] : 'unlocked';
+        const filter = FILTERS.some(([k]) => k === filters[r.packId]) ? filters[r.packId] : 'all';
         const shown = r.skins.filter(s => filter === 'all' || (filter === 'unlocked') === s.unlocked)
             .sort((a, b) => (filter === 'all' ? (b.unlocked - a.unlocked) : 0) || earnOrder(a) - earnOrder(b));
         const count = k => k === 'all' ? r.skinCount : k === 'unlocked' ? r.unlockedCount : r.skinCount - r.unlockedCount;
         const chips = `<div class="cm-filters" role="group" aria-label="Show ${escapeHtml(r.name)} skins">${FILTERS.map(([k, label]) => `<button type="button" class="cm-chip${k === filter ? ' on' : ''}" data-filter="${k}" data-pack="${r.packId}" aria-pressed="${k === filter}">${label} <span>${count(k)}</span></button>`).join('')}</div>`;
         const skins = shown.map(s => {
             const label = `${s.name}${s.unlocked ? '' : ` (${s.requirement})`}`;
-            const buttons = own && s.unlocked
-                ? `<span class="cm-skin-actions"><button type="button" class="cm-act${s.current ? ' on' : ''}" data-action="use" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.current}" title="Make ${escapeHtml(r.name)} in ${escapeHtml(s.name)} your champion">${s.current ? 'In use' : 'Use'}</button></span>`
-                : (s.unlocked && s.current ? '<span class="cm-skin-tag">In use</span>' : '');
+            // Changing the skin happens in Settings (one place, one Save): the tab shows the collection and opens Settings on the skin
+            const buttons = s.unlocked && s.current ? '<span class="cm-skin-tag">Wearing</span>'
+                : (own && s.unlocked ? `<span class="cm-skin-actions"><button type="button" class="cm-act" data-action="wear" data-pack="${r.packId}" data-skin="${s.num}" title="Open Settings to wear ${escapeHtml(s.name)}">Wear</button></span>` : '');
             return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}"><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? buttons : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
         }).join('');
         return `<article class="cm-card${r.active ? ' active' : ''}" data-pack="${r.packId}">
