@@ -759,3 +759,25 @@ The welcome alert asked the pack for `welcomeDialogs`, a section the Jinx, Vi an
 ## Affiliate wording removed
 
 The Amazon affiliate link is gone (footer link earlier, now also the "As an Amazon Associate" note, the footer's Affiliate Disclosure link, and `legal/disclosure.html`). Terms, Privacy and About no longer mention Amazon; Terms say Ko-fi donations are voluntary and give no say in votes or results. `/legal/disclosure` redirects to `/legal/terms` (netlify.toml). Money plan: donations first (Ko-fi); a supporter membership is a possible later step and, per Riot's General Policies, needs the product registered on the Developer Portal (see the notes on registration and monetization).
+## Roadmap after the alert round (agreed 18 October 2026)
+
+**Next round, in this order**
+1. **Achievements and level-up audit.** Review the existing achievements, ranks and XP, and write an *unlock table* at the same time: which skin, banner or art unlocks at which level or achievement (rarer achievements, rarer art; everyone keeps free default looks; existing avatar choices are kept).
+2. **Champion skin data.** A script writes a data file (champions, skin numbers and names, skipping chromas: entries with `parentSkin`), taking the newest build from `https://ddragon.leagueoflegends.com/api/versions.json`. One version constant replaces the three scattered ones (13.24.1, 14.1.1, 14.24.1; Data Dragon was at 16.20.1 on 18 Oct 2026). Splash and loading art are unversioned (`cdn/img/champion/splash/Vi_<num>.jpg`); only square icons are versioned. The tile path we use (`cdn/img/champion/tiles/`) is not in Riot's docs, so build the picker on splash. Also possible: Data Dragon profile icons as extra avatar options. Set `portrait.skin` for Vi and Caitlyn (Jinx uses 37).
+3. **Skin picker and unlock cards.** Locked and unlocked states; the level-up and achievement cards show the unlocked art with an "Unlocked" chip.
+4. **Past tournaments and gallery accolades.** Per-cup results files (`data/results/<cup>.json`: winner, finalists, bracket) plus `data/cups.json` and `/api/matches?tournament=<cupId>` feed a read-only "Past tournaments" page (champion and bracket per cup) and badges on gallery edits ("Jinx Cup 1 champion", "Finalist", Major qualifier).
+
+**Money plan (phase in once there is steady traffic)**
+- No ads and no affiliate links on the site today (affiliate wording removed). Donations stay on Ko-fi.
+- **Now:** a supporters page and a supporter badge fed by a hand-kept list (`data/supporters.json`, opt-in names). No payments code.
+- **Gate 1: register the product on the Riot Developer Portal.** Riot's General Policies: you may monetize "as long as your product is registered on the Developer Portal" (status Approved or Acknowledged); you must keep a free tier (which may include ads); subscriptions, donations and crowdfunding are allowed; charging for content must be transformative; no gouging, no gambling. Registration is encouraged even without the API. Reviewers want a complete site and look for player benefit. Ask Riot's support first (draft in this chat: free fan-made voting site, Data Dragon only, no Riot API, optional donations). Include the "not endorsed by Riot Games and doesn't reflect their views or opinions" wording.
+- **Gate 2: a recoverable sign-in.** Votes use anonymous sign-in, so a paying supporter could lose their account by clearing the browser. Upgrade anonymous accounts to email or Google sign-in (Firebase keeps the same user ID), and update the privacy page.
+- **Then:** Stripe subscriptions (about £3.99 a month idea): checkout with the account ID passed in, a Netlify function for the webhook, a supporter flag, automatic badge and supporters page; "no ads" only means something if ads are ever added (update the privacy page first). Ask an accountant about UK tax / VAT and consumer rules for recurring digital payments. Afterwards decide whether to keep Ko-fi for one-off tips.
+- Do not sell Riot art or skins directly.
+
+**Small leftovers**
+- Generate `sitemap.xml` (`robots.txt` points at it).
+- Deploy `firestore.rules` after merge.
+- Clear test data before the first public cup (section 8).
+- Optional cleanups: unused `.message-item` CSS, a redundant Firestore index entry, the own-vote tooltip count, old `battleship_matches` documents in Firestore.
+- Voice-review sheets (`docs/*-voice-review.md`) still list removed lines (tied result, faction alerts); they are history.
