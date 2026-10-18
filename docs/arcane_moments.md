@@ -783,4 +783,4 @@ The Amazon affiliate link is gone (footer link earlier, now also the "As an Amaz
 - Voice-review sheets (`docs/*-voice-review.md`) still list removed lines (tied result, faction alerts); they are history.
 
 ## Arcane art in alerts (18 October 2026)
-Toast backdrops and the champion's face in toasts and bell rows now use the pack's Arcane skin (`portrait.skin`): splash via `toastSplashUrl`, face via `championBadgeUrl` (tile `<Id>_<skin>.jpg`, plain icon when no skin is set). Jinx 37, Vi 29 (Arcane Undercity; Arcane Brawler is 48). Caitlyn has no skin number yet: add `"portrait": {"skin": N}` to `champion-packs/caitlyn.json` and she follows automatically.
+Toast backdrops and the champion's face in toasts and bell rows now use the pack's Arcane skin (`portrait.skin`): splash via `toastSplashUrl`, face via `championBadgeUrl` (tile `<Id>_<skin>.jpg`, plain icon when no skin is set). Jinx 37, Vi 29 (Arcane Undercity; Arcane Brawler is 48). Caitlyn 28 (Arcane Enforcer; Arcane Commander is 50). Change `portrait.skin` in a pack to switch the look everywhere.

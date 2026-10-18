@@ -1331,5 +1331,8 @@
       "{pct}% for {pick}. {other} is a long way behind.",
       "{pick} leads {other} decisively, at {pct}%. Cast your own vote."
     ]
+  },
+  "portrait": {
+    "skin": 28
   }
 }
