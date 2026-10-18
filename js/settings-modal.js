@@ -8,7 +8,7 @@ import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
 import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml, plainChampionHtml } from './champions-tab-model.js';
 import { lookSkin, readLooks, saveLook } from './companion-look.js';
-import { announceChampionSelected, championSelectedBulletin } from './champion-selected.js';
+import { announcePendingChampion, markChampionSelected, championSelectedBulletin } from './champion-selected.js';
 import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { masteryLevel } from './champion-unlocks.js';
@@ -24,6 +24,7 @@ const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;
+let packAtOpen = null;   // the champion they had when the window opened, to tell whether Save changes it
 let pendingLooks = {};   // skins chosen in this visit, saved with the rest of the settings: { vi: 29 }
 let modalElement = null;
 
@@ -40,6 +41,7 @@ export function openSettingsModal() {
     }
 
     pendingLooks = {};
+    packAtOpen = window.championLoader?.getCurrentPack?.()?.id || null;
 
     // Load current profile
     loadCurrentProfile();
@@ -768,6 +770,9 @@ if (socialLinks.youtube) socialLinks.youtube = socialLinks.youtube.replace(/^@/,
             saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
         }
 
+        // a different champion than when the window opened is announced once the save has gone through (see below)
+        const chosenPack = selectedPackId();
+        const announce = chosenPack && chosenPack !== packAtOpen ? { packId: chosenPack, skinNum: currentSkinNum(chosenPack) } : null;
         Object.entries(pendingLooks).forEach(([packId, num]) => saveLook(packId, num));
         pendingLooks = {};
 
@@ -865,6 +870,7 @@ if (saveBtn) {
 showNotification('✅ Profile updated successfully!', 'success');
 
 // Close modal after short delay
+if (announce) markChampionSelected(announce.packId, announce.skinNum);
 setTimeout(() => {
     closeSettingsModal();
     if (saveBtn) {
@@ -877,6 +883,8 @@ setTimeout(() => {
     if (window.location.pathname.includes('profile')) {
         console.log('🔄 Reloading profile page with fresh data...');
         window.location.reload(true);
+    } else if (announce) {
+        announcePendingChampion();   // no reload on this page: show the card now
     }
 }, 1500);
 
@@ -1128,8 +1136,6 @@ function renderYourChampion() {
 // Picks Jinx, Vi or Caitlyn: the companion pack (voice, XP) and the picture both follow.
 async function selectChampionPack(packId) {
     console.log(`🎭 User selected: ${packId}`);
-    const previousPack = window.championLoader?.getCurrentPack?.()?.id;
-
     await window.championLoader.setUserCompanionPack(packId);
 
     // ✅ Update Firebase profile with championPackId
@@ -1161,7 +1167,6 @@ async function selectChampionPack(packId) {
     renderYourChampion();
     hasChanges = true;
 
-    if (previousPack !== packId) announceChampionSelected(packId, currentSkinNum(packId));
     console.log(`✅ Arcane companion set to: ${packId}`);
 }
 

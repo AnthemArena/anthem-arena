@@ -111,6 +111,7 @@ const STREAK_CONFIG = {
 let pollInterval = null;
 let lastActivity = Date.now();
 let currentBulletin = null;
+let currentBulletinShownAt = 0;   // when it appeared (a champion pick is held for a few seconds, see showBulletin)
 let dismissedBulletins = new Set();
 let matchStates = {}; // Track previous states for comeback detection
 let recentlyShownBulletins = new Map(); // ✅ NEW: Track shown toasts with timestamps
@@ -1900,6 +1901,13 @@ function showBulletin(notification) {
         }
     }
 
+    // A champion the person just picked stays up for a few seconds: a routine alert (welcome, a match) that arrives on the same
+    // page load must not wipe it
+    if (currentBulletin?.type === 'champion-selected' && notification.type !== 'champion-selected' && Date.now() - currentBulletinShownAt < 6000) {
+        console.log('⏸️ Held back while the champion card is showing:', notification.type);
+        return;
+    }
+
     let banner = document.getElementById('bulletin-banner');
     
     if (!banner) {
@@ -2409,6 +2417,7 @@ function showBulletin(notification) {
     
     // Update content
     currentBulletin = notification;
+    currentBulletinShownAt = Date.now();
 
     // ✅ ESC key handler
 const escapeHandler = (e) => {

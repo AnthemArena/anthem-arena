@@ -860,3 +860,7 @@ Picking a champion (Settings card, or Use on a different champion on the Champio
 - **Your Champion** shows only the selected champion: mastery, next reward and the skins they have unlocked to wear (the choice is saved with Save, like the picture). Locked skins are counted, and the Champions tab shows how to earn them. A champion without levels says so and names who still earns the XP.
 - **No banner setting.** The cover is always the splash of the champion in the avatar, in the skin they wear (profile, feed header, alert backdrop). Older saved banner choices are ignored.
 - **Preview alert** shows the champion's card on the page and its button only closes it (before, it opened the profile). Alerts now sit above the settings window (z-index), so ones raised from it can be seen.
+
+### champion-selected after Save (18 Oct 2026, night)
+
+Picking a champion in Settings no longer shows the card straight away. Save leaves a note (`sessionStorage.championSelectedPending`, only when the champion differs from the one when the window opened); the next page load (`js/navigation.js`) or, on pages that do not reload, the end of the save shows the card once. The card is held for 6 seconds so a routine alert on the same page load cannot replace it. Preview still shows it at once. The "out of focus" preview before this was the alert sitting behind the settings window's blurred overlay (alert z-index is now above it).

@@ -30,3 +30,37 @@ export function announceChampionSelected(packId, skinNum = 0, storage = globalTh
     if (window.showBulletin) window.showBulletin({ ...bulletin, ctaAction: () => { window.location.href = '/profile#champions'; } });
     else window.showNotification?.(bulletin.message, 'success');
 }
+
+// ---- Shown after Save ----------------------------------------------------------------------------------------------
+// Saving reloads the profile page, which would cut a pop-up short. So Settings leaves a note for the next page load,
+// which shows the card once the alert system is ready.
+const PENDING_KEY = 'championSelectedPending';
+
+export function markChampionSelected(packId, skinNum = 0, storage = globalThis.sessionStorage) {
+    try { storage.setItem(PENDING_KEY, JSON.stringify({ packId, skinNum })); } catch { /* storage blocked: no alert, nothing lost */ }
+}
+
+// Reads and clears the note; null when there is none (or it is not a champion with levels).
+export function takePendingChampion(storage = globalThis.sessionStorage) {
+    try {
+        const raw = storage.getItem(PENDING_KEY);
+        if (!raw) return null;
+        storage.removeItem(PENDING_KEY);
+        const { packId, skinNum } = JSON.parse(raw);
+        return SKIN_UNLOCKS[packId] ? { packId, skinNum: Number.isFinite(Number(skinNum)) ? Number(skinNum) : 0 } : null;
+    } catch { return null; }
+}
+
+// Waits (up to ~8 s) for the alert system and the champion's voice, then shows the card.
+export function announcePendingChampion(storage = globalThis.sessionStorage) {
+    const pending = takePendingChampion(storage);
+    if (!pending) return false;
+    let tries = 0;
+    const attempt = () => {
+        const ready = window.showBulletin && window.championLoader?.getCurrentPack?.();
+        if (ready || (window.showBulletin && tries >= 40)) announceChampionSelected(pending.packId, pending.skinNum);   // no voice by then: plain words
+        else if (++tries <= 40) setTimeout(attempt, 200);
+    };
+    attempt();
+    return true;
+}
