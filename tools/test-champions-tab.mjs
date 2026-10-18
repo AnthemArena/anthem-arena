@@ -35,19 +35,32 @@ t('view: mastery from pack XP, skins locked or open, the current avatar marked',
 t('html: own profile gets clickable unlocked skins, visitors do not; locked ones show the requirement', () => {
     const v = buildChampionsView({ votes: votes({ vi: 4 }), packXp: { vi: 100 }, activePack: 'vi' });
     const own = championsHtml(v, { own: true }), other = championsHtml(v, { own: false });
-    assert.match(own, /data-action="avatar" data-pack="vi" data-skin="29"/);
-    assert.match(own, /data-action="look" data-pack="vi" data-skin="29"/);
+    assert.match(own, /data-action="use" data-pack="vi" data-skin="29"/);
+    assert.doesNotMatch(own, /data-action="(avatar|look)"/);
     assert.doesNotMatch(own, /data-skin="48"/);          // Arcane Brawler is locked at Mastery 2
     assert.doesNotMatch(other, /data-action=/);
-    assert.match(other, /Mastery 10/); assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
+    assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
+    assert.match(championsHtml(v, { filters: { vi: 'locked' } }), /Mastery 10/);
     assert.match(championsHtml(buildChampionsView({}), {}), /No votes yet/);
+});
+t('filters: unlocked by default, locked in the order they are earned, all lists unlocked first', () => {
+    const v = buildChampionsView({ packXp: { vi: 100 }, activePack: 'vi' });
+    const grid = (h) => { const c = h.split('data-pack="vi">')[1].split('<article')[0]; return [...c.matchAll(/class="cm-skin-name">([^<]+)/g)].map(m => m[1]); };
+    const names = f => grid(championsHtml(v, { filters: { vi: f } }));
+    assert.deepEqual(names(undefined), ['Classic', 'Arcane Undercity']);
+    const locked = names('locked');
+    assert.equal(locked.length, 12); assert.equal(locked[0], 'Neon Strike'); assert.equal(locked.at(-1), 'Arcane Brawler');
+    const all = names('all');
+    assert.equal(all.length, 14); assert.deepEqual(all.slice(0, 2), ['Classic', 'Arcane Undercity']);
+    assert.match(championsHtml(v, { filters: { vi: 'locked' } }), /data-filter="locked" data-pack="vi" aria-pressed="true">Locked <span>12<\/span>/);
+    assert.match(championsHtml(buildChampionsView({ packXp: { vi: 99999 } }), { filters: { vi: 'locked' } }), /Everything is unlocked/);
 });
 t('look: Arcane by default once unlocked, a chosen look wins, shown as pressed', () => {
     const v = buildChampionsView({ packXp: { jinx: 1700 }, looks: {} });
     assert.equal(v.rows[0].skins.find(s => s.look).num, 37);
-    const w = buildChampionsView({ packXp: { jinx: 1700 }, looks: { jinx: 13 } });
+    const w = buildChampionsView({ packXp: { jinx: 1700 }, looks: { jinx: 13 }, avatarKey: 'jinx:13' });
     assert.equal(w.rows[0].skins.find(s => s.look).num, 13);
-    assert.match(championsHtml(w, { own: true }), /class="cm-act on" data-action="look" data-pack="jinx" data-skin="13" aria-pressed="true"/);
+    assert.match(championsHtml(w, { own: true }), /class="cm-act on" data-action="use" data-pack="jinx" data-skin="13" aria-pressed="true" title="[^"]*">In use/);
     assert.equal(buildChampionsView({}).rows[0].skins.find(s => s.look).num, 0);
 });
 t('names are escaped and the settings chip shows level, progress and next reward', () => {

@@ -6,7 +6,9 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { readPackXp } from './xp-ledger.js';
 import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
-import { masteryChipHtml } from './champions-tab-model.js';
+import { masteryChipHtml, skinAvatar } from './champions-tab-model.js';
+import { lookSkin } from './companion-look.js';
+import { PACK_IDS } from './xp-ledger.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
@@ -128,7 +130,8 @@ function createModalHTML() {
                         <div class="settings-section">
                             <h3><i class="fas fa-image"></i> Avatar</h3>
 <p class="section-description">
-    Choose your profile avatar from League of Legends characters
+    Choose your profile avatar from League of Legends characters. Jinx, Vi and Caitlyn are champions you can level up:
+    picking one also makes them your champion, so your XP, skins and alerts follow them.
 </p>
 
                             <div class="avatar-search-wrapper">
@@ -176,10 +179,10 @@ function createModalHTML() {
 
 <!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
 <div class="settings-section">
-   <h3><i class="fas fa-user-astronaut"></i> Your Arcane Companion</h3>
+   <h3><i class="fas fa-user-astronaut"></i> Your Champion</h3>
 <p class="section-description">
-    Choose your Arcane companion. They’ll provide personality-driven notifications,
-    react to tournament activity, and accompany you throughout Arcane Moments.
+    Choose your champion. They’ll be your profile picture, give personality-driven notifications,
+    react to tournament activity and earn your XP. Your skins are on the Champions tab of your profile.
 </p>
 
     <div id="championPackSelector" class="champion-pack-grid">
@@ -205,7 +208,7 @@ function createModalHTML() {
         ">
         <div>
             <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
-Your Companion: <span id="teamName">Jinx</span>
+Your Champion: <span id="teamName">Jinx</span>
             </div>
             <small style="opacity: 0.7; font-size: 0.85em;">
 Your companion can react to matches, achievements, and other site activity
@@ -747,6 +750,10 @@ function handleChampionClick(e) {
     option.classList.add('selected');
 
     console.log('✅ Champion selected:', displayName);
+
+    // Jinx, Vi and Caitlyn are more than a picture: they become your champion (and wear your chosen skin)
+    const packId = champion.toLowerCase();
+    if (PACK_IDS.includes(packId)) selectChampionPack(packId);
 }
 
 // ========================================
@@ -1443,9 +1450,17 @@ async function selectChampionPack(packId) {
 
     // Show confirmation
     const pack = await window.championLoader.loadChampionPack(packId);
-showNotification(`${pack.emoji} ${pack.name} is now your companion!`, 'success');
+showNotification(`${pack.emoji} ${pack.name} is now your champion!`, 'success');
     // ✅ Update team preview
     updateTeamPreview(pack.id, pack.name, pack.icon, pack.emoji);
+
+    // Your champion is also your picture: wear the skin chosen for them (saved with the rest of the settings)
+    if (PACK_IDS.includes(packId)) {
+        const skin = skinAvatar(packId, lookSkin({ id: packId }, localStorage));
+        selectedChampion = { name: skin.name, displayName: pack.name, url: skin.value };
+        showSelectedAvatar();
+        document.querySelectorAll('.champion-avatar-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.champion?.toLowerCase() === packId));
+    }
 
     // Mark as changed
     hasChanges = true;

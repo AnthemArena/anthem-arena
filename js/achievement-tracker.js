@@ -198,15 +198,15 @@ export async function checkFoundingMemberStatus() {
  * @param {Array} allVotes - User's complete vote history
  * @returns {Object} - Stats object
  */
-// Votes are counted for the companion that was active when they were cast (older votes without one count as Jinx, like the
-// Champions tab does). "Tied" = the match was exactly tied (10+ votes) when the vote was cast.
+// Champion-specific stats count the votes cast while that companion was active (older votes without one count as Jinx, like
+// the Champions tab does). Account-wide ones (underdogs, ties) count every vote. "Tied" = the match was exactly tied
+// (10+ votes) when the vote was cast.
 export function companionStats(allVotes) {
     const by = id => allVotes.filter(v => (v.championId || 'jinx') === id);
     return {
-        jinxUnderdogVotes: by('jinx').filter(v => v.voteType === 'underdog').length,
         caitlynCloseVotes: by('caitlyn').filter(v => v.voteType === 'closeCall').length,
         caitlynStreak: streakFromVotes(by('caitlyn')),
-        caitlynDecidingVotes: by('caitlyn').filter(v => v.tiedBefore).length
+        decidingVotes: allVotes.filter(v => v.tiedBefore).length
     };
 }
 

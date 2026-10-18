@@ -25,7 +25,7 @@ t('look: prestige skin needs the achievement; packs without skins keep their own
     assert.equal(lookSkin({ id: 'vi' }, undefined), 0);
     assert.deepEqual(lookState('vi', store({ userPackXP: '{"vi":300}' })), { level: 3, achievements: [] });
 });
-t('companion stats count votes per companion (old votes count as Jinx)', () => {
+t('companion stats: close calls and streak are per companion (old votes count as Jinx), tie-breakers count every vote', () => {
     const day = d => Date.parse(`2026-10-${String(d).padStart(2, '0')}T12:00:00Z`);
     const votes = [
         ...Array.from({ length: 4 }, () => ({ championId: 'jinx', voteType: 'underdog', timestamp: day(1) })),
@@ -34,8 +34,8 @@ t('companion stats count votes per companion (old votes count as Jinx)', () => {
         { championId: 'caitlyn', voteType: 'mainstream', tiedBefore: true, timestamp: day(15) },
         { championId: 'vi', voteType: 'closeCall', tiedBefore: true, timestamp: day(15) }
     ];
-    assert.deepEqual(companionStats(votes), { jinxUnderdogVotes: 7, caitlynCloseVotes: 5, caitlynStreak: 6, caitlynDecidingVotes: 1 });
-    assert.deepEqual(companionStats([]), { jinxUnderdogVotes: 0, caitlynCloseVotes: 0, caitlynStreak: 0, caitlynDecidingVotes: 0 });
+    assert.deepEqual(companionStats(votes), { caitlynCloseVotes: 5, caitlynStreak: 6, decidingVotes: 2 });   // ties count for any champion
+    assert.deepEqual(companionStats([]), { caitlynCloseVotes: 0, caitlynStreak: 0, decidingVotes: 0 });
 });
 t('the four pack achievements exist, are visible, belong to a category and match the unlock table', () => {
     const ids = Object.values(SKIN_UNLOCKS).flatMap(p => p.skins.filter(s => s.achievement).map(s => s.achievement));
@@ -43,9 +43,9 @@ t('the four pack achievements exist, are visible, belong to a category and match
     for (const id of ids) {
         const a = ACHIEVEMENTS[id];
         assert.ok(a, id + ' missing'); assert.equal(a.hidden, false); assert.ok(ACHIEVEMENT_CATEGORIES[a.category], id + ' category');
-        assert.equal(a.condition({ jinxUnderdogVotes: 99, caitlynCloseVotes: 99, caitlynStreak: 99, caitlynDecidingVotes: 99 }), true);
-        assert.equal(a.condition({ jinxUnderdogVotes: 0, caitlynCloseVotes: 0, caitlynStreak: 0, caitlynDecidingVotes: 0 }), false);
-        assert.ok(a.progress({ jinxUnderdogVotes: 1, caitlynCloseVotes: 1, caitlynStreak: 1, caitlynDecidingVotes: 0 }).target >= 1);
+        assert.equal(a.condition({ underdogVotes: 99, caitlynCloseVotes: 99, caitlynStreak: 99, decidingVotes: 99 }), true);
+        assert.equal(a.condition({ caitlynCloseVotes: 0, caitlynStreak: 0, decidingVotes: 0 }), false);
+        assert.ok(a.progress({ underdogVotes: 1, caitlynCloseVotes: 1, caitlynStreak: 1, decidingVotes: 0 }).target >= 1);
     }
 });
 console.log(`\n${n} passed`);
