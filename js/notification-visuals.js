@@ -131,7 +131,7 @@ export function pairHtml({ theirSrc, theirName, yourSrc, relationship, size = 44
 
 // The match itself: [edit A] VS [edit B]. A pick is ringed (their pick in the accent colour, yours in white, a shared pick in
 // green); the other edit is dimmed. No avatars or labels on the pictures: the rings tell the story.
-export function editsPairHtml({ edits, relationship, size = 44, accent }) {
+export function editsPairHtml({ edits, relationship, size = 44, accent, mark = null }) {
     const w = Math.round(size * 1.5);
     const side = (s, outer) => {
         const theirs = s.key === edits.theirKey, yours = s.key === edits.yourKey;
@@ -139,7 +139,7 @@ export function editsPairHtml({ edits, relationship, size = 44, accent }) {
         const cls = (theirs || yours || edits.neutral) ? 'nv-pick' : 'nv-dim';
         return `<span class="nv-edit ${cls}" style="width:${w}px;height:${size}px;--nv-ring:${ring}">${s.thumb ? `<img src="${escapeHtml(s.thumb)}" alt="" onerror="this.remove()">` : ''}</span>`;
     };
-    return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">VS</span>${side(edits.right, 'right')}</div>`;
+    return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}${mark ? ' nv-mark-event' : ''}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px${mark ? `;font-size:${Math.round(size * 0.36)}px` : ''}">${escapeHtml(mark || 'VS')}</span>${side(edits.right, 'right')}</div>`;
 }
 
 export function headlineHtml(text, src, name, accent, size = 22) {
@@ -335,16 +335,25 @@ export function eventEdits(match, yourKey) {
 
 // The big round number for a level-up.
 export function levelBadgeHtml(level, accent, size = 64) {
-    return `<div class="nv-follow-face"><span class="nv-av"><span class="nv-circle" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${escapeHtml(String(level ?? '?'))}</span></span></div>`;
+    return `<div class="nv-lead nv-follow-face" role="img" aria-label="Level up" title="Level up"><span class="nv-av"><span class="nv-circle" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${escapeHtml(String(level ?? '?'))}</span><span class="nv-glyph-pip" style="--nv-accent:${accent}">▲</span></span></div>`;
+}
+
+// The picture at the top of a match-event card: the two edits with the state symbol between them, or, with no match to show,
+// the symbol alone in a ringed circle (same size, so the card does not jump when the edits arrive). label = hover / screen-reader text.
+export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
+    const g = glyph && glyph !== 'VS' ? glyph : null;
+    const inner = edits
+        ? editsPairHtml({ edits, relationship: 'event', size, accent, mark: g })
+        : `<span class="nv-av"><span class="nv-circle nv-glyph" style="width:${Math.round(size * 1.07)}px;height:${Math.round(size * 1.07)}px;font-size:${Math.round(size * 0.46)}px;--nv-accent:${accent}">${escapeHtml(g || 'VS')}</span></span>`;
+    return `<div class="nv-lead nv-follow-face" role="img" aria-label="${escapeHtml(label || '')}" title="${escapeHtml(label || '')}">${inner}</div>`;
 }
 
 // Pop-up: [edit A] VS [edit B], a small tag line, the champion's words in a bubble, a few chips, one button. The whole card opens the match.
-export function eventToastHtml(n, { tag, edits, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
+export function eventToastHtml(n, { tag, glyph, edits, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
     return `
     <div class="nv-body" onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        ${leadHtml || (edits ? editsPairHtml({ edits, relationship: 'event', size: 60, accent }) : '')}
-        <div class="nv-event-tag">${escapeHtml(tag)}</div>
+        ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
         ${bubbleHtml(quip, jinxSrc, accent)}
         ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
         ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
@@ -353,13 +362,13 @@ export function eventToastHtml(n, { tag, edits, accent, jinxSrc, quip, detail, c
 }
 
 // Bell-list row: the same card, compact. The whole row opens the match; the button does the same.
-export function eventRowHtml(n, { tag, edits, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
+export function eventRowHtml(n, { tag, glyph, edits, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
     ensureVersusStyles();
     const idList = n.ids ? n.ids.join(',') : n.id;
     const unread = !n.read && !n.dismissed ? 'unread' : '';
-    const lead = edits ? editsPairHtml({ edits, relationship: 'event', size: 40, accent }) : circleHtml(jinxSrc, 'C', 44, { accent });
+    const lead = eventLeadHtml({ glyph, label: tag, edits, accent, size: 40 });
     const sub = [timeAgo, n.matchTitle].filter(Boolean).map(escapeHtml).join(' · ');
-    const quote = quip ? `<div class="nv-quote">${jinxSrc && edits ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : '';
+    const quote = quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : '';
     return `
         <div class="notification-item nv-row nv-event-row ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url || '')}"
              title="${escapeHtml(n.matchTitle || '')}"
@@ -454,7 +463,10 @@ export function ensureVersusStyles() {
 .nv-row .nv-content{margin:8px 0;padding:6px 10px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.05);border-radius:0 8px 8px 0;font-size:12.5px;color:rgba(255,255,255,.82);font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .versus-toast .nv-content-toast{margin:2px 0 4px;padding:8px 12px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.07);border-radius:0 10px 10px 0;font-size:14px;line-height:1.35;color:#fff;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .versus-toast .nv-follow-face .nv-stack{justify-content:center}
-.versus-toast .nv-event-tag{text-align:center;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--nv-accent)}
+.nv-mark-event{color:var(--nv-accent);background:#0f0b18;box-shadow:0 0 12px var(--nv-glow,rgba(255,105,180,.35));font-weight:800}
+.nv-circle.nv-glyph{background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.08),#0f0b18 70%);color:var(--nv-accent);font-weight:800;box-shadow:0 0 14px var(--nv-glow,rgba(255,105,180,.35));line-height:1}
+.nv-glyph-pip{position:absolute;right:-4px;bottom:-4px;z-index:3;width:22px;height:22px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0f0b18;background:var(--nv-accent);border:2px solid #1a1226}
+.nv-event-row .nv-lead{padding:0}
 .versus-toast .nv-chip-plain{text-transform:none}
 .versus-toast .nv-event-detail{text-align:center;font-size:12.5px;color:rgba(255,255,255,.72)}
 .versus-toast .nv-edits{margin-top:2px}

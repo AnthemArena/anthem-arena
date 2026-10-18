@@ -106,8 +106,8 @@ with sync_playwright() as p:
             if 'targetUrl' in extra: extra['targetUrl'] = extra['targetUrl'].replace('%s', MATCH)
             pg.evaluate(SHOW.replace('MATCH', json.dumps(MATCH)), [typ, extra])
             pg.wait_for_timeout(900)
-            shown = pg.inner_text('#bulletin-banner .nv-event-tag').strip().lower()
-            check(f'{tag} {typ}: tag says "{want_tag}"', shown == want_tag, shown)
+            shown = (pg.get_attribute('#bulletin-banner .nv-lead', 'aria-label') or '').strip().lower()
+            check(f'{tag} {typ}: the picture is labelled "{want_tag}" and carries the state symbol (no heading line)', shown == want_tag and pg.locator('#bulletin-banner .nv-event-tag').count() == 0 and pg.locator('#bulletin-banner .nv-mark-event, #bulletin-banner .nv-glyph').count() >= 1 or typ in ('novotes','lowvotes') and shown == want_tag, shown)
             check(f'{tag} {typ}: card uses the new design (no old thumbnail)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.locator('#bulletin-banner .bulletin-thumbnail').count() == 0)
             has_pair = pg.locator('#bulletin-banner .nv-edits .nv-edit').count()
             if extra.get('matchId', 1) is not None and typ not in ('round-opening', 'new-matches'):
@@ -124,7 +124,7 @@ with sync_playwright() as p:
             pg.go_back(); pg.wait_for_timeout(1500)
             pg.evaluate(SHOW.replace('MATCH', json.dumps(MATCH)), [typ, extra]); pg.wait_for_timeout(700)
             with pg.expect_navigation(timeout=4000):
-                pg.click('#bulletin-banner .nv-event-tag')
+                pg.click('#bulletin-banner .nv-lead')
             check(f'{tag} {typ}: tapping the card opens the match too', ok_url and (pg.url.endswith(expect) if expect.startswith('/vote') else expect in pg.url), pg.url)
             pg.go_back(); pg.wait_for_timeout(1500)
         check(f'{tag}: no page errors from the event alerts', not errs, errs)
@@ -144,7 +144,7 @@ with sync_playwright() as p:
         # welcome (first time and back)
         for wt, want in (('first-time', 'welcome'), ('back', 'welcome back')):
             show("(wt)=>window.showBulletin({priority:1,type:'welcome',welcomeType:wt,matchId:'welcome',message:'Welcome. 6 matches are open.',detail:'Pick one.',cta:'Begin',action:'navigate',targetUrl:'/vote.html'})", wt)
-            check(f'{tag} welcome ({wt}): tag "{want}", new card, fits', pg.inner_text('#bulletin-banner .nv-event-tag').strip().lower() == want and pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and fits())
+            check(f'{tag} welcome ({wt}): tag "{want}", new card, fits', (pg.get_attribute('#bulletin-banner .nv-lead', 'aria-label') or '').strip().lower() == want and pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and fits())
             if wt == 'first-time': pg.screenshot(path=f'{SHOTS}/event-welcome-{tag}.png')
         # welcome on the vote page: the button only closes it
         show("window.showBulletin({priority:1,type:'welcome',welcomeType:'back',matchId:'welcome',message:'Hi.',detail:'',cta:'Ok',action:'dismiss',targetUrl:'/vote.html'})")
@@ -152,13 +152,13 @@ with sync_playwright() as p:
         check(f'{tag} welcome with action dismiss: the button closes it and does not navigate', pg.url == url0 and not pg.evaluate("document.querySelector('#bulletin-banner')?.classList.contains('show')"), pg.url)
         # encouragement
         show("window.showBulletin({priority:5,type:'encouragement',encouragementType:'gentle',matchId:'encouragement',message:'Still deciding? Pick one.',detail:'Every vote counts.',cta:'Vote now',action:'navigate',targetUrl:'/matches.html'})")
-        check(f'{tag} encouragement: tag, new card, fits', pg.inner_text('#bulletin-banner .nv-event-tag').strip().lower() == 'still deciding?' and pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and fits())
+        check(f'{tag} encouragement: tag, new card, fits', (pg.get_attribute('#bulletin-banner .nv-lead', 'aria-label') or '').strip().lower() == 'still deciding?' and pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and fits())
         with pg.expect_navigation(timeout=4000): pg.click('#bulletin-banner .nv-cta')
         check(f'{tag} encouragement: the button opens the matches page', pg.url.endswith('/matches.html'), pg.url)
         pg.go_back(); pg.wait_for_timeout(1500)
         # level up
         show("window.__lvl=0; window.showBulletin({type:'level-up',level:7,message:'A new rank. Well earned.',detail:'Hextech Adept. It suits you.',cta:'View progress',ctaAction:()=>{window.__lvl++},duration:60000})")
-        check(f'{tag} level up: tag, big level number, new card, fits', pg.inner_text('#bulletin-banner .nv-event-tag').strip().lower() == 'level up' and pg.inner_text('#bulletin-banner .nv-circle').strip() == '7' and pg.locator('#bulletin-banner .level-badge-large').count() == 0 and fits())
+        check(f'{tag} level up: tag, big level number, new card, fits', (pg.get_attribute('#bulletin-banner .nv-lead', 'aria-label') or '').strip().lower() == 'level up' and pg.inner_text('#bulletin-banner .nv-circle').strip() == '7' and pg.locator('#bulletin-banner .level-badge-large').count() == 0 and fits())
         pg.screenshot(path=f'{SHOTS}/event-levelup-{tag}.png')
         pg.click('#bulletin-banner .nv-cta'); pg.wait_for_timeout(300)
         check(f'{tag} level up: the button runs its action', pg.evaluate('window.__lvl') == 1, pg.evaluate('window.__lvl'))

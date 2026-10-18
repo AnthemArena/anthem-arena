@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
+import { eventLeadHtml, eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -139,12 +139,21 @@ t('event pictures: your pick ringed and the other dimmed; a match with no vote s
     assert.ok(!editsPairHtml({ edits: eventEdits(m, undefined), relationship: 'event', size: 40, accent: '#fff' }).includes('nv-dim'));
 });
 t('event toast: tag, bubble, chips, one button; the whole card and the button both call handleBulletinCTA', () => {
-    const html = eventToastHtml({ type: 'danger' }, { tag: 'Your pick is behind', edits: eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song1'), accent: '#ff5a5f', jinxSrc: 'https://x/j.png', quip: 'Down 12. <b>hi</b>', detail: 'Fix it', chips: ['38% vs 62%'], cta: 'Share the match' });
-    assert.ok(html.includes('Your pick is behind') && html.includes('Share the match') && html.includes('38% vs 62%') && html.includes('Fix it'));
+    const html = eventToastHtml({ type: 'danger' }, { tag: 'Your pick is behind', glyph: '▼', edits: eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song1'), accent: '#ff5a5f', jinxSrc: 'https://x/j.png', quip: 'Down 12. <b>hi</b>', detail: 'Fix it', chips: ['38% vs 62%'], cta: 'Share the match' });
+    assert.ok(!html.includes('nv-event-tag'), 'no heading line');
+    assert.ok(/aria-label="Your pick is behind"/.test(html) && html.includes('nv-mark-event') && html.includes('>▼<'), 'the symbol sits between the two edits');
+    assert.ok(html.includes('Share the match') && html.includes('38% vs 62%') && html.includes('Fix it'));
     assert.ok(html.includes('Down 12. &lt;b&gt;hi&lt;/b&gt;'), 'text is escaped');
     assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button/g) || []).length, 2);
     const bare = eventToastHtml({ type: 'round-opening' }, { tag: 'Round 2 is open', edits: null, accent: '#ff69b4', jinxSrc: null, quip: 'Go', cta: 'Start' });
-    assert.ok(!bare.includes('nv-edits'));
+    assert.ok(!bare.includes('nv-edits') && bare.includes('nv-glyph'), 'no match: the symbol alone in a circle');
+});
+t('event lead: symbol between the edits, or alone; VS stays plain', () => {
+    const e = eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song2');
+    assert.ok(eventLeadHtml({ glyph: '=', label: 'Too close', edits: e, accent: '#fb0', size: 60 }).includes('>=<'));
+    assert.ok(!eventLeadHtml({ glyph: 'VS', label: 'x', edits: e, accent: '#fb0' }).includes('nv-mark-event'));
+    const alone = eventLeadHtml({ glyph: '✓', label: 'Your pick won', edits: null, accent: '#4ade80', size: 40 });
+    assert.ok(alone.includes('nv-glyph') && alone.includes('>✓<') && !alone.includes('nv-edit '));
 });
 t('event row: opens the match from the row and from the button, with the tag, the match and the champion line', () => {
     const n = { id: 'e1', type: 'match-won', matchTitle: 'A vs B', read: false };
