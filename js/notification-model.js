@@ -158,6 +158,15 @@ export function eventTag(n) {
     return k.tag;
 }
 
+// The symbol in the middle of the picture (between the two edits, or alone in a circle when there is no match to show).
+// It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close / tied, ⇄ flipped, ✓ won, ✕ lost.
+const EVENT_GLYPHS = {
+    danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
+    closing: '⏳', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
+    'match-won': '✓', 'match-lost': '✕', 'match-tied': '=', welcome: '👋', encouragement: '👀'
+};
+export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
+
 // Where the button (and the alert itself) goes. A match you already voted in opens with the share panel in view.
 export function eventUrl(n) {
     const k = eventKind(n);
@@ -169,6 +178,9 @@ export function eventUrl(n) {
 // A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
 export function eventChips(n) {
     const chips = [];
+    if (n?.type === 'closing' && n.severityTier === 'final') chips.push('Last chance');
+    if (n?.type === 'encouragement' && n.encouragementType === 'urgent') chips.push('Closing soon');
+    if ((n?.type === 'round-opening' || n?.type === 'new-matches') && n.round) chips.push(`Round ${n.round}`);
     if (Number.isFinite(n?.userPct) && Number.isFinite(n?.opponentPct)) chips.push(`${n.userPct}% vs ${n.opponentPct}%`);
     if ((n?.type === 'round-opening' || n?.type === 'new-matches') && n.matchCount) chips.push(`${n.matchCount} ${n.matchCount === 1 ? 'match' : 'matches'}`);
     return chips;
