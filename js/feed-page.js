@@ -112,6 +112,19 @@ let allUsers = [];
 let lastUserLoad = 0;
 let ownProfileRefreshed = false;
 
+// A visitor whose profile was never created (new private window, failed first save) would stay "Anonymous" and could not post.
+async function repairMissingProfile() {
+    try {
+        const { isPlaceholderName, ensureOwnProfile } = await import('./profile-bootstrap.js');
+        if (!isPlaceholderName(localStorage.getItem('username')) && localStorage.getItem('avatar') && localStorage.getItem('avatar') !== 'null') return;
+        const made = await ensureOwnProfile();
+        if (made) {
+            try { window.updateNavProfile?.(); } catch { /* nav refresh is best effort */ }
+            if (made.created && window.showNotification) window.showNotification(`Welcome, ${made.username}! You can change your name anytime in settings.`, 'success');
+        }
+    } catch { /* never block the feed */ }
+}
+
 // Other people's tooltips read OUR saved profile, so make sure it matches this browser. Runs on every feed load
 // (the user list can come from a saved copy, which skips the check inside loadAllUsers); one read + one write, and
 // only when the vote count or XP changed since the last time it was saved from this browser.
@@ -511,6 +524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
 
          // ✅ Load users for mentions
+    await repairMissingProfile();
     await loadAllUsers();
     publishOwnProfileStats();
 

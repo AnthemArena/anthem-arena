@@ -613,3 +613,9 @@ Tooltips for other people read their saved profile. The refresh of our own profi
 
 ## Tooltip vote count = saved votes (fix)
 The saved profile vote count now comes from the votes stored in Firestore, counting only votes whose match still exists (`countLiveVotes`, same rule as the profile page). Previously it used this browser's copy, which included a vote from a deleted test match (3 vs 2 on the profile page). `profileStatsPublished` key bumped to `v2|…` so every account re-publishes once.
+
+## New visitors stuck as Anonymous (fix) — js/profile-bootstrap.js
+A first-time visitor got a made-up id (IP + fingerprint), but the security rules only allow writing `profiles/{firebase uid}`, so the profile save was refused: the account stayed "Anonymous", had no avatar and could not post. Now `waitForAuthUid` waits for the anonymous sign-in and `ensureOwnProfile` creates/restores the profile for that uid. The vote page uses it for first-time visitors and whenever there is no usable name; the feed runs `repairMissingProfile()` on load, so an account already stuck as Anonymous is repaired by opening the feed.
+
+## Pop-ups: splash backdrop + champion bubble
+`.versus-toast` pop-ups (ally/rival, follow, like/comment/reply/mention, achievement) now sit on the champion's splash art (`--nv-splash`, `toastSplashUrl(pack)`), darkened toward the bottom, and the champion's line uses the vote-modal bubble look (`bubbleHtml`). Achievements use the same family (`achievementToastHtml`: icon, ACHIEVEMENT UNLOCKED, name, XP/rarity chips, champion line, button). Bell rows keep the plain card (repeating art on every row was too busy). Other bulletin types (level-up, danger, etc.) still use the older layout.

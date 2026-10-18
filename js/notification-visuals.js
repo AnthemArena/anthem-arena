@@ -1,5 +1,6 @@
 import { fixAvatarUrl } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
+import { getChampionSplashUrl } from './arcane-config.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -37,6 +38,31 @@ export function avatarSrc(raw) {
 
 export function viewerAvatarSrc(storage = globalThis.localStorage) {
     try { return avatarSrc(storage?.getItem('avatar')); } catch { return null; }
+}
+
+// The champion's splash art for the pop-up backdrop (Data Dragon id is the pack id with a capital: jinx -> Jinx).
+export function toastSplashUrl(pack) {
+    const id = String(pack?.id || 'jinx');
+    return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1));
+}
+
+// The champion's speech bubble used inside pop-ups: same look as the vote modal (dark card, pink edge, tail at the portrait).
+export function bubbleHtml(text, jinxSrc, accent) {
+    if (!text) return '';
+    return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}</div></div>`;
+}
+
+// Achievement pop-up in the same family as the other alerts: icon, "Achievement unlocked", name, the champion's line, button.
+export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc, accent, cta }) {
+    return `
+    <div class="nv-body" onclick="window.handleBulletinCTA()">
+        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        <div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
+        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div>
+        ${xp || rarity ? `<div class="nv-chips">${xp ? `<span class="nv-chip">+${escapeHtml(xp)} XP</span>` : ''}${rarity ? `<span class="nv-chip">${escapeHtml(rarity)}</span>` : ''}</div>` : ''}
+        ${bubbleHtml(line, jinxSrc, accent)}
+    </div>
+    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View achievements')}</button>`;
 }
 
 // The companion's face: the pack's icon. (The Arcane skin tile is a dark picture; at 24-60 px it reads as a dark blob.)
@@ -120,7 +146,7 @@ export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, qui
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
         ${toastHeadlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent)}
-        ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
+        ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
     <button class="bulletin-toast-cta nv-cta ${n.relationship}" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
 }
@@ -215,7 +241,7 @@ export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headl
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         <div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
         ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}
-        ${quip ? `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(quip)}</div></div>` : ''}
+        ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
 }
@@ -300,7 +326,7 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-.versus-toast .nv-body{position:relative;cursor:pointer;padding:14px 16px 12px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
+.versus-toast .nv-body{position:relative;cursor:pointer;padding:18px 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(18,10,24,.25) 0%,rgba(18,10,24,.72) 45%,rgba(18,10,24,.96) 100%),var(--nv-splash,none) center 12%/cover no-repeat,linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
@@ -310,7 +336,11 @@ export function ensureVersusStyles() {
 .versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-accent);letter-spacing:.03em}
 .versus-toast .nv-jinx{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
 .versus-toast .nv-jinx-face{box-shadow:0 0 18px var(--nv-glow)}
-.versus-toast .nv-bubble{flex:1;background:#fff;color:#1a1226;border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:14px;font-weight:600;line-height:1.3;margin-bottom:4px}
+.versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,rgba(255,79,180,.35));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}
+.versus-toast .nv-bubble::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:rgba(11,13,24,.88);border-left:1px solid var(--nv-line,rgba(255,79,180,.35));border-bottom:1px solid var(--nv-line,rgba(255,79,180,.35));transform:rotate(45deg)}
+.versus-toast .nv-jinx{align-items:center;gap:14px}
+.versus-toast .nv-chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.versus-toast .nv-chip{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#ffd6ee;background:rgba(255,79,180,.18);border:1px solid rgba(255,79,180,.4);text-transform:capitalize}
 .versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:11px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
 .versus-toast .nv-cta.ally{color:#0f0b18}
 .versus-toast .nv-follow-face{display:flex;justify-content:center;padding-top:2px}
