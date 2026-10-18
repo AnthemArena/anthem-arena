@@ -8,7 +8,8 @@ import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
 import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml, plainChampionHtml } from './champions-tab-model.js';
 import { lookSkin, readLooks, saveLook } from './companion-look.js';
-import { announcePendingChampion, markChampionSelected, championSelectedBulletin } from './champion-selected.js';
+import { announcePendingChampion, markChampionSelected } from './champion-selected.js';
+import { buildPreview } from './champion-preview.js';
 import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { masteryLevel } from './champion-unlocks.js';
@@ -24,6 +25,7 @@ const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;
+let previewIndex = 0;   // which sample alert the Preview button shows next
 let packAtOpen = null;   // the champion they had when the window opened, to tell whether Save changes it
 let pendingLooks = {};   // skins chosen in this visit, saved with the rest of the settings: { vi: 29 }
 let modalElement = null;
@@ -41,6 +43,7 @@ export function openSettingsModal() {
     }
 
     pendingLooks = {};
+    previewIndex = 0;
     packAtOpen = window.championLoader?.getCurrentPack?.()?.id || null;
 
     // Load current profile
@@ -1105,7 +1108,7 @@ function renderYourChampion() {
                 hasChanges = true;
                 renderYourChampion();
             } else if (e.target.closest('[data-action="preview"]') && packId) {
-                previewChampion(packId);
+                previewChampion(packId, e.target.closest('[data-action="preview"]'));
             }
         });
     }
@@ -1163,13 +1166,21 @@ async function selectChampionPack(packId) {
     console.log(`✅ Arcane companion set to: ${packId}`);
 }
 
-// Shows what the champion's alerts look like. Stays on the page: closing it does not navigate anywhere.
-function previewChampion(packId) {
-    const mastery = masteryLevel(readPackXp()[packId]).level;
-    const voiced = window.championLoader?.getAchievementMessage?.('champion-selected', { rank: `Mastery ${mastery}`, xp: 0 });
-    const bulletin = { ...championSelectedBulletin({ packId, skinNum: currentSkinNum(packId), mastery, voiced }), cta: 'Close preview', ctaAction: () => window.dismissBulletin?.(), duration: 5000 };
-    if (window.showBulletin) window.showBulletin(bulletin);
-    else showNotification(bulletin.message, 'info');
+// Each press shows the next sample alert in the champion's voice (nail-biter, winning, comeback, welcome, achievement, level up,
+// mastery up). The button only closes a card, so a preview never opens another page.
+function previewChampion(packId, button) {
+    const loader = window.championLoader;
+    if (!window.showBulletin || !loader) { showNotification('Alerts are not available on this page', 'info'); return; }
+    const voice = {
+        alert: (type, data) => loader.getChampionMessage?.(type, data),
+        achievement: (id, data) => loader.getAchievementMessage?.(id, data),
+        custom: type => loader.getCustomMessage?.(type)
+    };
+    const { bulletin, number, total } = buildPreview(previewIndex, { voice, packId, dismiss: () => window.dismissBulletin?.() });
+    window.showBulletin(bulletin);
+    previewIndex = (previewIndex + 1) % total;
+    const next = buildPreview(previewIndex, { voice, packId, dismiss: () => {} });
+    if (button) button.innerHTML = `<i class="fas fa-play"></i> Next alert: ${next.step.label} (${next.number}/${total})`;
 }
 
 // Make functions global so onclick can access them

@@ -874,3 +874,7 @@ Choose Your Champion lists only the champions that are finished (`PACK_IDS` in `
 Each champion has a default voice plus optional voice sets attached to skins (Sheriff Caitlyn: stricter, law-and-order; Jinx: the original loud voice on Classic and non-Arcane skins, the current Arcane voice on the Arcane skins). Alerts use the voice for the worn skin and fall back to the champion's default. A set can be partial. The old Jinx lines are in `docs/jinx-voice-review.md` ("before"). The voice tests' "no !!" rule must apply per voice set, not per champion. Later ideas: customising your own voice (overrides per event), export/import as a file, and only after that, a moderated public gallery.
 
 Saving settings now also fires a `profile-settings-saved` event. The feed page listens and redraws its left-hand profile card (picture, name, bio, cover) so it matches the nav without a reload; the profile page still reloads after a save.
+
+### Preview cycles through alerts (18 Oct 2026, night)
+
+Settings > Your Champion > the preview button now cycles through sample alerts in the champion's voice: nail-biter, winning, comeback, welcome back, achievement (Spark), level up and mastery up, then round again. The button says which one is next. The samples use made-up songs, and their buttons only close the card (they never open a page). The champion-selected card is no longer used for Preview; it is shown once after Save. Code: `js/champion-preview.js`.
