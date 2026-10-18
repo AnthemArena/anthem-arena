@@ -46,6 +46,18 @@ export function toastSplashUrl(pack) {
     return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1));
 }
 
+// The viewer's own profile banner as a pop-up backdrop (same choice as the profile card: a chosen champion, "auto" = the
+// champion of their avatar, or the default gradient, which has no art). Falls back to the cup champion's splash.
+export function profileSplashUrl(pack, storage = globalThis.localStorage) {
+    const read = k => { try { return JSON.parse(storage.getItem(k) || 'null'); } catch { return null; } };
+    const banner = read('banner') || { type: 'auto' };
+    const avatar = read('avatar');
+    const clean = v => String(v || '').replace(/['\s]/g, '');
+    if (banner.type === 'champion' && banner.championId) return getChampionSplashUrl(clean(banner.championId), banner.skinNumber || 0);
+    if (banner.type !== 'default' && avatar?.type === 'url' && avatar.name) return getChampionSplashUrl(clean(avatar.name));
+    return toastSplashUrl(pack);
+}
+
 // The champion's speech bubble used inside pop-ups: same look as the vote modal (dark card, pink edge, tail at the portrait).
 export function bubbleHtml(text, jinxSrc, accent) {
     if (!text) return '';
@@ -326,7 +338,7 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-.versus-toast .nv-body{position:relative;cursor:pointer;padding:18px 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(18,10,24,.25) 0%,rgba(18,10,24,.72) 45%,rgba(18,10,24,.96) 100%),var(--nv-splash,none) center 12%/cover no-repeat,linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
+.versus-toast .nv-body{position:relative;cursor:pointer;padding:18px 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(18,10,24,.12) 0%,rgba(18,10,24,.55) 48%,rgba(18,10,24,.95) 100%),var(--nv-splash,none) center 20%/cover no-repeat,linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
