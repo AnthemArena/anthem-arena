@@ -853,3 +853,10 @@ First run on 18 Oct 2026 (newest was 16.20.1): every real champion icon and the 
 ### champion-selected alert (18 Oct 2026, evening)
 
 Picking a champion (Settings card, or Use on a different champion on the Champions tab) shows the standard event card instead of the small notification: tag "Your champion", a star, the champion's own line (`champion-selected` in each pack), "Name · Skin · Mastery N" and the skin's splash art. Changing only the skin of the current champion keeps the small "Skin updated" notice. Code: `js/champion-selected.js`; test button on `test-toasts.html`.
+
+### Settings, second pass (18 Oct 2026, night)
+
+- **Choose Your Champion** is now the grid of every champion (search kept). Jinx, Vi and Caitlyn come first with a ★: they have levels, skins and a voice. Anyone else is a plain picture for now.
+- **Your Champion** shows only the selected champion: mastery, next reward and the skins they have unlocked to wear (the choice is saved with Save, like the picture). Locked skins are counted, and the Champions tab shows how to earn them. A champion without levels says so and names who still earns the XP.
+- **No banner setting.** The cover is always the splash of the champion in the avatar, in the skin they wear (profile, feed header, alert backdrop). Older saved banner choices are ignored.
+- **Preview alert** shows the champion's card on the page and its button only closes it (before, it opened the profile). Alerts now sit above the settings window (z-index), so ones raised from it can be seen.

@@ -110,9 +110,10 @@ t('rows never use bare class names the feed stylesheet styles (a "comment" class
 t('profile splash: chosen champion, auto-match avatar, default gradient falls back to the cup champion', () => {
     const store = o => ({ getItem: k => (k in o ? o[k] : null) });
     const J = { id: 'jinx' };
-    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'champion', championId: 'Vi' }) })), /Vi_0\.jpg$/);
+    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'champion', championId: 'Vi' }), avatar: JSON.stringify({ type: 'url', name: 'Jinx' }) })), /Jinx_0\.jpg$/);   // old banner choices are ignored: the cover follows the champion
+    assert.match(profileSplashUrl(J, store({ avatar: JSON.stringify({ type: 'url', value: 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Vi_29.jpg', name: 'Vi' }) })), /Vi_29\.jpg$/);   // in the skin they wear
     assert.match(profileSplashUrl(J, store({ avatar: JSON.stringify({ type: 'url', name: "Kai'Sa" }) })), /KaiSa_0\.jpg$/);
-    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'default' }), avatar: JSON.stringify({ type: 'url', name: 'Vi' }) })), /Jinx_0\.jpg$/);
+    assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'default' }), avatar: JSON.stringify({ type: 'url', name: 'Vi' }) })), /Vi_0\.jpg$/);
     assert.match(profileSplashUrl(J, store({})), /Jinx_0\.jpg$/);
 });
 t('splash from a champion avatar address; other pictures give null', () => {

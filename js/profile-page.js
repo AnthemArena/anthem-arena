@@ -518,7 +518,7 @@ function applyProfileBanner(profile) {
     const bannerEl = document.querySelector('.profile-banner');
     if (!bannerEl) return;
     
-    const banner = profile.banner || { type: 'auto' };
+    const banner = { type: 'auto' };   // the cover follows the champion (and skin) in the avatar; banners are no longer chosen separately
     
     if (banner.type === 'default') {
         // Default gold gradient

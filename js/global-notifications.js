@@ -1939,7 +1939,7 @@ function showBulletin(notification) {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 999;
+    z-index: 100000;   /* above the settings modal (99999), so alerts shown from it are seen */
     width: 380px;
     max-width: calc(100vw - 48px);
     

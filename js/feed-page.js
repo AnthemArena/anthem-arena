@@ -2385,7 +2385,7 @@ async function updateFeedHeaderBanner() {
         
         let banner;
         try {
-            banner = bannerJson ? JSON.parse(bannerJson) : { type: 'auto' };
+            banner = { type: 'auto' };   // the cover follows the champion in the avatar; banners are no longer chosen separately
         } catch {
             banner = { type: 'auto' };
         }

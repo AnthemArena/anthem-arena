@@ -6,11 +6,12 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { readPackXp } from './xp-ledger.js';
 import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
-import { masteryChipHtml, skinAvatar } from './champions-tab-model.js';
-import { lookSkin } from './companion-look.js';
-import { announceChampionSelected } from './champion-selected.js';
-import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
+import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml, plainChampionHtml } from './champions-tab-model.js';
+import { lookSkin, readLooks, saveLook } from './companion-look.js';
+import { announceChampionSelected, championSelectedBulletin } from './champion-selected.js';
+import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
+import { masteryLevel } from './champion-unlocks.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
@@ -23,6 +24,7 @@ const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;
+let pendingLooks = {};   // skins chosen in this visit, saved with the rest of the settings: { vi: 29 }
 let modalElement = null;
 
 // ========================================
@@ -37,6 +39,8 @@ export function openSettingsModal() {
         createModalHTML();
     }
 
+    pendingLooks = {};
+
     // Load current profile
     loadCurrentProfile();
 
@@ -45,9 +49,6 @@ export function openSettingsModal() {
 
     // Setup event listeners
     setupEventListeners();
-
-    // ✅ NEW: Setup banner preview
-    setupBannerPreview();
 
     // Show modal with animation
     setTimeout(() => {
@@ -127,53 +128,13 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                        <!-- ✅ UPDATED: Champion Pack Section with Team Identity & Avatars -->
-<div class="settings-section">
-   <h3><i class="fas fa-user-astronaut"></i> Your Champion</h3>
-<p class="section-description">
-    Pick your champion. They become your profile picture and cover art, give personality-driven notifications,
-    react to tournament activity and earn your XP. Choose their skin on the Champions tab of your profile.
-</p>
-
-    <div id="championPackSelector" class="champion-pack-grid">
-        <!-- Champion pack options will be populated here with avatars -->
-    </div>
-
-    <div class="team-identity-preview" id="teamPreview" style="
-        margin-top: 16px;
-        padding: 16px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        display: none;
-        border-left: 4px solid var(--accent-gold);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    ">
-        <img id="teamAvatar" src="" alt="Team Avatar" style="
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            border: 2px solid var(--accent-gold);
-        ">
-        <div>
-            <div style="color: var(--accent-gold); font-weight: 600; margin-bottom: 4px;">
-Your Champion: <span id="teamName">Jinx</span>
-            </div>
-            <small style="opacity: 0.7; font-size: 0.85em;">
-Your companion can react to matches, achievements, and other site activity
-            </small>
-        </div>
-    </div>
-</div>
-
-                  <!-- Avatar Section -->
+                        <!-- Choose your champion: the grid of every champion; Jinx, Vi and Caitlyn come first and have levels -->
                         <div class="settings-section">
-                            <h3><i class="fas fa-image"></i> Other Profile Pictures</h3>
-<p class="section-description">
-    Prefer a different face? Any other champion works as a plain picture (no levels or skins). Your champion above
-    keeps earning your XP and sending your alerts.
-</p>
+                            <h3><i class="fas fa-user-astronaut"></i> Choose Your Champion</h3>
+                            <p class="section-description">
+                                Your champion is your profile picture and cover art. Champions marked ★ also have levels, skins and a voice:
+                                they send your alerts and earn your XP. More are coming.
+                            </p>
 
                             <div class="avatar-search-wrapper">
                                 <input
@@ -185,17 +146,15 @@ Your companion can react to matches, achievements, and other site activity
                                 <span class="search-icon">🔍</span>
                             </div>
 
-                            <div class="selected-avatar-display" id="selectedAvatarDisplay" style="display: none;">
-                                <img id="selectedAvatarImg" src="" alt="Selected avatar" />
-                                <span id="selectedAvatarName">No champion selected</span>
-                                <button type="button" class="clear-avatar-btn" id="clearAvatarBtn">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-
                             <div class="avatar-grid" id="avatarGrid">
                                 <!-- Champion grid will be inserted here -->
                             </div>
+                        </div>
+
+                        <!-- The selected champion, with the skins they have unlocked -->
+                        <div class="settings-section">
+                            <h3><i class="fas fa-star"></i> Your Champion</h3>
+                            <div id="yourChampion"></div>
                         </div>
 
                         <!-- Bio Section -->
@@ -279,50 +238,6 @@ Your companion can react to matches, achievements, and other site activity
                 placeholder="username#0000"
                 maxlength="50"
             >
-        </div>
-    </div>
-</div>
-
-<div class="setting-group">
-    <label for="bannerSelect">
-        <i class="fas fa-image"></i> Profile Banner
-    </label>
-    <select id="bannerSelect" class="setting-input">
-        <option value="auto">Auto (Match Avatar)</option>
-        <option value="default">Default (Gold Gradient)</option>
-        <optgroup label="Champions">
-            <option value="Ahri">Ahri</option>
-            <option value="Akali">Akali</option>
-            <option value="Akshan">Akshan</option>
-            <option value="Ashe">Ashe</option>
-            <option value="Ekko">Ekko</option>
-            <option value="Ezreal">Ezreal</option>
-            <option value="Jhin">Jhin</option>
-            <option value="Jinx">Jinx</option>
-            <option value="Kaisa">Kai'Sa</option>
-            <option value="KSante">K'Sante</option>
-            <option value="Katarina">Katarina</option>
-            <option value="LeeSin">Lee Sin</option>
-            <option value="Lux">Lux</option>
-            <option value="MissFortune">Miss Fortune</option>
-            <option value="Pyke">Pyke</option>
-            <option value="Seraphine">Seraphine</option>
-            <option value="Sett">Sett</option>
-            <option value="Sona">Sona</option>
-            <option value="Thresh">Thresh</option>
-            <option value="Yasuo">Yasuo</option>
-            <option value="Yone">Yone</option>
-            <option value="Zed">Zed</option>
-        </optgroup>
-    </select>
-    <small class="setting-hint">Choose a champion splash art for your profile banner</small>
-</div>
-
-<!-- ✅ OPTIONAL: Banner Preview -->
-<div class="setting-group">
-    <div id="bannerPreview" class="banner-preview">
-        <div class="banner-preview-overlay">
-            <span>Banner Preview</span>
         </div>
     </div>
 </div>
@@ -519,11 +434,10 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
             displayName: avatar.name || 'Champion',
             url: avatar.value
         };
-        showSelectedAvatar();
+        markSelectedInGrid();
     }
 
-     // ✅ NEW: Load champion pack selector
-    loadChampionPackSelector();
+    renderYourChampion();
 
     console.log('✅ Profile loaded with privacy settings');
 }
@@ -571,16 +485,20 @@ function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
     if (!grid) return;
 
-    const html = CHAMPIONS.filter(c => !PACK_IDS.includes(c.toLowerCase())).map(champion => {
+    const rankOf = c => { const i = PACK_IDS.indexOf(c.toLowerCase()); return i < 0 ? PACK_IDS.length : i; };
+    const ordered = [...CHAMPIONS].sort((a, b) => rankOf(a) - rankOf(b));   // Jinx, Vi, Caitlyn first, the rest as listed
+    const html = ordered.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
+        const levels = PACK_IDS.includes(champion.toLowerCase());
         return `
-            <div class="champion-avatar-option" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}">
+            <div class="champion-avatar-option${levels ? ' has-levels' : ''}" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}${levels ? ' ★ levels, skins and a voice' : ''}">
                 <img src="${CHAMPION_CDN}${champion}.png" alt="${displayName}" loading="lazy" />
             </div>
         `;
     }).join('');
 
     grid.innerHTML = html;
+    markSelectedInGrid();
 }
 
 // In settings-modal.js, add this function near setupEventListeners()
@@ -639,13 +557,6 @@ function setupEventListeners() {
     if (avatarGrid) {
         avatarGrid.removeEventListener('click', handleChampionClick);
         avatarGrid.addEventListener('click', handleChampionClick);
-    }
-
-    // Clear avatar button
-    const clearBtn = document.getElementById('clearAvatarBtn');
-    if (clearBtn) {
-        clearBtn.removeEventListener('click', clearSelectedAvatar);
-        clearBtn.addEventListener('click', clearSelectedAvatar);
     }
 
        // ✅ ADD BIO INPUT TRACKING
@@ -740,63 +651,18 @@ function handleChampionClick(e) {
     };
 
     hasChanges = true;
-    showSelectedAvatar();
+    markSelectedInGrid();
 
-    // Remove previous selection styling
-    document.querySelectorAll('.champion-avatar-option').forEach(opt => {
-        opt.classList.remove('selected');
-    });
-
-    // Add selection styling
-    option.classList.add('selected');
-
-    console.log('✅ Champion selected:', displayName);
-
-    const coverSelect = document.getElementById('bannerSelect');
-    if (coverSelect && (coverSelect.value === 'auto' || !coverSelect.value)) updateBannerPreview('auto');
-
-    // Jinx, Vi and Caitlyn are more than a picture: they become your champion (and wear your chosen skin)
+    // Jinx, Vi and Caitlyn have levels: they become your champion (and wear your chosen skin). Anyone else is just your picture.
     const packId = champion.toLowerCase();
     if (PACK_IDS.includes(packId)) selectChampionPack(packId);
+    else renderYourChampion();
 }
 
-// ========================================
-// SHOW SELECTED AVATAR
-// ========================================
-
-function showSelectedAvatar() {
-    if (!selectedChampion) return;
-
-    const display = document.getElementById('selectedAvatarDisplay');
-    const img = document.getElementById('selectedAvatarImg');
-    const name = document.getElementById('selectedAvatarName');
-
-    if (display && img && name) {
-        img.src = selectedChampion.url;
-        name.textContent = selectedChampion.displayName;
-        display.style.display = 'flex';
-    }
-}
-
-// ========================================
-// CLEAR SELECTED AVATAR
-// ========================================
-
-function clearSelectedAvatar() {
-    selectedChampion = null;
-    hasChanges = true;
-
-    const display = document.getElementById('selectedAvatarDisplay');
-    if (display) {
-        display.style.display = 'none';
-    }
-
-    // Remove selection styling
-    document.querySelectorAll('.champion-avatar-option').forEach(opt => {
-        opt.classList.remove('selected');
-    });
-
-    console.log('🗑️ Avatar cleared');
+// Highlights the chosen champion in the grid.
+function markSelectedInGrid() {
+    const chosen = String(selectedChampion?.name || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    document.querySelectorAll('.champion-avatar-option').forEach(opt => opt.classList.toggle('selected', !!chosen && opt.dataset.champion.toLowerCase() === chosen));
 }
 
 // ========================================
@@ -857,24 +723,8 @@ if (socialLinks.instagram) socialLinks.instagram = socialLinks.instagram.replace
 if (socialLinks.youtube) socialLinks.youtube = socialLinks.youtube.replace(/^@/, '');
 
 
-    // ✅ FIXED: Get banner selection with proper default
-const bannerSelect = document.getElementById('bannerSelect');
-const bannerValue = bannerSelect ? bannerSelect.value : 'auto';
-
-let banner;
-if (bannerValue === 'default') {
-    banner = { type: 'default' };
-} else if (bannerValue === 'auto' || !bannerValue) {
-    // ✅ Explicitly save 'auto' type
-    banner = { type: 'auto' };
-} else {
-    // Specific champion splash
-    banner = {
-        type: 'champion',
-        championId: bannerValue,
-        skinNumber: 0
-    };
-}
+    // The cover follows your champion (and the skin they wear); there is no separate banner choice any more
+    const banner = { type: 'auto' };
 
     // Validate username
     const validation = validateUsername(username);
@@ -917,6 +767,9 @@ if (bannerValue === 'default') {
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
         }
+
+        Object.entries(pendingLooks).forEach(([packId, num]) => saveLook(packId, num));
+        pendingLooks = {};
 
         // Save to localStorage (backward compatible)
         localStorage.setItem('username', username);
@@ -964,6 +817,7 @@ await setDoc(doc(db, 'profiles', userId), {
     // true only when they picked a companion themselves; otherwise they follow the cup's champion
     companionChosen: !!window.championLoader?.hasChosenCompanion?.(),
     banner: banner,
+    companionSkins: readLooks(),
     bio: bio,
     socialLinks: socialLinks,
     privacy: privacySettings,
@@ -1051,131 +905,6 @@ setTimeout(() => {
         return false;
     }
 }
-
-// ========================================
-// BANNER PREVIEW
-// ========================================
-
-function setupBannerPreview() {
-    const bannerSelect = document.getElementById('bannerSelect');
-    const bannerPreview = document.getElementById('bannerPreview');
-
-    if (!bannerSelect || !bannerPreview) return;
-
-    // Update preview when selection changes
-    bannerSelect.addEventListener('change', () => {
-        updateBannerPreview(bannerSelect.value);
-    });
-
-    // Initial preview
-    updateBannerPreview(bannerSelect.value);
-}
-
-function updateBannerPreview(selection) {
-    const bannerPreview = document.getElementById('bannerPreview');
-    if (!bannerPreview) return;
-
-    console.log('🖼️ Updating banner preview:', selection);
-
-    if (selection === 'default') {
-        // Gold gradient
-        bannerPreview.style.background = `
-            linear-gradient(135deg,
-                rgba(200, 170, 110, 0.9) 0%,
-                rgba(26, 26, 46, 0.95) 50%,
-                rgba(10, 10, 10, 0.98) 100%
-            )
-        `;
-        bannerPreview.style.backgroundImage = '';
-
-    } else if (selection === 'auto' || !selection) {
-        // Show current avatar's champion (if champion avatar)
-        const currentAvatar = getCurrentAvatarSelection();
-
-        // ✅ Check both selectedChampion and stored avatar
-        if (currentAvatar.type === 'champion' || currentAvatar.type === 'url') {
-            const championId = currentAvatar.championId || (currentAvatar.name ? currentAvatar.name.replace(/['\s]/g, '') : null);
-
-            if (championId) {
-                const splashUrl = currentAvatar.splash || `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
-                bannerPreview.style.backgroundImage = `
-                    linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
-                    url('${splashUrl}')
-                `;
-                bannerPreview.style.backgroundSize = 'cover';
-                bannerPreview.style.backgroundPosition = 'center 30%';
-            } else {
-                // Fallback to gradient
-                bannerPreview.style.background = `
-                    linear-gradient(135deg,
-                        rgba(200, 170, 110, 0.9) 0%,
-                        rgba(26, 26, 46, 0.95) 50%,
-                        rgba(10, 10, 10, 0.98) 100%
-                    )
-                `;
-                bannerPreview.style.backgroundImage = '';
-            }
-        } else {
-            // Fallback to gradient for emoji avatars
-            bannerPreview.style.background = `
-                linear-gradient(135deg,
-                    rgba(200, 170, 110, 0.9) 0%,
-                    rgba(26, 26, 46, 0.95) 50%,
-                    rgba(10, 10, 10, 0.98) 100%
-                )
-            `;
-            bannerPreview.style.backgroundImage = '';
-        }
-
-    } else {
-        // Specific champion
-        const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${selection}_0.jpg`;
-        bannerPreview.style.backgroundImage = `
-            linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(10,10,10,0.9)),
-            url('${splashUrl}')
-        `;
-        bannerPreview.style.backgroundSize = 'cover';
-        bannerPreview.style.backgroundPosition = 'center 30%';
-    }
-}
-
-function getCurrentAvatarSelection() {
-    // Check if user selected a champion in this session
-    if (selectedChampion) {
-        // Extract championId from the champion name
-        const championId = selectedChampion.name ? selectedChampion.name.replace(/['\s]/g, '') : null;
-        return {
-            type: 'champion',
-            championId: championId,
-            name: selectedChampion.name,
-            splash: splashFromAvatar({ type: 'url', value: selectedChampion.url, name: selectedChampion.name })
-        };
-    }
-
-    // Otherwise, get from localStorage
-    try {
-        const avatar = JSON.parse(localStorage.getItem('avatar') || '{}');
-
-        if (avatar.type === 'url' && avatar.name) {
-            // Extract championId from champion name
-            const championId = avatar.name.replace(/['\s]/g, '');
-            return {
-                type: 'champion',
-                championId: championId,
-                name: avatar.name,
-                splash: splashFromAvatar(avatar)
-            };
-        }
-
-        return avatar;
-    } catch {
-        return { type: 'emoji', value: '🎵' };
-    }
-}
-
-// ✅ Call this when settings modal opens
-// Add to your existing openSettingsModal() or init function:
-// setupBannerPreview();
 
 // ========================================
 // NOTIFICATION SYSTEM
@@ -1346,96 +1075,62 @@ function invalidateProfileCache(username) {
     }
 }
 // ========================================
-// CHAMPION PACK SELECTOR (Updated with Team Identity)
+// YOUR CHAMPION (the selected champion and the skins they have unlocked)
 // ========================================
 
-async function loadChampionPackSelector() {
-    const container = document.getElementById('championPackSelector');
-    if (!container) return;
-
-    try {
-        // Get available packs from manifest
-        const manifest = await window.championLoader.getManifest();
-        const currentPack = window.championLoader.getCurrentPack();
-
-        const packXp = readPackXp();
-        container.innerHTML = manifest.packs.map(pack => {
-            const isActive = pack.id === currentPack.id;
-            const isDisabled = !pack.enabled || pack.comingSoon;
-            // the card shows the skin this champion currently wears
-            const art = PACK_IDS.includes(pack.id) ? skinAvatar(pack.id, lookSkin({ id: pack.id }, localStorage)).value : pack.icon;
-
-            return `
-                <div class="champion-pack-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}"
-                     data-pack-id="${pack.id}"
-                     ${!isDisabled ? `onclick="selectChampionPack('${pack.id}')"` : ''}>
-
-${isActive ? '<span class="active-badge"></span>' : ''}
-                    ${pack.comingSoon ? '<span class="coming-soon-badge">🔒 Coming Soon</span>' : ''}
-
-                    <!-- ✅ Champion Avatar from Data Dragon -->
-                    <div class="champion-pack-avatar">
-                        ${art
-                            ? `<img src="${art}"
-                                    alt="${pack.name}"
-                                    class="champion-avatar-img"
-                                    loading="lazy"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                               <span class="champion-emoji-fallback" style="display: none;">${pack.emoji}</span>`
-                            : `<span class="champion-emoji-only">${pack.emoji}</span>`
-                        }
-                    </div>
-
-                    <!-- ✅ Team Name (emphasized) -->
-                    <div class="champion-pack-team">${pack.emoji} Team ${pack.name}</div>
-                    <div class="champion-pack-name">${pack.name}</div>
-                    <div class="champion-pack-description">${pack.description}</div>
-                    ${masteryChipHtml(pack.id, packXp[pack.id])}
-
-                    ${!isDisabled ? `
-                        <button class="champion-preview-btn"
-                                onclick="event.stopPropagation(); previewChampionPack('${pack.id}')">
-                            <i class="fas fa-play"></i> Preview
-                        </button>
-                    ` : ''}
-                </div>
-            `;
-        }).join('');
-
-        // ✅ Show current team preview
-        if (currentPack) {
-            updateTeamPreview(currentPack.id, currentPack.name, currentPack.icon, currentPack.emoji);
-        }
-
-        console.log('✅ Champion pack selector loaded');
-
-    } catch (error) {
-        console.error('❌ Failed to load champion packs:', error);
-        container.innerHTML = '<p style="color: rgba(255,255,255,0.6); text-align: center;">Failed to load champion packs</p>';
-    }
+// Which pack (jinx / vi / caitlyn) the selected champion is, or null for a plain picture.
+function selectedPackId() {
+    const id = String(selectedChampion?.name || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    return PACK_IDS.includes(id) ? id : null;
 }
 
+function currentSkinNum(packId) {
+    return pendingLooks[packId] ?? lookSkin({ id: packId }, localStorage);
+}
+
+function renderYourChampion() {
+    const host = document.getElementById('yourChampion');
+    if (!host) return;
+    if (!host.dataset.bound) {
+        host.dataset.bound = '1';
+        host.addEventListener('click', e => {
+            const skinBtn = e.target.closest('.yc-skin');
+            const packId = selectedPackId();
+            if (skinBtn && packId) {
+                const num = Number(skinBtn.dataset.skin);
+                pendingLooks[packId] = num;
+                const art = skinAvatar(packId, num);
+                selectedChampion = { name: art.name, displayName: selectedChampion?.displayName || art.name, url: art.value };
+                hasChanges = true;
+                renderYourChampion();
+            } else if (e.target.closest('[data-action="preview"]') && packId) {
+                previewChampion(packId);
+            }
+        });
+    }
+    if (!selectedChampion) { host.innerHTML = '<p class="section-description">Pick a champion above.</p>'; return; }
+    const packId = selectedPackId();
+    if (!packId) {
+        const xpFor = window.championLoader?.getCurrentPack?.()?.name || 'your last champion';
+        host.innerHTML = plainChampionHtml({ name: selectedChampion.displayName || selectedChampion.name, url: selectedChampion.url, xpFor });
+        return;
+    }
+    let achievements = [];
+    try { achievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]'); } catch { /* none */ }
+    const view = buildChampionsView({
+        packXp: readPackXp(), achievements, activePack: packId,
+        avatarKey: avatarKeyOf({ type: 'url', value: skinAvatar(packId, currentSkinNum(packId)).value }),
+        looks: { ...readLooks(), ...pendingLooks }
+    });
+    host.innerHTML = yourChampionHtml(view.rows.find(r => r.packId === packId));
+}
+
+// Picks Jinx, Vi or Caitlyn: the companion pack (voice, XP) and the picture both follow.
 async function selectChampionPack(packId) {
     console.log(`🎭 User selected: ${packId}`);
     const previousPack = window.championLoader?.getCurrentPack?.()?.id;
 
-    // Update UI immediately
-    document.querySelectorAll('.champion-pack-card').forEach(card => {
-        card.classList.remove('active');
-        card.querySelector('.active-badge')?.remove();
-    });
-
-    const selectedCard = document.querySelector(`[data-pack-id="${packId}"]`);
-    if (selectedCard) {
-        selectedCard.classList.add('active');
-
-        // Add active badge
-        if (!selectedCard.querySelector('.active-badge')) {
-            selectedCard.insertAdjacentHTML('afterbegin', '<span class="active-badge">✓ Active</span>');
-        }
-    }
-
-  await window.championLoader.setUserCompanionPack(packId);
+    await window.championLoader.setUserCompanionPack(packId);
 
     // ✅ Update Firebase profile with championPackId
     const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
@@ -1457,65 +1152,30 @@ async function selectChampionPack(packId) {
         }
     }
 
-    // Show confirmation
     const pack = await window.championLoader.loadChampionPack(packId);
-if (previousPack !== packId) announceChampionSelected(packId, PACK_IDS.includes(packId) ? lookSkin({ id: packId }, localStorage) : 0);
-    // ✅ Update team preview
-    updateTeamPreview(pack.id, pack.name, pack.icon, pack.emoji);
 
     // Your champion is also your picture: wear the skin chosen for them (saved with the rest of the settings)
-    if (PACK_IDS.includes(packId)) {
-        const skin = skinAvatar(packId, lookSkin({ id: packId }, localStorage));
-        selectedChampion = { name: skin.name, displayName: pack.name, url: skin.value };
-        showSelectedAvatar();
-        const cover = document.getElementById('bannerSelect');
-        if (cover && (cover.value === 'auto' || !cover.value)) updateBannerPreview('auto');   // an automatic cover follows the skin
-    }
-
-    // Mark as changed
+    const skin = skinAvatar(packId, currentSkinNum(packId));
+    selectedChampion = { name: skin.name, displayName: pack.name, url: skin.value };
+    markSelectedInGrid();
+    renderYourChampion();
     hasChanges = true;
 
-console.log(`✅ Arcane companion set to: ${packId}`);}
-
-async function previewChampionPack(packId) {
-    console.log(`👀 Previewing: ${packId}`);
-
-    // Temporarily load the pack
-    const originalPack = window.championLoader.getCurrentPack().id;
-    await window.championLoader.loadChampionPack(packId);
-
-    // Show a test notification
-    if (window.testBulletin) {
-        window.testBulletin('danger');
-    }
-
-    showNotification('Preview notification sent! Check bottom-right corner', 'info');
-
-    // Wait 5 seconds, then restore original pack
-    setTimeout(async () => {
-        await window.championLoader.loadChampionPack(originalPack);
-        console.log(`✅ Restored to: ${originalPack}`);
-    }, 5000);
+    if (previousPack !== packId) announceChampionSelected(packId, currentSkinNum(packId));
+    console.log(`✅ Arcane companion set to: ${packId}`);
 }
 
-// ✅ NEW: Update team preview box
-function updateTeamPreview(packId, packName, packIcon, packEmoji) {
-    const preview = document.getElementById('teamPreview');
-    const teamName = document.getElementById('teamName');
-    const teamAvatar = document.getElementById('teamAvatar');
-
-    if (!preview || !teamName || !teamAvatar) return;
-
-    teamAvatar.src = packIcon || '';
-    teamAvatar.alt = `Team ${packName}`;
-    teamName.textContent = `${packEmoji} Team ${packName}`;
-    preview.style.display = 'flex';
+// Shows what the champion's alerts look like. Stays on the page: closing it does not navigate anywhere.
+function previewChampion(packId) {
+    const mastery = masteryLevel(readPackXp()[packId]).level;
+    const voiced = window.championLoader?.getAchievementMessage?.('champion-selected', { rank: `Mastery ${mastery}`, xp: 0 });
+    const bulletin = { ...championSelectedBulletin({ packId, skinNum: currentSkinNum(packId), mastery, voiced }), cta: 'Close preview', ctaAction: () => window.dismissBulletin?.(), duration: 5000 };
+    if (window.showBulletin) window.showBulletin(bulletin);
+    else showNotification(bulletin.message, 'info');
 }
 
 // Make functions global so onclick can access them
 window.selectChampionPack = selectChampionPack;
-window.previewChampionPack = previewChampionPack;
-window.updateTeamPreview = updateTeamPreview;
 // ========================================
 // EXPORT AND GLOBAL ACCESS
 // ========================================
