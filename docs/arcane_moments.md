@@ -795,3 +795,18 @@ Toast backdrops and the champion's face in toasts and bell rows now use the pack
 4. Level-up toast carries no unlock info; `showBulletin` for achievements the same.
 5. Two copies of `unlockAchievementInFirebase` (`achievements.js` and `achievement-tracker.js`).
 6. Votes in old cups still count towards XP, which is fine, but nothing records which cup an achievement came from.
+
+## Champion mastery and skin unlocks (agreed design, 18 October 2026)
+**Rules.** Everyone starts on each champion's base skin. Each companion pack (Jinx, Vi, Caitlyn) has its own mastery level 1 to 10, filled by the XP earned while that pack is the active companion (the account level still grows from the same XP). Mastery unlocks that champion's skins; the three or so rarest skins per champion come from pack achievements. Season 1 Arcane skin at mastery 2, season 2 Arcane skin at mastery 10. The companion's look in alerts, bubbles and backdrops is the chosen unlocked skin (starts base, so the first Arcane unlock is a visible reward). Chromas (entries with `parentSkin`) are never used. Account level unlocks non-pack art (other champions, profile icons, banners).
+
+**Mastery XP:** L2 100, L3 300, L4 600, L5 1,000, L6 1,600, L7 2,400, L8 3,500, L9 5,000, L10 7,500 (slow on purpose).
+
+**Jinx (skin numbers from Data Dragon):** 1 default 0 | 2 Arcane Enemy 37 | 3 Crime City 1, Firecracker 2 | 4 Zombie Slayer 3, Ambitious Elf 12 | 5 Odyssey 13, Heartseeker 29 | 6 PROJECT 20, Cafe Cuties 51 | 7 Star Guardian 4, Ocean Song 65 | 8 Battle Cat 38 | 9 T1 62 | 10 Arcane Fractured 60 | achievement: Prestige Battle Cat 40 (idea: 10 underdog picks with Jinx active).
+
+**Caitlyn:** 1 default 0 | 2 Arcane Enforcer 28 | 3 Officer 5, Sheriff 2 | 4 Resistance 1, Safari 3 | 5 Arctic Warfare 4, Headhunter 6 | 6 Pulsefire 11, Lunar Wraith 10 | 7 Pool Party 13, Arcade 19 | 8 Battle Academia 22, Snow Moon 30 | 9 Heartthrob 39, Firecracker 54, DRX 48 | 10 Arcane Commander 50 | achievements: Prestige Arcade 29, Prestige Arcade (2022) 20, Prestige Arcane Commander 51 (ideas: 10 close-match votes, 7-day streak, deciding vote in a tie-break, each with Caitlyn active).
+
+**Vi (DRAFT, numbers from the wiki, check against her Data Dragon file):** 2 Arcane Undercity 29 | 3 Neon Strike 1, Officer 2 | 4 Debonair 3, Demon 4 | 5 Warring Kingdoms 5, PROJECT 11 | 6 Heartbreaker 12 | 7 Heartache 30, PsyOps 20 | 8 Primal Ambush 39 | 9 T1 49 | 10 Arcane Brawler 48.
+
+**Profile:** a new "Champions" tab next to Journey: one row per companion with avatar (current skin), mastery level, a bar for progress to the next level, and its share of the person's total XP as a percentage, plus a skin grid with locked and unlocked states.
+
+**Build order:** (1) one XP total from votes + achievements in Firestore; (2) per-pack mastery + unlock table as data; (3) skin data file + one Data Dragon version constant; (4) Champions tab, skin picker, unlock cards in alerts.
