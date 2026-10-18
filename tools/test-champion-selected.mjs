@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { championSelectedBulletin } from '../js/champion-selected.js';
+import { championSelectedBulletin, markChampionSelected, takePendingChampion } from '../js/champion-selected.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 
 t('the alert says who, which skin and the mastery level, with that skin\'s splash art', () => {
@@ -21,5 +21,21 @@ t('every pack has a champion-selected voice, and the alert type is wired into th
     }
     const g = fs.readFileSync(new URL('../js/global-notifications.js', import.meta.url), 'utf8');
     assert.match(g, /allowedWithoutMatch = \[[^\]]*'champion-selected'/); assert.match(g, /notification\.type === 'champion-selected'\) \{/);
+});
+const mem = () => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; };
+t('the note left by Save is read once, then gone; junk and champions without levels are ignored', () => {
+    const s = mem();
+    assert.equal(takePendingChampion(s), null);
+    markChampionSelected('caitlyn', 28, s);
+    assert.deepEqual(takePendingChampion(s), { packId: 'caitlyn', skinNum: 28 });
+    assert.equal(takePendingChampion(s), null);
+    markChampionSelected('ekko', 0, s); assert.equal(takePendingChampion(s), null);
+    s.setItem('championSelectedPending', '{bad'); assert.equal(takePendingChampion(s), null);
+    assert.equal(takePendingChampion({ getItem() { throw new Error('blocked'); } }), null);
+});
+t('a routine alert cannot wipe the champion card for its first seconds', () => {
+    const g = fs.readFileSync(new URL('../js/global-notifications.js', import.meta.url), 'utf8');
+    assert.match(g, /currentBulletin\?\.type === 'champion-selected' && notification\.type !== 'champion-selected' && Date\.now\(\) - currentBulletinShownAt < 6000/);
+    assert.match(g, /currentBulletinShownAt = Date\.now\(\)/);
 });
 console.log(`\n${n} passed`);

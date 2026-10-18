@@ -6,6 +6,7 @@ import { getUserXPFromStorage, getUserRank, hydrateXpFromProfile } from './rank-
 
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { fixAvatarUrl } from './avatar-url.js';
+import { announcePendingChampion } from './champion-selected.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // Bell icon: inline SVG so it takes the theme colour (the old 🔔 emoji was always yellow)
@@ -143,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Calling updateNavProfile...');
     await updateNavProfile();
     hydrateXpFromProfile();   // pull the saved XP back if this browser has less (redraws the nav when it changes)
+    announcePendingChampion();   // a champion picked in Settings is announced after the save reloads the page
 
     // ✅ Initialize notification center AFTER navigation is fully rendered
     console.log('🔔 Initializing notification center...');

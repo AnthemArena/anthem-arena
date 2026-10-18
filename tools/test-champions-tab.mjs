@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { voteShares, buildChampionsView, championsHtml, avatarKeyOf, skinAvatar, masteryChipHtml, requirementText } from '../js/champions-tab-model.js';
+import { voteShares, buildChampionsView, championsHtml, avatarKeyOf, skinAvatar, masteryChipHtml, requirementText, yourChampionHtml, plainChampionHtml } from '../js/champions-tab-model.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 const votes = (spec) => Object.entries(spec).flatMap(([id, c]) => Array.from({ length: c }, () => ({ championId: id === 'none' ? undefined : id })));
 
@@ -62,6 +62,20 @@ t('look: Arcane by default once unlocked, a chosen look wins, shown as pressed',
     assert.equal(w.rows[0].skins.find(s => s.look).num, 13);
     assert.match(championsHtml(w, { own: true }), /class="cm-act on" data-action="use" data-pack="jinx" data-skin="13" aria-pressed="true" title="[^"]*">In use/);
     assert.equal(buildChampionsView({}).rows[0].skins.find(s => s.look).num, 0);
+});
+t('your champion (settings): unlocked skins to choose from, the worn one pressed, locked ones counted', () => {
+    const v = buildChampionsView({ packXp: { vi: 100 }, activePack: 'vi', avatarKey: 'vi:29' });
+    const html = yourChampionHtml(v.rows.find(r => r.packId === 'vi'));
+    assert.equal([...html.matchAll(/class="yc-skin(?: on)?" data-skin/g)].length, 2);
+    assert.match(html, /class="yc-skin on" data-skin="29" aria-pressed="true"/);
+    assert.match(html, /class="yc-skin" data-skin="0" aria-pressed="false"/);
+    assert.doesNotMatch(html, /data-skin="48"/);
+    assert.match(html, /12 more skins to unlock/); assert.match(html, /Mastery 2/); assert.match(html, /data-action="preview"/);
+    assert.match(yourChampionHtml(buildChampionsView({ packXp: { vi: 99999 } }).rows.find(r => r.packId === 'vi')), /Every skin unlocked/);
+});
+t('a champion without levels says so and names who still earns the XP', () => {
+    const html = plainChampionHtml({ name: 'Ekko <b>', url: 'https://x/Ekko.png', xpFor: 'Vi' });
+    assert.match(html, /Ekko &lt;b&gt; has no levels/); assert.match(html, /stay with Vi/);
 });
 t('names are escaped and the settings chip shows level, progress and next reward', () => {
     assert.match(masteryChipHtml('jinx', 150), /Mastery 2/);

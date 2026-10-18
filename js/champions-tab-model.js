@@ -108,3 +108,27 @@ export function masteryChipHtml(packId, xp) {
     const hint = next ? `Next: ${next.skins.map(x => escapeHtml(x.name)).join(' + ')} at Mastery ${next.mastery}` : 'All mastery skins unlocked';
     return `<div class="champion-mastery"><span class="champion-mastery-level">Mastery ${m.level}${m.isMax ? ' · Max' : ''}</span><span class="champion-mastery-bar"><span style="width:${m.percent}%"></span></span><span class="champion-mastery-next">${hint}</span></div>`;
 }
+
+// Settings > Your Champion: the one selected champion with the skins they have unlocked to choose from.
+// `row` is one entry of buildChampionsView().rows (the pack the person picked).
+export function yourChampionHtml(row) {
+    const m = row.mastery, name = escapeHtml(row.name);
+    const unlocked = row.skins.filter(s => s.unlocked), locked = row.skinCount - row.unlockedCount;
+    const next = row.next ? `Next: ${row.next.skins.map(s => escapeHtml(s.name)).join(' + ')} at Mastery ${row.next.mastery}` : 'Every mastery skin unlocked';
+    const skins = unlocked.map(s => `<button type="button" class="yc-skin${s.current ? ' on' : ''}" data-skin="${s.num}" aria-pressed="${s.current}" title="Wear ${escapeHtml(s.name)}"><img src="${escapeHtml(tile(row.packId, s.num))}" alt="" loading="lazy"><span>${escapeHtml(s.name)}</span></button>`).join('');
+    return `<div class="yc-card" data-pack="${row.packId}">
+        <div class="yc-head"><img class="yc-face" src="${escapeHtml(tile(row.packId, (unlocked.find(s => s.current) || unlocked[0] || row.skins[0]).num))}" alt="">
+          <div class="yc-text"><h4>${name}</h4><div class="yc-level">Mastery ${m.level}${m.isMax ? ' · Max' : ''}</div>
+          <span class="champion-mastery-bar"><span style="width:${m.percent}%"></span></span><small>${next}</small></div></div>
+        <div class="yc-label">Skin</div>
+        <div class="yc-skins" role="group" aria-label="Choose ${name}'s skin">${skins}</div>
+        <p class="yc-note">${locked ? `${locked} more skin${locked === 1 ? '' : 's'} to unlock. Your Champions tab shows how.` : 'Every skin unlocked.'}</p>
+        <button type="button" class="champion-preview-btn yc-preview" data-action="preview"><i class="fas fa-play"></i> Preview alert</button>
+    </div>`;
+}
+
+// A champion without levels yet (just a picture): says so, and which champion still earns the XP.
+export function plainChampionHtml({ name, url, xpFor }) {
+    return `<div class="yc-card plain"><div class="yc-head"><img class="yc-face" src="${escapeHtml(url)}" alt="">
+        <div class="yc-text"><h4>${escapeHtml(name)}</h4><small>${escapeHtml(name)} has no levels, skins or voice yet. They're your picture and cover for now, and your XP and alerts stay with ${escapeHtml(xpFor)}.</small></div></div></div>`;
+}
