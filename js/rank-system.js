@@ -1,3 +1,5 @@
+import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes } from './xp-ledger.js';
+
 // ========================================
 // RANK PROGRESSION SYSTEM
 // ========================================
@@ -92,15 +94,13 @@ export function calculateUserXP(allVotes) {
         votedMatches.add(vote.matchId);
     });
     
-// Voting streak bonus (CAPPED at 10 days to prevent abuse)
-// Users get 15 XP per day streak, but only up to 10 days = max 150 XP
-const streak = parseInt(localStorage.getItem('votingStreak') || '0');
+// Voting streak bonus (CAPPED at 10 days to prevent abuse), worked out from the votes themselves so it is the
+// same for every viewer (it used to read the viewer's own browser).
+const streak = streakFromVotes(allVotes);
 const MAX_STREAK_BONUS = 10;
 const cappedStreak = Math.min(streak, MAX_STREAK_BONUS);
 totalXP += cappedStreak * RANK_SYSTEM.xpSources.votingStreakDaily;
 
-console.log(`📊 Streak bonus: ${cappedStreak} days × ${RANK_SYSTEM.xpSources.votingStreakDaily} XP = ${cappedStreak * RANK_SYSTEM.xpSources.votingStreakDaily} XP`);
-    
     return {
         totalXP,
         totalVotes: allVotes.length,
@@ -207,6 +207,7 @@ export function addXP(xpToAdd, source = 'vote') {
     
     const newXP = currentXP + xpToAdd;
     saveUserXP(newXP);
+    addPackXp(localStorage, activePackId(localStorage), xpToAdd);   // the active companion's mastery
     
     const newRank = getUserRank(newXP);
     const newLevel = newRank.currentLevel.level;
@@ -268,9 +269,10 @@ export async function syncProfileStatsToFirestore() {
             return;
         }
         
-        // Get current XP from storage
-        const totalXP = getUserXPFromStorage();
-        const rank = getUserRank(totalXP);
+        // XP only goes up: if the profile already holds more than this browser (cleared site data), keep the larger one
+        let totalXP = getUserXPFromStorage();
+        let packXp = readPackXp();
+        let rank = getUserRank(totalXP);
         
         // Vote count: the saved "stats" object can lag (it left other people's tooltips at 0 votes), so also count saved votes
         let voteCount = localVoteCount();
@@ -296,12 +298,16 @@ export async function syncProfileStatsToFirestore() {
         const profileDoc = await getDoc(profileRef);
         
         if (profileDoc.exists()) {
+            const merged = mergeXp({ xp: totalXP, packXp }, profileDoc.data());
+            if (merged.changedLocal) { saveUserXP(merged.xp); localStorage.setItem('userPackXP', JSON.stringify(merged.packXp)); }
+            totalXP = merged.xp; packXp = merged.packXp; rank = getUserRank(totalXP);
             // Update existing profile
             await updateDoc(profileRef, {
                 level: rank.currentLevel.level,
                 totalVotes: voteCount,
-                rank: rankTitle,
+                rank: String(rank.currentLevel.title).replace(/[^\w\s]/gi, '').trim(),
                 xp: totalXP,
+                packXp,
                 lastSynced: Date.now()
             });
             
@@ -328,6 +334,7 @@ export async function syncProfileStatsToFirestore() {
                 totalVotes: voteCount,
                 rank: rankTitle,
                 xp: totalXP,
+                packXp,
                 createdAt: Date.now(),
                 lastSynced: Date.now()
             });
@@ -339,4 +346,33 @@ export async function syncProfileStatsToFirestore() {
         console.error('❌ Error syncing profile stats:', error);
         // Non-blocking - don't fail the calling function
     }
+}
+
+// ========================================
+// READ THE SAVED XP BACK (once per visit)
+// ========================================
+// Pulls the larger of this browser's XP and the profile's XP into this browser, so the level survives cleared site data.
+// Returns true when this browser's numbers changed.
+export async function hydrateXpFromProfile() {
+    try {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        if (!userId || sessionStorage.getItem('xpHydrated') === userId) return false;
+        sessionStorage.setItem('xpHydrated', userId);
+        const { db } = await import('./firebase-config.js');
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        const snap = await getDoc(doc(db, 'profiles', userId));
+        if (!snap.exists()) return false;
+        const merged = mergeXp({ xp: getUserXPFromStorage(), packXp: readPackXp() }, snap.data());
+        if (!merged.changedLocal) return false;
+        saveUserXP(merged.xp);
+        localStorage.setItem('userPackXP', JSON.stringify(merged.packXp));
+        window.updateNavProfile?.();
+        return true;
+    } catch (e) { console.warn('⚠️ Could not read saved XP', e); return false; }
+}
+
+// A person's XP as shown to everyone: the profile's saved number when it has one, otherwise worked out from their votes.
+export function xpForProfile(profile, votes = []) {
+    const saved = Number(profile?.xp);
+    return Number.isFinite(saved) && saved > 0 ? saved : calculateUserXP(votes).totalXP;
 }

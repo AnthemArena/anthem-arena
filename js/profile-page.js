@@ -358,6 +358,8 @@ return {
     championPackId: profileData.championPackId || profileData.companionId || 'jinx',
 
     bio: profileData.bio || '',
+    xp: profileData.xp,                 // the saved XP total, so levels match for every viewer
+    packXp: profileData.packXp,
     privacy: profileData.privacy || {},
     createdAt: profileData.createdAt,
     updatedAt: profileData.updatedAt
@@ -432,7 +434,7 @@ async function renderProfile(profile) {
     document.getElementById('profileUsername').textContent = profile.username;
     
     // ✅ FIXED: Rank with proper XP detection
-    const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+    const { getUserXPFromStorage, getUserRank, calculateUserXP, xpForProfile } = await import('./rank-system.js');
     
     // Get current user ID with fallback
     const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
@@ -453,9 +455,8 @@ async function renderProfile(profile) {
         const votesSnapshot = await getDocs(votesQuery);
         const allVotes = votesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        const xpData = calculateUserXP(allVotes);
-        xp = xpData.totalXP;
-        console.log('✅ Calculated XP for rank display:', xp);
+        xp = xpForProfile(profile, allVotes);   // the saved total (votes + achievements), so everyone sees the same level
+        console.log('✅ XP for rank display:', xp);
     }
     
     const rank = getUserRank(xp);
@@ -844,7 +845,7 @@ else {
         // ... rest of the function (rank calculation, UI updates, etc.)
         
         // ✅ GET RANK
-        const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+        const { getUserXPFromStorage, getUserRank, calculateUserXP, xpForProfile } = await import('./rank-system.js');
         
         let currentXP;
         let rank;
@@ -859,10 +860,9 @@ else {
                 ...doc.data()
             }));
             
-            const xpData = calculateUserXP(allVotes);
-            currentXP = xpData.totalXP;
+            currentXP = xpForProfile(profileDoc.exists() ? profileDoc.data() : null, allVotes);
             rank = getUserRank(currentXP);
-            console.log('✅ Calculated XP for other user:', currentXP);
+            console.log('✅ XP for other user:', currentXP);
         }
         
         // Update stats display
