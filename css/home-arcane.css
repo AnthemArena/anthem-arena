@@ -87,3 +87,7 @@
     .page-home .block-head { flex-direction: column; align-items: flex-start; gap: .4rem; }
     .page-home .edit-row { grid-auto-columns: minmax(138px, 150px); margin-right: -1rem; padding-right: 1rem; }
 }
+
+/* open matches (merged in from the old live page, js/live.js) */
+.page-home .home-vote { margin-top: 1.5rem; }
+.page-home .home-vote[hidden] { display: none; }

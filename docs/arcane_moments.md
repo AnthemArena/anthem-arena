@@ -622,3 +622,30 @@ A first-time visitor got a made-up id (IP + fingerprint), but the security rules
 
 ## Pop-up backdrop for like/comment alerts
 Like / comment / reply / mention pop-ups have no champion speaking, so their backdrop is the viewer's own profile banner (`profileSplashUrl`: chosen champion, "auto" = the avatar's champion, default gradient → cup champion). Pop-ups with a champion bubble keep the champion's splash. Overlay lightened so the art shows through.
+
+Update: like/comment/reply/mention pop-ups now use the splash of the sender's own champion avatar (`splashFromAvatarSrc`, read from the avatar picture's address, no extra database read); no champion avatar → the viewer's profile banner → cup champion.
+
+Fix: achievement pop-ups still showed the old layout because an older `type === 'achievement'` branch in `showBulletin` ran first and the new one was unreachable. The old branch is removed; `tools/test-achievement-toast.mjs` guards that only one remains.
+
+## Bell panel: Clear all, tabs, achievements
+- "Clear Old" only dismissed notifications older than 48 h, but the panel lists the last 72 h, so it nearly always said "Nothing to Clear". It is now **Clear all**: dismisses everything in the tab you are on (second tap to confirm; not for Messages).
+- The five tabs overflowed the panel on desktop (Achievements cut off, Messages hidden): tighter padding/font in arcane-theme.css.
+- Unlocking an achievement now also saves a bell notification (`type: 'achievement'`, saved as already-toasted), so the Achievements tab is no longer empty. Achievements unlocked before this change are not back-filled.
+
+## Live results hidden until you vote (feed + homepage)
+- Feed vote posts showed the live percentage split and bar to everyone. For a **live** match you have not voted in (and that is not your own post) they now show a lock instead of the percentages, a "Vote in this match to see how it is going" line instead of the bar, and the button reads "Vote to see results". Ended matches show the result to everyone. `resultsVisible()` in feed-mix-model.js; the vote is read from the local `vote_<cup>_<match>` record like the sidebar cards.
+- Homepage "Most voted edits" now counts **finished matches only** (an edit's total in a live match would reveal who is ahead); before any match has finished the section falls back to "Most watched edits".
+
+## live.html merged into the homepage
+- The open-matches block (round banner, champion line, "N matches need your vote", match cards, "Your votes") now lives in `index.html` under the hero (`<section id="vote">`), filled in by the unchanged `js/live.js`. The hero's "Vote now" jumps to it (`#vote`). `live.html` is deleted; `/live` and `/live.html` 301-redirect to `/` (netlify.toml). Links in music-gallery, about, stats, music-gallery.js and the "matches need your vote" alert now point to `/#vote`.
+- On the homepage `live.js` skips the activity ticker and the mini activity feed (the Feed page does that job; saves reads and page length) and hides the whole block when nothing is live (the hero already says so).
+- The "Match of the day" block was removed: the open matches are directly under the hero now. (`homeState().featured` still exists in home-model.js, unused.)
+- The nav "Live" item was never this page (it opens activity.html) and is unchanged.
+- tools/test-home-browser.py checks: Vote now → #vote, cards under the hero before "Latest results", cards show no vote results, no ticker/mini feed, block hidden when nothing is live.
+
+## Fewer matches requests per page (usage)
+`getAllMatches()` (js/api-client.js) is called many times while a page loads (the page, the notification system, widgets; the homepage now twice with the merged open matches). Each call was its own request to the server (the console showed repeated "Cache: MISS"). Calls within 8 seconds now share one request per tournament; `getAllMatches(true)` (admin, refresh) always goes to the server, and a failed request is not shared. `tools/test-api-client-share.mjs`.
+Also fixed: the homepage drew as soon as the matches arrived, so "New edits" / "Most watched" stayed empty until the next 60 s refresh whenever the matches came back before `edits.json` (sharing the matches request made that the usual order). It now draws once both are loaded (`js/home.js`).
+
+## CDN caching of the public API answers (Netlify usage)
+Edge function responses are only cached by Netlify's CDN when the route opts in with `cache: "manual"` and the response has `Cache-Control` with `s-maxage` ([docs](https://docs.netlify.com/build/edge-functions/optional-configuration/)); a cached answer is served WITHOUT running the function. `netlify/edge-functions/firebase-cache.js` now has `cache: "manual"` in its config and `s-maxage` (30 s, the same as the existing `max-age`) on its public GET answers (matches, match, view-stats, total-votes, activity), so repeats within 30 s no longer invoke it. The `/api/track-view` POST sets no cache header and is never cached; `?_refresh=` (admin/refresh) uses a unique URL so it always reaches the function. Data can be up to 30 s old (as before, via the browser cache). **Verify after deploy:** `curl -sI https://arcanemoments.netlify.app/api/matches` twice; the second should show `cache-status: "Netlify Edge"; hit`. `total-votes` was already a COUNT aggregation (earlier fix); nothing more to do there.

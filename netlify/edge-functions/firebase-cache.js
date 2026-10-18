@@ -91,7 +91,7 @@ export default async (request, context) => {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+          "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -187,7 +187,7 @@ export default async (request, context) => {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+        "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
         "X-Cache": bypassCache ? "REFRESH" : "MISS",
         "Access-Control-Allow-Origin": "*"
       }
@@ -479,7 +479,7 @@ async function handleTotalVotes(request) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=30",
+          "Cache-Control": "public, max-age=30, s-maxage=30",
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -560,7 +560,7 @@ async function handleTotalVotes(request) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=30",
+        "Cache-Control": "public, max-age=30, s-maxage=30",
         "X-Cache": "MISS",
         "Access-Control-Allow-Origin": "*"
       }
@@ -604,7 +604,7 @@ async function handleActivityFeed(request) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+          "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -655,7 +655,7 @@ async function handleActivityFeed(request) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": `public, max-age=${CACHE_DURATION}`,
+        "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
         "X-Cache": bypassCache ? "REFRESH" : "MISS",
         "Access-Control-Allow-Origin": "*"
       }
@@ -889,6 +889,11 @@ function extractValue(field) {
 // ========================================
 
 // Update config to include new endpoint
+// cache: "manual" lets Netlify's CDN keep a response and serve repeats WITHOUT running this function (the edge function
+// invocations count is what the plan limit measures). A response is only cached when it carries Cache-Control with s-maxage
+// (the 30 s GET answers above do); responses with no cache header, such as the /api/track-view POST and error replies, are
+// never cached. Everything cached here is the same for every visitor. After a deploy the CDN cache starts empty.
 export const config = {
+  cache: "manual",
   path: ["/api/matches", "/api/match/*", "/api/track-view", "/api/view-stats", "/api/total-votes", "/api/activity"]
 };

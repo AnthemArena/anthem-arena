@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl } from '../js/notification-visuals.js';
+import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -110,5 +110,11 @@ t('profile splash: chosen champion, auto-match avatar, default gradient falls ba
     assert.match(profileSplashUrl(J, store({ avatar: JSON.stringify({ type: 'url', name: "Kai'Sa" }) })), /KaiSa_0\.jpg$/);
     assert.match(profileSplashUrl(J, store({ banner: JSON.stringify({ type: 'default' }), avatar: JSON.stringify({ type: 'url', name: 'Vi' }) })), /Jinx_0\.jpg$/);
     assert.match(profileSplashUrl(J, store({})), /Jinx_0\.jpg$/);
+});
+t('splash from a champion avatar address; other pictures give null', () => {
+    assert.match(splashFromAvatarSrc('https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Heimerdinger.png'), /splash\/Heimerdinger_0\.jpg$/);
+    assert.match(splashFromAvatarSrc('https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Vi_0.jpg'), /splash\/Vi_0\.jpg$/);
+    assert.equal(splashFromAvatarSrc('data:image/svg+xml,abc'), null);
+    assert.equal(splashFromAvatarSrc(null), null);
 });
 console.log(`${pass} passed`);

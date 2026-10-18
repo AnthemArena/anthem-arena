@@ -137,7 +137,7 @@ function addTabsToPanel(panel) {
     if (closeBtn && !header.querySelector('.clear-old-btn')) {
         const clearBtn = document.createElement('button');
         clearBtn.className = 'clear-old-btn';
-        clearBtn.textContent = 'Clear Old';
+        clearBtn.textContent = 'Clear all';
         clearBtn.onclick = dismissOldNotifications;
         clearBtn.style.cssText = `
             background: rgba(200, 170, 110, 0.15);
@@ -372,71 +372,57 @@ window.openConversationModal = function(userId, username) {
 };
 
 // ========================================
-// DISMISS OLD NOTIFICATIONS (>48 HOURS)
+// CLEAR ALL (in the tab you are looking at)
 // ========================================
+// This used to dismiss only notifications older than 48 hours, but the panel only lists the last 72 hours, so it nearly
+// always said "Nothing to Clear". Now it clears everything in the current tab (with a second tap to confirm).
+
+let clearConfirmTimer = null;
 
 async function dismissOldNotifications() {
     const userId = localStorage.getItem('tournamentUserId');
     if (!userId) return;
-    
     const button = document.querySelector('.clear-old-btn');
-    if (button) {
-        button.textContent = 'Cleaning...';
-        button.disabled = true;
+    const activeTab = document.querySelector('.notif-tab.active')?.dataset.tab || 'all';
+    if (activeTab === 'messages') {
+        if (button) { button.textContent = 'Not for messages'; setTimeout(() => { button.textContent = 'Clear all'; }, 2000); }
+        return;
     }
-    
+
+    // first tap asks, second tap (within 3 seconds) does it
+    if (button && !button.dataset.confirm) {
+        button.dataset.confirm = '1';
+        button.textContent = activeTab === 'all' ? 'Clear everything?' : `Clear ${activeTab}?`;
+        clearTimeout(clearConfirmTimer);
+        clearConfirmTimer = setTimeout(() => { delete button.dataset.confirm; button.textContent = 'Clear all'; }, 3000);
+        return;
+    }
+    clearTimeout(clearConfirmTimer);
+    if (button) { delete button.dataset.confirm; button.textContent = 'Clearing...'; button.disabled = true; }
+
     try {
-        // Get all unread notifications
         const notifications = await getUnreadNotifications(userId);
-        
-        // Filter to only old ones (>48 hours)
-        const twoDaysAgo = Date.now() - (48 * 60 * 60 * 1000);
-        const oldNotifications = notifications.filter(n => n.timestamp < twoDaysAgo);
-        
-        if (oldNotifications.length === 0) {
-            if (button) {
-                button.textContent = 'Nothing to Clear';
-                setTimeout(() => {
-                    button.textContent = 'Clear Old';
-                    button.disabled = false;
-                }, 2000);
-            }
+        let inTab = notifications;
+        if (activeTab === 'votes') inTab = notifications.filter(n => n.type === 'causal-event' || n.type === 'live-activity');
+        else if (activeTab === 'achievements') inTab = notifications.filter(n => n.type === 'achievement');
+        else if (activeTab === 'social') inTab = notifications.filter(isSocialTabItem);
+
+        if (inTab.length === 0) {
+            if (button) { button.textContent = 'Nothing to clear'; setTimeout(() => { button.textContent = 'Clear all'; button.disabled = false; }, 2000); }
             return;
         }
-        
-        console.log(`🧹 Dismissing ${oldNotifications.length} old notifications...`);
-        
-        // Dismiss each old notification
-        let dismissed = 0;
-        for (const notif of oldNotifications) {
-            const success = await dismissNotification(notif.id);
-            if (success) dismissed++;
-        }
-        
-        console.log(`✅ Dismissed ${dismissed} old notifications`);
-        
-        // Reload panel to show updated list
-        const activeTab = document.querySelector('.notif-tab.active')?.dataset.tab || 'all';
+
+        const ok = await dismissNotification(inTab.map(n => n.id).join(','));
+        console.log(`🧹 Cleared ${inTab.length} notifications (${activeTab})`);
+
         const content = document.getElementById('notificationPanelContent');
         await loadNotificationsTab(content, userId, activeTab);
-        
-        if (button) {
-            button.textContent = `✓ Cleared ${dismissed}`;
-            setTimeout(() => {
-                button.textContent = 'Clear Old';
-                button.disabled = false;
-            }, 3000);
-        }
-        
+        await updateBadgeCount();
+
+        if (button) { button.textContent = ok ? `✓ Cleared ${inTab.length}` : 'Error'; setTimeout(() => { button.textContent = 'Clear all'; button.disabled = false; }, 2500); }
     } catch (error) {
-        console.error('❌ Error dismissing old notifications:', error);
-        if (button) {
-            button.textContent = 'Error';
-            setTimeout(() => {
-                button.textContent = 'Clear Old';
-                button.disabled = false;
-            }, 2000);
-        }
+        console.error('❌ Error clearing notifications:', error);
+        if (button) { button.textContent = 'Error'; setTimeout(() => { button.textContent = 'Clear all'; button.disabled = false; }, 2000); }
     }
 }
 

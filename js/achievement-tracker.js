@@ -428,6 +428,25 @@ export function showAchievementUnlock(achievement) {
         });
     }
     
+    // Keep it in the bell too (the toast alone vanished after a few seconds and the Achievements tab stayed empty).
+    // Saved as already shown, so it does not pop up a second time.
+    try {
+        const userId = localStorage.getItem('tournamentUserId');
+        if (userId) {
+            import('./notification-storage.js').then(({ saveNotification }) => saveNotification(userId, {
+                type: 'achievement',
+                priority: 2,
+                message: `Achievement unlocked: ${achievement.name}`,
+                detail: `${achievement.description || ''} • +${achievement.xp || 0} XP`.trim(),
+                icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
+                eventType: achievement.id,
+                ctaText: 'View achievements',
+                targetUrl: '/profile.html#achievements',
+                shownAsToast: true
+            })).catch(() => {});
+        }
+    } catch (e) { /* the toast already showed; the bell copy is a bonus */ }
+
     console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP) [${achievement.rarity}]`);
 }
 

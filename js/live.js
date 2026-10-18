@@ -255,14 +255,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ✅ Initialize dismissible social banner
     initializeSocialBanner();
     
+    // On the homepage the ticker and the mini activity feed are left out: the Feed page already does that job and they
+    // made the homepage very long (and cost extra reads)
+    const onHome = document.body.classList.contains('page-home');
+
     // ✅ Initialize activity ticker (waits for countdown banner)
-    await initializeActivityTicker();
+    if (!onHome) await initializeActivityTicker();
     
     try {
         await loadLiveMatches();
         
         // ✅ Add mini activity feed after matches load
-        await displayMiniActivityFeed();
+        if (!onHome) await displayMiniActivityFeed();
         
     } catch (error) {
         console.error('❌ Error loading live matches:', error);
@@ -767,6 +771,10 @@ function showMainContent() {
 
 function showNoMatches() {
     hideLoading();
+
+    // On the homepage the hero already says what is going on; an empty "no live matches" block would only repeat it
+    const homeHost = document.getElementById('vote');
+    if (homeHost && document.body.classList.contains('page-home')) { homeHost.hidden = true; return; }
     
     const mainContent = document.getElementById('mainContent');
     const noMatches = document.getElementById('noMatches');

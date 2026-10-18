@@ -4,7 +4,7 @@
 // ========================================
 import { getAllMatches } from './api-client.js';
 import { cupDisplayName } from './bracket-builder.js';
-import { homeState, newestEdits, mostWatched, countdownText } from './home-model.js';
+import { homeState, newestEdits, mostWatched } from './home-model.js';
 
 const REFRESH_MS = 60000;
 const $ = id => document.getElementById(id);
@@ -32,7 +32,7 @@ function section(id, kicker, title, body, more) {
 
 function hero(s) {
     const pill = $('homePill'), lead = $('homeLead'), actions = $('homeActions'), stats = $('homeStats');
-    const vote = '<a class="btn btn-primary" href="/live">Vote now</a>', bracket = '<a class="btn btn-ghost" href="/brackets">See the bracket</a>', gallery = '<a class="btn btn-ghost" href="/music-gallery">Browse the edits</a>';
+    const vote = '<a class="btn btn-primary" href="#vote">Vote now</a>', bracket = '<a class="btn btn-ghost" href="/brackets">See the bracket</a>', gallery = '<a class="btn btn-ghost" href="/music-gallery">Browse the edits</a>';
     const cup = cupName || 'Arcane Moments';
     if (s.phase === 'live') {
         pill.textContent = `${cup}: ${plural(s.liveCount, 'match', 'matches')} live now`;
@@ -62,18 +62,11 @@ function hero(s) {
 
 function render() {
     if (!state) return;
-    const s = state, now = Date.now();
+    const s = state;
     hero(s);
 
     section('champion', 'Champion', 'Your Arcane Moments champion',
         s.champion ? `<div class="champion-card">${mini(s.champion)}<a class="btn btn-primary" href="/brackets">See the bracket</a></div>` : '');
-
-    const f = s.featured;
-    section('featured', 'Match of the day', 'The most voted match right now',
-        f ? `<div class="match-card"><p class="match-label">${esc(f.label)}${f.closesAt ? ` &middot; closes in ${esc(countdownText(f.closesAt, now))}` : ''}</p>
-            <div class="match-pair">${mini(f.a)}<span class="match-vs">vs</span>${mini(f.b)}</div>
-            <p class="match-votes">${plural(f.total, 'vote')} so far</p>
-            <a class="btn btn-primary" href="/vote?match=${encodeURIComponent(f.matchId)}">Vote on this match</a></div>` : '');
 
     section('recent', 'Results', 'Latest results',
         s.recent.length ? `<ul class="result-list">${s.recent.map(r => r.winner ? `<li><a href="/vote?match=${encodeURIComponent(r.matchId)}"><span class="result-label">${esc(r.label)}</span>
@@ -107,10 +100,11 @@ async function loadMatches() {
         console.error('Homepage matches failed to load', err);
         state = state || homeState([]);
     }
-    render();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // draw only when BOTH are in: drawing as soon as the matches arrived left "New edits" empty whenever they came back first
     await Promise.all([loadEdits(), loadMatches()]);
-    setInterval(() => { if (!document.hidden) loadMatches(); }, REFRESH_MS);
+    render();
+    setInterval(async () => { if (!document.hidden) { await loadMatches(); render(); } }, REFRESH_MS);
 });

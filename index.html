@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/scrollbar.css">
     <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/live.css">
     <link rel="stylesheet" href="/css/home-arcane.css">
     <!-- Arcane look (opt-in via the theme-arcane body class): load after every other stylesheet -->
     <link rel="stylesheet" href="/css/arcane-theme.generated.css">
@@ -62,14 +63,67 @@
             <h1 class="home-title">Arcane Moments</h1>
             <p class="home-lead" id="homeLead">A fan-made tournament where you vote for the best Arcane edits.</p>
             <div class="home-actions" id="homeActions">
-                <a class="btn btn-primary" href="/live">Vote now</a>
+                <a class="btn btn-primary" href="#vote">Vote now</a>
                 <a class="btn btn-ghost" href="/brackets">See the bracket</a>
             </div>
             <dl class="home-stats" id="homeStats" hidden></dl>
         </header>
 
+        <!-- Open matches: this used to be its own page (live.html). js/live.js fills it in. -->
+        <section class="home-vote" id="vote" aria-label="Open matches">
+            <div id="loadingState" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading live matches...</p>
+            </div>
+
+            <div id="errorState" class="error-state" style="display: none;">
+                <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h2>Unable to Load Matches</h2>
+                <p>Please check your connection and try again.</p>
+                <button onclick="location.reload()" class="retry-button">Retry</button>
+            </div>
+
+            <div id="mainContent" class="social-container" style="display: none;">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text">
+                        <span id="votedProgress">0</span> / <span id="totalProgress">0</span> matches voted
+                    </p>
+                </div>
+
+                <div id="unvotedSection" class="unvoted-section">
+                    <h2 class="unvoted-header">
+                        <span class="header-icon"><i class="fa-solid fa-check-to-slot"></i></span>
+                        <span class="header-text">
+                            <span id="unvotedCount">0</span> Matches Need Your Vote!
+                        </span>
+                    </h2>
+                    <div id="socialGrid" class="social-grid"></div>
+                </div>
+
+                <div id="votedSection" class="voted-section" style="display: none;">
+                    <div class="voted-header" onclick="toggleVotedSection()">
+                        <h2><i class="fa-solid fa-check"></i> Your Votes (<span id="votedCount">0</span>)</h2>
+                        <button id="votedToggle" class="toggle-btn">▼</button>
+                    </div>
+                    <div id="votedGrid" class="social-grid voted-grid"></div>
+                </div>
+
+                <div id="noMatches" class="no-matches" style="display: none;">
+                    <div class="no-matches-icon"><i class="fa-solid fa-film"></i></div>
+                    <h2>No Live Matches Right Now</h2>
+                    <p>Check back soon for new matchups!</p>
+                    <div class="no-matches-actions">
+                        <a href="/brackets.html" class="action-btn primary"><i class="fas fa-sitemap"></i> View Bracket</a>
+                        <a href="/profile#votes" class="action-btn secondary"><i class="fas fa-chart-bar"></i> My Progress</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="home-block" id="champion" hidden aria-labelledby="championHead"></section>
-        <section class="home-block" id="featured" hidden aria-labelledby="featuredHead"></section>
         <section class="home-block" id="recent" hidden aria-labelledby="recentHead"></section>
         <section class="home-block" id="popular" hidden aria-labelledby="popularHead"></section>
         <section class="home-block" id="newest" hidden aria-labelledby="newestHead"></section>
@@ -90,6 +144,7 @@
     <script src="/js/footer.js"></script>
 
     <script type="module" src="/js/rank-system.js"></script>
+    <script type="module" src="/js/live.js"></script>
     <script type="module" src="/js/home.js"></script>
     <script type="module" src="/js/settings-modal.js"></script>
 </body>

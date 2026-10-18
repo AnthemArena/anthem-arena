@@ -58,6 +58,13 @@ export function profileSplashUrl(pack, storage = globalThis.localStorage) {
     return toastSplashUrl(pack);
 }
 
+// Splash art that matches a person's champion avatar, worked out from the picture's own address
+// (.../champion/Heimerdinger.png, .../tiles/Vi_0.jpg). No lookup needed; null when the avatar is not a champion picture.
+export function splashFromAvatarSrc(src) {
+    const m = /\/champion\/(?:tiles\/|loading\/|splash\/|centered\/)?([A-Za-z]+)(?:_\d+)?\.(?:png|jpg)/.exec(String(src || ''));
+    return m ? getChampionSplashUrl(m[1]) : null;
+}
+
 // The champion's speech bubble used inside pop-ups: same look as the vote modal (dark card, pink edge, tail at the portrait).
 export function bubbleHtml(text, jinxSrc, accent) {
     if (!text) return '';

@@ -9,7 +9,24 @@ const API_BASE = '/api';
 /**
  * Fetch all matches (cached at Netlify edge)
  */
-export async function getAllMatches(bypassCache = false, tournament = null) {
+// One page asks for the matches many times while it loads (the page itself, the notification system, widgets...). Each call
+// was a separate request to the server; now callers within a few seconds share one. `bypassCache` (admin pages, "refresh")
+// always goes to the server.
+const MATCHES_SHARE_MS = 8000;
+const sharedMatches = new Map();   // tournament key -> { at, promise }
+
+export function getAllMatches(bypassCache = false, tournament = null) {
+    if (bypassCache) return fetchAllMatches(true, tournament);
+    const key = tournament || '';
+    const hit = sharedMatches.get(key);
+    if (hit && Date.now() - hit.at < MATCHES_SHARE_MS) return hit.promise;
+    const promise = fetchAllMatches(false, tournament);
+    sharedMatches.set(key, { at: Date.now(), promise });
+    promise.catch(() => sharedMatches.delete(key));   // a failed request must not be shared
+    return promise;
+}
+
+async function fetchAllMatches(bypassCache = false, tournament = null) {
     try {
         console.log('Fetching matches from edge cache...');
         
