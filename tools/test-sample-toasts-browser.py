@@ -33,6 +33,12 @@ with sync_playwright() as p:
     n = pg.locator('#bulletin-banner .nv-strip .nv-strip-th').count()
     check('round opening: a strip of the entering edits under the champion line, symbol kept', 1 <= n <= 5 and pg.locator('#bulletin-banner .nv-glyph').count() == 1 and pg.locator('#bulletin-banner .nv-chip', has_text='matches').count() == 0, n)
     pg.screenshot(path=f'{SHOTS}/sample-round.png')
+    show('testLevelUp(5)')
+    check('level up sample: new card, number 5, rank filled in (no placeholders)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '5' and '{' not in pg.inner_text('#bulletin-banner') and '(' not in pg.inner_text('#bulletin-banner .nv-bubble'), pg.inner_text('#bulletin-banner'))
+    for call in ('testAchievement("first-choice")', 'testAchievement("arcane-legend")'):
+        show(call)
+        txt = pg.inner_text('#bulletin-banner')
+        check(f'{call}: achievement card with its real name and no {{placeholders}}', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and '{' not in txt and ('first choice' in txt.lower() or 'arcane legend' in txt.lower()), txt)
     check('no page errors', not errs, errs)
     b.close()
 print('\nFAILED: ' + ', '.join(failed) if failed else '\nALL CHECKS PASSED')
