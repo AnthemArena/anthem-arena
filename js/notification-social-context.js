@@ -39,6 +39,9 @@ export async function matchesLoaded(ms = 10000) {
     return matchesCache.list.length > 0;
 }
 
+// The sample alerts on test-toasts.html use made-up match ids; show the first real match instead so the pictures can be checked.
+const isSampleMatch = id => /^test-match/.test(String(id || ''));
+
 async function matchById(matchId) {
     if (!matchId) return null;
     if (Date.now() - matchesCache.at > 5 * 60 * 1000) {
@@ -46,6 +49,7 @@ async function matchById(matchId) {
         matchesInflight = matchesInflight || withTimeout(startMatchesFetch(), 3000).finally(() => { matchesInflight = null; });
         await matchesInflight;
     }
+    if (isSampleMatch(matchId)) return matchesCache.list[0] || null;
     return matchesCache.list.find(m => (m.matchId || m.id) === matchId) || null;
 }
 
@@ -58,7 +62,7 @@ export async function socialContextFor(n) {
             out.avatars = await Promise.all(n.userIds.map(async (id, i) => (id && await profileAvatar(id)) || avatarSrc((n.avatars || [])[i]) || fallbackAvatarFor((n.users || [])[i])));
         }
         if (n.relationship === 'ally' || n.relationship === 'opponent') {      // only vote alerts draw the two edits
-            const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+            const yourKey = isSampleMatch(n.matchId) ? 'song1' : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
             out.edits = matchEdits(await matchById(n.matchId), yourKey, n.relationship);
             if (!out.edits) console.debug('social context: no edit pictures', { matchId: n.matchId, yourKey, haveMatches: matchesCache.list.length });
         }
@@ -71,7 +75,7 @@ export async function eventContextFor(n) {
     const out = { edits: null };
     try {
         if (!n?.matchId) return out;
-        const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+        const yourKey = isSampleMatch(n.matchId) ? 'song1' : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
         out.edits = eventEdits(await matchById(n.matchId), yourKey);
     } catch (e) { console.warn('event context failed', e); }
     return out;
