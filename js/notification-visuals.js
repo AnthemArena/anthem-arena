@@ -1,6 +1,6 @@
 import { fixAvatarUrl } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
-import { getChampionSplashUrl, getChampionTileUrl } from './arcane-config.js';
+import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
@@ -97,7 +97,7 @@ const FALLBACK_CHAMPIONS = ['Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerd
 export function fallbackAvatarFor(name) {
     const s = String(name || '?');
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-    return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`;
+    return ddragonUrl(`img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`);
 }
 
 // The two edits of a match as pictures, in match order (song1 left, song2 right), plus which side each person picked.

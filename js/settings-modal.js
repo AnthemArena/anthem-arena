@@ -4,6 +4,7 @@
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { readPackXp } from './xp-ledger.js';
+import { ddragonUrl } from './arcane-config.js';
 import { masteryChipHtml } from './champions-tab-model.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
@@ -34,7 +35,7 @@ const CHAMPIONS = [
     'Zac', 'Zed', 'Zeri', 'Ziggs', 'Zilean', 'Zoe', 'Zyra'
 ];
 
-const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
+const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;

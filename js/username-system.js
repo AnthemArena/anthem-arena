@@ -3,6 +3,7 @@
 // ========================================
 
 // List of all League champions (using Riot Data Dragon)
+import { ddragonUrl } from './arcane-config.js';
 const CHAMPIONS = [
     'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Aphelios', 
     'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Belveth', 'Blitzcrank', 'Brand', 'Braum', 'Briar',
@@ -25,7 +26,7 @@ const CHAMPIONS = [
     'Zac', 'Zed', 'Zeri', 'Ziggs', 'Zilean', 'Zoe', 'Zyra'
 ];
 
-const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
+const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 /**
  * Map avatar champion to available champion pack

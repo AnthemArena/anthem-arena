@@ -1,7 +1,9 @@
 import {
     COMPANION_PACKS,
     getCompanionPack,
-    getCupChampionId
+    getCupChampionId,
+    ddragonUrl,
+    withCurrentVersion
 } from './arcane-config.js';
 import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
 import { dialogFor } from './champion-lines.js';
@@ -30,6 +32,7 @@ async function loadChampionManifest() {
         if (!response.ok) throw new Error('Manifest not found');
         
         championManifest = await response.json();
+        for (const p of championManifest.packs || []) p.icon = withCurrentVersion(p.icon);   // the pack files carry a version; the config owns it
         console.log(`✅ Loaded champion manifest: ${championManifest.packs.length} packs available`);
         return championManifest;
         
@@ -43,7 +46,7 @@ async function loadChampionManifest() {
         name: pack.name,
         displayName: pack.name,
         emoji: '✨',
-        icon: `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${pack.championId}.png`,
+        icon: ddragonUrl(`img/champion/${pack.championId}.png`),
         description: `Your ${pack.name} Arcane companion`
     }))
 };
@@ -77,6 +80,7 @@ if (championId !== 'default' && !getCompanionPack(championId)) {
         }
         
         const pack = await response.json();
+        pack.icon = withCurrentVersion(pack.icon);
         
         // Validate pack structure
         if (!pack.id || !pack.alerts) {

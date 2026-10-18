@@ -11,6 +11,7 @@ import {
 } from './achievements.js';
 import { addXP } from './rank-system.js';
 import { streakFromVotes } from './xp-ledger.js';
+import { ddragonUrl } from './arcane-config.js';
 
 // ========================================
 // FIREBASE ACHIEVEMENT STORAGE
@@ -408,7 +409,7 @@ export async function checkAchievements(allVotes, context = {}) {
  */
 export function showAchievementUnlock(achievement) {
     // ✅ NEW: Use League item icon
-    const achievementIcon = achievement.icon || 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3041.png';
+    const achievementIcon = achievement.icon || ddragonUrl('img/item/3041.png');
     
     // ✅ Get champion-voiced message
     const championMessage = window.championLoader?.getAchievementMessage(achievement.id, {

@@ -16,7 +16,7 @@ import {
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
-import { ARCANE_CONFIG } from './arcane-config.js';
+import { ARCANE_CONFIG, ddragonUrl } from './arcane-config.js';
 import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
@@ -381,14 +381,14 @@ function generateFallbackProfile(username) {
     
     // Champion avatar pool
     const champions = [
-        { championId: 'Ahri', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ahri.png' },
-        { championId: 'Akali', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Akali.png' },
-        { championId: 'Yasuo', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Yasuo.png' },
-        { championId: 'Jinx', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Jinx.png' },
-        { championId: 'Lux', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Lux.png' },
-        { championId: 'Ezreal', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ezreal.png' },
-        { championId: 'Zed', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Zed.png' },
-        { championId: 'KSante', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/KSante.png' }
+        { championId: 'Ahri', imageUrl: ddragonUrl('img/champion/Ahri.png') },
+        { championId: 'Akali', imageUrl: ddragonUrl('img/champion/Akali.png') },
+        { championId: 'Yasuo', imageUrl: ddragonUrl('img/champion/Yasuo.png') },
+        { championId: 'Jinx', imageUrl: ddragonUrl('img/champion/Jinx.png') },
+        { championId: 'Lux', imageUrl: ddragonUrl('img/champion/Lux.png') },
+        { championId: 'Ezreal', imageUrl: ddragonUrl('img/champion/Ezreal.png') },
+        { championId: 'Zed', imageUrl: ddragonUrl('img/champion/Zed.png') },
+        { championId: 'KSante', imageUrl: ddragonUrl('img/champion/KSante.png') }
     ];
     
     // Use username hash to consistently pick same champion
