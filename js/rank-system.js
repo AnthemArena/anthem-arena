@@ -1,6 +1,6 @@
 import { masteryLevel, skinsUnlockedBetween } from './champion-unlocks.js';
 import { getChampionSplashUrl } from './arcane-config.js';
-import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes } from './xp-ledger.js';
+import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes, backfillPackXp } from './xp-ledger.js';
 
 // ========================================
 // RANK PROGRESSION SYSTEM
@@ -398,6 +398,9 @@ export async function hydrateXpFromProfile() {
             if (JSON.stringify(both) !== JSON.stringify(local)) { localStorage.setItem('companionSkins', JSON.stringify(both)); looksChanged = true; }
         }
         const merged = mergeXp({ xp: getUserXPFromStorage(), packXp: readPackXp() }, remote);
+        // XP from before per-companion XP existed goes to the active companion once
+        const filled = backfillPackXp(merged.packXp, merged.xp, activePackId());
+        if (JSON.stringify(Object.entries(filled).sort()) !== JSON.stringify(Object.entries(merged.packXp).sort())) { merged.packXp = filled; merged.changedLocal = true; }
         if (!merged.changedLocal) { if (looksChanged) window.updateNavProfile?.(); return looksChanged; }
         saveUserXP(merged.xp);
         localStorage.setItem('userPackXP', JSON.stringify(merged.packXp));

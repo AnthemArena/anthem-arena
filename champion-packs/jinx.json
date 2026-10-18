@@ -1049,8 +1049,8 @@
     },
     "jinx-loose-cannon": {
       "messages": [
-        "Ten underdogs with me. Now that's chaos.",
-        "Ten long shots. We're a bad influence on each other."
+        "Ten underdogs. Now that's chaos.",
+        "Ten long shots. You're a bad influence on yourself."
       ],
       "details": [
         "Loose cannon looks good on you. +{xp} XP",
@@ -1091,7 +1091,7 @@
     },
     "caitlyn-deciding-shot": {
       "messages": [
-        "You broke the tie with Cupcake. Boom.",
+        "You broke the tie. Boom.",
         "A tied match and you pulled the trigger. Nice."
       ],
       "details": [
