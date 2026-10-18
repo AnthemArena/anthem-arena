@@ -805,8 +805,8 @@ Toast backdrops and the champion's face in toasts and bell rows now use the pack
 
 **Caitlyn:** 1 default 0 | 2 Arcane Enforcer 28 | 3 Officer 5, Sheriff 2 | 4 Resistance 1, Safari 3 | 5 Arctic Warfare 4, Headhunter 6 | 6 Pulsefire 11, Lunar Wraith 10 | 7 Pool Party 13, Arcade 19 | 8 Battle Academia 22, Snow Moon 30 | 9 Heartthrob 39, Firecracker 54, DRX 48 | 10 Arcane Commander 50 | achievements: Prestige Arcade 29, Prestige Arcade (2022) 20, Prestige Arcane Commander 51 (ideas: 10 close-match votes, 7-day streak, deciding vote in a tie-break, each with Caitlyn active).
 
-**Vi (DRAFT, numbers from the wiki, check against her Data Dragon file):** 2 Arcane Undercity 29 | 3 Neon Strike 1, Officer 2 | 4 Debonair 3, Demon 4 | 5 Warring Kingdoms 5, PROJECT 11 | 6 Heartbreaker 12 | 7 Heartache 30, PsyOps 20 | 8 Primal Ambush 39 | 9 T1 49 | 10 Arcane Brawler 48.
+**Vi (numbers checked against her Data Dragon file):** 2 Arcane Undercity 29 | 3 Neon Strike 1, Officer 2 | 4 Debonair 3, Demon 4 | 5 Warring Kingdoms 5, PROJECT 11 | 6 Heartbreaker 12 | 7 Heartache 30, PsyOps 20 | 8 Primal Ambush 39 | 9 T1 49 | 10 Arcane Brawler 48.
 
-**Profile:** a new "Champions" tab next to Journey: one row per companion with avatar (current skin), mastery level, a bar for progress to the next level, and its share of the person's total XP as a percentage, plus a skin grid with locked and unlocked states.
+**Profile:** a new "Champions" tab next to Journey: a share bar at the top (the person's votes split across the companions, each with its avatar and percentage), then one row per companion with avatar (current skin), mastery level and a bar for progress to the next level, plus a skin grid with locked and unlocked states.
 
 **Build order:** (1) one XP total from votes + achievements in Firestore; (2) per-pack mastery + unlock table as data; (3) skin data file + one Data Dragon version constant; (4) Champions tab, skin picker, unlock cards in alerts.
