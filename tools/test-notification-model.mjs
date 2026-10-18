@@ -111,9 +111,10 @@ t('event links: matches you voted in open with the share panel, others do not', 
     assert.equal(eventUrl({ type: 'winning', matchId: 'm1', targetUrl: '/vote.html?match=m1&share=1' }), '/vote.html?match=m1&share=1');
     assert.equal(eventUrl({ type: 'match-won', matchId: 'm1', targetUrl: '/vote.html?match=m1' }), '/vote.html?match=m1');
     assert.equal(eventUrl({ type: 'novotes', matchId: 'm1' }), '/vote.html?match=m1');
-    assert.equal(eventUrl({ type: 'round-opening', targetUrl: '/vote.html' }), '/vote.html');
+    assert.equal(eventUrl({ type: 'round-opening', targetUrl: '/vote.html' }), '/matches.html');
+    assert.equal(eventUrl({ type: 'welcome', targetUrl: '/vote.html' }), '/matches.html'); assert.equal(eventUrl({ type: 'encouragement' }), '/matches.html');
     assert.equal(eventUrl({ type: 'closing', targetUrl: '/#vote' }), '/#vote');
-    assert.equal(eventUrl({ type: 'round-opening' }), '/vote.html');
+    assert.equal(eventUrl({ type: 'round-opening' }), '/matches.html');
 });
 t('event chips: percentages for a voted match, match count for a new round', () => {
     assert.deepEqual(eventChips({ type: 'danger', userPct: 38, opponentPct: 62 }), ['38% vs 62%']);

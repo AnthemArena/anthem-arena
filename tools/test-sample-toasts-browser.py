@@ -55,6 +55,16 @@ with sync_playwright() as p:
         show(call)
         txt = pg.inner_text('#bulletin-banner')
         check(f'{call}: achievement card with its real name and no {{placeholders}}', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and '{' not in txt and ('first choice' in txt.lower() or 'arcane legend' in txt.lower()), txt)
+    # alerts with a strip open the matches list; already there, the button just closes the alert
+    for typ, extra in (('round-opening', "round:3,matchCount:8"), ('welcome', "welcomeType:'back'"), ('encouragement', "encouragementType:'gentle'")):
+        pg.goto(f'http://127.0.0.1:{PORT}/index.html'); pg.wait_for_timeout(2500)
+        pg.evaluate("(a)=>window.showBulletin({priority:1,type:a[0],"+extra+",message:'Hi',detail:'',cta:'Go',action:'navigate',targetUrl:'/vote.html'})", [typ]); pg.wait_for_timeout(900)
+        with pg.expect_navigation(timeout=5000): pg.click('#bulletin-banner .nv-cta')
+        check(f'{typ}: from another page the button opens the matches list', pg.url.split('?')[0].endswith('/matches.html'), pg.url)
+        pg.wait_for_timeout(2500)
+        pg.evaluate("(a)=>window.showBulletin({priority:1,type:a[0],"+extra+",message:'Hi',detail:'',cta:'Go',action:'navigate',targetUrl:'/vote.html'})", [typ]); pg.wait_for_timeout(900)
+        u0 = pg.url; pg.click('#bulletin-banner .nv-cta'); pg.wait_for_timeout(700)
+        check(f'{typ}: already on the matches list, the button just closes the alert', pg.url == u0 and not pg.evaluate("document.querySelector('#bulletin-banner')?.classList.contains('show')"), pg.url)
     check('no page errors', not errs, errs)
     b.close()
 print('\nFAILED: ' + ', '.join(failed) if failed else '\nALL CHECKS PASSED')

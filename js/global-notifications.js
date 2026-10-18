@@ -1680,7 +1680,7 @@ async function showWelcomeToast() {
             ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
             : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
         
-        const isOnVotePage = window.location.pathname.includes('vote.html');
+        const isOnMatchesPage = /\/matches(\.html)?\/?$/.test(window.location.pathname);
         
         showBulletin({
             priority: 1,
@@ -1691,8 +1691,8 @@ async function showWelcomeToast() {
             message: welcomeData.message,
             detail: welcomeData.detail,
             cta: welcomeData.cta,
-            action: isOnVotePage ? 'dismiss' : 'navigate',
-            targetUrl: '/vote.html',
+            action: isOnMatchesPage ? 'dismiss' : 'navigate',
+            targetUrl: '/matches.html',
             duration: 5000
         });
         
@@ -2864,6 +2864,8 @@ window.handleBulletinCTA = function() {
 
     // Match-event alerts (new design): the button and the card both open the match (with the share panel for a match you voted in)
     if (isEventNotification(currentBulletin) && currentBulletin.matchId !== 'test-match' && currentBulletin.action !== 'dismiss') {
+        // Alerts with a strip of edits open the matches list; when you are already on it, the button just closes the alert
+        if (isStripAlert(currentBulletin) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
         window.location.href = eventUrl(currentBulletin);
         return;
     }

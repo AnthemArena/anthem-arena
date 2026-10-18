@@ -92,8 +92,8 @@ EVENTS = [
     ('match-won',     dict(message='Your pick went through. Told you.', detail='', cta='Next match', action='navigate', targetUrl='/vote.html?match=%s'), 'your pick won', '/vote.html?match=%s'),
     ('match-lost',    dict(message='Your pick is out. It happens.', detail='', cta='Next match', action='navigate', targetUrl='/vote.html?match=%s'), 'your pick lost', '/vote.html?match=%s'),
     ('match-tied',    dict(message='Dead level. Seed decided it.', detail='', cta='See the result', action='navigate', targetUrl='/vote.html?match=%s'), 'tied match', '/vote.html?match=%s'),
-    ('round-opening', dict(message='Round 3 is open. Eight matches.', detail='', round=3, matchCount=8, matchId=None, cta='Start round 3', action='navigate', targetUrl='/vote.html'), 'round 3 is open', '/vote.html'),
-    ('new-matches',   dict(message='Four more matches just opened.', detail='', round=3, matchCount=4, matchId=None, cta='Take a look', action='navigate', targetUrl='/vote.html'), 'new matches in round 3', '/vote.html'),
+    ('round-opening', dict(message='Round 3 is open. Eight matches.', detail='', round=3, matchCount=8, matchId=None, cta='Start round 3', action='navigate', targetUrl='/vote.html'), 'round 3 is open', '/matches.html'),
+    ('new-matches',   dict(message='Four more matches just opened.', detail='', round=3, matchCount=4, matchId=None, cta='Take a look', action='navigate', targetUrl='/vote.html'), 'new matches in round 3', '/matches.html'),
 ]
 SHOW = """([type, extra]) => { window.showBulletin(Object.assign({priority: 2, type, matchId: extra.matchId === null ? undefined : MATCH, matchTitle: 'A vs B', song: 'A', opponent: 'B'}, extra)); }"""
 with sync_playwright() as p:

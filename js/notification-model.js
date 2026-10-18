@@ -176,6 +176,7 @@ export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
 // Where the button (and the alert itself) goes. A match you already voted in opens with the share panel in view.
 export function eventUrl(n) {
     const k = eventKind(n);
+    if (isStripAlert(n)) return '/matches.html';          // these show several edits: the list is the place to pick from
     let url = n?.targetUrl || (n?.matchId ? `/vote.html?match=${encodeURIComponent(n.matchId)}` : '/vote.html');
     if (k?.share && n?.matchId && /^\/vote(\.html)?\?/.test(url) && !/[?&]share=/.test(url)) url += '&share=1';
     return url;
