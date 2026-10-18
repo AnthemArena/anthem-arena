@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { EVENT_KINDS, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { EVENT_KINDS, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -123,6 +123,13 @@ t('event chips: percentages for a voted match, match count for a new round', () 
     assert.deepEqual(eventChips({ type: 'closing', severityTier: 'final' }), ['Last chance']);
     assert.deepEqual(eventChips({ type: 'round-opening', round: 2, matchCount: 8 }), ['Round 2', '8 matches']);
     assert.deepEqual(eventChips({ type: 'encouragement', encouragementType: 'urgent' }), ['Closing soon']);
+    assert.deepEqual(eventChips({ type: 'danger', voteDiff: 15, userPct: 43, opponentPct: 57 }), ['Behind by 15', '43% vs 57%']);
+    assert.deepEqual(eventChips({ type: 'comeback', voteDiff: 5 }), ['Ahead by 5']);
+    assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 1 }), ['1 vote apart']);
+    assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 0, userPct: 50, opponentPct: 50 }), ['50% vs 50%']);
+    assert.ok(isStripAlert({ type: 'welcome' }) && isStripAlert({ type: 'encouragement' }) && isStripAlert({ type: 'round-opening' }) && !isStripAlert({ type: 'danger' }));
+    for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'match-tied', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
+    for (const k of ['closing', 'novotes', 'lowvotes']) assert.ok(!EVENT_KINDS[k].quiet, k);
     for (const k of Object.keys(EVENT_KINDS)) assert.ok(eventGlyph({ type: k }), k);
     assert.equal(eventGlyph({ type: 'danger' }), '▼'); assert.equal(eventGlyph({ type: 'winning' }), '▲'); assert.equal(eventGlyph({ type: 'match-lost' }), '✕'); assert.equal(eventGlyph({ type: 'nope' }), 'VS');
 });

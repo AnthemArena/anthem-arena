@@ -4,7 +4,7 @@ import { db } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAllMatches } from './api-client.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits, eventEdits, entrantsStrip } from './notification-visuals.js';
-import { isContentNotification, isEventNotification, isStreakNotification, eventKind, isRoundAlert, VOTED_KINDS } from './notification-model.js';
+import { isContentNotification, isEventNotification, isStreakNotification, eventKind, isRoundAlert, isStripAlert, VOTED_KINDS } from './notification-model.js';
 
 const avatarCache = new Map();          // userId -> url | null
 let matchesCache = { at: 0, list: [] };
@@ -70,18 +70,30 @@ export async function socialContextFor(n) {
     return out;
 }
 
+const endMs = m => { const v = m.endTime || m.endDate; const t = v?.toMillis ? v.toMillis() : new Date(v).getTime(); return Number.isFinite(t) ? t : Infinity; };
+
 // A match-event alert (danger, closing, match result ...): the two edit pictures with the viewer's own pick marked, as n.nv.edits.
 export async function eventContextFor(n) {
     const out = { edits: null, strip: null };
     try {
-        if (isRoundAlert(n)) {
-            // The edits entering: the live matches of that round (the newest ones for "new matches"), as a short strip of pictures.
-            await matchById('round');                                   // makes sure the match list is loaded
+        if (isStripAlert(n)) {
+            // The edits to look at: the live matches of the round (round alerts; the newest ones for "new matches"), every live
+            // match for a first visit, otherwise the live matches this person has not voted in yet.
+            await matchById('open');                                    // makes sure the match list is loaded
             const live = matchesCache.list.filter(m => m.status === 'live');
-            const round = n.round || Math.max(1, ...live.map(m => m.round || 1));
-            let inRound = live.filter(m => (m.round || 1) === round);
-            if (n.type === 'new-matches' && n.matchCount) inRound = inRound.slice(-n.matchCount);
-            out.strip = entrantsStrip(inRound);
+            let pool;
+            if (isRoundAlert(n)) {
+                const round = n.round || Math.max(1, ...live.map(m => m.round || 1));
+                pool = live.filter(m => (m.round || 1) === round);
+                if (n.type === 'new-matches' && n.matchCount) pool = pool.slice(-n.matchCount);
+            } else if (n.type === 'welcome' && n.welcomeType === 'first-time') {
+                pool = live;
+            } else {
+                const voted = JSON.parse(localStorage.getItem('userVotes') || '{}');
+                pool = live.filter(m => !voted[m.matchId || m.id]);
+                if (n.type === 'encouragement' && n.encouragementType === 'urgent') pool.sort((a, b) => endMs(a) - endMs(b));   // closing first
+            }
+            out.strip = entrantsStrip(pool);
             return out;
         }
         if (!n?.matchId) return out;

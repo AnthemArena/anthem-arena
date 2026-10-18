@@ -33,6 +33,18 @@ with sync_playwright() as p:
     n = pg.locator('#bulletin-banner .nv-strip .nv-strip-th').count()
     check('round opening: a strip of the entering edits under the champion line, symbol kept', 1 <= n <= 5 and pg.locator('#bulletin-banner .nv-glyph').count() == 1 and pg.locator('#bulletin-banner .nv-chip', has_text='matches').count() == 0, n)
     pg.screenshot(path=f'{SHOTS}/sample-round.png')
+    check('round opening: no second line under the champion', pg.locator('#bulletin-banner .nv-event-detail').count() == 0)
+    show('testDanger(15)')
+    chips = [c.strip() for c in pg.locator('#bulletin-banner .nv-chip').all_inner_texts()]
+    check('danger: no second line; facts are chips (Behind by 15, percentages)', pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and 'Behind by 15' in chips and any('vs' in c for c in chips), chips)
+    show('testWelcome("first-time")')
+    more = pg.inner_text('#bulletin-banner .nv-strip-more').strip() if pg.locator('#bulletin-banner .nv-strip-more').count() else ''
+    check('first-time welcome: strip of every live edit (6 matches = 12 edits, 5 shown, +7)', pg.locator('#bulletin-banner .nv-strip-th').count() == 5 and more == '+7' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0, more)
+    for call in ('testWelcome("streak")', 'testWelcome("comeback")', 'testWelcomeBack()', 'testEncouragement()'):
+        show(call)
+        more = pg.inner_text('#bulletin-banner .nv-strip-more').strip() if pg.locator('#bulletin-banner .nv-strip-more').count() else ''
+        check(f'{call}: strip leaves out the match already voted in (10 edits, +5), no second line', pg.locator('#bulletin-banner .nv-strip-th').count() == 5 and more == '+5' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0, more)
+    pg.screenshot(path=f'{SHOTS}/sample-encourage.png')
     show('testLevelUp(5)')
     check('level up sample: new card, number 5, rank filled in (no placeholders)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '5' and '{' not in pg.inner_text('#bulletin-banner') and '(' not in pg.inner_text('#bulletin-banner .nv-bubble'), pg.inner_text('#bulletin-banner'))
     for call in ('testAchievement("first-choice")', 'testAchievement("arcane-legend")'):

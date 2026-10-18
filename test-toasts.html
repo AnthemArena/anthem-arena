@@ -800,6 +800,7 @@ action: 'dismiss'
         window.showBulletin?.({
             priority: 5,
             type: 'welcome',
+            welcomeType: type,
             matchId: 'welcome',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
             message: msg?.message || `${config.icon} ${config.default}`,
@@ -909,6 +910,7 @@ function testWelcomeBack() {
     window.showBulletin?.({
         priority: 5,
         type: 'welcome',
+        welcomeType: 'back',
         matchId: 'welcome-back',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
         message: msg?.message || '👋 Welcome back!',
@@ -924,6 +926,7 @@ function testEncouragement() {
     window.showBulletin?.({
         priority: 5,
         type: 'encouragement',
+        encouragementType: 'gentle',
         matchId: 'encouragement',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
         message: msg?.message || '👀 Still deciding?',
