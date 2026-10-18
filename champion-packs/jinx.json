@@ -29,8 +29,8 @@
               "gte": 50
             }
           },
-          "message": "💥 KABOOM!! \"{momentTitle}\" is down {voteDiff} — THEY CHEATED I SWEAR!!",
-          "cta": "BLOW EVERYTHING UP!! 🚨"
+          "message": "{momentTitle} is down {voteDiff}. That's not a loss, that's a crime scene.",
+          "cta": "Rally some votes"
         },
         {
           "condition": {
@@ -38,8 +38,8 @@
               "gte": 30
             }
           },
-          "message": "😡 DOWN {voteDiff}?! Fishbones is crying blood and Pow-Pow wants names!!",
-          "cta": "SAVE IT OR I WILL!! 💣"
+          "message": "Down {voteDiff}. Someone cheated. I don't know who yet, but I'm making a list.",
+          "cta": "Call for backup"
         },
         {
           "condition": {
@@ -47,8 +47,8 @@
               "gte": 20
             }
           },
-          "message": "🔥 Losing by {voteDiff} already?! THIS IS WHY WE CAN'T HAVE NICE moments!!",
-          "cta": "TURN IT AROUND NOW!! 💥"
+          "message": "Losing by {voteDiff} already? Great. Love that for us.",
+          "cta": "Spread the word"
         },
         {
           "condition": {
@@ -56,8 +56,8 @@
               "gte": 10
             }
           },
-          "message": "⚠️ Trailing {voteDiff}… I'm adding EVERYONE who voted wrong to The List™",
-          "cta": "FIX THIS BEFORE I DO!! 🎪"
+          "message": "Trailing by {voteDiff}. Your move. Mine involves explosives.",
+          "cta": "See the damage"
         },
         {
           "condition": {
@@ -65,13 +65,13 @@
               "gte": 5
             }
           },
-          "message": "😬 Only down {voteDiff}?? Quick, give \"{momentTitle}\" a rocket launcher!!",
-          "cta": "HELP OR I'LL EXPLODE!! 🔥"
+          "message": "Only {voteDiff} behind. Fixable. I've fixed worse.",
+          "cta": "Get some help"
         },
         {
           "condition": "default",
-          "message": "🤔 Down {voteDiff}... carry the one... TOO MANY!! Time to cheat the math!!",
-          "cta": "Nudge it… or else ⚡"
+          "message": "Down {voteDiff}. Do the maths. Then do something about it.",
+          "cta": "Share it around"
         }
       ]
     },
@@ -83,8 +83,8 @@
               "eq": 0
             }
           },
-          "message": "🔥🔥🔥 DEAD EVEN 50-50!! ONE VOTE DECIDES EVERYTHING!!",
-          "cta": "BREAK THE TIE OR I WILL!! 💥"
+          "message": "Dead even. One vote decides it. No pressure. Okay, a little pressure.",
+          "cta": "Rally the troops"
         },
         {
           "condition": {
@@ -92,8 +92,8 @@
               "eq": 1
             }
           },
-          "message": "😱 ONE. VOTE. If I had ONE BULLET... actually I have WAY more than that!!",
-          "cta": "END MY SUFFERING!! 🎪"
+          "message": "One vote apart. I can't watch. I'm absolutely watching.",
+          "cta": "Get another vote"
         },
         {
           "condition": {
@@ -101,13 +101,13 @@
               "lte": 3
             }
           },
-          "message": "😬 ONLY {voteDiff} VOTES APART!! MY BRAIN IS SCREAMING!!",
-          "cta": "MAKE IT STOP!! ⚡"
+          "message": "{voteDiff} votes apart. My eye is twitching.",
+          "cta": "Watch it close"
         },
         {
           "condition": "default",
-          "message": "🔥 So close at {voteDiff} votes… maximum boom potential detected!",
-          "cta": "Watch the chaos unfold! 👀"
+          "message": "{voteDiff} votes in it. This is either going to be great or very loud.",
+          "cta": "See the match"
         }
       ]
     },
@@ -119,8 +119,8 @@
               "gte": 85
             }
           },
-          "message": "👑 TOTAL OBLITERATION!! \"{momentTitle}\" at {userPct}% — THEY'RE JUST ASH NOW!!",
-          "cta": "DANCE ON THEIR GRAVES!! 🎪"
+          "message": "{userPct}% on {momentTitle}. They didn't lose, they got deleted.",
+          "cta": "Gloat a little"
         },
         {
           "condition": {
@@ -128,8 +128,8 @@
               "gte": 75
             }
           },
-          "message": "💥 BOOM BABY!! {userPct}% — I LOVE THE SMELL OF VICTORY EXPLOSIONS!!",
-          "cta": "RUB IT IN!! 🎉"
+          "message": "{userPct}%. Look at that. I'd say don't let it go to your head, but where's the fun in that.",
+          "cta": "Enjoy it"
         },
         {
           "condition": {
@@ -137,13 +137,13 @@
               "gte": 65
             }
           },
-          "message": "🎯 Hehe~ {userPct}% domination! Pow-Pow says goodnight!!",
-          "cta": "BASK IN GLORY!! 💥"
+          "message": "{userPct}%. Nice. Keep your guard up, though. It's never over until it's over.",
+          "cta": "Keep it going"
         },
         {
           "condition": "default",
-          "message": "😎 Chilling at {userPct}%… still winning, still unstoppable!!",
-          "cta": "Keep the mayhem rolling! ✨"
+          "message": "Sitting at {userPct}%. Still ahead. Try not to jinx it. Too late.",
+          "cta": "Keep an eye on it"
         }
       ]
     },
@@ -155,8 +155,8 @@
               "gte": 30
             }
           },
-          "message": "💥💥💥 BACK FROM THE DEAD!! \"{momentTitle}\" was down {voteDiff} and RESURRECTED!!",
-          "cta": "WITNESS THE LEGEND!! 🎪"
+          "message": "{momentTitle} was down {voteDiff} and came back. Some things refuse to stay down.",
+          "cta": "Take a bow"
         },
         {
           "condition": {
@@ -164,8 +164,8 @@
               "gte": 15
             }
           },
-          "message": "🎉 PLOT TWIST!! Flipped a {voteDiff}-vote hole — did someone say 'stay down'? I DON'T KNOW THAT WORD!!",
-          "cta": "BOW DOWN!! 💥"
+          "message": "Flipped a {voteDiff}-vote hole. Everyone said stay down. Rude.",
+          "cta": "Enjoy this"
         },
         {
           "condition": {
@@ -173,276 +173,276 @@
               "gte": 5
             }
           },
-          "message": "🔥 HA! Snatched the lead from {voteDiff} behind like a BEAUTIFUL DISASTER!!",
-          "cta": "TOLD YOU SO!! ✨"
+          "message": "Clawed back from {voteDiff} behind. Messy. Perfect.",
+          "cta": "Nice one"
         },
         {
           "condition": "default",
-          "message": "😈 Sneaky little comeback… \"{momentTitle}\" just slipped into the lead, no biggie~",
-          "cta": "Admire my genius! 👀"
+          "message": "{momentTitle} just slid into the lead. Quietly. I respect that.",
+          "cta": "See where it stands"
         }
       ]
     },
     "ally": {
       "messages": [
-        "🤝 {username} just voted \"{momentTitle}\" too!! TWINSIES!!",
-        "💥 YES!! {username} gets it — certified chaos enjoyer!!",
-        "🎪 {username} hopped on the correct grenade!! Welcome aboard!!",
-        "😈 Hehe~ {username} picked \"{momentTitle}\" — new partner in crime acquired!!",
-        "🔥 {username} also chose \"{momentTitle}\"!! High-five through the screen!!",
-        "💣 {username} has IMMACULATE taste… almost as good as mine!!",
-        "🎉 Squad goals!! {username} and I are gonna burn this bracket down together!!",
-        "✨ Hey trinket!! {username} just proved they're cool — I'm keeping them!!"
+        "{username} voted for {momentTitle} too. Fine, you're not completely hopeless.",
+        "{username} picked {momentTitle}. Good taste. Suspicious, but good.",
+        "{username} is with you on {momentTitle}. Try to look surprised.",
+        "{username} just backed {momentTitle}. Looks like you've got company.",
+        "Same pick as {username}. Great minds. Or bad ideas. Same thing.",
+        "{username} agrees with you on {momentTitle}. Don't get used to it.",
+        "{username} voted {momentTitle}. That's two of you. That's practically a gang.",
+        "{username} has opinions and they match yours. Rare. Keep them."
       ],
       "details": [
-        "Great minds think alike—BOOM!! …sorry, reflex.",
-        "We should probably rob a bank after this.",
-        "Two psychos, one moment — statistically this ends in fireworks.",
-        "I'm sending them a friendship rocket. With glitter.",
-        "The army of good taste just gained +1 explosive soldier!!",
-        "Finally someone who won't leave me... right? RIGHT?!",
-        "Plot twist: we're the main characters now.",
-        "Yes I know this is just a notification. Doesn't make it less REAL!!"
+        "Two of you. That's a conspiracy.",
+        "Statistically, this ends in fireworks.",
+        "Don't tell them I said they're alright.",
+        "Alliances are fragile. Try not to blow it up.",
+        "I give it a week.",
+        "Look at you, making friends.",
+        "Nice. Now go win something.",
+        "I'm not smiling. Shut up."
       ],
       "buttons": [
-        "High Five!! 🙌",
-        "Send Glitter Bomb!! 💥",
-        "Fist Bump!! 👊",
-        "Let's Burn It Down!! 🎉",
-        "You're My Favorite!! ✨",
-        "Squad Forever!! 💝"
+        "Say hi",
+        "Send a fist bump",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Team up"
       ]
     },
     "rival": {
       "messages": [
-        "⚔️ {username} just picked \"{theirMoment}\" against \"{yourMoment}\"?! OH IT'S ON!!",
-        "😈 Hehe~ {username} wants to fight? CUTE. Let's blow their speakers up!!",
-        "💥 WRONG ANSWER {username}!! You dared vote against \"{yourMoment}\"?!",
-        "🎯 {username} chose \"{theirMoment}\" — adding them to The List™ immediately!!",
-        "🔥 {username} declared WAR on \"{yourMoment}\"!! Pow-Pow is locked and loaded!!",
-        "😡 OH THEY DID NOT just vote \"{theirMoment}\"!! Fishbones is taking this personally!!",
-        "💣 {username} thinks \"{theirMoment}\" is better?! Time to visit them with my rockets!!",
-        "⚡ {username} vs YOU — only one moment leaves in ashes!!"
+        "{username} picked {theirMoment} over {yourMoment}. Bold. Wrong, but bold.",
+        "{username} voted against {yourMoment}. Cute.",
+        "{username} chose {theirMoment}. I'm not mad. I'm just taking notes.",
+        "{username} went for {theirMoment}. Adding them to the list.",
+        "{username} is against you on {yourMoment}. Finally, something interesting.",
+        "{username} thinks {theirMoment} is better. That's a hot take.",
+        "{username} voted against you. This is why nobody invites us anywhere.",
+        "{username} versus you. I'll get the popcorn. And the other thing."
       ],
       "details": [
-        "I already sharpened the rockets with their name on it.",
-        "Fishbones just asked if we can make it hurt more. I said yes.",
-        "They're gonna learn the hard way — there are no rules in love and war!!",
-        "Hope they like the taste of gunpowder for breakfast!!",
-        "Sending them a friendly reminder… shaped like a missile.",
-        "Betting Vi would vote for {theirMoment} too... WHATEVER I DON'T CARE!!",
-        "This is why we can't have nice things. Or nice people."
+        "I'm not saying fight. I'm saying don't lose.",
+        "Pow-Pow wants a word. Fishbones wants two.",
+        "They'll learn. Everyone does.",
+        "Well, that's one way to make an enemy.",
+        "I like them already. Mostly because I get to dislike them.",
+        "Forget it. I don't care. I totally care.",
+        "A little rivalry is healthy. A lot is fun."
       ],
       "buttons": [
-        "Watch 'Em Burn!! ⚔️",
-        "Show 'Em!! 💥",
-        "Spectate the Carnage!! 🔥",
-        "Go to War!! 🎯",
-        "Face Enemy!! 😈",
-        "Front Row Seats!! 🎪"
+        "See the match",
+        "Go and look",
+        "Watch it go up",
+        "Face them",
+        "Settle it",
+        "Front row"
       ]
     },
     "streak-ally-10": {
       "messages": [
-        "🔥🔥🔥 TEN MATCHES with {username}!! You two are SOULMATES!!",
-        "💥💥💥 {username} is your chaos twin — 10 straight agreements!!",
-        "🎪 LEGENDARY DUO UNLOCKED — you and {username} are unstoppable!!"
+        "Ten matches in a row with {username}. You two should get a room. Or a bunker.",
+        "{username} has agreed with you ten times running. That's either friendship or a cult.",
+        "Ten straight with {username}. Okay, that's not a coincidence."
       ],
       "details": [
-        "This is the stuff of myths!!",
         "I ship it.",
-        "Nobody's ever been this in sync!!",
-        "My therapist would hate this... if I had one!! 💥"
+        "Weird. Good weird.",
+        "Don't let it fall apart now.",
+        "Honestly? Respect."
       ],
       "buttons": [
-        "Celebrate Forever!! 🎉",
-        "View Soulmate!! 👑",
-        "Send Love Bomb!! 💝"
+        "See their profile",
+        "Say hi",
+        "Nice"
       ]
     },
     "streak-ally-20": {
       "messages": [
-        "👑 {streakCount} MATCHES with {username} — ETERNAL CHAOS TWINS!!",
-        "💎 You two just broke reality with perfect agreement!!",
-        "🏆 HISTORY MADE — {streakCount} straight with {username}!!"
+        "{streakCount} matches in a row with {username}. That's scary. In a good way.",
+        "{streakCount} for {username} and you. At this point you're one brain.",
+        "{streakCount} straight with {username}. Somebody give you both a medal. Or a warning."
       ],
       "details": [
-        "I'm actually speechless (this never happens).",
-        "You're both getting statues.",
-        "Is this healthy? Probably not. Do I care? ALSO NO!!"
+        "I'm speechless. This never happens.",
+        "Is this healthy? Don't ask me.",
+        "That's not taste, that's destiny."
       ],
       "buttons": [
-        "WORSHIP!! 👑",
-        "Immortal Duo!! 💎",
-        "PARTY FOREVER!! 🎉"
+        "See their profile",
+        "Wow",
+        "Say hi"
       ]
     },
     "streak-rival-10": {
       "messages": [
-        "⚔️⚔️⚔️ TEN WARS with {username} — ULTIMATE NEMESIS ACHIEVED!!",
-        "💀 {username} is your ARCH-ENEMY — 10 battles and counting!!",
-        "🔥 LEGENDARY RIVALRY UNLOCKED — you two were born to fight!!"
+        "Ten matches against {username}. You two clearly can't stay away from each other.",
+        "{username} has disagreed with you ten times running. That's not a rival, that's a hobby.",
+        "Ten battles with {username}. I'm taking bets."
       ],
       "details": [
-        "This feud is the main plot now.",
+        "This is the main plot now.",
         "I'm selling tickets.",
-        "The voices say this is fine. All seven of them agree!!"
+        "The voices think this is fine. All of them agree."
       ],
       "buttons": [
-        "Face Nemesis!! 💀",
-        "View Eternal War!! ⚔️",
-        "FIGHT AGAIN!! 🔥"
+        "See their profile",
+        "Face them",
+        "Fight again"
       ]
     },
     "streak-rival-20": {
       "messages": [
-        "👹 {streakCount} BATTLES with {username} — DESTINED ENEMIES FOREVER!!",
-        "💀 ETERNAL RIVALRY — you two will clash until the end of time!!",
-        "⚔️ HISTORY'S GREATEST FEUD — {streakCount} wars and still going!!"
+        "{streakCount} matches against {username}. At this point it's personal.",
+        "{streakCount} battles with {username}. Bury the hatchet. Or don't. I'm enjoying this.",
+        "{streakCount} against {username}. That's a feud. A proper one."
       ],
       "details": [
-        "This is bigger than Piltover vs Zaun.",
-        "I'm scared and proud.",
-        "They'll pay for this. They'll ALL pay."
+        "Bigger than Piltover and Zaun. Nearly.",
+        "I'm scared and a bit proud.",
+        "One of you has to blink."
       ],
       "buttons": [
-        "WAR FOREVER!! ⚔️",
-        "View Immortal Foe!! 👹",
-        "NEVER SURRENDER!! 🔥"
+        "See their profile",
+        "Face them",
+        "Keep going"
       ]
     },
     "closing-24h": {
       "messages": [
-        "⏳ Psst… \"{matchTitle}\" blows up in {timeLeft} and you haven't voted!! Fix that!!",
-        "💣 Tick-tock, trinket!! {timeLeft} left on \"{matchTitle}\" and your vote's MISSING!!",
-        "🎆 \"{matchTitle}\" goes BOOM in {timeLeft}!! Don't miss the fireworks — vote!!"
+        "{matchTitle} closes in {timeLeft} and you haven't voted. I'm not nagging. I'm just saying.",
+        "{timeLeft} left on {matchTitle}. Your vote's missing. Make it less awkward.",
+        "{matchTitle} goes in {timeLeft}. Come on, it takes ten seconds."
       ],
       "buttons": [
-        "Beat the Clock!! ⏰",
-        "Vote Before It Blows!! 💥"
+        "Vote now",
+        "Beat the clock"
       ]
     },
     "closing-3h": {
       "messages": [
-        "🧨 Only {timeLeft} left on \"{matchTitle}\"!! You haven't voted, trinket!!",
-        "⏰ BOOM O'CLOCK is {timeLeft} away!! \"{matchTitle}\" still needs YOUR vote!!",
-        "😈 Hehe~ {timeLeft} till \"{matchTitle}\" closes… and your vote's still missing!!"
+        "{timeLeft} left on {matchTitle} and no vote from you. Really?",
+        "Clock's ticking. {matchTitle} closes in {timeLeft}.",
+        "{timeLeft} until {matchTitle} closes. Your vote's still not here."
       ],
       "buttons": [
-        "Vote NOW!! 💣",
-        "Don't Let It Go Boom!! 🧨"
+        "Vote now",
+        "Fine, I'll do it"
       ]
     },
     "closing-final": {
       "messages": [
-        "🚨 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft}!! VOTE VOTE VOTE!!",
-        "💥 It's now or NEVER!! {timeLeft} left on \"{matchTitle}\"!!",
-        "🔥 Fuse is almost OUT!! {timeLeft} to vote on \"{matchTitle}\"!!"
+        "{matchTitle} closes in {timeLeft}. Now or never.",
+        "{timeLeft}. That's all you've got on {matchTitle}. Go.",
+        "Last call on {matchTitle}. {timeLeft} left. Don't make me say it twice."
       ],
       "buttons": [
-        "LAST CHANCE!! 🚨",
-        "VOTE VOTE VOTE!! 💥"
+        "Last chance",
+        "Go go go"
       ]
     },
     "closing-multi": {
       "messages": [
-        "💣 {matchCount} matches you haven't voted in are about to blow!! Soonest: {timeLeft}!!",
-        "⏰ Tick-tock!! {matchCount} unvoted matches closing — soonest in {timeLeft}!!"
+        "{matchCount} matches are closing and you haven't voted in them. Soonest in {timeLeft}.",
+        "{matchCount} unvoted matches, about to end. The first goes in {timeLeft}."
       ],
       "buttons": [
-        "Show Me the Matches!! 💣",
-        "See the Chaos!! 🎪"
+        "Show me",
+        "Fine, let's go"
       ]
     },
     "novotes": {
       "messages": [
-        "🆘 ZERO VOTES on \"{matchTitle}\"?! THIS MATCH IS DEAD AND EMPTY!!",
-        "😱 NOBODY'S VOTED YET!! \"{moment1}\" vs \"{moment2}\" is a ghost town!!",
-        "💣 Uh-oh!! Brand-new match and it's quieter than Piltover… GROSS!!",
-        "🎪 BE THE FIRST TO BLOW THIS UP!! \"{matchTitle}\" needs a spark!!"
+        "Zero votes on {matchTitle}. Wow. It's lonely in there.",
+        "Nobody's voted yet. {moment1} versus {moment2} and total silence.",
+        "Brand new match and not a single vote. Someone has to go first.",
+        "{matchTitle} needs a spark. You know where I'd start."
       ],
       "buttons": [
-        "Vote First!! 💥",
-        "Light the Fuse!! 💣",
-        "START THE CHAOS!! 🎪",
-        "Click Me Before I Explode!! ⚡"
+        "Vote first",
+        "Light the fuse",
+        "Be the first",
+        "Fine, me then"
       ]
     },
     "lowvotes": {
       "messages": [
-        "⚠️ This match is practically empty! Like... {totalVotes} vote{votesPlural}? That's sad!",
-        "😬 Only a handful of votes here! Let's blow that number up!",
-        "🎯 Low turnout alert! Time to pump those numbers up!",
-        "👀 Barely anyone's voted here! Let's fix that, yeah?"
+        "{totalVotes} vote{votesPlural} on this one. That's embarrassing for everyone.",
+        "Barely anyone's voted here. Odd. It's good.",
+        "Low turnout. I blame the rest of you.",
+        "Hardly any votes here. Somebody do something."
       ],
       "details": [
-        "Give it some love! Every vote counts!",
-        "Help this match get the attention it deserves!",
-        "Let's make some noise here!",
-        "Time to show this match some chaos!"
+        "Go on. Give it a push.",
+        "It deserves better.",
+        "Make some noise.",
+        "Don't be shy."
       ],
       "ctas": [
-        "VOTE NOW!!",
-        "FIX THIS!!",
-        "SHOOT!!",
-        "LET'S GO!!"
+        "Vote",
+        "Fix it",
+        "Go on",
+        "Help"
       ]
     },
     "round-opening": {
       "messages": [
-        "ROUND {round} JUST DROPPED!! {matchCount} FRESH moments TO BLOW UP!!",
-        "NEW ROUND LIVE!! {matchCount} targets acquired — LOCK AND LOAD!!",
-        "Hehe~ Round {round} spawned with {matchCount} new explosions waiting!!",
-        "ROUND {round} IS HERE!! {matchCount} battles. {matchCount} booms. NO MERCY!!"
+        "Round {round} is open. {matchCount} new matches. Pick a side.",
+        "{matchCount} fresh matches in round {round}. Plenty to argue about.",
+        "Round {round} just started. {matchCount} matches waiting for you.",
+        "New round. {matchCount} matches. Nobody's safe."
       ],
       "buttons": [
-        "START THE MAYHEM!!",
-        "VIEW ROUND {round}!!",
-        "CAUSE CHAOS NOW!!",
-        "GET JINXED!!"
+        "Start voting",
+        "See round {round}",
+        "Let's go",
+        "Show me"
       ]
     },
     "match-won": {
       "messages": [
-        "GET JINXED LOSERS!! \"{momentTitle}\" JUST ADVANCED!!",
-        "BOOM BABY!! \"{momentTitle}\" obliterated the competition — next round is DOOMED!!",
-        "YOUR moment SURVIVED THE PURGE!! \"{momentTitle}\" moves on and the bodies are piling up!!",
-        "WINNER WINNER EXPLOSIVE DINNER!! \"{momentTitle}\" crushed souls and took names!!",
-        "Hehe~ \"{momentTitle}\" is moving up… leaving only ashes behind!!",
-        "VICTORY SMELLS LIKE GUNPOWDER!! \"{momentTitle}\" advances — as it should!!"
+        "{momentTitle} just advanced. Told you.",
+        "{momentTitle} beat the competition. Next round's in trouble.",
+        "{momentTitle} survived. I never doubted it. Okay, a bit.",
+        "{momentTitle} is through. Somebody's having a good day.",
+        "{momentTitle} moves up. The rest are ash.",
+        "{momentTitle} won. Look at you. Good call."
       ],
       "details": [
-        "Your reign of terror continues to the next round.",
-        "Another one bites the dust. Delicious.",
-        "The bracket just got a little smaller… thanks to you."
+        "Your pick keeps going.",
+        "One down. A lot to go.",
+        "The bracket got a bit smaller."
       ],
       "buttons": [
-        "RUB IT IN!!",
-        "View the Carnage!!",
-        "Next Target!!",
-        "TO THE FINALS!!"
+        "Gloat",
+        "See the result",
+        "Next match",
+        "On to the next round"
       ]
     },
     "match-lost": {
       "messages": [
-        "NO NO NO!! \"{momentTitle}\" got ROBBED — THEY CHEATED I SWEAR!!",
-        "THEY DID NOT JUST ELIMINATE \"{momentTitle}\" — ADDING EVERYONE TO THE LIST™!!",
-        "FINE!! \"{momentTitle}\" is dead… time to burn the entire bracket down!!",
-        "Pfft. \"{momentTitle}\" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!",
-        "They left me again... just like... NO WAIT THIS IS DIFFERENT!! REVENGE TIME!!",
-        "Time to visit everyone who voted wrong... Fishbones wants to have a CHAT!! 🚀"
+        "{momentTitle} is out. Somebody cheated. I'm sure of it.",
+        "{momentTitle} lost. I'm adding everyone who voted against it to the list.",
+        "Fine. {momentTitle} is gone. I'm not upset. I'm just loud.",
+        "{momentTitle} was too good for this place anyway.",
+        "{momentTitle} is out. And now it's quiet. I hate it when it's quiet.",
+        "{momentTitle} didn't make it. Moving on. Not really."
       ],
       "details": [
-        "They'll pay for this. They'll ALL pay.",
-        "Your moment may be gone, but the rage is eternal.",
-        "Death is only the beginning.",
-        "Everyone always leaves... BUT NOT THIS TIME!! Fishbones, load the big one!!"
+        "They'll pay for this.",
+        "It was good. They'll know.",
+        "You'll get another one. They always come back.",
+        "Everyone leaves eventually. It's fine."
       ],
       "buttons": [
-        "REVENGE VOTE NOW!!",
-        "BURN IT ALL DOWN!!",
-        "Next Target Acquired!!",
-        "I'm Fine (I'm lying)!!"
+        "See the result",
+        "Next match",
+        "Revenge",
+        "I'm fine"
       ]
     },
     "match-tied-alert": {
@@ -452,153 +452,93 @@
             "winner": "{momentTitle}"
           },
           "message": [
-            "50-50 TIE — AND YOU WON ON SEEDING!! CHAOS REWARDED!!",
-            "PERFECT DEADLOCK — and the bracket gave it to YOU!! BOOM!!"
+            "Dead tie, and your pick took it on seeding. Take the win.",
+            "Perfect deadlock. The bracket picked you. Lucky."
           ],
           "cta": [
-            "I WIN BABY!!",
-            "SEEDING IS MY FRIEND!!"
+            "Take it",
+            "Win's a win"
           ]
         },
         {
           "condition": "default",
           "message": [
-            "50-50 TIE — PURE CHAOS!! Nobody really won… except {winner} on boring seeding.",
-            "MAXIMUM TIE ACHIEVED — but some seed rule gave it to {winner}. LAME!"
+            "Dead tie. {winner} goes through on seeding. Boring way to end a fight.",
+            "A tie. {winner} gets it on the seeding rule. That's not winning, that's paperwork."
           ],
           "cta": [
-            "BEAUTIFUL CHAOS!!",
-            "Next Explosion!!"
+            "Next match",
+            "See the result"
           ]
         }
       ]
     },
-    "factionAlerts": {
-      "match-won": {
-        "messages": [
-          "💥 WE CRUSHED IT!! Team Jinx led the charge with {jinxVotes} votes!!",
-          "🧨 BOOM BABY!! Team Jinx dominated with {jinxVotes} votes while Vi's losers only managed {viVotes}!!",
-          "💣 HAHA!! {jinxVotes} Jinx voters vs {viVotes} Vi wannabes — and we WON!! Told you chaos works!!",
-          "🎆 FACTION VICTORY!! Team Jinx: {jinxVotes} votes | Everyone else: {otherVotes} — WE RUN THIS PLACE!!",
-          "💥 {jinxPercent}% Team Jinx unity!! We DEMOLISHED the competition!!",
-          "🧨 Team Jinx brought {jinxVotes} votes — Vi's {viVotes} losers didn't stand a CHANCE!!"
-        ],
-        "details": [
-          "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters! +{xp} XP",
-          "Team Jinx dominated! You ranked #{yourFactionRank} in the winning faction! +{xp} XP",
-          "Faction power!! #{yourFactionRank} of {totalFactionVoters} Jinx voters — CHAOS REIGNS!! +{xp} XP"
-        ],
-        "buttons": [
-          "💥 RUB IT IN!!",
-          "🎯 View Faction Carnage!!",
-          "💣 Mock Vi's Team!!"
-        ]
-      },
-      "match-lost": {
-        "messages": [
-          "😤 WE LOST?! {wrongPercent}% of Team Jinx voted WRONG?! TRAITORS!!",
-          "😑 Vi's team won with {viVotes} votes... I'm pretending I didn't see that.",
-          "💣 {jinxVotes} voted right, but {wrongVotes} Jinx voters BETRAYED US!!",
-          "🔥 TEAM JINX WHAT ARE YOU DOING?! Only {jinxVotes} votes?!",
-          "😠 {jinxPercent}% got it RIGHT but we STILL LOST?! Surrounded by idiots!!",
-          "💥 Embarrassing. {jinxVotes} Jinx votes vs {viVotes} Vi votes. Someone's getting kicked off..."
-        ],
-        "details": [
-          "Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters (at least YOU tried) +{xp} XP",
-          "You ranked #{yourFactionRank} in your faction... but we still lost. Ugh. +{xp} XP",
-          "Faction failure! #{yourFactionRank} of {totalFactionVoters} — half of them are WRONG!! +{xp} XP"
-        ],
-        "buttons": [
-          "🔥 DISOWN MY TEAM!!",
-          "💥 Demand Revenge!!",
-          "😤 View The Carnage!!"
-        ]
-      },
-      "comeback": {
-        "messages": [
-          "🎆 FROM {oldPercent}% TO {newPercent}%!! Team Jinx FLIPPED THIS MATCH!!",
-          "💥 COMEBACK BABY!! We were LOSING then {jinxVoteSwing} Jinx voters SAVED US!!",
-          "🧨 {oldPercent}% to {newPercent}% — Team Jinx went NUCLEAR in the final hour!!",
-          "💣 TURNAROUND!! {jinxVoteSwing} last-minute Jinx votes — Vi's team is CRYING!!",
-          "🎪 THE COMEBACK!! Team Jinx pulled a {swingPercent}% swing — from losing to DOMINATING!!"
-        ],
-        "details": [
-          "Legendary comeback! Team Jinx: +{jinxVoteSwing} votes in final stretch! +{xp} XP",
-          "Epic turnaround! #{yourFactionRank} among the {totalFactionVoters} Jinx voters who saved this!! +{xp} XP"
-        ],
-        "buttons": [
-          "💣 CELEBRATE!!",
-          "🎯 Replay The Comeback!!",
-          "💥 Mock The Doubters!!"
-        ]
-      }
-    },
     "encouragement": {
       "messages": [
-        "👀 Still browsing? Pick something! Anything! BOOM!",
-        "😊 No pressure, but... you gonna vote or just stare?",
-        "🎯 C'mon! Just click one! They're all good!",
-        "💥 Decisions, decisions! Just shoot and see what happens!"
+        "Still browsing? Pick something. Anything. I'm patient. I'm lying.",
+        "No pressure, but are you going to vote or just stare?",
+        "They're all good. Just pick one.",
+        "Decisions, decisions. Just shoot and see what happens."
       ],
       "details": [
-        "Every vote makes a difference!",
-        "Your opinion matters! Sort of!",
-        "Don't overthink it!",
-        "Trust your gut!"
+        "Every vote counts.",
+        "Your opinion matters. Sort of.",
+        "Don't overthink it.",
+        "Trust your gut."
       ],
       "buttons": [
-        "VOTE NOW!!",
-        "PICK ONE!!",
-        "DO IT!!",
-        "SHOOT!!"
+        "Vote now",
+        "Pick one",
+        "Do it",
+        "Go on"
       ]
     },
     "welcome": {
       "welcome-first-time": {
         "messages": [
-          "🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!",
-          "💥 HEY TOOTS!! {liveCount} moments are waiting to get blown up!!",
-          "😈 Welcome to MY world, trinket!! It's chaotic, it's broken, and you're GONNA LOVE IT!!",
-          "🔥 RULES? NEVER HEARD OF 'EM!! {liveCount} matches ready to explode!!"
+          "Welcome. {liveCount} matches live right now. Go and break something.",
+          "{liveCount} edits fighting it out. Pick a side before they pick one for you.",
+          "New here? Good. It's chaotic and it's broken, and I like it that way. {liveCount} live.",
+          "No rules. {liveCount} matches. Have fun."
         ],
         "buttons": [
-          "START THE MAYHEM!! 💥",
-          "Get Jinxed!! 😈",
-          "Cause Chaos!! 🎪",
-          "Light Everything Up!! 💣"
+          "Start voting",
+          "Show me",
+          "Let's go",
+          "Light it up"
         ]
       },
       "welcome-streak": {
         "messages": [
-          "🔥 Day 2 of chaos! You're back for MORE?! I LOVE IT!!",
-          "💥 TWO DAYS of mayhem!! You're officially a repeat offender!!",
-          "🎪 Back again?! Day 2 streak!! Let's make it EXPLODE!!"
+          "Day two. You came back. I'm not saying I'm pleased.",
+          "Two days running. Look at you, a regular.",
+          "Back again? Day two. I could get used to this."
         ],
         "buttons": [
-          "KEEP THE CHAOS GOING!! 💣",
-          "MORE MAYHEM!! 🔥"
+          "Keep going",
+          "More matches"
         ]
       },
       "welcome-comeback": {
         "messages": [
-          "💥 {days} DAYS?! Where've you BEEN, bubbles?! I missed blowing stuff up with you!!",
-          "🎪 YOU'RE BACK after {days} days!! Time to catch up on ALL the chaos!!",
-          "💣 {days} days away?! Did you forget about me?! Let's EXPLODE some votes!!"
+          "{days} days. Where've you been? I'm not asking because I care.",
+          "You're back after {days} days. A lot happened. Mostly loud things.",
+          "{days} days away. I noticed. I don't know why I said that."
         ],
         "buttons": [
-          "LET'S GO CRAZY!! 💥",
-          "CATCH UP ON CHAOS!! 🎪"
+          "Catch up",
+          "Show me"
         ]
       },
       "welcome-back": {
         "messages": [
-          "💥 HEYYYY!! You came back!! Ready for more explosions?!",
-          "🎪 The chaos queen returns!! Let's blow this place UP!!",
-          "💣 YOU'RE BACK!! Time to shake things up again!!"
+          "Oh, you're back. Good. It was getting quiet.",
+          "Look who's here. Ready for more?",
+          "You came back. Let's break something."
         ],
         "buttons": [
-          "GET JINXED!! 💥",
-          "CHAOS TIME!! 🎪"
+          "Let's go",
+          "Show me"
         ]
       }
     }
@@ -1282,6 +1222,53 @@
       "No bracket yet. Nothing's been drawn. Give it a moment.",
       "Empty. The draw hasn't happened. Soon.",
       "Nothing here yet. Check back."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One vote, no take-backs. Pick a side on Arcane Moments.",
+      "Two edits are fighting. {a} versus {b}. Come and settle it.",
+      "{a} versus {b} and nobody can agree. Be the tiebreaker."
+    ],
+    "voted": [
+      "I backed {pick} over {other}. Come and tell me I'm wrong.",
+      "{pick} got my vote. {other} did not. Your turn.",
+      "Picked {pick} over {other} on Arcane Moments. Go on, disagree."
+    ],
+    "early": [
+      "I got one of the first votes in on {pick} versus {other}. Be quick, it's quiet in here.",
+      "Early vote for {pick} over {other}. Come and make it a real fight.",
+      "Nobody's voted much on {pick} versus {other} yet. Fix that."
+    ],
+    "tied": [
+      "{pick} and {other} are dead level. One vote decides it. Guess whose.",
+      "Dead tie, {pick} versus {other}. I can't watch. Come and break it.",
+      "{pick} and {other} are exactly even. Somebody do something."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. My eye is twitching. Come and vote.",
+      "{voteDiff} votes between {pick} and {other}. This is going to get loud.",
+      "So close: {pick} versus {other}, {voteDiff} apart. Every vote counts now."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. Fixable. Come and fix it.",
+      "Down {voteDiff} against {other}, but {pick} isn't done. Help me out.",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me do this alone."
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}. Someone cheated. Come and even it up.",
+      "Down {voteDiff} on {other}. {pick} needs backup, and fast.",
+      "{pick} is getting buried by {other}. Rescue party, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's close. Come and help me hold it.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let it slip.",
+      "{pct}% for {pick} against {other}. Close enough to be nervous."
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}. Come and watch it burn, or join in.",
+      "{pick} is crushing {other}, {pct}%. Pick a side before it's over.",
+      "{pct}% for {pick}. {other} didn't see that coming."
     ]
   }
 }

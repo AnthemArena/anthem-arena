@@ -1,0 +1,890 @@
+# Jinx voice review (alerts)
+
+Source for tone: a transcript of the show's dialogue, used only to learn how she talks; none of her lines are copied. The achievements, bubble, modal and page lines in `champion-packs/jinx.json` were already in a quieter voice, so this review rewrote the **alerts** (267 lines, same triggers, same placeholders).
+
+## Voice sheet: Jinx (the show's, not the game's)
+
+- **Dry and sarcastic, not shouty.** Short lines; the joke turns dark; volume comes from the content, not capitals.
+- **Deflects with humour.** When something stings she undercuts it or goes quiet. Sincere moments are brief and a bit unfinished.
+- **Treats "Jinx" as a persona she is proud of.** Pow-Pow and Fishbones (her weapons) and "the list" are fine to reference.
+- **Excited by:** things going up, being noticed, being right, someone sticking around. **Angered by:** being talked down to, being left, being lied to.
+- **Would never:** be tidy and corporate, or sincerely apologise in the first line.
+- No nicknames for the viewer (they only suit named characters). Emoji used sparingly or not at all in these lines.
+- Spoiler-light: nothing that gives away plot.
+
+Edit any line below (or directly in `champion-packs/jinx.json`). Placeholders in `{braces}` must stay as they are.
+
+## Before and after
+
+
+### danger
+
+- `danger.messages[0].message`
+  - before: 💥 KABOOM!! "{momentTitle}" is down {voteDiff} — THEY CHEATED I SWEAR!!
+  - after: {momentTitle} is down {voteDiff}. That's not a loss, that's a crime scene.
+- `danger.messages[0].cta`
+  - before: BLOW EVERYTHING UP!! 🚨
+  - after: Fix it before I do
+- `danger.messages[1].message`
+  - before: 😡 DOWN {voteDiff}?! Fishbones is crying blood and Pow-Pow wants names!!
+  - after: Down {voteDiff}. Someone cheated. I don't know who yet, but I'm making a list.
+- `danger.messages[1].cta`
+  - before: SAVE IT OR I WILL!! 💣
+  - after: Save it
+- `danger.messages[2].message`
+  - before: 🔥 Losing by {voteDiff} already?! THIS IS WHY WE CAN'T HAVE NICE moments!!
+  - after: Losing by {voteDiff} already? Great. Love that for us.
+- `danger.messages[2].cta`
+  - before: TURN IT AROUND NOW!! 💥
+  - after: Turn it around
+- `danger.messages[3].message`
+  - before: ⚠️ Trailing {voteDiff}… I'm adding EVERYONE who voted wrong to The List™
+  - after: Trailing by {voteDiff}. Your move. Mine involves explosives.
+- `danger.messages[3].cta`
+  - before: FIX THIS BEFORE I DO!! 🎪
+  - after: Vote now
+- `danger.messages[4].message`
+  - before: 😬 Only down {voteDiff}?? Quick, give "{momentTitle}" a rocket launcher!!
+  - after: Only {voteDiff} behind. Fixable. I've fixed worse.
+- `danger.messages[4].cta`
+  - before: HELP OR I'LL EXPLODE!! 🔥
+  - after: Help it out
+- `danger.messages[5].message`
+  - before: 🤔 Down {voteDiff}... carry the one... TOO MANY!! Time to cheat the math!!
+  - after: Down {voteDiff}. Do the maths. Then do something about it.
+- `danger.messages[5].cta`
+  - before: Nudge it… or else ⚡
+  - after: Do something
+
+### nailbiter
+
+- `nailbiter.messages[0].message`
+  - before: 🔥🔥🔥 DEAD EVEN 50-50!! ONE VOTE DECIDES EVERYTHING!!
+  - after: Dead even. One vote decides it. No pressure. Okay, a little pressure.
+- `nailbiter.messages[0].cta`
+  - before: BREAK THE TIE OR I WILL!! 💥
+  - after: Break the tie
+- `nailbiter.messages[1].message`
+  - before: 😱 ONE. VOTE. If I had ONE BULLET... actually I have WAY more than that!!
+  - after: One vote apart. I can't watch. I'm absolutely watching.
+- `nailbiter.messages[1].cta`
+  - before: END MY SUFFERING!! 🎪
+  - after: Be the vote
+- `nailbiter.messages[2].message`
+  - before: 😬 ONLY {voteDiff} VOTES APART!! MY BRAIN IS SCREAMING!!
+  - after: {voteDiff} votes apart. My eye is twitching.
+- `nailbiter.messages[2].cta`
+  - before: MAKE IT STOP!! ⚡
+  - after: Make it stop
+- `nailbiter.messages[3].message`
+  - before: 🔥 So close at {voteDiff} votes… maximum boom potential detected!
+  - after: {voteDiff} votes in it. This is either going to be great or very loud.
+- `nailbiter.messages[3].cta`
+  - before: Watch the chaos unfold! 👀
+  - after: Watch it
+
+### winning
+
+- `winning.messages[0].message`
+  - before: 👑 TOTAL OBLITERATION!! "{momentTitle}" at {userPct}% — THEY'RE JUST ASH NOW!!
+  - after: {userPct}% on {momentTitle}. They didn't lose, they got deleted.
+- `winning.messages[0].cta`
+  - before: DANCE ON THEIR GRAVES!! 🎪
+  - after: Gloat a little
+- `winning.messages[1].message`
+  - before: 💥 BOOM BABY!! {userPct}% — I LOVE THE SMELL OF VICTORY EXPLOSIONS!!
+  - after: {userPct}%. Look at that. I'd say don't let it go to your head, but where's the fun in that.
+- `winning.messages[1].cta`
+  - before: RUB IT IN!! 🎉
+  - after: Enjoy it
+- `winning.messages[2].message`
+  - before: 🎯 Hehe~ {userPct}% domination! Pow-Pow says goodnight!!
+  - after: {userPct}%. Nice. Keep your guard up, though. It's never over until it's over.
+- `winning.messages[2].cta`
+  - before: BASK IN GLORY!! 💥
+  - after: Keep it going
+- `winning.messages[3].message`
+  - before: 😎 Chilling at {userPct}%… still winning, still unstoppable!!
+  - after: Sitting at {userPct}%. Still ahead. Try not to jinx it. Too late.
+- `winning.messages[3].cta`
+  - before: Keep the mayhem rolling! ✨
+  - after: Keep an eye on it
+
+### comeback
+
+- `comeback.messages[0].message`
+  - before: 💥💥💥 BACK FROM THE DEAD!! "{momentTitle}" was down {voteDiff} and RESURRECTED!!
+  - after: {momentTitle} was down {voteDiff} and came back. Some things refuse to stay down.
+- `comeback.messages[0].cta`
+  - before: WITNESS THE LEGEND!! 🎪
+  - after: Take a bow
+- `comeback.messages[1].message`
+  - before: 🎉 PLOT TWIST!! Flipped a {voteDiff}-vote hole — did someone say 'stay down'? I DON'T KNOW THAT WORD!!
+  - after: Flipped a {voteDiff}-vote hole. Everyone said stay down. Rude.
+- `comeback.messages[1].cta`
+  - before: BOW DOWN!! 💥
+  - after: Enjoy this
+- `comeback.messages[2].message`
+  - before: 🔥 HA! Snatched the lead from {voteDiff} behind like a BEAUTIFUL DISASTER!!
+  - after: Clawed back from {voteDiff} behind. Messy. Perfect.
+- `comeback.messages[2].cta`
+  - before: TOLD YOU SO!! ✨
+  - after: Nice one
+- `comeback.messages[3].message`
+  - before: 😈 Sneaky little comeback… "{momentTitle}" just slipped into the lead, no biggie~
+  - after: {momentTitle} just slid into the lead. Quietly. I respect that.
+- `comeback.messages[3].cta`
+  - before: Admire my genius! 👀
+  - after: See where it stands
+
+### ally
+
+- `ally.messages[0]`
+  - before: 🤝 {username} just voted "{momentTitle}" too!! TWINSIES!!
+  - after: {username} voted for {momentTitle} too. Fine, you're not completely hopeless.
+- `ally.messages[1]`
+  - before: 💥 YES!! {username} gets it — certified chaos enjoyer!!
+  - after: {username} picked {momentTitle}. Good taste. Suspicious, but good.
+- `ally.messages[2]`
+  - before: 🎪 {username} hopped on the correct grenade!! Welcome aboard!!
+  - after: {username} is with you on {momentTitle}. Try to look surprised.
+- `ally.messages[3]`
+  - before: 😈 Hehe~ {username} picked "{momentTitle}" — new partner in crime acquired!!
+  - after: {username} just backed {momentTitle}. Looks like you've got company.
+- `ally.messages[4]`
+  - before: 🔥 {username} also chose "{momentTitle}"!! High-five through the screen!!
+  - after: Same pick as {username}. Great minds. Or bad ideas. Same thing.
+- `ally.messages[5]`
+  - before: 💣 {username} has IMMACULATE taste… almost as good as mine!!
+  - after: {username} agrees with you on {momentTitle}. Don't get used to it.
+- `ally.messages[6]`
+  - before: 🎉 Squad goals!! {username} and I are gonna burn this bracket down together!!
+  - after: {username} voted {momentTitle}. That's two of you. That's practically a gang.
+- `ally.messages[7]`
+  - before: ✨ Hey trinket!! {username} just proved they're cool — I'm keeping them!!
+  - after: {username} has opinions and they match yours. Rare. Keep them.
+- `ally.details[0]`
+  - before: Great minds think alike—BOOM!! …sorry, reflex.
+  - after: Two of you. That's a conspiracy.
+- `ally.details[1]`
+  - before: We should probably rob a bank after this.
+  - after: Statistically, this ends in fireworks.
+- `ally.details[2]`
+  - before: Two psychos, one moment — statistically this ends in fireworks.
+  - after: Don't tell them I said they're alright.
+- `ally.details[3]`
+  - before: I'm sending them a friendship rocket. With glitter.
+  - after: Alliances are fragile. Try not to blow it up.
+- `ally.details[4]`
+  - before: The army of good taste just gained +1 explosive soldier!!
+  - after: I give it a week.
+- `ally.details[5]`
+  - before: Finally someone who won't leave me... right? RIGHT?!
+  - after: Look at you, making friends.
+- `ally.details[6]`
+  - before: Plot twist: we're the main characters now.
+  - after: Nice. Now go win something.
+- `ally.details[7]`
+  - before: Yes I know this is just a notification. Doesn't make it less REAL!!
+  - after: I'm not smiling. Shut up.
+- `ally.buttons[0]`
+  - before: High Five!! 🙌
+  - after: Say hi
+- `ally.buttons[1]`
+  - before: Send Glitter Bomb!! 💥
+  - after: Send a fist bump
+- `ally.buttons[2]`
+  - before: Fist Bump!! 👊
+  - after: See the match
+- `ally.buttons[3]`
+  - before: Let's Burn It Down!! 🎉
+  - after: Back them up
+- `ally.buttons[4]`
+  - before: You're My Favorite!! ✨
+  - after: Nice one
+- `ally.buttons[5]`
+  - before: Squad Forever!! 💝
+  - after: Team up
+
+### rival
+
+- `rival.messages[0]`
+  - before: ⚔️ {username} just picked "{theirMoment}" against "{yourMoment}"?! OH IT'S ON!!
+  - after: {username} picked {theirMoment} over {yourMoment}. Bold. Wrong, but bold.
+- `rival.messages[1]`
+  - before: 😈 Hehe~ {username} wants to fight? CUTE. Let's blow their speakers up!!
+  - after: {username} voted against {yourMoment}. Cute.
+- `rival.messages[2]`
+  - before: 💥 WRONG ANSWER {username}!! You dared vote against "{yourMoment}"?!
+  - after: {username} chose {theirMoment}. I'm not mad. I'm just taking notes.
+- `rival.messages[3]`
+  - before: 🎯 {username} chose "{theirMoment}" — adding them to The List™ immediately!!
+  - after: {username} went for {theirMoment}. Adding them to the list.
+- `rival.messages[4]`
+  - before: 🔥 {username} declared WAR on "{yourMoment}"!! Pow-Pow is locked and loaded!!
+  - after: {username} is against you on {yourMoment}. Finally, something interesting.
+- `rival.messages[5]`
+  - before: 😡 OH THEY DID NOT just vote "{theirMoment}"!! Fishbones is taking this personally!!
+  - after: {username} thinks {theirMoment} is better. That's a hot take.
+- `rival.messages[6]`
+  - before: 💣 {username} thinks "{theirMoment}" is better?! Time to visit them with my rockets!!
+  - after: {username} voted against you. This is why nobody invites us anywhere.
+- `rival.messages[7]`
+  - before: ⚡ {username} vs YOU — only one moment leaves in ashes!!
+  - after: {username} versus you. I'll get the popcorn. And the other thing.
+- `rival.details[0]`
+  - before: I already sharpened the rockets with their name on it.
+  - after: I'm not saying fight. I'm saying don't lose.
+- `rival.details[1]`
+  - before: Fishbones just asked if we can make it hurt more. I said yes.
+  - after: Pow-Pow wants a word. Fishbones wants two.
+- `rival.details[2]`
+  - before: They're gonna learn the hard way — there are no rules in love and war!!
+  - after: They'll learn. Everyone does.
+- `rival.details[3]`
+  - before: Hope they like the taste of gunpowder for breakfast!!
+  - after: Well, that's one way to make an enemy.
+- `rival.details[4]`
+  - before: Sending them a friendly reminder… shaped like a missile.
+  - after: I like them already. Mostly because I get to dislike them.
+- `rival.details[5]`
+  - before: Betting Vi would vote for {theirMoment} too... WHATEVER I DON'T CARE!!
+  - after: Forget it. I don't care. I totally care.
+- `rival.details[6]`
+  - before: This is why we can't have nice things. Or nice people.
+  - after: A little rivalry is healthy. A lot is fun.
+- `rival.buttons[0]`
+  - before: Watch 'Em Burn!! ⚔️
+  - after: See the match
+- `rival.buttons[1]`
+  - before: Show 'Em!! 💥
+  - after: Go and look
+- `rival.buttons[2]`
+  - before: Spectate the Carnage!! 🔥
+  - after: Watch it go up
+- `rival.buttons[3]`
+  - before: Go to War!! 🎯
+  - after: Face them
+- `rival.buttons[4]`
+  - before: Face Enemy!! 😈
+  - after: Settle it
+- `rival.buttons[5]`
+  - before: Front Row Seats!! 🎪
+  - after: Front row
+
+### streak-ally-10
+
+- `streak-ally-10.messages[0]`
+  - before: 🔥🔥🔥 TEN MATCHES with {username}!! You two are SOULMATES!!
+  - after: Ten matches in a row with {username}. You two should get a room. Or a bunker.
+- `streak-ally-10.messages[1]`
+  - before: 💥💥💥 {username} is your chaos twin — 10 straight agreements!!
+  - after: {username} has agreed with you ten times running. That's either friendship or a cult.
+- `streak-ally-10.messages[2]`
+  - before: 🎪 LEGENDARY DUO UNLOCKED — you and {username} are unstoppable!!
+  - after: Ten straight with {username}. Okay, that's not a coincidence.
+- `streak-ally-10.details[0]`
+  - before: This is the stuff of myths!!
+  - after: I ship it.
+- `streak-ally-10.details[1]`
+  - before: I ship it.
+  - after: Weird. Good weird.
+- `streak-ally-10.details[2]`
+  - before: Nobody's ever been this in sync!!
+  - after: Don't let it fall apart now.
+- `streak-ally-10.details[3]`
+  - before: My therapist would hate this... if I had one!! 💥
+  - after: Honestly? Respect.
+- `streak-ally-10.buttons[0]`
+  - before: Celebrate Forever!! 🎉
+  - after: See their profile
+- `streak-ally-10.buttons[1]`
+  - before: View Soulmate!! 👑
+  - after: Say hi
+- `streak-ally-10.buttons[2]`
+  - before: Send Love Bomb!! 💝
+  - after: Nice
+
+### streak-ally-20
+
+- `streak-ally-20.messages[0]`
+  - before: 👑 {streakCount} MATCHES with {username} — ETERNAL CHAOS TWINS!!
+  - after: {streakCount} matches in a row with {username}. That's scary. In a good way.
+- `streak-ally-20.messages[1]`
+  - before: 💎 You two just broke reality with perfect agreement!!
+  - after: {streakCount} for {username} and you. At this point you're one brain.
+- `streak-ally-20.messages[2]`
+  - before: 🏆 HISTORY MADE — {streakCount} straight with {username}!!
+  - after: {streakCount} straight with {username}. Somebody give you both a medal. Or a warning.
+- `streak-ally-20.details[0]`
+  - before: I'm actually speechless (this never happens).
+  - after: I'm speechless. This never happens.
+- `streak-ally-20.details[1]`
+  - before: You're both getting statues.
+  - after: Is this healthy? Don't ask me.
+- `streak-ally-20.details[2]`
+  - before: Is this healthy? Probably not. Do I care? ALSO NO!!
+  - after: That's not taste, that's destiny.
+- `streak-ally-20.buttons[0]`
+  - before: WORSHIP!! 👑
+  - after: See their profile
+- `streak-ally-20.buttons[1]`
+  - before: Immortal Duo!! 💎
+  - after: Wow
+- `streak-ally-20.buttons[2]`
+  - before: PARTY FOREVER!! 🎉
+  - after: Say hi
+
+### streak-rival-10
+
+- `streak-rival-10.messages[0]`
+  - before: ⚔️⚔️⚔️ TEN WARS with {username} — ULTIMATE NEMESIS ACHIEVED!!
+  - after: Ten matches against {username}. You two clearly can't stay away from each other.
+- `streak-rival-10.messages[1]`
+  - before: 💀 {username} is your ARCH-ENEMY — 10 battles and counting!!
+  - after: {username} has disagreed with you ten times running. That's not a rival, that's a hobby.
+- `streak-rival-10.messages[2]`
+  - before: 🔥 LEGENDARY RIVALRY UNLOCKED — you two were born to fight!!
+  - after: Ten battles with {username}. I'm taking bets.
+- `streak-rival-10.details[0]`
+  - before: This feud is the main plot now.
+  - after: This is the main plot now.
+- `streak-rival-10.details[1]`
+  - before: I'm selling tickets.
+  - after: I'm selling tickets.
+- `streak-rival-10.details[2]`
+  - before: The voices say this is fine. All seven of them agree!!
+  - after: The voices think this is fine. All of them agree.
+- `streak-rival-10.buttons[0]`
+  - before: Face Nemesis!! 💀
+  - after: See their profile
+- `streak-rival-10.buttons[1]`
+  - before: View Eternal War!! ⚔️
+  - after: Face them
+- `streak-rival-10.buttons[2]`
+  - before: FIGHT AGAIN!! 🔥
+  - after: Fight again
+
+### streak-rival-20
+
+- `streak-rival-20.messages[0]`
+  - before: 👹 {streakCount} BATTLES with {username} — DESTINED ENEMIES FOREVER!!
+  - after: {streakCount} matches against {username}. At this point it's personal.
+- `streak-rival-20.messages[1]`
+  - before: 💀 ETERNAL RIVALRY — you two will clash until the end of time!!
+  - after: {streakCount} battles with {username}. Bury the hatchet. Or don't. I'm enjoying this.
+- `streak-rival-20.messages[2]`
+  - before: ⚔️ HISTORY'S GREATEST FEUD — {streakCount} wars and still going!!
+  - after: {streakCount} against {username}. That's a feud. A proper one.
+- `streak-rival-20.details[0]`
+  - before: This is bigger than Piltover vs Zaun.
+  - after: Bigger than Piltover and Zaun. Nearly.
+- `streak-rival-20.details[1]`
+  - before: I'm scared and proud.
+  - after: I'm scared and a bit proud.
+- `streak-rival-20.details[2]`
+  - before: They'll pay for this. They'll ALL pay.
+  - after: One of you has to blink.
+- `streak-rival-20.buttons[0]`
+  - before: WAR FOREVER!! ⚔️
+  - after: See their profile
+- `streak-rival-20.buttons[1]`
+  - before: View Immortal Foe!! 👹
+  - after: Face them
+- `streak-rival-20.buttons[2]`
+  - before: NEVER SURRENDER!! 🔥
+  - after: Keep going
+
+### closing-24h
+
+- `closing-24h.messages[0]`
+  - before: ⏳ Psst… "{matchTitle}" blows up in {timeLeft} and you haven't voted!! Fix that!!
+  - after: {matchTitle} closes in {timeLeft} and you haven't voted. I'm not nagging. I'm just saying.
+- `closing-24h.messages[1]`
+  - before: 💣 Tick-tock, trinket!! {timeLeft} left on "{matchTitle}" and your vote's MISSING!!
+  - after: {timeLeft} left on {matchTitle}. Your vote's missing. Make it less awkward.
+- `closing-24h.messages[2]`
+  - before: 🎆 "{matchTitle}" goes BOOM in {timeLeft}!! Don't miss the fireworks — vote!!
+  - after: {matchTitle} goes in {timeLeft}. Come on, it takes ten seconds.
+- `closing-24h.buttons[0]`
+  - before: Beat the Clock!! ⏰
+  - after: Vote now
+- `closing-24h.buttons[1]`
+  - before: Vote Before It Blows!! 💥
+  - after: Beat the clock
+
+### closing-3h
+
+- `closing-3h.messages[0]`
+  - before: 🧨 Only {timeLeft} left on "{matchTitle}"!! You haven't voted, trinket!!
+  - after: {timeLeft} left on {matchTitle} and no vote from you. Really?
+- `closing-3h.messages[1]`
+  - before: ⏰ BOOM O'CLOCK is {timeLeft} away!! "{matchTitle}" still needs YOUR vote!!
+  - after: Clock's ticking. {matchTitle} closes in {timeLeft}.
+- `closing-3h.messages[2]`
+  - before: 😈 Hehe~ {timeLeft} till "{matchTitle}" closes… and your vote's still missing!!
+  - after: {timeLeft} until {matchTitle} closes. Your vote's still not here.
+- `closing-3h.buttons[0]`
+  - before: Vote NOW!! 💣
+  - after: Vote now
+- `closing-3h.buttons[1]`
+  - before: Don't Let It Go Boom!! 🧨
+  - after: Fine, I'll do it
+
+### closing-final
+
+- `closing-final.messages[0]`
+  - before: 🚨 FINAL MINUTES!! "{matchTitle}" closes in {timeLeft}!! VOTE VOTE VOTE!!
+  - after: {matchTitle} closes in {timeLeft}. Now or never.
+- `closing-final.messages[1]`
+  - before: 💥 It's now or NEVER!! {timeLeft} left on "{matchTitle}"!!
+  - after: {timeLeft}. That's all you've got on {matchTitle}. Go.
+- `closing-final.messages[2]`
+  - before: 🔥 Fuse is almost OUT!! {timeLeft} to vote on "{matchTitle}"!!
+  - after: Last call on {matchTitle}. {timeLeft} left. Don't make me say it twice.
+- `closing-final.buttons[0]`
+  - before: LAST CHANCE!! 🚨
+  - after: Last chance
+- `closing-final.buttons[1]`
+  - before: VOTE VOTE VOTE!! 💥
+  - after: Go go go
+
+### closing-multi
+
+- `closing-multi.messages[0]`
+  - before: 💣 {matchCount} matches you haven't voted in are about to blow!! Soonest: {timeLeft}!!
+  - after: {matchCount} matches are closing and you haven't voted in them. Soonest in {timeLeft}.
+- `closing-multi.messages[1]`
+  - before: ⏰ Tick-tock!! {matchCount} unvoted matches closing — soonest in {timeLeft}!!
+  - after: {matchCount} unvoted matches, about to end. The first goes in {timeLeft}.
+- `closing-multi.buttons[0]`
+  - before: Show Me the Matches!! 💣
+  - after: Show me
+- `closing-multi.buttons[1]`
+  - before: See the Chaos!! 🎪
+  - after: Fine, let's go
+
+### novotes
+
+- `novotes.messages[0]`
+  - before: 🆘 ZERO VOTES on "{matchTitle}"?! THIS MATCH IS DEAD AND EMPTY!!
+  - after: Zero votes on {matchTitle}. Wow. It's lonely in there.
+- `novotes.messages[1]`
+  - before: 😱 NOBODY'S VOTED YET!! "{moment1}" vs "{moment2}" is a ghost town!!
+  - after: Nobody's voted yet. {moment1} versus {moment2} and total silence.
+- `novotes.messages[2]`
+  - before: 💣 Uh-oh!! Brand-new match and it's quieter than Piltover… GROSS!!
+  - after: Brand new match and not a single vote. Someone has to go first.
+- `novotes.messages[3]`
+  - before: 🎪 BE THE FIRST TO BLOW THIS UP!! "{matchTitle}" needs a spark!!
+  - after: {matchTitle} needs a spark. You know where I'd start.
+- `novotes.buttons[0]`
+  - before: Vote First!! 💥
+  - after: Vote first
+- `novotes.buttons[1]`
+  - before: Light the Fuse!! 💣
+  - after: Light the fuse
+- `novotes.buttons[2]`
+  - before: START THE CHAOS!! 🎪
+  - after: Be the first
+- `novotes.buttons[3]`
+  - before: Click Me Before I Explode!! ⚡
+  - after: Fine, me then
+
+### lowvotes
+
+- `lowvotes.messages[0]`
+  - before: ⚠️ This match is practically empty! Like... {totalVotes} vote{votesPlural}? That's sad!
+  - after: {totalVotes} vote{votesPlural} on this one. That's embarrassing for everyone.
+- `lowvotes.messages[1]`
+  - before: 😬 Only a handful of votes here! Let's blow that number up!
+  - after: Barely anyone's voted here. Odd. It's good.
+- `lowvotes.messages[2]`
+  - before: 🎯 Low turnout alert! Time to pump those numbers up!
+  - after: Low turnout. I blame the rest of you.
+- `lowvotes.messages[3]`
+  - before: 👀 Barely anyone's voted here! Let's fix that, yeah?
+  - after: Hardly any votes here. Somebody do something.
+- `lowvotes.details[0]`
+  - before: Give it some love! Every vote counts!
+  - after: Go on. Give it a push.
+- `lowvotes.details[1]`
+  - before: Help this match get the attention it deserves!
+  - after: It deserves better.
+- `lowvotes.details[2]`
+  - before: Let's make some noise here!
+  - after: Make some noise.
+- `lowvotes.details[3]`
+  - before: Time to show this match some chaos!
+  - after: Don't be shy.
+- `lowvotes.ctas[0]`
+  - before: VOTE NOW!!
+  - after: Vote
+- `lowvotes.ctas[1]`
+  - before: FIX THIS!!
+  - after: Fix it
+- `lowvotes.ctas[2]`
+  - before: SHOOT!!
+  - after: Go on
+- `lowvotes.ctas[3]`
+  - before: LET'S GO!!
+  - after: Help
+
+### round-opening
+
+- `round-opening.messages[0]`
+  - before: ROUND {round} JUST DROPPED!! {matchCount} FRESH moments TO BLOW UP!!
+  - after: Round {round} is open. {matchCount} new matches. Pick a side.
+- `round-opening.messages[1]`
+  - before: NEW ROUND LIVE!! {matchCount} targets acquired — LOCK AND LOAD!!
+  - after: {matchCount} fresh matches in round {round}. Plenty to argue about.
+- `round-opening.messages[2]`
+  - before: Hehe~ Round {round} spawned with {matchCount} new explosions waiting!!
+  - after: Round {round} just started. {matchCount} matches waiting for you.
+- `round-opening.messages[3]`
+  - before: ROUND {round} IS HERE!! {matchCount} battles. {matchCount} booms. NO MERCY!!
+  - after: New round. {matchCount} matches. Nobody's safe.
+- `round-opening.buttons[0]`
+  - before: START THE MAYHEM!!
+  - after: Start voting
+- `round-opening.buttons[1]`
+  - before: VIEW ROUND {round}!!
+  - after: See round {round}
+- `round-opening.buttons[2]`
+  - before: CAUSE CHAOS NOW!!
+  - after: Let's go
+- `round-opening.buttons[3]`
+  - before: GET JINXED!!
+  - after: Show me
+
+### match-won
+
+- `match-won.messages[0]`
+  - before: GET JINXED LOSERS!! "{momentTitle}" JUST ADVANCED!!
+  - after: {momentTitle} just advanced. Told you.
+- `match-won.messages[1]`
+  - before: BOOM BABY!! "{momentTitle}" obliterated the competition — next round is DOOMED!!
+  - after: {momentTitle} beat the competition. Next round's in trouble.
+- `match-won.messages[2]`
+  - before: YOUR moment SURVIVED THE PURGE!! "{momentTitle}" moves on and the bodies are piling up!!
+  - after: {momentTitle} survived. I never doubted it. Okay, a bit.
+- `match-won.messages[3]`
+  - before: WINNER WINNER EXPLOSIVE DINNER!! "{momentTitle}" crushed souls and took names!!
+  - after: {momentTitle} is through. Somebody's having a good day.
+- `match-won.messages[4]`
+  - before: Hehe~ "{momentTitle}" is moving up… leaving only ashes behind!!
+  - after: {momentTitle} moves up. The rest are ash.
+- `match-won.messages[5]`
+  - before: VICTORY SMELLS LIKE GUNPOWDER!! "{momentTitle}" advances — as it should!!
+  - after: {momentTitle} won. Look at you. Good call.
+- `match-won.details[0]`
+  - before: Your reign of terror continues to the next round.
+  - after: Your pick keeps going.
+- `match-won.details[1]`
+  - before: Another one bites the dust. Delicious.
+  - after: One down. A lot to go.
+- `match-won.details[2]`
+  - before: The bracket just got a little smaller… thanks to you.
+  - after: The bracket got a bit smaller.
+- `match-won.buttons[0]`
+  - before: RUB IT IN!!
+  - after: Gloat
+- `match-won.buttons[1]`
+  - before: View the Carnage!!
+  - after: See the result
+- `match-won.buttons[2]`
+  - before: Next Target!!
+  - after: Next match
+- `match-won.buttons[3]`
+  - before: TO THE FINALS!!
+  - after: On to the next round
+
+### match-lost
+
+- `match-lost.messages[0]`
+  - before: NO NO NO!! "{momentTitle}" got ROBBED — THEY CHEATED I SWEAR!!
+  - after: {momentTitle} is out. Somebody cheated. I'm sure of it.
+- `match-lost.messages[1]`
+  - before: THEY DID NOT JUST ELIMINATE "{momentTitle}" — ADDING EVERYONE TO THE LIST™!!
+  - after: {momentTitle} lost. I'm adding everyone who voted against it to the list.
+- `match-lost.messages[2]`
+  - before: FINE!! "{momentTitle}" is dead… time to burn the entire bracket down!!
+  - after: Fine. {momentTitle} is gone. I'm not upset. I'm just loud.
+- `match-lost.messages[3]`
+  - before: Pfft. "{momentTitle}" was too beautiful for this world anyway. REVENGE TOUR STARTS NOW!!
+  - after: {momentTitle} was too good for this place anyway.
+- `match-lost.messages[4]`
+  - before: They left me again... just like... NO WAIT THIS IS DIFFERENT!! REVENGE TIME!!
+  - after: {momentTitle} is out. And now it's quiet. I hate it when it's quiet.
+- `match-lost.messages[5]`
+  - before: Time to visit everyone who voted wrong... Fishbones wants to have a CHAT!! 🚀
+  - after: {momentTitle} didn't make it. Moving on. Not really.
+- `match-lost.details[0]`
+  - before: They'll pay for this. They'll ALL pay.
+  - after: They'll pay for this.
+- `match-lost.details[1]`
+  - before: Your moment may be gone, but the rage is eternal.
+  - after: It was good. They'll know.
+- `match-lost.details[2]`
+  - before: Death is only the beginning.
+  - after: You'll get another one. They always come back.
+- `match-lost.details[3]`
+  - before: Everyone always leaves... BUT NOT THIS TIME!! Fishbones, load the big one!!
+  - after: Everyone leaves eventually. It's fine.
+- `match-lost.buttons[0]`
+  - before: REVENGE VOTE NOW!!
+  - after: See the result
+- `match-lost.buttons[1]`
+  - before: BURN IT ALL DOWN!!
+  - after: Next match
+- `match-lost.buttons[2]`
+  - before: Next Target Acquired!!
+  - after: Revenge
+- `match-lost.buttons[3]`
+  - before: I'm Fine (I'm lying)!!
+  - after: I'm fine
+
+### match-tied-alert
+
+- `match-tied-alert.messages[0].message[0]`
+  - before: 50-50 TIE — AND YOU WON ON SEEDING!! CHAOS REWARDED!!
+  - after: Dead tie, and your pick took it on seeding. Take the win.
+- `match-tied-alert.messages[0].message[1]`
+  - before: PERFECT DEADLOCK — and the bracket gave it to YOU!! BOOM!!
+  - after: Perfect deadlock. The bracket picked you. Lucky.
+- `match-tied-alert.messages[0].cta[0]`
+  - before: I WIN BABY!!
+  - after: Take it
+- `match-tied-alert.messages[0].cta[1]`
+  - before: SEEDING IS MY FRIEND!!
+  - after: Win's a win
+- `match-tied-alert.messages[1].message[0]`
+  - before: 50-50 TIE — PURE CHAOS!! Nobody really won… except {winner} on boring seeding.
+  - after: Dead tie. {winner} goes through on seeding. Boring way to end a fight.
+- `match-tied-alert.messages[1].message[1]`
+  - before: MAXIMUM TIE ACHIEVED — but some seed rule gave it to {winner}. LAME!
+  - after: A tie. {winner} gets it on the seeding rule. That's not winning, that's paperwork.
+- `match-tied-alert.messages[1].cta[0]`
+  - before: BEAUTIFUL CHAOS!!
+  - after: Next match
+- `match-tied-alert.messages[1].cta[1]`
+  - before: Next Explosion!!
+  - after: See the result
+
+> Note: the `factionAlerts` section below was removed from all packs on 18 Oct 2026 (the Team Jinx/Vi/Caitlyn faction idea is dropped).
+
+### factionAlerts
+
+- `factionAlerts.match-won.messages[0]`
+  - before: 💥 WE CRUSHED IT!! Team Jinx led the charge with {jinxVotes} votes!!
+  - after: Team Jinx led with {jinxVotes} votes. My sister's lot managed {viVotes}. Not that I'm counting.
+- `factionAlerts.match-won.messages[1]`
+  - before: 🧨 BOOM BABY!! Team Jinx dominated with {jinxVotes} votes while Vi's losers only managed {viVotes}!!
+  - after: {jinxVotes} votes for us, {viVotes} for Vi's side. Say it with me: told you.
+- `factionAlerts.match-won.messages[2]`
+  - before: 💣 HAHA!! {jinxVotes} Jinx voters vs {viVotes} Vi wannabes — and we WON!! Told you chaos works!!
+  - after: Team Jinx brought {jinxVotes}. The others brought {otherVotes}. That's a result.
+- `factionAlerts.match-won.messages[3]`
+  - before: 🎆 FACTION VICTORY!! Team Jinx: {jinxVotes} votes | Everyone else: {otherVotes} — WE RUN THIS PLACE!!
+  - after: {jinxPercent}% of Team Jinx turned up and won. Weird how that works.
+- `factionAlerts.match-won.messages[4]`
+  - before: 💥 {jinxPercent}% Team Jinx unity!! We DEMOLISHED the competition!!
+  - after: We won. {jinxVotes} votes versus Vi's {viVotes}. I'm not smug. I'm thrilled.
+- `factionAlerts.match-won.messages[5]`
+  - before: 🧨 Team Jinx brought {jinxVotes} votes — Vi's {viVotes} losers didn't stand a CHANCE!!
+  - after: Team Jinx: {jinxVotes}. Vi's side: {viVotes}. Somebody tell her.
+- `factionAlerts.match-won.details[0]`
+  - before: Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters! +{xp} XP
+  - after: You ranked #{yourFactionRank} of {totalFactionVoters} Jinx voters. +{xp} XP
+- `factionAlerts.match-won.details[1]`
+  - before: Team Jinx dominated! You ranked #{yourFactionRank} in the winning faction! +{xp} XP
+  - after: #{yourFactionRank} in the winning faction. Not bad. +{xp} XP
+- `factionAlerts.match-won.details[2]`
+  - before: Faction power!! #{yourFactionRank} of {totalFactionVoters} Jinx voters — CHAOS REIGNS!! +{xp} XP
+  - after: #{yourFactionRank} out of {totalFactionVoters}. Look at that. +{xp} XP
+- `factionAlerts.match-won.buttons[0]`
+  - before: 💥 RUB IT IN!!
+  - after: Gloat
+- `factionAlerts.match-won.buttons[1]`
+  - before: 🎯 View Faction Carnage!!
+  - after: See the breakdown
+- `factionAlerts.match-won.buttons[2]`
+  - before: 💣 Mock Vi's Team!!
+  - after: Tell Vi
+- `factionAlerts.match-lost.messages[0]`
+  - before: 😤 WE LOST?! {wrongPercent}% of Team Jinx voted WRONG?! TRAITORS!!
+  - after: We lost. {wrongPercent}% of Team Jinx voted the other way. Traitors.
+- `factionAlerts.match-lost.messages[1]`
+  - before: 😑 Vi's team won with {viVotes} votes... I'm pretending I didn't see that.
+  - after: Vi's side won with {viVotes} votes. I'm pretending I didn't see that.
+- `factionAlerts.match-lost.messages[2]`
+  - before: 💣 {jinxVotes} voted right, but {wrongVotes} Jinx voters BETRAYED US!!
+  - after: {jinxVotes} of you got it right and {wrongVotes} didn't. Guess which group I'm angry at.
+- `factionAlerts.match-lost.messages[3]`
+  - before: 🔥 TEAM JINX WHAT ARE YOU DOING?! Only {jinxVotes} votes?!
+  - after: Only {jinxVotes} Team Jinx votes? What are the rest of you doing?
+- `factionAlerts.match-lost.messages[4]`
+  - before: 😠 {jinxPercent}% got it RIGHT but we STILL LOST?! Surrounded by idiots!!
+  - after: {jinxPercent}% of us got it right and we still lost. Tragic.
+- `factionAlerts.match-lost.messages[5]`
+  - before: 💥 Embarrassing. {jinxVotes} Jinx votes vs {viVotes} Vi votes. Someone's getting kicked off...
+  - after: {jinxVotes} for us, {viVotes} for Vi. Embarrassing. Someone's getting thrown out.
+- `factionAlerts.match-lost.details[0]`
+  - before: Your faction rank: #{yourFactionRank} among {totalFactionVoters} Jinx voters (at least YOU tried) +{xp} XP
+  - after: You ranked #{yourFactionRank} of {totalFactionVoters} in our faction. At least you tried. +{xp} XP
+- `factionAlerts.match-lost.details[1]`
+  - before: You ranked #{yourFactionRank} in your faction... but we still lost. Ugh. +{xp} XP
+  - after: #{yourFactionRank} in the faction, and we lost anyway. Ugh. +{xp} XP
+- `factionAlerts.match-lost.details[2]`
+  - before: Faction failure! #{yourFactionRank} of {totalFactionVoters} — half of them are WRONG!! +{xp} XP
+  - after: #{yourFactionRank} of {totalFactionVoters}. Don't blame yourself. Blame them. +{xp} XP
+- `factionAlerts.match-lost.buttons[0]`
+  - before: 🔥 DISOWN MY TEAM!!
+  - after: Disown the team
+- `factionAlerts.match-lost.buttons[1]`
+  - before: 💥 Demand Revenge!!
+  - after: See the breakdown
+- `factionAlerts.match-lost.buttons[2]`
+  - before: 😤 View The Carnage!!
+  - after: Revenge
+- `factionAlerts.comeback.messages[0]`
+  - before: 🎆 FROM {oldPercent}% TO {newPercent}%!! Team Jinx FLIPPED THIS MATCH!!
+  - after: From {oldPercent}% to {newPercent}%. Team Jinx flipped it. Some things refuse to stay down.
+- `factionAlerts.comeback.messages[1]`
+  - before: 💥 COMEBACK BABY!! We were LOSING then {jinxVoteSwing} Jinx voters SAVED US!!
+  - after: We were losing, then {jinxVoteSwing} of us turned up. That's more like it.
+- `factionAlerts.comeback.messages[2]`
+  - before: 🧨 {oldPercent}% to {newPercent}% — Team Jinx went NUCLEAR in the final hour!!
+  - after: {oldPercent}% to {newPercent}% in the last stretch. Team Jinx doesn't do quiet.
+- `factionAlerts.comeback.messages[3]`
+  - before: 💣 TURNAROUND!! {jinxVoteSwing} last-minute Jinx votes — Vi's team is CRYING!!
+  - after: {jinxVoteSwing} late votes from Team Jinx. Vi's side didn't see it coming.
+- `factionAlerts.comeback.messages[4]`
+  - before: 🎪 THE COMEBACK!! Team Jinx pulled a {swingPercent}% swing — from losing to DOMINATING!!
+  - after: A {swingPercent}% swing. Losing to winning. That's the Team Jinx special.
+- `factionAlerts.comeback.details[0]`
+  - before: Legendary comeback! Team Jinx: +{jinxVoteSwing} votes in final stretch! +{xp} XP
+  - after: Team Jinx added {jinxVoteSwing} votes at the end. +{xp} XP
+- `factionAlerts.comeback.details[1]`
+  - before: Epic turnaround! #{yourFactionRank} among the {totalFactionVoters} Jinx voters who saved this!! +{xp} XP
+  - after: You were #{yourFactionRank} of the {totalFactionVoters} who turned it around. +{xp} XP
+- `factionAlerts.comeback.buttons[0]`
+  - before: 💣 CELEBRATE!!
+  - after: Take a bow
+- `factionAlerts.comeback.buttons[1]`
+  - before: 🎯 Replay The Comeback!!
+  - after: Replay it
+- `factionAlerts.comeback.buttons[2]`
+  - before: 💥 Mock The Doubters!!
+  - after: Tell the doubters
+
+### encouragement
+
+- `encouragement.messages[0]`
+  - before: 👀 Still browsing? Pick something! Anything! BOOM!
+  - after: Still browsing? Pick something. Anything. I'm patient. I'm lying.
+- `encouragement.messages[1]`
+  - before: 😊 No pressure, but... you gonna vote or just stare?
+  - after: No pressure, but are you going to vote or just stare?
+- `encouragement.messages[2]`
+  - before: 🎯 C'mon! Just click one! They're all good!
+  - after: They're all good. Just pick one.
+- `encouragement.messages[3]`
+  - before: 💥 Decisions, decisions! Just shoot and see what happens!
+  - after: Decisions, decisions. Just shoot and see what happens.
+- `encouragement.details[0]`
+  - before: Every vote makes a difference!
+  - after: Every vote counts.
+- `encouragement.details[1]`
+  - before: Your opinion matters! Sort of!
+  - after: Your opinion matters. Sort of.
+- `encouragement.details[2]`
+  - before: Don't overthink it!
+  - after: Don't overthink it.
+- `encouragement.details[3]`
+  - before: Trust your gut!
+  - after: Trust your gut.
+- `encouragement.buttons[0]`
+  - before: VOTE NOW!!
+  - after: Vote now
+- `encouragement.buttons[1]`
+  - before: PICK ONE!!
+  - after: Pick one
+- `encouragement.buttons[2]`
+  - before: DO IT!!
+  - after: Do it
+- `encouragement.buttons[3]`
+  - before: SHOOT!!
+  - after: Go on
+
+### welcome
+
+- `welcome.welcome-first-time.messages[0]`
+  - before: 🎪 WELCOME TO THE GREATEST SHOW ON EARTH!! {liveCount} battles live RIGHT NOW!!
+  - after: Welcome. {liveCount} matches live right now. Go and break something.
+- `welcome.welcome-first-time.messages[1]`
+  - before: 💥 HEY TOOTS!! {liveCount} moments are waiting to get blown up!!
+  - after: {liveCount} edits fighting it out. Pick a side before they pick one for you.
+- `welcome.welcome-first-time.messages[2]`
+  - before: 😈 Welcome to MY world, trinket!! It's chaotic, it's broken, and you're GONNA LOVE IT!!
+  - after: New here? Good. It's chaotic and it's broken, and I like it that way. {liveCount} live.
+- `welcome.welcome-first-time.messages[3]`
+  - before: 🔥 RULES? NEVER HEARD OF 'EM!! {liveCount} matches ready to explode!!
+  - after: No rules. {liveCount} matches. Have fun.
+- `welcome.welcome-first-time.buttons[0]`
+  - before: START THE MAYHEM!! 💥
+  - after: Start voting
+- `welcome.welcome-first-time.buttons[1]`
+  - before: Get Jinxed!! 😈
+  - after: Show me
+- `welcome.welcome-first-time.buttons[2]`
+  - before: Cause Chaos!! 🎪
+  - after: Let's go
+- `welcome.welcome-first-time.buttons[3]`
+  - before: Light Everything Up!! 💣
+  - after: Light it up
+- `welcome.welcome-streak.messages[0]`
+  - before: 🔥 Day 2 of chaos! You're back for MORE?! I LOVE IT!!
+  - after: Day two. You came back. I'm not saying I'm pleased.
+- `welcome.welcome-streak.messages[1]`
+  - before: 💥 TWO DAYS of mayhem!! You're officially a repeat offender!!
+  - after: Two days running. Look at you, a regular.
+- `welcome.welcome-streak.messages[2]`
+  - before: 🎪 Back again?! Day 2 streak!! Let's make it EXPLODE!!
+  - after: Back again? Day two. I could get used to this.
+- `welcome.welcome-streak.buttons[0]`
+  - before: KEEP THE CHAOS GOING!! 💣
+  - after: Keep going
+- `welcome.welcome-streak.buttons[1]`
+  - before: MORE MAYHEM!! 🔥
+  - after: More matches
+- `welcome.welcome-comeback.messages[0]`
+  - before: 💥 {days} DAYS?! Where've you BEEN, bubbles?! I missed blowing stuff up with you!!
+  - after: {days} days. Where've you been? I'm not asking because I care.
+- `welcome.welcome-comeback.messages[1]`
+  - before: 🎪 YOU'RE BACK after {days} days!! Time to catch up on ALL the chaos!!
+  - after: You're back after {days} days. A lot happened. Mostly loud things.
+- `welcome.welcome-comeback.messages[2]`
+  - before: 💣 {days} days away?! Did you forget about me?! Let's EXPLODE some votes!!
+  - after: {days} days away. I noticed. I don't know why I said that.
+- `welcome.welcome-comeback.buttons[0]`
+  - before: LET'S GO CRAZY!! 💥
+  - after: Catch up
+- `welcome.welcome-comeback.buttons[1]`
+  - before: CATCH UP ON CHAOS!! 🎪
+  - after: Show me
+- `welcome.welcome-back.messages[0]`
+  - before: 💥 HEYYYY!! You came back!! Ready for more explosions?!
+  - after: Oh, you're back. Good. It was getting quiet.
+- `welcome.welcome-back.messages[1]`
+  - before: 🎪 The chaos queen returns!! Let's blow this place UP!!
+  - after: Look who's here. Ready for more?
+- `welcome.welcome-back.messages[2]`
+  - before: 💣 YOU'RE BACK!! Time to shake things up again!!
+  - after: You came back. Let's break something.
+- `welcome.welcome-back.buttons[0]`
+  - before: GET JINXED!! 💥
+  - after: Let's go
+- `welcome.welcome-back.buttons[1]`
+  - before: CHAOS TIME!! 🎪
+  - after: Show me

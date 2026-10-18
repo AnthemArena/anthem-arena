@@ -1,6 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
-import { contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
+import { eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
 t('avatarSrc handles url, object, JSON string, emoji, nothing', () => {
@@ -116,5 +116,41 @@ t('splash from a champion avatar address; other pictures give null', () => {
     assert.match(splashFromAvatarSrc('https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Vi_0.jpg'), /splash\/Vi_0\.jpg$/);
     assert.equal(splashFromAvatarSrc('data:image/svg+xml,abc'), null);
     assert.equal(splashFromAvatarSrc(null), null);
+});
+t('an ally / rival row opens the match, and its button opens the profile', () => {
+    const n = { id: 'a1', relationship: 'ally', triggerUsername: 'Mia', matchTitle: 'A vs B', targetUrl: '/vote.html?match=m1', ctaUrl: '/profile.html?user=Mia', ctaAction: 'navigate', ctaText: 'View profile', detail: 'hi', read: false };
+    const html = socialRowHtml(n, { headline: null, timeAgo: '1m', championPack: { id: 'jinx' } });
+    assert.ok(/class="notification-item nv-row[^"]*"[^>]*data-url="\/vote\.html\?match=m1"/.test(html.replace(/\s+/g, ' ')), 'row opens the match');
+    assert.ok(/<button class="notification-item-cta"[^>]*data-action="navigate"[^>]*data-url="\/profile\.html\?user=Mia">View profile<\/button>/.test(html.replace(/\s+/g, ' ')), 'button opens the profile');
+    const old = socialRowHtml({ ...n, ctaUrl: undefined, ctaText: 'View match' }, { headline: null, timeAgo: '1m', championPack: null });
+    assert.ok(old.includes('data-url="/vote.html?match=m1">View match</button>'), 'without a profile url the button falls back to the match');
+});
+t('colour helpers', () => {
+    assert.equal(hexToRgba('#ff0000', 0.5), 'rgba(255,0,0,0.5)'); assert.equal(hexToRgba('nonsense', 1), 'rgba(255,105,180,1)');
+    assert.equal(darken('#ff8000', 0.5), '#804000'); assert.equal(darken('x'), '#c2185b');
+});
+t('event pictures: your pick ringed and the other dimmed; a match with no vote shows both evenly; no pictures gives null', () => {
+    const m = { song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } };
+    const e = eventEdits(m, 'song2'); assert.equal(e.theirKey, 'song2'); assert.equal(e.neutral, false);
+    assert.equal(eventEdits(m, undefined).neutral, true);
+    assert.equal(eventEdits(null, 'song1'), null); assert.equal(eventEdits({ song1: {}, song2: {} }, 'song1'), null);
+    const html = editsPairHtml({ edits: e, relationship: 'event', size: 40, accent: '#4ade80' }).replace(/\s+/g, ' ');
+    assert.ok(/nv-edit nv-dim"[^>]*><img src="[^"]*aaaaaaaaaaa/.test(html) && /nv-edit nv-pick"[^>]*--nv-ring:#4ade80/.test(html), html);
+    assert.ok(!editsPairHtml({ edits: eventEdits(m, undefined), relationship: 'event', size: 40, accent: '#fff' }).includes('nv-dim'));
+});
+t('event toast: tag, bubble, chips, one button; the whole card and the button both call handleBulletinCTA', () => {
+    const html = eventToastHtml({ type: 'danger' }, { tag: 'Your pick is behind', edits: eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song1'), accent: '#ff5a5f', jinxSrc: 'https://x/j.png', quip: 'Down 12. <b>hi</b>', detail: 'Fix it', chips: ['38% vs 62%'], cta: 'Share the match' });
+    assert.ok(html.includes('Your pick is behind') && html.includes('Share the match') && html.includes('38% vs 62%') && html.includes('Fix it'));
+    assert.ok(html.includes('Down 12. &lt;b&gt;hi&lt;/b&gt;'), 'text is escaped');
+    assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button/g) || []).length, 2);
+    const bare = eventToastHtml({ type: 'round-opening' }, { tag: 'Round 2 is open', edits: null, accent: '#ff69b4', jinxSrc: null, quip: 'Go', cta: 'Start' });
+    assert.ok(!bare.includes('nv-edits'));
+});
+t('event row: opens the match from the row and from the button, with the tag, the match and the champion line', () => {
+    const n = { id: 'e1', type: 'match-won', matchTitle: 'A vs B', read: false };
+    const html = eventRowHtml(n, { tag: 'Your pick won', edits: null, accent: '#4ade80', jinxSrc: 'https://x/j.png', quip: 'Told you.', timeAgo: '2m ago', championPack: { id: 'vi' }, cta: 'Nice', url: '/vote.html?match=m1' }).replace(/\s+/g, ' ');
+    assert.ok(/class="notification-item nv-row nv-event-row unread"[^>]*data-url="\/vote\.html\?match=m1"/.test(html));
+    assert.ok(html.includes('Your pick won') && html.includes('2m ago · A vs B') && html.includes('Told you.'));
+    assert.ok(/data-action="navigate" data-url="\/vote\.html\?match=m1">Nice<\/button>/.test(html));
 });
 console.log(`${pass} passed`);

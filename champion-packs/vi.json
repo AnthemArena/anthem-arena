@@ -4,7 +4,7 @@
   "displayName": "Punch First, Ask Later 👊",
   "emoji": "👊",
   "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Vi.png",
-  "description": "Street-tough, no-nonsense, and ready to throw down. Your votes hit harder than her gauntlets!",
+  "description": "Blunt, tough and loyal. She says what she thinks, then she backs it up.",
   "buttonPrefix": "👊",
   "color": "#e91e63",
   "theme": {
@@ -29,8 +29,8 @@
               "gte": 50
             }
           },
-          "message": "👊 DOWN FIFTY VOTES?! Hell no. \"{momentTitle}\" doesn't go down like this — GET IN THERE!!",
-          "cta": "PUNCH BACK — NOW!! 💥"
+          "message": "{momentTitle} is down {voteDiff}. That's a hole. We've climbed out of worse.",
+          "cta": "Rally some votes"
         },
         {
           "condition": {
@@ -38,8 +38,8 @@
               "gte": 30
             }
           },
-          "message": "🥊 Thirty votes behind?! We've come back from worse. Time to swing for the fences!!",
-          "cta": "HIT 'EM WHERE IT HURTS!! 👊"
+          "message": "Thirty-plus behind. Not pretty. So get loud and bring people.",
+          "cta": "Get loud"
         },
         {
           "condition": {
@@ -47,8 +47,8 @@
               "gte": 20
             }
           },
-          "message": "💢 Down twenty already? Not on my watch. Let's turn this thing around!!",
-          "cta": "Fight back — vote NOW!! 💥"
+          "message": "Down {voteDiff} on {momentTitle}. Sit there or fix it. Your call.",
+          "cta": "Share the match"
         },
         {
           "condition": {
@@ -56,8 +56,8 @@
               "gte": 15
             }
           },
-          "message": "⚡ Losing by fifteen?! I've seen worse odds in Zaun alleys. We got this!!",
-          "cta": "Show 'em what you're made of!! 🥊"
+          "message": "Fifteen or more votes behind. Annoying, not over.",
+          "cta": "Call for backup"
         },
         {
           "condition": {
@@ -65,8 +65,8 @@
               "gte": 10
             }
           },
-          "message": "💪 Ten votes? That's nothing. One good punch and we're back in it!!",
-          "cta": "Knock 'em out!! 👊"
+          "message": "Trailing by {voteDiff}. Time to drag some friends into this.",
+          "cta": "Drag a friend in"
         },
         {
           "condition": {
@@ -74,13 +74,13 @@
               "gte": 5
             }
           },
-          "message": "🔥 Only down five? We can close that gap with our eyes closed!!",
-          "cta": "Quick jab — let's go!! 💥"
+          "message": "{voteDiff} behind. A couple of votes and we're back in it.",
+          "cta": "Round up a few"
         },
         {
           "condition": "default",
-          "message": "👊 Down by {voteDiff}. Not ideal, but I've fought through worse. Let's do this!!",
-          "cta": "Get back in the fight!! 🥊"
+          "message": "Down {voteDiff}. Small gap. Go close it.",
+          "cta": "Share the match"
         }
       ]
     },
@@ -92,8 +92,8 @@
               "eq": 0
             }
           },
-          "message": "💥 DEAD EVEN!! 50-50 — ONE PUNCH DECIDES EVERYTHING!!",
-          "cta": "BE THE KNOCKOUT VOTE!! 👊"
+          "message": "Dead level. One vote swings it. Find that vote.",
+          "cta": "Find the vote"
         },
         {
           "condition": {
@@ -101,8 +101,8 @@
               "eq": 1
             }
           },
-          "message": "🥊 ONE. SINGLE. VOTE. This is the fight of the century right here!!",
-          "cta": "FINISH IT NOW!! 💥"
+          "message": "One vote apart. Don't sit on your hands.",
+          "cta": "Bring a friend"
         },
         {
           "condition": {
@@ -110,13 +110,13 @@
               "lte": 3
             }
           },
-          "message": "⚡ Only {voteDiff} votes apart!! This match is hanging by a thread — GO!!",
-          "cta": "Land the final blow!! 👊"
+          "message": "{voteDiff} votes apart. Anyone's game. Get more people in.",
+          "cta": "Rally the crew"
         },
         {
           "condition": "default",
-          "message": "💢 Too close at {voteDiff} votes. Time to throw the knockout punch!!",
-          "cta": "Swing for the win!! 🥊"
+          "message": "{voteDiff} votes between them. This one's going to the wire.",
+          "cta": "Watch it close"
         }
       ]
     },
@@ -128,8 +128,8 @@
               "gte": 85
             }
           },
-          "message": "👊 CRUSHING IT AT {userPct}%!! \"{momentTitle}\" is DESTROYING the competition!!",
-          "cta": "PILE ON — FINISH THEM!! 💥"
+          "message": "{momentTitle} is on {userPct}%. That's a beating.",
+          "cta": "Keep swinging"
         },
         {
           "condition": {
@@ -137,8 +137,8 @@
               "gte": 75
             }
           },
-          "message": "🥊 {userPct}% and climbing!! We're pounding them into the ground!!",
-          "cta": "Keep throwing punches!! 👊"
+          "message": "{userPct}% and still pushing. Don't ease up.",
+          "cta": "Keep it going"
         },
         {
           "condition": {
@@ -146,8 +146,8 @@
               "gte": 70
             }
           },
-          "message": "💪 Seventy percent!! That's what I call a beatdown!!",
-          "cta": "No mercy — keep going!! 💥"
+          "message": "{userPct}%. Solid lead. Don't get comfortable.",
+          "cta": "See the match"
         },
         {
           "condition": {
@@ -155,13 +155,13 @@
               "gte": 65
             }
           },
-          "message": "🔥 Leading at {userPct}%!! They're on the ropes — don't let up!!",
-          "cta": "Finish the job!! 🥊"
+          "message": "{userPct}% on your pick. We're ahead. Stay on it.",
+          "cta": "Stay on it"
         },
         {
           "condition": "default",
-          "message": "👊 We're ahead at {userPct}%! Not bad, but stay sharp — fights can turn quick!!",
-          "cta": "Keep your guard up!! 💥"
+          "message": "Up at {userPct}%. Good. Now keep it that way.",
+          "cta": "See the match"
         }
       ]
     },
@@ -173,8 +173,8 @@
               "gte": 30
             }
           },
-          "message": "💥 DOWN THIRTY AND WE FLIPPED IT?! That's the Zaun way — NEVER GIVE UP!!",
-          "cta": "COMEBACK OF THE CENTURY!! 👊"
+          "message": "{momentTitle} was down {voteDiff} and just took the lead. Told you.",
+          "cta": "Take a bow"
         },
         {
           "condition": {
@@ -182,8 +182,8 @@
               "gte": 15
             }
           },
-          "message": "🥊 Came back from FIFTEEN down!! Told you we could do it!!",
-          "cta": "THAT'S how you fight!! 💪"
+          "message": "{voteDiff} behind, now ahead. Late votes did that.",
+          "cta": "See how"
         },
         {
           "condition": {
@@ -191,8 +191,8 @@
               "gte": 10
             }
           },
-          "message": "⚡ Ten-vote comeback!! When you get knocked down, you GET BACK UP!!",
-          "cta": "Hell yeah we did it!! 🔥"
+          "message": "Climbed out of a {voteDiff} hole. Nobody gave it a chance.",
+          "cta": "See the match"
         },
         {
           "condition": {
@@ -200,305 +200,306 @@
               "gte": 5
             }
           },
-          "message": "💢 Down five, now we're winning?! That's the spirit I like to see!!",
-          "cta": "Keep swinging!! 👊"
+          "message": "{momentTitle} was losing and now it isn't. Good.",
+          "cta": "See the match"
         },
         {
           "condition": "default",
-          "message": "👊 Turned it around!! \"{momentTitle}\" just went from underdog to top dog!!",
-          "cta": "Never count us out!! 💥"
+          "message": "{momentTitle} just pulled ahead. Didn't see that coming. I did, actually.",
+          "cta": "See the match"
         }
       ]
     },
     "ally": {
       "messages": [
-        "💪 {username} voted with us!! Nice taste, kid — we make a good team!!",
-        "👊 Yo, {username} picked \"{momentTitle}\" too!! That's what I'm talking about!!",
-        "🥊 {username}'s got our back!! Together we're unstoppable!!",
-        "⚡ {username} knows a winner when they see one!! Smart!!",
-        "🔥 {username} just joined the winning side!! Smart move!!",
-        "💥 My gauntlets and {username}'s vote — unbeatable combo!!",
-        "👊 {username} knows what's up!! Same fight, same moment!!",
-        "💪 {username} picked the right horse!! Let's ride this to victory!!",
-        "🥊 Hell yeah, {username}!! You and me, we see eye to eye on this one!!"
+        "{username} voted with you on {momentTitle}. Good call, both of you.",
+        "{username} picked {momentTitle} too. Fine by me.",
+        "{username} agrees with you. Rare. Enjoy it.",
+        "Same pick as {username}. We know what we're doing.",
+        "{username} backed {momentTitle}. Smart.",
+        "{username} chose the same. That's two of us who can read a fight.",
+        "{username} is on your side of {momentTitle}. Keep them close.",
+        "{username} made the same call. No arguments from me.",
+        "{username} voted {momentTitle}. We're good."
       ],
       "details": [
-        "Two fists are better than one — let's knock this out of the park.",
-        "Great minds think alike. Or at least, great taste does.",
-        "You've got a good head on your shoulders, kid.",
-        "This is how you build a winning team — one vote at a time.",
-        "Together we're a one-two punch that can't be stopped.",
-        "Not bad at all. I like your style.",
-        "When we team up, nobody stands a chance."
+        "Nice to have backup.",
+        "That's two of us.",
+        "Good company.",
+        "Don't let them down.",
+        "See? Not hard.",
+        "A friend with taste.",
+        "Count them in."
       ],
       "buttons": [
-        "Let's Go!! 👊",
-        "Team Up!! 💪",
-        "Hell Yeah!! 🔥",
-        "Fist Bump!! 🥊",
-        "We Got This!! ⚡",
-        "Unbeatable!! 💥",
-        "Partners in Crime!! 👊"
+        "Nice one",
+        "Say thanks",
+        "See the match",
+        "Good call",
+        "Respect",
+        "Fair enough",
+        "Cheers"
       ]
     },
     "rival": {
       "messages": [
-        "💢 {username} voted AGAINST us?! Alright, you wanna throw down? Let's GO!!",
-        "👊 {username} picked \"{theirMoment}\"? Wrong choice, pal — dead wrong!!",
-        "🥊 Oh, {username} thinks they've got better taste? We'll see about that!!",
-        "⚡ {username} just made this personal. Time to show them who's boss!!",
-        "💥 {username} voted for the OTHER side?! Brave move — or stupid. We'll find out!!",
-        "🔥 So {username} wants a fight? Fine by me — I live for this!!",
-        "💢 {username}'s standing in our way? Not for long!!",
-        "👊 {username} chose poorly. Real poorly. Time to teach them a lesson!!"
+        "{username} voted for {theirMoment} against {yourMoment}. Bad call.",
+        "{username} picked {theirMoment}. We'll see who's right.",
+        "{username} went the other way on {yourMoment}. Wrong, but okay.",
+        "{username} voted against you. I'd say something, but the votes will.",
+        "{username} took {theirMoment}. Bold. Dumb, but bold.",
+        "{username} is against {yourMoment}. Fine. Come at us.",
+        "{username} disagrees on {yourMoment}. Let's find out who's got it right.",
+        "{username} voted the other way. Hope they're ready to be wrong."
       ],
       "details": [
-        "Everybody's entitled to their wrong opinion, I guess.",
-        "Some people just like making bad decisions.",
-        "They'll learn eventually. The hard way.",
-        "I respect the guts, but not the choice.",
-        "Let's show them what a real winner looks like.",
-        "They picked a fight with the wrong person.",
-        "This just makes winning that much sweeter."
+        "Everyone's entitled to be wrong.",
+        "Bring it.",
+        "Let the votes sort it out.",
+        "Don't take it personally. Or do.",
+        "Rivals keep you sharp.",
+        "They'll come around. Maybe.",
+        "Fair fight, at least."
       ],
       "buttons": [
-        "Bring It!! 👊",
-        "Knock 'Em Out!! 💥",
-        "Show 'Em!! 🥊",
-        "Let's Fight!! 💢",
-        "Game On!! ⚡",
-        "Prove It!! 🔥",
-        "Hit Back!! 💪"
+        "See the match",
+        "Look closer",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
       ]
     },
     "streak-ally-10": {
       "messages": [
-        "💪👊 TEN MATCHES with {username}!! We're like a well-oiled fighting machine!!",
-        "🥊 Ten times in a row — {username}, you're officially my battle buddy!!",
-        "⚡ {username} and me, ten straight agreements!! This is legendary teamwork!!",
-        "🔥 A perfect ten-match streak with {username}!! Nobody can touch us!!",
-        "💥 Ten fights, ten wins, one team!! {username}, you're alright in my book!!"
+        "Ten in a row with {username}. That's not luck.",
+        "{username} and you, ten matches, same pick every time. Solid.",
+        "Ten straight with {username}. Good team.",
+        "A ten-match run with {username}. Not bad.",
+        "Ten for ten with {username}. I'm impressed. Don't tell anyone."
       ],
       "details": [
-        "This is the kind of partnership that wins championships.",
-        "We're synchronized like hextech gauntlets on both fists.",
-        "Ten matches and we haven't missed once. That's skill.",
-        "You're the only partner I need in this bracket.",
-        "This streak is tougher to break than Piltover steel."
+        "Ten and no arguments.",
+        "That's a real partnership.",
+        "Rare. Don't blow it.",
+        "Keep it up.",
+        "Hard to beat."
       ],
       "buttons": [
-        "Battle Buddies!! 👊",
-        "Unbreakable Team!! 💪",
-        "To Victory!! 🥊",
-        "Streak Kings!! ⚡",
-        "Let's Keep Going!! 🔥"
+        "See their profile",
+        "Nice",
+        "Keep going",
+        "Ten strong",
+        "Respect"
       ]
     },
     "streak-ally-20": {
       "messages": [
-        "👊🔥 {streakCount} PERFECT MATCHES!! {username}, we're not just a team — we're a DYNASTY!!",
-        "💥 Twenty straight with {username}!! This is the stuff of LEGENDS!!",
-        "🥊 {streakCount} agreements in a row — {username} and Vi, the undefeated duo!!",
-        "⚡ TWENTY TIMES we've fought side by side, {username}!! Nothing can stop us!!",
-        "💪 {streakCount} matches — {username}, you're my ride-or-die in this bracket!!"
+        "{streakCount} matches with {username}. That's more than a streak, it's a team.",
+        "{streakCount} in a row with {username}. I'd fight alongside you.",
+        "{streakCount} straight picks with {username}. Ridiculous. Good ridiculous.",
+        "A {streakCount}-match run with {username}. Nobody beats that.",
+        "{streakCount} with {username}. You two should be running this place."
       ],
       "details": [
-        "Twenty fights, twenty wins — this is how you dominate.",
-        "We're writing history here, one punch at a time.",
-        "Nobody's ever had this kind of winning streak. Nobody.",
-        "They'll be talking about us in the underground for years.",
-        "This partnership could take down armies."
+        "Hard to believe. Great, though.",
+        "That's loyalty.",
+        "I don't have anything to add. Just wow.",
+        "Unbeatable.",
+        "Take a bow, both of you."
       ],
       "buttons": [
-        "Legendary Status!! 👊",
-        "Undefeated!! 💥",
-        "Dynasty Mode!! 🔥",
-        "To Twenty-One!! 🥊",
-        "Unstoppable!! ⚡"
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Nice"
       ]
     },
     "streak-rival-10": {
       "messages": [
-        "💢👊 TEN battles with {username} — this rivalry is getting SERIOUS!!",
-        "🥊 Ten times {username}'s stood against me!! Respect — but you're still wrong!!",
-        "⚡ A full ten-match feud with {username}!! This is personal now!!",
-        "🔥 Ten clashes and counting!! {username}, you're officially my arch-nemesis!!",
-        "💥 Ten fights, {username}!! I almost respect your stubborn streak!!"
+        "Ten matches against {username}. This is a proper feud now.",
+        "{username} has voted against you ten times running. They really don't like your taste.",
+        "Ten in a row opposite {username}. Neither of you is backing down.",
+        "A ten-match run against {username}. Stubborn, both of you.",
+        "Ten times at odds with {username}. I'd pay to see that argument."
       ],
       "details": [
-        "This rivalry is the kind legends are made of.",
-        "Ten rounds and neither of us backs down. That's grit.",
-        "Every fight with you just makes me swing harder.",
-        "You're tough, I'll give you that. Still gonna beat you though.",
-        "This feud could fuel its own tournament."
+        "Ten and no budging.",
+        "You two should talk it out. Or not.",
+        "That's a rivalry.",
+        "Stubborn is a good look.",
+        "Let's see who cracks first."
       ],
       "buttons": [
-        "Round Eleven!! 👊",
-        "Bring It On!! 💢",
-        "Never Surrender!! 🥊",
-        "Let's Go Again!! ⚡",
-        "Rivalry Lives!! 🔥"
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold the line",
+        "Check the record"
       ]
     },
     "streak-rival-20": {
       "messages": [
-        "👊🔥 {streakCount} WARS with {username}!! This is the greatest rivalry in bracket history!!",
-        "💥 TWENTY TIMES we've clashed, {username}!! This feud is LEGENDARY!!",
-        "🥊 {streakCount} battles — {username}, you're the only rival worth fighting!!",
-        "⚡ Twenty rounds of pure combat with {username}!! Neither of us will EVER quit!!",
-        "💢 {streakCount} fights and we're STILL going!! {username}, this is epic!!"
+        "{streakCount} matches against {username}. That's not a rivalry, that's a war.",
+        "{streakCount} in a row opposite {username}. Neither of you gives an inch.",
+        "{streakCount} straight disagreements with {username}. Impressive stubbornness.",
+        "A {streakCount}-match feud with {username}. Somebody should referee.",
+        "{streakCount} against {username}. I respect it. I'd still tell you to get a hobby."
       ],
       "details": [
-        "Twenty battles and neither of us blinks. That's respect.",
-        "This rivalry will be in the history books. Guaranteed.",
-        "We're beyond enemies now — we're eternal competitors.",
-        "Every underground fighter dreams of a feud this fierce.",
-        "You and me? We're locked in forever."
+        "Neither of you is going to quit.",
+        "That's commitment.",
+        "Legendary grudge.",
+        "I'm just glad I'm not in the middle.",
+        "This is going in the record."
       ],
       "buttons": [
-        "Forever Rivals!! 👊",
-        "Fight Twenty-One!! 💥",
-        "Never Ends!! 🥊",
-        "Epic Battle!! ⚡",
-        "To Infinity!! 🔥"
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
       ]
     },
     "closing-24h": {
       "messages": [
-        "👊 {timeLeft} left on \"{matchTitle}\" and you haven't thrown your punch yet!!",
-        "⏳ Clock's ticking on \"{matchTitle}\" — {timeLeft} left. Step up and vote!!",
-        "🥊 \"{matchTitle}\" closes in {timeLeft}. Don't sit this round out!!"
+        "{matchTitle} closes in {timeLeft} and you haven't voted. Get on it.",
+        "{timeLeft} left on {matchTitle}. You still haven't picked. Pick.",
+        "{matchTitle} is done in {timeLeft}. Your vote's missing."
       ],
       "buttons": [
-        "Throw Your Punch!! 👊",
-        "Get In There!! 🥊"
+        "Vote now",
+        "Pick one",
+        "Get on it"
       ]
     },
     "closing-3h": {
       "messages": [
-        "⏰ Only {timeLeft} left on \"{matchTitle}\"!! Get in there and vote!!",
-        "💪 {timeLeft} to go and you haven't voted on \"{matchTitle}\"?! Move it!!",
-        "👊 Last stretch on \"{matchTitle}\" — {timeLeft} left. Make it count!!"
+        "{timeLeft} left on {matchTitle}. Move.",
+        "{matchTitle} closes in {timeLeft}. Don't make me come get you.",
+        "Only {timeLeft} until {matchTitle} ends. You haven't voted."
       ],
       "buttons": [
-        "Vote Now!! 💪",
-        "Hit It!! 👊"
+        "Vote now",
+        "Move it"
       ]
     },
     "closing-final": {
       "messages": [
-        "🔥 FINAL MINUTES!! \"{matchTitle}\" closes in {timeLeft} — VOTE NOW!!",
-        "💥 Last chance to land your punch on \"{matchTitle}\"!! {timeLeft} left!!",
-        "🥊 Bell's about to ring!! {timeLeft} to vote on \"{matchTitle}\"!!"
+        "{matchTitle} closes in {timeLeft}. Now or never.",
+        "{timeLeft} left. Pick one. Go.",
+        "Last chance on {matchTitle}. {timeLeft}. That's it."
       ],
       "buttons": [
-        "LAST CHANCE!! 🔥",
-        "PUNCH IN!! 💥"
+        "Last chance",
+        "Vote now"
       ]
     },
     "closing-multi": {
       "messages": [
-        "👊 {matchCount} matches you haven't voted in are closing!! Soonest: {timeLeft}!!",
-        "⏰ {matchCount} fights waiting on your vote!! First bell in {timeLeft}!!"
+        "{matchCount} matches you haven't voted in are about to close. First one in {timeLeft}.",
+        "{matchCount} unvoted matches closing. The nearest has {timeLeft} left."
       ],
       "buttons": [
-        "See the Fights!! 🥊",
-        "Pick Your Fights!! 👊"
+        "Show me",
+        "Get it done"
       ]
     },
     "novotes": {
       "messages": [
-        "👊 Zero votes?! This match hasn't even started yet!! Time to throw the first punch!!",
-        "💥 Nobody's voted on \"{moment1}\" vs \"{moment2}\"?! Let's get this fight going!!",
-        "🥊 An empty battlefield? Not for long. Someone's gotta start this thing!!",
-        "⚡ No votes yet? Perfect — I love throwing the FIRST PUNCH!!"
+        "No votes on {matchTitle}. Somebody go first.",
+        "{moment1} against {moment2} and nobody's voted. Fine, I'll wait. Not long.",
+        "A new match, zero votes. Be the first one in.",
+        "{matchTitle} is wide open. Take the first swing."
       ],
       "buttons": [
-        "First Blood!! 👊",
-        "Start the Fight!! 💥",
-        "Let's Go!! 🥊",
-        "Throw First Punch!! ⚡"
+        "Go first",
+        "Be first",
+        "Take the swing",
+        "Open it up"
       ]
     },
     "lowvotes": {
       "messages": [
-        "⚠️ This match needs backup! Only a few votes in!",
-        "👊 Low turnout here! Let's change that!",
-        "💪 Barely anyone's voted! Time to step up!",
-        "🥊 This match needs some muscle! Let's go!"
+        "{totalVotes} vote{votesPlural}. That's nothing.",
+        "Barely anyone's voted here. Fix that.",
+        "Low turnout. Come on.",
+        "Nobody's weighed in on this one. Somebody should."
       ],
       "details": [
-        "Every punch counts! Help this match out!",
-        "Give it the attention it deserves!",
-        "Let's make this count!",
-        "Time to make some noise!"
+        "Needs more people.",
+        "Every vote matters when it's this quiet.",
+        "Your vote counts for more here.",
+        "Don't let it fade out."
       ],
       "ctas": [
-        "VOTE NOW!!",
-        "HIT IT!!",
-        "LET'S GO!!",
-        "PUNCH IN!!"
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
       ]
     },
     "round-opening": {
       "messages": [
-        "💥 ROUND {round} IS LIVE!! {matchCount} new fights just opened up — let's CRUSH them!!",
-        "👊 Here we go — Round {round} with {matchCount} battles waiting!! Time to get to work!!",
-        "🥊 Round {round} starts NOW!! {matchCount} matches need someone to knock 'em out!!",
-        "⚡ {matchCount} brand new fights in Round {round}!! I'm ready — you ready?!",
-        "🔥 Round {round} just dropped with {matchCount} matchups!! Let's show them how it's done!!"
+        "Round {round} is open. {matchCount} new matches. Let's go.",
+        "{matchCount} matches just opened in round {round}. Get stuck in.",
+        "Round {round} is live, {matchCount} matches deep.",
+        "New round. {matchCount} matches. Time to pick sides.",
+        "Round {round}: {matchCount} matches waiting on you."
       ],
       "buttons": [
-        "Let's Brawl!! 👊",
-        "Hit Round {round}!! 💥",
-        "Fight Time!! 🥊",
-        "Bring It!! ⚡",
-        "To Battle!! 🔥"
+        "Start round {round}",
+        "Let's go",
+        "Get stuck in",
+        "Show me",
+        "Do it"
       ]
     },
     "match-won": {
       "messages": [
-        "👊 VICTORY!! \"{momentTitle}\" just DESTROYED the competition!!",
-        "💥 We won!! \"{momentTitle}\" knocked them out cold!!",
-        "🥊 That's how it's DONE!! \"{momentTitle}\" advances — HELL YEAH!!",
-        "⚡ \"{momentTitle}\" moves forward!! Another win in the books!!",
-        "🔥 Flawless victory!! \"{momentTitle}\" is heading to the next round!!",
-        "💪 Boom!! \"{momentTitle}\" just punched its ticket to the next fight!!"
+        "{momentTitle} won. Told you.",
+        "{momentTitle} is through. Good pick.",
+        "{momentTitle} took it. Clean.",
+        "{momentTitle} won, and it earned it.",
+        "{momentTitle} advances. Easy.",
+        "{momentTitle} moves on. That's how it's done."
       ],
       "details": [
-        "Your vote packed a serious punch. +{xp} XP",
-        "That's what winning looks like, kid.",
-        "One fight down, plenty more to go.",
-        "You helped knock them out — nice work."
+        "Good pick.",
+        "One down.",
+        "That's a win.",
+        "Nicely done."
       ],
       "buttons": [
-        "Hell Yeah!! 👊",
-        "Next Fight!! 💥",
-        "Keep Going!! 🥊",
-        "Victory Lap!! ⚡"
+        "Nice",
+        "Next match",
+        "Keep going",
+        "Onward"
       ]
     },
     "match-lost": {
       "messages": [
-        "💢 Damn it. \"{momentTitle}\" went down fighting, but it wasn't enough.",
-        "👊 We lost this one. \"{momentTitle}\" gave it everything — sometimes that's how it goes.",
-        "🥊 \"{momentTitle}\" didn't make it. Tough break, but we'll bounce back.",
-        "⚡ They got us this time. \"{momentTitle}\" fought hard though.",
-        "💔 \"{momentTitle}\" is out. That one stings — but we'll be back.",
-        "💥 Lost the fight, but not the war. \"{momentTitle}\" went down swinging.",
-        "🔥 Alright, \"{momentTitle}\" didn't win. We pick ourselves up and move on."
+        "{momentTitle} lost. That stings.",
+        "{momentTitle} is out. Not the result I wanted.",
+        "{momentTitle} didn't make it. Shake it off.",
+        "{momentTitle} went down. It gave a good fight.",
+        "{momentTitle} is out. Move on.",
+        "{momentTitle} lost this round. Annoying. Not the end of it.",
+        "{momentTitle} got knocked out. We take the next one."
       ],
       "details": [
-        "You can't win every fight. But you gave it your all. +{xp} XP",
-        "Even the toughest fighters take a loss sometimes.",
-        "Dust yourself off. Next fight's waiting.",
-        "That's life in the ring — you win some, you lose some."
+        "You can't win them all.",
+        "It had a fair shot.",
+        "There's always another match.",
+        "Take the hit. Keep moving."
       ],
       "buttons": [
-        "Get Back Up!! 👊",
-        "Next Round!! 💥",
-        "Keep Fighting!! 🥊",
-        "Move Forward!! ⚡"
+        "Next match",
+        "Shake it off",
+        "Keep going",
+        "See the result"
       ]
     },
     "match-tied-alert": {
@@ -508,256 +509,213 @@
             "winner": "{momentTitle}"
           },
           "message": [
-            "👊 PERFECT TIE — 50-50!! But YOUR moment takes it on seeding!!",
-            "💥 Dead even, but {winner} wins by tiebreaker!! Close one!!",
-            "🥊 Tied score, but {winner} advances!! That's how the rules work!!"
+            "Dead tie, and your pick goes through on seed. I'll take it.",
+            "Level on votes. {winner} advances on seed. Lucky."
           ],
           "detail": [
-            "Came down to the wire and you STILL won. That's skill.",
-            "Tied fight, your moment wins by decision. I'll take it."
+            "A win's a win.",
+            "Won't complain."
           ],
           "cta": [
-            "Victory by the Rules!!",
-            "We'll Take It!!"
+            "Take it",
+            "Nice"
           ]
         },
         {
           "condition": "default",
           "message": [
-            "💢 DEAD TIE — 50-50!! But {winner} takes it on higher seeding.",
-            "👊 Perfect split, but {winner} wins the tiebreaker. Tough break.",
-            "🥊 Tied votes, {winner} advances by seeding. That's the game."
+            "Dead tie, and {winner} goes through on seed. That's the rule.",
+            "Level on votes. {winner} takes it on seed. Rough."
           ],
           "detail": [
-            "Even score, but the rules gave it to them. Nothing we could do.",
-            "Lost on a technicality. That's rough, but it happens."
+            "Rules are rules.",
+            "Lost on seed. Annoying."
           ],
           "cta": [
-            "Respect the Tie!!",
-            "On to the Next!!"
+            "Next match",
+            "See the result"
           ]
         }
       ]
     },
-    "factionAlerts": {
-      "match-won": {
-        "messages": [
-          "👊 TEAM VI DOMINATED!! We brought {viVotes} votes and crushed it!!",
-          "💥 {viVotes} Vi voters showed up and WON!! That's teamwork!!",
-          "🥊 Team Vi: {viVotes} votes strong!! We don't lose!!",
-          "⚡ {viPercent}% Team Vi unity!! We knocked them OUT!!",
-          "🔥 Our crew threw {viVotes} punches and landed EVERY ONE!!",
-          "💪 Team Vi brought {viVotes} votes — nobody beats us when we're united!!"
-        ],
-        "details": [
-          "Your faction rank: #{yourFactionRank} out of {totalFactionVoters} Vi voters! Hell yeah!! +{xp} XP",
-          "Ranked #{yourFactionRank} among {totalFactionVoters} Team Vi fighters — solid work!! +{xp} XP",
-          "You're #{yourFactionRank} of {totalFactionVoters} on Team Vi — keep swinging!! +{xp} XP"
-        ],
-        "buttons": [
-          "👊 Team Victory!!",
-          "💥 Check Rankings!!",
-          "🥊 We Did It!!"
-        ]
-      },
-      "match-lost": {
-        "messages": [
-          "💢 We lost with {viVotes} votes. Not enough — we gotta do better next time.",
-          "👊 Only {viVotes} Vi votes? That's not gonna cut it. Step it up.",
-          "🥊 Team Vi gave {viVotes} votes but came up short. Damn.",
-          "⚡ {wrongPercent}% of Team Vi went the other way. That's why we lost.",
-          "💔 {viVotes} votes from our side — should've been more. We'll get 'em next time.",
-          "💥 Team Vi brought {viVotes} votes, but it wasn't enough today."
-        ],
-        "details": [
-          "Your faction rank: #{yourFactionRank} of {totalFactionVoters} — you tried. +{xp} XP",
-          "Ranked #{yourFactionRank} among {totalFactionVoters} Team Vi voters — tough loss. +{xp} XP",
-          "#{yourFactionRank} of {totalFactionVoters} on our side — we'll bounce back. +{xp} XP"
-        ],
-        "buttons": [
-          "👊 Get Back Up!!",
-          "💥 Next Fight!!",
-          "🥊 Keep Swinging!!"
-        ]
-      },
-      "comeback": {
-        "messages": [
-          "💥 FROM {oldPercent}% TO {newPercent}%!! Team Vi just pulled off the IMPOSSIBLE!!",
-          "👊 {viVoteSwing} last-minute Vi votes SAVED US!! That's a comeback!!",
-          "🥊 We were LOSING and Team Vi brought {viVoteSwing} clutch votes!! LEGENDARY!!",
-          "⚡ {oldPercent}% to {newPercent}% — Team Vi NEVER gives up!!",
-          "🔥 COMEBACK COMPLETE!! {viVoteSwing} Vi voters turned this around!!"
-        ],
-        "details": [
-          "Epic turnaround!! Team Vi: +{viVoteSwing} votes in the final stretch!! +{xp} XP",
-          "You're #{yourFactionRank} of {totalFactionVoters} Vi voters who made the comeback happen!! +{xp} XP"
-        ],
-        "buttons": [
-          "💥 Hell Yeah!!",
-          "👊 Replay That!!",
-          "🥊 Never Quit!!"
-        ]
-      }
-    },
     "welcome": {
       "welcome-first-time": {
         "messages": [
-          "👊 Welcome to the fight, kid!! {liveCount} battles are live RIGHT NOW!!",
-          "💥 New blood!! {liveCount} matches need someone with guts — that you?",
-          "🥊 Hey!! {liveCount} fights are waiting and you look ready to throw down!!",
-          "⚡ Fresh face!! {liveCount} matchups are live — time to make your mark!!",
-          "🔥 Look who showed up!! {liveCount} battles need a fighter like you!!"
+          "Welcome. {liveCount} matches are open. Pick one.",
+          "New here? {liveCount} matches are live. Jump in.",
+          "Good timing. {liveCount} matches need votes.",
+          "{liveCount} matches open. Choose a side.",
+          "Welcome. {liveCount} matches. Let's see what you've got."
         ],
         "buttons": [
-          "Let's Go!! 👊",
-          "Bring It!! 💥",
-          "Fight Time!! 🥊",
-          "I'm Ready!! ⚡",
-          "Let's Brawl!! 🔥"
+          "Let's go",
+          "Start",
+          "Show me",
+          "Jump in",
+          "Ready"
         ]
       },
       "welcome-streak": {
         "messages": [
-          "💪 Day 2!! You came back — I like your style!!",
-          "👊 Two days in a row!! You're building momentum, kid!!",
-          "🥊 Back again on Day 2!! That's dedication right there!!"
+          "Day two. You came back. Good.",
+          "Two days in a row. Nice.",
+          "Back for day two. I noticed."
         ],
         "buttons": [
-          "Keep It Up!! 💪",
-          "Day 2 Fight!! 👊",
-          "Let's Roll!! 🥊"
+          "Keep going",
+          "Let's go",
+          "Show me"
         ]
       },
       "welcome-comeback": {
         "messages": [
-          "⚡ {days} DAYS?! Where the hell have you BEEN?! Get in here!!",
-          "👊 After {days} days away, you're back!! About damn time!!",
-          "💥 {days} days gone and NOW you return?! Better late than never, I guess!!",
-          "🥊 Been {days} days — thought you quit on me!! Welcome back, fighter!!"
+          "{days} days gone. Nice of you to show up.",
+          "After {days} days you're back. Better late than never.",
+          "{days} days. Thought you'd quit. Glad you didn't.",
+          "{days} days away. Lots to catch up on."
         ],
         "buttons": [
-          "I'm Back!! 👊",
-          "Let's Fight!! 💥",
-          "Never Left!! 🥊",
-          "Ready to Go!! ⚡"
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
         ]
       },
       "encouragement": {
         "messages": [
-          "👀 Still browsing? Pick one and throw a punch already!!",
-          "💪 C'mon, don't overthink it — just vote and move on!!",
-          "👊 Decisions aren't that hard. Pick your favorite and HIT IT!!",
-          "🥊 You gonna stand there all day or actually vote?",
-          "⚡ Just choose one, kid! They're all good fights!!"
+          "Still deciding? Quit stalling and pick.",
+          "Don't overthink it. Choose one and move on.",
+          "They're all worth a look. Go with your gut.",
+          "You've looked long enough. Pick."
         ],
         "details": [
-          "Every vote counts — even if you're second-guessing.",
-          "Trust your gut. That's what fighters do.",
-          "Don't overthink it. Just swing.",
-          "Your opinion matters. Now use it."
+          "Every vote counts.",
+          "Trust your gut.",
+          "There's no wrong way to pick.",
+          "Just choose."
         ],
         "buttons": [
-          "Vote Now!! 👊",
-          "Pick One!! 💥",
-          "Let's Go!! 🥊",
-          "Do It!! ⚡"
+          "Vote now",
+          "Choose one",
+          "Decide",
+          "Cast your vote"
         ]
       },
       "welcome-back": {
         "messages": [
-          "👊 Look who's back!! Ready to throw some punches?",
-          "💥 You again!! Good — we've got work to do!!",
-          "🥊 Welcome back to the ring, fighter!!",
-          "⚡ Hey!! You're back!! Let's get after it!!"
+          "You're back. Good.",
+          "Welcome back. Let's get to it.",
+          "Back already. Nice.",
+          "Hey. Matches are waiting."
         ],
         "buttons": [
-          "Let's Go!! 👊",
-          "Ready to Fight!! 💥",
-          "Back in Action!! 🥊",
-          "Hit Me!! ⚡"
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
         ]
       }
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Quit stalling and pick.",
+        "Don't overthink it. Choose one and move on.",
+        "They're all worth a look. Go with your gut.",
+        "You've looked long enough. Pick."
+      ],
+      "details": [
+        "Every vote counts.",
+        "Trust your gut.",
+        "There's no wrong way to pick.",
+        "Just choose."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
     }
   },
   "achievements": {
     "first-choice": {
       "messages": [
-        "First vote. See? Not so hard.",
-        "You picked. Good. That's the hardest part."
+        "First vote. See? Not hard.",
+        "You picked. Good. That was the hard part."
       ],
       "details": [
         "Keep voting. +{xp} XP",
         "That's how it's done. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "getting-started": {
       "messages": [
-        "Five votes. You're not just looking around anymore.",
-        "Five. You're sticking around. Good."
+        "Five votes. You're warming up.",
+        "Five. Not just a tourist anymore."
       ],
       "details": [
-        "Keep voting. +{xp} XP",
-        "That's how it's done. +{xp} XP"
+        "Good start. +{xp} XP",
+        "Keep it up. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "arcane-regular": {
       "messages": [
-        "Ten votes. You're a regular now.",
-        "Ten. Keep showing up like that."
+        "Ten votes. You're a regular.",
+        "Ten. People will start to know your name."
       ],
       "details": [
-        "Keep voting. +{xp} XP",
-        "That's how it's done. +{xp} XP"
+        "Regulars are what matter. +{xp} XP",
+        "Ten and counting. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "crowd-voice": {
       "messages": [
-        "Twenty-five votes. People are going to notice you.",
-        "Twenty-five. That's a voice worth hearing."
+        "Twenty-five votes. You're a voice in this crowd.",
+        "Twenty-five. People are listening."
       ],
       "details": [
-        "Keep voting. +{xp} XP",
-        "That's how it's done. +{xp} XP"
+        "Loud and clear. +{xp} XP",
+        "Twenty-five on the board. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "deep-in-the-story": {
       "messages": [
-        "Fifty votes. You're not just watching, you're in it.",
-        "Fifty. That takes some stamina."
+        "Fifty votes. You're in deep.",
+        "Fifty. You actually care about this."
       ],
       "details": [
-        "Keep voting. +{xp} XP",
-        "That's how it's done. +{xp} XP"
+        "Fifty down. +{xp} XP",
+        "Deep in it. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "arcane-legend": {
       "messages": [
-        "A hundred votes. Okay, that's legend stuff.",
-        "A hundred. Respect."
+        "A hundred votes. That's a legend.",
+        "One hundred. I'm impressed. Really."
       ],
       "details": [
-        "Keep voting. +{xp} XP",
-        "That's how it's done. +{xp} XP"
+        "You earned it. +{xp} XP",
+        "A hundred. Nice one. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -766,54 +724,54 @@
     },
     "spark": {
       "messages": [
-        "Three days in a row. You came back.",
-        "Three days. That's the start of something."
+        "Three days in a row. That's a habit.",
+        "Three straight days. Not bad."
       ],
       "details": [
-        "Keep that streak alive. +{xp} XP",
-        "Come back tomorrow. +{xp} XP"
+        "Coming back is the hard part. +{xp} XP",
+        "Three in a row. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "on-a-roll": {
       "messages": [
-        "A week straight. Don't stop now.",
-        "Seven days. That's commitment."
+        "A whole week. That's dedication.",
+        "Seven days straight. Respect."
       ],
       "details": [
-        "Keep that streak alive. +{xp} XP",
-        "Come back tomorrow. +{xp} XP"
+        "A week without a miss. +{xp} XP",
+        "Seven in a row. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "unstoppable": {
       "messages": [
-        "Two weeks. Nothing's slowing you down.",
-        "Fourteen days. You don't quit."
+        "Two weeks. You're not stopping, are you?",
+        "Fourteen days straight. Wow."
       ],
       "details": [
-        "Keep that streak alive. +{xp} XP",
-        "Come back tomorrow. +{xp} XP"
+        "Two weeks, no gaps. +{xp} XP",
+        "That's commitment. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "arcane-dedication": {
       "messages": [
-        "Thirty days. That's real dedication.",
-        "A whole month. I'm impressed. Don't tell anyone I said so."
+        "Thirty days. Honestly, thanks.",
+        "A month of showing up. That counts."
       ],
       "details": [
-        "Keep that streak alive. +{xp} XP",
-        "Come back tomorrow. +{xp} XP"
+        "Thirty days straight. +{xp} XP",
+        "A whole month. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -822,40 +780,40 @@
     },
     "against-the-grain": {
       "messages": [
-        "Five underdogs. You root for the ones who need it.",
-        "Backing the underdog. Good instinct."
+        "Five underdogs. You back the little guy.",
+        "Five against the odds. Good."
       ],
       "details": [
-        "Somebody's got to back them. +{xp} XP",
-        "Nice taste in fights. +{xp} XP"
+        "Going against the crowd. +{xp} XP",
+        "Five and still going. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "rebel-heart": {
       "messages": [
-        "Fifteen underdogs. You've got a rebel streak.",
-        "Fifteen. You don't follow the crowd, do you?"
+        "Fifteen underdogs. You like a hard fight.",
+        "Fifteen. You don't follow the crowd."
       ],
       "details": [
-        "Somebody's got to back them. +{xp} XP",
-        "Nice taste in fights. +{xp} XP"
+        "Your own call. +{xp} XP",
+        "Fifteen underdog votes. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "dark-horse": {
       "messages": [
-        "Thirty underdogs. You pick fighters.",
-        "Thirty. You love a long shot."
+        "Thirty underdogs. Nobody can read you.",
+        "Thirty. You always back the long shot."
       ],
       "details": [
-        "Somebody's got to back them. +{xp} XP",
-        "Nice taste in fights. +{xp} XP"
+        "Hard to predict. +{xp} XP",
+        "Thirty underdog votes. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -864,110 +822,110 @@
     },
     "first-on-the-scene": {
       "messages": [
-        "First on the scene. Five times now.",
-        "You show up early. I like that."
+        "First in five matches. You don't wait around.",
+        "Five times you got there first."
       ],
       "details": [
-        "Be there at the start. +{xp} XP",
-        "First in. +{xp} XP"
+        "You show up early. +{xp} XP",
+        "Five early votes. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "ahead-of-the-curve": {
       "messages": [
-        "Fifteen matches where you got there first.",
-        "Always early. Always first in."
+        "Fifteen matches where you were early. That's a habit.",
+        "First again and again. Nice."
       ],
       "details": [
-        "Be there at the start. +{xp} XP",
-        "First in. +{xp} XP"
+        "Fifteen early votes. +{xp} XP",
+        "Ahead of the pack. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "nail-biter": {
       "messages": [
-        "Ten close matches. You like a tight fight.",
-        "Close ones. That's where it counts."
+        "Ten close matches. You like it tight.",
+        "Another narrow one. Your nerves are better than mine."
       ],
       "details": [
-        "Every vote counts here. +{xp} XP",
-        "Tight fight. +{xp} XP"
+        "Close ones suit you. +{xp} XP",
+        "Ten tight matches. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "deciding-voice": {
       "messages": [
         "Twenty-five close matches. Your vote keeps mattering.",
-        "You keep landing on the close ones. Good aim."
+        "You've tipped it more than once."
       ],
       "details": [
-        "Every vote counts here. +{xp} XP",
-        "Tight fight. +{xp} XP"
+        "Twenty-five close ones. +{xp} XP",
+        "You decide things. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "comeback-believer": {
       "messages": [
-        "You backed a comeback five times. Stubborn. I like it.",
-        "Never count a fighter out. You get that."
+        "You stuck with the one that was behind, five times. Stubborn. I like it.",
+        "You don't ditch the losing side. Respect."
       ],
       "details": [
-        "You stick with what you believe in. +{xp} XP",
-        "Loyalty counts. +{xp} XP"
+        "Faith in a comeback. +{xp} XP",
+        "Five comebacks backed. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "repeat-favourite": {
       "messages": [
-        "Same one three times. You know what you like.",
-        "That one again? Yeah, I get it."
+        "Same moment, three times. You've got a favourite.",
+        "That one again. It must be good."
       ],
       "details": [
-        "You stick with what you believe in. +{xp} XP",
-        "Loyalty counts. +{xp} XP"
+        "You know what you like. +{xp} XP",
+        "Three votes, one pick. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "die-hard": {
       "messages": [
-        "Five for the same one. That's loyalty.",
-        "You're riding with that one. Respect."
+        "Five votes for the same moment. That's loyal.",
+        "You're sticking with that one. Fine."
       ],
       "details": [
-        "You stick with what you believe in. +{xp} XP",
-        "Loyalty counts. +{xp} XP"
+        "Loyal all the way. +{xp} XP",
+        "Five votes, one favourite. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "obsession": {
       "messages": [
-        "Ten times. Okay, that's an obsession.",
-        "Ten votes, same pick. You really mean it."
+        "Ten votes for one moment. That's an obsession.",
+        "Ten times, same pick. I won't judge. Much."
       ],
       "details": [
-        "You stick with what you believe in. +{xp} XP",
-        "Loyalty counts. +{xp} XP"
+        "Ten for the same one. +{xp} XP",
+        "Dedicated. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -976,40 +934,40 @@
     },
     "two-round-journey": {
       "messages": [
-        "Two rounds. You're following this through.",
-        "You stuck around for round two."
+        "Two rounds. You're sticking around.",
+        "You stayed for round two. Good."
       ],
       "details": [
-        "Stay for the whole thing. +{xp} XP",
-        "Rounds don't scare you. +{xp} XP"
+        "Keep watching. +{xp} XP",
+        "Two rounds in. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "deep-into-the-bracket": {
       "messages": [
-        "Four rounds in. You're deep now.",
-        "Four rounds. You don't leave early."
+        "Four rounds. You're deep in it now.",
+        "Deep in the bracket. Gets serious from here."
       ],
       "details": [
-        "Stay for the whole thing. +{xp} XP",
-        "Rounds don't scare you. +{xp} XP"
+        "Four rounds in. +{xp} XP",
+        "A long way from the start. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "all-the-way": {
       "messages": [
-        "All six rounds. You saw it through.",
-        "From start to finish. That's how it's done."
+        "Six rounds. You saw it through.",
+        "All the way. You didn't bail."
       ],
       "details": [
-        "Stay for the whole thing. +{xp} XP",
-        "Rounds don't scare you. +{xp} XP"
+        "Start to finish. +{xp} XP",
+        "Six rounds. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -1018,40 +976,40 @@
     },
     "match-explorer": {
       "messages": [
-        "Ten matches. You're checking everything out.",
-        "Ten different matches. Good, look around."
+        "Ten matches. You're looking at everything.",
+        "Ten different matches. Curious type."
       ],
       "details": [
-        "See it all. +{xp} XP",
-        "Plenty more to go. +{xp} XP"
+        "Exploring the bracket. +{xp} XP",
+        "Ten matches checked. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "every-corner": {
       "messages": [
-        "Twenty-five matches. You've seen every corner.",
-        "Twenty-five. You leave nothing out."
+        "Twenty-five matches. You've been everywhere.",
+        "Twenty-five. You check everything."
       ],
       "details": [
-        "See it all. +{xp} XP",
-        "Plenty more to go. +{xp} XP"
+        "Every corner. +{xp} XP",
+        "Twenty-five matches. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "bracket-veteran": {
       "messages": [
-        "Fifty matches. That's a veteran.",
-        "Fifty. You know this place now."
+        "Fifty matches. That's not browsing, that's work.",
+        "Fifty. You know this bracket better than most."
       ],
       "details": [
-        "See it all. +{xp} XP",
-        "Plenty more to go. +{xp} XP"
+        "A real veteran. +{xp} XP",
+        "Fifty matches. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -1060,68 +1018,68 @@
     },
     "long-session": {
       "messages": [
-        "Five in one go. You're on a roll.",
-        "Five matches without stopping."
+        "Five in one sitting. Nice pace.",
+        "Five matches back to back. Keep going."
       ],
       "details": [
-        "See it all. +{xp} XP",
-        "Plenty more to go. +{xp} XP"
+        "One long session. +{xp} XP",
+        "Five in a row. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "deep-dive": {
       "messages": [
-        "Ten in one sitting. Take a breather.",
-        "Ten in a row. That's a marathon."
+        "Ten in one go. Take a breath.",
+        "Ten matches in one sitting. That's stamina."
       ],
       "details": [
-        "See it all. +{xp} XP",
-        "Plenty more to go. +{xp} XP"
+        "A deep dive. +{xp} XP",
+        "Ten at once. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "night-owl": {
       "messages": [
-        "Voting at this hour? Get some sleep. After this one.",
-        "Middle of the night and you're still going."
+        "Voting at this hour? Get some sleep. Then come back.",
+        "Middle of the night. Dedication or insomnia."
       ],
       "details": [
-        "Sleep eventually. +{xp} XP",
-        "The late shift. +{xp} XP"
+        "The quiet hours. +{xp} XP",
+        "A midnight vote. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "signal-boost": {
       "messages": [
-        "You told people. That helps more than you think.",
-        "Five shares. Keep spreading it."
+        "You told people. Thanks, for real.",
+        "Five shares. Good. More people, more votes."
       ],
       "details": [
-        "More voters, better fights. +{xp} XP",
-        "Thanks for the help. +{xp} XP"
+        "Thanks for spreading it. +{xp} XP",
+        "Five shares. +{xp} XP"
       ],
       "buttons": [
-        "Next fight",
+        "Next match",
         "Keep going"
       ]
     },
     "spreading-the-word": {
       "messages": [
-        "Fifteen shares. You're basically recruiting.",
-        "Fifteen. Everyone's going to know."
+        "Fifteen shares. You're basically on the crew.",
+        "Fifteen. You keep telling everyone. I like that."
       ],
       "details": [
-        "More voters, better fights. +{xp} XP",
-        "Thanks for the help. +{xp} XP"
+        "You keep spreading it. +{xp} XP",
+        "Fifteen shares. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
@@ -1130,12 +1088,12 @@
     },
     "founding-member": {
       "messages": [
-        "You were here before it got loud. Founding member.",
-        "One of the first thousand. That's yours for good."
+        "You were here at the start. Founding member, for good.",
+        "One of the first thousand. That's yours to keep."
       ],
       "details": [
-        "Yours for good. +{xp} XP",
-        "You were first. +{xp} XP"
+        "Yours for keeps. +{xp} XP",
+        "Nobody takes that away. +{xp} XP"
       ],
       "buttons": [
         "See the badge",
@@ -1144,11 +1102,11 @@
     },
     "level-up": {
       "messages": [
-        "Level up. You earned that.",
-        "Moved up a rank. Keep going."
+        "New rank. You earned it.",
+        "Moved up. Don't let it go to your head."
       ],
       "details": [
-        "{rank}. You earned it.",
+        "{rank}. Suits you.",
         "You've reached {rank}. +{xp} XP"
       ],
       "buttons": [
@@ -1158,17 +1116,249 @@
     },
     "default": {
       "messages": [
-        "Achievement unlocked: {name}. Nice.",
-        "Another one: {name}."
+        "Achievement unlocked: {name}. Nice one.",
+        "Another one down: {name}."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description}. +{xp} XP"
+        "{description} +{xp} XP"
       ],
       "buttons": [
         "View achievements",
         "See all"
       ]
     }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. Be patient.",
+      "Voting hasn't started. I'll tell you when it does.",
+      "Locked for now. Get ready."
+    ],
+    "prevote": [
+      "Two edits, one vote. Watch both, then pick.",
+      "Watch them both before you choose. Don't guess.",
+      "I'm not telling you which. Your call.",
+      "Take a minute. Then pick.",
+      "Go with your gut."
+    ],
+    "prevote-empty": [
+      "No votes yet. You could go first.",
+      "Quiet in here. Somebody start.",
+      "Empty so far. Make the first mark."
+    ],
+    "closing-24h": [
+      "Less than a day left and you haven't voted. Fix that.",
+      "Window's closing. Pick now."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time's short. Vote before it ends."
+    ],
+    "closing-final": [
+      "Last hour. Vote now.",
+      "Minutes left. Go."
+    ],
+    "voted-early": [
+      "You voted early. Few votes in, you picked anyway. Good.",
+      "Barely anyone's voted and you chose. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Nice. Not done though.",
+      "{pct}% with you. Good start.",
+      "Ahead for now. Things shift.",
+      "{pick} is pulling ahead. Good call.",
+      "A lead's a lead. Keep an eye on it."
+    ],
+    "voted-close": [
+      "That's close. Too close. I'm biting my knuckles.",
+      "Tight margin. One more vote changes it. Tell someone.",
+      "Neck and neck. Your pick needs help.",
+      "{pct} to {otherPct}. Don't look away."
+    ],
+    "voted-tied": [
+      "Dead level. Nobody's ahead.",
+      "A perfect tie. Annoying. Kind of great."
+    ],
+    "voted-behind": [
+      "You're behind. Doesn't mean you're wrong.",
+      "{pick} is trailing. Underdog. I like those.",
+      "They lead. You're not wrong, just outnumbered.",
+      "Behind by {diff} points. Tell people. Share it.",
+      "Most are going the other way. Doesn't settle anything."
+    ],
+    "closed-won": [
+      "Your pick won. Good call.",
+      "A win. Clean.",
+      "{pick} went through. You read that right."
+    ],
+    "closed-lost": [
+      "Your pick lost. Sucks. Shake it off.",
+      "It didn't make it. Happens. Next match.",
+      "{pick} is out. Sorry. It was a good choice."
+    ],
+    "closed-tied": [
+      "A tie. Neither side gave an inch."
+    ],
+    "closed-unvoted": [
+      "Voting's closed and you missed this one. There'll be more.",
+      "Match is over. {winner} took it. Next time, vote."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "First vote. Welcome. Everyone starts somewhere.",
+      "That's your first. It gets easier.",
+      "You're in now. Welcome."
+    ],
+    "streak": [
+      "Back again. Good.",
+      "{streak} days running. I see you.",
+      "You keep coming back. I like that."
+    ],
+    "underdog": [
+      "You backed the one nobody else did. Noted.",
+      "Hard choice. Good choice.",
+      "An underdog. Takes guts."
+    ],
+    "early": [
+      "Early. You helped shape this before anyone else.",
+      "Few votes so far. Yours counts big.",
+      "First through the door. Nice."
+    ],
+    "close": [
+      "That vote just moved things. It's tight.",
+      "Razor thin. One more person changes it.",
+      "Close one. Your vote counts for a lot."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't over. Bring people.",
+      "Not winning yet. So there's work to do.",
+      "Behind but not beaten. Not close."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't coast. Margins move.",
+      "Winning for now. Enjoy it.",
+      "Good pick, looks like."
+    ],
+    "default": [
+      "Noted. I won't try to change your mind. Yet.",
+      "Done. Your call.",
+      "Vote's in. There's more to see."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't picked a side. Start with the one you've got an opinion on.",
+      "Everything's open. Pick. I won't rush you.",
+      "{unvoted} to go. No pressure. Some pressure."
+    ],
+    "live-some": [
+      "{voted} done, {unvoted} to go. Keep moving.",
+      "You've started. {unvoted} more waiting.",
+      "Good start. The rest won't vote themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish it today.",
+      "Nearly there. {unvoted} more.",
+      "Close. Don't stop now."
+    ],
+    "live-one": [
+      "One left. Just one.",
+      "Last one. Don't leave it hanging.",
+      "One match between you and done."
+    ],
+    "live-closing": [
+      "Some of these close in {timeLeft}. {unvoted} still need you.",
+      "Clock's running. {unvoted} left, {timeLeft} to go.",
+      "Almost out of time. Get voting."
+    ],
+    "live-done": [
+      "You've voted in everything. Nice. Go check the bracket.",
+      "Nothing left for you here. Come back when the next round opens.",
+      "All done. Rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll open again. Check the bracket meanwhile.",
+      "Quiet. Check back soon.",
+      "No matches open. I'm as bored as you are."
+    ],
+    "brackets-groups": [
+      "Groups first. Top two from each go through. The rest go home.",
+      "Everyone starts in a group. Not everyone leaves.",
+      "Watch the tables. They move fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts soon. Top two from each group go through.",
+      "No knockout yet. The groups have to finish.",
+      "Patience. The knockout builds itself once the groups end."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you're out.",
+      "Single elimination. No second chances.",
+      "Every match counts more now. Choose well."
+    ],
+    "brackets-bracket": [
+      "Round by round. Lose once and you're gone.",
+      "Follow the bracket. It tightens every round.",
+      "Every line here is a match someone voted on."
+    ],
+    "brackets-complete": [
+      "That's the cup done. Thanks for being part of it.",
+      "It's over. Good run. I'll miss it.",
+      "Champion's decided. Worth following."
+    ],
+    "brackets-empty": [
+      "No bracket yet. Nothing's been drawn.",
+      "Empty. The draw hasn't happened. Soon.",
+      "Nothing here yet. Check back."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One vote decides it. Pick.",
+      "Two edits, one choice: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Come tell me what you think."
+    ],
+    "voted": [
+      "I voted {pick} over {other}. What would you pick?",
+      "{pick} gets my vote over {other}. Prove me wrong.",
+      "I chose {pick} over {other}. Think I'm wrong?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more.",
+      "I voted early for {pick} over {other}. Add yours.",
+      "{pick} versus {other}, barely any votes yet. Yours would count."
+    ],
+    "tied": [
+      "{pick} and {other} are dead level. One vote settles it.",
+      "A tie, {pick} against {other}. Break it.",
+      "{pick} and {other} can't be separated. Your vote can."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every vote counts now.",
+      "Only {voteDiff} votes between {pick} and {other}. Cast yours.",
+      "{pick} against {other}, {voteDiff} apart. Could go either way."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A few votes flip it.",
+      "Down {voteDiff} against {other}, but {pick} can still win. Help.",
+      "{pick} trails {other} by {voteDiff}. It's recoverable. Vote."
+    ],
+    "losing-bad": [
+      "{pick} is behind {other} by {voteDiff}. It needs help.",
+      "Down {voteDiff} against {other}. {pick} deserves better. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let's fix that."
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but only just. Help it hold.",
+      "{pick} is ahead of {other}, {pct}%. Not safe. Vote.",
+      "{pct}% for {pick} over {other}. A slim lead."
+    ],
+    "dominating": [
+      "{pick} is ahead of {other} at {pct}%. Come see why.",
+      "{pct}% for {pick}. {other} isn't close.",
+      "{pick} leads {other} by a mile, {pct}%. Cast yours."
+    ]
   }
 }

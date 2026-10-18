@@ -34,7 +34,7 @@ for _s in ('song1', 'song2'):
     next(m for m in matches if m['matchId'] == CURRENT)[_s]['shortTitle'] += ' #jinx #arcane #edit'
 EXPECT_LEFT = len(live) - 2        # everything live except the one being viewed and the one already voted in
 
-def load(browser, width, height, voted, mid=None):
+def load(browser, width, height, voted, mid=None, extra=''):
     ctx = browser.new_context(viewport={'width': width, 'height': height})
     init = f"localStorage.setItem('username','tester');localStorage.setItem('isPublic','true');localStorage.setItem('tournamentUserId','u1');"
     init += f"localStorage.setItem('userVotes', JSON.stringify({{'{OTHER_VOTED}': {{songId:'song1', songTitle:'x', opponentTitle:'y', timestamp:1}}}}));"
@@ -57,7 +57,7 @@ def load(browser, width, height, voted, mid=None):
         elif 'gstatic.com' in u or 'googleapis' in u or 'cdnjs' in u or 'google-analytics' in u or 'googletagmanager' in u: r.fulfill(body='', content_type='text/css' if u.endswith('.css') else 'text/plain')
         else: r.continue_()
     pg.route('**/*', route)
-    pg.goto(f'http://127.0.0.1:{PORT}/vote.html?match={mid or CURRENT}')
+    pg.goto(f'http://127.0.0.1:{PORT}/vote.html?match={mid or CURRENT}{extra}')
     pg.wait_for_timeout(3500)
     return pg, errs
 
@@ -154,6 +154,29 @@ with sync_playwright() as p:
     check('desktop: the About block still sits under its own vote button, and its "About:" label is hidden', d1['y'] > v1['b'] and not pg.is_visible('#competitor1-details-for'), (d1, v1))
     pg.context.close()
 
+
+    # ---------- arriving from an alert button (?share=1): the slim share modal opens by itself ----------
+    for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
+        pg, errs = load(b, w, h, voted=True, extra='&share=1')
+        check(f'alert link ({tag}): the share modal opens by itself', pg.is_visible('#vote-modal .pvm--share'))
+        txt = pg.inner_text('#vote-modal .pvm-line')
+        check(f'alert link ({tag}): the champion speech bubble is the share message and the box does not repeat it', pg.is_visible('#vote-modal .pvm-line') and pg.query_selector('#vote-modal .share-quote') is None and pg.query_selector('#vote-modal .share-text') is None and len(txt) > 20 and '{' not in txt, txt)
+        check(f'alert link ({tag}): no XP block in the slim modal', pg.query_selector('#vote-modal .pvm-xp') is None)
+        mr = rect(pg, '#vote-modal .pvm')
+        check(f'alert link ({tag}): the modal fits the window', mr and mr['r'] <= w + 1 and mr['b'] <= h + 1 and mr['x'] >= -1, mr)
+        pg.screenshot(path=f'{SHOTS}/vote-share-modal-{tag}.png')
+        before = pg.inner_text('#vote-modal .pvm-line')
+        pg.click('#vote-modal [data-share="reword"]'); pg.wait_for_timeout(200)
+        check(f'alert link ({tag}): "New line" changes the bubble', pg.inner_text('#vote-modal .pvm-line') != before, before)
+        pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+        check(f'alert link ({tag}): Escape closes it', not pg.is_visible('#vote-modal .pvm--share'))
+        check(f'alert link ({tag}): the page panel is still at the bottom', pg.query_selector('#share-panel .share-quote') is not None)
+        pg.context.close()
+        # not voted: the alert link must not open anything
+    pg, errs = load(b, 1280, 900, voted=False, extra='&share=1')
+    check('alert link, not voted: no modal pops up', not pg.is_visible('#vote-modal .pvm--share'))
+    pg.context.close()
+
     # ---------- voted: the Next match bar ----------
     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
         pg, errs = load(b, w, h, voted=True)
@@ -171,6 +194,15 @@ with sync_playwright() as p:
             check(f'voted ({tag}): the page has room under it (body padding)', pg.evaluate("document.body.classList.contains('has-next-bar')"))
         vst = pg.get_attribute('#champion-bubble', 'data-state')
         check(f'voted ({tag}): the bubble now talks about your pick ("voted-..." state)', (vst or '').startswith('voted-'), vst)
+        txt_share = pg.inner_text('#share-panel .share-quote') if pg.query_selector('#share-panel .share-quote') else ''
+        check(f'voted ({tag}): the share panel is filled with in-character text, no placeholder left', len(txt_share) > 20 and '{' not in txt_share, txt_share)
+        check(f'voted ({tag}): the share buttons exist (X, Reddit, WhatsApp, Facebook, Copy)', all(pg.query_selector(f'#share-panel [data-share="{k}"]') for k in ('x', 'reddit', 'whatsapp', 'facebook', 'copy')))
+        pg.evaluate("window.__opened = []; window.open = u => { window.__opened.push(u); return null; }")
+        pg.click('#share-panel [data-share="x"]'); pg.wait_for_timeout(200)
+        all_open = pg.evaluate("window.__opened.filter(Boolean)")
+        opened = all_open[0] if all_open else ''
+        check(f'voted ({tag}): X opens with the champion line and the match link carrying the share tag', len(all_open) == 1 and 'twitter.com/intent/tweet' in opened and 'ref%3Dshare' in opened and CURRENT in opened and '%7B' not in opened, (opened, errs[:3]))
+        pg.locator('#share-section').screenshot(path=f'{SHOTS}/vote-share-{tag}.png')
         sec = pg.inner_text('#other-matches-section h2') if pg.query_selector('#other-matches-section h2') else ''
         check(f'voted ({tag}): the "More Matches" list agrees ({EXPECT_LEFT})', f'{EXPECT_LEFT} More Matches' in sec, sec)
         # the post-vote modal, built by the same module vote.js uses, shown over the real page with the real stylesheet
@@ -207,10 +239,10 @@ with sync_playwright() as p:
         check(f'achievement ({tag}): the champion pack gave a line, a detail and a button', bool(shown and shown['message'] and shown['detail'] and shown['cta']), shown)
         check(f'achievement ({tag}): no placeholder is left in the text ({{xp}} used to stay in)', bool(shown) and '{' not in shown['message'] + shown['detail'] + shown['cta'], shown)
         ab = rect(pg, '#bulletin-banner')
-        check(f'achievement ({tag}): the popup is on screen and shows the achievement name above the champion line', bool(ab) and ab['r'] <= w and ab['y'] >= 0 and 'First Choice' in pg.inner_text('#bulletin-banner .achievement-title') and pg.is_visible('#bulletin-banner .achievement-line'), ab)
+        check(f'achievement ({tag}): the popup is on screen and shows the achievement name above the champion line', bool(ab) and ab['r'] <= w and ab['y'] >= 0 and 'First Choice' in pg.inner_text('#bulletin-banner .nv-toast-name') and pg.is_visible('#bulletin-banner .nv-bubble'), ab)
         nb = rect(pg, '#next-match-bar')
         check(f'achievement ({tag}): the popup does not cover the Next match bar', bool(ab and nb) and (ab['b'] <= nb['y'] + 1 or ab['x'] >= nb['r'] - 1 or ab['r'] <= nb['x'] + 1), (ab, nb))
-        check(f'achievement ({tag}): the popup takes the champion splash like the other alerts', pg.evaluate("getComputedStyle(document.querySelector('#bulletin-banner')).backgroundImage").startswith('url('), pg.evaluate("getComputedStyle(document.querySelector('#bulletin-banner')).backgroundImage"))
+        check(f'achievement ({tag}): the popup uses the shared alert layout (nv-body)', pg.query_selector('#bulletin-banner .nv-body') is not None)
         pg.screenshot(path=f'{SHOTS}/vote-achievement-{tag}.png')
         pg.screenshot(path=f'{SHOTS}/vote-voted-{tag}.png')
         check(f'voted ({tag}): no errors from the new code', not [e for e in errs if 'next-match' in e or 'updateNextMatchBar' in e or 'unvotedLiveMatches' in e], errs)

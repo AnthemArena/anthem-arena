@@ -1481,7 +1481,9 @@ body.theme-arcane .notification-panel {
 }
 
 /* five tabs (All, Votes, Social, Achievements, Messages) also overflowed the panel on desktop: "Achievements" was cut off and Messages hidden */
-body.theme-arcane .notif-tab { padding: 8px 8px; gap: 5px; font-size: 12.5px; flex: 1 1 auto; justify-content: center; }
+body.theme-arcane .notif-tab { padding: 8px 6px; gap: 0; font-size: 12.5px; flex: 1 1 auto; justify-content: center; }
+/* the tab icons cost about 90px and Messages was still clipped: the words are enough */
+body.theme-arcane .notif-tab i { display: none; }
 @media (max-width: 480px) {
     /* five tabs (All, Votes, Social, Achievements, Messages) did not fit, "Achievements" was cut off */
     body.theme-arcane .notif-tab { padding: 8px 4px; gap: 0; font-size: 11px; flex: 1 1 auto; justify-content: center; }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎪 Toast Testing Suite - Anthem Arena</title>
+    <title>🎪 Toast Testing Suite - Arcane Moments</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
@@ -450,31 +450,7 @@
     </div>
 </div>
 
-<!-- Faction Alerts (if you have factions) -->
-<div class="test-section">
-    <h2><i class="fas fa-flag"></i> Faction Alerts</h2>
-    <div class="test-grid">
-        <button class="test-btn" onclick="testFactionWon()">
-            <span class="test-btn-icon">🏆</span>
-            <strong>Faction Victory</strong>
-            <span class="test-btn-label">Your faction won majority</span>
-        </button>
-        
-        <button class="test-btn" onclick="testFactionLost()">
-            <span class="test-btn-icon">💔</span>
-            <strong>Faction Defeat</strong>
-            <span class="test-btn-label">Your faction lost majority</span>
-        </button>
-        
-        <button class="test-btn" onclick="testFactionComeback()">
-            <span class="test-btn-icon">⚡</span>
-            <strong>Faction Comeback</strong>
-            <span class="test-btn-label">Faction flipped the match</span>
-        </button>
-    </div>
-</div>
-    
-    <!-- Welcome & Onboarding -->
+<!-- Welcome & Onboarding -->
     <div class="test-section">
         <h2><i class="fas fa-hand-wave"></i> Welcome Messages</h2>
         <div class="test-grid">
@@ -814,7 +790,7 @@ action: 'dismiss'
         const msg = window.championLoader?.getCustomMessage(`welcome-${type}`);
         
         const messages = {
-            'first-time': { icon: '🎵', default: 'Welcome to Anthem Arena!' },
+            'first-time': { icon: '🎵', default: 'Welcome to Arcane Moments!' },
             'streak': { icon: '🔥', default: 'Day 2! You came back!' },
             'comeback': { icon: '👋', default: 'Welcome back after 5 days!' }
         };
@@ -954,67 +930,6 @@ function testEncouragement() {
         detail: msg?.detail || 'Pick your favorites and see results live!',
         cta: msg?.cta || 'Browse Matches',
         action: 'dismiss'
-    });
-}
-
-// ========================================
-// FACTION TESTS
-// ========================================
-
-function testFactionWon() {
-    const msg = window.championLoader?.getChampionMessage('factionAlerts.match-won', {
-        songTitle: 'GODS',
-        factionName: 'Team Jinx'
-    });
-    
-    window.showBulletin?.({
-        priority: 2,
-        type: 'faction-won',
-        matchId: 'test-faction-won',
-        song: 'GODS',
-        factionName: 'Team Jinx',
-        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-        message: msg?.message || '🏆 Your faction won!',
-        detail: msg?.detail || 'Team Jinx secured majority for GODS',
-        cta: msg?.cta || 'View Results'
-    });
-}
-
-function testFactionLost() {
-    const msg = window.championLoader?.getChampionMessage('factionAlerts.match-lost', {
-        songTitle: 'GODS',
-        factionName: 'Team Jinx'
-    });
-    
-    window.showBulletin?.({
-        priority: 2,
-        type: 'faction-lost',
-        matchId: 'test-faction-lost',
-        song: 'GODS',
-        factionName: 'Team Jinx',
-        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-        message: msg?.message || '💔 Your faction lost',
-        detail: msg?.detail || 'Team Jinx lost majority for GODS',
-        cta: msg?.cta || 'View Results'
-    });
-}
-
-function testFactionComeback() {
-    const msg = window.championLoader?.getChampionMessage('factionAlerts.comeback', {
-        songTitle: 'GODS',
-        factionName: 'Team Jinx'
-    });
-    
-    window.showBulletin?.({
-        priority: 3,
-        type: 'faction-comeback',
-        matchId: 'test-faction-comeback',
-        song: 'GODS',
-        factionName: 'Team Jinx',
-        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-        message: msg?.message || '⚡ Faction comeback!',
-        detail: msg?.detail || 'Team Jinx flipped the match for GODS!',
-        cta: msg?.cta || 'View Match'
     });
 }
 

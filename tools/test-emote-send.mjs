@@ -76,4 +76,26 @@ await t('with emotes switched off nothing is sent, and an emote button becomes V
         assert.equal(features.withoutEmoteCta(kept), kept);
     } finally { features.__setEmotesEnabledForTests(true); }
 });
+await t('ally and rival alerts get a View profile button while emotes are off; the alert itself still opens the match', async () => {
+    features.__setEmotesEnabledForTests(false);
+    try {
+        for (const relationship of ['ally', 'opponent']) {
+            const n = features.withoutEmoteCta({ type: 'live-activity', relationship, triggerUsername: 'Kai Lee', matchId: 'm1', targetUrl: '/vote.html?match=m1', ctaAction: 'send-emote', ctaText: 'Say thanks: x', ctaData: { a: 1 } });
+            assert.equal(n.ctaText, 'View profile'); assert.equal(n.cta, 'View profile'); assert.equal(n.ctaAction, 'navigate'); assert.equal(n.ctaData, undefined);
+            assert.equal(n.ctaUrl, '/profile.html?user=Kai%20Lee'); assert.equal(n.targetUrl, '/vote.html?match=m1');
+            // alerts saved earlier (already turned into "View match") are fixed too, and a second pass changes nothing more
+            const old = { type: 'live-activity', relationship, username: 'Mia', matchId: 'm2', ctaAction: 'navigate', ctaText: 'View match', targetUrl: '/vote.html?match=m2' };
+            const fixed = features.withoutEmoteCta(old);
+            assert.equal(fixed.ctaText, 'View profile'); assert.equal(fixed.ctaUrl, '/profile.html?user=Mia'); assert.equal(fixed.targetUrl, '/vote.html?match=m2');
+            assert.deepEqual(features.withoutEmoteCta(fixed), fixed);
+        }
+        // not an ally / rival alert, or nobody to link to: unchanged rules
+        assert.equal(features.withoutEmoteCta({ type: 'live-activity', relationship: 'ally' }).ctaUrl, undefined);
+        const other = { type: 'danger', relationship: 'ally', triggerUsername: 'x', ctaAction: 'navigate' };
+        assert.equal(features.withoutEmoteCta(other), other);
+        features.__setEmotesEnabledForTests(true);
+        const on = { type: 'live-activity', relationship: 'ally', triggerUsername: 'x', ctaAction: 'send-emote' };
+        assert.equal(features.withoutEmoteCta(on), on);
+    } finally { features.__setEmotesEnabledForTests(true); }
+});
 console.log(`${pass} passed${fail ? `, ${fail} FAILED` : ''}`); process.exit(fail ? 1 : 0);

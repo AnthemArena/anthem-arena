@@ -6,7 +6,6 @@
   "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/29.png",
   "description": "Professional, straightforward tournament notifications",
   "color": "#C8AA6E",
-
   "alerts": {
     "danger": {
       "messages": [
@@ -18,9 +17,11 @@
         "Behind by {voteDiff} vote{voteDiffPlural}",
         "Currently {userPct}% vs {opponentPct}%"
       ],
-      "buttons": ["View Match", "Check Status"]
+      "buttons": [
+        "View Match",
+        "Check Status"
+      ]
     },
-
     "nailbiter": {
       "messages": [
         "Neck and neck!",
@@ -30,9 +31,10 @@
       "details": [
         "Only {voteDiff} vote{voteDiffPlural} apart"
       ],
-      "buttons": ["View Match"]
+      "buttons": [
+        "View Match"
+      ]
     },
-
     "winning": {
       "messages": [
         "\"{songTitle}\" is leading!",
@@ -43,9 +45,10 @@
         "Ahead by {voteDiff} vote{voteDiffPlural}",
         "Currently {userPct}%"
       ],
-      "buttons": ["View Match"]
+      "buttons": [
+        "View Match"
+      ]
     },
-
     "comeback": {
       "messages": [
         "Amazing comeback!",
@@ -55,49 +58,72 @@
       "details": [
         "Now leading {userPct}% to {opponentPct}%"
       ],
-      "buttons": ["View Match"]
+      "buttons": [
+        "View Match"
+      ]
     },
-
     "ally": {
       "messages": [
         "{username} also voted for \"{songTitle}\"",
         "{username} agrees with your choice"
       ],
-      "buttons": ["View Profile"]
+      "buttons": [
+        "View Profile"
+      ]
     },
-
     "rival": {
       "messages": [
         "{username} voted for the opponent",
         "{username} chose differently"
       ],
-      "buttons": ["View Match"]
+      "buttons": [
+        "View Match"
+      ]
     },
-
     "streak-ally-10": {
-      "messages": ["10-match alliance with {username}!"],
-      "details": ["You've agreed 10 times"],
-      "buttons": ["View Profile"]
+      "messages": [
+        "10-match alliance with {username}!"
+      ],
+      "details": [
+        "You've agreed 10 times"
+      ],
+      "buttons": [
+        "View Profile"
+      ]
     },
-
     "streak-ally-20": {
-      "messages": ["Legendary {streakCount}-match streak with {username}!"],
-      "details": ["Unbreakable alliance"],
-      "buttons": ["View Profile"]
+      "messages": [
+        "Legendary {streakCount}-match streak with {username}!"
+      ],
+      "details": [
+        "Unbreakable alliance"
+      ],
+      "buttons": [
+        "View Profile"
+      ]
     },
-
     "streak-rival-10": {
-      "messages": ["10-match rivalry with {username}!"],
-      "details": ["A true battle of taste"],
-      "buttons": ["View Profile"]
+      "messages": [
+        "10-match rivalry with {username}!"
+      ],
+      "details": [
+        "A true battle of taste"
+      ],
+      "buttons": [
+        "View Profile"
+      ]
     },
-
     "streak-rival-20": {
-      "messages": ["Legendary {streakCount}-match rivalry with {username}!"],
-      "details": ["The ultimate clash"],
-      "buttons": ["View Profile"]
+      "messages": [
+        "Legendary {streakCount}-match rivalry with {username}!"
+      ],
+      "details": [
+        "The ultimate clash"
+      ],
+      "buttons": [
+        "View Profile"
+      ]
     },
-
     "closing-24h": {
       "messages": [
         "\"{matchTitle}\" closes in {timeLeft}. You haven't voted yet."
@@ -131,96 +157,107 @@
       ]
     },
     "novotes": {
-      "messages": ["This match has zero votes yet!"],
-      "details": ["\"{song1}\" vs \"{song2}\""],
-      "buttons": ["Be the First!"]
+      "messages": [
+        "This match has zero votes yet!"
+      ],
+      "details": [
+        "\"{song1}\" vs \"{song2}\""
+      ],
+      "buttons": [
+        "Be the First!"
+      ]
     },
-
     "welcome": {
-      "messages": ["Welcome to the tournament!"],
-      "details": ["{liveCount} matches live right now"],
-      "buttons": ["Start Voting"]
+      "messages": [
+        "Welcome to the tournament!"
+      ],
+      "details": [
+        "{liveCount} matches live right now"
+      ],
+      "buttons": [
+        "Start Voting"
+      ]
     },
-
     "round-opening": {
-      "messages": ["Round {round} is now live!"],
-      "details": ["{matchCount} new matches available"],
-      "buttons": ["View Round"]
+      "messages": [
+        "Round {round} is now live!"
+      ],
+      "details": [
+        "{matchCount} new matches available"
+      ],
+      "buttons": [
+        "View Round"
+      ]
     },
-
     "match-won": {
-      "messages": ["\"{songTitle}\" advanced!"],
-      "details": ["Your pick won the match"],
-      "buttons": ["See Results"]
+      "messages": [
+        "\"{songTitle}\" advanced!"
+      ],
+      "details": [
+        "Your pick won the match"
+      ],
+      "buttons": [
+        "See Results"
+      ]
     },
-
     "match-lost": {
-      "messages": ["\"{songTitle}\" was eliminated"],
-      "details": ["Better luck next round"],
-      "buttons": ["View Bracket"]
+      "messages": [
+        "\"{songTitle}\" was eliminated"
+      ],
+      "details": [
+        "Better luck next round"
+      ],
+      "buttons": [
+        "View Bracket"
+      ]
     },
-
     "match-tied": {
-      "messages": ["Perfect tie!"],
-      "details": ["\"{songTitle}\" ended 50-50"],
-      "buttons": ["View Results"]
+      "messages": [
+        "Perfect tie!"
+      ],
+      "details": [
+        "\"{songTitle}\" ended 50-50"
+      ],
+      "buttons": [
+        "View Results"
+      ]
     }
   },
-
   "achievements": {
-    "opening-act": {
-      "messages": ["Achievement: Opening Act"],
-      "details": ["Cast your first vote • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "encore": {
-      "messages": ["Achievement: Encore"],
-      "details": ["5 votes cast • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "pentakill": {
-      "messages": ["Achievement: Pentakill"],
-      "details": ["50 votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "chart-topper": {
-      "messages": ["Achievement: Chart Topper"],
-      "details": ["100 votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "hall-of-fame": {
-      "messages": ["Achievement: Hall of Fame"],
-      "details": ["250 votes • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "hot-streak": {
-      "messages": ["Achievement: Hot Streak"],
-      "details": ["7-day voting streak • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-    "legendary-streak": {
-      "messages": ["Achievement: Legendary"],
-      "details": ["30-day voting streak • +{xp} XP"],
-      "buttons": ["View Achievements"]
-    },
-
     "default": {
-      "messages": ["Achievement Unlocked: {name}"],
-      "details": ["{description} • +{xp} XP"],
-      "buttons": ["View Achievements"]
+      "messages": [
+        "Achievement Unlocked: {name}"
+      ],
+      "details": [
+        "{description} • +{xp} XP"
+      ],
+      "buttons": [
+        "View Achievements"
+      ]
     }
   },
-
   "welcomeDialogs": {
     "welcome-first-time": {
-      "messages": ["Welcome!"],
-      "details": ["Ready to vote on the best League songs?"],
-      "buttons": ["Let's Go!"]
+      "messages": [
+        "Welcome!"
+      ],
+      "details": [
+        "Ready to vote on the best Arcane edits?"
+      ],
+      "buttons": [
+        "Let's Go!"
+      ]
     },
     "welcome-back": {
-      "messages": ["Welcome back!"],
-      "details": ["{liveCount} matches are live"],
-      "buttons": ["Continue Voting"]
+      "messages": [
+        "Welcome back!"
+      ],
+      "details": [
+        "{liveCount} matches are live"
+      ],
+      "buttons": [
+        "Continue Voting"
+      ]
     }
   }
 }

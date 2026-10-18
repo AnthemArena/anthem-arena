@@ -135,8 +135,8 @@ export function editsPairHtml({ edits, relationship, size = 44, accent }) {
     const w = Math.round(size * 1.5);
     const side = (s, outer) => {
         const theirs = s.key === edits.theirKey, yours = s.key === edits.yourKey;
-        const ring = theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
-        const cls = (theirs || yours) ? 'nv-pick' : 'nv-dim';
+        const ring = edits.neutral ? 'rgba(255,255,255,0.4)' : theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
+        const cls = (theirs || yours || edits.neutral) ? 'nv-pick' : 'nv-dim';
         return `<span class="nv-edit ${cls}" style="width:${w}px;height:${size}px;--nv-ring:${ring}">${s.thumb ? `<img src="${escapeHtml(s.thumb)}" alt="" onerror="this.remove()">` : ''}</span>`;
     };
     return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px">VS</span>${side(edits.right, 'right')}</div>`;
@@ -171,7 +171,7 @@ export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, qui
 }
 
 // Ally / rival rows: the same "versus" look as the toast (js/notification-visuals.js), compact.
-// The whole row opens the match (a per-person group opens its list instead); the button sends the emote.
+// The whole row opens the match (a per-person group opens its list instead); the button opens the other voter's profile.
 export function socialRowHtml(n, { headline, timeAgo, championPack }) {
     ensureVersusStyles();
     const ally = n.relationship === 'ally';
@@ -199,7 +199,7 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
                     style="background: linear-gradient(135deg, ${accent}, ${ally ? '#22c55e' : '#ff1493'}); border: 0; color: ${ally ? '#0f0b18' : '#fff'};"
                     data-id="${idList}" data-action="${n.ctaAction}"
                     ${n.ctaAction === 'send-emote' ? `data-target-user="${escapeHtml(n.triggerUserId)}"` : ''}
-                    data-url="${escapeHtml(n.targetUrl || '')}">${n.ctaAction === 'send-emote' ? '<span class="cta-loading">Checking...</span>' : escapeHtml(n.ctaText || 'View match')}</button>
+                    data-url="${escapeHtml(n.ctaUrl || n.targetUrl || '')}">${n.ctaAction === 'send-emote' ? '<span class="cta-loading">Checking...</span>' : escapeHtml(n.ctaText || 'View match')}</button>
         </div>`;
     const open = perPersonGroup ? `data-group="${idList}"` : `data-url="${escapeHtml(n.targetUrl || '')}"`;
     const unread = !n.read && !n.dismissed ? 'unread' : '';
@@ -309,6 +309,76 @@ export function contentToastHtml(n, { parts, quote, icon, cta, accent, srcs = []
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View')}</button>`;
 }
 
+// ---------- match-event alerts ----------
+export const hexToRgba = (hex, a) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+    if (!m) return `rgba(255,105,180,${a})`;
+    const v = parseInt(m[1], 16);
+    return `rgba(${v >> 16},${(v >> 8) & 255},${v & 255},${a})`;
+};
+export const darken = (hex, f = 0.25) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+    if (!m) return '#c2185b';
+    const v = parseInt(m[1], 16), k = c => Math.round(c * (1 - f)).toString(16).padStart(2, '0');
+    return `#${k(v >> 16)}${k((v >> 8) & 255)}${k(v & 255)}`;
+};
+
+// What the two edit pictures show for an event: the viewer's pick ringed in the alert's colour, the other dimmed
+// (a match nobody has voted in yet shows both, evenly). yourKey = 'song1' | 'song2' | undefined.
+export function eventEdits(match, yourKey) {
+    if (!match) return null;
+    const l = songThumb(match.song1), r = songThumb(match.song2);
+    if (!l && !r) return null;
+    const picked = yourKey === 'song1' || yourKey === 'song2';
+    return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey: null, theirKey: picked ? yourKey : null, neutral: !picked };
+}
+
+// The big round number for a level-up.
+export function levelBadgeHtml(level, accent, size = 64) {
+    return `<div class="nv-follow-face"><span class="nv-av"><span class="nv-circle" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${escapeHtml(String(level ?? '?'))}</span></span></div>`;
+}
+
+// Pop-up: [edit A] VS [edit B], a small tag line, the champion's words in a bubble, a few chips, one button. The whole card opens the match.
+export function eventToastHtml(n, { tag, edits, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
+    return `
+    <div class="nv-body" onclick="window.handleBulletinCTA()">
+        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        ${leadHtml || (edits ? editsPairHtml({ edits, relationship: 'event', size: 60, accent }) : '')}
+        <div class="nv-event-tag">${escapeHtml(tag)}</div>
+        ${bubbleHtml(quip, jinxSrc, accent)}
+        ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
+        ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
+    </div>
+    <button class="bulletin-toast-cta nv-cta event" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View match')}</button>`;
+}
+
+// Bell-list row: the same card, compact. The whole row opens the match; the button does the same.
+export function eventRowHtml(n, { tag, edits, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
+    ensureVersusStyles();
+    const idList = n.ids ? n.ids.join(',') : n.id;
+    const unread = !n.read && !n.dismissed ? 'unread' : '';
+    const lead = edits ? editsPairHtml({ edits, relationship: 'event', size: 40, accent }) : circleHtml(jinxSrc, 'C', 44, { accent });
+    const sub = [timeAgo, n.matchTitle].filter(Boolean).map(escapeHtml).join(' · ');
+    const quote = quip ? `<div class="nv-quote">${jinxSrc && edits ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : '';
+    return `
+        <div class="notification-item nv-row nv-event-row ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url || '')}"
+             title="${escapeHtml(n.matchTitle || '')}"
+             style="--nv-accent:${accent}; --nv-line:${hexToRgba(accent, 0.4)}; --nv-accent-text:${accent}">
+            <button class="notification-item-dismiss" data-id="${idList}" aria-label="Dismiss">×</button>
+            <div class="nv-top">
+                ${lead}
+                <div class="nv-text">
+                    <div class="nv-headline"><span class="nv-headline-text">${escapeHtml(tag)}</span></div>
+                    <div class="nv-sub">${sub}</div>
+                </div>
+            </div>
+            ${quote}
+            <div class="notification-item-footer">
+                <button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, ${darken(accent)}); border: 0; color: #0f0b18;" data-id="${idList}" data-action="navigate" data-url="${escapeHtml(url || '')}">${escapeHtml(cta || 'View match')}</button>
+            </div>
+        </div>`;
+}
+
 function socialHeadlineFor(n) {
     return `${n.triggerUsername || 'Someone'} voted ${n.relationship === 'ally' ? 'with' : 'against'} you`;
 }
@@ -384,6 +454,13 @@ export function ensureVersusStyles() {
 .nv-row .nv-content{margin:8px 0;padding:6px 10px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.05);border-radius:0 8px 8px 0;font-size:12.5px;color:rgba(255,255,255,.82);font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .versus-toast .nv-content-toast{margin:2px 0 4px;padding:8px 12px;border-left:3px solid var(--nv-accent);background:rgba(255,255,255,.07);border-radius:0 10px 10px 0;font-size:14px;line-height:1.35;color:#fff;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .versus-toast .nv-follow-face .nv-stack{justify-content:center}
+.versus-toast .nv-event-tag{text-align:center;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--nv-accent)}
+.versus-toast .nv-chip-plain{text-transform:none}
+.versus-toast .nv-event-detail{text-align:center;font-size:12.5px;color:rgba(255,255,255,.72)}
+.versus-toast .nv-edits{margin-top:2px}
+.versus-toast .nv-cta.event{color:#0f0b18}
+.nv-event-row .nv-headline-text{text-transform:uppercase;font-size:11.5px;letter-spacing:.1em;font-weight:800;color:var(--nv-accent-text)}
+.nv-event-row .notification-item-cta{color:#0f0b18}
 `;
     document.head.appendChild(s);
 }

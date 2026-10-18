@@ -178,7 +178,7 @@ function createModalHTML() {
                             <div class="form-group">
                                 <textarea
                                     id="bioInput"
-                                    placeholder="Music enthusiast, League fan, proud underdog supporter..."
+                                    placeholder="Arcane fan, edit hunter, proud underdog supporter..."
                                     maxlength="200"
                                     rows="3"
                                     autocomplete="off"
@@ -355,18 +355,6 @@ Your companion can react to matches, achievements, and other site activity
             </div>
         </label>
 
-        <!-- Message Privacy -->
-        <div class="toggle-label select-wrapper">
-            <div class="toggle-info" style="flex: 1;">
-                <strong>💬 Who Can Message You?</strong>
-                <select id="messagePrivacySelect" class="privacy-select">
-                    <option value="everyone">Everyone</option>
-                    <option value="followers">People You Follow</option>
-                    <option value="nobody">Nobody</option>
-                </select>
-            </div>
-        </div>
-
         <!-- Show Online Status -->
         <label class="toggle-label">
             <input type="checkbox" id="showOnlineStatusToggle" class="toggle-input" />
@@ -466,7 +454,6 @@ function loadCurrentProfile() {
     const privacyDefaults = {
         isPublic: 'true',
     allowFollows: 'true',  // ✅ Changed from allowFriendRequests
-        messagePrivacy: 'everyone',
         showOnlineStatus: 'true',
         emotePrivacy: 'everyone'
     };
@@ -480,7 +467,6 @@ function loadCurrentProfile() {
 
     const isPublic = localStorage.getItem('isPublic') === 'true';
 const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Changed
-    const messagePrivacy = localStorage.getItem('messagePrivacy') || 'everyone';
     const showOnlineStatus = localStorage.getItem('showOnlineStatus') === 'true';
     const emotePrivacy = localStorage.getItem('emotePrivacy') || 'everyone';
 
@@ -529,7 +515,6 @@ if (socialLinksJson) {
 
   // ✅ Set all privacy toggles
 document.getElementById('publicToggle').checked = isPublic;
-document.getElementById('messagePrivacySelect').value = messagePrivacy;
 document.getElementById('showOnlineStatusToggle').checked = showOnlineStatus;
 document.getElementById('emotePrivacySelect').value = emotePrivacy;
     {   // notification preferences
@@ -686,7 +671,6 @@ function setupEventListeners() {
     const trackableInputs = [
         'usernameInput',
         'publicToggle',
-        'messagePrivacySelect',
         'showOnlineStatusToggle',
         'emotePrivacySelect',
         'notifyFromSelect',
@@ -859,7 +843,6 @@ async function handleSaveSettings(e) {
     // ✅ Get all privacy settings
     const privacySettings = {
         isPublic: document.getElementById('publicToggle')?.checked ?? true,
-        messagePrivacy: document.getElementById('messagePrivacySelect')?.value ?? 'everyone',
         showOnlineStatus: document.getElementById('showOnlineStatusToggle')?.checked ?? true,
         emotePrivacy: document.getElementById('emotePrivacySelect')?.value ?? 'everyone'
     };

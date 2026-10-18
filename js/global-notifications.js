@@ -7,9 +7,9 @@ import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
-import { socialContextFor } from './notification-social-context.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, eventKind, eventTag, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
+import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
     saveNotification, 
@@ -131,9 +131,7 @@ const COOLDOWN_MINUTES = {
     encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
     achievement: 0,      // ✅ Keep - one-time
     'level-up': 0,       // ✅ Keep - one-time
-    trending: 30,        // ✅ Keep - good for engagement
     votesurge: 30,       // ✅ Keep
-    mostviewed: 60,       // 🔽 Reduce from 90 - still low priority but more active
         'live-activity': 5,  // ✅ NEW: Show live votes every 5 minutes max
             streak: 30  // ✅ NEW: Show streak alerts max every 30 minutes
 
@@ -425,6 +423,7 @@ async function getMatchData(matchId) {
 
 async function checkAndShowBulletin() {
     try {
+        if (document.hidden) return;     // nobody can see a toast in a background tab; the return-to-tab handler catches up
         // ========================================
         // PRIORITY 0: CHECK FOR NEW ROUNDS/BATCHES
         // ========================================
@@ -625,7 +624,7 @@ async function checkAndShowBulletin() {
                 const notificationType = alertCount === 0 ? 'danger' : 'danger-repeat';
 
                 const championMessage = window.championLoader?.getChampionMessage('danger', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
                     voteDiff: voteDiff,
@@ -637,7 +636,7 @@ async function checkAndShowBulletin() {
                     priority: 1,
                     type: notificationType,
                     matchId: normalizedMatchId,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
@@ -680,7 +679,7 @@ async function checkAndShowBulletin() {
                 }
                 
                 const championMessage = window.championLoader?.getChampionMessage('comeback', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
                     voteDiff: voteDiff,
@@ -692,7 +691,7 @@ async function checkAndShowBulletin() {
                     priority: 2,
                     type: 'comeback',
                     matchId: normalizedMatchId,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
@@ -724,7 +723,7 @@ async function checkAndShowBulletin() {
                 }
 
                 const championMessage = window.championLoader?.getChampionMessage('nailbiter', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponentTitle: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     matchTitle: `${userSong?.shortTitle || userSong?.title} vs ${opponent?.shortTitle || opponent?.title}`,
                     voteDiff: voteDiff,
@@ -736,7 +735,7 @@ async function checkAndShowBulletin() {
                     priority: 3,
                     type: 'nailbiter',
                     matchId: normalizedMatchId,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     voteDiff,
@@ -778,7 +777,7 @@ async function checkAndShowBulletin() {
                 }
                 
                 const championMessage = window.championLoader?.getChampionMessage('winning', {
-                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    songTitle: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     userPct: userPct,
                     opponentPct: opponentPct,
                     voteDiff: voteDiff
@@ -788,7 +787,7 @@ async function checkAndShowBulletin() {
                     priority: 4,
                     type: 'winning',
                     matchId: normalizedMatchId,
-                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown Song',
+                    song: userSong?.shortTitle || userSong?.title || vote.songTitle || 'Unknown edit',
                     opponent: opponent?.shortTitle || opponent?.title || vote.opponentTitle || 'Opponent',
                     thumbnailUrl: getThumbnailUrl(userSong),
                     userPct,
@@ -957,64 +956,6 @@ async function checkAndShowBulletin() {
             }
         } catch (error) {
             console.error('⚠️ Error checking closing-soon matches:', error);
-        }
-        
-        // ========================================
-        // PRIORITY 4: CHECK FOR TRENDING/ENGAGING MATCHES
-        // ========================================
-        
-        if (hasVoted && Object.keys(userVotes).length >= 2) {
-            for (const match of liveMatches) {
-                const matchId = match.matchId || match.id;
-                
-                if (userVotes[matchId]) continue;
-                
-                try {
-                    const viewResponse = await fetch(`/api/view-stats?matchId=${matchId}`);
-                    
-                    if (!viewResponse.ok) continue;
-                    
-                    const viewStats = await viewResponse.json();
-                    const totalViews = viewStats.totalViews || 0;
-                    const recentViews = viewStats.recentViews || 0;
-                    const totalVotes = match.totalVotes || 0;
-                    
-                    if (recentViews >= 10 && totalVotes >= 5) {
-                        notifications.push({
-                            priority: 3,
-                            type: 'trending',
-                            matchId: matchId,
-                            song: match.song1?.shortTitle || match.song1?.title || 'Unknown',
-                            opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
-                            thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
-                            viewCount: recentViews,
-                            message: `🔥 Hottest match right now!`,
-                            detail: `${match.song1?.shortTitle} vs ${match.song2?.shortTitle} is trending - join the action`,
-                            cta: 'Vote Now',
-                            action: 'navigate',
-                            targetUrl: `/vote.html?match=${matchId}`
-                        });
-                    }
-                    else if (totalViews >= 30 && totalVotes < 15) {
-                        notifications.push({
-                            priority: 4,
-                            type: 'mostviewed',
-                            matchId: matchId,
-                            song: match.song1?.shortTitle || match.song1?.title || 'Unknown',
-                            opponent: match.song2?.shortTitle || match.song2?.title || 'Unknown',
-                            thumbnailUrl: getThumbnailUrl(match.song1?.youtubeUrl),
-                            viewCount: totalViews,
-                            message: `👀 Most popular match today!`,
-                            detail: `Everyone's watching ${match.song1?.shortTitle} vs ${match.song2?.shortTitle} - add your vote!`,
-                            cta: 'Cast Your Vote',
-                            action: 'navigate',
-                            targetUrl: `/vote.html?match=${matchId}`
-                        });
-                    }
-                } catch (error) {
-                    console.error(`Error checking engagement for ${matchId}:`, error);
-                }
-            }
         }
         
         // ========================================
@@ -1381,12 +1322,7 @@ function buildSocialNotification(activity, isAlly, currentUserId) {
         ctaData,
         targetUrl: `/vote.html?match=${activity.matchId}`,
         relationship: isAlly ? 'ally' : 'opponent',
-        shownAsToast: false,
-        secondaryCta: {
-            text: `View ${activity.username}'s Profile`,
-            action: 'navigate',
-            url: `/profile?user=${activity.username}`
-        }
+        shownAsToast: false
     });
 }
 
@@ -1516,12 +1452,12 @@ if (streak >= 20) {
                 priority = 5;
             } else if (streak === 5) {
                 message = `🔥🔥 5-match alliance with ${username}!`;
-                detail = `Your taste in music is perfectly aligned!`;
+                detail = `Your picks are perfectly aligned!`;
                 icon = '✨';
                 priority = 4;
             } else if (streak === 10) {
                 message = `🔥🔥🔥 EPIC 10-match streak with ${username}!`;
-                detail = `You two are music soulmates!`;
+                detail = `You two keep choosing the same edits!`;
                 icon = '💫';
                 priority = 3;
             } else if (streak >= 20) {
@@ -1749,6 +1685,7 @@ async function showWelcomeToast() {
         showBulletin({
             priority: 1,
             type: 'welcome',
+            welcomeType,
             matchId: 'welcome',
             thumbnailUrl: thumbnailUrl,
             message: welcomeData.message,
@@ -1840,29 +1777,20 @@ async function showEncouragementToast(type = 'gentle') {
             ? getThumbnailUrl(randomMatch.song1?.youtubeUrl) || getThumbnailUrl(randomMatch.song2?.youtubeUrl)
             : 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg';
         
-        const messages = {
-            gentle: {
-                icon: '👀',
-                message: 'Still deciding?',
-                detail: 'Pick your favorite songs and see the results in real-time!',
-                cta: 'Vote Now'
-            },
-            urgent: {
-                icon: '⏰',
-                message: 'Matches closing soon!',
-                detail: `Don't miss your chance to influence the winners!`,
-                cta: 'Cast Your Votes'
-            }
+        const voiced = type === 'gentle' ? window.championLoader?.getChampionMessage?.('encouragement', {}) : null;
+        const plain = {
+            gentle: { message: 'Still deciding? Pick your favourite edit.', detail: 'See the results in real time once you have voted.', cta: 'Vote now' },
+            urgent: { message: 'Matches are closing soon.', detail: "Don't miss your chance to influence the winners.", cta: 'Cast your votes' }
         };
-        
-        const config = messages[type] || messages.gentle;
+        const config = (voiced && voiced.message && voiced) || plain[type] || plain.gentle;
         
         showBulletin({
             priority: 5,
             type: 'encouragement',
+            encouragementType: type,
             matchId: 'encouragement',
             thumbnailUrl: thumbnailUrl,
-            message: `${config.icon} ${config.message}`,
+            message: config.message,
             detail: config.detail,
             cta: config.cta,
             action: 'navigate',
@@ -1908,7 +1836,7 @@ function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower', ...CONTENT_TYPES];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower', 'round-opening', 'new-matches', ...CONTENT_TYPES];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -2504,42 +2432,23 @@ if (championPack && championPack.theme) {
     
     // ✅ LEVEL-UP SPECIFIC STYLING
     if (notification.type === 'level-up') {
-        const levelMatch = notification.message.match(/Level (\d+)/);
+        // Level up: the same card family as the other alerts (big level number, tag, the champion's words, one button)
+        ensureVersusStyles();
+        const levelMatch = String(notification.message || '').match(/Level (\d+)/);
         const level = notification.level ?? (levelMatch ? levelMatch[1] : '?');
-        
-        banner.innerHTML = `
-            <div class="bulletin-toast-content level-up-toast">
-                <div class="level-badge-large">
-                    ${level}
-                </div>
-                <div class="bulletin-toast-text">
-                    <div class="level-label">LEVEL UP!</div>
-                    <div class="bulletin-message level-title">${notification.message}</div>
-                    <div class="bulletin-detail">${notification.detail}</div>
-                </div>
-                <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
-            </div>
-            <button class="bulletin-toast-cta level-cta" onclick="window.handleBulletinCTA()">
-                ${notification.cta || 'View Progress'}
-            </button>
-            ${notification.secondaryCta ? `
-                <button class="bulletin-toast-cta-secondary" 
-                        onclick="window.location.href='${notification.secondaryCta.url}'">
-                    ${notification.secondaryCta.text}
-                </button>
-            ` : ''}
-        `;
-        
-        banner.className = 'bulletin-banner level-up show';
-        
-        // Add special animation for level badge
-        setTimeout(() => {
-            const badge = banner.querySelector('.level-badge-large');
-            if (badge) {
-                badge.style.animation = 'levelPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-            }
-        }, 100);
-        
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = pack?.color || '#ff69b4';
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', darken(accent));
+        banner.style.setProperty('--nv-glow', hexToRgba(accent, 0.35));
+        banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
+        banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
+        banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        banner.innerHTML = eventToastHtml(notification, {
+            tag: 'Level up', accent, jinxSrc: championBadgeUrl(pack), leadHtml: levelBadgeHtml(level, accent),
+            quip: notification.message, detail: notification.detail, cta: notification.cta || 'View progress'
+        });
+        banner.className = 'bulletin-banner versus-toast event level-up-card';
     } 
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
@@ -2725,6 +2634,61 @@ else {
             cta: notification.cta
         });
         banner.className = 'bulletin-banner versus-toast opponent';
+    } else if (isStreakNotification(notification)) {
+        // A streak with one person: the ally / rival card with a View profile button
+        ensureVersusStyles();
+        const view = streakView(notification);
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = accentFor(view.relationship, pack);
+        const ally = view.relationship === 'ally';
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', ally ? '#22c55e' : '#ff1493');
+        banner.style.setProperty('--nv-glow', ally ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
+        banner.style.setProperty('--nv-tint', ally ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
+        banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        const who = notification.triggerUsername || notification.username;
+        const drawStreak = () => {
+            banner.innerHTML = toastHtml({ ...notification, relationship: view.relationship, targetUrl: view.profileUrl }, {
+                theirSrc: notification.nv?.theirSrc || fallbackAvatarFor(who),
+                yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),
+                jinxSrc: championBadgeUrl(pack), accent, headline: view.headline, quip: notification.message, cta: 'View profile'
+            });
+        };
+        drawStreak();
+        banner.className = `bulletin-banner versus-toast ${view.relationship}`;
+        if (!notification.nv) {
+            socialContextFor({ triggerUserId: notification.triggerUserId, triggerUsername: who }).then(nv => {
+                notification.nv = nv;
+                if (currentBulletin === notification) drawStreak();
+            }).catch(() => {});
+        }
+    } else if (isEventNotification(notification)) {
+        // Match events (danger, nailbiter, winning, comeback, closing, no / low votes, round open, match result): one design.
+        // The pop-up shows at once; the two edit pictures are added a moment later when the match list is at hand.
+        ensureVersusStyles();
+        const pack = window.championLoader?.getCurrentPack();
+        const accent = eventKind(notification).tone || pack?.color || '#ff69b4';
+        banner.style.setProperty('--nv-accent', accent);
+        banner.style.setProperty('--nv-accent-dark', darken(accent));
+        banner.style.setProperty('--nv-glow', hexToRgba(accent, 0.35));
+        banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
+        banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
+        banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        const drawEvent = () => {
+            banner.innerHTML = eventToastHtml(notification, {
+                tag: eventTag(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(pack),
+                quip: notification.message, detail: notification.detail, chips: eventChips(notification),
+                cta: notification.ctaText || notification.cta || 'View match'
+            });
+        };
+        drawEvent();
+        banner.className = 'bulletin-banner versus-toast event';
+        if (!notification.nv && notification.matchId) {
+            eventContextFor(notification).then(nv => {
+                notification.nv = nv;
+                if (nv.edits && currentBulletin === notification) drawEvent();
+            }).catch(() => {});
+        }
     } else if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
         // Ally / rival: the shared "versus" look (js/notification-visuals.js), same as the bell-list row
         ensureVersusStyles();
@@ -2833,9 +2797,10 @@ window.dismissBulletin = function() {
     currentBulletin = null;
 };
 
-// Clicking the body of a versus toast opens its match (the button still sends the emote).
+// Clicking the body of a versus toast opens its match (its button opens the other voter's profile).
 window.openBulletinMatch = function() {
     const b = currentBulletin;
+    if (isStreakNotification(b)) { hideBulletin(); window.location.href = streakView(b).profileUrl; return; }
     if (!b || !b.targetUrl) return;
     hideBulletin();
     window.location.href = b.targetUrl;
@@ -2864,6 +2829,12 @@ window.handleBulletinCTA = function() {
         return;
     }
 
+    // Ally / rival toast: the button opens the other voter's profile (the toast body opens the match)
+    if (currentBulletin.ctaUrl && currentBulletin.type === 'live-activity') {
+        window.location.href = currentBulletin.ctaUrl;
+        return;
+    }
+
     // ✅ PRIORITY 2a: Ally bulletins ("X also voted for Y") carry ctaAction + ctaData.
     // Send the emote instead of navigating. handleEmoteClick shows "Sending...",
     // "Sent!" on the button and hides the bulletin itself, so don't hide here.
@@ -2885,10 +2856,24 @@ window.handleBulletinCTA = function() {
         return;
     }
     
+    // Streak card: the button opens the other voter's profile
+    if (isStreakNotification(currentBulletin)) {
+        window.location.href = streakView(currentBulletin).profileUrl;
+        return;
+    }
+
+    // Match-event alerts (new design): the button and the card both open the match (with the share panel for a match you voted in)
+    if (isEventNotification(currentBulletin) && currentBulletin.matchId !== 'test-match' && currentBulletin.action !== 'dismiss') {
+        window.location.href = eventUrl(currentBulletin);
+        return;
+    }
+
     // Handle all match-specific alerts
     if (['danger', 'nailbiter', 'comeback', 'winning', 'live-activity', 'novotes', 'lowvotes'].includes(currentBulletin.type)) {
         if (currentBulletin.matchId && currentBulletin.matchId !== 'test-match') {
-            window.location.href = `/vote.html?match=${currentBulletin.matchId}`;
+            // danger / nailbiter / winning / comeback alerts are about a match the viewer already voted in: open it with the share panel in view
+            const wantsShare = ['danger', 'nailbiter', 'winning', 'comeback'].includes(currentBulletin.type);
+            window.location.href = `/vote.html?match=${currentBulletin.matchId}${wantsShare ? '&share=1' : ''}`;
             return; // ✅ Don't hide - page is navigating away
         } else {
             showNotificationToast('Match not available', 'error');
@@ -3506,7 +3491,7 @@ window.testBulletin = function(type = 'winning') {
             priority: 5,
             type: 'welcome',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-            message: '🎵 Welcome to the League Music Tournament!',
+            message: 'Welcome to Arcane Moments!',
             detail: '15 matches live - cast your first vote!',
             cta: 'Start Voting',
             action: 'navigate',
@@ -3577,35 +3562,6 @@ window.testBulletin = function(type = 'winning') {
             cta: 'Browse Matches',
             action: 'navigate',
             targetUrl: '/matches.html'
-        },
-      trending: {
-            priority: 3,
-            type: 'trending',
-            matchId: 'round-1-match-4',
-            song: 'Welcome to Noxus',
-            opponent: 'Unstoppable',
-            thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-            viewCount: 25,
-            message: '🔥 Hottest match right now!',
-            detail: 'Welcome to Noxus vs Unstoppable is trending - join the action',
-            cta: 'Vote Now',
-            action: 'navigate',
-            targetUrl: '/vote.html?match=round-1-match-4'
-        },
-        
-        mostviewed: {
-            priority: 4,
-            type: 'mostviewed',
-            matchId: 'round-1-match-2',
-            song: 'MORE',
-            opponent: 'Worlds Collide',
-            thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-            viewCount: 45,
-            message: '👀 Most popular match today!',
-            detail: 'Everyone\'s watching MORE vs Worlds Collide - add your vote!',
-            cta: 'Cast Your Vote',
-            action: 'navigate',
-            targetUrl: '/vote.html?match=round-1-match-2'
         },
     };
     
@@ -3858,9 +3814,15 @@ setTimeout(checkMissedNotifications, 4000);
 
 // ✅ MODIFIED: Check when user returns from background tab
 let wasHidden = document.hidden;
+let hiddenAt = document.hidden ? Date.now() : 0;
 document.addEventListener('visibilitychange', () => {
+    if (document.hidden) hiddenAt = Date.now();
     if (!document.hidden && wasHidden) {
         console.log('👀 User returned to tab — checking for missed notifications');
+        // Both timers (vote alerts every 60 s, match alerts every 2 min) pause while hidden, so run them now if the tab was away a while
+        if (hiddenAt && Date.now() - hiddenAt > 30000) {
+            setTimeout(() => { checkRecentVotes(); checkAndShowBulletin(); }, 1500);
+        }
         
         // ✅ Clear the session flag so it can check again
         sessionStorage.removeItem('missedNotificationsChecked');

@@ -1034,9 +1034,6 @@ body.theme-arcane .modal-competitor.winner .modal-video-container {
 body.theme-arcane .modal-competitor.winner .result-percentage {
     color: var(--pink-bright)
 }
-body.theme-arcane .modal-competitor.winner .competitor-name-modal::after {
-    color: var(--pink-bright)
-}
 body.theme-arcane .modal-vs-circle {
     border: 3px solid var(--pink-bright);
     font-family: var(--font);
@@ -3624,29 +3621,8 @@ body.theme-arcane.page-profile .no-featured-posts {
     color: rgba(255, 112, 195, 0.4);
     border: 1px dashed rgba(255, 79, 180, 0.2)
 }
-body.theme-arcane.page-profile .battleship-match-card {
-    background: linear-gradient(135deg, var(--bg-veil) 0%, #141414 100%);
-    border: 2px solid rgba(255, 79, 180, 0.2)
-}
-body.theme-arcane.page-profile .battleship-match-card:hover {
-    border-color: rgba(255, 79, 180, 0.4);
-    box-shadow: 0 4px 20px rgba(255, 79, 180, 0.15)
-}
-body.theme-arcane.page-profile .character-portrait {
-    border: 2px solid rgba(255, 79, 180, 0.3)
-}
-body.theme-arcane.page-profile .character-name {
-    color: var(--pink-bright)
-}
-body.theme-arcane.page-profile .match-stats-row {
-    border-top: 1px solid rgba(255, 79, 180, 0.1);
-    border-bottom: 1px solid rgba(255, 79, 180, 0.1)
-}
 body.theme-arcane.page-profile .stat-value {
     color: var(--pink-bright)
-}
-body.theme-arcane.page-profile .difficulty-medium {
-    color: var(--pink)
 }
 body.theme-arcane.page-profile .xp-earned {
     color: var(--pink-bright)

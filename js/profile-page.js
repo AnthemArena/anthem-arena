@@ -619,15 +619,12 @@ async function renderProfileActions(isOwnProfile) {
         
     } else {
         // ========================================
-        // OTHER USER'S PROFILE - Show Follow + Message (with privacy checks)
+        // OTHER USER'S PROFILE - Show Follow
         // ========================================
         
         // Show loading state initially
         actionsEl.innerHTML = `
             <button class="profile-action-btn follow" disabled style="opacity: 0.6;">
-                <i class="fas fa-spinner fa-spin"></i> Loading...
-            </button>
-            <button class="profile-action-btn secondary" disabled style="opacity: 0.6;">
                 <i class="fas fa-spinner fa-spin"></i> Loading...
             </button>
         `;
@@ -636,12 +633,6 @@ async function renderProfileActions(isOwnProfile) {
             // Check follow status
             const { isFollowing } = await import('./follow-system.js');
             const following = await isFollowing(currentProfile.userId);
-            
-            // Check privacy permissions
-            const { getAvailableActions } = await import('./notification-storage.js');
-            const permissions = await getAvailableActions(currentProfile.userId);
-            
-            console.log('🔐 Permissions for profile actions:', permissions);
             
             // Build Follow button
             const followBtn = `
@@ -656,40 +647,12 @@ async function renderProfileActions(isOwnProfile) {
                 </button>
             `;
             
-            // Build Message button (with privacy check)
-            let messageBtn;
-            if (permissions.canMessage) {
-                messageBtn = `
-                    <button class="profile-action-btn secondary" id="profileMessageBtn"
-                            data-user-id="${currentProfile.userId}"
-                            data-username="${currentProfile.username}">
-                        <i class="fas fa-envelope"></i> Message
-                    </button>
-                `;
-            } else {
-                // Show disabled button with reason
-                const reason = permissions.messageReason || 'Messages disabled';
-                messageBtn = `
-                    <button class="profile-action-btn secondary" 
-                            disabled 
-                            style="opacity: 0.5; cursor: not-allowed;"
-                            title="${reason}">
-                        <i class="fas fa-lock"></i> ${reason.includes('followers') ? 'Follow to Message' : 'Messages Off'}
-                    </button>
-                `;
-            }
-            
-            actionsEl.innerHTML = followBtn + messageBtn;
+            actionsEl.innerHTML = followBtn;
             
             // Attach event listeners
             const followButton = document.getElementById('profileFollowBtn');
             if (followButton) {
                 followButton.addEventListener('click', handleFollowClick);
-            }
-            
-            const messageButton = document.getElementById('profileMessageBtn');
-            if (messageButton && permissions.canMessage) {
-                messageButton.addEventListener('click', handleMessageClick);
             }
             
         } catch (error) {
@@ -702,15 +665,9 @@ async function renderProfileActions(isOwnProfile) {
                         data-username="${currentProfile.username}">
                     <i class="fas fa-user-plus"></i> Follow
                 </button>
-                <button class="profile-action-btn secondary" id="profileMessageBtn"
-                        data-user-id="${currentProfile.userId}"
-                        data-username="${currentProfile.username}">
-                    <i class="fas fa-envelope"></i> Message
-                </button>
             `;
             
             document.getElementById('profileFollowBtn')?.addEventListener('click', handleFollowClick);
-            document.getElementById('profileMessageBtn')?.addEventListener('click', handleMessageClick);
         }
     }
 }
@@ -772,175 +729,6 @@ async function handleFollowClick(e) {
     } finally {
         btn.disabled = false;
     }
-}
-
-// ========================================
-// HANDLE MESSAGE BUTTON CLICK
-// ========================================
-
-async function handleMessageClick(e) {
-    const btn = e.currentTarget;
-    const targetUserId = btn.dataset.userId;
-    const targetUsername = btn.dataset.username;
-    
-    try {
-        // Open message composer
-        showProfileMessageComposer(targetUserId, targetUsername);
-    } catch (error) {
-        console.error('❌ Error opening message composer:', error);
-        alert('Could not open message composer. Please try again.');
-    }
-}
-
-// ========================================
-// MESSAGE COMPOSER MODAL
-// ========================================
-
-function showProfileMessageComposer(toUserId, toUsername) {
-    const existing = document.getElementById('messageComposer');
-    if (existing) existing.remove();
-    
-    const composer = document.createElement('div');
-    composer.id = 'messageComposer';
-    composer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(5px);
-        z-index: 10001;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.2s ease;
-    `;
-    
-    composer.innerHTML = `
-        <div style="
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid color-mix(in srgb, var(--pink, #c8aa6e) 30%, transparent);
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="margin: 0; color: var(--pink-bright, #c8aa6e); font-size: 1.2rem;">
-                    💬 Message ${toUsername}
-                </h3>
-                <button id="closeComposer" style="
-                    background: none;
-                    border: none;
-                    color: #888;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                ">×</button>
-            </div>
-            
-            <textarea id="messageInput" 
-                placeholder="Type your message... (max 300 characters)"
-                maxlength="300"
-                style="
-                    width: 100%;
-                    height: 120px;
-                    background: rgba(0, 0, 0, 0.3);
-                    border: 2px solid color-mix(in srgb, var(--pink, #c8aa6e) 30%, transparent);
-                    border-radius: 8px;
-                    padding: 12px;
-                    color: #fff;
-                    font-family: inherit;
-                    font-size: 1rem;
-                    resize: vertical;
-                    margin-bottom: 12px;
-                    box-sizing: border-box;
-                "
-            ></textarea>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="charCount" style="color: #888; font-size: 0.85rem;">0/300</span>
-                <div style="display: flex; gap: 8px;">
-                    <button id="cancelMessage" style="
-                        background: rgba(255, 255, 255, 0.1);
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        color: #fff;
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                    ">Cancel</button>
-                    <button id="sendMessage" style="
-                        background: linear-gradient(135deg, var(--pink-bright, #C8AA6E), var(--pink, #B89A5E));
-                        border: none;
-                        color: #1a1a2e;
-                        padding: 10px 24px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 700;
-                    ">Send 💬</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(composer);
-    
-    const input = document.getElementById('messageInput');
-    const charCount = document.getElementById('charCount');
-    const sendBtn = document.getElementById('sendMessage');
-    const cancelBtn = document.getElementById('cancelMessage');
-    const closeBtn = document.getElementById('closeComposer');
-    
-    input.focus();
-    
-    input.addEventListener('input', () => {
-        const length = input.value.length;
-        charCount.textContent = `${length}/300`;
-    });
-    
-    const closeComposer = () => {
-        composer.style.animation = 'fadeOut 0.2s ease';
-        setTimeout(() => composer.remove(), 200);
-    };
-    
-    closeBtn.addEventListener('click', closeComposer);
-    cancelBtn.addEventListener('click', closeComposer);
-    composer.addEventListener('click', (e) => {
-        if (e.target === composer) closeComposer();
-    });
-    
-    sendBtn.addEventListener('click', async () => {
-        const message = input.value.trim();
-        if (!message) return;
-        
-        sendBtn.textContent = 'Sending...';
-        sendBtn.disabled = true;
-        
-        try {
-            const { sendMessage } = await import('./message-system.js');
-            const result = await sendMessage(toUserId, toUsername, message, { source: 'profile' });
-            
-            if (result.success) {
-                sendBtn.textContent = '✓ Sent!';
-                setTimeout(() => {
-                    closeComposer();
-                    if (window.showQuickToast) {
-                        window.showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
-                    }
-                }, 1000);
-            } else {
-                throw new Error(result.error || 'Failed to send');
-            }
-        } catch (error) {
-            console.error('❌ Send message error:', error);
-            sendBtn.textContent = '✗ Failed';
-            setTimeout(() => {
-                sendBtn.textContent = 'Send 💬';
-                sendBtn.disabled = false;
-            }, 2000);
-        }
-    });
 }
 
 // ========================================
@@ -1447,175 +1235,6 @@ async function loadAllFavoriteSongs(userId) {
     }
 }
 
-// ========================================
-// LOAD BATTLESHIP STATS
-// ========================================
-
-async function loadBattleshipStats(userId) {
-    try {
-        console.log('🎮 Loading Battleship stats for:', userId);
-        
-        // Get profile to read battleship stats
-        const profileDoc = await getDoc(doc(db, 'profiles', userId));
-        
-        if (!profileDoc.exists()) {
-            console.log('⚠️ No profile found for Battleship stats');
-            return;
-        }
-        
-        const battleshipStats = profileDoc.data().stats?.battleship || {};
-        
-        // Update stat cards
-        const gamesPlayed = battleshipStats.gamesPlayed || 0;
-        const gamesWon = battleshipStats.gamesWon || 0;
-        const winRate = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
-        const bestAccuracy = battleshipStats.bestAccuracy || 0;
-        
-        document.getElementById('battleship-games-played').textContent = gamesPlayed;
-        document.getElementById('battleship-win-rate').textContent = `${winRate}%`;
-        document.getElementById('battleship-best-accuracy').textContent = `${bestAccuracy}%`;
-        
-        // Update tab count badge
-        document.getElementById('battleshipCount').textContent = gamesPlayed;
-        
-        if (gamesPlayed === 0) {
-            return; // Keep no-content state
-        }
-        
-        // Load match history
-        await loadBattleshipMatchHistory(userId);
-        
-        console.log('✅ Battleship stats loaded:', {
-            gamesPlayed,
-            gamesWon,
-            winRate,
-            bestAccuracy
-        });
-        
-    } catch (error) {
-        console.error('❌ Error loading Battleship stats:', error);
-    }
-}
-
-// ========================================
-// LOAD BATTLESHIP MATCH HISTORY
-// ========================================
-
-async function loadBattleshipMatchHistory(userId) {
-    try {
-        const matchesQuery = query(
-            collection(db, 'battleship_matches'),
-            where('userId', '==', userId),
-            orderBy('timestamp', 'desc'),
-            limit(20)
-        );
-        
-        const snapshot = await getDocs(matchesQuery);
-        
-        if (snapshot.empty) {
-            return; // Keep no-content state
-        }
-        
-        const matches = snapshot.docs.map(doc => doc.data());
-        
-        const container = document.getElementById('battleshipMatchHistory');
-        
-        container.innerHTML = matches.map(match => renderBattleshipMatchCard(match)).join('');
-        
-        console.log(`✅ Loaded ${matches.length} Battleship matches`);
-        
-    } catch (error) {
-        console.error('❌ Error loading Battleship match history:', error);
-    }
-}
-
-// ========================================
-// RENDER BATTLESHIP MATCH CARD
-// ========================================
-
-function renderBattleshipMatchCard(match) {
-    const characterData = {
-        caitlyn: {
-            name: 'Caitlyn',
-            emoji: '🎯',
-            color: '#0397AB',
-            portrait: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Caitlyn_0.jpg`
-        },
-        jinx: {
-            name: 'Jinx',
-            emoji: '💥',
-            color: '#FF3366',
-            portrait: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_0.jpg`
-        }
-    };
-    
-    const player = characterData[match.character] || characterData.caitlyn;
-    const opponent = characterData[match.opponent] || characterData.jinx;
-    
-    const statusClass = match.victory ? 'victory' : 'defeat';
-    const statusEmoji = match.victory ? '✅' : '❌';
-    const statusText = match.victory ? 'VICTORY' : 'DEFEAT';
-    
-    const timeAgo = formatTimeAgo(match.timestamp);
-    
-    // Format duration
-    const durationMinutes = Math.floor(match.duration / 60000);
-    const durationSeconds = Math.floor((match.duration % 60000) / 1000);
-    const durationText = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
-    
-    return `
-        <div class="battleship-match-card ${statusClass}">
-            <div class="match-header">
-                <div class="match-status-badge ${statusClass}">
-                    ${statusEmoji} ${statusText}
-                </div>
-                <div class="match-timestamp">${timeAgo}</div>
-            </div>
-            
-            <div class="match-characters">
-                <div class="character-display player">
-                    <img src="${player.portrait}" alt="${player.name}" class="character-portrait">
-                    <div class="character-name">${player.emoji} ${player.name}</div>
-                </div>
-                
-                <div class="match-vs">VS</div>
-                
-                <div class="character-display opponent">
-                    <img src="${opponent.portrait}" alt="${opponent.name}" class="character-portrait">
-                    <div class="character-name">${opponent.emoji} ${opponent.name}</div>
-                </div>
-            </div>
-            
-            <div class="match-stats-row">
-                <div class="match-stat">
-                    <span class="stat-label">Accuracy</span>
-                    <span class="stat-value ${match.accuracy >= 70 ? 'good' : ''}">${match.accuracy}%</span>
-                </div>
-                <div class="match-stat">
-                    <span class="stat-label">Shots</span>
-                    <span class="stat-value">${match.shotsFired}</span>
-                </div>
-                <div class="match-stat">
-                    <span class="stat-label">Duration</span>
-                    <span class="stat-value">${durationText}</span>
-                </div>
-                <div class="match-stat">
-                    <span class="stat-label">Difficulty</span>
-                    <span class="stat-value difficulty-${match.difficulty}">${capitalizeFirst(match.difficulty)}</span>
-                </div>
-            </div>
-            
-            <div class="match-footer">
-                <span class="xp-earned">+${match.xpEarned} XP</span>
-            </div>
-        </div>
-    `;
-}
-
-// Helper function
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
 // ========================================
 // LOAD RECENT POSTS
 // ========================================
@@ -2443,11 +2062,6 @@ function setupTabs() {
             
             if (targetTab === 'songs' && document.getElementById('allFavoriteSongs').querySelector('.no-content')) {
                 await loadAllFavoriteSongs(currentProfile.userId);
-            }
-
-            // ✅ ADD THIS:
-            if (targetTab === 'battleship') {
-                await loadBattleshipStats(currentProfile.userId);
             }
         });
     });
@@ -3627,12 +3241,6 @@ window.toggleFollow = async function(userId) {
     console.log('🔔 Toggle follow:', userId);
     // TODO: Implement follow system
     alert('Follow system coming soon!');
-};
-
-window.sendMessage = function(userId) {
-    console.log('💬 Send message to:', userId);
-    // TODO: Implement messaging
-    alert('Messaging system coming soon!');
 };
 
 window.openUsernamePrompt = function() {
