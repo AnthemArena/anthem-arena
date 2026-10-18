@@ -3,8 +3,8 @@
 import { db } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAllMatches } from './api-client.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits, eventEdits } from './notification-visuals.js';
-import { isContentNotification, isEventNotification, isStreakNotification } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits, eventEdits, entrantsStrip } from './notification-visuals.js';
+import { isContentNotification, isEventNotification, isStreakNotification, eventKind, isRoundAlert, VOTED_KINDS } from './notification-model.js';
 
 const avatarCache = new Map();          // userId -> url | null
 let matchesCache = { at: 0, list: [] };
@@ -72,11 +72,22 @@ export async function socialContextFor(n) {
 
 // A match-event alert (danger, closing, match result ...): the two edit pictures with the viewer's own pick marked, as n.nv.edits.
 export async function eventContextFor(n) {
-    const out = { edits: null };
+    const out = { edits: null, strip: null };
     try {
+        if (isRoundAlert(n)) {
+            // The edits entering: the live matches of that round (the newest ones for "new matches"), as a short strip of pictures.
+            await matchById('round');                                   // makes sure the match list is loaded
+            const live = matchesCache.list.filter(m => m.status === 'live');
+            const round = n.round || Math.max(1, ...live.map(m => m.round || 1));
+            let inRound = live.filter(m => (m.round || 1) === round);
+            if (n.type === 'new-matches' && n.matchCount) inRound = inRound.slice(-n.matchCount);
+            out.strip = entrantsStrip(inRound);
+            return out;
+        }
         if (!n?.matchId) return out;
-        const yourKey = isSampleMatch(n.matchId) ? 'song1' : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
-        out.edits = eventEdits(await matchById(n.matchId), yourKey);
+        const sample = isSampleMatch(n.matchId);
+        const yourKey = sample ? (VOTED_KINDS.includes(n.type) ? 'song1' : undefined) : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+        out.edits = eventEdits(await matchById(n.matchId), yourKey, !!eventKind(n)?.both);
     } catch (e) { console.warn('event context failed', e); }
     return out;
 }

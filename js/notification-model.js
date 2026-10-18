@@ -129,7 +129,7 @@ export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.
 export const EVENT_KINDS = {
     danger:           { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
     'danger-repeat':  { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
-    nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true },
+    nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true, both: true },
     winning:          { tag: 'Your pick is winning', tone: '#4ade80', share: true },
     comeback:         { tag: 'Comeback',            tone: '#4ade80', share: true },
     closing:          { tag: 'Closing soon',        tone: '#ffb020' },
@@ -139,7 +139,7 @@ export const EVENT_KINDS = {
     'new-matches':    { tag: 'New matches',         tone: null },
     'match-won':      { tag: 'Your pick won',       tone: '#4ade80', outcome: 'won' },
     'match-lost':     { tag: 'Your pick lost',      tone: '#f87171', outcome: 'lost' },
-    'match-tied':     { tag: 'Tied match',          tone: '#a5b4fc', outcome: 'tied' },
+    'match-tied':     { tag: 'Tied match',          tone: '#a5b4fc', outcome: 'tied', both: true },
     welcome:          { tag: 'Welcome',             tone: null },
     encouragement:    { tag: 'Still deciding?',     tone: null }
 };
@@ -157,6 +157,10 @@ export function eventTag(n) {
     if (n.type === 'encouragement') return n.encouragementType === 'urgent' ? 'Closing soon' : k.tag;
     return k.tag;
 }
+
+// Which alerts are about a match the viewer must have voted in (the test page pretends so for its sample alerts).
+export const VOTED_KINDS = ['danger', 'danger-repeat', 'nailbiter', 'winning', 'comeback', 'match-won', 'match-lost', 'match-tied'];
+export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type === 'new-matches');
 
 // The symbol in the middle of the picture (between the two edits, or alone in a circle when there is no match to show).
 // It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close / tied, ⇄ flipped, ✓ won, ✕ lost.

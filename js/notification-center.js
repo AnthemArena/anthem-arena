@@ -597,7 +597,7 @@ function renderNotificationItem(notification) {
         const kind = eventKind(notification);
         const accent = kind.tone || championPack?.color || '#ff69b4';
         return eventRowHtml(notification, {
-            tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(championPack),
+            tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(championPack),
             quip: notification.message, timeAgo, championPack, cta: notification.ctaText || 'View match', url: eventUrl(notification)
         });
     }

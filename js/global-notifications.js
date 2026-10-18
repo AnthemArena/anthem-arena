@@ -7,7 +7,7 @@ import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isRoundAlert, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
 import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
@@ -2676,17 +2676,17 @@ else {
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
         const drawEvent = () => {
             banner.innerHTML = eventToastHtml(notification, {
-                tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(pack),
+                tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(pack),
                 quip: notification.message, detail: notification.detail, chips: eventChips(notification),
                 cta: notification.ctaText || notification.cta || 'View match'
             });
         };
         drawEvent();
         banner.className = 'bulletin-banner versus-toast event';
-        if (!notification.nv && notification.matchId) {
+        if (!notification.nv && (notification.matchId || isRoundAlert(notification))) {
             eventContextFor(notification).then(nv => {
                 notification.nv = nv;
-                if (nv.edits && currentBulletin === notification) drawEvent();
+                if ((nv.edits || nv.strip) && currentBulletin === notification) drawEvent();
             }).catch(() => {});
         }
     } else if (notification.relationship === 'ally' || notification.relationship === 'opponent') {
