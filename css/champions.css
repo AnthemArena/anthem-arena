@@ -31,7 +31,7 @@
 .cm-skin.locked img { filter: grayscale(.85) brightness(.7); transition: filter .15s; }
 .cm-skin.locked:hover img { filter: none; }
 .cm-skin.locked { color: var(--muted); }
-.cm-skin.look, .cm-skin.current { border-color: var(--pink-bright); box-shadow: 0 0 0 1px var(--pink-bright) inset; }
+.cm-skin.current { border-color: var(--pink-bright); box-shadow: 0 0 0 1px var(--pink-bright) inset; }
 .cm-skin-tag { display: block; color: var(--pink-bright); font-weight: 700; margin-top: 2px; }
 .cm-filters { display: flex; gap: 6px; margin: 0 0 12px; flex-wrap: wrap; }
 .cm-chip { font: inherit; font-size: .74rem; font-weight: 700; padding: 4px 11px; border-radius: 999px; cursor: pointer; color: var(--muted); background: transparent; border: 1px solid var(--line); }

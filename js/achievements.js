@@ -635,21 +635,21 @@ export const ACHIEVEMENTS = {
   'jinx-loose-cannon': {
     id: 'jinx-loose-cannon',
     name: 'Loose Cannon',
-    description: 'Vote for 10 underdogs with Jinx as your companion',
+    description: 'Vote for 10 underdogs, whoever your champion is. Unlocks Prestige Battle Cat for Jinx',
     icon: '💣',
     xp: 200,
     category: 'companions',
     hidden: false,
     tier: 'gold',
     rarity: 'epic',
-    condition: (stats) => stats.jinxUnderdogVotes >= 10,
-    progress: (stats) => ({ current: stats.jinxUnderdogVotes, target: 10 })
+    condition: (stats) => stats.underdogVotes >= 10,
+    progress: (stats) => ({ current: stats.underdogVotes, target: 10 })
   },
 
   'caitlyn-close-calls': {
     id: 'caitlyn-close-calls',
     name: 'Close Calls',
-    description: 'Vote in 10 close matches with Caitlyn as your companion',
+    description: 'Vote in 10 close matches with Caitlyn as your champion. Unlocks Prestige Arcade',
     icon: '🔎',
     xp: 250,
     category: 'companions',
@@ -663,7 +663,7 @@ export const ACHIEVEMENTS = {
   'caitlyn-steady-aim': {
     id: 'caitlyn-steady-aim',
     name: 'Steady Aim',
-    description: 'Vote 7 days in a row with Caitlyn as your companion',
+    description: 'Vote 7 days in a row with Caitlyn as your champion. Unlocks Prestige Arcade (2022)',
     icon: '🏹',
     xp: 250,
     category: 'companions',
@@ -677,15 +677,15 @@ export const ACHIEVEMENTS = {
   'caitlyn-deciding-shot': {
     id: 'caitlyn-deciding-shot',
     name: 'Deciding Shot',
-    description: 'Cast the vote that breaks a tie, with Caitlyn as your companion',
+    description: 'Cast the vote that breaks a tied match, whoever your champion is. Unlocks Prestige Arcane Commander for Caitlyn',
     icon: '🔫',
     xp: 500,
     category: 'companions',
     hidden: false,
     tier: 'legendary',
     rarity: 'legendary',
-    condition: (stats) => stats.caitlynDecidingVotes >= 1,
-    progress: (stats) => ({ current: stats.caitlynDecidingVotes, target: 1 })
+    condition: (stats) => stats.decidingVotes >= 1,
+    progress: (stats) => ({ current: stats.decidingVotes, target: 1 })
   }
 };
 

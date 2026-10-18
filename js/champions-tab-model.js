@@ -72,7 +72,7 @@ export function championsHtml(view, { own = false, filters = {} } = {}) {
     const byId = Object.fromEntries(view.rows.map(r => [r.packId, r]));
     const spread = view.total
         ? view.shares.map(s => `<div class="cm-share"><img class="cm-face" src="${escapeHtml(tile(s.packId, byId[s.packId].faceSkin))}" alt="" loading="lazy"><span class="cm-share-name">${escapeHtml(byId[s.packId].name)}</span><span class="cm-bar" role="img" aria-label="${s.percent}% of votes"><span style="width:${s.percent}%"></span></span><span class="cm-pct">${s.percent}%</span><span class="cm-votes">${s.votes} ${s.votes === 1 ? 'vote' : 'votes'}</span></div>`).join('')
-        : `<p class="cm-empty">No votes yet. Votes are counted for the companion that was active when they were cast.</p>`;
+        : `<p class="cm-empty">No votes yet. Votes are counted for the champion you had when they were cast.</p>`;
     const cards = view.rows.map(r => {
         const m = r.mastery;
         const next = r.next ? `Next: ${r.next.skins.map(s => escapeHtml(s.name)).join(' + ')} at Mastery ${r.next.mastery}` : 'Every mastery skin unlocked';
@@ -84,13 +84,13 @@ export function championsHtml(view, { own = false, filters = {} } = {}) {
         const skins = shown.map(s => {
             const label = `${s.name}${s.unlocked ? '' : ` (${s.requirement})`}`;
             const buttons = own && s.unlocked
-                ? `<span class="cm-skin-actions"><button type="button" class="cm-act${s.current ? ' on' : ''}" data-action="avatar" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.current}" title="Use ${escapeHtml(s.name)} as my avatar">Avatar</button><button type="button" class="cm-act${s.look ? ' on' : ''}" data-action="look" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.look}" title="Use ${escapeHtml(s.name)} as ${escapeHtml(r.name)}'s look in alerts">Look</button></span>`
-                : (s.unlocked ? [s.current ? '<span class="cm-skin-tag">Avatar</span>' : '', s.look ? '<span class="cm-skin-tag">Look</span>' : ''].join('') : '');
-            return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}${s.look ? ' look' : ''}"><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? buttons : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
+                ? `<span class="cm-skin-actions"><button type="button" class="cm-act${s.current ? ' on' : ''}" data-action="use" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.current}" title="Make ${escapeHtml(r.name)} in ${escapeHtml(s.name)} your champion">${s.current ? 'In use' : 'Use'}</button></span>`
+                : (s.unlocked && s.current ? '<span class="cm-skin-tag">In use</span>' : '');
+            return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}"><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? buttons : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
         }).join('');
         return `<article class="cm-card${r.active ? ' active' : ''}" data-pack="${r.packId}">
             <header class="cm-head"><img class="cm-face big" src="${escapeHtml(tile(r.packId, r.faceSkin))}" alt="" loading="lazy">
-              <div class="cm-head-text"><h3>${escapeHtml(r.name)}${r.active ? ' <span class="cm-active">Companion</span>' : ''}</h3>
+              <div class="cm-head-text"><h3>${escapeHtml(r.name)}${r.active ? ' <span class="cm-active">Your champion</span>' : ''}</h3>
               <div class="cm-level">Mastery ${m.level}${m.isMax ? ' · Max' : ''}</div>
               <div class="cm-bar thin" role="img" aria-label="${m.percent}% to the next mastery level"><span style="width:${m.percent}%"></span></div>
               <div class="cm-xp">${m.isMax ? `${m.xp.toLocaleString()} XP` : `${m.progressXp.toLocaleString()} / ${m.neededXp.toLocaleString()} XP to Mastery ${m.level + 1}`}</div></div></header>

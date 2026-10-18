@@ -19,26 +19,28 @@ function draw(host) {
     host.innerHTML = championsHtml(view, { own, filters });
 }
 
-async function useAsLook(host, packId, num) {
-    const looks = saveLook(packId, num);
-    shown.data.looks = looks;
-    try { await updateDoc(doc(db, 'profiles', shown.userId), { companionSkins: looks }); }
-    catch (e) { console.warn('Could not save the look to the profile (kept on this device)', e); }
-    (window.showNotification || (() => {}))('Look updated', 'success');
-    draw(host);
+// One choice: the champion, the skin you see everywhere (profile picture, alerts) and where your XP goes.
+function setChampionLocally(packId) {
+    if (window.championLoader?.setUserCompanionPack) return window.championLoader.setUserCompanionPack(packId);
+    localStorage.setItem('companionId', packId);
+    localStorage.setItem('companionChosen', 'true');
+    localStorage.setItem('championPack', packId);
+    return Promise.resolve(true);
 }
 
-async function useAsAvatar(host, packId, num) {
+async function useChampion(host, packId, num) {
     const avatar = skinAvatar(packId, num);
+    const looks = saveLook(packId, num);
     try {
+        await setChampionLocally(packId);
         localStorage.setItem('avatar', JSON.stringify(avatar));
-        await updateDoc(doc(db, 'profiles', shown.userId), { avatar });
-        shown.data.avatar = avatar;
+        shown.data.avatar = avatar; shown.data.looks = looks; shown.data.activePack = packId;
         window.updateNavProfile?.();
-        (window.showNotification || (() => {}))('Avatar updated', 'success');
+        await updateDoc(doc(db, 'profiles', shown.userId), { avatar, companionSkins: looks, companionId: packId, championPackId: packId, updatedAt: Date.now() });
+        (window.showNotification || (() => {}))('Champion updated', 'success');
     } catch (e) {
-        console.warn('Could not save the avatar', e);
-        (window.showNotification || (() => {}))('Could not save the avatar', 'error');
+        console.warn('Could not save the champion', e);
+        (window.showNotification || (() => {}))('Saved on this device only; could not reach your profile', 'error');
     }
     draw(host);
 }
@@ -73,7 +75,7 @@ export async function loadChampionsTab(profile, own) {
                 const el = e.target.closest('.cm-act');
                 if (!el || !shown?.own) return;
                 const num = Number(el.dataset.skin);
-                (el.dataset.action === 'look' ? useAsLook : useAsAvatar)(host, el.dataset.pack, num);
+                useChampion(host, el.dataset.pack, num);
             };
             host.addEventListener('click', pick);
         }
