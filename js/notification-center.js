@@ -7,7 +7,7 @@ import {
     dismissNotification 
 } from './notification-storage.js';
 import { withoutEmoteCta } from './features.js';
-import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, isEventNotification, eventKind, eventTag, eventUrl, isStreakNotification, streakView } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, isEventNotification, eventKind, eventTag, eventGlyph, eventUrl, isStreakNotification, streakView } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
 import { socialRowHtml, followRowHtml, contentRowHtml, eventRowHtml, avatarSrc, fallbackAvatarFor, championBadgeUrl } from './notification-visuals.js';
 import { enrichSocial, matchesLoaded } from './notification-social-context.js';
@@ -597,7 +597,7 @@ function renderNotificationItem(notification) {
         const kind = eventKind(notification);
         const accent = kind.tone || championPack?.color || '#ff69b4';
         return eventRowHtml(notification, {
-            tag: eventTag(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(championPack),
+            tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(championPack),
             quip: notification.message, timeAgo, championPack, cta: notification.ctaText || 'View match', url: eventUrl(notification)
         });
     }
