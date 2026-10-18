@@ -8,7 +8,7 @@ import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './no
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
 import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, toastSplashUrl, profileSplashUrl, ensureVersusStyles } from './notification-visuals.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -375,7 +375,7 @@ function buildClosingNotification(items) {
             : (count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`),
         cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
         action: 'navigate',
-        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/live.html'
+        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/#vote'
     };
 }
 
@@ -2541,48 +2541,6 @@ if (championPack && championPack.theme) {
         }, 100);
         
     } 
-    // ✅ ACHIEVEMENT SPECIFIC STYLING
-    else if (notification.type === 'achievement') {
- // ✅ NEW: Support League item icons (can be URL or emoji)
-    const achievementIcon = notification.thumbnailUrl || notification.icon || '🏆';
-    const isLeagueItem = typeof achievementIcon === 'string' && achievementIcon.startsWith('http');
-
-       banner.innerHTML = `
-        <div class="bulletin-toast-content achievement-toast">
-            <div class="achievement-badge-large" style="${isLeagueItem ? 'background: linear-gradient(135deg, rgba(10,10,10,0.95), rgba(20,20,30,0.95)); padding: 8px; border: 2px solid rgba(200, 170, 110, 0.4);' : ''}">
-                ${isLeagueItem ? 
-                    `<img src="${achievementIcon}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(200, 170, 110, 0.7));">` 
-                    : achievementIcon
-                }
-            </div>
-            <div class="bulletin-toast-text">
-                <div class="achievement-label">ACHIEVEMENT UNLOCKED</div>
-                ${notification.achievementName ? `<div class="bulletin-message achievement-title">${notification.achievementName}</div>
-                <div class="achievement-line">${notification.message}</div>` : `<div class="bulletin-message achievement-title">${notification.message.replace(/🏆 Achievement Unlocked: /, '')}</div>`}
-                <div class="bulletin-detail">${notification.detail}</div>
-            </div>
-            <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
-        </div>
-        <button class="bulletin-toast-cta achievement-cta" onclick="window.handleBulletinCTA()">
-            ${notification.cta || 'View Achievements'}
-        </button>
-    `;
-    
-    banner.className = 'bulletin-banner achievement show';
-        
-       // ✅ NEW: Add rarity border color
-    if (notification.rarity) {
-        banner.setAttribute('data-rarity', notification.rarity);
-    }
-    
-    // Add special animation for achievement badge
-    setTimeout(() => {
-        const badge = banner.querySelector('.achievement-badge-large');
-        if (badge) {
-            badge.style.animation = 'achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-        }
-    }, 100);
-}
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 else {
@@ -2738,10 +2696,11 @@ else {
         banner.style.setProperty('--nv-accent-dark', '#ff1493');
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
-        // No champion speaking here: use the viewer's own profile banner
-        banner.style.setProperty('--nv-splash', `url("${profileSplashUrl(pack)}")`);
         const names = g.users?.length ? g.users : [g.triggerUsername].filter(Boolean);
         const srcs = names.map((nm, i) => (names.length > 1 ? notification.nv?.avatars?.[i] : notification.nv?.theirSrc) || avatarSrc((g.avatars || [])[i]) || fallbackAvatarFor(nm));
+        // No champion speaking here: the backdrop is the splash of the person's own champion avatar (a crowd uses the first
+        // face); someone without a champion avatar falls back to the viewer's profile banner
+        banner.style.setProperty('--nv-splash', `url("${splashFromAvatarSrc(srcs[0]) || profileSplashUrl(pack)}")`);
         banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
         banner.className = 'bulletin-banner versus-toast opponent';
     } else if (notification.type === 'achievement') {

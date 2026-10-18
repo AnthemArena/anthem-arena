@@ -35,4 +35,9 @@ t('newest and most watched', () => {
 });
 t('isEntered mirrors the gallery rule', () => { assert.ok(isEntered(ed('1', 'x', 1))); assert.ok(!isEntered(ed('1', 'x', 1, { embedAllowed: false }))); assert.ok(!isEntered(null)); });
 t('countdown text', () => { const now = 0; assert.equal(countdownText(2 * 86400e3 + 4 * 3600e3, now), '2d 4h'); assert.equal(countdownText(5 * 3600e3 + 12 * 60e3, now), '5h 12m'); assert.equal(countdownText(30e3, now), '1m'); assert.equal(countdownText(-5, now), 'closing now'); assert.equal(countdownText(null), ''); });
+t('most voted edits count finished matches only (a live match would show who is ahead)', () => {
+    const s = homeState([m('1', c('a', 50), c('b', 40), 'live', null), m('2', c('c', 7), c('d', 3), 'completed', 'c')]);
+    assert.deepEqual(s.topVoted.map(e => e.id).sort(), ['c', 'd']);
+    assert.deepEqual(homeState([m('1', c('a', 50), c('b', 40), 'live', null)]).topVoted, []);
+});
 console.log(`${n} passed`);

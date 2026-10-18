@@ -81,3 +81,9 @@ export function extractMentions(text, users) {
     }
     return out;
 }
+
+// Results of a live match stay hidden until the viewer has voted in it (same rule as the vote page and the sidebar cards).
+// A finished match shows its result to everyone; your own vote post always shows (you obviously voted).
+export function resultsVisible({ status, viewerVoted = false, isOwn = false } = {}) {
+    return status !== 'live' || !!viewerVoted || !!isOwn;
+}

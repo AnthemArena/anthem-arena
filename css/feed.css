@@ -3257,3 +3257,9 @@ body {
     margin: 0 !important;  /* ✅ Remove all paragraph margins inside container */
     padding: 0;
 }
+
+/* results of a live match stay hidden until you have voted in it */
+.results-locked { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; margin-top: 4px;
+    border-radius: 10px; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .75);
+    background: rgba(255, 79, 180, .08); border: 1px dashed rgba(255, 79, 180, .35); }
+.results-lock { font-size: 13px; opacity: .8; }

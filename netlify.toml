@@ -110,6 +110,19 @@
   to = "/feed"
   status = 301
 
+# live.html was merged into the homepage (the open matches are the first thing under the hero)
+[[redirects]]
+  from = "/live"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/live.html"
+  to = "/"
+  status = 301
+  force = true
+
 # Profile routes with username
 [[redirects]]
   from = "/@:username"

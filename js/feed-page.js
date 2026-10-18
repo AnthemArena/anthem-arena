@@ -2,7 +2,8 @@
 // FEED PAGE - UI CONTROLLER
 // Arcane Moments Community
 // ========================================
-import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions } from './feed-mix-model.js';
+import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, resultsVisible } from './feed-mix-model.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
 // Mention alerts call this directly (it used to be imported only inside some helpers, so every mention alert failed with a ReferenceError)
 import { saveNotification } from './notification-storage.js';
 import { getUserXPFromStorage, getUserRank, localVoteCount } from './rank-system.js';
@@ -1101,15 +1102,15 @@ function renderPostContent(post) {
         const matchState = post.matchState || {};
         const matchStatus = matchState.status || null;
         const roundSuffix = matchState.roundLabel ? ` · ${escapeHtml(matchState.roundLabel)}` : '';
-        const youVoted = post.tournamentId
-            ? !!localStorage.getItem(`vote_${post.tournamentId}_${post.matchId}`)
-            : false;
+        const youVoted = !!localStorage.getItem(`vote_${post.tournamentId || ARCANE_CONFIG.tournamentId}_${post.matchId}`);
+        const viewerId = localStorage.getItem('tournamentUserId');
+        const showResults = resultsVisible({ status: matchStatus, viewerVoted: youVoted, isOwn: !!viewerId && post.userId === viewerId });
 
         let statusChip = '';
         let ctaLabel = 'View match';
         if (matchStatus === 'live') {
             statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>Live${roundSuffix}</span>`;
-            ctaLabel = youVoted ? 'View match' : 'Vote now';
+            ctaLabel = showResults ? 'View match' : 'Vote to see results';
         } else if (matchStatus === 'completed') {
             statusChip = `<span class="match-status-chip is-final">Ended${roundSuffix}</span>`;
             ctaLabel = 'See result';
@@ -1142,7 +1143,7 @@ function renderPostContent(post) {
                             <span class="song-name">
                                 ${escapeHtml(votedMomentName)}
                             </span>
-                            <span class="song-pct">${userPct}%</span>
+                            <span class="song-pct">${showResults ? `${userPct}%` : '<i class="fa-solid fa-lock results-lock"></i>'}</span>
                         </div>
                     </div>
 
@@ -1165,20 +1166,20 @@ function renderPostContent(post) {
                             <span class="song-name">
                                 ${escapeHtml(opponentMomentName)}
                             </span>
-                            <span class="song-pct">${opponentPct}%</span>
+                            <span class="song-pct">${showResults ? `${opponentPct}%` : '<i class="fa-solid fa-lock results-lock"></i>'}</span>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="match-progress">
+                ${showResults ? `<div class="match-progress">
                     <div class="progress-bar-bg">
                         <div
                             class="progress-bar-fill"
                             style="width: ${userPct}%"
                         ></div>
                     </div>
-                </div>
+                </div>` : `<div class="results-locked"><i class="fa-solid fa-lock"></i> Vote in this match to see how it is going</div>`}
 
                 <div class="match-foot">
                     ${statusChip}

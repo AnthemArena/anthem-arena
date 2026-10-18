@@ -39,7 +39,9 @@ export function homeState(matches = [], now = Date.now()) {
         .map(({ m }) => { const w = side(m); return { matchId: m.matchId, label: m.roundLabel || '', total: votesOf(m),
             winner: w ? comp(w === 1 ? m.song1 : m.song2) : null, loser: w ? comp(w === 1 ? m.song2 : m.song1) : null }; });
 
-    const topVoted = stats.rows.filter(r => r.votes > 0).sort((a, b) => b.votes - a.votes).slice(0, 6)
+    // finished matches only: an edit's total in a live match would show who is ahead before people have voted
+    const doneStats = computeStats(completed);
+    const topVoted = doneStats.rows.filter(r => r.votes > 0).sort((a, b) => b.votes - a.votes).slice(0, 6)
         .map(r => ({ id: r.id, videoId: r.videoId, title: r.title, creator: r.creator, votes: r.votes }));
 
     return {

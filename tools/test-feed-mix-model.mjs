@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, RUN_MIN } from '../js/feed-mix-model.js';
+import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, resultsVisible, RUN_MIN } from '../js/feed-mix-model.js';
 let pass = 0, fail = 0;
 const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
 const vote = (i, u = 'u' + i) => ({ type: 'vote', postId: 'v' + i, username: u, timestamp: 1000 - i });
@@ -43,6 +43,10 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
     t('mentions: empty, no @, no users', extractMentions('', users).length === 0 && extractMentions('no at signs', users).length === 0 && extractMentions('@Kai', []).length === 0 && extractMentions(null, users).length === 0);
     const src = fs.readFileSync(new URL('../js/feed-page.js', import.meta.url), 'utf8');
     t('feed load publishes own profile stats regardless of the user-list cache', /await loadAllUsers\(\);\s*publishOwnProfileStats\(\);/.test(src));
+    t('live match results hidden until you vote; ended matches and your own posts always show', resultsVisible({ status: 'live' }) === false
+        && resultsVisible({ status: 'live', viewerVoted: true }) === true && resultsVisible({ status: 'live', isOwn: true }) === true
+        && resultsVisible({ status: 'completed' }) === true && resultsVisible({ status: null }) === true);
+    t('feed vote card hides the split and the bar when results are locked', /showResults \? `\$\{userPct\}%`/.test(src) && /results-locked/.test(src));
     t('the Post button has exactly one click handler (two used to create every post twice)', (src.match(/submitBtn\.addEventListener\('click'/g) || []).length === 1);
     t('createUserPost refuses a second call while one is saving', /let postingNow = false;/.test(src) && /if \(!content \|\| postingNow\) return;/.test(src) && /postingNow = false;\s*\n\s*submitBtn\.disabled = false;/.test(src));
     t('feed-page imports saveNotification at the top (mention alerts call it directly)', /^import \{ saveNotification \} from '\.\/notification-storage\.js';/m.test(src));

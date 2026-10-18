@@ -190,7 +190,7 @@ function render() {
     const list = visible();
     document.getElementById('editCount').textContent = `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
     if (!ALL.length) {
-        grid.innerHTML = '<div class="gallery-message"><h3>No edits have entered a cup yet</h3><p>The first cup is on its way. Check back soon, or <a href="/live">see what is live</a>.</p></div>';
+        grid.innerHTML = '<div class="gallery-message"><h3>No edits have entered a cup yet</h3><p>The first cup is on its way. Check back soon, or <a href="/#vote">see what is live</a>.</p></div>';
         return;
     }
     if (!list.length) {
