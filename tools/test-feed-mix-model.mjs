@@ -42,6 +42,7 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
     t('mentions: case-insensitive, each person once, unknown names ignored', m.length === 2 && m[0].userId === 'u1' && m[0].username === 'FierceWatcher229' && m[1].userId === 'u2');
     t('mentions: empty, no @, no users', extractMentions('', users).length === 0 && extractMentions('no at signs', users).length === 0 && extractMentions('@Kai', []).length === 0 && extractMentions(null, users).length === 0);
     const src = fs.readFileSync(new URL('../js/feed-page.js', import.meta.url), 'utf8');
+    t('feed load publishes own profile stats regardless of the user-list cache', /await loadAllUsers\(\);\s*publishOwnProfileStats\(\);/.test(src));
     t('the Post button has exactly one click handler (two used to create every post twice)', (src.match(/submitBtn\.addEventListener\('click'/g) || []).length === 1);
     t('createUserPost refuses a second call while one is saving', /let postingNow = false;/.test(src) && /if \(!content \|\| postingNow\) return;/.test(src) && /postingNow = false;\s*\n\s*submitBtn\.disabled = false;/.test(src));
     t('feed-page imports saveNotification at the top (mention alerts call it directly)', /^import \{ saveNotification \} from '\.\/notification-storage\.js';/m.test(src));
