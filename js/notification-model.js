@@ -127,21 +127,21 @@ export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.
 // One look for all of them (js/notification-visuals.js eventToastHtml / eventRowHtml): the match's two edits with the viewer's pick
 // ringed in the colour below, a small tag line, the champion's words in a bubble, one button. tone null = the champion pack's colour.
 export const EVENT_KINDS = {
-    danger:           { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
-    'danger-repeat':  { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
-    nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true },
-    winning:          { tag: 'Your pick is winning', tone: '#4ade80', share: true },
-    comeback:         { tag: 'Comeback',            tone: '#4ade80', share: true },
+    danger:           { tag: 'Your pick is behind', tone: '#ff5a5f', share: true, quiet: true },
+    'danger-repeat':  { tag: 'Your pick is behind', tone: '#ff5a5f', share: true, quiet: true },
+    nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true, both: true, quiet: true },
+    winning:          { tag: 'Your pick is winning', tone: '#4ade80', share: true, quiet: true },
+    comeback:         { tag: 'Comeback',            tone: '#4ade80', share: true, quiet: true },
+    tiebreaker:       { tag: 'Tie-breaker needed', tone: '#ffb020', both: true, quiet: true },
     closing:          { tag: 'Closing soon',        tone: '#ffb020' },
     novotes:          { tag: 'Needs a first vote',  tone: null },
     lowvotes:         { tag: 'Needs more votes',    tone: null },
-    'round-opening':  { tag: 'New round',           tone: null },
-    'new-matches':    { tag: 'New matches',         tone: null },
-    'match-won':      { tag: 'Your pick won',       tone: '#4ade80', outcome: 'won' },
-    'match-lost':     { tag: 'Your pick lost',      tone: '#f87171', outcome: 'lost' },
-    'match-tied':     { tag: 'Tied match',          tone: '#a5b4fc', outcome: 'tied' },
-    welcome:          { tag: 'Welcome',             tone: null },
-    encouragement:    { tag: 'Still deciding?',     tone: null }
+    'round-opening':  { tag: 'New round',           tone: null, quiet: true },
+    'new-matches':    { tag: 'New matches',         tone: null, quiet: true },
+    'match-won':      { tag: 'Your pick won',       tone: '#4ade80', outcome: 'won', quiet: true },
+    'match-lost':     { tag: 'Your pick lost',      tone: '#f87171', outcome: 'lost', quiet: true },
+    welcome:          { tag: 'Welcome',             tone: null, quiet: true },
+    encouragement:    { tag: 'Still deciding?',     tone: null, quiet: true }
 };
 export const eventKind = n => (n && Object.prototype.hasOwnProperty.call(EVENT_KINDS, n.type)) ? EVENT_KINDS[n.type] : null;
 export const isEventNotification = n => !!eventKind(n);
@@ -150,6 +150,7 @@ export const isEventNotification = n => !!eventKind(n);
 export function eventTag(n) {
     const k = eventKind(n);
     if (!k) return '';
+    if (n.type === 'tiebreaker') return n.severityTier === 'final' ? 'Last chance to break the tie' : k.tag;
     if (n.type === 'closing') return n.severityTier === 'final' ? 'Last chance to vote' : 'Closing soon';
     if (n.type === 'round-opening') return n.round ? `Round ${n.round} is open` : k.tag;
     if (n.type === 'new-matches') return n.round ? `New matches in round ${n.round}` : k.tag;
@@ -158,18 +159,45 @@ export function eventTag(n) {
     return k.tag;
 }
 
+// Which alerts are about a match the viewer must have voted in (the test page pretends so for its sample alerts).
+export const VOTED_KINDS = ['danger', 'danger-repeat', 'nailbiter', 'winning', 'comeback', 'match-won', 'match-lost'];
+// Alerts that show a strip of the edits that are open (round opening, new matches, welcome, still deciding).
+export const isStripAlert = n => !!n && (n.type === 'round-opening' || n.type === 'new-matches' || n.type === 'welcome' || n.type === 'encouragement');
+export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type === 'new-matches');
+
 // The symbol in the middle of the picture (between the two edits, or alone in a circle when there is no match to show).
-// It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close / tied, ⇄ flipped, ✓ won, ✕ lost.
+// It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close, ⇄ flipped, ✓ won, ✕ lost.
 const EVENT_GLYPHS = {
     danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
-    closing: '⏳', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
-    'match-won': '✓', 'match-lost': '✕', 'match-tied': '=', welcome: '👋', encouragement: '👀'
+    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
+    'match-won': '✓', 'match-lost': '✕', welcome: '👋', encouragement: '👀'
 };
 export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
+
+// Matches you have not voted in that are exactly level and still open. covered = every such match (the closing-soon alert leaves
+// them alone); ties = the ones not yet announced at their current step ('tied', or 'final' inside the last hours), soonest first.
+export function tieBreakerCandidates(matches, { userVotes = {}, seen = {}, msLeftOf, minVotes = 10, finalMs = 3 * 3600000 } = {}) {
+    const covered = new Set(), ties = [];
+    for (const match of matches || []) {
+        const matchId = match.matchId || match.id;
+        if (!matchId || userVotes[matchId]) continue;
+        const v1 = match.song1?.votes || 0, v2 = match.song2?.votes || 0;
+        if (v1 !== v2 || v1 + v2 < minVotes) continue;
+        const msLeft = msLeftOf ? msLeftOf(match) : null;
+        if (msLeft === null || msLeft === undefined || msLeft <= 0) continue;
+        covered.add(matchId);
+        const tier = msLeft <= finalMs ? 'final' : 'tied';
+        if (seen[`${matchId}:${tier}`]) continue;
+        ties.push({ match, matchId, msLeft, tier, score: v1 });
+    }
+    ties.sort((a, b) => a.msLeft - b.msLeft);
+    return { ties, covered };
+}
 
 // Where the button (and the alert itself) goes. A match you already voted in opens with the share panel in view.
 export function eventUrl(n) {
     const k = eventKind(n);
+    if (isStripAlert(n)) return '/matches.html';          // these show several edits: the list is the place to pick from
     let url = n?.targetUrl || (n?.matchId ? `/vote.html?match=${encodeURIComponent(n.matchId)}` : '/vote.html');
     if (k?.share && n?.matchId && /^\/vote(\.html)?\?/.test(url) && !/[?&]share=/.test(url)) url += '&share=1';
     return url;
@@ -178,6 +206,14 @@ export function eventUrl(n) {
 // A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
 export function eventChips(n) {
     const chips = [];
+    const diff = Number.isFinite(n?.voteDiff) ? n.voteDiff : null;
+    if (diff != null) {
+        if (n.type === 'danger' || n.type === 'danger-repeat') { if (diff > 0) chips.push(`Behind by ${diff}`); }
+        else if (n.type === 'winning' || n.type === 'comeback') { if (diff > 0) chips.push(`Ahead by ${diff}`); }
+        else if (n.type === 'nailbiter') { if (diff > 0) chips.push(`${diff} vote${diff === 1 ? '' : 's'} apart`); }
+    }
+    if (n?.type === 'tiebreaker' && n.score) chips.push(`Level at ${n.score}`);
+    if (n?.type === 'tiebreaker' && n.severityTier === 'final') chips.push('Last chance');
     if (n?.type === 'closing' && n.severityTier === 'final') chips.push('Last chance');
     if (n?.type === 'encouragement' && n.encouragementType === 'urgent') chips.push('Closing soon');
     if ((n?.type === 'round-opening' || n?.type === 'new-matches') && n.round) chips.push(`Round ${n.round}`);

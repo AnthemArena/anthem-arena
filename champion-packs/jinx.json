@@ -388,6 +388,33 @@
         "Help"
       ]
     },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level right now. One vote breaks it. Funny, I know someone who hasn't voted.",
+        "Perfect tie on {matchTitle}. Somebody has to blink. I'm looking at you.",
+        "Dead even, and nobody's moving. You haven't voted. You're the tiebreaker.",
+        "{moment1} and {moment2}, level, and you've been quiet. Fix that."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the clock's nearly out. Last chance to break it.",
+        "Dead level, almost out of time. You're the only thing left that can change this.",
+        "Still tied with the clock running down. Pick a side. Do it for the drama."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it now",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
     "round-opening": {
       "messages": [
         "Round {round} is open. {matchCount} new matches. Pick a side.",
@@ -443,34 +470,6 @@
         "Next match",
         "Revenge",
         "I'm fine"
-      ]
-    },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "Dead tie, and your pick took it on seeding. Take the win.",
-            "Perfect deadlock. The bracket picked you. Lucky."
-          ],
-          "cta": [
-            "Take it",
-            "Win's a win"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "Dead tie. {winner} goes through on seeding. Boring way to end a fight.",
-            "A tie. {winner} gets it on the seeding rule. That's not winning, that's paperwork."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
       ]
     },
     "encouragement": {
@@ -1032,6 +1031,76 @@
       "buttons": [
         "View achievements",
         "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Look at all the shiny new stuff.",
+        "Mastery up. Now we're getting somewhere."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "You've reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs with me. Now that's chaos.",
+        "Ten long shots. We're a bad influence on each other."
+      ],
+      "details": [
+        "Loose cannon looks good on you. +{xp} XP",
+        "Ten wild picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake. Fine, you're good.",
+        "Ten tight finishes with her. Don't tell her I said so."
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love rules.",
+        "Seven days of steady aim. Boring. Impressive."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie with Cupcake. Boom.",
+        "A tied match and you pulled the trigger. Nice."
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
       ]
     }
   },

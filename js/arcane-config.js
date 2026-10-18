@@ -2,6 +2,14 @@
 // ARCANE MOMENTS - SHARED CONFIG
 // ========================================
 
+// THE one place the Data Dragon version lives. Only the versioned assets use it (champion squares, profile icons, spells, items,
+// runes); splash and tile art are unversioned. To update: node tools/check-ddragon.mjs shows the newest version and checks that
+// our icons exist there, then change this one line.
+export const DATA_DRAGON_VERSION = '16.20.1';
+export const ddragonUrl = path => `https://ddragon.leagueoflegends.com/cdn/${DATA_DRAGON_VERSION}/${path}`;
+// Any versioned Data Dragon url (saved in a pack file, say) with the current version in it; other urls come back unchanged.
+export const withCurrentVersion = url => (typeof url === 'string' ? url.replace(/^(https:\/\/ddragon\.leagueoflegends\.com\/cdn\/)\d+\.\d+\.\d+(\/)/, `$1${DATA_DRAGON_VERSION}$2`) : url);
+
 export const ARCANE_CONFIG = {
     tournamentId: 'jinx-cup-1',
     tournamentName: 'Arcane Moments',
@@ -10,9 +18,8 @@ export const ARCANE_CONFIG = {
     // companion/toast pack for anyone who has not chosen their own (companion ids, see COMPANION_PACKS below).
     cupChampion: 'jinx',
 
-    dataDragonVersion: '14.24.1',
-    dataDragonChampionCdn:
-        'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/',
+    dataDragonVersion: DATA_DRAGON_VERSION,
+    dataDragonChampionCdn: ddragonUrl('img/champion/'),
     dataDragonSplashCdn:
         'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/',
     dataDragonTileCdn:

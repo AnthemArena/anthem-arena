@@ -11,6 +11,7 @@
 // Rule: BEFORE the viewer has voted the line never says who is ahead (the page hides results until you vote).
 
 import { ARCANE_CONFIG, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionImageUrl } from './arcane-config.js';
+import { lookSkin } from './companion-look.js';
 
 export const BUBBLE_STATES = [
     'upcoming', 'prevote', 'prevote-empty', 'closing-24h', 'closing-3h', 'closing-final',
@@ -157,7 +158,7 @@ export async function renderChampionBubble(ctx) {
     const textEl = root.querySelector('.cb-text');
     const img = root.querySelector('.cb-portrait img');
     const meta = getCompanionPack(championId);
-    const skin = pack?.portrait?.skin ?? 0;
+    const skin = lookSkin(pack);
     const champ = meta?.championId || 'Jinx';
     if (img && !img.dataset.ready) {
         img.dataset.ready = '1';

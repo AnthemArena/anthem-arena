@@ -9,6 +9,7 @@
 // ({unvoted} {voted} {live} {timeLeft}). A pack without "pages" (or a state) uses the plain lines below.
 
 import { getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionImageUrl } from './arcane-config.js';
+import { lookSkin } from './companion-look.js';
 import { fillPlaceholders, loadChampionPack } from './champion-bubble.js';
 
 export const SAY_STATES = [
@@ -136,7 +137,7 @@ export async function mountSay(opts) {
         img.dataset.ready = '1';
         img.alt = pack?.name || champ;
         img.onerror = () => { img.onerror = null; img.src = getChampionImageUrl(champ); };
-        img.src = getChampionTileUrl(champ, pack?.portrait?.skin ?? 0);
+        img.src = getChampionTileUrl(champ, lookSkin(pack));
     }
     el.dataset.state = state;
     const textEl = el.querySelector('.cb-text');

@@ -441,6 +441,33 @@
         "See the match"
       ]
     },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied right now. You haven't voted. Fix that.",
+        "Dead level on {matchTitle}. One vote breaks it.",
+        "Tied. Someone has to move. Make it you.",
+        "{moment1} and {moment2}, level. Pick one."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and closing soon. This is your last chance to break it.",
+        "Level with time running out. Vote.",
+        "Tied, and almost out of time. Don't sit this one out."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
     "round-opening": {
       "messages": [
         "Round {round} is open. {matchCount} new matches. Let's go.",
@@ -502,42 +529,6 @@
         "See the result"
       ]
     },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "Dead tie, and your pick goes through on seed. I'll take it.",
-            "Level on votes. {winner} advances on seed. Lucky."
-          ],
-          "detail": [
-            "A win's a win.",
-            "Won't complain."
-          ],
-          "cta": [
-            "Take it",
-            "Nice"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "Dead tie, and {winner} goes through on seed. That's the rule.",
-            "Level on votes. {winner} takes it on seed. Rough."
-          ],
-          "detail": [
-            "Rules are rules.",
-            "Lost on seed. Annoying."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
-      ]
-    },
     "welcome": {
       "welcome-first-time": {
         "messages": [
@@ -579,26 +570,6 @@
           "Catch up",
           "Show me",
           "Let's go"
-        ]
-      },
-      "encouragement": {
-        "messages": [
-          "Still deciding? Quit stalling and pick.",
-          "Don't overthink it. Choose one and move on.",
-          "They're all worth a look. Go with your gut.",
-          "You've looked long enough. Pick."
-        ],
-        "details": [
-          "Every vote counts.",
-          "Trust your gut.",
-          "There's no wrong way to pick.",
-          "Just choose."
-        ],
-        "buttons": [
-          "Vote now",
-          "Choose one",
-          "Decide",
-          "Cast your vote"
         ]
       },
       "welcome-back": {
@@ -1127,6 +1098,76 @@
         "View achievements",
         "See all"
       ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. You've earned it.",
+        "You put the work in. It shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "You've reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs with Jinx. Stubborn. I like it.",
+        "Ten long shots. You don't scare easy."
+      ],
+      "details": [
+        "Ten against the odds. +{xp} XP",
+        "Not afraid of a long shot. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cait. Your nerves are solid.",
+        "Ten tight finishes. She'd be proud."
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady under pressure. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days with Cait. She's a good influence on you.",
+        "A week without a miss. Nice."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie with Cait. Good call.",
+        "A tied match, and you made the call. Respect."
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
     }
   },
   "bubble": {
@@ -1360,5 +1401,8 @@
       "{pct}% for {pick}. {other} isn't close.",
       "{pick} leads {other} by a mile, {pct}%. Cast yours."
     ]
+  },
+  "portrait": {
+    "skin": 29
   }
 }

@@ -3,8 +3,8 @@
 import { db } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAllMatches } from './api-client.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits, eventEdits } from './notification-visuals.js';
-import { isContentNotification, isEventNotification, isStreakNotification } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, matchEdits, eventEdits, entrantsStrip } from './notification-visuals.js';
+import { isContentNotification, isEventNotification, isStreakNotification, eventKind, isRoundAlert, isStripAlert, VOTED_KINDS } from './notification-model.js';
 
 const avatarCache = new Map();          // userId -> url | null
 let matchesCache = { at: 0, list: [] };
@@ -39,6 +39,9 @@ export async function matchesLoaded(ms = 10000) {
     return matchesCache.list.length > 0;
 }
 
+// The sample alerts on test-toasts.html use made-up match ids; show the first real match instead so the pictures can be checked.
+const isSampleMatch = id => /^test-(?!round-opening)/.test(String(id || ''));
+
 async function matchById(matchId) {
     if (!matchId) return null;
     if (Date.now() - matchesCache.at > 5 * 60 * 1000) {
@@ -46,6 +49,7 @@ async function matchById(matchId) {
         matchesInflight = matchesInflight || withTimeout(startMatchesFetch(), 3000).finally(() => { matchesInflight = null; });
         await matchesInflight;
     }
+    if (isSampleMatch(matchId)) return matchesCache.list[0] || null;
     return matchesCache.list.find(m => (m.matchId || m.id) === matchId) || null;
 }
 
@@ -58,7 +62,7 @@ export async function socialContextFor(n) {
             out.avatars = await Promise.all(n.userIds.map(async (id, i) => (id && await profileAvatar(id)) || avatarSrc((n.avatars || [])[i]) || fallbackAvatarFor((n.users || [])[i])));
         }
         if (n.relationship === 'ally' || n.relationship === 'opponent') {      // only vote alerts draw the two edits
-            const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+            const yourKey = isSampleMatch(n.matchId) ? 'song1' : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
             out.edits = matchEdits(await matchById(n.matchId), yourKey, n.relationship);
             if (!out.edits) console.debug('social context: no edit pictures', { matchId: n.matchId, yourKey, haveMatches: matchesCache.list.length });
         }
@@ -66,13 +70,36 @@ export async function socialContextFor(n) {
     return out;
 }
 
+const endMs = m => { const v = m.endTime || m.endDate; const t = v?.toMillis ? v.toMillis() : new Date(v).getTime(); return Number.isFinite(t) ? t : Infinity; };
+
 // A match-event alert (danger, closing, match result ...): the two edit pictures with the viewer's own pick marked, as n.nv.edits.
 export async function eventContextFor(n) {
-    const out = { edits: null };
+    const out = { edits: null, strip: null };
     try {
+        if (isStripAlert(n)) {
+            // The edits to look at: the live matches of the round (round alerts; the newest ones for "new matches"), every live
+            // match for a first visit, otherwise the live matches this person has not voted in yet.
+            await matchById('open');                                    // makes sure the match list is loaded
+            const live = matchesCache.list.filter(m => m.status === 'live');
+            let pool;
+            if (isRoundAlert(n)) {
+                const round = n.round || Math.max(1, ...live.map(m => m.round || 1));
+                pool = live.filter(m => (m.round || 1) === round);
+                if (n.type === 'new-matches' && n.matchCount) pool = pool.slice(-n.matchCount);
+            } else if (n.type === 'welcome' && n.welcomeType === 'first-time') {
+                pool = live;
+            } else {
+                const voted = JSON.parse(localStorage.getItem('userVotes') || '{}');
+                pool = live.filter(m => !voted[m.matchId || m.id]);
+                if (n.type === 'encouragement' && n.encouragementType === 'urgent') pool.sort((a, b) => endMs(a) - endMs(b));   // closing first
+            }
+            out.strip = entrantsStrip(pool);
+            return out;
+        }
         if (!n?.matchId) return out;
-        const yourKey = JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
-        out.edits = eventEdits(await matchById(n.matchId), yourKey);
+        const sample = isSampleMatch(n.matchId);
+        const yourKey = sample ? (VOTED_KINDS.includes(n.type) ? 'song1' : undefined) : JSON.parse(localStorage.getItem('userVotes') || '{}')[n.matchId]?.songId;
+        out.edits = eventEdits(await matchById(n.matchId), yourKey, !!eventKind(n)?.both);
     } catch (e) { console.warn('event context failed', e); }
     return out;
 }

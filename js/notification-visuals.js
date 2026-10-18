@@ -1,6 +1,7 @@
 import { fixAvatarUrl } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
-import { getChampionSplashUrl } from './arcane-config.js';
+import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
+import { lookSkin } from './companion-look.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -41,9 +42,9 @@ export function viewerAvatarSrc(storage = globalThis.localStorage) {
 }
 
 // The champion's splash art for the pop-up backdrop (Data Dragon id is the pack id with a capital: jinx -> Jinx).
-export function toastSplashUrl(pack) {
+export function toastSplashUrl(pack, storage = globalThis.localStorage) {
     const id = String(pack?.id || 'jinx');
-    return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1));
+    return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1), lookSkin(pack, storage));   // the skin this companion wears (chosen, or Arcane once unlocked)
 }
 
 // The viewer's own profile banner as a pop-up backdrop (same choice as the profile card: a chosen champion, "auto" = the
@@ -52,7 +53,7 @@ export function profileSplashUrl(pack, storage = globalThis.localStorage) {
     const read = k => { try { return JSON.parse(storage.getItem(k) || 'null'); } catch { return null; } };
     const banner = read('banner') || { type: 'auto' };
     const avatar = read('avatar');
-    const clean = v => String(v || '').replace(/['\s]/g, '');
+    const clean = v => { const c = String(v || '').replace(/['\s]/g, ''); return c.toLowerCase() === 'wukong' ? 'MonkeyKing' : c; };
     if (banner.type === 'champion' && banner.championId) return getChampionSplashUrl(clean(banner.championId), banner.skinNumber || 0);
     if (banner.type !== 'default' && avatar?.type === 'url' && avatar.name) return getChampionSplashUrl(clean(avatar.name));
     return toastSplashUrl(pack);
@@ -84,8 +85,10 @@ export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc,
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View achievements')}</button>`;
 }
 
-// The companion's face: the pack's icon. (The Arcane skin tile is a dark picture; at 24-60 px it reads as a dark blob.)
-export function championBadgeUrl(pack) {
+// The companion's face: the tile of the skin it wears (see companion-look.js), otherwise its plain icon.
+export function championBadgeUrl(pack, storage = globalThis.localStorage) {
+    const skin = lookSkin(pack, storage);
+    if (skin && pack?.id) return getChampionTileUrl(pack.id.charAt(0).toUpperCase() + pack.id.slice(1), skin);
     return pack?.icon || null;
 }
 
@@ -94,7 +97,7 @@ const FALLBACK_CHAMPIONS = ['Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerd
 export function fallbackAvatarFor(name) {
     const s = String(name || '?');
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-    return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`;
+    return ddragonUrl(`img/champion/${FALLBACK_CHAMPIONS[h % FALLBACK_CHAMPIONS.length]}.png`);
 }
 
 // The two edits of a match as pictures, in match order (song1 left, song2 right), plus which side each person picked.
@@ -135,8 +138,8 @@ export function editsPairHtml({ edits, relationship, size = 44, accent, mark = n
     const w = Math.round(size * 1.5);
     const side = (s, outer) => {
         const theirs = s.key === edits.theirKey, yours = s.key === edits.yourKey;
-        const ring = edits.neutral ? 'rgba(255,255,255,0.4)' : theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
-        const cls = (theirs || yours || edits.neutral) ? 'nv-pick' : 'nv-dim';
+        const ring = edits.both ? accent : edits.neutral ? 'rgba(255,255,255,0.4)' : theirs && yours ? ALLY_ACCENT : theirs ? accent : yours ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.12)';
+        const cls = (theirs || yours || edits.neutral || edits.both) ? 'nv-pick' : 'nv-dim';
         return `<span class="nv-edit ${cls}" style="width:${w}px;height:${size}px;--nv-ring:${ring}">${s.thumb ? `<img src="${escapeHtml(s.thumb)}" alt="" onerror="this.remove()">` : ''}</span>`;
     };
     return `<div class="nv-pair nv-edits" style="--nv-accent:${accent}">${side(edits.left, 'left')}<span class="nv-mark ${relationship}${mark ? ' nv-mark-event' : ''}" style="width:${Math.round(size * 0.7)}px;height:${Math.round(size * 0.7)}px${mark ? `;font-size:${Math.round(size * 0.36)}px` : ''}">${escapeHtml(mark || 'VS')}</span>${side(edits.right, 'right')}</div>`;
@@ -325,17 +328,43 @@ export const darken = (hex, f = 0.25) => {
 
 // What the two edit pictures show for an event: the viewer's pick ringed in the alert's colour, the other dimmed
 // (a match nobody has voted in yet shows both, evenly). yourKey = 'song1' | 'song2' | undefined.
-export function eventEdits(match, yourKey) {
+export function eventEdits(match, yourKey, both = false) {
     if (!match) return null;
     const l = songThumb(match.song1), r = songThumb(match.song2);
     if (!l && !r) return null;
     const picked = yourKey === 'song1' || yourKey === 'song2';
-    return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey: null, theirKey: picked ? yourKey : null, neutral: !picked };
+    return { left: { key: 'song1', thumb: l }, right: { key: 'song2', thumb: r }, yourKey: null, theirKey: picked ? yourKey : null, neutral: !picked && !both, both: !!both };
+}
+
+// A tidy list of the edits entering a round: up to `max` pictures and how many more there are. matches = live matches of that round.
+export function entrantsStrip(matches, max = 5) {
+    const thumbs = [];
+    let total = 0;
+    for (const m of matches || []) for (const s of [m.song1, m.song2]) {
+        if (!s) continue;
+        total++;
+        const t = songThumb(s);
+        if (t && thumbs.length < max) thumbs.push(t);
+    }
+    return thumbs.length ? { thumbs, more: Math.max(0, total - thumbs.length) } : null;
+}
+export function stripHtml(strip, accent, size = 34) {
+    if (!strip || !strip.thumbs?.length) return '';
+    return `<div class="nv-strip" style="--nv-accent:${accent}">${strip.thumbs.map(t => `<span class="nv-strip-th" style="width:${Math.round(size * 1.35)}px;height:${size}px"><img src="${escapeHtml(t)}" alt="" onerror="this.parentNode.remove()"></span>`).join('')}${strip.more > 0 ? `<span class="nv-strip-more" style="height:${size}px;min-width:${size}px">+${strip.more}</span>` : ''}</div>`;
 }
 
 // The big round number for a level-up.
 export function levelBadgeHtml(level, accent, size = 64) {
     return `<div class="nv-lead nv-follow-face" role="img" aria-label="Level up" title="Level up"><span class="nv-av"><span class="nv-circle" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${escapeHtml(String(level ?? '?'))}</span><span class="nv-glyph-pip" style="--nv-accent:${accent}">▲</span></span></div>`;
+}
+
+// The champion's line without a leading symbol that the picture above already shows ("👋 Welcome back!" under a 👋 circle).
+export function withoutLeadingGlyph(text, glyph) {
+    const t = String(text ?? '');
+    if (!glyph || glyph === 'VS') return t;
+    const g = String(glyph).replace(/\uFE0F/g, '');
+    const plain = t.replace(/^\s+/, '').replace(/\uFE0F/g, '');
+    return plain.startsWith(g) ? plain.slice(g.length).replace(/^[\s:\-–—]+/, '') || t : t;
 }
 
 // The picture at the top of a match-event card: the two edits with the state symbol between them, or, with no match to show,
@@ -349,26 +378,28 @@ export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
 }
 
 // Pop-up: [edit A] VS [edit B], a small tag line, the champion's words in a bubble, a few chips, one button. The whole card opens the match.
-export function eventToastHtml(n, { tag, glyph, edits, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
+export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
+    if (strip) chips = chips.filter(c => !/^\d+ matches?$/.test(c));   // the picture strip says it better
     return `
     <div class="nv-body" onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
-        ${bubbleHtml(quip, jinxSrc, accent)}
+        ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
         ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
+        ${stripHtml(strip, accent, 34)}
         ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
     </div>
     <button class="bulletin-toast-cta nv-cta event" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View match')}</button>`;
 }
 
 // Bell-list row: the same card, compact. The whole row opens the match; the button does the same.
-export function eventRowHtml(n, { tag, glyph, edits, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
+export function eventRowHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
     ensureVersusStyles();
     const idList = n.ids ? n.ids.join(',') : n.id;
     const unread = !n.read && !n.dismissed ? 'unread' : '';
     const lead = eventLeadHtml({ glyph, label: tag, edits, accent, size: 40 });
     const sub = [timeAgo, n.matchTitle].filter(Boolean).map(escapeHtml).join(' · ');
-    const quote = quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : '';
+    const quote = quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(withoutLeadingGlyph(quip, glyph))}"</span></div>` : '';
     return `
         <div class="notification-item nv-row nv-event-row ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url || '')}"
              title="${escapeHtml(n.matchTitle || '')}"
@@ -382,6 +413,7 @@ export function eventRowHtml(n, { tag, glyph, edits, accent, jinxSrc, quip, time
                 </div>
             </div>
             ${quote}
+            ${stripHtml(strip, accent, 26)}
             <div class="notification-item-footer">
                 <button class="notification-item-cta" style="background: linear-gradient(135deg, ${accent}, ${darken(accent)}); border: 0; color: #0f0b18;" data-id="${idList}" data-action="navigate" data-url="${escapeHtml(url || '')}">${escapeHtml(cta || 'View match')}</button>
             </div>
@@ -467,6 +499,11 @@ export function ensureVersusStyles() {
 .nv-circle.nv-glyph{background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.08),#0f0b18 70%);color:var(--nv-accent);font-weight:800;box-shadow:0 0 14px var(--nv-glow,rgba(255,105,180,.35));line-height:1}
 .nv-glyph-pip{position:absolute;right:-4px;bottom:-4px;z-index:3;width:22px;height:22px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0f0b18;background:var(--nv-accent);border:2px solid #1a1226}
 .nv-event-row .nv-lead{padding:0}
+.nv-strip{display:flex;align-items:center;justify-content:center;padding-left:8px}
+.nv-strip-th{position:relative;display:inline-block;flex-shrink:0;margin-left:-8px;border-radius:8px;overflow:hidden;box-sizing:border-box;border:2px solid #1a1226;box-shadow:0 2px 6px rgba(0,0,0,.5);background:#2b1747}
+.nv-strip-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.nv-strip-more{margin-left:-8px;display:inline-flex;align-items:center;justify-content:center;padding:0 8px;border-radius:8px;box-sizing:border-box;font-size:12px;font-weight:800;color:var(--nv-accent);background:#0f0b18;border:2px solid var(--nv-accent)}
+.nv-event-row .nv-strip{justify-content:flex-start;margin:6px 0 2px 8px}
 .versus-toast .nv-chip-plain{text-transform:none}
 .versus-toast .nv-event-detail{text-align:center;font-size:12.5px;color:rgba(255,255,255,.72)}
 .versus-toast .nv-edits{margin-top:2px}

@@ -10,6 +10,8 @@ import {
     getAchievementById  // ✅ Use the exported function
 } from './achievements.js';
 import { addXP } from './rank-system.js';
+import { streakFromVotes } from './xp-ledger.js';
+import { ddragonUrl } from './arcane-config.js';
 
 // ========================================
 // FIREBASE ACHIEVEMENT STORAGE
@@ -196,6 +198,18 @@ export async function checkFoundingMemberStatus() {
  * @param {Array} allVotes - User's complete vote history
  * @returns {Object} - Stats object
  */
+// Votes are counted for the companion that was active when they were cast (older votes without one count as Jinx, like the
+// Champions tab does). "Tied" = the match was exactly tied (10+ votes) when the vote was cast.
+export function companionStats(allVotes) {
+    const by = id => allVotes.filter(v => (v.championId || 'jinx') === id);
+    return {
+        jinxUnderdogVotes: by('jinx').filter(v => v.voteType === 'underdog').length,
+        caitlynCloseVotes: by('caitlyn').filter(v => v.voteType === 'closeCall').length,
+        caitlynStreak: streakFromVotes(by('caitlyn')),
+        caitlynDecidingVotes: by('caitlyn').filter(v => v.tiedBefore).length
+    };
+}
+
 export async function calculateAchievementStats(allVotes) {
 
     // ✅ Track votes in current session
@@ -224,7 +238,7 @@ export async function calculateAchievementStats(allVotes) {
         comebackVotes: 0,
         isFoundingMember: isFoundingMember,
         votesInSession: votesThisSession.length,
-        
+        ...companionStats(allVotes)
     };
   
   
@@ -395,7 +409,7 @@ export async function checkAchievements(allVotes, context = {}) {
  */
 export function showAchievementUnlock(achievement) {
     // ✅ NEW: Use League item icon
-    const achievementIcon = achievement.icon || 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/3041.png';
+    const achievementIcon = achievement.icon || ddragonUrl('img/item/3041.png');
     
     // ✅ Get champion-voiced message
     const championMessage = window.championLoader?.getAchievementMessage(achievement.id, {

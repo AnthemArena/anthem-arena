@@ -274,10 +274,10 @@ export function showMatchOutcomeNotification(outcome) {
         priority = 3;
         type = 'match-lost';
 
-    } else if (outcome.result === 'tied') {
-        championMessage = championLoader.getChampionMessage('match-tied-alert', toastData);
-        priority = 3;
-        type = 'match-tied';
+    } else {
+        // A match can no longer close level: the admin casts the deciding vote first (js/admin.js), so the usual
+        // won / lost alert covers every result. Anything else (an old tied result) gets no alert.
+        return;
     }
 
     if (!championMessage) {

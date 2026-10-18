@@ -120,7 +120,7 @@ export function showRoundOpeningNotification(roundData) {
             detail: championMessage.detail,
             cta: championMessage.cta,
             action: 'navigate',
-            targetUrl: '/vote.html'
+            targetUrl: '/matches.html'
         });
         
         const logMsg = roundData.isNewRound 

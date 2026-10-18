@@ -174,8 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="/legal/privacy">Privacy</a>
                 <span class="separator">•</span>
                 <a href="/legal/terms">Terms</a>
-                <span class="separator">•</span>
-                <a href="/legal/disclosure">Affiliate Disclosure</a>
             </div>
             
             <!-- Riot Games Disclaimer -->
@@ -187,13 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="footer-disclaimer">
                 League of Legends®, Arcane and all related logos, characters, music, and content 
                 are trademarks and copyrights of Riot Games, Inc.
-            </p>
-            
-            <!-- Amazon Affiliate Disclosure -->
-            <p class="footer-disclaimer footer-affiliate">
-                As an Amazon Associate, we earn from qualifying purchases made through 
-                book recommendation links on this site. This helps support the tournament 
-                at no extra cost to you.
             </p>
         </div>
     </div>

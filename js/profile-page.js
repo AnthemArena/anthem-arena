@@ -16,10 +16,11 @@ import {
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
-import { ARCANE_CONFIG } from './arcane-config.js';
+import { ARCANE_CONFIG, ddragonUrl } from './arcane-config.js';
 import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
+import { loadChampionsTab } from './champions-tab.js';
 
 import { fixAvatarUrl } from './avatar-url.js';
 import { compareVotes, pickTitle, pickThumb } from './taste-match.js';
@@ -358,6 +359,8 @@ return {
     championPackId: profileData.championPackId || profileData.companionId || 'jinx',
 
     bio: profileData.bio || '',
+    xp: profileData.xp,                 // the saved XP total, so levels match for every viewer
+    packXp: profileData.packXp,
     privacy: profileData.privacy || {},
     createdAt: profileData.createdAt,
     updatedAt: profileData.updatedAt
@@ -378,14 +381,14 @@ function generateFallbackProfile(username) {
     
     // Champion avatar pool
     const champions = [
-        { championId: 'Ahri', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ahri.png' },
-        { championId: 'Akali', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Akali.png' },
-        { championId: 'Yasuo', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Yasuo.png' },
-        { championId: 'Jinx', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Jinx.png' },
-        { championId: 'Lux', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Lux.png' },
-        { championId: 'Ezreal', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Ezreal.png' },
-        { championId: 'Zed', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Zed.png' },
-        { championId: 'KSante', imageUrl: 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/KSante.png' }
+        { championId: 'Ahri', imageUrl: ddragonUrl('img/champion/Ahri.png') },
+        { championId: 'Akali', imageUrl: ddragonUrl('img/champion/Akali.png') },
+        { championId: 'Yasuo', imageUrl: ddragonUrl('img/champion/Yasuo.png') },
+        { championId: 'Jinx', imageUrl: ddragonUrl('img/champion/Jinx.png') },
+        { championId: 'Lux', imageUrl: ddragonUrl('img/champion/Lux.png') },
+        { championId: 'Ezreal', imageUrl: ddragonUrl('img/champion/Ezreal.png') },
+        { championId: 'Zed', imageUrl: ddragonUrl('img/champion/Zed.png') },
+        { championId: 'KSante', imageUrl: ddragonUrl('img/champion/KSante.png') }
     ];
     
     // Use username hash to consistently pick same champion
@@ -432,7 +435,7 @@ async function renderProfile(profile) {
     document.getElementById('profileUsername').textContent = profile.username;
     
     // ✅ FIXED: Rank with proper XP detection
-    const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+    const { getUserXPFromStorage, getUserRank, calculateUserXP, xpForProfile } = await import('./rank-system.js');
     
     // Get current user ID with fallback
     const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
@@ -453,9 +456,8 @@ async function renderProfile(profile) {
         const votesSnapshot = await getDocs(votesQuery);
         const allVotes = votesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        const xpData = calculateUserXP(allVotes);
-        xp = xpData.totalXP;
-        console.log('✅ Calculated XP for rank display:', xp);
+        xp = xpForProfile(profile, allVotes);   // the saved total (votes + achievements), so everyone sees the same level
+        console.log('✅ XP for rank display:', xp);
     }
     
     const rank = getUserRank(xp);
@@ -844,7 +846,7 @@ else {
         // ... rest of the function (rank calculation, UI updates, etc.)
         
         // ✅ GET RANK
-        const { getUserXPFromStorage, getUserRank, calculateUserXP } = await import('./rank-system.js');
+        const { getUserXPFromStorage, getUserRank, calculateUserXP, xpForProfile } = await import('./rank-system.js');
         
         let currentXP;
         let rank;
@@ -859,10 +861,9 @@ else {
                 ...doc.data()
             }));
             
-            const xpData = calculateUserXP(allVotes);
-            currentXP = xpData.totalXP;
+            currentXP = xpForProfile(profileDoc.exists() ? profileDoc.data() : null, allVotes);
             rank = getUserRank(currentXP);
-            console.log('✅ Calculated XP for other user:', currentXP);
+            console.log('✅ XP for other user:', currentXP);
         }
         
         // Update stats display
@@ -2013,6 +2014,7 @@ const TAB_HASHES = {
     votes: 'votes',
     posts: 'posts',
     journey: 'participation',
+    champions: 'champions',
     achievements: 'achievements',
     moments: 'songs'
 };
@@ -2050,6 +2052,10 @@ function setupTabs() {
               // ✅ NEW: Load posts tab
             if (targetTab === 'posts') {
                 await loadAllUserPosts(currentProfile.userId);
+            }
+
+            if (targetTab === 'champions') {
+                await loadChampionsTab(currentProfile, currentProfile.userId === localStorage.getItem('tournamentUserId'));
             }
 
             if (targetTab === 'participation' && window.participationData) {
