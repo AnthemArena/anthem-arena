@@ -2370,6 +2370,20 @@ async function sendCommentNotification(recipientUserId, post, commentContent) {
     }
 }
 
+// Settings saved on this page (no reload here): refresh the profile card in the left column so it matches the nav
+window.addEventListener('profile-settings-saved', () => {
+    try {
+        const avatar = JSON.parse(localStorage.getItem('avatar') || 'null');
+        const img = document.getElementById('sidebarAvatar');
+        if (img && avatar?.type === 'url') img.src = fixAvatarUrl(avatar.value);
+        const name = document.getElementById('sidebarUsername');
+        if (name && localStorage.getItem('username')) name.textContent = localStorage.getItem('username');
+        const bio = document.getElementById('sidebarBio');
+        if (bio && localStorage.getItem('bio')) bio.textContent = localStorage.getItem('bio');
+        updateFeedHeaderBanner();
+    } catch (e) { console.warn('Could not refresh the profile card', e); }
+});
+
 // ========================================
 // UPDATE FEED HEADER BANNER
 // ========================================
