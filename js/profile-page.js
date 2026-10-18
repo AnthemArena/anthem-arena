@@ -20,6 +20,7 @@ import { ARCANE_CONFIG } from './arcane-config.js';
 import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
+import { loadChampionsTab } from './champions-tab.js';
 
 import { fixAvatarUrl } from './avatar-url.js';
 import { compareVotes, pickTitle, pickThumb } from './taste-match.js';
@@ -2013,6 +2014,7 @@ const TAB_HASHES = {
     votes: 'votes',
     posts: 'posts',
     journey: 'participation',
+    champions: 'champions',
     achievements: 'achievements',
     moments: 'songs'
 };
@@ -2050,6 +2052,10 @@ function setupTabs() {
               // ✅ NEW: Load posts tab
             if (targetTab === 'posts') {
                 await loadAllUserPosts(currentProfile.userId);
+            }
+
+            if (targetTab === 'champions') {
+                await loadChampionsTab(currentProfile, currentProfile.userId === localStorage.getItem('tournamentUserId'));
             }
 
             if (targetTab === 'participation' && window.participationData) {

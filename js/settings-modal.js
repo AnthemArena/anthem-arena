@@ -3,6 +3,8 @@
 // ========================================
 
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
+import { readPackXp } from './xp-ledger.js';
+import { masteryChipHtml } from './champions-tab-model.js';
 import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
@@ -1361,6 +1363,7 @@ async function loadChampionPackSelector() {
         const manifest = await window.championLoader.getManifest();
         const currentPack = window.championLoader.getCurrentPack();
 
+        const packXp = readPackXp();
         container.innerHTML = manifest.packs.map(pack => {
             const isActive = pack.id === currentPack.id;
             const isDisabled = !pack.enabled || pack.comingSoon;
@@ -1390,6 +1393,7 @@ ${isActive ? '<span class="active-badge"></span>' : ''}
                     <div class="champion-pack-team">${pack.emoji} Team ${pack.name}</div>
                     <div class="champion-pack-name">${pack.name}</div>
                     <div class="champion-pack-description">${pack.description}</div>
+                    ${masteryChipHtml(pack.id, packXp[pack.id])}
 
                     ${!isDisabled ? `
                         <button class="champion-preview-btn"
