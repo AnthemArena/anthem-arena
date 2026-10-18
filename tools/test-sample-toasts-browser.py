@@ -44,6 +44,10 @@ with sync_playwright() as p:
         show(call)
         more = pg.inner_text('#bulletin-banner .nv-strip-more').strip() if pg.locator('#bulletin-banner .nv-strip-more').count() else ''
         check(f'{call}: strip leaves out the match already voted in (10 edits, +5), no second line', pg.locator('#bulletin-banner .nv-strip-th').count() == 5 and more == '+5' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0, more)
+    for call in ('testWelcomeBack()', 'testEncouragement()', 'testWelcome("comeback")'):
+        show(call)
+        g = pg.inner_text('#bulletin-banner .nv-glyph').strip(); line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
+        check(f'{call}: the symbol in the circle is not repeated at the start of the champion line', not line.startswith(g), (g, line))
     pg.screenshot(path=f'{SHOTS}/sample-encourage.png')
     show('testLevelUp(5)')
     check('level up sample: new card, number 5, rank filled in (no placeholders)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '5' and '{' not in pg.inner_text('#bulletin-banner') and '(' not in pg.inner_text('#bulletin-banner .nv-bubble'), pg.inner_text('#bulletin-banner'))

@@ -355,6 +355,15 @@ export function levelBadgeHtml(level, accent, size = 64) {
     return `<div class="nv-lead nv-follow-face" role="img" aria-label="Level up" title="Level up"><span class="nv-av"><span class="nv-circle" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px;--nv-accent:${accent}">${escapeHtml(String(level ?? '?'))}</span><span class="nv-glyph-pip" style="--nv-accent:${accent}">▲</span></span></div>`;
 }
 
+// The champion's line without a leading symbol that the picture above already shows ("👋 Welcome back!" under a 👋 circle).
+export function withoutLeadingGlyph(text, glyph) {
+    const t = String(text ?? '');
+    if (!glyph || glyph === 'VS') return t;
+    const g = String(glyph).replace(/\uFE0F/g, '');
+    const plain = t.replace(/^\s+/, '').replace(/\uFE0F/g, '');
+    return plain.startsWith(g) ? plain.slice(g.length).replace(/^[\s:\-–—]+/, '') || t : t;
+}
+
 // The picture at the top of a match-event card: the two edits with the state symbol between them, or, with no match to show,
 // the symbol alone in a ringed circle (same size, so the card does not jump when the edits arrive). label = hover / screen-reader text.
 export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
@@ -372,7 +381,7 @@ export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jin
     <div class="nv-body" onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
-        ${bubbleHtml(quip, jinxSrc, accent)}
+        ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
         ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
         ${stripHtml(strip, accent, 34)}
         ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
@@ -387,7 +396,7 @@ export function eventRowHtml(n, { tag, glyph, edits, strip = null, accent, jinxS
     const unread = !n.read && !n.dismissed ? 'unread' : '';
     const lead = eventLeadHtml({ glyph, label: tag, edits, accent, size: 40 });
     const sub = [timeAgo, n.matchTitle].filter(Boolean).map(escapeHtml).join(' · ');
-    const quote = quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(quip)}"</span></div>` : '';
+    const quote = quip ? `<div class="nv-quote">${jinxSrc ? circleHtml(jinxSrc, 'J', 24, { accent }) : ''}<span class="q">"${escapeHtml(withoutLeadingGlyph(quip, glyph))}"</span></div>` : '';
     return `
         <div class="notification-item nv-row nv-event-row ${unread}" data-id="${idList}" data-from-champion="${escapeHtml(championPack?.id || '')}" data-url="${escapeHtml(url || '')}"
              title="${escapeHtml(n.matchTitle || '')}"
