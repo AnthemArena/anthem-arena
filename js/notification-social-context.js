@@ -40,7 +40,7 @@ export async function matchesLoaded(ms = 10000) {
 }
 
 // The sample alerts on test-toasts.html use made-up match ids; show the first real match instead so the pictures can be checked.
-const isSampleMatch = id => /^test-match/.test(String(id || ''));
+const isSampleMatch = id => /^test-(?!round-opening)/.test(String(id || ''));
 
 async function matchById(matchId) {
     if (!matchId) return null;
