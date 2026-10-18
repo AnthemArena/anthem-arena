@@ -472,34 +472,6 @@
         "I'm fine"
       ]
     },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "Dead tie, and your pick took it on seeding. Take the win.",
-            "Perfect deadlock. The bracket picked you. Lucky."
-          ],
-          "cta": [
-            "Take it",
-            "Win's a win"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "Dead tie. {winner} goes through on seeding. Boring way to end a fight.",
-            "A tie. {winner} gets it on the seeding rule. That's not winning, that's paperwork."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
-      ]
-    },
     "encouragement": {
       "messages": [
         "Still browsing? Pick something. Anything. I'm patient. I'm lying.",

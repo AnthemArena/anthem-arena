@@ -529,42 +529,6 @@
         "See the result"
       ]
     },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "Dead tie, and your pick goes through on seed. I'll take it.",
-            "Level on votes. {winner} advances on seed. Lucky."
-          ],
-          "detail": [
-            "A win's a win.",
-            "Won't complain."
-          ],
-          "cta": [
-            "Take it",
-            "Nice"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "Dead tie, and {winner} goes through on seed. That's the rule.",
-            "Level on votes. {winner} takes it on seed. Rough."
-          ],
-          "detail": [
-            "Rules are rules.",
-            "Lost on seed. Annoying."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
-      ]
-    },
     "welcome": {
       "welcome-first-time": {
         "messages": [

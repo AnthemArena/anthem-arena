@@ -429,12 +429,6 @@
             <strong>Match Lost</strong>
             <span class="test-btn-label">Your pick lost</span>
         </button>
-        
-        <button class="test-btn" onclick="testMatchTied()">
-            <span class="test-btn-icon">⚖️</span>
-            <strong>Match Tied</strong>
-            <span class="test-btn-label">Perfect tie at close</span>
-        </button>
     </div>
 </div>
 
@@ -887,28 +881,6 @@ function testMatchLost() {
         message: msg?.message || '😢 Your pick lost',
         detail: msg?.detail || 'GODS lost to RISE 142-156',
         cta: msg?.cta || 'View Results'
-    });
-}
-
-function testMatchTied() {
-    const msg = window.championLoader?.getChampionMessage('match-tied', {  // Changed from 'match-tied-alert'
-        songTitle: 'GODS',
-        song1: 'GODS',
-        song2: 'RISE',
-        finalScore: '150-150'
-    });
-    
-    window.showBulletin?.({
-        priority: 2,
-        type: 'match-tied',
-        matchId: 'test-match-tied',
-        song: 'GODS',
-        opponent: 'RISE',
-        thumbnailUrl: 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg',
-        finalScore: '150-150',
-        message: msg?.message || '⚖️ Perfect tie!',
-        detail: msg?.detail || 'GODS vs RISE ended 150-150',
-        cta: msg?.cta || 'View Tiebreaker'
     });
 }
 

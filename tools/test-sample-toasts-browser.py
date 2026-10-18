@@ -7,7 +7,7 @@ setup = open(os.path.join(here, 'test-social-toast-browser.py')).read().split('r
 exec(setup.replace("/index.html'", "/test-toasts.html'"))
 
 CASES = [('testDanger(15)', True), ('testNailbiter(1)', True), ('testComeback(5)', True), ('testWinning(75)', True),
-         ('testMatchWon()', True), ('testMatchLost()', True), ('testMatchTied()', True), ('testNoVotes()', True), ('testLowVotes()', True)]
+         ('testMatchWon()', True), ('testMatchLost()', True), ('testNoVotes()', True), ('testLowVotes()', True)]
 with sync_playwright() as p:
     b = p.chromium.launch()
     pg, errs = load(b, 1280, 900)
@@ -22,8 +22,6 @@ with sync_playwright() as p:
         pg.evaluate("document.querySelector('#bulletin-banner')?.remove()"); pg.evaluate(call); pg.wait_for_timeout(1800)
     show('testNailbiter(0)'); r = ring('#bulletin-banner .nv-edits .nv-edit')
     check('perfect tie: both edits ringed the same (amber), none dimmed', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0, r)
-    show('testMatchTied()'); r = ring('#bulletin-banner .nv-edits .nv-edit')
-    check('match tied: both edits ringed the same, none dimmed', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0, r)
     show('testDanger(15)')
     check('danger: your pick ringed, the other dimmed', pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 1)
     for call in ('testNoVotes()', 'testLowVotes()'):

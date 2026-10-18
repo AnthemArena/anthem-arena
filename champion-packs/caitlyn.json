@@ -482,42 +482,6 @@
         "Review the result"
       ]
     },
-    "match-tied-alert": {
-      "messages": [
-        {
-          "condition": {
-            "winner": "{momentTitle}"
-          },
-          "message": [
-            "A dead tie, and your pick takes it on seeding. A win by procedure.",
-            "Level on votes. {winner} advances on seed, as the rules provide."
-          ],
-          "detail": [
-            "A tie resolved in your favour. I will accept it.",
-            "Legitimate, though unspectacular."
-          ],
-          "cta": [
-            "Rules upheld",
-            "Noted"
-          ]
-        },
-        {
-          "condition": "default",
-          "message": [
-            "A dead tie, and {winner} advances on seeding. Those are the rules.",
-            "Level on votes. {winner} takes it on seed. Unsatisfying, but fair."
-          ],
-          "detail": [
-            "The rules decided it. Fair is fair.",
-            "Lost on a technicality, though a proper one."
-          ],
-          "cta": [
-            "Next match",
-            "See the result"
-          ]
-        }
-      ]
-    },
     "welcome": {
       "welcome-first-time": {
         "messages": [

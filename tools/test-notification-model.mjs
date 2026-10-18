@@ -129,7 +129,7 @@ t('event chips: percentages for a voted match, match count for a new round', () 
     assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 1 }), ['1 vote apart']);
     assert.deepEqual(eventChips({ type: 'nailbiter', voteDiff: 0, userPct: 50, opponentPct: 50 }), ['50% vs 50%']);
     assert.ok(isStripAlert({ type: 'welcome' }) && isStripAlert({ type: 'encouragement' }) && isStripAlert({ type: 'round-opening' }) && !isStripAlert({ type: 'danger' }));
-    for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'match-tied', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
+    for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
     for (const k of ['closing', 'novotes', 'lowvotes']) assert.ok(!EVENT_KINDS[k].quiet, k);
     for (const k of Object.keys(EVENT_KINDS)) assert.ok(eventGlyph({ type: k }), k);
     assert.equal(eventGlyph({ type: 'danger' }), '▼'); assert.equal(eventGlyph({ type: 'winning' }), '▲'); assert.equal(eventGlyph({ type: 'match-lost' }), '✕'); assert.equal(eventGlyph({ type: 'nope' }), 'VS');
@@ -167,6 +167,7 @@ t('tie-breaker: only exact ties in matches you have not voted in, open, with eno
 });
 t('tie-breaker alert: tag, symbol, chips, link, both edits', () => {
     const n = { type: 'tiebreaker', matchId: 'm9', severityTier: 'tied', score: '24–24' };
+    assert.ok(!isEventNotification({ type: 'match-tied' }), 'a match can no longer close level, so there is no tied-result alert');
     assert.ok(isEventNotification(n) && EVENT_KINDS.tiebreaker.both && EVENT_KINDS.tiebreaker.quiet);
     assert.equal(eventTag(n), 'Tie-breaker needed'); assert.equal(eventTag({ ...n, severityTier: 'final' }), 'Last chance to break the tie');
     assert.equal(eventGlyph(n), '=');

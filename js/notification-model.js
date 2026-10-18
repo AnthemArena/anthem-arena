@@ -140,7 +140,6 @@ export const EVENT_KINDS = {
     'new-matches':    { tag: 'New matches',         tone: null, quiet: true },
     'match-won':      { tag: 'Your pick won',       tone: '#4ade80', outcome: 'won', quiet: true },
     'match-lost':     { tag: 'Your pick lost',      tone: '#f87171', outcome: 'lost', quiet: true },
-    'match-tied':     { tag: 'Tied match',          tone: '#a5b4fc', outcome: 'tied', both: true, quiet: true },
     welcome:          { tag: 'Welcome',             tone: null, quiet: true },
     encouragement:    { tag: 'Still deciding?',     tone: null, quiet: true }
 };
@@ -161,17 +160,17 @@ export function eventTag(n) {
 }
 
 // Which alerts are about a match the viewer must have voted in (the test page pretends so for its sample alerts).
-export const VOTED_KINDS = ['danger', 'danger-repeat', 'nailbiter', 'winning', 'comeback', 'match-won', 'match-lost', 'match-tied'];
+export const VOTED_KINDS = ['danger', 'danger-repeat', 'nailbiter', 'winning', 'comeback', 'match-won', 'match-lost'];
 // Alerts that show a strip of the edits that are open (round opening, new matches, welcome, still deciding).
 export const isStripAlert = n => !!n && (n.type === 'round-opening' || n.type === 'new-matches' || n.type === 'welcome' || n.type === 'encouragement');
 export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type === 'new-matches');
 
 // The symbol in the middle of the picture (between the two edits, or alone in a circle when there is no match to show).
-// It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close / tied, ⇄ flipped, ✓ won, ✕ lost.
+// It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close, ⇄ flipped, ✓ won, ✕ lost.
 const EVENT_GLYPHS = {
     danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
     closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
-    'match-won': '✓', 'match-lost': '✕', 'match-tied': '=', welcome: '👋', encouragement: '👀'
+    'match-won': '✓', 'match-lost': '✕', welcome: '👋', encouragement: '👀'
 };
 export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
 
