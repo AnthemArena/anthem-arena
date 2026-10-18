@@ -8,7 +8,8 @@ import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
 import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml, plainChampionHtml } from './champions-tab-model.js';
 import { lookSkin, readLooks, saveLook } from './companion-look.js';
-import { announcePendingChampion, markChampionSelected, championSelectedBulletin } from './champion-selected.js';
+import { announcePendingChampion, markChampionSelected } from './champion-selected.js';
+import { buildPreview } from './champion-preview.js';
 import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { masteryLevel } from './champion-unlocks.js';
@@ -24,6 +25,7 @@ const CHAMPION_CDN = ddragonUrl('img/champion/');
 
 let selectedChampion = null;
 let hasChanges = false;
+let previewIndex = 0;   // which sample alert the Preview button shows next
 let packAtOpen = null;   // the champion they had when the window opened, to tell whether Save changes it
 let pendingLooks = {};   // skins chosen in this visit, saved with the rest of the settings: { vi: 29 }
 let modalElement = null;
@@ -41,6 +43,7 @@ export function openSettingsModal() {
     }
 
     pendingLooks = {};
+    previewIndex = 0;
     packAtOpen = window.championLoader?.getCurrentPack?.()?.id || null;
 
     // Load current profile
@@ -130,26 +133,16 @@ function createModalHTML() {
                             </div>
                         </div>
 
-                        <!-- Choose your champion: the grid of every champion; Jinx, Vi and Caitlyn come first and have levels -->
+                        <!-- Choose your champion: the champions that are finished (levels, skins and a voice). More are added as they are ready. -->
                         <div class="settings-section">
                             <h3><i class="fas fa-user-astronaut"></i> Choose Your Champion</h3>
                             <p class="section-description">
-                                Your champion is your profile picture and cover art. Champions marked ★ also have levels, skins and a voice:
-                                they send your alerts and earn your XP. More are coming.
+                                Your champion is your profile picture and cover art. They send your alerts, speak in their own voice
+                                and earn your XP. More champions are coming.
                             </p>
 
-                            <div class="avatar-search-wrapper">
-                                <input
-                                    type="text"
-                                    id="avatarSearch"
-                                    placeholder="Search champions..."
-                                    autocomplete="off"
-                                />
-                                <span class="search-icon">🔍</span>
-                            </div>
-
-                            <div class="avatar-grid" id="avatarGrid">
-                                <!-- Champion grid will be inserted here -->
+                            <div class="avatar-grid few" id="avatarGrid">
+                                <!-- Champions are inserted here -->
                             </div>
                         </div>
 
@@ -487,14 +480,15 @@ function renderChampionGrid() {
     const grid = document.getElementById('avatarGrid');
     if (!grid) return;
 
-    const rankOf = c => { const i = PACK_IDS.indexOf(c.toLowerCase()); return i < 0 ? PACK_IDS.length : i; };
-    const ordered = [...CHAMPIONS].sort((a, b) => rankOf(a) - rankOf(b));   // Jinx, Vi, Caitlyn first, the rest as listed
-    const html = ordered.map(champion => {
+    // Only the champions that are finished (they have levels, skins and a voice): PACK_IDS, the same list the XP and unlock
+    // tables use. Adding a champion there adds them here.
+    const finished = PACK_IDS.map(id => CHAMPIONS.find(c => c.toLowerCase() === id)).filter(Boolean);
+    const html = finished.map(champion => {
         const displayName = champion.replace(/([A-Z])/g, ' $1').trim();
-        const levels = PACK_IDS.includes(champion.toLowerCase());
         return `
-            <div class="champion-avatar-option${levels ? ' has-levels' : ''}" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}${levels ? ' ★ levels, skins and a voice' : ''}">
+            <div class="champion-avatar-option" data-champion="${champion}" data-search="${championSearchText(champion)}" title="${displayName}" role="button" tabindex="0">
                 <img src="${CHAMPION_CDN}${champion}.png" alt="${displayName}" loading="lazy" />
+                <span class="cao-name">${displayName}</span>
             </div>
         `;
     }).join('');
@@ -559,6 +553,7 @@ function setupEventListeners() {
     if (avatarGrid) {
         avatarGrid.removeEventListener('click', handleChampionClick);
         avatarGrid.addEventListener('click', handleChampionClick);
+        avatarGrid.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.champion-avatar-option')) { e.preventDefault(); e.target.closest('.champion-avatar-option').click(); } };
     }
 
        // ✅ ADD BIO INPUT TRACKING
@@ -859,6 +854,7 @@ if (window.invalidateProfileCache) {
 if (window.updateNavProfile) {
     window.updateNavProfile();
 }
+window.dispatchEvent(new CustomEvent('profile-settings-saved'));   // pages with their own profile card (the feed) redraw it
 
 // Show success state
 if (saveBtn) {
@@ -1112,7 +1108,7 @@ function renderYourChampion() {
                 hasChanges = true;
                 renderYourChampion();
             } else if (e.target.closest('[data-action="preview"]') && packId) {
-                previewChampion(packId);
+                previewChampion(packId, e.target.closest('[data-action="preview"]'));
             }
         });
     }
@@ -1170,13 +1166,21 @@ async function selectChampionPack(packId) {
     console.log(`✅ Arcane companion set to: ${packId}`);
 }
 
-// Shows what the champion's alerts look like. Stays on the page: closing it does not navigate anywhere.
-function previewChampion(packId) {
-    const mastery = masteryLevel(readPackXp()[packId]).level;
-    const voiced = window.championLoader?.getAchievementMessage?.('champion-selected', { rank: `Mastery ${mastery}`, xp: 0 });
-    const bulletin = { ...championSelectedBulletin({ packId, skinNum: currentSkinNum(packId), mastery, voiced }), cta: 'Close preview', ctaAction: () => window.dismissBulletin?.(), duration: 5000 };
-    if (window.showBulletin) window.showBulletin(bulletin);
-    else showNotification(bulletin.message, 'info');
+// Each press shows the next sample alert in the champion's voice (nail-biter, winning, comeback, welcome, achievement, level up,
+// mastery up). The button only closes a card, so a preview never opens another page.
+function previewChampion(packId, button) {
+    const loader = window.championLoader;
+    if (!window.showBulletin || !loader) { showNotification('Alerts are not available on this page', 'info'); return; }
+    const voice = {
+        alert: (type, data) => loader.getChampionMessage?.(type, data),
+        achievement: (id, data) => loader.getAchievementMessage?.(id, data),
+        custom: type => loader.getCustomMessage?.(type)
+    };
+    const { bulletin, number, total } = buildPreview(previewIndex, { voice, packId, dismiss: () => window.dismissBulletin?.() });
+    window.showBulletin(bulletin);
+    previewIndex = (previewIndex + 1) % total;
+    const next = buildPreview(previewIndex, { voice, packId, dismiss: () => {} });
+    if (button) button.innerHTML = `<i class="fas fa-play"></i> Next alert: ${next.step.label} (${next.number}/${total})`;
 }
 
 // Make functions global so onclick can access them

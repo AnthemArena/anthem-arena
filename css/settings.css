@@ -1259,7 +1259,13 @@
 
 /* Choose Your Champion: champions with levels, skins and a voice come first and carry a star */
 .champion-avatar-option { position: relative; }
-.champion-avatar-option.has-levels::after { content: '★'; position: absolute; right: -3px; top: -3px; width: 18px; height: 18px; line-height: 18px; text-align: center; font-size: .7rem; border-radius: 50%; color: #fff; background: var(--pink, #ff2d95); border: 1px solid rgba(255,255,255,.35); pointer-events: none; }
+/* a short list (the finished champions): big portraits with their names, no scrolling */
+.avatar-grid.few { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; max-height: none; overflow: visible; padding: 16px; }
+.avatar-grid.few .champion-avatar-option { width: 104px; height: auto; aspect-ratio: auto; border-radius: 14px; padding: 8px 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.avatar-grid.few .champion-avatar-option img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(255,255,255,.2); }
+.avatar-grid.few .champion-avatar-option.selected img { border-color: var(--pink, #ff2d95); }
+.avatar-grid.few .champion-avatar-option:hover { transform: translateY(-2px) scale(1); }
+.cao-name { font-size: .8rem; font-weight: 700; letter-spacing: .03em; }
 
 /* Your Champion: the selected champion and the skins they have unlocked */
 .yc-card { background: rgba(255,255,255,0.05); border: 1px solid var(--pink, #ff2d95); border-radius: 12px; padding: 16px; }
