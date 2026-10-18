@@ -388,6 +388,33 @@
         "Help"
       ]
     },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level right now. One vote breaks it. Funny, I know someone who hasn't voted.",
+        "Perfect tie on {matchTitle}. Somebody has to blink. I'm looking at you.",
+        "Dead even, and nobody's moving. You haven't voted. You're the tiebreaker.",
+        "{moment1} and {moment2}, level, and you've been quiet. Fix that."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the clock's nearly out. Last chance to break it.",
+        "Dead level, almost out of time. You're the only thing left that can change this.",
+        "Still tied with the clock running down. Pick a side. Do it for the drama."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it now",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
     "round-opening": {
       "messages": [
         "Round {round} is open. {matchCount} new matches. Pick a side.",

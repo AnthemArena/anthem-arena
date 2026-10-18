@@ -132,6 +132,7 @@ export const EVENT_KINDS = {
     nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true, both: true, quiet: true },
     winning:          { tag: 'Your pick is winning', tone: '#4ade80', share: true, quiet: true },
     comeback:         { tag: 'Comeback',            tone: '#4ade80', share: true, quiet: true },
+    tiebreaker:       { tag: 'Tie-breaker needed', tone: '#ffb020', both: true, quiet: true },
     closing:          { tag: 'Closing soon',        tone: '#ffb020' },
     novotes:          { tag: 'Needs a first vote',  tone: null },
     lowvotes:         { tag: 'Needs more votes',    tone: null },
@@ -150,6 +151,7 @@ export const isEventNotification = n => !!eventKind(n);
 export function eventTag(n) {
     const k = eventKind(n);
     if (!k) return '';
+    if (n.type === 'tiebreaker') return n.severityTier === 'final' ? 'Last chance to break the tie' : k.tag;
     if (n.type === 'closing') return n.severityTier === 'final' ? 'Last chance to vote' : 'Closing soon';
     if (n.type === 'round-opening') return n.round ? `Round ${n.round} is open` : k.tag;
     if (n.type === 'new-matches') return n.round ? `New matches in round ${n.round}` : k.tag;
@@ -168,10 +170,30 @@ export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type ==
 // It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close / tied, ⇄ flipped, ✓ won, ✕ lost.
 const EVENT_GLYPHS = {
     danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
-    closing: '⏳', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
+    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
     'match-won': '✓', 'match-lost': '✕', 'match-tied': '=', welcome: '👋', encouragement: '👀'
 };
 export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
+
+// Matches you have not voted in that are exactly level and still open. covered = every such match (the closing-soon alert leaves
+// them alone); ties = the ones not yet announced at their current step ('tied', or 'final' inside the last hours), soonest first.
+export function tieBreakerCandidates(matches, { userVotes = {}, seen = {}, msLeftOf, minVotes = 10, finalMs = 3 * 3600000 } = {}) {
+    const covered = new Set(), ties = [];
+    for (const match of matches || []) {
+        const matchId = match.matchId || match.id;
+        if (!matchId || userVotes[matchId]) continue;
+        const v1 = match.song1?.votes || 0, v2 = match.song2?.votes || 0;
+        if (v1 !== v2 || v1 + v2 < minVotes) continue;
+        const msLeft = msLeftOf ? msLeftOf(match) : null;
+        if (msLeft === null || msLeft === undefined || msLeft <= 0) continue;
+        covered.add(matchId);
+        const tier = msLeft <= finalMs ? 'final' : 'tied';
+        if (seen[`${matchId}:${tier}`]) continue;
+        ties.push({ match, matchId, msLeft, tier, score: v1 });
+    }
+    ties.sort((a, b) => a.msLeft - b.msLeft);
+    return { ties, covered };
+}
 
 // Where the button (and the alert itself) goes. A match you already voted in opens with the share panel in view.
 export function eventUrl(n) {
@@ -191,6 +213,8 @@ export function eventChips(n) {
         else if (n.type === 'winning' || n.type === 'comeback') { if (diff > 0) chips.push(`Ahead by ${diff}`); }
         else if (n.type === 'nailbiter') { if (diff > 0) chips.push(`${diff} vote${diff === 1 ? '' : 's'} apart`); }
     }
+    if (n?.type === 'tiebreaker' && n.score) chips.push(`Level at ${n.score}`);
+    if (n?.type === 'tiebreaker' && n.severityTier === 'final') chips.push('Last chance');
     if (n?.type === 'closing' && n.severityTier === 'final') chips.push('Last chance');
     if (n?.type === 'encouragement' && n.encouragementType === 'urgent') chips.push('Closing soon');
     if ((n?.type === 'round-opening' || n?.type === 'new-matches') && n.round) chips.push(`Round ${n.round}`);

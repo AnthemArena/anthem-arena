@@ -441,6 +441,33 @@
         "See the match"
       ]
     },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied right now. You haven't voted. Fix that.",
+        "Dead level on {matchTitle}. One vote breaks it.",
+        "Tied. Someone has to move. Make it you.",
+        "{moment1} and {moment2}, level. Pick one."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and closing soon. This is your last chance to break it.",
+        "Level with time running out. Vote.",
+        "Tied, and almost out of time. Don't sit this one out."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
     "round-opening": {
       "messages": [
         "Round {round} is open. {matchCount} new matches. Let's go.",

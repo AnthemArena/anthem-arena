@@ -596,6 +596,33 @@
         "See the match"
       ]
     },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is level at present. A single vote would settle it.",
+        "A perfect tie on {matchTitle}. You have not yet voted. I suggest you do.",
+        "The result stands level. Your vote would be decisive.",
+        "{moment1} and {moment2} are tied. The matter is yours to resolve."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Cast the deciding vote",
+        "Resolve it",
+        "Vote now"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} remains tied with little time left. This is the last opportunity to resolve it.",
+        "Level, and closing soon. Your vote would decide it.",
+        "A tied match, nearly out of time. I would not wait."
+      ],
+      "buttons": [
+        "Resolve it",
+        "Cast the vote",
+        "Decide it",
+        "Vote now"
+      ]
+    },
     "encouragement": {
       "messages": [
         "Still deciding? Take your time. But do decide.",

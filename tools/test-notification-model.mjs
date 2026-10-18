@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { EVENT_KINDS, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -150,5 +150,27 @@ t('streaks: recognised, drawn as ally / rival, headline names the person and the
     assert.equal(streakView({ ...a, relationship: 'rival-streak', streakCount: 20 }).headline, 'Mia Lee has voted against you 20 matches in a row');
     assert.equal(streakView({ ...a, relationship: 'rival-streak' }).relationship, 'opponent');
     assert.equal(streakView({ relationship: 'ally-streak' }).headline, 'Someone has voted with you again and again');
+});
+t('tie-breaker: only exact ties in matches you have not voted in, open, with enough votes; once per step', () => {
+    const H = 3600000;
+    const m = (id, a, b) => ({ matchId: id, song1: { votes: a }, song2: { votes: b } });
+    const left = { A: 20 * H, B: 2 * H, C: 5 * H, D: 4 * H, E: 3 * H, F: -1, G: 9 * H, H: null };
+    const msLeftOf = x => left[x.matchId];
+    const matches = [m('A', 12, 12), m('B', 11, 11), m('C', 12, 11), m('D', 3, 3), m('E', 10, 10), m('F', 20, 20), m('G', 15, 15), m('H', 15, 15)];
+    let r = tieBreakerCandidates(matches, { userVotes: { G: { songId: 'song1' } }, seen: {}, msLeftOf });
+    assert.deepEqual(r.ties.map(x => [x.matchId, x.tier, x.score]), [['B', 'final', 11], ['E', 'final', 10], ['A', 'tied', 12]], 'soonest first; the last 3 hours is the final step');
+    assert.deepEqual([...r.covered].sort(), ['A', 'B', 'E'], 'covered = every open tie you could vote in (not voted-in G, not 1 apart C, not low D, not closed F, not unknown H)');
+    r = tieBreakerCandidates(matches, { userVotes: {}, seen: { 'B:final': 1, 'A:tied': 1 }, msLeftOf });
+    assert.deepEqual(r.ties.map(x => x.matchId), ['E', 'G'], 'announced steps are skipped (G is now open to vote in)');
+    assert.ok(r.covered.has('B') && r.covered.has('A'), 'but stay covered, so the closing alert leaves them alone');
+    assert.deepEqual(tieBreakerCandidates([], { msLeftOf }).ties, []);
+});
+t('tie-breaker alert: tag, symbol, chips, link, both edits', () => {
+    const n = { type: 'tiebreaker', matchId: 'm9', severityTier: 'tied', score: '24–24' };
+    assert.ok(isEventNotification(n) && EVENT_KINDS.tiebreaker.both && EVENT_KINDS.tiebreaker.quiet);
+    assert.equal(eventTag(n), 'Tie-breaker needed'); assert.equal(eventTag({ ...n, severityTier: 'final' }), 'Last chance to break the tie');
+    assert.equal(eventGlyph(n), '=');
+    assert.deepEqual(eventChips(n), ['Level at 24–24']); assert.deepEqual(eventChips({ ...n, severityTier: 'final' }), ['Level at 24–24', 'Last chance']);
+    assert.equal(eventUrl(n), '/vote.html?match=m9');
 });
 console.log(`${pass} passed`);

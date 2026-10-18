@@ -399,6 +399,18 @@
                 <strong>Low Votes</strong>
                 <span class="test-btn-label">Only a few votes</span>
             </button>
+
+            <button class="test-btn" onclick="testTieBreaker()">
+                <span class="test-btn-icon">⚖️</span>
+                <strong>Tie-breaker</strong>
+                <span class="test-btn-label">Level, and you haven't voted</span>
+            </button>
+
+            <button class="test-btn" onclick="testTieBreaker(true)">
+                <span class="test-btn-icon">⏳</span>
+                <strong>Tie-breaker (last hours)</strong>
+                <span class="test-btn-label">Still level, closing soon</span>
+            </button>
         </div>
     </div>
 
@@ -782,6 +794,25 @@ action: 'dismiss'
         });
     }
     
+    function testTieBreaker(final = false) {
+        const msg = window.championLoader?.getChampionMessage(final ? 'tiebreaker-final' : 'tiebreaker', { matchTitle: 'GODS vs RISE', moment1: 'GODS', moment2: 'RISE', hoursLeft: final ? 2 : 14 });
+        window.showBulletin?.({
+            priority: 2,
+            type: 'tiebreaker',
+            severityTier: final ? 'final' : 'tied',
+            matchId: 'test-tiebreaker',
+            song: 'GODS',
+            opponent: 'RISE',
+            voteDiff: 0,
+            score: '24–24',
+            hoursLeft: final ? 2 : 14,
+            message: msg?.message || 'GODS vs RISE is tied right now. Your vote would break it.',
+            cta: msg?.cta || 'Break the tie',
+            action: 'navigate',
+            targetUrl: '/vote.html?match=test-tiebreaker'
+        });
+    }
+
     // ========================================
     // WELCOME TESTS
     // ========================================

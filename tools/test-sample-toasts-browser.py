@@ -49,6 +49,13 @@ with sync_playwright() as p:
         g = pg.inner_text('#bulletin-banner .nv-glyph').strip(); line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
         check(f'{call}: the symbol in the circle is not repeated at the start of the champion line', not line.startswith(g), (g, line))
     pg.screenshot(path=f'{SHOTS}/sample-encourage.png')
+    for call, tier in (('testTieBreaker()', 'tied'), ('testTieBreaker(true)', 'final')):
+        show(call); r = ring('#bulletin-banner .nv-edits .nv-edit')
+        chips = [c.strip() for c in pg.locator('#bulletin-banner .nv-chip').all_inner_texts()]
+        line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
+        check(f'{call}: both edits ringed alike with "=", no second line, "Level at 24–24" chip', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0 and pg.inner_text('#bulletin-banner .nv-mark').strip() == '=' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and 'Level at 24–24' in chips and (tier != 'final' or 'Last chance' in chips), (r, chips))
+        check(f'{call}: the champion line comes from the pack (not the plain fallback)', line not in ('GODS vs RISE is tied right now. Your vote would break it.', 'GODS vs RISE is still tied and closing soon. Last chance to break it.'), line)
+        check(f'{call}: pack line has no unfilled {{placeholders}}', '{' not in line and line != '', line)
     show('testLevelUp(5)')
     check('level up sample: new card, number 5, rank filled in (no placeholders)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '5' and '{' not in pg.inner_text('#bulletin-banner') and '(' not in pg.inner_text('#bulletin-banner .nv-bubble'), pg.inner_text('#bulletin-banner'))
     for call in ('testAchievement("first-choice")', 'testAchievement("arcane-legend")'):
