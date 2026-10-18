@@ -7,6 +7,8 @@ import {
 } from './arcane-config.js';
 import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
 import { dialogFor } from './champion-lines.js';
+import { voiceSetFor, mergeVoice } from './champion-voice.js';
+import { lookSkin } from './companion-look.js';
 
 console.log('🎭 champion-loader.js loaded');
 
@@ -57,16 +59,22 @@ async function loadChampionManifest() {
 // LOAD CHAMPION PACK
 // ========================================
 
-async function loadChampionPack(championId = 'default') {
+// skinNum picks the voice set for that skin (the settings window previews a skin before it is saved); without it the skin
+// the person wears is used.
+async function loadChampionPack(championId = 'default', skinNum = null) {
+    const wanted = skinNum ?? lookSkin({ id: championId }, localStorage);
+    const voiceId = voiceSetFor(championId, wanted);
+    const cacheKey = `${championId}:${voiceId || ''}`;
+
     // Check cache first
-    if (packCache.has(championId)) {
-        currentChampionPack = packCache.get(championId);
+    if (packCache.has(cacheKey)) {
+        currentChampionPack = packCache.get(cacheKey);
         console.log(`✅ Loaded ${currentChampionPack.name} from cache`);
         return currentChampionPack;
     }
     
     try {
-        console.log(`📦 Loading champion pack: ${championId}`);
+        console.log(`📦 Loading champion pack: ${championId}${voiceId ? ` (${voiceId} voice)` : ''}`);
 
         // Keep "default" as an internal fallback, but validate real companions.
 if (championId !== 'default' && !getCompanionPack(championId)) {
@@ -79,16 +87,24 @@ if (championId !== 'default' && !getCompanionPack(championId)) {
             throw new Error(`Pack not found: ${championId}`);
         }
         
-        const pack = await response.json();
+        let pack = await response.json();
         pack.icon = withCurrentVersion(pack.icon);
         
         // Validate pack structure
         if (!pack.id || !pack.alerts) {
             throw new Error('Invalid pack structure');
         }
+
+        // A skin with its own voice set: lay it over the base pack (a missing file keeps the base voice)
+        if (voiceId) {
+            try {
+                const vr = await fetch(`../champion-packs/${voiceId}.json`);
+                if (vr.ok) pack = mergeVoice(pack, { ...(await vr.json()), id: voiceId });
+            } catch (e) { console.warn(`⚠️ Voice set ${voiceId} unavailable, using the base voice`, e); }
+        }
         
         // Cache it
-        packCache.set(championId, pack);
+        packCache.set(cacheKey, pack);
         currentChampionPack = pack;
         
         console.log(`✅ Loaded ${pack.name} pack (${pack.displayName})`);

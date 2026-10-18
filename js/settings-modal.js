@@ -86,7 +86,7 @@ function restoreCompanion() {
     companionAtOpen = null;
     if (!before) return;
     try { Object.entries(before).forEach(([k, v]) => { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); }); } catch { /* storage blocked */ }
-    if (packAtOpen && window.championLoader?.getCurrentPack?.()?.id !== packAtOpen) window.championLoader?.loadChampionPack?.(packAtOpen);
+    if (packAtOpen) window.championLoader?.loadChampionPack?.(packAtOpen);
 }
 
 // ========================================
@@ -1165,7 +1165,7 @@ async function selectChampionPack(packId) {
 
     // Nothing is written to the profile here: Save stores the champion with the rest of the settings
 
-    const pack = await window.championLoader.loadChampionPack(packId);
+    const pack = await window.championLoader.loadChampionPack(packId, currentSkinNum(packId));
 
     // Your champion is also your picture: wear the skin chosen for them (saved with the rest of the settings)
     const skin = skinAvatar(packId, currentSkinNum(packId));
@@ -1179,9 +1179,11 @@ async function selectChampionPack(packId) {
 
 // Each press shows the next sample alert in the champion's voice (nail-biter, winning, comeback, welcome, achievement, level up,
 // mastery up). The button only closes a card, so a preview never opens another page.
-function previewChampion(packId, button) {
+async function previewChampion(packId, button) {
     const loader = window.championLoader;
     if (!window.showBulletin || !loader) { showNotification('Alerts are not available on this page', 'info'); return; }
+    // The skin they are about to wear decides the voice (Jinx's Arcane skins and her other skins sound different)
+    await loader.loadChampionPack(packId, currentSkinNum(packId));
     const voice = {
         alert: (type, data) => loader.getChampionMessage?.(type, data),
         achievement: (id, data) => loader.getAchievementMessage?.(id, data),

@@ -885,3 +885,19 @@ profile have a **Wear** button that opens Settings on that champion and skin (`o
 "Wearing". The mastery-up alert's button reads "Wear it now" and does the same for the newest skin it unlocked. Nothing is saved until
 Save; choosing a champion in Settings no longer writes to the profile straight away, and closing with "discard" puts the previous
 champion back.
+
+## Voice sets (a skin picks its voice)
+A champion pack (`champion-packs/<id>.json`) is the base voice. A skin can speak with another **voice set** instead
+(`champion-packs/<set>.json`): a file that rewrites some sections (`alerts`, `achievements`, `bubble`, `modal`, `pages`, `share`) and leaves the rest
+to the base pack. `js/champion-voice.js` holds the table (`VOICES`) and the merge; `champion-loader.js` and `champion-bubble.js` both load
+through it, using the skin the person wears (`lookSkin`). Several skins share a set, so lines are never copied per skin.
+
+- **Jinx:** Arcane Enemy (37) and Arcane Fractured (60) keep the base (Arcane) voice. Every other Jinx skin, Classic and PROJECT included,
+  uses `jinx-original.json`. In League the two share every line, so they share a set.
+- **Original Jinx tone** (written from the in-game lines as a reference, nothing copied): short, bratty, playful. Fake-innocent set-ups
+  with a punchline, gun banter (Pow-Pow, Fishbones), pet names, cheerful menace. Single "!" is fine, no "!!" and no long stretches of capitals.
+  The "no !!" rule in `test-champion-achievements.mjs` still guards the base (Arcane) pack; the voice test only forbids shouted stretches.
+- **Previewing:** Settings > Preview alert loads the voice of the skin you have picked (saved or not), and cancelling puts the old voice back.
+- **To add a voice set:** write `champion-packs/<set>.json` (same shape as the base, only the sections you rewrite), then add the skin
+  numbers to `VOICES` in `champion-voice.js`. `tools/test-champion-voice.mjs` checks that a set has every entry and placeholder the base has.
+- **Next:** Sheriff Caitlyn (stricter), a few events at a time for approval.
