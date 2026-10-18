@@ -132,6 +132,7 @@ const COOLDOWN_MINUTES = {
     encouragement: 45,   // 🔽 Reduce from 120 - nudge inactive browsers more
     achievement: 0,      // ✅ Keep - one-time
     'level-up': 0,       // ✅ Keep - one-time
+    'mastery-up': 0,     // a companion reached a new mastery level
     votesurge: 30,       // ✅ Keep
         'live-activity': 5,  // ✅ NEW: Show live votes every 5 minutes max
             streak: 30  // ✅ NEW: Show streak alerts max every 30 minutes
@@ -1891,7 +1892,7 @@ function showBulletin(notification) {
 
     // ✅ Final safety net
     if (!notification.matchId) {
-        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'new-follower', 'round-opening', 'new-matches', ...CONTENT_TYPES];
+        const allowedWithoutMatch = ['welcome', 'encouragement', 'urgency', 'achievement', 'level-up', 'mastery-up', 'new-follower', 'round-opening', 'new-matches', ...CONTENT_TYPES];
         if (!allowedWithoutMatch.includes(notification.type)) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
@@ -2481,14 +2482,15 @@ if (championPack && championPack.theme) {
         encouragement: '👀',
         'return-voter': '👋',
         achievement: '🏆',
-        'level-up': '⬆️'
+        'level-up': '⬆️',
+        'mastery-up': '⬆️'
     };
     
     const icon = icons[notification.type] || '📢';
     
     // ✅ LEVEL-UP SPECIFIC STYLING
-    if (notification.type === 'level-up') {
-        // Level up: the same card family as the other alerts (big level number, tag, the champion's words, one button)
+    if (notification.type === 'level-up' || notification.type === 'mastery-up') {
+        // Level up (account) and mastery up (a companion; its unlocked skins show as a strip of splash art): the same card family as the other alerts (big level number, tag, the champion's words, one button)
         ensureVersusStyles();
         const levelMatch = String(notification.message || '').match(/Level (\d+)/);
         const level = notification.level ?? (levelMatch ? levelMatch[1] : '?');
@@ -2501,8 +2503,9 @@ if (championPack && championPack.theme) {
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
         banner.innerHTML = eventToastHtml(notification, {
-            tag: 'Level up', accent, jinxSrc: championBadgeUrl(pack), leadHtml: levelBadgeHtml(level, accent),
-            quip: notification.message, detail: notification.detail, cta: notification.cta || 'View progress'
+            tag: notification.type === 'mastery-up' ? 'Mastery up' : 'Level up', accent, jinxSrc: championBadgeUrl(pack), leadHtml: levelBadgeHtml(level, accent),
+            strip: notification.strip || null,
+            quip: notification.message, detail: notification.detail, cta: notification.cta || (notification.type === 'mastery-up' ? 'View champions' : 'View progress')
         });
         banner.className = 'bulletin-banner versus-toast event level-up-card';
     } 

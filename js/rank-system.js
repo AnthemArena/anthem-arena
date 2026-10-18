@@ -1,3 +1,5 @@
+import { masteryLevel, skinsUnlockedBetween } from './champion-unlocks.js';
+import { getChampionSplashUrl } from './arcane-config.js';
 import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes } from './xp-ledger.js';
 
 // ========================================
@@ -200,6 +202,27 @@ export function getUserXPFromStorage() {
     return parseInt(localStorage.getItem('userTotalXP') || '0');
 }
 
+// A companion reached a new mastery level: one alert saying so, with the skins it unlocked (their splash art as a strip).
+function announceMastery(packId, from, to, xp) {
+    if (!window.showBulletin) return;
+    const unlocked = skinsUnlockedBetween(packId, from, to);
+    const name = window.championLoader?.getCurrentPack?.()?.name || packId;
+    const rank = `${name} Mastery ${to}`;
+    const voiced = window.championLoader?.getAchievementMessage('mastery-up', { rank, xp });
+    const champ = packId.charAt(0).toUpperCase() + packId.slice(1);
+    window.showBulletin({
+        type: 'mastery-up',
+        level: to,
+        packId,
+        message: voiced?.message || `${rank}!`,
+        detail: unlocked.length ? `Unlocked: ${unlocked.map(x => x.name).join(', ')}` : (voiced?.detail || rank),
+        strip: unlocked.length ? { thumbs: unlocked.slice(0, 3).map(x => getChampionSplashUrl(champ, x.num)), more: Math.max(0, unlocked.length - 3) } : null,
+        cta: voiced?.cta || 'View champions',
+        ctaAction: () => { window.location.href = '/profile#champions'; },
+        duration: 6000
+    });
+}
+
 export function addXP(xpToAdd, source = 'vote') {
     const currentXP = getUserXPFromStorage();
     const oldRank = getUserRank(currentXP);
@@ -207,7 +230,11 @@ export function addXP(xpToAdd, source = 'vote') {
     
     const newXP = currentXP + xpToAdd;
     saveUserXP(newXP);
-    addPackXp(localStorage, activePackId(localStorage), xpToAdd);   // the active companion's mastery
+    const packId = activePackId(localStorage);
+    const masteryBefore = masteryLevel(readPackXp(localStorage)[packId]).level;
+    addPackXp(localStorage, packId, xpToAdd);   // the active companion's mastery
+    const masteryAfter = masteryLevel(readPackXp(localStorage)[packId]).level;
+    if (masteryAfter > masteryBefore) announceMastery(packId, masteryBefore, masteryAfter, xpToAdd);
     
     const newRank = getUserRank(newXP);
     const newLevel = newRank.currentLevel.level;
@@ -362,8 +389,16 @@ export async function hydrateXpFromProfile() {
         const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         const snap = await getDoc(doc(db, 'profiles', userId));
         if (!snap.exists()) return false;
-        const merged = mergeXp({ xp: getUserXPFromStorage(), packXp: readPackXp() }, snap.data());
-        if (!merged.changedLocal) return false;
+        const remote = snap.data();
+        // the chosen companion looks follow the profile too (what is already on this device wins)
+        let looksChanged = false;
+        if (remote.companionSkins && typeof remote.companionSkins === 'object') {
+            let local = {}; try { local = JSON.parse(localStorage.getItem('companionSkins') || '{}') || {}; } catch { /* none */ }
+            const both = { ...remote.companionSkins, ...local };
+            if (JSON.stringify(both) !== JSON.stringify(local)) { localStorage.setItem('companionSkins', JSON.stringify(both)); looksChanged = true; }
+        }
+        const merged = mergeXp({ xp: getUserXPFromStorage(), packXp: readPackXp() }, remote);
+        if (!merged.changedLocal) { if (looksChanged) window.updateNavProfile?.(); return looksChanged; }
         saveUserXP(merged.xp);
         localStorage.setItem('userPackXP', JSON.stringify(merged.packXp));
         window.updateNavProfile?.();

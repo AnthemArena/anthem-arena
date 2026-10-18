@@ -18,7 +18,10 @@ t('viewer avatar comes from storage', () => {
     assert.equal(viewerAvatarSrc(st), 'https://x/me.png'); assert.equal(viewerAvatarSrc({ getItem: () => null }), null);
 });
 t('champion badge is the pack icon', () => {
-    assert.match(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png', portrait: { skin: 37 } }), /Jinx_37\.jpg$/);
+    const st = o => ({ getItem: k => (k in o ? o[k] : null) });
+    assert.match(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({ userPackXP: '{"jinx":150}' })), /Jinx_37\.jpg$/);   // Arcane once mastery 2
+    assert.equal(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({})), 'https://x/Jinx.png');                        // classic (the plain icon) before that
+    assert.equal(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png' }, st({ userPackXP: '{"jinx":150}', companionSkins: '{"jinx":0}' })), 'https://x/Jinx.png');   // a chosen look wins
     assert.equal(championBadgeUrl({ id: 'caitlyn', icon: 'https://x/Caitlyn.png' }), 'https://x/Caitlyn.png');
     assert.equal(championBadgeUrl(null), null);
 });

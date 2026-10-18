@@ -12,7 +12,7 @@ for (const pack of ['jinx', 'vi', 'caitlyn']) {
 const A = JSON.parse(read(`../champion-packs/${pack}.json`)).achievements;
 console.log(`-- ${pack}`);
 check('every real achievement id has a Jinx entry (the old ids came from the previous site and never matched)', ids.every(i => A[i]), ids.filter(i => !A[i]));
-check('there is a default, a founding-member and a level-up entry', ['default', 'founding-member', 'level-up'].every(k => A[k]));
+check('there is a default, a founding-member, a level-up and a mastery-up entry', ['default', 'founding-member', 'level-up', 'mastery-up'].every(k => A[k]));
 check('every entry has messages, details and buttons', Object.values(A).every(e => ['messages', 'details', 'buttons'].every(k => Array.isArray(e[k]) && e[k].length >= 2)));
 
 const allowed = new Set(['xp', 'name', 'description', 'rarity', 'rank']);
@@ -21,7 +21,7 @@ for (const e of Object.values(A)) for (const k of ['messages', 'details', 'butto
 check('lines only use placeholders the loader fills', [...used].every(p => allowed.has(p)), [...used]);
 check('the loader really replaces each of those placeholders', [...used].every(p => loader.includes(`\\{${p}\\}`)), [...used]);
 check('no line yells in capitals with double exclamation marks (that is the League voice, the page speaks in the Arcane one)', Object.values(A).every(e => [...e.messages, ...e.details, ...e.buttons].every(s => !/!!/.test(s))));
-check('detail lines show the XP', Object.entries(A).filter(([k]) => k !== 'level-up').every(([, e]) => e.details.every(s => s.includes('{xp}'))));
+check('detail lines show the XP', Object.entries(A).filter(([k]) => k !== 'level-up' && k !== 'mastery-up').every(([, e]) => e.details.every(s => s.includes('{xp}'))));
 check('no achievement line mentions percentages or standings', Object.values(A).every(e => [...e.messages, ...e.details].every(s => !s.includes('%'))));
 }
 console.log(failed ? `\n${failed} FAILED` : '\nall passed'); process.exit(failed ? 1 : 0);

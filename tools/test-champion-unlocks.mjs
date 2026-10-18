@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { MASTERY_XP, SKIN_UNLOCKS, masteryLevel, skinsFor, isSkinUnlocked, unlockedSkins, skinsUnlockedBetween, nextUnlock, usableSkin } from '../js/champion-unlocks.js';
+import { resolveLook, MASTERY_XP, SKIN_UNLOCKS, masteryLevel, skinsFor, isSkinUnlocked, unlockedSkins, skinsUnlockedBetween, nextUnlock, usableSkin } from '../js/champion-unlocks.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 
 t('mastery curve: levels at the agreed XP and progress inside a level', () => {
@@ -57,5 +57,17 @@ t('next unlock and the fall-back to the classic look', () => {
     assert.equal(usableSkin('vi', 29, { level: 2 }), 29);
     assert.equal(usableSkin('vi', 999, { level: 10 }), 0);
     assert.equal(usableSkin('nobody', 29, { level: 10 }), 0);
+});
+t('look: chosen skin if unlocked, else Arcane once unlocked, else classic', () => {
+    assert.equal(resolveLook('jinx', undefined, { level: 1 }), 0);
+    assert.equal(resolveLook('jinx', undefined, { level: 2 }), 37);
+    assert.equal(resolveLook('jinx', 0, { level: 5 }), 0);              // choosing the classic look sticks
+    assert.equal(resolveLook('jinx', 13, { level: 5 }), 13);
+    assert.equal(resolveLook('jinx', 60, { level: 5 }), 37);            // chosen skin still locked: falls back to Arcane
+    assert.equal(resolveLook('jinx', 40, { level: 10 }), 37);           // prestige needs its achievement
+    assert.equal(resolveLook('jinx', 40, { level: 1, achievements: ['jinx-loose-cannon'] }), 40);
+    assert.equal(resolveLook('vi', undefined, { level: 2 }), 29);
+    assert.equal(resolveLook('caitlyn', undefined, { level: 3 }), 28);
+    assert.equal(resolveLook('default', 5, { level: 10 }), 0);
 });
 console.log(`\n${n} passed`);

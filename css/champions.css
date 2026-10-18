@@ -23,12 +23,14 @@
 .cm-next { margin: 12px 0 10px; }
 .cm-skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
 .cm-skin { position: relative; text-align: center; font-size: .72rem; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 6px 6px 8px; background: rgba(255,255,255,.02); }
-.cm-skin[data-action] { cursor: pointer; }
-.cm-skin[data-action]:hover, .cm-skin[data-action]:focus-visible { border-color: var(--pink-bright); outline: none; }
+.cm-skin-actions { display: flex; gap: 4px; justify-content: center; margin-top: 4px; }
+.cm-act { font: inherit; font-size: .66rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; cursor: pointer; color: var(--muted); background: transparent; border: 1px solid var(--line); }
+.cm-act:hover, .cm-act:focus-visible { color: var(--text); border-color: var(--pink-bright); outline: none; }
+.cm-act.on { color: #fff; background: var(--pink, #ff2d95); border-color: var(--pink, #ff2d95); }
 .cm-skin img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 4px; }
 .cm-skin.locked img { filter: grayscale(1) brightness(.45); }
 .cm-skin.locked { color: var(--muted); }
-.cm-skin.current { border-color: var(--pink-bright); box-shadow: 0 0 0 1px var(--pink-bright) inset; }
+.cm-skin.look, .cm-skin.current { border-color: var(--pink-bright); box-shadow: 0 0 0 1px var(--pink-bright) inset; }
 .cm-skin-tag { display: block; color: var(--pink-bright); font-weight: 700; margin-top: 2px; }
 .cm-skin-lock { display: block; margin-top: 2px; font-size: .68rem; }
 @media (max-width: 560px) {

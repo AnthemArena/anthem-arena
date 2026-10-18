@@ -501,6 +501,18 @@
                 <strong>Level Up</strong>
                 <span class="test-btn-label">Reached level 5</span>
             </button>
+
+            <button class="test-btn" onclick="testMasteryUp(2)">
+                <span class="test-btn-icon">🎖️</span>
+                <strong>Mastery Up</strong>
+                <span class="test-btn-label">Mastery 2 (Arcane skin unlocked)</span>
+            </button>
+
+            <button class="test-btn" onclick="testMasteryUp(3)">
+                <span class="test-btn-icon">🎖️</span>
+                <strong>Mastery Up (two skins)</strong>
+                <span class="test-btn-label">Mastery 3</span>
+            </button>
         </div>
     </div>
     
@@ -967,6 +979,23 @@ function testEncouragement() {
             cta: msg?.cta || 'View Achievements',
             action: 'navigate',
             targetUrl: '/profile#achievements'
+        });
+    }
+
+    function testMasteryUp(level = 2) {
+        // Same shape as the real alert (js/rank-system.js announceMastery): type 'mastery-up' with a strip of the unlocked skins' splash art
+        const skins = level === 2 ? [['Arcane Enemy', 37]] : [['Crime City', 1], ['Firecracker', 2]];
+        const rank = `Jinx Mastery ${level}`, xp = 100;
+        const msg = window.championLoader?.getAchievementMessage('mastery-up', { rank, xp });
+        window.showBulletin?.({
+            type: 'mastery-up',
+            level,
+            message: msg?.message || `${rank}!`,
+            detail: `Unlocked: ${skins.map(x => x[0]).join(', ')}`,
+            strip: { thumbs: skins.map(x => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_${x[1]}.jpg`), more: 0 },
+            cta: msg?.cta || 'View champions',
+            ctaAction: () => { window.location.href = '/profile#champions'; },
+            duration: 8000
         });
     }
 

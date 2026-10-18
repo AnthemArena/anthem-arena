@@ -36,10 +36,19 @@ t('html: own profile gets clickable unlocked skins, visitors do not; locked ones
     const v = buildChampionsView({ votes: votes({ vi: 4 }), packXp: { vi: 100 }, activePack: 'vi' });
     const own = championsHtml(v, { own: true }), other = championsHtml(v, { own: false });
     assert.match(own, /data-action="avatar" data-pack="vi" data-skin="29"/);
+    assert.match(own, /data-action="look" data-pack="vi" data-skin="29"/);
     assert.doesNotMatch(own, /data-skin="48"/);          // Arcane Brawler is locked at Mastery 2
     assert.doesNotMatch(other, /data-action=/);
     assert.match(other, /Mastery 10/); assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
     assert.match(championsHtml(buildChampionsView({}), {}), /No votes yet/);
+});
+t('look: Arcane by default once unlocked, a chosen look wins, shown as pressed', () => {
+    const v = buildChampionsView({ packXp: { jinx: 1700 }, looks: {} });
+    assert.equal(v.rows[0].skins.find(s => s.look).num, 37);
+    const w = buildChampionsView({ packXp: { jinx: 1700 }, looks: { jinx: 13 } });
+    assert.equal(w.rows[0].skins.find(s => s.look).num, 13);
+    assert.match(championsHtml(w, { own: true }), /class="cm-act on" data-action="look" data-pack="jinx" data-skin="13" aria-pressed="true"/);
+    assert.equal(buildChampionsView({}).rows[0].skins.find(s => s.look).num, 0);
 });
 t('names are escaped and the settings chip shows level, progress and next reward', () => {
     assert.match(masteryChipHtml('jinx', 150), /Mastery 2/);

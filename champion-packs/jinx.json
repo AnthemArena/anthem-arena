@@ -1032,6 +1032,76 @@
         "View achievements",
         "See all"
       ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Look at all the shiny new stuff.",
+        "Mastery up. Now we're getting somewhere."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "You've reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs with me. Now that's chaos.",
+        "Ten long shots. We're a bad influence on each other."
+      ],
+      "details": [
+        "Loose cannon looks good on you. +{xp} XP",
+        "Ten wild picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake. Fine, you're good.",
+        "Ten tight finishes with her. Don't tell her I said so."
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love rules.",
+        "Seven days of steady aim. Boring. Impressive."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie with Cupcake. Boom.",
+        "A tied match and you pulled the trigger. Nice."
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
     }
   },
   "portrait": {

@@ -1098,6 +1098,76 @@
         "View achievements",
         "See all"
       ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. You've earned it.",
+        "You put the work in. It shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "You've reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs with Jinx. Stubborn. I like it.",
+        "Ten long shots. You don't scare easy."
+      ],
+      "details": [
+        "Ten against the odds. +{xp} XP",
+        "Not afraid of a long shot. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cait. Your nerves are solid.",
+        "Ten tight finishes. She'd be proud."
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady under pressure. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days with Cait. She's a good influence on you.",
+        "A week without a miss. Nice."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie with Cait. Good call.",
+        "A tied match, and you made the call. Respect."
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
     }
   },
   "bubble": {

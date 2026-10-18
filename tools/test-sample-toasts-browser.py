@@ -59,6 +59,8 @@ with sync_playwright() as p:
         check(f'{call}: pack line has no unfilled {{placeholders}}', '{' not in line and line != '', line)
     show('testLevelUp(5)')
     check('level up sample: new card, number 5, rank filled in (no placeholders)', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '5' and '{' not in pg.inner_text('#bulletin-banner') and '(' not in pg.inner_text('#bulletin-banner .nv-bubble'), pg.inner_text('#bulletin-banner'))
+    show('testMasteryUp(3)')
+    check('mastery up sample: level badge 3, unlocked skins listed with their art, no placeholders', pg.locator('#bulletin-banner.versus-toast .nv-body').count() == 1 and pg.inner_text('#bulletin-banner .nv-circle').strip() == '3' and 'Crime City, Firecracker' in pg.inner_text('#bulletin-banner .nv-event-detail') and pg.locator('#bulletin-banner .nv-strip-th').count() == 2 and '{' not in pg.inner_text('#bulletin-banner'), pg.inner_text('#bulletin-banner'))
     for call in ('testAchievement("first-choice")', 'testAchievement("arcane-legend")'):
         show(call)
         txt = pg.inner_text('#bulletin-banner')

@@ -2,6 +2,8 @@
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { db } from './firebase-config.js';
 import { readPackXp, mergePackXp, activePackId } from './xp-ledger.js';
+import { readLooks, saveLook } from './companion-look.js';
+import { ACHIEVEMENTS } from './achievements.js';
 import { buildChampionsView, championsHtml, avatarKeyOf, skinAvatar } from './champions-tab-model.js';
 
 let shown = null;   // { userId, own, data } so a click can redraw without asking Firestore again
@@ -10,9 +12,19 @@ function draw(host) {
     const { own, data } = shown;
     const view = buildChampionsView({
         votes: data.votes, packXp: data.packXp, achievements: data.achievements,
-        activePack: data.activePack, avatarKey: avatarKeyOf(data.avatar)
+        activePack: data.activePack, avatarKey: avatarKeyOf(data.avatar), looks: data.looks,
+        achievementNames: Object.fromEntries(Object.values(ACHIEVEMENTS).map(a => [a.id, a.name]))
     });
     host.innerHTML = championsHtml(view, { own });
+}
+
+async function useAsLook(host, packId, num) {
+    const looks = saveLook(packId, num);
+    shown.data.looks = looks;
+    try { await updateDoc(doc(db, 'profiles', shown.userId), { companionSkins: looks }); }
+    catch (e) { console.warn('Could not save the look to the profile (kept on this device)', e); }
+    (window.showNotification || (() => {}))('Look updated', 'success');
+    draw(host);
 }
 
 async function useAsAvatar(host, packId, num) {
@@ -47,21 +59,20 @@ export async function loadChampionsTab(profile, own) {
                 packXp: own ? mergePackXp(readPackXp(), saved.packXp) : (saved.packXp || {}),
                 achievements: saved.unlockedAchievements || [],
                 activePack: saved.companionId || saved.championPackId || (own ? activePackId() : null),
-                avatar: own ? (safeJson(localStorage.getItem('avatar')) || saved.avatar) : saved.avatar
+                avatar: own ? (safeJson(localStorage.getItem('avatar')) || saved.avatar) : saved.avatar,
+                looks: own ? { ...(saved.companionSkins || {}), ...readLooks() } : (saved.companionSkins || {})
             }
         };
         draw(host);
         if (!host.dataset.bound) {
             host.dataset.bound = '1';
             const pick = e => {
-                const el = e.target.closest('.cm-skin[data-action="avatar"]');
+                const el = e.target.closest('.cm-act');
                 if (!el || !shown?.own) return;
-                if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-                e.preventDefault();
-                useAsAvatar(host, el.dataset.pack, Number(el.dataset.skin));
+                const num = Number(el.dataset.skin);
+                (el.dataset.action === 'look' ? useAsLook : useAsAvatar)(host, el.dataset.pack, num);
             };
             host.addEventListener('click', pick);
-            host.addEventListener('keydown', pick);
         }
     } catch (e) {
         console.warn('Champions tab unavailable:', e);

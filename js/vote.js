@@ -30,6 +30,8 @@ import { buildMatchShare, shareKind } from './match-share.js';
 import { mountShareBox } from './share-box.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, buildShareModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
+import { lookSkin } from './companion-look.js';
+import { activePackId } from './xp-ledger.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -2133,6 +2135,8 @@ export async function checkForAchievementUnlocks() {
                     matchId,
                     timestamp: voteData.timestamp || new Date().toISOString(),
                     voteType: 'balanced',
+                    championId: voteData.championId,
+                    tiedBefore: !!voteData.tiedBefore,
                     round: 1,
                     votedForSeed: null,
                     votedForName: null,
@@ -2168,6 +2172,8 @@ export async function checkForAchievementUnlocks() {
                 matchId,
                 timestamp: voteData.timestamp || new Date().toISOString(),
                 voteType,
+                championId: voteData.championId,
+                tiedBefore: !!voteData.tiedBefore,
                 round: matchData.round || 1,
                 votedForSeed: votedForSong?.seed ?? null,
                 votedForName: votedForSong?.shortTitle || votedForSong?.title,
@@ -2281,6 +2287,8 @@ function saveVoteForOtherPages(matchId, songId) {
         opponentTitle: opponentSong.name,
         timestamp: Date.now(),
         voteType: voteType,  // ✅ NEW
+        championId: activePackId(localStorage),   // the companion that was active (pack achievements, Champions tab)
+        tiedBefore: (currentMatch.competitor1.votes || 0) === (currentMatch.competitor2.votes || 0) && (currentMatch.totalVotes || 0) >= 10,
         round: currentMatch.round,  // ✅ NEW
         totalVotesAtTime: currentMatch.totalVotes  // ✅ NEW (for early voter tracking)
     };
@@ -2404,7 +2412,7 @@ async function openShareModal() {
     const champKey = meta?.championId || 'Jinx';
     if (!sharePack) sharePack = await loadChampionPack(championId);
     const pack = sharePack;
-    const skin = pack?.portrait?.skin ?? 0;
+    const skin = lookSkin(pack);
     const modal = document.getElementById('vote-modal');
     modal.innerHTML = buildShareModalHtml({
         line: currentShare().text, championName: pack?.name || champKey,
@@ -2979,7 +2987,7 @@ else {
         situationType
     });
     const prettyName = cleanTitle(songName);
-    const skin = pack?.portrait?.skin ?? 0;
+    const skin = lookSkin(pack);
     const line = chooseModalLine(pack, modalKey,
         { pick: prettyName.split(/\s+[-–—]\s+|\s*\|\|?\s*/)[0].trim() || prettyName, streak: localStorage.getItem('votingStreak') || '' },
         currentMatch.id || '');

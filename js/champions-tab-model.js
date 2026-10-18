@@ -1,6 +1,6 @@
 // Profile "Champions" tab: how a person's votes spread across the companions, each companion's mastery and its skins.
 // Pure (no Firebase, no DOM) so it can be tested: tools/test-champions-tab.mjs.
-import { SKIN_UNLOCKS, masteryLevel, skinsFor, isSkinUnlocked, nextUnlock } from './champion-unlocks.js';
+import { SKIN_UNLOCKS, masteryLevel, skinsFor, isSkinUnlocked, nextUnlock, resolveLook } from './champion-unlocks.js';
 import { getChampionTileUrl } from './arcane-config.js';
 
 export const PACK_ORDER = ['jinx', 'vi', 'caitlyn'];
@@ -43,14 +43,15 @@ export function requirementText(skin, achievementNames = {}) {
 }
 
 // view = { total, shares, rows } for one person.
-export function buildChampionsView({ votes = [], packXp = {}, achievements = [], activePack = null, avatarKey = null, achievementNames = {} } = {}) {
+export function buildChampionsView({ votes = [], packXp = {}, achievements = [], activePack = null, avatarKey = null, looks = {}, achievementNames = {} } = {}) {
     const shares = voteShares(votes);
     const rows = PACK_ORDER.map(id => {
         const mastery = masteryLevel(packXp[id]);
         const state = { level: mastery.level, achievements };
+        const look = resolveLook(id, looks[id], state);
         const skins = skinsFor(id).map(s => ({
             ...s, unlocked: isSkinUnlocked(s, state), requirement: requirementText(s, achievementNames),
-            current: avatarKey === `${id}:${s.num}`
+            current: avatarKey === `${id}:${s.num}`, look: look === s.num
         }));
         return {
             packId: id, name: NAMES[id], mastery, active: id === activePack, next: nextUnlock(id, mastery.level),
@@ -72,8 +73,10 @@ export function championsHtml(view, { own = false } = {}) {
         const next = r.next ? `Next: ${r.next.skins.map(s => escapeHtml(s.name)).join(' + ')} at Mastery ${r.next.mastery}` : 'Every mastery skin unlocked';
         const skins = r.skins.map(s => {
             const label = `${s.name}${s.unlocked ? '' : ` (${s.requirement})`}`;
-            const attrs = own && s.unlocked ? ` data-action="avatar" data-pack="${r.packId}" data-skin="${s.num}" role="button" tabindex="0" title="Use ${escapeHtml(s.name)} as my avatar"` : '';
-            return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}"${attrs}><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? (s.current ? '<span class="cm-skin-tag">Your avatar</span>' : '') : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
+            const buttons = own && s.unlocked
+                ? `<span class="cm-skin-actions"><button type="button" class="cm-act${s.current ? ' on' : ''}" data-action="avatar" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.current}" title="Use ${escapeHtml(s.name)} as my avatar">Avatar</button><button type="button" class="cm-act${s.look ? ' on' : ''}" data-action="look" data-pack="${r.packId}" data-skin="${s.num}" aria-pressed="${s.look}" title="Use ${escapeHtml(s.name)} as ${escapeHtml(r.name)}'s look in alerts">Look</button></span>`
+                : (s.unlocked ? [s.current ? '<span class="cm-skin-tag">Avatar</span>' : '', s.look ? '<span class="cm-skin-tag">Look</span>' : ''].join('') : '');
+            return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}${s.look ? ' look' : ''}"><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? buttons : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
         }).join('');
         return `<article class="cm-card${r.active ? ' active' : ''}" data-pack="${r.packId}">
             <header class="cm-head"><img class="cm-face big" src="${escapeHtml(tile(r.packId, r.faceSkin))}" alt="" loading="lazy">

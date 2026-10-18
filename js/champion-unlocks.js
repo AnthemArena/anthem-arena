@@ -113,3 +113,14 @@ export function usableSkin(packId, wantedNum, state) {
     const skin = skinsFor(packId).find(s => s.num === wantedNum);
     return skin && isSkinUnlocked(skin, state) ? skin.num : 0;
 }
+
+// The look a companion has in alerts, bubbles and backdrops: the skin the person chose when it is unlocked (the classic skin
+// 0 always is), otherwise the Arcane skin once it is unlocked (mastery 2), otherwise the classic skin.
+export function resolveLook(packId, chosen, state) {
+    const skins = skinsFor(packId);
+    if (!skins.length) return 0;
+    const open = num => { const sk = skins.find(x => x.num === num); return !!sk && isSkinUnlocked(sk, state); };
+    if (Number.isInteger(chosen) && open(chosen)) return chosen;
+    const arcane = skins.find(x => x.mastery === 2);
+    return arcane && open(arcane.num) ? arcane.num : 0;
+}
