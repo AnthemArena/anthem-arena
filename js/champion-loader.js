@@ -7,7 +7,7 @@ import {
 } from './arcane-config.js';
 import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
 import { dialogFor } from './champion-lines.js';
-import { voiceSetFor, mergeVoice } from './champion-voice.js';
+import { voiceSetFor, applyVoiceSet } from './champion-voice.js';
 import { lookSkin } from './companion-look.js';
 
 console.log('🎭 champion-loader.js loaded');
@@ -95,12 +95,11 @@ if (championId !== 'default' && !getCompanionPack(championId)) {
             throw new Error('Invalid pack structure');
         }
 
-        // A skin with its own voice set: lay it over the base pack (a missing file keeps the base voice)
+        // A skin with its own voice set: lay it (and the set it extends) over the base pack; missing files keep the voice below
         if (voiceId) {
-            try {
-                const vr = await fetch(`../champion-packs/${voiceId}.json`);
-                if (vr.ok) pack = mergeVoice(pack, { ...(await vr.json()), id: voiceId });
-            } catch (e) { console.warn(`⚠️ Voice set ${voiceId} unavailable, using the base voice`, e); }
+            pack = await applyVoiceSet(pack, voiceId, async id => {
+                try { const vr = await fetch(`../champion-packs/${id}.json`); return vr.ok ? await vr.json() : null; } catch (e) { return null; }
+            });
         }
         
         // Cache it

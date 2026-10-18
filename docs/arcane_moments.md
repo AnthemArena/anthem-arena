@@ -900,4 +900,10 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Previewing:** Settings > Preview alert loads the voice of the skin you have picked (saved or not), and cancelling puts the old voice back.
 - **To add a voice set:** write `champion-packs/<set>.json` (same shape as the base, only the sections you rewrite), then add the skin
   numbers to `VOICES` in `champion-voice.js`. `tools/test-champion-voice.mjs` checks that a set has every entry and placeholder the base has.
-- **Next:** Sheriff Caitlyn (stricter), a few events at a time for approval.
+- **Every skin gets its own set.** Even when League gives two skins the same lines, each skin here has a voice written from its theme.
+  A set can name the set it builds on (`"extends": "jinx-original"`), so it is a full layer of its own (all 112 events, about 470 lines
+  of speech) on top of the parent. One skin at a time, to keep the writing quality up.
+- **Done:** Original Jinx (Classic and every skin without a set), Crime City Jinx (`jinx-crime-city`: showbiz gangster, violin case, recital,
+  duets, curtain calls, corks and toasts; written from the skin's theme, none of its in-game lines are reused; the test checks that).
+- **Next:** PROJECT Jinx (corrupted memory core, system words), then the other Jinx skins in mastery order, then Vi and Caitlyn
+  (Sheriff Caitlyn stricter).

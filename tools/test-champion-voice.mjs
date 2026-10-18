@@ -1,16 +1,17 @@
 // node tools/test-champion-voice.mjs: a skin picks its voice set, the set is laid over the base pack, and Original Jinx covers every line the Arcane pack has.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { voiceSetFor, mergeVoice, loadVoicedPack, VOICES, VOICE_SECTIONS } from '../js/champion-voice.js';
+import { voiceSetFor, mergeVoice, applyVoiceSet, loadVoicedPack, VOICES, VOICE_SECTIONS } from '../js/champion-voice.js';
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let pass = 0; const t = async (n, f) => { await f(); console.log('  ok  ', n); pass++; };
 const read = id => JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
-const base = read('jinx'), orig = read('jinx-original');
+const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city');
 
 await t('Arcane skins keep the base voice, every other Jinx skin speaks with the original', () => {
     assert.equal(voiceSetFor('jinx', 37), null);
     assert.equal(voiceSetFor('jinx', 60), null);
-    for (const n of [0, 20, 40, 1, 62]) assert.equal(voiceSetFor('jinx', n), 'jinx-original', `skin ${n}`);
+    for (const n of [0, 20, 40, 62]) assert.equal(voiceSetFor('jinx', n), 'jinx-original', `skin ${n}`);
+    assert.equal(voiceSetFor('jinx', 1), 'jinx-crime-city');
     assert.equal(voiceSetFor('vi', 29), null);
     assert.equal(voiceSetFor('nobody', 0), null);
     assert.equal(voiceSetFor('jinx', '37'), null);
@@ -37,45 +38,63 @@ await t('loadVoicedPack: right set per skin, cached, a missing voice file keeps 
     assert.equal(await loadVoicedPack('jinx', 0, async () => null, new Map()), null);
 });
 
-// Original Jinx must have the same entries as the Arcane pack (so a skin never loses a line) and the same placeholders
 const holes = s => new Set([...JSON.stringify(s).matchAll(/\{(\w+)\}/g)].map(m => m[1]));
 const strings = x => typeof x === 'string' ? [x] : x && typeof x === 'object' ? Object.values(x).flatMap(strings) : [];
 const shape = x => Array.isArray(x) ? x.map(shape) : x && typeof x === 'object' ? Object.fromEntries(Object.entries(x).map(([k, v]) => [k, shape(v)])) : typeof x;
-await t('Original Jinx has every section and entry of the Arcane pack, in the same shape', () => {
-    for (const s of VOICE_SECTIONS) {
-        assert.ok(orig[s], s);
-        assert.deepEqual(Object.keys(orig[s]).sort(), Object.keys(base[s]).sort(), `${s} keys`);
-    }
-    for (const k of Object.keys(base.alerts)) {
-        if (k === 'welcome') { for (const w of Object.keys(base.alerts.welcome)) assert.deepEqual(Object.keys(orig.alerts.welcome[w]), Object.keys(base.alerts.welcome[w]), w); continue; }
-        assert.deepEqual(Object.keys(orig.alerts[k]), Object.keys(base.alerts[k]), `alerts.${k} parts`);
-        for (const part of Object.keys(base.alerts[k])) assert.equal(orig.alerts[k][part].length, base.alerts[k][part].length, `alerts.${k}.${part} count`);
-        const conds = x => (x.messages || []).map(m => JSON.stringify(m.condition ?? null));
-        assert.deepEqual(conds(orig.alerts[k]), conds(base.alerts[k]), `alerts.${k} conditions`);
-    }
-    for (const s of ['bubble', 'modal', 'pages', 'share']) for (const k of Object.keys(base[s])) assert.equal(orig[s][k].length, base[s][k].length, `${s}.${k} count`);
-    for (const k of Object.keys(base.achievements)) assert.deepEqual(shape(orig.achievements[k]), shape(base.achievements[k]), `achievement ${k}`);
+await t('applyVoiceSet follows "extends": parent first, then the set itself, missing files skipped', async () => {
+    const files = { child: { extends: 'parent', alerts: { b: 'child-b' } }, parent: { alerts: { a: 'parent-a', b: 'parent-b' } } };
+    const f = async id => files[id] || null;
+    const m = await applyVoiceSet({ alerts: { a: 'base-a', b: 'base-b', c: 'base-c' } }, 'child', f);
+    assert.deepEqual(m.alerts, { a: 'parent-a', b: 'child-b', c: 'base-c' });
+    assert.equal(m.voiceSet, 'child');
+    assert.deepEqual((await applyVoiceSet({ alerts: { a: 'base-a' } }, 'missing', f)).alerts, { a: 'base-a' });
+    const loop = { x: { extends: 'y', alerts: { a: 'x' } }, y: { extends: 'x', alerts: { a: 'y' } } };
+    await applyVoiceSet({ alerts: {} }, 'x', async id => loop[id]);   // a loop of "extends" ends instead of hanging
 });
-await t('Original Jinx only uses placeholders the Arcane lines use, and keeps the ones each part needs', () => {
-    for (const s of VOICE_SECTIONS) for (const k of Object.keys(base[s])) {
-        const allowed = holes(base[s][k]);
-        for (const h of holes(orig[s][k])) assert.ok(allowed.has(h), `${s}.${k} uses {${h}}`);
-    }
-    for (const k of Object.keys(base.achievements)) {
-        const need = e => holes(e.details);
-        for (const h of need(base.achievements[k])) assert.ok(holes(orig.achievements[k].details).has(h), `achievement ${k} details keep {${h}}`);
-    }
-});
-await t('Original Jinx lines are real sentences: no leftovers from the old pack, no empty strings, no stretches yelled in capitals (one shouted word for emphasis is fine)', () => {
-    const all = VOICE_SECTIONS.flatMap(s => strings(orig[s]));
-    assert.ok(all.length > 600);
-    for (const s of all) {
-        assert.ok(s.trim().length > 0);
-        assert.doesNotMatch(s, /songTitle|\bsongs?\b/i);
-        assert.doesNotMatch(s, /!!/);
-        assert.doesNotMatch(s, /\b[A-Z]{3,}\b[ ,.!?]+\b[A-Z]{3,}\b/, `shouting: ${s}`);
-    }
-    const long = all.filter(x => x.length > 28);
-    assert.ok(new Set(long).size >= long.length - 3, 'almost no repeated lines (buttons repeat on purpose)');
+
+// Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
+for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig]]) {
+    await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
+        for (const s of VOICE_SECTIONS) {
+            assert.ok(set[s], s);
+            assert.deepEqual(Object.keys(set[s]).sort(), Object.keys(below[s]).sort(), `${s} keys`);
+        }
+        for (const k of Object.keys(below.alerts)) {
+            if (k === 'welcome') { for (const w of Object.keys(below.alerts.welcome)) assert.deepEqual(Object.keys(set.alerts.welcome[w]), Object.keys(below.alerts.welcome[w]), w); continue; }
+            assert.deepEqual(Object.keys(set.alerts[k]), Object.keys(below.alerts[k]), `alerts.${k} parts`);
+            for (const part of Object.keys(below.alerts[k])) assert.equal(set.alerts[k][part].length, below.alerts[k][part].length, `alerts.${k}.${part} count`);
+            const conds = x => (x.messages || []).map(m => JSON.stringify(m.condition ?? null));
+            assert.deepEqual(conds(set.alerts[k]), conds(below.alerts[k]), `alerts.${k} conditions`);
+        }
+        for (const s of ['bubble', 'modal', 'pages', 'share']) for (const k of Object.keys(below[s])) assert.equal(set[s][k].length, below[s][k].length, `${s}.${k} count`);
+        for (const k of Object.keys(below.achievements)) assert.deepEqual(shape(set.achievements[k]), shape(below.achievements[k]), `achievement ${k}`);
+    });
+    await t(`${name} only uses placeholders the lines below use, and keeps the ones each achievement needs`, () => {
+        for (const s of VOICE_SECTIONS) for (const k of Object.keys(below[s])) {
+            const allowed = holes(below[s][k]);
+            for (const h of holes(set[s][k])) assert.ok(allowed.has(h), `${s}.${k} uses {${h}}`);
+        }
+        for (const k of Object.keys(below.achievements)) for (const h of holes(below.achievements[k].details)) assert.ok(holes(set.achievements[k].details).has(h), `achievement ${k} details keep {${h}}`);
+    });
+    await t(`${name} lines are real sentences: no leftovers, no empty strings, no stretches yelled in capitals`, () => {
+        const all = VOICE_SECTIONS.flatMap(s => strings(set[s]));
+        assert.ok(all.length > 600);
+        for (const s of all) {
+            assert.ok(s.trim().length > 0);
+            assert.doesNotMatch(s, name === 'jinx-original' ? /songTitle|\bsongs?\b/i : /songTitle/);   // a music-hall skin may talk about songs
+            assert.doesNotMatch(s, /!!/);
+            assert.doesNotMatch(s, /\b[A-Z]{3,}\b[ ,.!?]+\b[A-Z]{3,}\b/, `shouting: ${s}`);
+        }
+        const long = all.filter(x => x.length > 28);
+        assert.ok(new Set(long).size >= long.length - 3, 'almost no repeated lines (buttons repeat on purpose)');
+    });
+}
+await t('a themed set really is different from the one it builds on, and copies none of the in-game lines', () => {
+    const lines = x => new Set(VOICE_SECTIONS.flatMap(s => strings(x[s])).filter(l => l.length > 28));
+    const mine = lines(crime), theirs = lines(orig);
+    const shared = [...mine].filter(l => theirs.has(l));
+    assert.ok(shared.length < mine.size * 0.02, `only ${shared.length} shared lines`);
+    const text = [...mine].join('\n').toLowerCase();
+    for (const quote of ["what's in my violin case", 'who wants a solo', "i've got a recital", 'scream along if you know the words', 'pop the cork', 'drink up']) assert.ok(!text.includes(quote), quote);
 });
 console.log(`${pass} passed`);
