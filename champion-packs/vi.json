@@ -572,26 +572,6 @@
           "Let's go"
         ]
       },
-      "encouragement": {
-        "messages": [
-          "Still deciding? Quit stalling and pick.",
-          "Don't overthink it. Choose one and move on.",
-          "They're all worth a look. Go with your gut.",
-          "You've looked long enough. Pick."
-        ],
-        "details": [
-          "Every vote counts.",
-          "Trust your gut.",
-          "There's no wrong way to pick.",
-          "Just choose."
-        ],
-        "buttons": [
-          "Vote now",
-          "Choose one",
-          "Decide",
-          "Cast your vote"
-        ]
-      },
       "welcome-back": {
         "messages": [
           "You're back. Good.",

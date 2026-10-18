@@ -4,6 +4,7 @@ import {
     getCupChampionId
 } from './arcane-config.js';
 import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
+import { dialogFor } from './champion-lines.js';
 
 console.log('🎭 champion-loader.js loaded');
 
@@ -301,16 +302,8 @@ function getCustomMessage(messageType) {
         return null;
     }
     
-    // Check if pack has welcomeDialogs
-    const welcomeDialogs = currentChampionPack.welcomeDialogs;
-    
-    if (!welcomeDialogs) {
-        console.warn(`⚠️ No welcome dialogs in pack "${currentChampionPack.id}"`);
-        return null;
-    }
-    
-    // Get the specific dialog type
-    const dialog = welcomeDialogs[messageType];
+    // The lines live under welcomeDialogs (older packs) or alerts.welcome (current packs); see js/champion-lines.js
+    const dialog = dialogFor(currentChampionPack, messageType);
     
     if (!dialog) {
         console.warn(`⚠️ Welcome message type "${messageType}" not found in pack "${currentChampionPack.id}"`);

@@ -46,6 +46,9 @@ with sync_playwright() as p:
         show(call)
         g = pg.inner_text('#bulletin-banner .nv-glyph').strip(); line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
         check(f'{call}: the symbol in the circle is not repeated at the start of the champion line', not line.startswith(g), (g, line))
+    for call, plain in (('testWelcome("first-time")', 'Welcome to Arcane Moments!'), ('testWelcome("streak")', 'Day 2! You came back!'), ('testWelcome("comeback")', 'Welcome back after 5 days!'), ('testWelcomeBack()', 'Welcome back!'), ('testEncouragement()', 'Still deciding?')):
+        show(call); line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
+        check(f'{call}: the champion pack line is used (not the test page fallback)', line and plain.lower() not in line.lower(), line)
     pg.screenshot(path=f'{SHOTS}/sample-encourage.png')
     for call, tier in (('testTieBreaker()', 'tied'), ('testTieBreaker(true)', 'final')):
         show(call); r = ring('#bulletin-banner .nv-edits .nv-edit')
