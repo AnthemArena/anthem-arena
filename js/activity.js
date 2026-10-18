@@ -141,7 +141,7 @@ function getSongTitle(songId, fallbackTitle) {
         console.log(`📝 Using fallback title for ${songId}: ${fallbackTitle}`);
     }
     
-    return shortTitle(song?.shortTitle || song?.title || fallbackTitle || 'Unknown Song', 60);
+    return shortTitle(song?.shortTitle || song?.title || fallbackTitle || 'Unknown edit', 60);
 }
 
 // ========================================
@@ -252,8 +252,8 @@ function renderVoteCard(activity) {
     // Parse match title to get both songs
     const matchTitle = activity.matchTitle || '';
     const songs = matchTitle.split(' vs ');
-    const song1 = shortTitle(songs[0]?.trim() || 'Song 1', 50);
-    const song2 = shortTitle(songs[1]?.trim() || 'Song 2', 50);
+    const song1 = shortTitle(songs[0]?.trim() || 'Edit 1', 50);
+    const song2 = shortTitle(songs[1]?.trim() || 'Edit 2', 50);
     
     // ✅ USE THE DATABASE FIELD AS SOURCE OF TRUTH
     const votedForSong1 = activity.choice === 'song1';

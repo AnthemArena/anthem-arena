@@ -3204,3 +3204,40 @@ body.has-next-bar { padding-bottom: 5.5rem; }
 .moment-details--no-about .details-meta { margin-top: 0; }
 .moment-details--no-about .details-meta { padding-top: 0; border-top: 0; }
 
+
+
+/* Share panel: editable message, then the targets */
+.share-link { margin: .9rem 0 0; text-align: center; font-size: .8rem; opacity: .6; word-break: break-all; }
+.share-section.share-flash { animation: share-flash 2.5s ease-out; }
+@keyframes share-flash { 0% { box-shadow: inset 0 0 0 2px #ff69b4, 0 0 40px rgba(255,105,180,.35); } 100% { box-shadow: inset 0 0 0 2px transparent, 0 0 0 transparent; } }
+
+/* on phones the share targets sit two to a row instead of one long column */
+@media (max-width: 640px) {
+    #share-panel .share-buttons { flex-direction: row; flex-wrap: wrap; gap: .6rem; }
+    #share-panel .share-btn { flex: 1 1 calc(50% - .6rem); min-width: 0; padding: .75rem .5rem; }
+}
+
+/* the share box inside the modal (post-vote and the slim share version) */
+.pvm-share-box { width: 100%; }
+.pvm-share-box .share-buttons { gap: .45rem; }
+.pvm-share-box .share-btn { padding: .5rem .85rem; font-size: .85rem; }
+.pvm-share-box .share-link { margin-top: .6rem; font-size: .72rem; text-align: left; }
+.pvm--share .pvm-body { gap: .9rem; }
+@media (max-width: 640px) {
+    .pvm-share-box .share-buttons { flex-direction: row; flex-wrap: wrap; }
+    .pvm-share-box .share-btn { flex: 1 1 calc(50% - .45rem); min-width: 0; padding: .6rem .4rem; }
+}
+
+/* the champion's line shown as a quote above the share buttons (page panel, post-vote modal) */
+.share-quote {
+    max-width: 560px;
+    margin: 0 auto 1rem;
+    padding: .8rem 1.1rem;
+    background: rgba(0, 0, 0, .4);
+    border: 1px solid rgba(255, 105, 180, .45);
+    border-radius: 16px;
+    line-height: 1.45;
+    font-weight: 600;
+    text-align: center;
+}
+.pvm-share-box .share-quote { max-width: none; margin-bottom: .6rem; font-size: .92rem; text-align: left; }

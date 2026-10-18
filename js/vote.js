@@ -25,8 +25,10 @@ import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { cleanTitle, shortTitle } from './title-clean.js';
 import { votingState, closedButton } from './vote-closed.js';
-import { renderChampionBubble, loadChampionPack } from './champion-bubble.js';
-import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, TAG_FOR_KEY } from './champion-modal.js';
+import { renderChampionBubble, loadChampionPack, shortName } from './champion-bubble.js';
+import { buildMatchShare, shareKind } from './match-share.js';
+import { mountShareBox } from './share-box.js';
+import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, buildShareModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
 import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
@@ -568,7 +570,7 @@ const h2hRecord = undefined;
             </span>
             <span class="meta-item artist">
                 <i class="fas fa-microphone"></i>
-                <span class="meta-label">Artist</span>
+                <span class="meta-label">Creator</span>
                 <span class="meta-value">${artist}</span>
             </span>
         </div>
@@ -705,6 +707,7 @@ await checkVoteStatus();
 // Update page content
 await updatePageContent();
 updateChampionBubble();
+updateSharePanel();
 
 // ✅ NEW: Update vote counts UI AFTER page content is set
 if (hasVoted) {
@@ -830,7 +833,7 @@ try {
                 hasVoted: hasVoted,
                 competitor1: {
                     seed: match.song1?.seed || 1,
-                    name: match.song1?.shortTitle || match.song1?.title || 'Unknown Song',
+                    name: match.song1?.shortTitle || match.song1?.title || 'Unknown edit',
                     source: `${match.song1?.artist || 'Unknown'} • ${match.song1?.year || '2024'}`,
                     videoId: match.song1?.videoId || '',
                     votes: song1Votes,
@@ -841,7 +844,7 @@ try {
                 },
                 competitor2: {
                     seed: match.song2?.seed || 2,
-                    name: match.song2?.shortTitle || match.song2?.title || 'Unknown Song',
+                    name: match.song2?.shortTitle || match.song2?.title || 'Unknown edit',
                     source: `${match.song2?.artist || 'Unknown'} • ${match.song2?.year || '2024'}`,
                     videoId: match.song2?.videoId || '',
                     votes: song2Votes,
@@ -1092,7 +1095,6 @@ if (profileDoc.exists()) {
         // ✅ Default privacy settings
         const privacy = {
             isPublic: true,  // Default to public so votes show
-            messagePrivacy: 'everyone',
             emotePrivacy: 'everyone',
             showOnlineStatus: true
         };
@@ -1319,7 +1321,7 @@ if (comp2Video) {
     const origin = encodeURIComponent(window.location.origin);
 
 comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.videoId}?enablejsapi=1&origin=${origin}&rel=0`;
-    comp2Video.title = `${song2Name} by ${artist2} - League of Legends Music Video`;
+    comp2Video.title = `${song2Name} by ${artist2} - Arcane Moments edit`;
     comp2Video.loading = 'lazy';
 }
 
@@ -1827,8 +1829,8 @@ voteBatch.set(voteRef, {
             const activityId = `${userId}_${currentMatch.id}`;
 
             const votedVideoId = votedSong.videoId;
-            const votedSongName = votedSong.name || 'Unknown Song';
-            const otherSongName = otherSong.name || 'Unknown Song';
+            const votedSongName = votedSong.name || 'Unknown edit';
+            const otherSongName = otherSong.name || 'Unknown edit';
             const matchTitle = `${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`;
 
             // ✅ DEBUG: Log exactly what we're about to write
@@ -2001,7 +2003,7 @@ console.log(
         // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
         const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
         const songSeed = votedSong.seed;
-        const songName = votedSong.name || votedSong.shortTitle || votedSong.title || 'Your Song';
+        const songName = votedSong.name || votedSong.shortTitle || votedSong.title || 'Your pick';
         // Seeds are null in random-draw cups, so never identify a competitor by seed.
         // votedSlot ('song1' | 'song2') is the reliable identity of the voted competitor.
         const votedSlot = votedForSong1 ? 'song1' : 'song2';
@@ -2367,6 +2369,58 @@ function checkIfFirstVoter() {
 // UPDATE VOTE COUNTS UI
 // ========================================
 // The cup champion's speech bubble: tell it where this viewer is in this match (js/champion-bubble.js)
+// ========================================
+// SHARE BOX: bottom of the page, inside the post-vote modal, and the slim share modal opened from alerts
+// ========================================
+function mountMatchShareBox(el, extra = {}) {
+    return mountShareBox(el, {
+        getShare: bump => currentShare(null, { bump }),
+        onShare: (platform, kind) => trackShare(platform, kind),
+        notify: (msg, type) => showNotification(msg, type),
+        ...extra
+    });
+}
+
+let pageShareBox = null;
+async function updateSharePanel() {
+    try {
+        const el = document.getElementById('share-panel');
+        if (!el || !currentMatch?.competitor1 || !currentMatch?.competitor2) return;
+        if (!sharePack) { try { sharePack = await loadChampionPack(getCupChampionId()); } catch (e) { /* plain wording */ } }
+        if (!pageShareBox) pageShareBox = mountMatchShareBox(el);
+        else pageShareBox.refresh();
+        // Arriving from an alert button (?share=1) and already voted: open the slim share modal once
+        if (!shareModalOpened && new URLSearchParams(location.search).get('share') && (hasVoted || localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`))) {
+            shareModalOpened = true;
+            openShareModal();
+        }
+    } catch (e) { console.warn('share panel skipped:', e); }
+}
+
+let shareModalOpened = false;
+async function openShareModal() {
+    const championId = getCupChampionId();
+    const meta = getCompanionPack(championId);
+    const champKey = meta?.championId || 'Jinx';
+    if (!sharePack) sharePack = await loadChampionPack(championId);
+    const pack = sharePack;
+    const skin = pack?.portrait?.skin ?? 0;
+    const modal = document.getElementById('vote-modal');
+    modal.innerHTML = buildShareModalHtml({
+        line: currentShare().text, championName: pack?.name || champKey,
+        portraitUrl: getChampionTileUrl(champKey, skin), splashUrl: getChampionSplashUrl(champKey, skin)
+    });
+    const portraitImg = modal.querySelector('.pvm-portrait');
+    if (portraitImg) portraitImg.onerror = () => { portraitImg.onerror = null; portraitImg.src = getChampionTileUrl(champKey, 0); };
+    // the champion's speech bubble IS the share message; "New line" swaps it
+    const lineEl = modal.querySelector('.pvm-line');
+    mountMatchShareBox(modal.querySelector('[data-share-box]'), { showText: false, onText: text => { if (lineEl) lineEl.textContent = text; } });
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+window.openShareModal = openShareModal;
+
 function updateChampionBubble() {
     try {
         if (!currentMatch?.competitor1 || !currentMatch?.competitor2) return;
@@ -2468,6 +2522,7 @@ function updateVoteCountsUI() {
 
     console.log('UI updated with current vote counts');
     updateChampionBubble();
+    updateSharePanel();
 }
 
     // ========================================
@@ -2513,8 +2568,8 @@ function showNotification(message, type = 'success') {
 
     // ✅ NEW: Get song name for alt text
     const songData = competitorNum === 1 ? currentMatch.competitor1 : currentMatch.competitor2;
-    const songName = songData.name || 'League of Legends Music Video';
-    const artist = songData.source.split('•')[0]?.trim() || 'Unknown Artist';
+    const songName = songData.name || 'Arcane Moments edit';
+    const artist = songData.source.split('•')[0]?.trim() || 'Unknown creator';
 
     // Set thumbnail image
     thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
@@ -2669,8 +2724,8 @@ else if (voteDiff === 0) {
         ? 'FINAL HOURS - PERFECTLY TIED!'
         : 'This is INSANE!';
     const tiedMessage = isFinalHours
-        ? `Final hours and these songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Your vote could be the tiebreaker.`
-        : `These songs are PERFECTLY TIED at ${userVotes}-${userVotes}! Every single vote decides the winner.`;
+        ? `Final hours and these edits are PERFECTLY TIED at ${userVotes}-${userVotes}! Your vote could be the tiebreaker.`
+        : `these edits are PERFECTLY TIED at ${userVotes}-${userVotes}! Every single vote decides the winner.`;
 
     shareMessage = `
         <div class="share-cta extreme">
@@ -2703,7 +2758,7 @@ else if (voteDiff <= 2) {
     successMessage = `
         <p class="modal-message special">
             You voted for <strong>"${escapeHtml(songName)}"</strong><br>
-            <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!</span>
+            <span class="stakes-text">Only ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these edits!</span>
         </p>
     `;
     shareContext = 'nailbiter';
@@ -2713,8 +2768,8 @@ else if (voteDiff <= 2) {
         ? 'FINAL HOURS - TOO CLOSE!'
         : 'TOO CLOSE TO CALL!';
     const nailbiterMessage = isFinalHours
-        ? `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs in the FINAL HOURS! This could go either way!`
-        : `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs. Your vote could decide everything!`;
+        ? `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these edits in the FINAL HOURS! This could go either way!`
+        : `Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these edits. Your vote could decide everything!`;
 
     shareMessage = `
         <div class="share-cta extreme">
@@ -2770,10 +2825,10 @@ else if (userPct < opponentPct && voteDiff <= 5) {
                 ${comebackMessage}
             </p>
             <div class="share-buttons">
-                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
+                <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'losing-close')">
         <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
                 </button>
-                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
+                <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'losing-close')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
                 </button>
                 <button class="share-btn copy" onclick="copyMatchLink()">
@@ -2914,6 +2969,7 @@ else {
     const meta = getCompanionPack(championId);
     const champKey = meta?.championId || 'Jinx';
     const pack = await loadChampionPack(championId);
+    sharePack = pack;
     const userVotesMap = (() => { try { return JSON.parse(localStorage.getItem('userVotes') || '{}'); } catch (e) { return {}; } })();
     const modalKey = pickModalKey({
         isFirstEver: Object.keys(userVotesMap).length <= 1,
@@ -2941,6 +2997,8 @@ else {
     });
     const portraitImg = modal.querySelector('.pvm-portrait');
     if (portraitImg) portraitImg.onerror = () => { portraitImg.onerror = null; portraitImg.src = getChampionTileUrl(champKey, 0); };
+    const modalShare = modal.querySelector('[data-share-box]');
+    if (modalShare) mountMatchShareBox(modalShare);
 
     modal.classList.add('active');
     modal.style.display = 'flex';
@@ -2957,106 +3015,41 @@ else {
 // UPDATED: Share functions with tracking
 // ========================================
 
+// The wording comes from the cup champion's pack ("share" lines, see js/match-share.js); the post-vote buttons and the
+// share panel at the bottom of the page use the same builder, so the text is the same everywhere.
+let sharePack = null;
+function currentShare(kind, extra = {}) {
+    const c1 = currentMatch.competitor1, c2 = currentMatch.competitor2;
+    const mine = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);   // 'song1' | 'song2' | null
+    const pick = mine === 'song2' ? c2 : mine === 'song1' ? c1 : null;
+    const other = pick === c1 ? c2 : c1;
+    const voted = !!(hasVoted || mine);
+    return buildMatchShare({
+        kind: kind || shareKind({
+            hasVoted: voted && !!pick, status: currentMatch.status === 'completed' ? 'completed' : 'live',
+            pickVotes: pick?.votes || 0, otherVotes: (pick ? other : c2).votes || 0, total: currentMatch.totalVotes || 0
+        }),
+        pack: sharePack, matchId: currentMatch.id, origin: window.location.origin,
+        a: c1.name, b: c2.name, pick: (pick || c1).name, other: (pick ? other : c2).name,
+        pickVotes: pick?.votes || 0, otherVotes: (pick ? other : c2).votes || 0, total: currentMatch.totalVotes || 0,
+        ...extra
+    });
+}
+
 window.shareToTwitter = function(songName, context) {
-    const matchUrl = window.location.href;
-    let tweetText = '';
-
-    const opponentName = songName === currentMatch.competitor1.name
-        ? currentMatch.competitor2.name
-        : currentMatch.competitor1.name;
-
-    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-
-    switch(context) {
-        case 'early':
-            tweetText = `🌟 Just cast an early vote for "${songName}" in the League Music Tournament! Be part of the action:\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'tied':
-            tweetText = `⚖️ PERFECT TIE! "${songName}" vs "${opponentName}" in the League Tournament! Cast the deciding vote!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'nailbiter':
-            tweetText = `🔥 NAIL-BITER! "${songName}" needs your vote! Just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'} separate these songs!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'losing-close':
-            tweetText = `⚔️ "${songName}" is behind by ${voteDiff} votes but can still win! Help with a comeback!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'losing-bad':
-            tweetText = `🆘 EMERGENCY! "${songName}" is losing badly in the League Music Tournament! Rally support now!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'winning-close':
-            tweetText = `📊 "${songName}" is leading in the League Tournament, but it's still close! Help secure the victory!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        case 'dominating':
-            tweetText = `🎯 "${songName}" is DOMINATING in the League Music Tournament! Join the winning side!\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-            break;
-        default:
-            tweetText = `🎵 I voted in the League Music Tournament! Which League song is YOUR favorite?\n\n${matchUrl}\n\n#LeagueMusicTournament`;
-    }
-
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-    window.open(twitterUrl, '_blank', 'width=550,height=420');
-
-    // ✅ ADD THIS:
+    const s = currentShare(context);
+    window.open(s.targets.x, '_blank', 'width=550,height=420');
     trackShare('twitter', context);
-
-    console.log(`📤 Shared to Twitter (${context})`);
 };
 
 window.shareToReddit = function(songName, context) {
-    const matchUrl = window.location.href;
-    let title = '';
-    let text = '';
-
-    const opponentName = songName === currentMatch.competitor1.name
-        ? currentMatch.competitor2.name
-        : currentMatch.competitor1.name;
-    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-
-    switch(context) {
-        case 'early':
-            title = `Early voting is open for "${songName}" in the League Music Tournament!`;
-            text = `Just cast one of the first votes in this matchup! Be part of shaping the results from the start.\n\nVote here: ${matchUrl}`;
-            break;
-        case 'tied':
-            title = `[PERFECT TIE] "${songName}" vs "${opponentName}" - Cast the deciding vote!`;
-            text = `These songs are EXACTLY tied! Every single vote matters right now.\n\nVote here: ${matchUrl}`;
-            break;
-        case 'nailbiter':
-            title = `[NAIL-BITER] "${songName}" matchup separated by just ${voteDiff} ${voteDiff === 1 ? 'vote' : 'votes'}!`;
-            text = `This is as close as it gets! Come cast your vote in this insane matchup.\n\nVote here: ${matchUrl}`;
-            break;
-        case 'losing-close':
-            title = `"${songName}" is behind but can still win with your help!`;
-            text = `"${songName}" is only ${voteDiff} votes behind. A comeback is totally possible!\n\nVote here: ${matchUrl}`;
-            break;
-        case 'losing-bad':
-            title = `[URGENT] "${songName}" needs a miracle comeback in the League Tournament!`;
-            text = `"${songName}" is being eliminated! If you love this song, vote now to rally support!\n\nVote here: ${matchUrl}`;
-            break;
-        case 'winning-close':
-            title = `"${songName}" is leading but the race is still close!`;
-            text = `Help maintain the lead and secure the victory for "${songName}"!\n\nVote here: ${matchUrl}`;
-            break;
-        case 'dominating':
-            title = `"${songName}" is dominating in the League Music Tournament!`;
-            text = `Come vote in the League Music Tournament and see the results!\n\nVote here: ${matchUrl}`;
-            break;
-        default:
-            title = `League Music Tournament - Vote for your favorite songs!`;
-            text = `I just voted in the League Music Tournament! Come vote for your favorites.\n\n${matchUrl}`;
-    }
-
-    const redditUrl = `https://reddit.com/submit?url=${encodeURIComponent(matchUrl)}&title=${encodeURIComponent(title)}`;
-    window.open(redditUrl, '_blank', 'width=800,height=600');
-
-    // ✅ ADD THIS:
+    const s = currentShare(context);
+    window.open(s.targets.reddit, '_blank');
     trackShare('reddit', context);
-
-    console.log(`📤 Shared to Reddit (${context})`);
 };
 
 window.copyMatchLink = function() {
-    const matchUrl = window.location.href;
+    const matchUrl = currentShare().copyText;
 
     navigator.clipboard.writeText(matchUrl).then(() => {
         showNotification('Link copied to clipboard! 🔗', 'success');
@@ -3095,6 +3088,7 @@ function closePostVoteModal() {
 
 // Make functions available globally
 window.closePostVoteModal = closePostVoteModal;
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('vote-modal')?.classList.contains('active')) closePostVoteModal(); });
     // ========================================
     // EVENT LISTENERS
     // ========================================
@@ -3148,37 +3142,7 @@ window.closePostVoteModal = closePostVoteModal;
         }
     });
 
-    // Share button handlers
-    document.addEventListener('click', (e) => {
-        // Twitter share
-        if (e.target.classList.contains('twitter') || e.target.closest('.twitter')) {
-            const shareUrl = encodeURIComponent(window.location.href);
-            const shareText = encodeURIComponent(`Vote now: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name} | League Music Tournament`);
-            window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
-        }
-
-        // Facebook share
-        if (e.target.classList.contains('facebook') || e.target.closest('.facebook')) {
-            const shareUrl = encodeURIComponent(window.location.href);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, '_blank');
-        }
-
-        // Reddit share
-        if (e.target.classList.contains('reddit') || e.target.closest('.reddit')) {
-            const shareUrl = encodeURIComponent(window.location.href);
-            const shareText = encodeURIComponent(`Vote now: ${currentMatch.competitor1.name} vs ${currentMatch.competitor2.name}`);
-            window.open(`https://reddit.com/submit?url=${shareUrl}&title=${shareText}`, '_blank');
-        }
-
-        // Copy link
-        if (e.target.classList.contains('copy') || e.target.closest('.copy')) {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                showNotification('Link copied to clipboard!', 'success');
-            }).catch(() => {
-                showNotification('Failed to copy link', 'error');
-            });
-        }
-    });
+    // (Share buttons: js/share-box.js. The old delegated .twitter/.reddit/.copy handler was removed: it opened a second, old-wording tab on top of the new box.)
 
     // Back button handler
     const backBtn = document.querySelector('.back-btn');

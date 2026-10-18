@@ -56,7 +56,7 @@ function side(name, creator, thumb) {
     ]);
 }
 
-export function cardTree(d, thumbs = {}, host = 'anthemarena.com') {
+export function cardTree(d, thumbs = {}, host = 'arcanemoments.netlify.app') {
     return h('div', {
         width: W, height: H, flexDirection: 'column', padding: 40, fontFamily: 'Inter', color: TEXT, backgroundColor: BG,
         backgroundImage: 'radial-gradient(circle at 50% 12%, rgba(255, 79, 180, 0.16), rgba(255, 79, 180, 0) 45%), radial-gradient(circle at 0% 45%, rgba(255, 79, 180, 0.18), rgba(255, 79, 180, 0) 40%), radial-gradient(circle at 100% 75%, rgba(255, 79, 180, 0.15), rgba(255, 79, 180, 0) 40%)'

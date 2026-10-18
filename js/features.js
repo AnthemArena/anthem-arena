@@ -7,9 +7,22 @@
 export let EMOTES_ENABLED = false;
 export function __setEmotesEnabledForTests(v) { EMOTES_ENABLED = !!v; }      // tests only
 
-// An alert whose button would send an emote becomes a plain "View match" alert while emotes are off. Also fixes alerts saved earlier.
+// While emotes are off, an ally / rival alert ("X voted with / against you") has its own button: "View profile" opens the
+// other voter's profile (Follow lives there, and their taste profile). The alert itself (toast body, bell row) still opens the match.
+// Any other alert whose button would send an emote becomes a plain "View match". Also fixes alerts saved earlier.
 export function withoutEmoteCta(n, enabled = EMOTES_ENABLED) {
-    if (enabled || !n || (n.ctaAction !== 'send-emote' && n.action !== 'send-emote')) return n;
+    if (enabled || !n) return n;
+    const user = n.triggerUsername || n.username;
+    if (n.type === 'live-activity' && (n.relationship === 'ally' || n.relationship === 'opponent') && user) {
+        return {
+            ...n,
+            ctaAction: 'navigate', action: 'navigate', ctaText: 'View profile', cta: 'View profile',
+            ctaData: undefined, emoteData: undefined,
+            ctaUrl: `/profile.html?user=${encodeURIComponent(user)}`,
+            targetUrl: n.targetUrl || (n.matchId ? `/vote.html?match=${encodeURIComponent(n.matchId)}` : undefined)
+        };
+    }
+    if (n.ctaAction !== 'send-emote' && n.action !== 'send-emote') return n;
     return {
         ...n,
         ctaAction: 'navigate', action: 'navigate', ctaText: 'View match', cta: 'View match',

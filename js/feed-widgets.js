@@ -654,30 +654,6 @@ const notifBtn = document.getElementById('sidebarNotifications');
             console.log('✅ Notifications button handler attached');
         }
         
-        // Messages button - opens notifications and switches to messages tab
-        const msgBtn = document.getElementById('sidebarMessages');
-        if (msgBtn) {
-            msgBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation(); // Prevent card click
-                console.log('💬 Messages clicked');
-                
-                if (window.openNotificationPanel) {
-                    window.openNotificationPanel();
-                    
-                    // Switch to messages tab after panel opens
-                    setTimeout(() => {
-                        const messagesTab = document.querySelector('[data-tab="messages"]');
-                        if (messagesTab) {
-                            messagesTab.click();
-                        }
-                    }, 150);
-                } else {
-                    console.warn('⚠️ Notification panel not ready yet');
-                }
-            });
-            console.log('✅ Messages button handler attached');
-        }
     }, 500); // Wait 500ms for notification center to initialize
 }
 

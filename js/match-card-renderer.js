@@ -133,8 +133,8 @@ export function createMatchCard(match) {
         : '';
     
     // ✅ Extract artist names for better alt text
-    const artist1 = match.competitor1.source.split('•')[0]?.trim() || 'Artist';
-    const artist2 = match.competitor2.source.split('•')[0]?.trim() || 'Artist';
+    const artist1 = match.competitor1.source.split('•')[0]?.trim() || 'Creator';
+    const artist2 = match.competitor2.source.split('•')[0]?.trim() || 'Creator';
 
 
 

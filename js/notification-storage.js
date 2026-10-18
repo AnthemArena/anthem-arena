@@ -13,7 +13,7 @@ import { EMOTES_ENABLED } from './features.js';
 // {
 //   notificationId: "auto-generated",
 //   userId: "user123",
-//   type: "causal-event" | "live-activity" | "match-status" | "achievement" | "emote-received" | "message-received",
+//   type: "causal-event" | "live-activity" | "match-status" | "achievement" | "emote-received",
 // //   priority: 10,
 //   
 //   message: "SummonerElite flipped the match!",
@@ -303,38 +303,6 @@ export async function getUnreadCount(userId) {
 }
 
 // ========================================
-// SAVE MESSAGE NOTIFICATION
-// ========================================
-
-export async function saveMessageNotification(toUserId, fromUsername, fromUserId, messageText, context = {}) {
-    return await saveNotification(toUserId, {
-        type: 'message-received',
-        priority: 8, // High priority
-        message: `💬 ${fromUsername} sent you a message`,
-        detail: messageText.length > 60 ? messageText.substring(0, 60) + '...' : messageText,
-        icon: '💬',
-        
-        // Sender info
-        triggerUsername: fromUsername,
-        triggerUserId: fromUserId,
-        
-        // Context
-        matchId: context.matchId || null,
-        matchTitle: context.matchTitle || null,
-        
-        // Action
-        ctaText: 'Reply',
-        ctaAction: 'open-message',
-        ctaData: {
-            fromUsername,
-            fromUserId,
-            originalMessage: messageText
-        },
-        targetUrl: `/messages.html?user=${fromUserId}`
-    });
-}
-
-// ========================================
 // CLEANUP OLD NOTIFICATIONS (call periodically)
 // ========================================
 
@@ -375,7 +343,6 @@ export async function getAvailableActions(targetUserId, context = {}) {
     
     if (!targetUserId || currentUserId === targetUserId) {
         return {
-            canMessage: false,
             canEmote: false,
             canAddFriend: false,
             reason: 'Cannot interact with yourself'
@@ -390,10 +357,8 @@ export async function getAvailableActions(targetUserId, context = {}) {
         const areFriends = context.areFriends || false; // TODO: Check friends list when implemented
         
         return {
-            canMessage: checkMessagePermission(privacy.messagePrivacy, areFriends),
             canEmote: checkEmotePermission(privacy.emotePrivacy, areFriends),
             canAddFriend: privacy.allowFriendRequests,
-            messageReason: getMessageRestrictionReason(privacy.messagePrivacy, areFriends),
             emoteReason: getEmoteRestrictionReason(privacy.emotePrivacy, areFriends),
             friendReason: privacy.allowFriendRequests ? null : 'This user is not accepting friend requests'
         };
@@ -401,19 +366,9 @@ export async function getAvailableActions(targetUserId, context = {}) {
         console.warn('Could not check privacy settings, defaulting to allowed', error);
         // Default to allowing actions if can't fetch settings
         return {
-            canMessage: true,
             canEmote: true,
             canAddFriend: true
         };
-    }
-}
-
-function checkMessagePermission(messagePrivacy, areFriends) {
-    switch (messagePrivacy) {
-        case 'everyone': return true;
-        case 'friends': return areFriends;
-        case 'nobody': return false;
-        default: return true;
     }
 }
 
@@ -423,17 +378,6 @@ function checkEmotePermission(emotePrivacy, areFriends) {
         case 'friends': return areFriends;
         case 'nobody': return false;
         default: return true;
-    }
-}
-
-function getMessageRestrictionReason(messagePrivacy, areFriends) {
-    switch (messagePrivacy) {
-        case 'friends': 
-            return areFriends ? null : '🔒 This user only accepts messages from friends';
-        case 'nobody': 
-            return '🔒 This user has disabled messages';
-        default: 
-            return null;
     }
 }
 

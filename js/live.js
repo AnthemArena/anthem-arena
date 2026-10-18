@@ -120,7 +120,7 @@ function displayActivityInTicker(activity) {
     
     const username = activity.username || 'Someone';
     const timeAgo = getTimeAgo(activity.timestamp);
-    const songName = shortTitle(activity.votedForName || activity.songTitle || 'a song', 50);
+    const songName = shortTitle(activity.votedForName || activity.songTitle || 'an edit', 50);
     
     tickerText.innerHTML = `
         <strong>${escapeHtml(username)}</strong> voted for 
@@ -584,7 +584,7 @@ function updateUnvotedHeader(unvotedCount) {
         headerIcon.innerHTML = '<i class="fa-solid fa-check-to-slot"></i>';
         headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Matches Need Your Vote!`;
     } else {
-        headerIcon.innerHTML = '<i class="fa-solid fa-music"></i>';
+        headerIcon.innerHTML = '<i class="fa-solid fa-film"></i>';
         headerText.innerHTML = `<span id="unvotedCount">${unvotedCount}</span> Live Matches — Start Voting!`;
     }
 }

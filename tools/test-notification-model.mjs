@@ -1,6 +1,6 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { EVENT_KINDS, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -88,5 +88,54 @@ t('follow notifications: type check, headline, stable quip', () => {
     assert.equal(followHeadline({ triggerUsername: 'Kai' }), 'Kai followed you'); assert.equal(followHeadline({}), 'Someone followed you');
     const a = followQuip({ id: 'abc123' }); assert.equal(a, followQuip({ id: 'abc123' })); assert.ok(FOLLOW_QUIPS.includes(a));
     assert.ok(FOLLOW_QUIPS.includes(followQuip(null)));
+});
+t('every match-event alert type has a tag and a colour rule', () => {
+    for (const [type, k] of Object.entries(EVENT_KINDS)) {
+        assert.ok(k.tag && k.tag.length < 30, type);
+        assert.ok(k.tone === null || /^#[0-9a-f]{6}$/i.test(k.tone), type);
+        assert.ok(isEventNotification({ type }));
+    }
+    assert.equal(eventKind({ type: 'like' }), null); assert.equal(eventKind({ type: 'toString' }), null); assert.equal(eventKind(null), null);
+});
+t('event tags say a little more when the data is there', () => {
+    assert.equal(eventTag({ type: 'round-opening', round: 3 }), 'Round 3 is open');
+    assert.equal(eventTag({ type: 'round-opening' }), 'New round');
+    assert.equal(eventTag({ type: 'new-matches', round: 2 }), 'New matches in round 2');
+    assert.equal(eventTag({ type: 'closing', severityTier: 'final' }), 'Last chance to vote');
+    assert.equal(eventTag({ type: 'closing', severityTier: '3h' }), 'Closing soon');
+    assert.equal(eventTag({ type: 'danger' }), 'Your pick is behind');
+});
+t('event links: matches you voted in open with the share panel, others do not', () => {
+    assert.equal(eventUrl({ type: 'danger', matchId: 'm 1' }), '/vote.html?match=m%201&share=1');
+    assert.equal(eventUrl({ type: 'winning', matchId: 'm1', targetUrl: '/vote.html?match=m1' }), '/vote.html?match=m1&share=1');
+    assert.equal(eventUrl({ type: 'winning', matchId: 'm1', targetUrl: '/vote.html?match=m1&share=1' }), '/vote.html?match=m1&share=1');
+    assert.equal(eventUrl({ type: 'match-won', matchId: 'm1', targetUrl: '/vote.html?match=m1' }), '/vote.html?match=m1');
+    assert.equal(eventUrl({ type: 'novotes', matchId: 'm1' }), '/vote.html?match=m1');
+    assert.equal(eventUrl({ type: 'round-opening', targetUrl: '/vote.html' }), '/vote.html');
+    assert.equal(eventUrl({ type: 'closing', targetUrl: '/#vote' }), '/#vote');
+    assert.equal(eventUrl({ type: 'round-opening' }), '/vote.html');
+});
+t('event chips: percentages for a voted match, match count for a new round', () => {
+    assert.deepEqual(eventChips({ type: 'danger', userPct: 38, opponentPct: 62 }), ['38% vs 62%']);
+    assert.deepEqual(eventChips({ type: 'round-opening', matchCount: 8 }), ['8 matches']);
+    assert.deepEqual(eventChips({ type: 'new-matches', matchCount: 1 }), ['1 match']);
+    assert.deepEqual(eventChips({ type: 'closing' }), []);
+});
+t('welcome and encouragement are event cards with their own tags', () => {
+    assert.equal(eventTag({ type: 'welcome', welcomeType: 'first-time' }), 'Welcome');
+    assert.equal(eventTag({ type: 'welcome', welcomeType: 'comeback' }), 'Welcome back');
+    assert.equal(eventTag({ type: 'welcome' }), 'Welcome');
+    assert.equal(eventTag({ type: 'encouragement', encouragementType: 'gentle' }), 'Still deciding?');
+    assert.equal(eventTag({ type: 'encouragement', encouragementType: 'urgent' }), 'Closing soon');
+    assert.equal(eventUrl({ type: 'encouragement', targetUrl: '/matches.html' }), '/matches.html');
+});
+t('streaks: recognised, drawn as ally / rival, headline names the person and the run, button goes to the profile', () => {
+    const a = { type: 'streak', relationship: 'ally-streak', triggerUsername: 'Mia Lee', streakCount: 10 };
+    assert.ok(isStreakNotification(a)); assert.ok(isStreakNotification({ ...a, relationship: 'rival-streak' }));
+    assert.ok(!isStreakNotification({ type: 'streak', relationship: 'ally' })); assert.ok(!isStreakNotification({ type: 'like' })); assert.ok(!isStreakNotification(null));
+    assert.deepEqual(streakView(a), { relationship: 'ally', headline: 'Mia Lee has voted with you 10 matches in a row', profileUrl: '/profile.html?user=Mia%20Lee' });
+    assert.equal(streakView({ ...a, relationship: 'rival-streak', streakCount: 20 }).headline, 'Mia Lee has voted against you 20 matches in a row');
+    assert.equal(streakView({ ...a, relationship: 'rival-streak' }).relationship, 'opponent');
+    assert.equal(streakView({ relationship: 'ally-streak' }).headline, 'Someone has voted with you again and again');
 });
 console.log(`${pass} passed`);

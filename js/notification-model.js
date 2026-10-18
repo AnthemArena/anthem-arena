@@ -122,3 +122,69 @@ export function contentQuote(g, max = 110) {
 }
 // One consistent wording whatever older notifications saved ("View Comment" vs "View comment").
 export const contentCta = g => g?.type === 'emote-received' ? 'View match' : g?.type === 'mention' ? `View ${mentionWhere(g)}` : ({ like: g?.eventType === 'vote' ? 'View pick' : 'View post', comment: 'View comment', reply: 'View reply' }[g?.type] || 'View');
+
+// ---------- Match-event alerts (danger, nailbiter, winning, comeback, closing, no/low votes, round open, match result) ----------
+// One look for all of them (js/notification-visuals.js eventToastHtml / eventRowHtml): the match's two edits with the viewer's pick
+// ringed in the colour below, a small tag line, the champion's words in a bubble, one button. tone null = the champion pack's colour.
+export const EVENT_KINDS = {
+    danger:           { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
+    'danger-repeat':  { tag: 'Your pick is behind', tone: '#ff5a5f', share: true },
+    nailbiter:        { tag: 'Too close to call',   tone: '#ffb020', share: true },
+    winning:          { tag: 'Your pick is winning', tone: '#4ade80', share: true },
+    comeback:         { tag: 'Comeback',            tone: '#4ade80', share: true },
+    closing:          { tag: 'Closing soon',        tone: '#ffb020' },
+    novotes:          { tag: 'Needs a first vote',  tone: null },
+    lowvotes:         { tag: 'Needs more votes',    tone: null },
+    'round-opening':  { tag: 'New round',           tone: null },
+    'new-matches':    { tag: 'New matches',         tone: null },
+    'match-won':      { tag: 'Your pick won',       tone: '#4ade80', outcome: 'won' },
+    'match-lost':     { tag: 'Your pick lost',      tone: '#f87171', outcome: 'lost' },
+    'match-tied':     { tag: 'Tied match',          tone: '#a5b4fc', outcome: 'tied' },
+    welcome:          { tag: 'Welcome',             tone: null },
+    encouragement:    { tag: 'Still deciding?',     tone: null }
+};
+export const eventKind = n => (n && Object.prototype.hasOwnProperty.call(EVENT_KINDS, n.type)) ? EVENT_KINDS[n.type] : null;
+export const isEventNotification = n => !!eventKind(n);
+
+// The small line above the champion's words. Closing and round alerts say a little more when the data is there.
+export function eventTag(n) {
+    const k = eventKind(n);
+    if (!k) return '';
+    if (n.type === 'closing') return n.severityTier === 'final' ? 'Last chance to vote' : 'Closing soon';
+    if (n.type === 'round-opening') return n.round ? `Round ${n.round} is open` : k.tag;
+    if (n.type === 'new-matches') return n.round ? `New matches in round ${n.round}` : k.tag;
+    if (n.type === 'welcome') return n.welcomeType && n.welcomeType !== 'first-time' ? 'Welcome back' : k.tag;
+    if (n.type === 'encouragement') return n.encouragementType === 'urgent' ? 'Closing soon' : k.tag;
+    return k.tag;
+}
+
+// Where the button (and the alert itself) goes. A match you already voted in opens with the share panel in view.
+export function eventUrl(n) {
+    const k = eventKind(n);
+    let url = n?.targetUrl || (n?.matchId ? `/vote.html?match=${encodeURIComponent(n.matchId)}` : '/vote.html');
+    if (k?.share && n?.matchId && /^\/vote(\.html)?\?/.test(url) && !/[?&]share=/.test(url)) url += '&share=1';
+    return url;
+}
+
+// A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
+export function eventChips(n) {
+    const chips = [];
+    if (Number.isFinite(n?.userPct) && Number.isFinite(n?.opponentPct)) chips.push(`${n.userPct}% vs ${n.opponentPct}%`);
+    if ((n?.type === 'round-opening' || n?.type === 'new-matches') && n.matchCount) chips.push(`${n.matchCount} ${n.matchCount === 1 ? 'match' : 'matches'}`);
+    return chips;
+}
+
+// ---------- Streaks ("10 matches in a row with Kai") ----------
+// Saved as type 'streak' with relationship 'ally-streak' / 'rival-streak'. They are drawn like the ally / rival cards, with a profile button.
+export const isStreakNotification = n => !!n && n.type === 'streak' && (n.relationship === 'ally-streak' || n.relationship === 'rival-streak');
+export function streakView(n) {
+    const ally = n?.relationship === 'ally-streak';
+    const who = n?.triggerUsername || n?.username || 'Someone';
+    const count = Number(n?.streakCount) > 0 ? Number(n.streakCount) : null;
+    const run = count ? `${count} matches in a row` : 'again and again';
+    return {
+        relationship: ally ? 'ally' : 'opponent',
+        headline: `${who} has voted ${ally ? 'with' : 'against'} you ${run}`,
+        profileUrl: `/profile.html?user=${encodeURIComponent(who)}`
+    };
+}

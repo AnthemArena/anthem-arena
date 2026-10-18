@@ -1,4 +1,4 @@
-# Anthem Arena - League of Legends Music Tournament
+# Arcane Moments - Arcane edits tournament
 User-agent: *
 Allow: /
 
@@ -18,7 +18,7 @@ Allow: /vote.html
 Allow: /vote?*
 
 # Sitemap location
-Sitemap: https://anthemarena.com/sitemap.xml
+Sitemap: https://arcanemoments.netlify.app/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1

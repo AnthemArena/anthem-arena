@@ -82,14 +82,10 @@ export function buildPostVoteModalHtml(view) {
         ? `<a class="pvm-btn pvm-btn--primary" href="${esc(view.next.href)}">${esc(view.next.label || 'Next match')} <span aria-hidden="true">&rarr;</span></a>`
         : `<a class="pvm-btn pvm-btn--primary" href="${esc(view.bracketHref || 'brackets')}">See the bracket <span aria-hidden="true">&rarr;</span></a>`;
 
-    const song = esc(view.songNameRaw || '');
-    const ctx = esc(view.shareContext || 'default');
     const share = `
         <div class="pvm-share" role="group" aria-label="Share this match">
             <span class="pvm-share-label">Share</span>
-            <button type="button" class="pvm-share-btn" data-song="${song}" onclick="shareToTwitter(this.dataset.song, '${ctx}')"><i class="fa-brands fa-twitter" aria-hidden="true"></i> Tweet</button>
-            <button type="button" class="pvm-share-btn" data-song="${song}" onclick="shareToReddit(this.dataset.song, '${ctx}')"><i class="fa-brands fa-reddit" aria-hidden="true"></i> Reddit</button>
-            <button type="button" class="pvm-share-btn" onclick="copyMatchLink()"><i class="fa-solid fa-link" aria-hidden="true"></i> Copy link</button>
+            <div class="pvm-share-box" data-share-box></div>
             <a class="pvm-kofi" href="${esc(view.kofiUrl || 'https://ko-fi.com/arcanemoments')}" target="_blank" rel="noopener noreferrer">Support on Ko-fi</a>
         </div>`;
 
@@ -115,6 +111,29 @@ export function buildPostVoteModalHtml(view) {
                     <a class="pvm-btn pvm-btn--ghost" href="/matches.html">View all matches</a>
                 </div>
                 ${share}
+            </div>
+        </div>`;
+}
+
+
+/**
+ * The slim "share" version of the modal (opened from an alert button): the champion's face and line, then the share box.
+ * view: { line, championName, portraitUrl, splashUrl, heading }  (the line is the share text itself: the champion says it, the buttons send it)
+ */
+export function buildShareModalHtml(view) {
+    return `
+        <div class="modal-overlay" onclick="closePostVoteModal()"></div>
+        <div class="modal-content post-vote-content pvm pvm--share" role="dialog" aria-modal="true" aria-label="Share this match">
+            <button class="modal-close" onclick="closePostVoteModal()" aria-label="Close">&times;</button>
+            <div class="pvm-hero"${view.splashUrl ? ` style="--pvm-splash:url('${esc(view.splashUrl)}')"` : ''}>
+                <div class="pvm-hero-row">
+                    ${view.portraitUrl ? `<img class="pvm-portrait" src="${esc(view.portraitUrl)}" alt="${esc(view.championName || '')}" width="64" height="64">` : ''}
+                    <div class="pvm-speech"><p class="pvm-line">${esc(view.line)}</p></div>
+                </div>
+            </div>
+            <div class="pvm-body">
+                <p class="pvm-voted"><strong>${esc(view.heading || 'Share the match and rally support')}</strong></p>
+                <div class="pvm-share-box" data-share-box></div>
             </div>
         </div>`;
 }

@@ -1,4 +1,4 @@
-// Achievement lines of Jinx, Vi, Caitlyn and Lux: every real achievement has one, in the Arcane voice, with only placeholders the loader fills.
+// Achievement lines of Jinx, Vi and Caitlyn: every real achievement has one, in the Arcane voice, with only placeholders the loader fills.
 //   node tools/test-champion-achievements.mjs
 import fs from 'node:fs';
 const read = p => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
@@ -8,7 +8,7 @@ const check = (name, ok, got) => { console.log((ok ? '  ok  ' : 'FAIL  ') + name
 const ids = [...read('../js/achievements.js').matchAll(/^\s+id: '([a-z-]+)',\s*$/gm)].map(m => m[1]);
 const loader = read('../js/champion-loader.js');
 check('found the real achievement ids', ids.length >= 30, ids.length);
-for (const pack of ['jinx', 'vi', 'caitlyn', 'lux']) {
+for (const pack of ['jinx', 'vi', 'caitlyn']) {
 const A = JSON.parse(read(`../champion-packs/${pack}.json`)).achievements;
 console.log(`-- ${pack}`);
 check('every real achievement id has a Jinx entry (the old ids came from the previous site and never matched)', ids.every(i => A[i]), ids.filter(i => !A[i]));

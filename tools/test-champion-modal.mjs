@@ -1,6 +1,6 @@
 // Unit tests for js/champion-modal.js (pure helpers) and the Jinx modal lines.   node tools/test-champion-modal.mjs
 import fs from 'node:fs';
-import { pickModalKey, chooseModalLine, modalLinesFor, buildPostVoteModalHtml, MODAL_KEYS, TAG_FOR_KEY } from '../js/champion-modal.js';
+import { pickModalKey, chooseModalLine, modalLinesFor, buildPostVoteModalHtml, buildShareModalHtml, MODAL_KEYS, TAG_FOR_KEY } from '../js/champion-modal.js';
 let failed = 0;
 const check = (name, ok, got) => { console.log((ok ? '  ok  ' : 'FAIL  ') + name + (ok ? '' : '   got: ' + JSON.stringify(got))); if (!ok) failed++; };
 
@@ -34,5 +34,9 @@ check('html has the primary Next match button and View all matches', html.includ
 check('primary comes before the share row (actions above Ko-fi)', html.indexOf('pvm-actions') < html.indexOf('pvm-share') && html.indexOf('pvm-share') < html.indexOf('ko-fi.com'));
 check('XP total, bonus chip and level bar are shown', html.includes('+40 XP') && html.includes('+30 First vote today') && html.includes('width:40%'));
 check('no next match -> bracket button', buildPostVoteModalHtml({ xp: { totalXP: 10, baseXP: 10, bonuses: [] }, line: 'x', voteTitle: 'y' }).includes('See the bracket'));
-check('share buttons carry the song through data-song (quotes safe)', html.includes('data-song="It&#39;s A"'));
+check('share row has a mount point for the share box', html.includes('data-share-box'));
+const sm = buildShareModalHtml({ line: 'Go on <b>', championName: 'Jinx', portraitUrl: 'p.png', heading: 'Rally <support>' });
+check('share modal: face, escaped line, mount point, close button, no XP block', sm.includes('pvm-portrait') && sm.includes('Go on &lt;b&gt;') && sm.includes('data-share-box') && sm.includes('modal-close') && !sm.includes('pvm-xp'), sm);
+check('share modal: heading is escaped', sm.includes('Rally &lt;support&gt;'));
+check('share modal: default heading', buildShareModalHtml({ line: 'x' }).includes('Share the match and rally support'));
 console.log(failed ? `\n${failed} FAILED` : '\nall passed'); process.exit(failed ? 1 : 0);

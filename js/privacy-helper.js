@@ -18,7 +18,6 @@ function getDefaultPrivacySettings() {
     return {
         isPublic: true,
         allowFollows: true,  // ✅ Changed from allowFriendRequests
-        messagePrivacy: 'everyone',  // 'everyone', 'followers', 'nobody'
         showOnlineStatus: true,
         emotePrivacy: 'everyone'  // 'everyone', 'followers', 'nobody'
     };
@@ -45,9 +44,6 @@ export async function getUserPrivacySettings(userId) {
             const privacy = data.privacy || getDefaultPrivacySettings();
             
             // ✅ Migrate old 'friends' settings to 'followers'
-            if (privacy.messagePrivacy === 'friends') {
-                privacy.messagePrivacy = 'followers';
-            }
             if (privacy.emotePrivacy === 'friends') {
                 privacy.emotePrivacy = 'followers';
             }
@@ -98,27 +94,6 @@ async function isFollowing(followerUserId, followingUserId) {
 // CHECK IF ACTION IS ALLOWED (WITH FIREBASE)
 // ========================================
 
-export async function canUserSendMessage(currentUserId, targetUserId, areFollowing = false) {
-    if (currentUserId === targetUserId) return false;
-    
-    const privacy = await getUserPrivacySettings(targetUserId);
-    
-    switch (privacy.messagePrivacy) {
-        case 'everyone':
-            return true;
-        case 'followers':  // ✅ Changed from 'friends'
-            // If not provided, check follow status
-            if (areFollowing === false) {
-                areFollowing = await isFollowing(currentUserId, targetUserId);
-            }
-            return areFollowing;
-        case 'nobody':
-            return false;
-        default:
-            return true;
-    }
-}
-
 export async function canUserSendEmote(currentUserId, targetUserId, areFollowing = false) {
     if (currentUserId === targetUserId) return false;
     
@@ -148,62 +123,6 @@ export async function shouldShowOnlineStatus(userId) {
 export async function isProfilePublic(userId) {
     const privacy = await getUserPrivacySettings(userId);
     return privacy.isPublic;
-}
-
-// ========================================
-// CHECK USER MESSAGE PRIVACY (FOR NOTIFICATIONS)
-// Returns object with canMessage boolean and reason
-// ========================================
-
-/**
- * Check if a user can receive messages based on their privacy settings
- * Used by notification system to show/hide Reply buttons
- * @param {string} toUserId - User receiving the message
- * @param {string} fromUserId - User sending the message (optional, defaults to current user)
- * @returns {Object} { canMessage: boolean, reason: string }
- */
-export async function checkUserMessagePrivacy(toUserId, fromUserId = null) {
-    try {
-        // If no fromUserId provided, use current user
-        if (!fromUserId) {
-            fromUserId = localStorage.getItem('userId');
-        }
-        
-        console.log('🔍 Privacy check: from', fromUserId, '→ to', toUserId);
-        
-        // Get recipient's privacy settings
-        const privacy = await getUserPrivacySettings(toUserId);
-        
-        console.log('🔒 Message privacy setting:', privacy.messagePrivacy);
-        
-        // Check privacy settings
-        if (privacy.messagePrivacy === 'nobody') {
-            console.log('❌ User has disabled all messages');
-            return { canMessage: false, reason: 'disabled' };
-        }
-        
-        if (privacy.messagePrivacy === 'followers') {  // ✅ Changed from 'friends'
-            console.log('🔍 Checking if user is following...');
-            
-            // ✅ Check if fromUserId follows toUserId
-            const areFollowing = await isFollowing(fromUserId, toUserId);
-            
-            if (!areFollowing) {
-                console.log('❌ Not following, messages blocked');
-                return { canMessage: false, reason: 'followers-only' };
-            }
-            
-            console.log('✅ User is following, messages allowed');
-        }
-        
-        console.log('✅ Messages allowed');
-        return { canMessage: true, reason: 'allowed' };
-        
-    } catch (error) {
-        console.error('❌ Error checking message privacy:', error);
-        // Default to allowing messages on error (fail open)
-        return { canMessage: true, reason: 'error' };
-    }
 }
 
 // ========================================

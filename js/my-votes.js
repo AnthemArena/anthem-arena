@@ -663,8 +663,8 @@ function displayUpcomingReminders(matches) {
     
     container.innerHTML = `
         <div class="reminders-header">
-            <h3 class="reminders-title"><i class="fa-solid fa-bell"></i> Your Songs Coming Up</h3>
-            <p class="reminders-subtitle">Songs you've supported have upcoming matches</p>
+            <h3 class="reminders-title"><i class="fa-solid fa-bell"></i> Your Edits Coming Up</h3>
+            <p class="reminders-subtitle">Edits you've supported have upcoming matches</p>
         </div>
         <div class="reminders-list">
             ${topMatches.map(match => {
@@ -903,8 +903,8 @@ function displayFavoriteSongs(songs) {
     
     container.innerHTML = `
         <div class="favorite-songs-header">
-            <h3 class="favorite-songs-title"><i class="fa-solid fa-music"></i> Your Most Supported Songs</h3>
-            <p class="favorite-songs-subtitle">Songs you've voted for the most across all matches</p>
+            <h3 class="favorite-songs-title"><i class="fa-solid fa-film"></i> Your Most Supported Edits</h3>
+            <p class="favorite-songs-subtitle">Edits you've voted for the most across all matches</p>
         </div>
         <div class="favorite-songs-list">
             ${songs.map((song, index) => `
@@ -971,8 +971,8 @@ function displaySongJourneys() {
     
     container.innerHTML = `
         <div class="song-journeys-header">
-            <h3 class="journeys-title"><i class="fa-solid fa-trophy"></i> Song Journeys</h3>
-            <p class="journeys-subtitle">Track how far your favorite songs have gone</p>
+            <h3 class="journeys-title"><i class="fa-solid fa-trophy"></i> Edit Journeys</h3>
+            <p class="journeys-subtitle">Track how far your favourite edits have gone</p>
         </div>
         <div class="journeys-list">
             ${topSongs.map(song => createSongJourneyCard(song)).join('')}
@@ -988,7 +988,7 @@ function createSongJourneyCard(song) {
     
     // Status display
     const statusConfig = {
-        'active': { icon: '<i class="fa-solid fa-music"></i>', label: 'Still Active', class: 'active' },
+        'active': { icon: '<i class="fa-solid fa-film"></i>', label: 'Still Active', class: 'active' },
         'advanced': { icon: '✓', label: 'Advanced', class: 'advanced' },
         'eliminated': { icon: '○', label: 'Eliminated', class: 'eliminated' }
     };
@@ -1071,7 +1071,7 @@ function displayJourneyMap() {
     container.innerHTML = `
         <div class="journey-map-header">
             <h3 class="map-title">🗺️ Your Tournament Journey</h3>
-            <p class="map-subtitle">Visual map of how far your songs have traveled</p>
+            <p class="map-subtitle">Visual map of how far your edits have travelled</p>
         </div>
         <div class="journey-map">
             ${rounds.map(round => `
@@ -1175,7 +1175,7 @@ function displayTournamentCoverage(coverage) {
 function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
     if (totalVotes < 5) {
         return {
-            icon: '<i class="fa-solid fa-music"></i>',
+            icon: '<i class="fa-solid fa-film"></i>',
             title: 'New Voter',
             description: 'Just getting started - vote more to unlock your taste profile!'
         };
@@ -1210,9 +1210,9 @@ function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
         };
     } else {
         return {
-            icon: '<i class="fa-solid fa-music"></i>',
-            title: 'Music Enthusiast',
-            description: 'You appreciate all kinds of League music'
+            icon: '<i class="fa-solid fa-film"></i>',
+            title: 'Edit Enthusiast',
+            description: 'You enjoy all kinds of Arcane edits'
         };
     }
 }
@@ -1233,7 +1233,7 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
     if (journeyStats.songsStillAlive >= 10) {
         badgeData = {
             title: '<i class="fa-solid fa-star"></i> Champion Supporter',
-            description: `${journeyStats.songsStillAlive} songs you voted for are still competing!`
+            description: `${journeyStats.songsStillAlive} edits you voted for are still competing!`
         };
     } else if (votingStreak >= 7) {
         badgeData = {
@@ -1252,7 +1252,7 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
         };
     } else if (journeyStats.songsStillAlive >= 5) {
         badgeData = {
-            title: '<i class="fa-solid fa-music"></i> Song Champion',
+            title: '<i class="fa-solid fa-film"></i> Edit Champion',
             description: `${journeyStats.songsStillAlive} of your picks are still in the tournament!`
         };
     } else if (votingStreak >= 5) {
@@ -1277,7 +1277,7 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
         };
     } else if (totalVotes >= 20) {
         badgeData = {
-            title: '<i class="fa-solid fa-music"></i> Dedicated Fan',
+            title: '<i class="fa-solid fa-film"></i> Dedicated Fan',
             description: `${totalVotes} votes and counting!`
         };
     } else if (totalVotes >= 10) {
@@ -1287,7 +1287,7 @@ function showAchievementBadge(tasteProfile, totalVotes, underdogPicks, mainstrea
         };
     } else if (totalVotes >= 5) {
         badgeData = {
-            title: '🎵 Music Enthusiast',
+            title: '🎬 Edit Enthusiast',
             description: `${totalVotes} votes cast - keep going!`
         };
     }

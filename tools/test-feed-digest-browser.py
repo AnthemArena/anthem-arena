@@ -53,7 +53,9 @@ def load(browser, width, height):
         else: r.continue_()
     pg.route('**/*', route)
     pg.goto(f'http://127.0.0.1:{PORT}/feed.html')
-    pg.wait_for_timeout(4000)
+    try: pg.wait_for_selector('.feed-vote-digest', timeout=20000)   # the feed fills in after the match list and activity arrive
+    except Exception: pass
+    pg.wait_for_timeout(500)
     return pg, errs
 
 with sync_playwright() as p:

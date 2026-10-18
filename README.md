@@ -16,7 +16,7 @@ Anthem Arena is a community-driven tournament where League of Legends fans vote 
 
 ## Live Site
 
-Visit: **anthemarena.com** *(coming soon)*
+Visit: **https://arcanemoments.netlify.app**
 
 ## Tech Stack
 

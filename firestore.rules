@@ -19,7 +19,7 @@ rules_version = '2';
 // STAGE 1 covers: votes, tournaments/matches, activity, profiles, posts.
 // STAGE 2 covers: user-notifications, user-reactions, follows, comments,
 // likes, messages, feeds, users, blog, plus like/comment counters on posts.
-// Still locked on purpose: matchViews, battleship_matches (see notes below).
+// Still locked on purpose: matchViews (see notes below).
 // ============================================================================
 
 service cloud.firestore {
@@ -354,36 +354,6 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------------
-    // Direct messages (js/message-system.js). Only the two people involved
-    // can read. The sender creates; the recipient can mark as read.
-    // ---------------------------------------------------------------------
-
-    match /messages/{messageId} {
-      allow read: if signedIn()
-        && (resource.data.fromUserId == request.auth.uid
-            || resource.data.toUserId == request.auth.uid);
-
-      allow create: if signedIn()
-        && request.resource.data.fromUserId == request.auth.uid
-        && request.resource.data.toUserId is string
-        && request.resource.data.toUserId != request.auth.uid
-        && request.resource.data.message is string
-        && request.resource.data.message.size() > 0
-        && request.resource.data.message.size() <= 300
-        && request.resource.data.read == false
-        && request.resource.data.keys().hasOnly([
-             'fromUserId', 'fromUsername', 'toUserId', 'toUsername', 'message',
-             'timestamp', 'read', 'matchId', 'matchTitle', 'parentNotificationId'
-           ]);
-
-      allow update: if signedIn()
-        && resource.data.toUserId == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
-
-      allow delete: if isAdmin();
-    }
-
-    // ---------------------------------------------------------------------
     // Feed fan-out (js/social-feed.js). feeds/<followerId>/posts/<postId>.
     // Only the feed's owner reads it. The post's author writes copies into
     // their followers' feeds.
@@ -431,7 +401,6 @@ service cloud.firestore {
     // Everything else stays locked, on purpose:
     //  - matchViews: written by the Netlify edge function with no sign-in.
     //    Opening it would let anyone write to it. Needs a different design.
-    //  - battleship_matches: dead code, slated for removal.
     // ---------------------------------------------------------------------
 
     match /{document=**} {

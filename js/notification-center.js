@@ -6,12 +6,11 @@ import {
     markNotificationRead, 
     dismissNotification 
 } from './notification-storage.js';
-import { sendMessage } from './message-system.js';
 import { withoutEmoteCta } from './features.js';
-import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta } from './notification-model.js';
+import { groupNotifications, groupHeadline, socialHeadline, isSocialTabItem, isFollowNotification, isFollowBack, followHeadline, followQuip, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, isEventNotification, eventKind, eventTag, eventUrl, isStreakNotification, streakView } from './notification-model.js';
 import { getFollowingIds } from './follow-system.js';
-import { socialRowHtml, followRowHtml, contentRowHtml, avatarSrc, fallbackAvatarFor } from './notification-visuals.js';
-import { enrichSocial } from './notification-social-context.js';
+import { socialRowHtml, followRowHtml, contentRowHtml, eventRowHtml, avatarSrc, fallbackAvatarFor, championBadgeUrl } from './notification-visuals.js';
+import { enrichSocial, matchesLoaded } from './notification-social-context.js';
 
 // ✅ GUARD: Prevent duplicate initialization
 let isInitialized = false;
@@ -172,10 +171,6 @@ function addTabsToPanel(panel) {
         <button class="notif-tab" data-tab="achievements">
             <i class="fa-solid fa-trophy"></i> Achievements
         </button>
-        <button class="notif-tab" data-tab="messages">
-            <i class="fa-solid fa-envelope"></i> Messages
-            <span class="tab-badge" id="messageTabBadge" style="display: none;"></span>
-        </button>
     </div>
     `;
     
@@ -250,83 +245,7 @@ async function loadNotificationsByTab(tab) {
     
     content.innerHTML = '<div class="notification-empty"><p>Loading...</p></div>';
     
-    if (tab === 'messages') {
-        await loadMessagesTab(content, userId);
-    } else {
-        await loadNotificationsTab(content, userId, tab);
-    }
-}
-
-async function loadMessagesTab(content, userId) {
-    const { getRecentConversations } = await import('./message-system.js');
-    const conversations = await getRecentConversations(20);
-    
-    if (conversations.length === 0) {
-        content.innerHTML = `
-            <div class="notification-empty">
-                <span style="font-size: 48px; opacity: 0.3;">💬</span>
-                <p>No messages yet</p>
-                <p style="font-size: 0.85rem; color: #888; margin-top: 8px;">
-                    Messages from other users will appear here
-                </p>
-            </div>
-        `;
-        return;
-    }
-    
-    content.innerHTML = conversations.map(conv => `
-        <div class="notification-item message-item ${conv.unreadCount > 0 ? 'unread' : ''}" 
-             data-user-id="${conv.userId}"
-             onclick="openConversationModal('${conv.userId}', '${conv.username}')"
-             style="cursor: pointer;">
-            <div class="notification-item-header" style="display: flex; align-items: center;">
-                <div style="
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, #667eea, #764ba2);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.2rem;
-                    font-weight: 700;
-                    color: white;
-                    margin-right: 12px;
-                    flex-shrink: 0;
-                ">
-                    ${conv.username.charAt(0).toUpperCase()}
-                </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div class="notification-item-message" style="font-weight: 600; color: #C8AA6E;">
-                        ${conv.username}
-                    </div>
-                    <div class="notification-item-detail" style="
-                        color: rgba(255, 255, 255, 0.7);
-                        font-size: 0.85rem;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    ">
-                        ${conv.lastMessage}
-                    </div>
-                </div>
-                ${conv.unreadCount > 0 ? `
-                    <span class="unread-badge" style="
-                        background: #e74c3c;
-                        color: white;
-                        font-size: 0.75rem;
-                        font-weight: 700;
-                        padding: 4px 8px;
-                        border-radius: 12px;
-                        margin-left: 8px;
-                    ">${conv.unreadCount}</span>
-                ` : ''}
-            </div>
-            <div class="notification-item-footer">
-                <span class="notification-item-time">${getTimeAgo(conv.lastMessageTime)}</span>
-            </div>
-        </div>
-    `).join('');
+    await loadNotificationsTab(content, userId, tab);
 }
 
 async function loadNotificationsTab(content, userId, tab) {
@@ -365,11 +284,17 @@ async function loadNotificationsTab(content, userId, tab) {
     
     attachNotificationListeners();
     await updateCtaButtonsWithPrivacy();
-}
 
-window.openConversationModal = function(userId, username) {
-    showMessageComposer(userId, username, {});
-};
+    // A slow match list made vote rows fall back to avatars; once it lands, draw them again with the edit pictures
+    const missing = grouped.some(n => (n.relationship === 'ally' || n.relationship === 'opponent') && n.nv && !n.nv.edits);
+    if (missing && await matchesLoaded()) {
+        if (document.querySelector('.notif-tab.active')?.dataset.tab !== tab || !document.body.contains(content)) return;
+        await enrichSocial(grouped.filter(n => n.nv && !n.nv.edits));
+        content.innerHTML = grouped.map(renderNotificationItem).join('');
+        attachNotificationListeners();
+        await updateCtaButtonsWithPrivacy();
+    }
+}
 
 // ========================================
 // CLEAR ALL (in the tab you are looking at)
@@ -384,10 +309,6 @@ async function dismissOldNotifications() {
     if (!userId) return;
     const button = document.querySelector('.clear-old-btn');
     const activeTab = document.querySelector('.notif-tab.active')?.dataset.tab || 'all';
-    if (activeTab === 'messages') {
-        if (button) { button.textContent = 'Not for messages'; setTimeout(() => { button.textContent = 'Clear all'; }, 2000); }
-        return;
-    }
 
     // first tap asks, second tap (within 3 seconds) does it
     if (button && !button.dataset.confirm) {
@@ -594,7 +515,6 @@ function renderNotificationItem(notification) {
         'achievement': '🏆',
         'live-activity': '🎯',
         'causal-event': '⚡',
-        'message-received': '💬'
     };
     
     // ✅ NEW: Text-to-emoji fallback map
@@ -665,6 +585,23 @@ function renderNotificationItem(notification) {
         return contentRowHtml(notification, { parts: contentHeadline(notification), quote: contentQuote(notification), icon: contentIcon(notification), cta: contentCta(notification), timeAgo, championPack, srcs, names });
     }
 
+    if (isStreakNotification(notification)) {
+        // "10 matches in a row with Kai": the ally / rival row, with the champion's line and a View profile button
+        const v = streakView(notification);
+        return socialRowHtml({ ...notification, relationship: v.relationship, detail: notification.message, matchTitle: '', ctaAction: 'navigate', ctaText: 'View profile', ctaUrl: v.profileUrl, targetUrl: v.profileUrl },
+            { headline: { message: v.headline, detail: '' }, timeAgo, championPack });
+    }
+
+    if (isEventNotification(notification)) {
+        // danger / nailbiter / winning / comeback / closing / no or low votes / round open / match result: one card design
+        const kind = eventKind(notification);
+        const accent = kind.tone || championPack?.color || '#ff69b4';
+        return eventRowHtml(notification, {
+            tag: eventTag(notification), edits: notification.nv?.edits || null, accent, jinxSrc: championBadgeUrl(championPack),
+            quip: notification.message, timeAgo, championPack, cta: notification.ctaText || 'View match', url: eventUrl(notification)
+        });
+    }
+
     // Image logic
     let imageHtml = '';
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -716,7 +653,7 @@ function renderNotificationItem(notification) {
     
     // CTA button logic (unchanged but uses notification.ids for grouped)
     let ctaHtml = '';
-    if (notification.ctaAction === 'send-emote' || notification.ctaAction === 'open-message') {
+    if (notification.ctaAction === 'send-emote') {
         ctaHtml = `
             <button class="notification-item-cta" 
                     data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
@@ -799,19 +736,6 @@ async function updateCtaButtonsWithPrivacy() {
                     btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Emotes Disabled</span>`;
                     btn.disabled = true;
                     btn.title = permissions.emoteReason || 'Cannot send emote';
-                    btn.style.cursor = 'not-allowed';
-                    btn.style.opacity = '0.5';
-                }
-            } else if (action === 'open-message') {
-                if (permissions.canMessage) {
-                    btn.innerHTML = notification?.ctaText || 'Reply';
-                    btn.disabled = false;
-                    btn.style.cursor = 'pointer';
-                    btn.style.opacity = '1';
-                } else {
-                    btn.innerHTML = `<span style="opacity: 0.6; font-size: 0.85rem;">🔒 Messages Disabled</span>`;
-                    btn.disabled = true;
-                    btn.title = permissions.messageReason || 'Cannot send message';
                     btn.style.cursor = 'not-allowed';
                     btn.style.opacity = '0.5';
                 }
@@ -922,32 +846,6 @@ function attachNotificationListeners() {
                 }
             }
             
-           // ✅ HANDLE MESSAGE REPLY
-            if (action === 'open-message') {
-                const userId = localStorage.getItem('tournamentUserId');
-                const notifications = await getUnreadNotifications(userId);
-                const notification = notifications.find(n => n.id === id);
-                
-                if (notification && notification.ctaData) {
-                    // Show message composer
-                    await markNotificationRead(id);
-                    await updateBadgeCount();
-                    
-                    showMessageComposer(
-                        notification.ctaData.fromUserId,
-                        notification.ctaData.fromUsername,
-                        {
-                            matchId: notification.matchId,
-                            matchTitle: notification.matchTitle,
-                            replyTo: notification.ctaData.originalMessage,
-                            notificationId: id
-                        }
-                    );
-                    
-                    return; // Don't navigate
-                }
-            }
-            
             // ✅ HANDLE NAVIGATION
             await markNotificationRead(id);
             await updateBadgeCount();
@@ -1023,242 +921,6 @@ function getTimeAgo(timestamp) {
     if (days < 7) return `${days}d ago`;
     return 'Over a week ago';
 }
-// ========================================
-// MESSAGE COMPOSER
-// ========================================
-
-function showMessageComposer(toUserId, toUsername, context = {}) {
-    // Remove existing composer if any
-    const existing = document.getElementById('messageComposer');
-    if (existing) existing.remove();
-    
-    // Create composer overlay
-    const composer = document.createElement('div');
-    composer.id = 'messageComposer';
-    composer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(5px);
-        z-index: 10001;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.2s ease;
-    `;
-    
-    composer.innerHTML = `
-        <div style="
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid rgba(200, 170, 110, 0.3);
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.3s ease;
-        ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="margin: 0; color: #C8AA6E; font-size: 1.2rem;">
-                    💬 Message ${toUsername}
-                </h3>
-                  <a href="/profile?user=${toUsername}" 
-                   style="color: #888; text-decoration: none; font-size: 0.85rem; border: 1px solid rgba(200, 170, 110, 0.3); padding: 4px 8px; border-radius: 4px; transition: all 0.2s;"
-                   onmouseover="this.style.color='#C8AA6E'; this.style.borderColor='#C8AA6E';"
-                   onmouseout="this.style.color='#888'; this.style.borderColor='rgba(200, 170, 110, 0.3)';">
-                    👤 View Profile
-                </a>
-            </div>
-                <button id="closeComposer" style="
-                    background: none;
-                    border: none;
-                    color: #888;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    padding: 0;
-                    width: 30px;
-                    height: 30px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                ">×</button>
-            </div>
-            
-            ${context.replyTo ? `
-                <div style="
-                    background: rgba(200, 170, 110, 0.1);
-                    border-left: 3px solid #C8AA6E;
-                    padding: 12px;
-                    margin-bottom: 16px;
-                    border-radius: 4px;
-                    font-size: 0.9rem;
-                    color: #aaa;
-                ">
-                    <div style="color: #C8AA6E; font-weight: 600; margin-bottom: 4px;">
-                        Replying to:
-                    </div>
-                    "${context.replyTo}"
-                </div>
-            ` : ''}
-            
-            ${context.matchTitle ? `
-                <div style="
-                    background: rgba(200, 170, 110, 0.05);
-                    padding: 8px 12px;
-                    margin-bottom: 16px;
-                    border-radius: 4px;
-                    font-size: 0.85rem;
-                    color: #888;
-                ">
-                    📍 About: ${context.matchTitle}
-                </div>
-            ` : ''}
-            
-            <textarea id="messageInput" 
-                placeholder="Type your message... (max 300 characters)"
-                maxlength="300"
-                style="
-                    width: 100%;
-                    height: 120px;
-                    background: rgba(0, 0, 0, 0.3);
-                    border: 2px solid rgba(200, 170, 110, 0.3);
-                    border-radius: 8px;
-                    padding: 12px;
-                    color: #fff;
-                    font-family: inherit;
-                    font-size: 1rem;
-                    resize: vertical;
-                    margin-bottom: 12px;
-                "
-            ></textarea>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="charCount" style="color: #888; font-size: 0.85rem;">0/300</span>
-                <div style="display: flex; gap: 8px;">
-                    <button id="cancelMessage" style="
-                        background: rgba(255, 255, 255, 0.1);
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        color: #fff;
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 600;
-                    ">Cancel</button>
-                    <button id="sendMessage" style="
-                        background: linear-gradient(135deg, #C8AA6E, #B89A5E);
-                        border: none;
-                        color: #1a1a2e;
-                        padding: 10px 24px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 700;
-                        box-shadow: 0 4px 12px rgba(200, 170, 110, 0.3);
-                    ">Send 💬</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(composer);
-    
-    // Get elements
-    const input = document.getElementById('messageInput');
-    const charCount = document.getElementById('charCount');
-    const sendBtn = document.getElementById('sendMessage');
-    const cancelBtn = document.getElementById('cancelMessage');
-    const closeBtn = document.getElementById('closeComposer');
-    
-    // Focus input
-    input.focus();
-    
-    // Character counter
-    input.addEventListener('input', () => {
-        const length = input.value.length;
-        charCount.textContent = `${length}/300`;
-        charCount.style.color = length > 280 ? '#e74c3c' : '#888';
-    });
-    
-    // Close handlers
-    const closeComposer = () => {
-        composer.style.animation = 'fadeOut 0.2s ease';
-        setTimeout(() => composer.remove(), 200);
-    };
-    
-    closeBtn.addEventListener('click', closeComposer);
-    cancelBtn.addEventListener('click', closeComposer);
-    composer.addEventListener('click', (e) => {
-        if (e.target === composer) closeComposer();
-    });
-    
-    // Send message
-    sendBtn.addEventListener('click', async () => {
-        const message = input.value.trim();
-        
-        if (!message) {
-            input.style.borderColor = '#e74c3c';
-            setTimeout(() => {
-                input.style.borderColor = 'rgba(200, 170, 110, 0.3)';
-            }, 1000);
-            return;
-        }
-        
-        // Show loading state
-        sendBtn.textContent = 'Sending...';
-        sendBtn.disabled = true;
-        sendBtn.style.opacity = '0.6';
-        
-       // Send message
-        const result = await sendMessage(toUserId, toUsername, message, context);
-        
-        if (result.success) {
-            // Success feedback
-            sendBtn.textContent = '✓ Sent!';
-            sendBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
-            
-            // Close after 1 second
-            setTimeout(() => {
-                closeComposer();
-                
-                // Show success toast
-                showQuickToast(`✅ Message sent to ${toUsername}!`, 2000);
-            }, 1000);
-            
-       } else {
-            // Error feedback
-            sendBtn.textContent = '✗ Failed';
-            sendBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
-            
-            // ✅ Show reason if available
-            if (result.reason) {
-                input.placeholder = result.reason;
-                input.style.borderColor = '#e74c3c';
-                showQuickToast(result.reason, 3000);
-            } else {
-                showQuickToast('⚠️ Could not send message', 2000);
-            }
-            
-            setTimeout(() => {
-                sendBtn.textContent = 'Send 💬';
-                sendBtn.disabled = false;
-                sendBtn.style.opacity = '1';
-                sendBtn.style.background = 'linear-gradient(135deg, #C8AA6E, #B89A5E)';
-                input.style.borderColor = 'rgba(200, 170, 110, 0.3)';
-            }, 2000);
-        }
-    });
-    
-    // Send on Enter (Shift+Enter for new line)
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendBtn.click();
-        }
-    });
-}
-
 // Helper function for quick toasts
 function showQuickToast(message, duration = 2000) {
     const existing = document.getElementById('quickToast');
