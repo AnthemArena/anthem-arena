@@ -39,8 +39,21 @@ t('html: own profile gets clickable unlocked skins, visitors do not; locked ones
     assert.match(own, /data-action="look" data-pack="vi" data-skin="29"/);
     assert.doesNotMatch(own, /data-skin="48"/);          // Arcane Brawler is locked at Mastery 2
     assert.doesNotMatch(other, /data-action=/);
-    assert.match(other, /Mastery 10/); assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
+    assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
+    assert.match(championsHtml(v, { filters: { vi: 'locked' } }), /Mastery 10/);
     assert.match(championsHtml(buildChampionsView({}), {}), /No votes yet/);
+});
+t('filters: unlocked by default, locked in the order they are earned, all lists unlocked first', () => {
+    const v = buildChampionsView({ packXp: { vi: 100 }, activePack: 'vi' });
+    const grid = (h) => { const c = h.split('data-pack="vi">')[1].split('<article')[0]; return [...c.matchAll(/class="cm-skin-name">([^<]+)/g)].map(m => m[1]); };
+    const names = f => grid(championsHtml(v, { filters: { vi: f } }));
+    assert.deepEqual(names(undefined), ['Classic', 'Arcane Undercity']);
+    const locked = names('locked');
+    assert.equal(locked.length, 12); assert.equal(locked[0], 'Neon Strike'); assert.equal(locked.at(-1), 'Arcane Brawler');
+    const all = names('all');
+    assert.equal(all.length, 14); assert.deepEqual(all.slice(0, 2), ['Classic', 'Arcane Undercity']);
+    assert.match(championsHtml(v, { filters: { vi: 'locked' } }), /data-filter="locked" data-pack="vi" aria-pressed="true">Locked <span>12<\/span>/);
+    assert.match(championsHtml(buildChampionsView({ packXp: { vi: 99999 } }), { filters: { vi: 'locked' } }), /Everything is unlocked/);
 });
 t('look: Arcane by default once unlocked, a chosen look wins, shown as pressed', () => {
     const v = buildChampionsView({ packXp: { jinx: 1700 }, looks: {} });

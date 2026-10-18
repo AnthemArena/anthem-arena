@@ -28,10 +28,17 @@
 .cm-act:hover, .cm-act:focus-visible { color: var(--text); border-color: var(--pink-bright); outline: none; }
 .cm-act.on { color: #fff; background: var(--pink, #ff2d95); border-color: var(--pink, #ff2d95); }
 .cm-skin img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 4px; }
-.cm-skin.locked img { filter: grayscale(1) brightness(.45); }
+.cm-skin.locked img { filter: grayscale(.85) brightness(.7); transition: filter .15s; }
+.cm-skin.locked:hover img { filter: none; }
 .cm-skin.locked { color: var(--muted); }
 .cm-skin.look, .cm-skin.current { border-color: var(--pink-bright); box-shadow: 0 0 0 1px var(--pink-bright) inset; }
 .cm-skin-tag { display: block; color: var(--pink-bright); font-weight: 700; margin-top: 2px; }
+.cm-filters { display: flex; gap: 6px; margin: 0 0 12px; flex-wrap: wrap; }
+.cm-chip { font: inherit; font-size: .74rem; font-weight: 700; padding: 4px 11px; border-radius: 999px; cursor: pointer; color: var(--muted); background: transparent; border: 1px solid var(--line); }
+.cm-chip span { opacity: .7; font-weight: 600; margin-left: 2px; }
+.cm-chip:hover, .cm-chip:focus-visible { color: var(--text); border-color: var(--pink-bright); outline: none; }
+.cm-chip.on { color: #fff; background: var(--pink, #ff2d95); border-color: var(--pink, #ff2d95); }
+.cm-skin-name { display: block; min-height: 2.4em; line-height: 1.2; }
 .cm-skin-lock { display: block; margin-top: 2px; font-size: .68rem; }
 @media (max-width: 560px) {
   .cm-share { grid-template-columns: 32px 1fr 40px; }

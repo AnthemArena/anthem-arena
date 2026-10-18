@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readPackXp, addPackXp, mergePackXp, mergeXp, streakFromVotes, activePackId, cleanPackXp } from '../js/xp-ledger.js';
+import { readPackXp, addPackXp, mergePackXp, mergeXp, streakFromVotes, activePackId, cleanPackXp, backfillPackXp } from '../js/xp-ledger.js';
 const mem = (o = {}) => { const m = { ...o }; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; };
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 
@@ -14,6 +14,13 @@ t('pack XP adds up per companion and ignores junk', () => {
     assert.deepEqual(readPackXp(s), { vi: 50, jinx: 10 });
     assert.deepEqual(cleanPackXp({ a: 'z', b: -1, c: 7.9 }), { c: 7 });
     assert.deepEqual(readPackXp(mem({ userPackXP: '{bad' })), {});
+});
+t('old XP from before companions goes to the active companion, once', () => {
+    assert.deepEqual(backfillPackXp({}, 450, 'vi'), { vi: 450 });
+    assert.deepEqual(backfillPackXp({ jinx: 100 }, 450, 'vi'), { jinx: 100, vi: 350 });
+    assert.deepEqual(backfillPackXp(backfillPackXp({ jinx: 100 }, 450, 'vi'), 450, 'vi'), { jinx: 100, vi: 350 });
+    assert.deepEqual(backfillPackXp({ jinx: 500 }, 450, 'vi'), { jinx: 500 });
+    assert.deepEqual(backfillPackXp({}, 50, 'nobody'), { jinx: 50 });
 });
 t('merge keeps the larger copy, per companion', () => {
     assert.deepEqual(mergePackXp({ jinx: 100, vi: 5 }, { jinx: 40, vi: 60, caitlyn: 3 }), { jinx: 100, vi: 60, caitlyn: 3 });

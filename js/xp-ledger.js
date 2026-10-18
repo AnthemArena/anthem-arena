@@ -39,6 +39,16 @@ export function mergePackXp(a, b) {
     return out;
 }
 
+// XP earned before per-companion XP existed only lives in the account total. If the companions add up to less than the
+// total, the difference is given to the active companion (only ever adds, so running it twice changes nothing).
+export function backfillPackXp(packXp, totalXp, activeId = 'jinx') {
+    const xp = cleanPackXp(packXp);
+    const sum = Object.values(xp).reduce((a, b) => a + b, 0);
+    const missing = num(totalXp) - sum;
+    if (missing > 0) { const id = PACK_IDS.includes(activeId) ? activeId : 'jinx'; xp[id] = num(xp[id]) + missing; }
+    return xp;
+}
+
 // Merge this browser's numbers with the profile's: { xp, packXp, changedLocal, changedRemote }.
 export function mergeXp(local, remote) {
     const lx = num(local?.xp), rx = num(remote?.xp);
