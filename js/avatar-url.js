@@ -15,3 +15,14 @@ export function fixAvatarUrl(url) {
     const id = name.replace(/[^A-Za-z0-9]/g, '');
     return m[1] + (ODD[id.toLowerCase()] || id) + m[3];
 }
+
+// The splash art that goes with an avatar: the skin shown in the picture (tile or icon url with _<skin>), else the classic
+// splash of the champion named by the avatar. null when the avatar is not a champion.
+export function splashFromAvatar(avatar) {
+    if (!avatar || avatar.type !== 'url') return null;
+    const base = 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/';
+    const m = /\/champion\/(?:tiles\/)?([A-Za-z0-9]+?)(?:_(\d+))?\.(?:png|jpg)(?:[?#].*)?$/.exec(fixAvatarUrl(String(avatar.value || '')));
+    if (m) return `${base}${m[1]}_${m[2] || 0}.jpg`;
+    const id = String(avatar.name || '').replace(/[^A-Za-z0-9]/g, '');
+    return id ? `${base}${ALIASES[id.toLowerCase()] || id}_0.jpg` : null;
+}

@@ -513,6 +513,12 @@
                 <strong>Mastery Up (two skins)</strong>
                 <span class="test-btn-label">Mastery 3</span>
             </button>
+
+            <button class="test-btn" onclick="testChampionSelected('vi', 29)">
+                <span class="test-btn-icon">⭐</span>
+                <strong>Champion Selected</strong>
+                <span class="test-btn-label">Vi in Arcane Undercity (uses the loaded pack's voice)</span>
+            </button>
         </div>
     </div>
     
@@ -993,6 +999,22 @@ function testEncouragement() {
             message: msg?.message || `${rank}!`,
             detail: `Unlocked: ${skins.map(x => x[0]).join(', ')}`,
             strip: { thumbs: skins.map(x => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_${x[1]}.jpg`), more: 0 },
+            cta: msg?.cta || 'View champions',
+            ctaAction: () => { window.location.href = '/profile#champions'; },
+            duration: 8000
+        });
+    }
+
+    function testChampionSelected(packId = 'vi', skin = 29) {
+        // Same shape as the real alert (js/champion-selected.js): type 'champion-selected', the skin splash, the champion's own words
+        const names = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' }, skinNames = { 29: 'Arcane Undercity', 37: 'Arcane Enemy', 28: 'Arcane Enforcer' };
+        const msg = window.championLoader?.getAchievementMessage('champion-selected', { rank: `${names[packId]} Mastery 3`, xp: 0 });
+        window.showBulletin?.({
+            type: 'champion-selected',
+            packId,
+            message: msg?.message || `${names[packId]} is now your champion.`,
+            detail: `${names[packId]} · ${skinNames[skin]} · Mastery 3`,
+            strip: { thumbs: [`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${names[packId]}_${skin}.jpg`], more: 0 },
             cta: msg?.cta || 'View champions',
             ctaAction: () => { window.location.href = '/profile#champions'; },
             duration: 8000

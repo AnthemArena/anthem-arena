@@ -22,7 +22,7 @@ import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
 import { loadChampionsTab } from './champions-tab.js';
 
-import { fixAvatarUrl } from './avatar-url.js';
+import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { compareVotes, pickTitle, pickThumb } from './taste-match.js';
 // ========================================
 // HELPER FUNCTIONS - Loading Spinner
@@ -546,10 +546,8 @@ function applyProfileBanner(profile) {
         
     } else {
         // Auto-match avatar (default behavior)
-        if (profile.avatar && profile.avatar.type === 'url' && profile.avatar.name) {
-            // Extract championId from champion name
-            const championId = profile.avatar.name.replace(/['\s]/g, ''); // Remove spaces and apostrophes
-            const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg`;
+        const splashUrl = splashFromAvatar(profile.avatar);   // the champion in the picture, wearing the same skin
+        if (splashUrl) {
             
             bannerEl.style.backgroundImage = `
                 linear-gradient(to bottom, 
