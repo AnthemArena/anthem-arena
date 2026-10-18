@@ -18,7 +18,8 @@ t('viewer avatar comes from storage', () => {
     assert.equal(viewerAvatarSrc(st), 'https://x/me.png'); assert.equal(viewerAvatarSrc({ getItem: () => null }), null);
 });
 t('champion badge is the pack icon', () => {
-    assert.equal(championBadgeUrl({ icon: 'https://x/Jinx.png', portrait: { skin: 37 } }), 'https://x/Jinx.png');
+    assert.match(championBadgeUrl({ id: 'jinx', icon: 'https://x/Jinx.png', portrait: { skin: 37 } }), /Jinx_37\.jpg$/);
+    assert.equal(championBadgeUrl({ id: 'caitlyn', icon: 'https://x/Caitlyn.png' }), 'https://x/Caitlyn.png');
     assert.equal(championBadgeUrl(null), null);
 });
 t('fallback avatar is stable per name and always an Arcane champion icon', () => {

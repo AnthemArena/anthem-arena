@@ -617,7 +617,7 @@ function renderNotificationItem(notification) {
         imageHtml = `
             <div style="position:relative;width:44px;height:44px;flex-shrink:0;margin-right:10px;">
                 ${face}
-                <img src="${esc(championPack.icon)}" alt="${esc(championPack.name)}" title="${esc(championPack.name)}"
+                <img src="${esc(championBadgeUrl(championPack))}" alt="${esc(championPack.name)}" title="${esc(championPack.name)}"
                      style="position:absolute;bottom:-4px;right:-6px;width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid ${championPack.color || '#ff69b4'};background:#14101f;">
             </div>
         `;

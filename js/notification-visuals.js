@@ -1,6 +1,6 @@
 import { fixAvatarUrl } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
-import { getChampionSplashUrl } from './arcane-config.js';
+import { getChampionSplashUrl, getChampionTileUrl } from './arcane-config.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -43,7 +43,7 @@ export function viewerAvatarSrc(storage = globalThis.localStorage) {
 // The champion's splash art for the pop-up backdrop (Data Dragon id is the pack id with a capital: jinx -> Jinx).
 export function toastSplashUrl(pack) {
     const id = String(pack?.id || 'jinx');
-    return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1));
+    return getChampionSplashUrl(id.charAt(0).toUpperCase() + id.slice(1), pack?.portrait?.skin ?? 0);   // the pack's Arcane skin
 }
 
 // The viewer's own profile banner as a pop-up backdrop (same choice as the profile card: a chosen champion, "auto" = the
@@ -84,8 +84,10 @@ export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc,
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View achievements')}</button>`;
 }
 
-// The companion's face: the pack's icon. (The Arcane skin tile is a dark picture; at 24-60 px it reads as a dark blob.)
+// The companion's face: the pack's Arcane skin tile when it has one (portrait.skin), otherwise its plain icon.
 export function championBadgeUrl(pack) {
+    const skin = pack?.portrait?.skin;
+    if (skin && pack?.id) return getChampionTileUrl(pack.id.charAt(0).toUpperCase() + pack.id.slice(1), skin);
     return pack?.icon || null;
 }
 

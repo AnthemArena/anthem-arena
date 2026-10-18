@@ -1331,5 +1331,8 @@
       "{pct}% for {pick}. {other} isn't close.",
       "{pick} leads {other} by a mile, {pct}%. Cast yours."
     ]
+  },
+  "portrait": {
+    "skin": 29
   }
 }
