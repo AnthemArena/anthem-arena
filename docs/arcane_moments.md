@@ -955,7 +955,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
 - **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
   Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
-  Vi is now fully voiced (Arcane Undercity keeps the base voice); next is Caitlyn, one skin at a time.
+  Vi is now fully voiced (Arcane Undercity keeps the base voice); next is Caitlyn, one skin at a time (Sheriff Caitlyn stricter).
 - **Done:** Heartache Vi (`vi-heartache`, skin 30): a tough brawler who finds love letters in her locker (the card is a letter from Caitlyn), secretly flustered
   and never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama; votes are valentines.
 - **Done:** Primal Ambush Vi (`vi-primal-ambush`, skin 39): the unfazed leader of a clan of beast-warriors, hungry for any challenger worthy of her fists.
@@ -968,6 +968,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Rings, bets, crowds, purses and dive-bar mornings; votes are bets and a closing match is the final bell. Tone only from the in-game list, nothing copied.
 - **Done:** T1 Vi (`vi-t1`, skin 49): an esports-champion Vi on the world finals stage, a jungler with a winning mentality. Drafts, series, objectives,
   tempo and trophy lifts; votes are picks and a closing match is the final game. No real player or team names appear in the lines.
+- **Done:** Original Caitlyn (`caitlyn-original`, Classic and every Caitlyn skin without its own set): a full rewrite of her Classic voice, tone only from her in-game list,
+  nothing copied. A composed, dry-witted sheriff-investigator with perfect aim and a taste for tea (traps, chases, evidence, the trail going cold). The old
+  `caitlyn.json` voice stays for Arcane Enforcer (28) and Arcane Commander (50). Next: Caitlyn's skins one at a time, each extending `caitlyn-original`.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
