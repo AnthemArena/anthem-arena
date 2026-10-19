@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/fire
 import { db } from './firebase-config.js';
 import { addXP } from './rank-system.js';
 import { checkForAchievementUnlocks } from './vote.js';
+import { recordProgress } from './vote-progress.js';
 
 const FOUNDING_MEMBER_THRESHOLD = 1000;
 const FOUNDING_MEMBER_ACHIEVEMENT_ID = 'founding-member';
@@ -89,8 +90,16 @@ export async function awardFoundingMemberBadge(userId) {
       await checkForAchievementUnlocks();
     }
 
+    // During a vote the post-vote modal lists it instead of a toast over the modal (js/vote-progress.js)
+    const captured = recordProgress({ type: 'achievement', id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', icon: '👑', xp: 500, rarity: 'legendary' });
+    if (captured) {
+      import('./achievement-tracker.js').then(({ saveAchievementToBell }) => saveAchievementToBell({
+        id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', description: 'One of the first 1,000 voters', xp: 500, rarity: 'legendary'
+      })).catch(() => {});
+    }
+
     // Show toast if available
-    if (typeof window !== 'undefined' && window.showBulletin) {
+    if (!captured && typeof window !== 'undefined' && window.showBulletin) {
       setTimeout(() => {
         const voiced = window.championLoader?.getAchievementMessage(FOUNDING_MEMBER_ACHIEVEMENT_ID, {
           name: 'Founding Member', description: 'One of the first 1,000 voters', xp: 500, rarity: 'legendary'

@@ -418,7 +418,7 @@ async function _checkAchievements(allVotes, context = {}) {
                     type: 'achievement', id: achievement.id, name: achievement.name, icon: achievement.icon,
                     xp: achievement.xp, rarity: achievement.rarity
                 });
-                if (!captured) showAchievementUnlock(achievement);
+                if (captured) saveAchievementToBell(achievement); else showAchievementUnlock(achievement);
             } else {
                 console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
             }
@@ -435,6 +435,31 @@ async function _checkAchievements(allVotes, context = {}) {
         completionPercentage: completion.general.percentage,
         completion
     };
+}
+
+/**
+ * Keep an unlocked achievement in the bell (notification history). Called for every unlock, whether it toasts or is shown in the
+ * post-vote modal instead (js/vote-progress.js). Saved as already shown, so it does not pop up a second time.
+ */
+export function saveAchievementToBell(achievement) {
+    // (the toast alone vanished after a few seconds and the Achievements tab stayed empty)
+    try {
+        const userId = localStorage.getItem('tournamentUserId');
+        if (userId) {
+            import('./notification-storage.js').then(({ saveNotification }) => saveNotification(userId, {
+                type: 'achievement',
+                priority: 2,
+                message: `Achievement unlocked: ${achievement.name}`,
+                detail: `${achievement.description || ''} • +${achievement.xp || 0} XP`.trim(),
+                icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
+                eventType: achievement.id,
+                ctaText: 'View achievements',
+                targetUrl: '/profile.html#achievements',
+                shownAsToast: true
+            })).catch(() => {});
+        }
+    } catch (e) { /* the toast already showed; the bell copy is a bonus */ }
+
 }
 
 /**
@@ -475,24 +500,7 @@ export function showAchievementUnlock(achievement) {
         });
     }
     
-    // Keep it in the bell too (the toast alone vanished after a few seconds and the Achievements tab stayed empty).
-    // Saved as already shown, so it does not pop up a second time.
-    try {
-        const userId = localStorage.getItem('tournamentUserId');
-        if (userId) {
-            import('./notification-storage.js').then(({ saveNotification }) => saveNotification(userId, {
-                type: 'achievement',
-                priority: 2,
-                message: `Achievement unlocked: ${achievement.name}`,
-                detail: `${achievement.description || ''} • +${achievement.xp || 0} XP`.trim(),
-                icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
-                eventType: achievement.id,
-                ctaText: 'View achievements',
-                targetUrl: '/profile.html#achievements',
-                shownAsToast: true
-            })).catch(() => {});
-        }
-    } catch (e) { /* the toast already showed; the bell copy is a bonus */ }
+    saveAchievementToBell(achievement);
 
     console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP) [${achievement.rarity}]`);
 }

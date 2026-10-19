@@ -177,6 +177,17 @@ with sync_playwright() as p:
     check('alert link, not voted: no modal pops up', not pg.is_visible('#vote-modal .pvm--share'))
     pg.context.close()
 
+    # ---------- a toast fired while the vote modal is open waits, then shows once it is closed ----------
+    pg, errs = load(b, 1280, 900, voted=True)
+    pg.wait_for_timeout(1500)
+    pg.evaluate("document.getElementById('bulletin-banner')?.remove(); const m = document.getElementById('vote-modal'); m.classList.add('active'); m.style.display = 'flex'; window.showBulletin({ type: 'encouragement', message: 'HELD-TOAST', detail: 'd', cta: 'Browse', action: 'navigate', targetUrl: '/matches.html' });")
+    pg.wait_for_timeout(500)
+    check('toast during the modal: nothing shows on top of it', 'HELD-TOAST' not in pg.evaluate("document.getElementById('bulletin-banner')?.innerText || ''"))
+    pg.evaluate("const m = document.getElementById('vote-modal'); m.classList.remove('active'); m.style.display = 'none';")
+    pg.wait_for_timeout(1500)
+    check('toast during the modal: it shows once the modal is closed', 'HELD-TOAST' in pg.evaluate("document.getElementById('bulletin-banner')?.innerText || ''"))
+    pg.context.close()
+
     # ---------- voted: the Next match bar ----------
     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
         pg, errs = load(b, w, h, voted=True)

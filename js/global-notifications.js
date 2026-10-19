@@ -1081,6 +1081,13 @@ async function checkAndShowBulletin() {
                 }
             }
             
+            // The vote page's modal (after a vote, or the share window opened from an alert) owns the screen: an alert would sit on top
+            // of it. Not shown means not recorded as shown, so the next poll shows it once the modal is closed.
+            if (document.querySelector('#vote-modal.active')) {
+                console.log('⏸️ Held while the vote modal is open:', notification.type);
+                continue;
+            }
+
             showBulletin(notification);
             try { notification._commit?.(); } catch (e) { console.warn('Could not record the alert as shown:', e); }
             recentlyShownBulletins.set(bulletinKey, Date.now());
@@ -1933,6 +1940,21 @@ async function checkForClosingMatches() {
     }
 }
 
+// Toasts that arrived while the vote modal was open; the newest is shown a moment after it closes.
+let toastHeldForModal = null, modalWatcher = null;
+function deferForVoteModal(notification) {
+    toastHeldForModal = notification;
+    const modal = document.getElementById('vote-modal');
+    if (!modal || modalWatcher) return;
+    modalWatcher = new MutationObserver(() => {
+        if (modal.classList.contains('active') || !toastHeldForModal) return;
+        const held = toastHeldForModal;
+        toastHeldForModal = null;
+        setTimeout(() => showBulletin(Object.assign(Object.create(Object.getPrototypeOf(held)), held, { _afterModal: true })), 700);
+    });
+    modalWatcher.observe(modal, { attributes: true, attributeFilter: ['class'] });
+}
+
 function showBulletin(notification) {
     notification = withoutEmoteCta(notification);      // emotes are off: a thanks / challenge button becomes "View match"
 
@@ -1943,6 +1965,13 @@ function showBulletin(notification) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
         }
+    }
+
+    // The vote page's modal owns the screen while it is open: a toast would sit on top of it. Defer it, and show the newest one
+    // when the modal closes (callers save their bell copy themselves, so nothing is lost from the history).
+    if (!notification._afterModal && document.querySelector('#vote-modal.active')) {
+        deferForVoteModal(notification);
+        return;
     }
 
     // A champion the person just picked stays up for a few seconds: a routine alert (welcome, a match) that arrives on the same

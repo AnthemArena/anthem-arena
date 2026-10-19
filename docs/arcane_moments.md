@@ -1140,3 +1140,15 @@ The facts judged when a vote is cast (`facts`: underdog, close, againstTide, ear
 **Deploy the rules with this change.** `firestore.rules` now allows those four fields on a new vote (and checks `facts` is a map with only the five known keys, `sharePct` is 0-100, `totalVotesAtTime` is not negative, `votedForVideoId` is a short string). If the site is running the old rules, a vote carrying the new fields is rejected; publish the new rules in the Firebase console at the same time as the code (the rules were not tested in the emulator). The facts are only used for the voter's own progress, never for anything shared, because a person can write their own.
 
 The record builder is now `buildVoteRecord` in `js/vote-facts.js` (tested in `tools/test-vote-facts.mjs`, including the restore cases); it also fixes a pick change inheriting the old record's time.
+
+## Post-vote modal and toasts: how they fit together (19 October 2026)
+
+**Rule: the modal owns the vote moment; toasts are for everywhere else.**
+- While a vote is processed, level-ups, mastery-ups, achievement unlocks and the Founding Member badge are collected (`js/vote-progress.js`) and shown in the post-vote modal (XP total including achievement XP, level-up banner, mastery bar, an "Unlocked" list with skins and achievements). They do not toast.
+- Outside a vote (a share, the hourly profile check, a profile visit) they toast as before.
+- An unlock shown in the modal is still saved in the bell (`saveAchievementToBell`), so the history is complete.
+- If the modal cannot be shown (missing data, an error after XP was paid), what was collected is replayed as ordinary toasts (`replayProgressAsToasts`), so nothing the vote earned is lost.
+- The Founding Member badge is now awarded inside the capture (before the final XP and rank are read), so its 500 XP and its unlock appear in the modal instead of a toast arriving afterwards.
+- Other alerts no longer sit on top of the vote modal: the poller holds an alert while `#vote-modal` is open (not shown means not recorded as shown, so it appears after the modal closes), and `showBulletin` itself defers any other toast while the modal is open and shows the newest one shortly after it closes. Before, an alert banner (z-index above modals) could cover the modal's buttons, which `tools/test-vote-browser.py` caught.
+
+Tests: `tools/test-vote-capture.mjs` (XP award across a level and a mastery level, inside and outside a capture), `tools/test-vote-progress.mjs`, and the toast-during-modal checks in `tools/test-vote-browser.py`.

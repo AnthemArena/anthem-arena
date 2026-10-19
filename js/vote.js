@@ -1915,6 +1915,11 @@ localStorage.setItem('votingStreak', String(voteStreak));
 // final profile sync and final rank calculation.
 await checkForAchievementUnlocks();
 
+// Founding Member badge (first 1,000 voters): inside the capture, so its XP and its unlock appear in the post-vote modal
+try {
+    if (await awardFoundingMemberBadge(userId)) console.log('👑 User earned Founding Member badge!');
+} catch (e) { console.warn('Founding member check failed:', e); }
+
 // ✅ Recalculate final XP/rank after achievement rewards
 const finalTotalXP = parseInt(
     localStorage.getItem('userTotalXP') || '0',
@@ -1965,13 +1970,6 @@ console.log(
             console.warn('⚠️ updateNavProfile not available yet');
         }
 
-        // ✅ ADD THIS: Check for founding member badge
-        const earnedFoundingBadge = await awardFoundingMemberBadge(userId);
-        if (earnedFoundingBadge) {
-            console.log('👑 User earned Founding Member badge!');
-            // Toast will show automatically from founding-member-tracker.js
-        }
-
         // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
         const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
         const songSeed = votedSong.seed;
@@ -2012,6 +2010,7 @@ console.log(
                 rank: !!rank
             });
             showNotification(`Vote cast for "${cleanTitle(songName || '')}"`, 'success');
+            replayProgressAsToasts(progressEvents);   // no modal to carry them, so they toast
         } else {
             // Show modal with correct numbers
             showPostVoteModal(songName, songData, xpData, rank, progressEvents);
@@ -2022,7 +2021,7 @@ console.log(
         console.log('✅ Vote submitted successfully!');
 
     } catch (error) { // ✅ NOW THE CATCH PROPERLY PAIRS WITH TRY
-        endVoteProgress();   // never leave a capture open: it would hide later toasts
+        replayProgressAsToasts(endVoteProgress());   // never leave a capture open (it would hide later toasts) and never lose what it caught
         hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
@@ -2162,6 +2161,28 @@ function saveVoteForOtherPages(matchId, songId, cast = null) {
         localStorage.setItem('userVotes', JSON.stringify(userVotes));
     }
     return record;
+}
+
+// If the post-vote modal cannot be shown (missing data, an error after XP was paid), what the vote earned still has to reach the
+// person: the events collected during the vote (js/vote-progress.js) are shown as ordinary toasts, one after another.
+async function replayProgressAsToasts(events) {
+    try {
+        if (!events || !events.length) return;
+        const { getAchievementById } = await import('./achievements.js');
+        const { showAchievementUnlock } = await import('./achievement-tracker.js');
+        events.forEach((e, i) => setTimeout(() => {
+            try {
+                if (e.type === 'achievement') {
+                    showAchievementUnlock(getAchievementById(e.id) || { id: e.id, name: e.name, description: '', xp: e.xp, rarity: e.rarity, icon: e.icon });
+                } else if (e.type === 'level' && window.showBulletin) {
+                    window.showBulletin({ type: 'level-up', level: e.to, message: '⬆️ New Arcane Rank!', detail: `You've reached ${e.title}!`, cta: 'View Progress', ctaAction: () => { window.location.href = '/profile#overview'; }, duration: 5000 });
+                } else if (e.type === 'mastery' && window.showBulletin) {
+                    const names = (e.skins || []).map(x => x.name).join(', ');
+                    window.showBulletin({ type: 'mastery-up', level: e.to, packId: e.packId, message: `${e.packId.charAt(0).toUpperCase() + e.packId.slice(1)} Mastery ${e.to}!`, detail: names ? `Unlocked: ${names}` : `Mastery ${e.to}`, cta: 'View champions', ctaAction: () => { window.location.href = '/profile#champions'; }, duration: 6000 });
+                }
+            } catch (err) { console.warn('Could not replay a progress toast:', err); }
+        }, i * 2500));
+    } catch (err) { console.warn('Could not replay progress toasts:', err); }
 }
 
 // ========================================
