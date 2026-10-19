@@ -1,0 +1,1403 @@
+{
+  "id": "vi-arcane-brawler",
+  "extends": "vi-original",
+  "name": "Vi",
+  "displayName": "Arcane Brawler Vi",
+  "description": "Voice set for Arcane Brawler Vi (skin 48): a bitter, bruised pit fighter in the underground cage fights, an undefeated champion with a chip on her shoulder who bets, brawls and trusts no one. Rings, bets, crowds, purses and dive-bar mornings. Builds on vi-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} down. It's taking a beating. Get some bets on it.",
+          "cta": "Rally some votes"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more behind. Shout from the cheap seats until the whole crowd turns.",
+          "cta": "Get loud"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Tell everyone who owes you a drink.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. Split lip, not a lost fight.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Find someone to stand in your corner. I never had one. Don't copy me.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few clean jabs and the odds even out.",
+          "cta": "Throw a few jabs"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Small gap. Close it before the final bell.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One bet tips the bout. Place it.",
+          "cta": "Place a bet"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Quit leaning on the rail and step in.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. Crowd's holding its breath. Drag more people in.",
+          "cta": "Rally the crowd"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes between them. This one goes the distance.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} is bossing the ring at {userPct}%. Look at that swagger.",
+          "cta": "Keep swinging"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and still pressing. Don't drop your guard.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. The crowd's on its feet. Don't let it get to you.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% on your pick. You've got the centre of the ring. Keep it.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Good. Finish it before it bleeds out of your hands.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. Off the ropes, swinging.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. Somebody found a second wind.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Dragged itself out of a {voteDiff} hole. Bookies are sweating.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was written off. Now it's collecting.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just pulled ahead. Nobody put money on that. I almost did.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Same bet. Fine by me.",
+        "{username} backed {momentTitle} too. Two gamblers, one horse.",
+        "{username} agrees with you. Write it on the wall. Rare.",
+        "Same pick as {username}. Good eye. Don't let it go to your heads.",
+        "{username} put their chips on {momentTitle}. Smart.",
+        "{username} chose the same. Pull up a stool.",
+        "{username} is on your side of {momentTitle}. Keep them close. People vanish.",
+        "{username} made the same call. No arguing. Weird.",
+        "{username} voted {momentTitle}. Welcome to the cheap seats."
+      ],
+      "details": [
+        "Another believer.",
+        "Two bets, one fighter.",
+        "Good instincts sit together.",
+        "Don't lose them.",
+        "Look, you've got company.",
+        "Someone who gets it.",
+        "Save them a seat."
+      ],
+      "buttons": [
+        "Nice one",
+        "Say thanks",
+        "See the match",
+        "Fist bump",
+        "Respect",
+        "Fair play",
+        "Cheers"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. Other corner. Other money.",
+        "{username} picked {theirMoment}. Bold. We'll see who walks out.",
+        "{username} went the other way on {yourMoment}. Wrong, but they believed it.",
+        "{username} voted against you. Fine. Meet me by the ring after.",
+        "{username} backed {theirMoment}. Brave. Dumb. Brave.",
+        "{username} is against {yourMoment}. Alright. The count will tell.",
+        "{username} disagrees on {yourMoment}. Let the bell decide.",
+        "{username} voted the other way. They'll be buying the first round soon."
+      ],
+      "details": [
+        "Everyone loses a bet.",
+        "Behind the ring. After.",
+        "The scorecard has the final say.",
+        "Don't take it personally. Or do, and swing.",
+        "A rival keeps you sharp.",
+        "They'll come around.",
+        "At least it's a clean fight."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That's not luck, that's a fixed fight. The good kind.",
+        "{username} and you, ten matches, same bet every time. Hell of a team.",
+        "Ten straight with {username}. I'd split a purse with you two.",
+        "A ten-match run with {username}. Quiet, steady, deadly.",
+        "Ten for ten with {username}. Impressive. That stays between us."
+      ],
+      "details": [
+        "Ten bouts, no losses.",
+        "A solid corner.",
+        "Rare. Guard it.",
+        "Keep the streak alive.",
+        "Hard to beat."
+      ],
+      "buttons": [
+        "See their profile",
+        "Nice",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. That's past a pair, that's a whole corner crew.",
+        "{streakCount} in a row with {username}. I'd back you two in any ring.",
+        "{streakCount} straight picks with {username}. Ridiculous. Beautifully ridiculous.",
+        "A {streakCount}-match run with {username}. They'll tell stories about this in the bars.",
+        "{streakCount} with {username}. Undefeated. Both of you."
+      ],
+      "details": [
+        "Hard to believe. You bled for that one.",
+        "Loyalty that sticks.",
+        "No jokes. Just respect.",
+        "Untouchable.",
+        "Two legends of the pit."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. That's a grudge match now.",
+        "{username} has opposed you ten times running. They really hate your odds.",
+        "Ten in a row opposite {username}. Neither of you will leave the cage.",
+        "Ten matches opposite {username}. Two thick skulls, no give.",
+        "Ten times at odds with {username}. I'd pay gate money to watch."
+      ],
+      "details": [
+        "Ten rounds, no bell.",
+        "Talk it out. Or swing it out.",
+        "That's a rivalry.",
+        "Stubborn suits you.",
+        "Who taps first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a feud.",
+        "{streakCount} in a row opposite {username}. Neither of you gives up an inch of canvas.",
+        "{streakCount} fights in a row with {username}. Stubborn undersells it.",
+        "A {streakCount}-match feud with {username}. Someone ring the bell for good.",
+        "{streakCount} against {username}. I respect it. Go sit down somewhere."
+      ],
+      "details": [
+        "Neither of you is tapping out.",
+        "Commitment, honestly.",
+        "A legendary grudge.",
+        "Glad I'm not between you.",
+        "They'd have to retire the bell."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} ends in {timeLeft} and you haven't placed a bet. Get moving.",
+        "{timeLeft} left on {matchTitle}. Nothing on your slip. Fix it.",
+        "{matchTitle} wraps in {timeLeft}. Your money's the missing piece."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Place your bet"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. Move your feet.",
+        "{matchTitle} closes in {timeLeft}. Don't make me drag you to the ring.",
+        "Only {timeLeft} until {matchTitle} ends. The crowd noticed you're quiet."
+      ],
+      "buttons": [
+        "Vote now",
+        "Move your feet"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Last round.",
+        "{timeLeft} left. Throw the bet.",
+        "Final bell on {matchTitle}. {timeLeft}. Commit."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your bet are about to close. The first rings out in {timeLeft}.",
+        "{matchCount} unvoted matches and the bell's loaded. The nearest has {timeLeft} left."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Somebody throw the first punch. Don't hover.",
+        "{moment1} against {moment2} and not a single bet. I'll wait. Barely.",
+        "New match, zero votes. Be the first in the cage.",
+        "{matchTitle} is empty. Take the first swing."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Swing",
+        "Open it up"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. Half-empty benches.",
+        "Barely anyone's watching. Fix that.",
+        "Turnout's pitiful. Come on, fill the benches.",
+        "No money down on this one. Someone should risk some."
+      ],
+      "details": [
+        "Needs more bettors.",
+        "Every wager counts in a thin crowd.",
+        "Yours counts double here.",
+        "Don't let the fight die."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. Pick a corner.",
+        "Dead even on {matchTitle}. One bet decides the bout.",
+        "Tied. Somebody has to land one. Make it you.",
+        "{moment1} and {moment2}, nose to nose in the ring. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the last bell's close. One chance to land it.",
+        "Level with the clock almost gone. Vote.",
+        "Tied, and the lights are dimming. Don't sit this one out."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new bouts on the card. Step in.",
+        "{matchCount} matches just opened in round {round}. Doors are open, crowd's loud.",
+        "Round {round} is live, {matchCount} bouts deep.",
+        "New round. {matchCount} matches. Pick who you're backing.",
+        "Round {round}: {matchCount} bouts waiting on your money."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Step in",
+        "Enter the pit",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Payout time.",
+        "{momentTitle} is through. Crowd's roaring.",
+        "{momentTitle} took the bout. Earned.",
+        "{momentTitle} won, and the whole pit lost its mind.",
+        "{momentTitle} advances. Clean win.",
+        "{momentTitle} moves on. Fists up."
+      ],
+      "details": [
+        "Clean finish.",
+        "One bout down, more on the card.",
+        "Remember how it feels.",
+        "Flawless."
+      ],
+      "buttons": [
+        "Nice",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. That one hurt my knuckles.",
+        "{momentTitle} is out. Not the result I bet on.",
+        "{momentTitle} didn't make it. Get some ice. Breathe.",
+        "{momentTitle} fell with fists up. Respect.",
+        "{momentTitle} is out. Back to the stool. Reset.",
+        "{momentTitle} lost this round. Bruised. Not finished.",
+        "{momentTitle} got carried out. Pick another fighter."
+      ],
+      "details": [
+        "Nobody wins every night.",
+        "It took a good beating bravely.",
+        "There's always another card.",
+        "Take the hit. Stay standing."
+      ],
+      "buttons": [
+        "Next match",
+        "Shake it off",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Stop circling and pick a corner.",
+        "Don't overthink it. Bet and brace.",
+        "They're all worth watching. Trust your read.",
+        "You've watched from the rail long enough. Step in."
+      ],
+      "details": [
+        "Every bet matters.",
+        "Trust your gut.",
+        "No wrong corner. A few painful ones.",
+        "Just pick."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the pit. {liveCount} matches are open. Pick one.",
+          "New face? {liveCount} matches are live. Don't stand in the doorway.",
+          "You're early. {liveCount} matches need bets.",
+          "{liveCount} matches open. Choose a corner.",
+          "Welcome. {liveCount} matches. Chin down, hands up."
+        ],
+        "buttons": [
+          "Let's go",
+          "Start",
+          "Show me",
+          "Enter the pit",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back. Smart.",
+          "Two days running. Nice.",
+          "Back for day two. I noticed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days gone. Did the bookies get you?",
+          "After {days} days you're back. Better late than owing.",
+          "{days} days. Figured you skipped town. Glad you didn't.",
+          "{days} days away. The card's changed a lot."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You came back. Good.",
+          "Welcome back. Let's fight.",
+          "Back already. Itchy knuckles?",
+          "Hey. The ring's waiting."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First bet down. Welcome to the pit.",
+        "You picked a corner. First fight's yours."
+      ],
+      "details": [
+        "Now find another. +{xp} XP",
+        "First blood's on the house. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Again"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. Your knuckles are warming.",
+        "Five. Not a bystander any more."
+      ],
+      "details": [
+        "A decent first night. +{xp} XP",
+        "Finding your footing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The regulars know your face.",
+        "Ten. You've got a stool with your name on it."
+      ],
+      "details": [
+        "A fixture at the cage. +{xp} XP",
+        "Ten bets logged. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. You can be heard over the roar.",
+        "Twenty-five. The crowd's chanting with you."
+      ],
+      "details": [
+        "Loud enough for the bookies. +{xp} XP",
+        "Twenty-five bets slammed down. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Deep in the pit now.",
+        "Fifty. You actually care. Good for you."
+      ],
+      "details": [
+        "Fifty bets on the board. +{xp} XP",
+        "Deep in the fight night. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. Bartenders will tell stories.",
+        "One hundred. Honestly legendary. I'll deny I said it."
+      ],
+      "details": [
+        "Paid for in bruises. +{xp} XP",
+        "A hundred. Salute. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A habit forming.",
+        "Three straight days. Steady."
+      ],
+      "details": [
+        "Showing up is the job. +{xp} XP",
+        "Three nights in the pit. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's grit.",
+        "Seven days running. Solid."
+      ],
+      "details": [
+        "A week and never a no-show. +{xp} XP",
+        "Seven nights at the cage. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never miss a fight night.",
+        "Fourteen days. Wow."
+      ],
+      "details": [
+        "Two weeks, no gaps. +{xp} XP",
+        "That's pure stubbornness. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Honestly? Thanks. Really.",
+        "A month of dragging yourself back here. That counts."
+      ],
+      "details": [
+        "Thirty nights of grit. +{xp} XP",
+        "A full month in the pit. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You bet on the ones nobody bets on.",
+        "Five long shots. I like you."
+      ],
+      "details": [
+        "Against the odds. +{xp} XP",
+        "Five longshots backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You back the battered ones on purpose.",
+        "Fifteen. You never follow the crowd."
+      ],
+      "details": [
+        "Always your own money. +{xp} XP",
+        "Fifteen contrarian bets. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Rebel on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No bookie can read you.",
+        "Thirty. The beaten one is your whole system."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty bets on the one behind. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First at the cage five times. Eager.",
+        "Five times you beat the crowd to the ring."
+      ],
+      "details": [
+        "You show up before the bell. +{xp} XP",
+        "Five bets before the rush. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you bet first. Gutsy.",
+        "First to wager, again and again."
+      ],
+      "details": [
+        "Fifteen bets before the rest. +{xp} XP",
+        "Ahead of the whole pit. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. You thrive in a scrap.",
+        "Another down-to-the-wire. Your nerves are rusted iron."
+      ],
+      "details": [
+        "Close fights suit you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your bet keeps deciding it.",
+        "You've tipped more than one bout."
+      ],
+      "details": [
+        "Twenty-five coin-flip fights. +{xp} XP",
+        "You settle the draws. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You stuck with the underdog five times. Stubborn. I respect that.",
+        "You never walk out on a fighter who's down. Respect."
+      ],
+      "details": [
+        "Faith in a last-round surge. +{xp} XP",
+        "Five comebacks you called. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Somebody's got a favourite fighter.",
+        "That one again? Must hit hard."
+      ],
+      "details": [
+        "You know who you like. +{xp} XP",
+        "One fighter, three bets. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same moment. That's loyalty.",
+        "You won't ditch that one. Fair."
+      ],
+      "details": [
+        "Loyal as a cornerman. +{xp} XP",
+        "One favourite, five bets. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on the same moment. That's an obsession, kid.",
+        "Ten times, same pick. I won't tell anyone. Mostly."
+      ],
+      "details": [
+        "Ten on a single fighter. +{xp} XP",
+        "Devoted. Or just hooked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying for the whole card.",
+        "Round two and still on your feet. Good."
+      ],
+      "details": [
+        "Stay for the next bout. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. The pit's getting crowded.",
+        "Deep in the bracket. It hurts more from here."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "A long walk from the door now. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You stayed till the final bell.",
+        "All the way. You never left your seat."
+      ],
+      "details": [
+        "First bell to last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've worked the whole pit.",
+        "Ten different matches. Checking every cage. Smart."
+      ],
+      "details": [
+        "Working the card. +{xp} XP",
+        "Ten bouts scouted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've sat in every corner.",
+        "Twenty-five. Not a bench left unsat."
+      ],
+      "details": [
+        "Every bench sat on. +{xp} XP",
+        "Twenty-five bouts watched. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's not a visit, that's a career in the pit.",
+        "Fifty. You know this card better than the promoters."
+      ],
+      "details": [
+        "A true old-timer. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long night.",
+        "Five back to back. Drink some water."
+      ],
+      "details": [
+        "One long fight night. +{xp} XP",
+        "Five bouts straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one stretch. Get some air.",
+        "Ten on one stool. That's endurance."
+      ],
+      "details": [
+        "A marathon night. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting this late? Pit crawler or can't sleep?",
+        "Dead of night. Dedication, or you can't switch your head off either."
+      ],
+      "details": [
+        "Late-night fights suit you. +{xp} XP",
+        "A small-hours bet. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Go to bed"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people. Thanks, pal.",
+        "Five shares. More bettors, bigger purse."
+      ],
+      "details": [
+        "Cheers for bringing a crowd. +{xp} XP",
+        "Five invites handed out. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a promoter.",
+        "Fifteen. You keep bringing people. Love it."
+      ],
+      "details": [
+        "Still filling the seats. +{xp} XP",
+        "Fifteen fliers handed out. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first bout. Founding member, for good.",
+        "One of the first thousand in the pit. That sticks."
+      ],
+      "details": [
+        "That's carved into the wall for good. +{xp} XP",
+        "Nobody's erasing that name from the wall. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank. Hard-won.",
+        "Promoted. Don't swagger."
+      ],
+      "details": [
+        "{rank}. Fits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Not bad, rookie.",
+        "Another scar for the collection: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Hard-earned.",
+        "You put in the rounds and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Wild. Runs in the blood, unfortunately.",
+        "Ten long shots. You've got no fear."
+      ],
+      "details": [
+        "Ten bets against the odds. +{xp} XP",
+        "Longshots are your speciality. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cait. Your nerves are steady.",
+        "Ten tight finishes. She'd be proud. Me? Not smiling. Much."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady aim, rough pulse. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A week with Cait. Some of her patience is sticking.",
+        "A week and you never missed. Nice."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. Clean punch.",
+        "Dead draw, and you swung it. Respect."
+      ],
+      "details": [
+        "The bet that settled the bout. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Vi's your champion now. Try to keep up.",
+        "Vi's covering you. Don't make her sorry."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The cage is still locked.",
+      "Voting hasn't started. I'll bang on the bars when it does.",
+      "Not yet. Patience, kid."
+    ],
+    "prevote": [
+      "Two moments, one bet. Study both before you put money down.",
+      "Size them both up before you choose. No peeking at the crowd.",
+      "I won't tell you who to back. Your money, your call.",
+      "Take a minute. Then bet.",
+      "Trust your gut. It's taken worse hits than you."
+    ],
+    "prevote-empty": [
+      "No votes yet. Make the first bet.",
+      "Empty pit. Somebody step in first.",
+      "Nobody's voted. Be brave."
+    ],
+    "closing-24h": [
+      "Under a day left and nothing from you. Move.",
+      "Bell's about to go. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Clock's burning. Vote before the lights go out."
+    ],
+    "closing-final": [
+      "Last hour. Vote now.",
+      "Final bell. Swing."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone around. First money in the pot.",
+      "Hardly a vote in and you jumped. Gutsy."
+    ],
+    "voted-ahead": [
+      "Your pick's ahead. Nice. The fight's not over.",
+      "{pct}% with you. The crowd's following.",
+      "Ahead for now. Fights turn.",
+      "{pick} is opening a gap. Sharp read.",
+      "A lead's a lead. Cover your face."
+    ],
+    "voted-close": [
+      "That's close. Too close. My knuckles are cracking.",
+      "Razor-thin. One more bet flips it. Tell someone.",
+      "Dead heat. Your fighter needs a cornerman.",
+      "{pct} to {otherPct}. Brace."
+    ],
+    "voted-tied": [
+      "Dead even. Nobody's winning the bout.",
+      "A dead draw. Irritating. Weirdly satisfying."
+    ],
+    "voted-behind": [
+      "You're trailing. Doesn't mean you read it wrong.",
+      "{pick} is trailing. Underdog. My favourite kind of fight.",
+      "They're ahead. You're not wrong, just outbet.",
+      "Down by {diff} points. Tell your friends. Fill the cage.",
+      "The crowd leaned elsewhere. Crowds lose money all the time."
+    ],
+    "closed-won": [
+      "Your pick won. Collect your winnings.",
+      "A win. Savour it.",
+      "{pick} went through. Your gut was right."
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Spit it out.",
+      "It didn't make it. Happens. Next bout.",
+      "{pick} is out. Sorry. It fought hard."
+    ],
+    "closed-tied": [
+      "A tie. Nobody left the mat."
+    ],
+    "closed-unvoted": [
+      "Voting's closed and you missed this fight. More coming.",
+      "Match is over. {winner} took it. Next time, bet first."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "First vote. Welcome. Everyone's first bet is shaky.",
+      "There's your first. Gets easier. Mostly.",
+      "You're in the pit now. Welcome."
+    ],
+    "streak": [
+      "Back in the pit. Good.",
+      "{streak} days running. I see you coming round.",
+      "You keep returning to the ring. Nice."
+    ],
+    "underdog": [
+      "You bet on the one everyone skipped. I saw.",
+      "Hard bet. Good bet.",
+      "A battered pick. That takes a strong stomach."
+    ],
+    "early": [
+      "Early. You hit the ring before the crowd.",
+      "Not many bets yet. Yours hits like a haymaker.",
+      "First one in the cage. Respect."
+    ],
+    "close": [
+      "That bet just shifted things. It's tight.",
+      "Razor-thin. One more bettor flips it.",
+      "Close fight. Your bet matters."
+    ],
+    "behind": [
+      "{pick} is down. Down isn't dead. Bring company.",
+      "Not ahead yet. So keep swinging.",
+      "Down on the mat, not out. Big difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't coast. Fights turn.",
+      "Winning for now. Enjoy it.",
+      "Looks like a sharp pick."
+    ],
+    "default": [
+      "Fine. I'll keep my mouth shut. For now.",
+      "Done. Your money, your call.",
+      "Vote's in. Plenty more fights ahead."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and nothing bet yet. Start with the one that makes your knuckles itch.",
+      "Every cage is open. Pick. I won't rush you. Much.",
+      "{unvoted} open. No rush. Fine, a bit of rush."
+    ],
+    "live-some": [
+      "{voted} bets down, {unvoted} left. Keep going.",
+      "You're in the ring. {unvoted} still unfought.",
+      "Decent start. The rest won't bet themselves."
+    ],
+    "live-few": [
+      "{unvoted} left. Finish it before closing.",
+      "Almost there. {unvoted} more bouts.",
+      "Close. Don't walk out now."
+    ],
+    "live-one": [
+      "One left. Just one.",
+      "Last bout. Don't skip it.",
+      "One match between you and a full slip."
+    ],
+    "live-closing": [
+      "A few close in {timeLeft}. {unvoted} still need your money.",
+      "Clock's draining. {unvoted} left, {timeLeft} until close.",
+      "Bell's almost on. Move."
+    ],
+    "live-done": [
+      "Every bout covered. Look at you. Go read the bracket.",
+      "Nothing left on your slip. Come back when the next round opens.",
+      "All done. Rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll come back. Study the bracket meanwhile.",
+      "Quiet pit. Check back soon.",
+      "No matches open. My hands are twitching as much as yours."
+    ],
+    "brackets-groups": [
+      "Groups first. Top two from each go through. The rest get carried out.",
+      "Everyone starts in a group. Not everyone makes the finale.",
+      "Eye the standings. They swing hard."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are coming. Two per group walk out standing.",
+      "No knockout card yet. The groups have fights left.",
+      "Hang tight. The knockout shows up when the groups wrap."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you're out the door.",
+      "Lose once and you're carried out. No rematches.",
+      "Every match hits harder now. Choose carefully."
+    ],
+    "brackets-bracket": [
+      "Bout by bout. Lose once and you're done.",
+      "Trace the card. Fewer fighters every round.",
+      "Every line here is a fighter someone bet on."
+    ],
+    "brackets-complete": [
+      "That's the cup complete. Thanks for fighting with me.",
+      "It's over. Good run. I'll miss the noise.",
+      "We have a champion. Worth every bruise."
+    ],
+    "brackets-empty": [
+      "No bracket yet. Nobody's been matched.",
+      "Empty. The card hasn't been drawn. Soon.",
+      "Empty ring for now. Swing by later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One bet decides it. Choose.",
+      "Two fighters, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the crowd and tell me what you think."
+    ],
+    "voted": [
+      "I put my bet on {pick} over {other}. Who's getting yours?",
+      "{pick} gets my money over {other}. Fight me.",
+      "I chose {pick} over {other}. Think I bet wrong?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more bettors.",
+      "My money went on {pick} over {other} early. Put yours beside it.",
+      "{pick} against {other}, hardly a bet down. Yours would matter."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One bet settles it.",
+      "A tie, {pick} against {other}. Step in.",
+      "{pick} and {other} are locked up. Your bet breaks it."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every bet counts now.",
+      "{voteDiff} votes divide {pick} and {other}. Throw yours in.",
+      "{voteDiff} between {pick} and {other}. Either walks out."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A few bets flip it.",
+      "{pick} is {voteDiff} short of {other} but still on its feet. Bet on it.",
+      "{pick} sits {voteDiff} under {other}. Fixable with bets. Vote."
+    ],
+    "losing-bad": [
+      "{pick} is behind {other} by {voteDiff}. It needs a crowd.",
+      "{voteDiff} behind {other}. {pick} got a raw deal. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let's turn this fight."
+    ],
+    "winning-close": [
+      "{pick} holds {pct}% over {other}, just. Help it stay up.",
+      "{pick} leads {other}, {pct}%. Not locked. Vote.",
+      "{pick} edges {other} at {pct}%. By a nose."
+    ],
+    "dominating": [
+      "{pick} is up on {other} at {pct}%. Come watch.",
+      "{pick} owns {pct}%. {other} is on the floor.",
+      "{pick} leads {other} by a mile, {pct}%. Add your bet."
+    ]
+  }
+}

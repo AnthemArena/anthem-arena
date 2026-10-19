@@ -7,7 +7,7 @@
 // has to rewrite what its theme gives it.
 export const VOICES = {
     jinx: { baseSkins: [37], skins: { 60: 'jinx-arcane-fractured', 1: 'jinx-crime-city', 2: 'jinx-firecracker', 4: 'jinx-star-guardian', 13: 'jinx-odyssey', 20: 'jinx-project', 51: 'jinx-cafe-cuties', 65: 'jinx-ocean-song', 3: 'jinx-zombie-slayer', 12: 'jinx-ambitious-elf', 29: 'jinx-heartseeker', 62: 'jinx-t1', 38: 'jinx-battle-cat', 40: 'jinx-battle-cat' }, other: 'jinx-original' },
-    vi: { baseSkins: [29, 48], skins: { 1: 'vi-neon-strike', 2: 'vi-officer', 3: 'vi-debonair', 4: 'vi-demon', 11: 'vi-project', 5: 'vi-warring-kingdoms', 12: 'vi-heartbreaker', 20: 'vi-psyops', 30: 'vi-heartache', 39: 'vi-primal-ambush' }, other: 'vi-original' }
+    vi: { baseSkins: [29], skins: { 1: 'vi-neon-strike', 2: 'vi-officer', 3: 'vi-debonair', 4: 'vi-demon', 11: 'vi-project', 5: 'vi-warring-kingdoms', 12: 'vi-heartbreaker', 20: 'vi-psyops', 30: 'vi-heartache', 39: 'vi-primal-ambush', 48: 'vi-arcane-brawler' }, other: 'vi-original' }
 };
 
 // The sections a voice set may rewrite; anything it leaves out falls back to the base pack.
