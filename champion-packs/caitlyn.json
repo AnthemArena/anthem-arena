@@ -1182,6 +1182,76 @@
         "View champions",
         "Continue"
       ]
+    },
+    "jinx-troublemaker": {
+      "messages": [
+        "Underdogs on five different days. Jinx would call it trouble. I'd call it persistence.",
+        "Five days, five long shots. I'll keep an eye on you."
+      ],
+      "details": [
+        "A pattern of daring. +{xp} XP",
+        "Underdogs across five days. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "jinx-chaos-agent": {
+      "messages": [
+        "Five edits you backed while they trailed. Against the odds, on purpose.",
+        "You stood with the losing side five times. Unconventional, but deliberate."
+      ],
+      "details": [
+        "Conviction against the tide. +{xp} XP",
+        "Five trailing picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-door-breaker": {
+      "messages": [
+        "Ten votes before anyone else arrived. That takes nerve.",
+        "First on the scene, ten times. Vi would approve."
+      ],
+      "details": [
+        "Ahead of the crowd. +{xp} XP",
+        "Ten early votes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-heavy-hitter": {
+      "messages": [
+        "Thirty votes. That's real commitment.",
+        "Thirty votes cast, every one with intent."
+      ],
+      "details": [
+        "Thirty and counting. +{xp} XP",
+        "A heavy hand with the ballot. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-right-call": {
+      "messages": [
+        "Fifteen winners backed. You read these matches well.",
+        "Fifteen correct calls. A good eye."
+      ],
+      "details": [
+        "A sharp read. +{xp} XP",
+        "Fifteen winners picked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
     }
   },
   "bubble": {
