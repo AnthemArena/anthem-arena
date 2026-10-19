@@ -5,11 +5,11 @@ import { voiceSetFor, mergeVoice, applyVoiceSet, loadVoicedPack, VOICES, VOICE_S
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let pass = 0; const t = async (n, f) => { await f(); console.log('  ok  ', n); pass++; };
 const read = id => JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
-const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project'), firecracker = read('jinx-firecracker'), starGuardian = read('jinx-star-guardian'), odyssey = read('jinx-odyssey'), battleCat = read('jinx-battle-cat'), cafeCuties = read('jinx-cafe-cuties'), oceanSong = read('jinx-ocean-song'), zombieSlayer = read('jinx-zombie-slayer'), ambitiousElf = read('jinx-ambitious-elf'), heartseeker = read('jinx-heartseeker'), t1 = read('jinx-t1');
+const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project'), firecracker = read('jinx-firecracker'), starGuardian = read('jinx-star-guardian'), odyssey = read('jinx-odyssey'), battleCat = read('jinx-battle-cat'), cafeCuties = read('jinx-cafe-cuties'), oceanSong = read('jinx-ocean-song'), zombieSlayer = read('jinx-zombie-slayer'), ambitiousElf = read('jinx-ambitious-elf'), heartseeker = read('jinx-heartseeker'), t1 = read('jinx-t1'), arcaneFractured = read('jinx-arcane-fractured');
 
-await t('Arcane skins keep the base voice, every other Jinx skin speaks with the original', () => {
+await t('Arcane Enemy keeps the base voice, every other Jinx skin has its own set or speaks with the original', () => {
     assert.equal(voiceSetFor('jinx', 37), null);
-    assert.equal(voiceSetFor('jinx', 60), null);
+    assert.equal(voiceSetFor('jinx', 60), 'jinx-arcane-fractured');
     for (const n of [0, 999]) assert.equal(voiceSetFor('jinx', n), 'jinx-original', `skin ${n}`);
     assert.equal(voiceSetFor('jinx', 1), 'jinx-crime-city');
     assert.equal(voiceSetFor('jinx', 20), 'jinx-project');
@@ -65,7 +65,7 @@ await t('applyVoiceSet follows "extends": parent first, then the set itself, mis
 });
 
 // Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
-for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig], ['jinx-odyssey', odyssey, orig], ['jinx-battle-cat', battleCat, orig], ['jinx-cafe-cuties', cafeCuties, orig], ['jinx-ocean-song', oceanSong, orig], ['jinx-zombie-slayer', zombieSlayer, orig], ['jinx-ambitious-elf', ambitiousElf, orig], ['jinx-heartseeker', heartseeker, orig], ['jinx-t1', t1, orig]]) {
+for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig], ['jinx-odyssey', odyssey, orig], ['jinx-battle-cat', battleCat, orig], ['jinx-cafe-cuties', cafeCuties, orig], ['jinx-ocean-song', oceanSong, orig], ['jinx-zombie-slayer', zombieSlayer, orig], ['jinx-ambitious-elf', ambitiousElf, orig], ['jinx-heartseeker', heartseeker, orig], ['jinx-t1', t1, orig], ['jinx-arcane-fractured', arcaneFractured, orig]]) {
     await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
         for (const s of VOICE_SECTIONS) {
             assert.ok(set[s], s);
@@ -104,9 +104,9 @@ for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-ci
 // Lines from the League audio pages that Jinx's skins share: ours are written from the character, never copied
 const RIOT_PHRASES = ["what's in my violin case", 'who wants a solo', "i've got a recital", 'scream along if you know the words', 'pop the cork', 'drink up',
     'wreaking havoc', 'stands for jinx', "doctor's note", "guns don't kill people", 'fat hands', 'hat lady', 'snoresville', 'everybody, panic',
-    'gotta die sometime', 'favorite waste of bullets', 'no need to be scared', 'accidentally did that on purpose', 'gun play', 'pandemonium with a purpose', 'glitter and guns', 'glitter bomb', 'that was stellar', 'star light, star bright', 'to infinity and', 'sparkle party', 'extreme makeover', 'mercy, or mayhem', 'guardian code', 'guardian handbook', 'first star made me', 'twinkle, twinkle', 'rising star', 'shooting star'];
+    'gotta die sometime', 'favorite waste of bullets', 'no need to be scared', 'accidentally did that on purpose', 'gun play', 'pandemonium with a purpose', 'glitter and guns', 'glitter bomb', 'that was stellar', 'star light, star bright', 'to infinity and', 'sparkle party', 'extreme makeover', 'mercy, or mayhem', 'guardian code', 'guardian handbook', 'first star made me', 'twinkle, twinkle', 'rising star', 'shooting star', 'tippity-top', 'pilty palace', 'nobody tells me what to do', 'nothin\' to lose but ammo', 'blue hair, blue hair', "saving the day's exhausting", 'some hero i am', 'every impossible problem', "fate doesn't care", 'stronger than i think', "i'm ignoring you", 'fortune cookie', 'sump rat', 'get jinxed', "can't fix a broken city", 'level-headed one around here', 'probably just the hair', 'silco', 'vander', 'ekko', 'sevika', 'stillwater', 'ambessa', 'heimerdinger', 'warwick'];
 // Every skin voice set that has its own theme: add new ones here and the tests compare them against all the others
-const THEMED = [['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker], ['jinx-star-guardian', starGuardian], ['jinx-odyssey', odyssey], ['jinx-battle-cat', battleCat], ['jinx-cafe-cuties', cafeCuties], ['jinx-ocean-song', oceanSong], ['jinx-zombie-slayer', zombieSlayer], ['jinx-ambitious-elf', ambitiousElf], ['jinx-heartseeker', heartseeker], ['jinx-t1', t1]];
+const THEMED = [['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker], ['jinx-star-guardian', starGuardian], ['jinx-odyssey', odyssey], ['jinx-battle-cat', battleCat], ['jinx-cafe-cuties', cafeCuties], ['jinx-ocean-song', oceanSong], ['jinx-zombie-slayer', zombieSlayer], ['jinx-ambitious-elf', ambitiousElf], ['jinx-heartseeker', heartseeker], ['jinx-t1', t1], ['jinx-arcane-fractured', arcaneFractured]];
 const lines = x => new Set(VOICE_SECTIONS.flatMap(s => strings(x[s])).filter(l => l.length > 28));
 for (const [name, set] of THEMED) {
     await t(`${name} is its own voice: almost nothing shared with Original Jinx or the other skins, and no in-game lines`, () => {

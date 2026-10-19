@@ -928,6 +928,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Done:** T1 Jinx (`jinx-t1`, skin 62: a championship-winning carry performance; draft, scrims, clutch plays, trophies and a roaring crowd.
   Lines never name the real player).
 - **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
-- **Jinx is complete.** Arcane Enemy (37) and Arcane Fractured (60) deliberately keep the base Arcane voice; Prestige Battle Cat (40) shares
-  Battle Cat's set.
+- **Done:** Arcane Fractured Jinx (`jinx-arcane-fractured`, skin 60): three selves in one skin. Every event rotates Hero (weary, reluctant,
+  wry), Tinkerer (curious, soft, nervous) and Menace (manic, snarky, jumpy), one line each, so she changes personality mid-conversation.
+  Messages and details are chosen independently at random, so the three voices mix freely. No lore character names are used in any set
+  (the guard test blocks them).
+- **Jinx is complete.** Arcane Enemy (37) deliberately keeps the base Arcane voice; Prestige Battle Cat (40) shares Battle Cat's set.
 - **Next:** Vi (14 skins), then Caitlyn (21, Sheriff Caitlyn stricter).
