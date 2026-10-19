@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-odyssey",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Odyssey Jinx",
+  "description": "Voice set for Odyssey Jinx (skin 13): the Morning Star's pilot and former mining-explosives tech. Cockpits, thrusters, asteroid fields and collateral damage. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! Hull breach! Hull breach! Everybody to the escape pods, except me, I'm flying!",
+          "cta": "Patch the hull"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? The engines are screaming and nobody's even touched the throttle. Rude!",
+          "cta": "Fire the thrusters"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind and drifting. Good news: I just found the emergency boost. Bad news: I don't know what it does!",
+          "cta": "Hit the boost"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. The warning lights are doing a little dance. I love it. Fix it!",
+          "cta": "Check the dials"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. A scratch on the paint! Crew, give the engine a smack!",
+          "cta": "Smack the engine"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Time to reroute the power and find a shortcut through an asteroid belt. Go vote!",
+          "cta": "Share it around"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! We're hovering in the dock and one vote decides which way the ship turns!",
+          "cta": "Pick the heading"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! One! The ship's hanging on the very last bolt! Don't look! Look!",
+          "cta": "Tighten the bolt"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! Everybody's gripping the seat. Even the toolbox is gripping the seat!",
+          "cta": "Hold on tight"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either a perfect landing or a very exciting crash. I'm good with either!",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! Smooth sailing, full thrusters, the whole crew's cheering! Take the wheel, captain!",
+          "cta": "Take the wheel"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! The ship's flying itself! I'm not allowed to say that but it's true!",
+          "cta": "Cruise a bit"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and climbing! Keep the engines humming, captain, don't run on fumes!",
+          "cta": "Keep flying"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still in the lead. Don't jinx the autopilot. Too late, I'm the pilot!",
+          "cta": "Watch the radar"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just punched through the asteroid field! Whoooo! Best flying ever!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Pulled out of a {voteDiff}-vote nosedive with seconds to spare! Pilot of the year!",
+          "cta": "Enjoy this"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Crawled back from {voteDiff} behind on the last of the fuel! Scrappy, sputtery, perfect!",
+          "cta": "Nice one"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just slid into the lead with the engines off. Silent running! Sneaky!",
+          "cta": "See where it stands"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! A co-pilot! I don't normally do co-pilots, but here we are!",
+        "{username} picked {momentTitle}. Matching flight paths! Try not to crash into me!",
+        "{username} is on your crew with {momentTitle}. Welcome aboard! The seatbelt's the loose one.",
+        "{username} backed {momentTitle} as well. Two on the bridge! That's practically a fleet!",
+        "Same pick as {username}! Two ships, one heading. Make sure you've got a landing plan!",
+        "{username} agrees with you on {momentTitle}. Log it in the captain's book, it's very rare!",
+        "{username} voted {momentTitle}. Two of you! A tiny crew! The galaxy's mildly safer!",
+        "{username} has taste and it matches yours. Good navigators, both of you!"
+      ],
+      "details": [
+        "Crew's growing! I'll find another seat. And another gun.",
+        "Look at you, two pilots, one dashboard!",
+        "Don't tell them I let them near the controls.",
+        "A co-pilot! Please don't touch the red button.",
+        "Teamwork! In space! Very legal!",
+        "I give it a week before one of you steals the other's chair.",
+        "New crewmate! I'm drawing a badge for you.",
+        "Ship's brighter with more of us on board!"
+      ],
+      "buttons": [
+        "Say hi",
+        "Send a signal",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Join the crew"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival ship on the radar! Shields up, chaos on!",
+        "{username} voted against {yourMoment}. Aww. A stowaway! With opinions!",
+        "{username} chose {theirMoment}. Not worried. Just recalculating the course. And loading the cannon.",
+        "{username} went for {theirMoment}. New entry in the pirate log!",
+        "{username} is against you on {yourMoment}. Finally, a proper dogfight!",
+        "{username} thinks {theirMoment} is better. A rival pilot! Let's see who dodges better.",
+        "{username} voted against you. Two ships, one asteroid belt. Somebody's scraping paint!",
+        "{username} versus you! I'm taking the best seat on the bridge, plus snacks, plus the big gun."
+      ],
+      "details": [
+        "I'm not saying dogfight. I'm saying don't let them out-fly you.",
+        "The cannon wants a word. It's been waiting since the last mission.",
+        "They'll learn. Space teaches everyone.",
+        "One sector, two pilots. Somebody's getting a dented hull.",
+        "I like them already. They're a great target for test shots.",
+        "I don't care. Check the radar. I super care.",
+        "A little rivalry keeps the engines warm!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Scramble the ships",
+        "Face them",
+        "Settle it",
+        "Front window"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! You two fly like one ship! A messy ship, but a ship!",
+        "{username} has agreed with you ten times running. Either perfect navigation or a very lucky coin!",
+        "Ten straight with {username}! The whole crew's talking about it. By crew I mean me."
+      ],
+      "details": [
+        "Ten! That's a whole hyperspace jump!",
+        "Don't scuff the paint now!",
+        "Honestly? Great piloting.",
+        "Weird. Good weird. Orbit weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hi",
+        "Fly together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a whole voyage, and you two never lost the signal!",
+        "{streakCount} for you and {username}. Perfectly in formation, like two ships on one beam. I'm tearing up. It's engine smoke!",
+        "{streakCount} straight with {username}! Somebody give you both a captain's badge. Or a repair bill."
+      ],
+      "details": [
+        "I'm speechless, and I'm the loud one!",
+        "Is this healthy? Ask the ship's doctor. We don't have one!",
+        "That's not luck, that's flying."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Fly together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep crossing flight paths!",
+        "{username} has disagreed with you ten times running. That's not a rival, that's a whole sector grudge!",
+        "Ten dogfights with {username}. I'm selling tickets from the cockpit."
+      ],
+      "details": [
+        "This is the main run now.",
+        "Seats selling fast!",
+        "The whole crew wants a window."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Fly again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a space war! I LOVE space wars!",
+        "{streakCount} dogfights with {username}. Call a truce? Nah. Reload!",
+        "{streakCount} against {username}. That's not a rivalry, that's a whole star system."
+      ],
+      "details": [
+        "Bigger than the Morning Star's worst mission. Almost!",
+        "I'm nervous and a bit proud. And a bit scorched.",
+        "One of you has to run out of fuel. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep flying"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! Docking's almost over, captain. Come on in!",
+        "{timeLeft} left on {matchTitle}. Your vote's missing from the manifest! Don't be left on the pad!",
+        "{matchTitle} departs in {timeLeft}. Voting takes ten seconds. I timed it with the ship's clock. It's wrong, but still!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Make the launch"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? The launch lights are blinking, captain!",
+        "Countdown started! {matchTitle} closes in {timeLeft}. Don't miss the launch!",
+        "{timeLeft} until {matchTitle} closes and your seat's still empty. Strap in!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, strapping in"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! Final launch call! Engines roaring!",
+        "{timeLeft}! That's all the fuel left on {matchTitle}. Go go go!",
+        "Last boarding on {matchTitle}! {timeLeft} left. Punch it!"
+      ],
+      "buttons": [
+        "Last chance",
+        "Punch it"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to leave the dock and you haven't voted in a single one! First launch in {timeLeft}!",
+        "{matchCount} unvoted matches, all about to depart. The first one lifts off in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, boarding now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! An empty bridge! Somebody has to press the first button!",
+        "Nobody's voted on {moment1} versus {moment2}. Silent cockpit. Even the intercom's bored!",
+        "Brand new match and not a single vote. Somebody has to take off first. Pick me. Pick you!",
+        "{matchTitle} needs a first pilot. I've got a seat. And a very suspicious fuel gauge."
+      ],
+      "buttons": [
+        "Take off first",
+        "Hit the ignition",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. That's the emptiest corner of the galaxy!",
+        "Hardly anyone's boarded here. What's wrong with everybody?",
+        "Low turnout. I blame all of you. Equally. With thrusters.",
+        "Barely any votes here. Somebody fill the crew quarters!"
+      ],
+      "details": [
+        "Go on, grab a seat.",
+        "It deserves a full crew. So do I.",
+        "Make some noise, loudly!",
+        "Don't be shy. The ship's friendly. Mostly."
+      ],
+      "ctas": [
+        "Vote",
+        "Join the crew",
+        "Go on",
+        "Board"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the heading. Funny, I know someone who hasn't boarded. Guess who!",
+        "Perfect tie on {matchTitle}. Two ships, same speed. I'm looking at you, captain. Hehe!",
+        "Dead even and nobody's steering. You haven't voted. You're the pilot of this one!",
+        "{moment1} and {moment2}, side by side, and you've been quiet in the cockpit. Fix that!"
+      ],
+      "buttons": [
+        "Take the wheel",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the fuel's almost out! Last chance to pick a heading!",
+        "Dead level, almost no time left. You're the only pilot who can land this!",
+        "Still tied with the tank running dry. Pick a side! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Land it",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Ship's fuelled, crew's grumpy! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new sector to explore!",
+        "Round {round} just started! {matchCount} matches waiting for a pilot. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even the autopilot!"
+      ],
+      "buttons": [
+        "Take off",
+        "See round {round}",
+        "Let's go",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Perfect landing! I'd like to say I planned it. I did not!",
+        "{momentTitle} beat the competition! Next round's in for a rough flight.",
+        "{momentTitle} survived! I never doubted it. Okay, the autopilot doubted. Just a smidge.",
+        "{momentTitle} is through! Somebody's having a great trip. Hehe, you!",
+        "{momentTitle} moves up and the rest are scrap metal. Shiny scrap metal.",
+        "{momentTitle} won! Good call! Captain's orders: celebrate loudly!"
+      ],
+      "details": [
+        "Your pick keeps flying!",
+        "One down, lots of space left.",
+        "The bracket just shrank. Tidier! Faster!"
+      ],
+      "buttons": [
+        "Celebrate",
+        "See the result",
+        "Next match",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. Shot down. A moment of silence. Okay, that's enough, it's boring!",
+        "{momentTitle} lost. Everyone who voted against it gets a ticket to the smallest moon.",
+        "Fine. {momentTitle} is gone. I'll fire one salute shot. Maybe three.",
+        "{momentTitle} was too fast for this sector anyway. Obviously.",
+        "{momentTitle} is out, and the cockpit went quiet. I hate a quiet cockpit. Somebody bang something!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A cockpit bit."
+      ],
+      "details": [
+        "They'll pay for this. At the next dock.",
+        "It was good. The whole fleet knows.",
+        "You'll find another one. Good ships always return.",
+        "Every ship goes down eventually. That's what makes landing fun. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next match",
+        "Take revenge",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still browsing? Pick one! Any one! I'll hold the wheel. I'm lying, I'll let go to grab a snack!",
+        "No pressure, but are you gonna vote or just stare at the dashboard until it blinks back?",
+        "They're all great ships! Pick one! Launch first, panic later!",
+        "Decisions, decisions. Close your eyes, hit a button, and hold on."
+      ],
+      "details": [
+        "Every vote is thrust!",
+        "Your opinion matters. Sort of. Mostly on this ship.",
+        "Don't overthink it. Overthinking stalls engines.",
+        "Trust your gut. It's got great navigation."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Launch",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New face on the bridge! Welcome aboard! {liveCount} matches live and every one of them's a mess!",
+          "{liveCount} edits fighting it out in orbit and you just docked. Grab a seat before they grab yours!",
+          "Oooh, a new crewmate! Engines are warm, a spanner's on the console, and {liveCount} matches are live. You'll love it.",
+          "No rules, {liveCount} live matches, and me at the wheel. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Come aboard",
+          "Light it up"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I saved your seat. A toolbox was in it, but I saved it.",
+          "Two days running! Look at you, crew regular!",
+          "Back again? Day two! I could get used to this. Don't tell the captain."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because your seat's been cold!",
+          "You're back after {days} days! The ship kept flying without you. Mostly into asteroids.",
+          "{days} days away. I noticed. The cockpit was too quiet. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The bridge was getting dull!",
+          "Look who's here! Ready for another run?",
+          "You came back! Let's fly into something exciting."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! Feels like nothing. Then the engines kick in!",
+        "You picked a side! That's how every voyage begins."
+      ],
+      "details": [
+        "First flight logged! +{xp} XP",
+        "Welcome aboard the mess! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're staying on the crew! Weird. Good weird!",
+        "Five votes! Okay, now I'm keeping an eye on your seat."
+      ],
+      "details": [
+        "Most recruits jump ship by now. +{xp} XP",
+        "Look at you, flying steady! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're proper crew now. Don't make it weird!",
+        "Ten votes! You keep boarding. I noticed. Hehe."
+      ],
+      "details": [
+        "Regulars get the window seat. +{xp} XP",
+        "Ten flights and counting! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! That's a whole crew's worth of opinions!",
+        "You're getting loud! The intercom picked it up!"
+      ],
+      "details": [
+        "The fleet's listening. +{xp} XP",
+        "Twenty-five logged flights! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly deep in the voyage!",
+        "Fifty! Most people turn back at the first moon. Their loss!"
+      ],
+      "details": [
+        "You're past the first jump. +{xp} XP",
+        "Fifty down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! That's legend stuff, a captain's legend!",
+        "A hundred! I'd say I'm impressed, but I'm only saying it once. Impressed!"
+      ],
+      "details": [
+        "You earned the captain's chair. +{xp} XP",
+        "A hundred! Wow! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! Hehe, your harness was waiting!",
+        "Three days! Something's firing up."
+      ],
+      "details": [
+        "Re-boarding is the tricky part. +{xp} XP",
+        "Three in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You really do keep flying with us!",
+        "Seven days! I stopped counting. Okay, I didn't. The ship's log kept score."
+      ],
+      "details": [
+        "A week of take-offs. +{xp} XP",
+        "Seven days of launches. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Nothing stops you, does it? Not even a meteor shower!",
+        "Fourteen days! Even the engines overheat by day ten!"
+      ],
+      "details": [
+        "Two weeks! Wow! +{xp} XP",
+        "That's a long-range engine. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! I don't know what to say. Thanks, captain!",
+        "A whole month! You stayed on board. That means more than I'll admit!"
+      ],
+      "details": [
+        "Thirty days on the crew roster. +{xp} XP",
+        "A whole month! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You board the ships nobody else wants!",
+        "Backing the underdog ship again! I get it. I really do."
+      ],
+      "details": [
+        "Flying against traffic. +{xp} XP",
+        "Five and still flying! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You've got a thing for wrecks that secretly fly!",
+        "Rebel! Yeah. I see it!"
+      ],
+      "details": [
+        "You don't follow the flight path, do you? +{xp} XP",
+        "Fifteen underdogs! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! You never board the obvious ship!",
+        "Thirty! You always board the ship nobody else spotted!"
+      ],
+      "details": [
+        "Not even the radar predicts you. +{xp} XP",
+        "Thirty underdog flights! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on board! That's five matches now!",
+        "Early again! That's five empty docks you've claimed!"
+      ],
+      "details": [
+        "You like an empty hangar. +{xp} XP",
+        "Five early votes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you boarded first! Impressive!",
+        "Early, over and over! You never wait for the other pilots!"
+      ],
+      "details": [
+        "Fifteen first boardings. +{xp} XP",
+        "Ahead of everyone! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! You like the last bolt holding, huh?",
+        "Another razor edge! Are your hands shaking? Mine are rattling the wrench drawer!"
+      ],
+      "details": [
+        "Photo finishes suit you. +{xp} XP",
+        "Ten tight ones! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! You keep steering the last bit!",
+        "Your vote keeps landing right on the final bolt!"
+      ],
+      "details": [
+        "Twenty-five photo-finish landings. +{xp} XP",
+        "You decide the landing! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the ship that was smoking. Five times! Stubborn! Brilliant!",
+        "You don't abandon a ship that's smoking. I love that."
+      ],
+      "details": [
+        "Believing in the late burn. +{xp} XP",
+        "Five late burns backed! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've got a favourite ship!",
+        "That one again? Yeah. It flies nicely."
+      ],
+      "details": [
+        "You know your favourite ship. +{xp} XP",
+        "Three boardings, one ship! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for one ship! That's a real crew oath!",
+        "Okay, you've bought a lifetime pass for that one. No refunds!"
+      ],
+      "details": [
+        "Loyal to the last jump. +{xp} XP",
+        "Five boardings, one favourite! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a fixation orbit!",
+        "Ten votes, same moment. My lips are sealed. The intercom's not. Hush, intercom!"
+      ],
+      "details": [
+        "Ten boardings, one ship. +{xp} XP",
+        "Obsessed! The whole crew respects it! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You're following the whole route!",
+        "You came back for round two! The second leg has the best views!"
+      ],
+      "details": [
+        "Keep watching! +{xp} XP",
+        "Two rounds down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly deep in the system now!",
+        "Deep in the bracket! Hope you like the dark between the stars."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Deep into it! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the last jump!",
+        "Six rounds! You stayed to the final dock! Wow!"
+      ],
+      "details": [
+        "From launch to here. +{xp} XP",
+        "All six rounds! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're poking around every cargo bay!",
+        "Ten different matches! Wandering every deck, huh?"
+      ],
+      "details": [
+        "Exploring the ship. +{xp} XP",
+        "Ten matches! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been in every airlock!",
+        "Twenty-five! You've checked every cargo bay!"
+      ],
+      "details": [
+        "Every corner of the ship. +{xp} XP",
+        "Twenty-five bays checked! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not browsing, that's a whole deployment!",
+        "Fifty matches! You know this ship better than I do!"
+      ],
+      "details": [
+        "A real veteran. +{xp} XP",
+        "Fifty matches! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't leave the pilot's seat, can you?",
+        "Five matches back to back! Keep the engines humming!"
+      ],
+      "details": [
+        "One long flight. +{xp} XP",
+        "Five in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Check the oxygen!",
+        "Ten matches in one shift! Your seat's gone flat!"
+      ],
+      "details": [
+        "Deep dive! +{xp} XP",
+        "Ten at once! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. The night shift has the best views!",
+        "Middle of the night! That's when the best flying happens."
+      ],
+      "details": [
+        "The late shift. +{xp} XP",
+        "Midnight voter! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Signal boosted across the fleet!",
+        "Five shares! You're a distress beacon! Good!"
+      ],
+      "details": [
+        "Thanks for calling in the fleet. +{xp} XP",
+        "Five shares! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically in recruitment!",
+        "Fifteen! You keep recruiting half the sector!"
+      ],
+      "details": [
+        "You keep filling the crew quarters. +{xp} XP",
+        "Fifteen shares! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before it got loud! Founding crew! Yours forever!",
+        "One of the first thousand aboard! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever. +{xp} XP",
+        "Nobody can scuff that badge. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! Captain's stripes!",
+        "You climbed a rank! Don't let it go to your head. Or do. I'm flying!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Engines roar!",
+        "Another one: {name}! Boom!"
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the shiny new parts!",
+        "Mastery up! Now we're getting to the good bit of the voyage!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a headline voyage!",
+        "Ten long shots! You're a menace to your own flight plan. I love it!"
+      ],
+      "details": [
+        "Loose cannon, ship edition. +{xp} XP",
+        "Ten wild picks! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. Flares for everyone!",
+        "Ten tight finishes with her! Don't tell her I saluted!"
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love flight checklists!",
+        "Seven days of steady aim! Dull! Impressive! Mostly dull!"
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Steered right through! Boom!",
+        "A tied match and you took the controls! Nice!"
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next flight"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, in the pilot's seat? Great choice! Dangerous choice! Great!",
+        "Odyssey Jinx! Buckle up. Not that it'll help."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not boarding yet! I'm polishing the thrusters. Mostly with a wrench. Check back soon!",
+      "Shh! Launch sequence's about to start. I can feel it in my boots.",
+      "Hangar's closed for now. Doesn't stop me from planning the route."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, the instruments say it's never easy.",
+      "Watch both. Then steer towards the one that gets under your skin.",
+      "I won't tell the crew which one you picked. Probably. The intercom might.",
+      "Take your time, captain! Actually, don't. The fuel's burning.",
+      "Go on, nobody's judging. Okay, the radar is. A little.",
+      "Pick the one you'd replay at 2am from the pilot's seat. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's boarded yet. Be the first on the bridge, I dare you!",
+      "Empty cockpit! Make some noise with a vote.",
+      "Not one passenger! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still in the hangar. Pick a ship!",
+      "The shift's nearly over. Don't make me read out the countdown. I will, over the intercom."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Take off before the dock shuts!",
+      "Tick, tick, whirr. That's the last of the fuel counting down."
+    ],
+    "closing-final": [
+      "Last hour! Launch now, plan on the way!",
+      "Any second now. Seriously. Hit ignition!"
+    ],
+    "voted-early": [
+      "One of the first aboard! Bold! I love bold!",
+      "Hardly anybody's boarded and you picked a ship anyway. Respect, pilot!"
+    ],
+    "voted-ahead": [
+      "Look at you, flying with the crowd favourite! Don't get comfy, turbulence happens.",
+      "{pct}% with you! Great instincts. I didn't say that. Forget it.",
+      "Your pick's ahead. The whole fleet's with you for once. Strange!",
+      "{pick} is pulling away! Feels good? Hold the stick steady!",
+      "Ahead, for now. Currents shift. So do crews."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm looking through the porthole!",
+      "A hair apart. One more vote could flip it. Tell a friend. Tell the dock!",
+      "Neck and neck! Your pick needs you and everybody on the station.",
+      "{pct} to {otherPct}. Something's overheating and it's me, from the nerves."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody circling the same moon!",
+      "A perfect tie. Honestly? Rude of the cosmos."
+    ],
+    "voted-behind": [
+      "You're behind! Don't sulk in the cockpit. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog ship! That's my favourite kind!",
+      "They're ahead. Doesn't make you wrong. Just early to the launch!",
+      "Behind by {diff} points. Tell the station. Loudly. Make a ruckus!",
+      "Everyone's flying the other way. Cool! Be the odd ship."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got a pilot's eye.",
+      "A win! A sneaky little smooth landing. I'll take it!",
+      "{pick} went through! You called the arrival!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it fizzle, then launch the next one!",
+      "Didn't make it. I've had rougher flights. So have you. Next one!",
+      "{pick} is out. Sorry. For real. I'll fly low in its honour."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to land first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Voting's closed. You missed this flight! There's always another departure.",
+      "All done here. {winner} took the dock. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first flight! The scary one. Now you're on the crew. Welcome aboard!",
+      "That's your first. Feels small, right? Wait for the engines to warm up.",
+      "You're one of the crew now. Try not to make it weird!"
+    ],
+    "streak": [
+      "Again? You keep boarding! I'm not complaining. I saved your seat.",
+      "{streak} days running! Okay, now I'm logging your flights.",
+      "Back again! Crews stick around when the flying's good. Stay!"
+    ],
+    "underdog": [
+      "Backing the ship nobody's boarding? Ooh. I see you, pilot.",
+      "Bold! Everyone else is flying the other direction. Love that.",
+      "Underdog, huh? Takes a certain kind of pilot. A good kind."
+    ],
+    "early": [
+      "Early! You get to plot the course before anyone else boards. Don't waste it!",
+      "Hardly anyone's on the bridge yet. Your vote's doing all the heavy lifting.",
+      "First up the ramp! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just nudged the ship! Feel it? Everything's close right now.",
+      "Razor thin! One more vote and the whole heading flips.",
+      "Close one! Your vote counts here. Really, truly counts."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't crashed. Go fetch the rest of the crew!",
+      "Not winning yet. Good! Means there's still a course to fix.",
+      "Behind, but the engines are still running. Not even close to out!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Space turns on you fast!",
+      "Winning, for now. Enjoy it. Quietly. Or fire a flare. I don't mind.",
+      "Look at that! Fine navigation. Obviously."
+    ],
+    "default": [
+      "Logged, pilot! I'm not changing your mind. Not yet.",
+      "Done! That one's on your flight record now.",
+      "Your vote's in. Go see what else is flying!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't boarded a single one yet! Start with whichever one itches.",
+      "Everything's open! Pick your ship. I'll pretend I'm not watching from the cockpit.",
+      "{unvoted} to go. No pressure. Okay, a little thruster pressure!"
+    ],
+    "live-some": [
+      "{voted} flown, {unvoted} to go! Keep the engines running!",
+      "You're in the flight now! {unvoted} more waiting on you.",
+      "Good take-off! The rest won't fly themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole schedule!",
+      "Almost there! {unvoted} more and the dock's empty.",
+      "So close! Don't land before the finale!"
+    ],
+    "live-one": [
+      "One left! Just one! Final approach!",
+      "Last one! Don't leave it circling!",
+      "One match between you and a perfect landing!"
+    ],
+    "live-closing": [
+      "Some of these depart in {timeLeft}! {unvoted} still need a pilot. Move it!",
+      "The launch clock's loud now! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of runway! Pick, quick!"
+    ],
+    "live-done": [
+      "You've flown everything! Look at you! Go see the star map, the bracket!",
+      "Nothing left for you here. Come back when the next round opens the hangar!",
+      "All done! That's rare. Thanks, captain!"
+    ],
+    "live-none": [
+      "Nothing's flying right now. The hangar will open again! Go look at the bracket.",
+      "Quiet. Too quiet. The whole fleet's napping. Check back soon!",
+      "No matches open. The runway's empty and I'm bored already!"
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each fly on. The rest get a snack and a nap!",
+      "Every ship docks in a group. Not every ship leaves one.",
+      "Watch the tables. They shuffle fast!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group get the big ships.",
+      "No knockout yet. The groups have to burn their fuel first!",
+      "Patience! The knockout plots itself once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're floating!",
+      "Single elimination! No re-entry. Okay, almost none.",
+      "Every match counts more now. Pick carefully. Or don't, I'm not your navigator."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and you're drifting!",
+      "Follow the bracket. It narrows every jump!",
+      "Every line here is a match someone voted on. Ooh, flight plans."
+    ],
+    "brackets-complete": [
+      "And that's the cup! Final destination! Thanks for being here!",
+      "It's over! Good voyage! I'll miss it. A bit. Don't tell the crew.",
+      "That's the champion! All of it, worth the fuel!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's been plotted. The charts are still printing.",
+      "Empty chart! The draw hasn't happened. Soon!",
+      "Nothing on the map yet. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no take-backs. Board a ship on Arcane Moments!",
+      "Two edits are fighting! {a} versus {b}. Come and take the wheel.",
+      "{a} versus {b} and nobody on the crew can agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I flew with {pick} over {other}. Come tell me I'm off course!",
+      "{pick} got my vote. {other} did not. Your turn, pilot!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, correct my heading."
+    ],
+    "early": [
+      "I got one of the first votes in on {pick} versus {other}! Be quick, the bridge is empty.",
+      "Early vote for {pick} over {other}. Come make it a real flight!",
+      "Hardly anyone's boarded {pick} versus {other} yet. Fill the seats!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the heading. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm peeking through the porthole. Come break it!",
+      "{pick} and {other} are exactly even. Somebody take the controls!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My knuckles are white. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This landing's gonna be loud!",
+      "A hair apart: {pick} versus {other}, {voteDiff} votes. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A wobble, not a wreck! Come help it level out!",
+      "Down {voteDiff} against {other}, but {pick} isn't down. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me fly this solo!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Hull's cracking. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole crew, fast!",
+      "{pick} is getting blown out of the sky by {other}. Rescue ship, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's tight! Come help me hold the course.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the engines die!",
+      "{pct}% for {pick} against {other}. Close enough to chew a spanner!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the fireworks, or join in!",
+      "{pick} is flattening {other}, {pct}%! Hop aboard before it's over.",
+      "{pct}% for {pick}! {other} never saw the thrusters coming."
+    ]
+  }
+}

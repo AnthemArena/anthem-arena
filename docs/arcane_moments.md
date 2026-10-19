@@ -911,5 +911,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   favour"; festival wording kept playful and about the fireworks).
 - **Done:** Star Guardian Jinx (`jinx-star-guardian`, skin 4: a reluctant, sarcastic hero in glitter who talks to her guns Shiro and Kuro;
   duty versus mischief, stars and sparkles).
-- **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Odyssey, Heartseeker, ...), then Vi and Caitlyn
+- **Done:** Odyssey Jinx (`jinx-odyssey`, skin 13: the Morning Star's pilot and former mining-explosives tech; cockpits, thrusters, asteroid fields,
+  docking, crew and collateral damage).
+- **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
