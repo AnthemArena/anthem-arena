@@ -1003,6 +1003,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   ties are balanced curses and a closing match is the moon setting. Written from the theme only, not from the card's text; no character names.
 - **Done:** Arcane depth pass on the base voices (`jinx.json`, `caitlyn.json`): five lines each swapped in place for quieter, more vulnerable Jinx and guilt-tinged Caitlyn moments
   (lost match, comeback, long absence, long ally streak, losing badly). Same events and counts; original lines only.
+- **Done:** DRX Caitlyn (`caitlyn-drx`, skin 48): a calm, exact championship marksman. Drafts, scrims, lanes, objectives, clean farm and a finals-stage trophy; votes are picks locked and
+  a closing match is game point. No real player or team names in any line. This completes the Caitlyn skin voices (Arcane Enforcer and Arcane Commander keep `caitlyn.json`).
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
