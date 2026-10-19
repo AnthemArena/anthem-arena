@@ -955,7 +955,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
 - **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
   Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
-  one skin at a time (Warring Kingdoms, Heartbreaker, Heartache, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
+  one skin at a time (Warring Kingdoms, Heartbreaker, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
+- **Done:** Heartache Vi (`vi-heartache`, skin 30): a tough brawler who finds love letters in her locker (the card is a letter from Caitlyn), secretly flustered
+  and never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama; votes are valentines.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
