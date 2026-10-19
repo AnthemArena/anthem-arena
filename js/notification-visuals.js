@@ -385,7 +385,7 @@ export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jin
         ${n.matchTitle || (!leadHtml && tag) ? `<div class="nv-caption">${escapeHtml(n.matchTitle || tag)}</div>` : ''}
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
         ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
-        ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
+        ${detail && n.type !== 'novotes' && n.type !== 'lowvotes' ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
         ${stripHtml(strip, accent, 34)}
     </div>
     <button class="bulletin-toast-cta nv-cta event" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View match')}</button>`;
@@ -481,8 +481,8 @@ export function ensureVersusStyles() {
 .versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
 /* inner colours follow the toast's own accent (green for allies, amber for tie-breakers...) so the bubble, pills and ring always match the outer border; plain pink where color-mix is unsupported */
-.bulletin-banner.versus-toast{--nv-line-auto:rgba(255,105,180,.4);--nv-chip-bg-auto:rgba(255,79,180,.18);--nv-chip-text-auto:#ffd6ee}
-@supports (color:color-mix(in srgb,red,blue)){.bulletin-banner.versus-toast{--nv-line-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 40%,transparent);--nv-chip-bg-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 18%,transparent);--nv-chip-text-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 30%,#fff)}}
+.bulletin-banner.versus-toast{--nv-line-auto:rgba(255,105,180,.4);--nv-chip-bg-auto:rgba(255,79,180,.18);--nv-chip-text-auto:#ffd6ee;--nv-readable-auto:#ffd6ee}
+@supports (color:color-mix(in srgb,red,blue)){.bulletin-banner.versus-toast{--nv-line-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 40%,transparent);--nv-chip-bg-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 18%,transparent);--nv-chip-text-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 30%,#fff);--nv-readable-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 42%,#fff)}}
 /* toast styles (Settings > Notifications): classic is the rules above; the others override them */
 .versus-toast .nv-head-row{display:contents}
 .versus-toast .nv-bubble-x{display:none}
@@ -538,7 +538,7 @@ html[data-toast-style="minimal"] .versus-toast .nv-jinx{width:fit-content;max-wi
 .versus-toast .nv-toast-headline{justify-content:flex-start;gap:10px;text-align:left}
 .versus-toast .nv-toast-headline .nv-headline-text{display:flex;flex-direction:column;min-width:0;line-height:1.2}
 .versus-toast .nv-toast-name{font-size:18px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-accent);letter-spacing:.03em}
+.versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-readable-auto);letter-spacing:.03em}
 .versus-toast .nv-jinx{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
 .versus-toast .nv-jinx-face{box-shadow:0 0 18px var(--nv-glow)}
 .versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,var(--nv-line-auto));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}

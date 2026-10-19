@@ -187,4 +187,12 @@ t('pop-up inner colours follow the toast accent: the bubble and pills never hard
     assert.ok(chip.includes('var(--nv-line-auto)') && chip.includes('var(--nv-chip-bg-auto)') && !/255,\s*79,\s*180/.test(chip), 'pills follow the accent');
     assert.ok(/@supports \(color:color-mix/.test(css), 'accent-derived colours, with a plain fallback');
 });
+t('no-votes / low-votes toasts drop the grey sub-line; other events keep theirs', () => {
+    const base = { tag: 'x', glyph: 'VS', accent: '#1e3a8a', jinxSrc: 'https://x/j.png', quip: 'hi', detail: 'GODS vs RISE • Closes in 4h', cta: 'Go' };
+    for (const type of ['novotes', 'lowvotes']) assert.ok(!eventToastHtml({ type }, base).includes('GODS vs RISE'), type);
+    assert.ok(eventToastHtml({ type: 'closing' }, base).includes('GODS vs RISE'));
+});
+t('header action text uses a lightened accent so dark packs stay readable', () => {
+    assert.ok(/\.nv-toast-action\{[^}]*color:var\(--nv-readable-auto\)/.test(fs.readFileSync(new URL('../js/notification-visuals.js', import.meta.url), 'utf8')));
+});
 console.log(`${pass} passed`);
