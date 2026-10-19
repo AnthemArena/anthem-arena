@@ -1089,3 +1089,12 @@ So new champions can bring their own achievements without touching the general s
 - **Budget**: at most 5 achievements and 1,000 XP per champion, so ten champions cannot outweigh the general set.
 - **Completion** is reported separately: general X/33, then each champion's own. A new champion never lowers the general percentage.
 - **Test**: `tools/test-achievement-registry.mjs` checks unique ids, namespaces, the budget, that every prestige skin names a real achievement and every champion achievement unlocks a skin, and that completion stays separate.
+
+## Profile achievements tab: general and per-champion sections (19 October 2026)
+
+The profile's Achievements tab (`js/achievements-view-model.js`, rendered by `loadAllAchievements` in `js/profile-page.js`) is now grouped: **General** first, then one section per champion with achievements, each with its own `unlocked / total`.
+- **Own profile**: locked achievements are shown greyed, with a progress bar where the numbers are known (worked out from the votes saved in this browser); hidden ones appear only as "N hidden achievements left to discover". Every champion section is shown.
+- **Someone else's profile**: unlocked only, and a champion section only when they have earned something with that champion. No private progress is needed or shown.
+- Cards for champion achievements say which skin they unlock (one note, instead of repeating it in the description).
+- Saved ids that no longer exist in the code are ignored (they used to render as an "undefined" card and inflate the count). The tab count uses the same rule.
+- Tests: `tools/test-achievements-view-model.mjs`.
