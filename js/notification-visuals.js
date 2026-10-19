@@ -74,8 +74,8 @@ export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc,
     return `
     <div class="nv-body" onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
-        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div>
+        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
+        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div></div>
         ${xp || rarity ? `<div class="nv-chips">${xp ? `<span class="nv-chip">+${escapeHtml(xp)} XP</span>` : ''}${rarity ? `<span class="nv-chip">${escapeHtml(rarity)}</span>` : ''}</div>` : ''}
         ${bubbleHtml(line, jinxSrc, accent)}
     </div>
@@ -259,8 +259,8 @@ export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headl
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
-        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}
+        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
+        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}</div>
         ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
@@ -481,6 +481,7 @@ export function ensureVersusStyles() {
 .versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
 /* toast styles (Settings > Notifications): classic is the rules above; the others override them */
+.versus-toast .nv-head-row{display:contents}
 .versus-toast .nv-caption{display:none}
 /* full art: the splash is the whole card; no match thumbnails, a caption on the art, and the champion's words in a frosted bubble over it */
 html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
@@ -517,6 +518,12 @@ html[data-toast-style="minimal"] .versus-toast .bulletin-close{position:relative
 html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{display:flex;width:fit-content;max-width:100%;align-items:center;justify-content:flex-start !important;text-align:left !important;gap:10px;margin:0 0 6px 90px;padding:0;background:none;border:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 12px rgba(0,0,0,.85)}
 html[data-toast-style="minimal"] .versus-toast .nv-toast-headline .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
 html[data-toast-style="minimal"] .versus-toast .nv-follow-face{justify-content:flex-start;margin-left:90px;padding-bottom:6px}
+/* achievement / follow: their icon or face small beside the words, like the social alerts; event alerts lose their emoji circle */
+html[data-toast-style="minimal"] .versus-toast .nv-head-row{display:flex;align-items:center;gap:10px;margin:0 0 6px 90px;order:-2}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-follow-face{margin:0;padding:0}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-toast-headline{margin:0}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-glyph){display:none}
 /* the bubble hugs its words (the toast shrinks to fit, staying on the right edge) */
 html[data-toast-style="minimal"] .versus-toast .nv-bubble{flex:0 1 auto}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx{width:fit-content;max-width:100%}
