@@ -975,6 +975,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   The front line, rounds, spotters, last light and atonement; votes are rounds fired and a closing match is the last light. No lore names (no machine or ruler names).
 - **Done:** Arctic Warfare Caitlyn (`caitlyn-arctic-warfare`, skin 4): a sniper on the Arctic front, where the cold is unforgiving and the winds are harsh.
   Tundra, whiteouts, patience, frost and the last shot before the storm; votes are shots and a closing match is the storm arriving. No lore names.
+- **Done:** Officer Caitlyn (`caitlyn-officer`, skin 5): a sharp-eyed beat cop who is routinely underestimated, with doughnuts, patrols, radios and stakeouts.
+  Votes are filed reports and a closing match is the end of shift. No lore names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
