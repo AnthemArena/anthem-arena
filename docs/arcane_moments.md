@@ -979,6 +979,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Votes are filed reports and a closing match is the end of shift. No lore names.
 - **Done:** Headhunter Caitlyn (`caitlyn-headhunter`, skin 6): a cold, patient bounty hunter in alien armour, where every hunt and every shot goes exactly her way.
   Contracts, quarry, scanners and the clean shot; votes are claimed shots and a closing match is the quarry about to bolt. No lore names.
+- **Done:** Pulsefire Caitlyn (`caitlyn-pulsefire`, skin 11, a skin with its own in-game voice, so treated as high reward): a legendary chrono-law enforcer who protects the
+  fragile enigma that is time. Timelines, anomalies, paperwork and the clean correction; votes are entries in the record and a closing match is the window collapsing.
+  Tone only from her in-game list, nothing copied. No lore names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
