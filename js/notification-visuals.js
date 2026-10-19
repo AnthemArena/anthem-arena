@@ -376,9 +376,9 @@ export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
     return `<div class="nv-lead nv-follow-face" role="img" aria-label="${escapeHtml(label || '')}" title="${escapeHtml(label || '')}">${inner}</div>`;
 }
 
-// Pop-up: [edit A] VS [edit B], a small tag line, the champion's words in a bubble, a few chips, one button. The whole card opens the match.
+// Pop-up: [edit A] VS [edit B], the champion's words in a bubble, one button. The whole card opens the match. (No pills: the vote page already
+// shows the percentages, so `chips` is accepted for old callers but not drawn.)
 export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
-    if (strip) chips = chips.filter(c => !/^\d+ matches?$/.test(c));   // the picture strip says it better
     return `
     <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
@@ -387,7 +387,6 @@ export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jin
         ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
         ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
         ${stripHtml(strip, accent, 34)}
-        ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
     </div>
     <button class="bulletin-toast-cta nv-cta event" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View match')}</button>`;
 }

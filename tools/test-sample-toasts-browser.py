@@ -34,7 +34,7 @@ with sync_playwright() as p:
     check('round opening: no second line under the champion', pg.locator('#bulletin-banner .nv-event-detail').count() == 0)
     show('testDanger(15)')
     chips = [c.strip() for c in pg.locator('#bulletin-banner .nv-chip').all_inner_texts()]
-    check('danger: no second line; facts are chips (Behind by 15, percentages)', pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and 'Behind by 15' in chips and any('vs' in c for c in chips), chips)
+    check('danger: no second line and no pills (the vote page shows the numbers)', pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and chips == [], chips)
     show('testWelcome("first-time")')
     more = pg.inner_text('#bulletin-banner .nv-strip-more').strip() if pg.locator('#bulletin-banner .nv-strip-more').count() else ''
     check('first-time welcome: strip of every live edit (6 matches = 12 edits, 5 shown, +7)', pg.locator('#bulletin-banner .nv-strip-th').count() == 5 and more == '+7' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0, more)
@@ -54,7 +54,7 @@ with sync_playwright() as p:
         show(call); r = ring('#bulletin-banner .nv-edits .nv-edit')
         chips = [c.strip() for c in pg.locator('#bulletin-banner .nv-chip').all_inner_texts()]
         line = pg.inner_text('#bulletin-banner .nv-bubble').strip()
-        check(f'{call}: both edits ringed alike with "=", no second line, "Level at 24–24" chip', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0 and pg.inner_text('#bulletin-banner .nv-mark').strip() == '=' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and 'Level at 24–24' in chips and (tier != 'final' or 'Last chance' in chips), (r, chips))
+        check(f'{call}: both edits ringed alike with "=", no second line, no pills', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0 and pg.inner_text('#bulletin-banner .nv-mark').strip() == '=' and pg.locator('#bulletin-banner .nv-event-detail').count() == 0 and chips == [], (r, chips))
         check(f'{call}: the champion line comes from the pack (not the plain fallback)', line not in ('GODS vs RISE is tied right now. Your vote would break it.', 'GODS vs RISE is still tied and closing soon. Last chance to break it.'), line)
         check(f'{call}: pack line has no unfilled {{placeholders}}', '{' not in line and line != '', line)
     show('testLevelUp(5)')
