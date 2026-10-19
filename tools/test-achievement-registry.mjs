@@ -46,6 +46,15 @@ for (const a of Object.values(ACHIEVEMENTS).filter(x => x.champion)) {
     assert.ok(!(unlocksSkin && a.noSkin), `${a.id} is marked noSkin but a skin names it`);
 }
 
+// no two general achievements may count the same thing at the same target (the removed Explorer set copied Milestones)
+const sig = a => { try { return a.progress({}).target + '|' + String(a.condition).replace(/\s+/g, ''); } catch (e) { return null; } };
+const seen = new Map();
+for (const a of Object.values(GENERAL_ACHIEVEMENTS)) {
+    const k = sig(a); if (!k) continue;
+    assert.ok(!seen.has(k), `${a.id} duplicates ${seen.get(k)}`); seen.set(k, a.id);
+}
+assert.equal(GENERAL_ACHIEVEMENTS['match-explorer'], undefined);
+
 // completion is separate: a champion's achievements never change the general percentage
 const all = Object.keys(GENERAL_ACHIEVEMENTS);
 const c = achievementCompletion(all);

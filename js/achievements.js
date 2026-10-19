@@ -489,51 +489,8 @@ export const GENERAL_ACHIEVEMENTS = {
     progress: (stats) => ({ current: stats.roundsParticipated, target: 6 })
   },
 
-  // ========================================
-  // EXPLORER / PARTICIPATION
-  // ========================================
-
-  'match-explorer': {
-    id: 'match-explorer',
-    name: 'Match Explorer',
-    description: 'Vote in 10 unique matches',
-    icon: '🗺️',
-    xp: 100,
-    category: 'completionist',
-    hidden: true,
-    tier: 'bronze',
-    rarity: 'uncommon',
-    condition: (stats) => stats.uniqueMatches >= 10,
-    progress: (stats) => ({ current: stats.uniqueMatches, target: 10 })
-  },
-
-  'every-corner': {
-    id: 'every-corner',
-    name: 'Every Corner',
-    description: 'Vote in 25 unique matches',
-    icon: '🧭',
-    xp: 200,
-    category: 'completionist',
-    hidden: true,
-    tier: 'silver',
-    rarity: 'rare',
-    condition: (stats) => stats.uniqueMatches >= 25,
-    progress: (stats) => ({ current: stats.uniqueMatches, target: 25 })
-  },
-
-  'bracket-veteran': {
-    id: 'bracket-veteran',
-    name: 'Bracket Veteran',
-    description: 'Vote in 50 unique matches',
-    icon: '🏅',
-    xp: 400,
-    category: 'completionist',
-    hidden: true,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.uniqueMatches >= 50,
-    progress: (stats) => ({ current: stats.uniqueMatches, target: 50 })
-  },
+  // (Match Explorer, Every Corner and Bracket Veteran were removed: you can vote once per match, so they counted
+  //  exactly what the Milestones achievements count.)
 
   // ========================================
   // SESSION / SPECIAL
@@ -702,13 +659,6 @@ export const ACHIEVEMENT_CATEGORIES = {
     icon: '<i class="fa-solid fa-road"></i>',
     color: '#c8aa6e',
     description: 'Follow the tournament through its rounds'
-  },
-
-  completionist: {
-    name: 'Explorer',
-    icon: '<i class="fa-solid fa-compass"></i>',
-    color: '#4aff4a',
-    description: 'Explore more of the tournament'
   },
 
   special: {
