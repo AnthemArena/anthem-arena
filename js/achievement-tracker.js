@@ -11,6 +11,7 @@ import {
 } from './achievements.js';
 import { addXP } from './rank-system.js';
 import { streakFromVotes } from './xp-ledger.js';
+import { factsOf } from './vote-facts.js';
 import { ddragonUrl } from './arcane-config.js';
 
 // ========================================
@@ -204,16 +205,17 @@ export async function checkFoundingMemberStatus() {
 export function companionStats(allVotes) {
     const by = id => allVotes.filter(v => (v.championId || 'jinx') === id);
     return {
-        caitlynCloseVotes: by('caitlyn').filter(v => v.voteType === 'closeCall').length,
+        caitlynCloseVotes: by('caitlyn').filter(v => factsOf(v).close).length,
         caitlynStreak: streakFromVotes(by('caitlyn')),
-        decidingVotes: allVotes.filter(v => v.tiedBefore).length
+        decidingVotes: allVotes.filter(v => factsOf(v).tiedBefore).length
     };
 }
 
 export async function calculateAchievementStats(allVotes) {
 
     // ✅ Track votes in current session
-    const sessionStart = parseInt(sessionStorage.getItem('sessionStart') || Date.now());
+    let sessionStart = parseInt(sessionStorage.getItem('sessionStart'));
+    if (!Number.isFinite(sessionStart)) { sessionStart = Date.now(); try { sessionStorage.setItem('sessionStart', String(sessionStart)); } catch (e) {} }
     const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
 
     // Check founding member status from Firebase
@@ -221,10 +223,11 @@ export async function calculateAchievementStats(allVotes) {
   
     const stats = {
         totalVotes: allVotes.length,
-        underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
-        closeMatchVotes: allVotes.filter(v => v.voteType === 'closeCall').length,
-        earlyVotes: 0,
-        votingStreak: parseInt(localStorage.getItem('votingStreak') || '0'),
+        // All of these read what was true when the vote was cast (see vote-facts.js), not how the match stands now
+        underdogVotes: allVotes.filter(v => factsOf(v).underdog).length,
+        closeMatchVotes: allVotes.filter(v => factsOf(v).close).length,
+        earlyVotes: allVotes.filter(v => factsOf(v).early).length,
+        votingStreak: streakFromVotes(allVotes),           // from the vote days themselves (the saved counter was reset by every vote)
         furthestRound: Math.max(...allVotes.map(v => v.round), 0),
         roundsParticipated: new Set(allVotes.map(v => v.round)).size,
         uniqueMatches: new Set(allVotes.map(v => v.matchId)).size,
@@ -235,7 +238,7 @@ export async function calculateAchievementStats(allVotes) {
         sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
         uniqueArtists: 0,
         uniqueYears: 0,
-        comebackVotes: 0,
+        comebackVotes: allVotes.filter(v => factsOf(v).againstTide).length,   // "Against the Tide": backed the edit that was behind 60-40
         isFoundingMember: isFoundingMember,
         votesInSession: votesThisSession.length,
         ...companionStats(allVotes)
@@ -244,23 +247,10 @@ export async function calculateAchievementStats(allVotes) {
   
 
   
-    // Calculate early votes (match had <10 votes when user voted)
-    stats.earlyVotes = allVotes.filter(v => {
-        const match = v.match;
-        if (!match) return false;
-        const totalAtTimeOfVote = (match.song1?.votes || 0) + (match.song2?.votes || 0);
-        return totalAtTimeOfVote <= 10;
-    }).length;
-  
     // Calculate late night votes (midnight to 5am)
     stats.lateNightVotes = allVotes.filter(v => {
         const hour = new Date(v.timestamp).getHours();
         return hour >= 0 && hour < 5;
-    }).length;
-  
-    // Calculate comeback votes (voted for song that was losing <40%)
-    stats.comebackVotes = allVotes.filter(v => {
-        return v.votedSongPercentage < 40;
     }).length;
   
     // Calculate max votes for a single song
@@ -304,7 +294,15 @@ export async function calculateAchievementStats(allVotes) {
  * @param {Object} context - Context for when this is being called (e.g., { afterVote: true })
  * @returns {Object} - Achievement status
  */
-export async function checkAchievements(allVotes, context = {}) {
+let _awardChain = Promise.resolve();
+export function checkAchievements(allVotes, context = {}) {
+    // One check at a time: two overlapping checks (vote + share) would each see the same achievement as new and toast it twice.
+    const run = _awardChain.then(() => _checkAchievements(allVotes, context));
+    _awardChain = run.catch(() => {});
+    return run;
+}
+
+async function _checkAchievements(allVotes, context = {}) {
     const stats = await calculateAchievementStats(allVotes);
     const unlocked = [];
     const locked = [];

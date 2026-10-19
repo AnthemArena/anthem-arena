@@ -1063,3 +1063,19 @@ All 37 achievements plus every vote in a 64-entry group cup (about 127 matches) 
 2. One written definition of "close" and "underdog", shown on the achievements page.
 3. Decide the pace (levels 8-10, mastery 10, prestige skins) and cup-size-aware achievements.
 4. Then new content: Jinx achievement set with ability icons, Ekko unlock, Vi achievement skin, past-tournament accolades.
+
+## Vote-time facts and XP correctness (19 October 2026)
+
+What was true when a vote was cast is now worked out once, saved with the vote (`facts` in the `userVotes` record) and read by XP, achievements and the post-vote modal. Rules live in `js/vote-facts.js`:
+
+- **Underdog**: you backed the edit seeded at least two pots lower (a pot is a quarter of the field). No pot data: seeded 8+ places lower. No seeds: never.
+- **Close**: 45-55% share with at least 10 votes in.
+- **Against the Tide** (was Comeback Believer, same id): the edit you backed was behind 60-40 or worse, with at least 10 votes in.
+- **Early voter**: fewer than 10 votes in before yours.
+- **Tie-breaker**: exactly level with 10+ votes in.
+
+XP per vote: 10 base, +20 first vote of the UTC day, +10 on days 2-10 of a streak (that bonus ends after day 10), +5 underdog, +10 close, +5 early. The old clash between the daily bonus and the streak key (every vote paid +30, streak stuck at 1) is gone; the streak is derived from vote days (`streakFromVotes`).
+
+Also fixed: a revisit no longer overwrites the saved vote record; achievement checks run one at a time (no duplicate unlocks or toasts); the vote page no longer shows a second achievement toast; the share check is awaited; share XP and the share count are paid once per match per day; the session start is initialised once.
+
+Records saved before this model have no `facts` and are read from the old share-based `voteType` (`factsOf`). Tests: `tools/test-vote-facts.mjs`.

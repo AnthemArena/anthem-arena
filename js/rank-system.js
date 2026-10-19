@@ -1,6 +1,7 @@
 import { masteryLevel, skinsUnlockedBetween } from './champion-unlocks.js';
 import { getChampionSplashUrl } from './arcane-config.js';
 import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes, backfillPackXp } from './xp-ledger.js';
+import { factsOf, voteXpAward, utcDay } from './vote-facts.js';
 
 // ========================================
 // RANK PROGRESSION SYSTEM
@@ -31,7 +32,7 @@ export const RANK_SYSTEM = {
         underdogPick: 5,
         closeMatch: 10,
         firstVoteInMatch: 5,
-        share: 10
+        share: 5
     },
 
     tiers: {
@@ -83,15 +84,12 @@ export function calculateUserXP(allVotes) {
             voteDates.add(voteDate);
         }
         
-        // First voter in match bonus (if vote number < 10)
-        if (vote.voteNumber && vote.voteNumber <= 10) {
-            totalXP += RANK_SYSTEM.xpSources.firstVoteInMatch;
-        }
-        
-        // Close match bonus (if within 10 votes difference when they voted)
-        if (vote.isCloseMatch) {
-            totalXP += RANK_SYSTEM.xpSources.closeMatch;
-        }
+        // Bonuses use what was true at vote time (vote.facts, see vote-facts.js); a vote from before that existed falls back to
+        // the old flags
+        const f = vote.facts ? factsOf(vote) : null;
+        if (f ? f.early : (vote.voteNumber && vote.voteNumber <= 10)) totalXP += RANK_SYSTEM.xpSources.firstVoteInMatch;
+        if (f ? f.close : vote.isCloseMatch) totalXP += RANK_SYSTEM.xpSources.closeMatch;
+        if (f && f.underdog) totalXP += RANK_SYSTEM.xpSources.underdogPick;
         
         votedMatches.add(vote.matchId);
     });
@@ -158,36 +156,13 @@ export function getUserRank(xp) {
 // CALCULATE XP GAINED FROM VOTE
 // ========================================
 
-export function calculateVoteXP(voteData) {
-    let xp = RANK_SYSTEM.xpSources.vote;
-    const bonuses = [];
-    
-    // First vote of day
-    const lastVoteDate = localStorage.getItem('lastVoteDate');
-    const today = new Date().toISOString().split('T')[0];
-    if (lastVoteDate !== today) {
-        xp += RANK_SYSTEM.xpSources.firstVoteOfDay;
-        bonuses.push({ type: 'First vote today', xp: RANK_SYSTEM.xpSources.firstVoteOfDay });
-        localStorage.setItem('lastVoteDate', today);
-    }
-    
-    // Underdog bonus (if voted for lower seed)
-    if (voteData.isUnderdog) {
-        xp += RANK_SYSTEM.xpSources.underdogPick;
-        bonuses.push({ type: 'Underdog pick', xp: RANK_SYSTEM.xpSources.underdogPick });
-    }
-    
-    // Close match bonus
-    if (voteData.isCloseMatch) {
-        xp += RANK_SYSTEM.xpSources.closeMatch;
-        bonuses.push({ type: 'Close match', xp: RANK_SYSTEM.xpSources.closeMatch });
-    }
-    
-    return {
-        totalXP: xp,
-        baseXP: RANK_SYSTEM.xpSources.vote,
-        bonuses
-    };
+export function calculateVoteXP(voteData = {}) {
+    // The daily bonus is paid once per UTC day, remembered under one key in one format (it used to share a key with the
+    // streak counter in a different format, so every vote counted as the first of the day).
+    const today = utcDay();
+    const firstVoteToday = localStorage.getItem('lastVoteDayUtc') !== today;
+    if (firstVoteToday) localStorage.setItem('lastVoteDayUtc', today);
+    return voteXpAward({ facts: voteData.facts || {}, firstVoteToday, streak: voteData.streak || 1 });
 }
 
 // ========================================

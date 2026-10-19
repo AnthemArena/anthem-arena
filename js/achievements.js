@@ -278,7 +278,7 @@ export const ACHIEVEMENTS = {
   'against-the-grain': {
     id: 'against-the-grain',
     name: 'Against the Grain',
-    description: 'Vote for 5 underdogs',
+    description: 'Back 5 underdogs (edits seeded two pots lower)',
     icon: '🃏',
     xp: 75,
     category: 'underdog',
@@ -356,7 +356,7 @@ export const ACHIEVEMENTS = {
   'nail-biter': {
     id: 'nail-biter',
     name: 'Nail-Biter',
-    description: 'Vote in 10 close matches',
+    description: 'Vote in 10 close matches (45-55% split, 10+ votes in)',
     icon: '⚖️',
     xp: 125,
     category: 'clutch',
@@ -383,8 +383,8 @@ export const ACHIEVEMENTS = {
 
   'comeback-believer': {
     id: 'comeback-believer',
-    name: 'Comeback Believer',
-    description: 'Vote for 5 moments that were behind when you chose them',
+    name: 'Against the Tide',
+    description: 'Back 5 edits that were behind 60-40 or worse when you voted',
     icon: '🔄',
     xp: 150,
     category: 'clutch',
