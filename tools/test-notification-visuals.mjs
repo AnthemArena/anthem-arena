@@ -1,5 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { withoutLeadingGlyph, eventLeadHtml, eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
@@ -176,5 +177,14 @@ t('event row: opens the match from the row and from the button, with the tag, th
     assert.ok(/class="notification-item nv-row nv-event-row unread"[^>]*data-url="\/vote\.html\?match=m1"/.test(html));
     assert.ok(html.includes('Your pick won') && html.includes('2m ago · A vs B') && html.includes('Told you.'));
     assert.ok(/data-action="navigate" data-url="\/vote\.html\?match=m1">Nice<\/button>/.test(html));
+});
+t('pop-up inner colours follow the toast accent: the bubble and pills never hard-code pink', () => {
+    const css = fs.readFileSync(new URL('../js/notification-visuals.js', import.meta.url), 'utf8');
+    const rule = sel => css.split('\n').find(l => l.startsWith(sel)) || '';
+    assert.ok(rule('.versus-toast .nv-bubble{').includes('var(--nv-line,var(--nv-line-auto))'), 'bubble border follows the accent');
+    assert.ok(rule('.versus-toast .nv-bubble::before{').includes('var(--nv-line,var(--nv-line-auto))'), 'bubble tail follows the accent');
+    const chip = rule('.versus-toast .nv-chip{');
+    assert.ok(chip.includes('var(--nv-line-auto)') && chip.includes('var(--nv-chip-bg-auto)') && !/255,\s*79,\s*180/.test(chip), 'pills follow the accent');
+    assert.ok(/@supports \(color:color-mix/.test(css), 'accent-derived colours, with a plain fallback');
 });
 console.log(`${pass} passed`);

@@ -480,6 +480,9 @@ export function ensureVersusStyles() {
 /* the same splash, stretched and heavily blurred, tints the card body so the fade picks up the art's own colours (kept dim so the text stays readable) */
 .versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
+/* inner colours follow the toast's own accent (green for allies, amber for tie-breakers...) so the bubble, pills and ring always match the outer border; plain pink where color-mix is unsupported */
+.bulletin-banner.versus-toast{--nv-line-auto:rgba(255,105,180,.4);--nv-chip-bg-auto:rgba(255,79,180,.18);--nv-chip-text-auto:#ffd6ee}
+@supports (color:color-mix(in srgb,red,blue)){.bulletin-banner.versus-toast{--nv-line-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 40%,transparent);--nv-chip-bg-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 18%,transparent);--nv-chip-text-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 30%,#fff)}}
 /* toast styles (Settings > Notifications): classic is the rules above; the others override them */
 .versus-toast .nv-head-row{display:contents}
 .versus-toast .nv-bubble-x{display:none}
@@ -538,11 +541,11 @@ html[data-toast-style="minimal"] .versus-toast .nv-jinx{width:fit-content;max-wi
 .versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-accent);letter-spacing:.03em}
 .versus-toast .nv-jinx{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
 .versus-toast .nv-jinx-face{box-shadow:0 0 18px var(--nv-glow)}
-.versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,rgba(255,79,180,.35));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}
-.versus-toast .nv-bubble::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:rgba(11,13,24,.88);border-left:1px solid var(--nv-line,rgba(255,79,180,.35));border-bottom:1px solid var(--nv-line,rgba(255,79,180,.35));transform:rotate(45deg)}
+.versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,var(--nv-line-auto));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}
+.versus-toast .nv-bubble::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:rgba(11,13,24,.88);border-left:1px solid var(--nv-line,var(--nv-line-auto));border-bottom:1px solid var(--nv-line,var(--nv-line-auto));transform:rotate(45deg)}
 .versus-toast .nv-jinx{align-items:center;gap:14px}
 .versus-toast .nv-chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
-.versus-toast .nv-chip{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#ffd6ee;background:rgba(255,79,180,.18);border:1px solid rgba(255,79,180,.4);text-transform:capitalize}
+.versus-toast .nv-chip{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;color:var(--nv-chip-text-auto);background:var(--nv-chip-bg-auto);border:1px solid var(--nv-line-auto);text-transform:capitalize}
 .versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:11px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
 .versus-toast .nv-cta.ally{color:#0f0b18}
 .versus-toast .nv-follow-face{display:flex;justify-content:center;padding-top:2px}
