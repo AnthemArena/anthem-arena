@@ -945,7 +945,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Done:** Demon Vi (`vi-demon`, skin 4): a bored infernal brawler summoned into the mortal realm who answers a good fight and only for so long.
   Votes are offerings, matches are sentences, a closing match is a binding about to slip. Builds on `vi-original`.
 - **Done:** PROJECT Vi (`vi-project`, skin 11): a street-smart, blunt detective keeping the neon streets in line, with a lower-sector enforcer's toughness.
-  Patrols, cases, statements, stakeouts and badges. Next: the rest of Vi's ladder, one skin at a time (Neon Strike, Officer, Debonair, Warring Kingdoms,
+  Patrols, cases, statements, stakeouts and badges.
+- **Done:** Neon Strike Vi (`vi-neon-strike`, skin 1; the card has no description, so the theme comes from the art and the wiki's theme tag, a retro vice-squad
+  look: shades, neon strip, sting operations, synth soundtrack and sunset showdowns). Next: the rest of Vi's ladder, one skin at a time (Officer, Debonair, Warring Kingdoms,
   Heartbreaker, Heartache, PsyOps, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
