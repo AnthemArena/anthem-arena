@@ -1079,3 +1079,13 @@ XP per vote: 10 base, +20 first vote of the UTC day, +10 on days 2-10 of a strea
 Also fixed: a revisit no longer overwrites the saved vote record; achievement checks run one at a time (no duplicate unlocks or toasts); the vote page no longer shows a second achievement toast; the share check is awaited; share XP and the share count are paid once per match per day; the session start is initialised once.
 
 Records saved before this model have no `facts` and are read from the old share-based `voteType` (`factsOf`). Tests: `tools/test-vote-facts.mjs`.
+
+## Champion achievements are separate from general ones (19 October 2026)
+
+So new champions can bring their own achievements without touching the general set:
+- **One file per champion** in `js/champion-achievements/` (`jinx.js`, `caitlyn.js`), joined in `index.js`. `achievements.js` still exports `ACHIEVEMENTS` (general plus champion) so existing code works; `GENERAL_ACHIEVEMENTS`, `getChampionAchievements(packId)` and `achievementCompletion()` give the split. To add a champion: one new file and one line in `index.js`.
+- **Namespace**: champion ids start with the pack id (`vi-door-breaker`); general ids never do. Each entry is stamped with `champion` and the `companions` category by `index.js`.
+- **Stats**: champion achievements read `stats.byChampion.<packId>` (`votes, underdogVotes, closeVotes, earlyVotes, decidingVotes, streak`), counted only from votes cast with that companion active. Jinx's Loose Cannon and Caitlyn's Deciding Shot still deliberately count every vote ("whoever your champion is").
+- **Budget**: at most 5 achievements and 1,000 XP per champion, so ten champions cannot outweigh the general set.
+- **Completion** is reported separately: general X/33, then each champion's own. A new champion never lowers the general percentage.
+- **Test**: `tools/test-achievement-registry.mjs` checks unique ids, namespaces, the budget, that every prestige skin names a real achievement and every champion achievement unlocks a skin, and that completion stays separate.

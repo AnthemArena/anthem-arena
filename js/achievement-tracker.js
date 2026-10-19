@@ -4,6 +4,7 @@
 
 import { 
     ACHIEVEMENTS, 
+    achievementCompletion,
     ACHIEVEMENT_CATEGORIES,
     getRarityColor,
     getRarityGlow,
@@ -203,6 +204,22 @@ export async function checkFoundingMemberStatus() {
 // Champion-specific stats count the votes cast while that companion was active (older votes without one count as Jinx, like
 // the Champions tab does). Account-wide ones (underdogs, ties) count every vote. "Tied" = the match was exactly tied
 // (10+ votes) when the vote was cast.
+export function championStats(allVotes) {
+    const out = {};
+    for (const v of allVotes) {
+        const id = v.championId || 'jinx';
+        (out[id] ||= []).push(v);
+    }
+    return Object.fromEntries(Object.entries(out).map(([id, votes]) => [id, {
+        votes: votes.length,
+        underdogVotes: votes.filter(v => factsOf(v).underdog).length,
+        closeVotes: votes.filter(v => factsOf(v).close).length,
+        earlyVotes: votes.filter(v => factsOf(v).early).length,
+        decidingVotes: votes.filter(v => factsOf(v).tiedBefore).length,
+        streak: streakFromVotes(votes)
+    }]));
+}
+
 export function companionStats(allVotes) {
     const by = id => allVotes.filter(v => (v.championId || 'jinx') === id);
     return {
@@ -242,6 +259,7 @@ export async function calculateAchievementStats(allVotes) {
         comebackVotes: allVotes.filter(v => factsOf(v).againstTide).length,   // "Against the Tide": backed the edit that was behind 60-40
         isFoundingMember: isFoundingMember,
         votesInSession: votesThisSession.length,
+        byChampion: championStats(allVotes),   // per-champion numbers for champion achievements (js/champion-achievements)
         ...companionStats(allVotes)
     };
   
@@ -399,12 +417,15 @@ async function _checkAchievements(allVotes, context = {}) {
         }
     }
   
+    const completion = achievementCompletion(unlocked.map(a => a.id));
     return {
         unlocked,
         locked,
         newlyUnlocked,
         totalXPFromAchievements: unlocked.reduce((sum, a) => sum + a.xp, 0),
-        completionPercentage: Math.round((unlocked.length / Object.keys(ACHIEVEMENTS).length) * 100)
+        // general set only: a new champion's achievements must not lower it (see completion for the per-champion numbers)
+        completionPercentage: completion.general.percentage,
+        completion
     };
 }
 

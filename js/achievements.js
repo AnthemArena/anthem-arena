@@ -121,7 +121,9 @@ export async function getUnlockedAchievementsFromFirebase() {
 // Music-focused achievements with League item icons
 // ========================================
 
-export const ACHIEVEMENTS = {
+import { CHAMPION_ACHIEVEMENTS, CHAMPION_ACHIEVEMENTS_FLAT } from './champion-achievements/index.js';
+
+export const GENERAL_ACHIEVEMENTS = {
 
   // ========================================
   // MILESTONES
@@ -625,69 +627,28 @@ export const ACHIEVEMENTS = {
     rarity: 'rare',
     condition: (stats) => stats.sharesCount >= 15,
     progress: (stats) => ({ current: stats.sharesCount, target: 15 })
-  },
-
-  // ========================================
-  // COMPANIONS (votes counted for the companion that was active when they were cast)
-  // Each one unlocks a Prestige skin (js/champion-unlocks.js)
-  // ========================================
-
-  'jinx-loose-cannon': {
-    id: 'jinx-loose-cannon',
-    name: 'Loose Cannon',
-    description: 'Vote for 10 underdogs, whoever your champion is. Unlocks Prestige Battle Cat for Jinx',
-    icon: '💣',
-    xp: 200,
-    category: 'companions',
-    hidden: false,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.underdogVotes >= 10,
-    progress: (stats) => ({ current: stats.underdogVotes, target: 10 })
-  },
-
-  'caitlyn-close-calls': {
-    id: 'caitlyn-close-calls',
-    name: 'Close Calls',
-    description: 'Vote in 10 close matches with Caitlyn as your champion. Unlocks Prestige Arcade',
-    icon: '🔎',
-    xp: 250,
-    category: 'companions',
-    hidden: false,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.caitlynCloseVotes >= 10,
-    progress: (stats) => ({ current: stats.caitlynCloseVotes, target: 10 })
-  },
-
-  'caitlyn-steady-aim': {
-    id: 'caitlyn-steady-aim',
-    name: 'Steady Aim',
-    description: 'Vote 7 days in a row with Caitlyn as your champion. Unlocks Prestige Arcade (2022)',
-    icon: '🏹',
-    xp: 250,
-    category: 'companions',
-    hidden: false,
-    tier: 'gold',
-    rarity: 'epic',
-    condition: (stats) => stats.caitlynStreak >= 7,
-    progress: (stats) => ({ current: stats.caitlynStreak, target: 7 })
-  },
-
-  'caitlyn-deciding-shot': {
-    id: 'caitlyn-deciding-shot',
-    name: 'Deciding Shot',
-    description: 'Cast the vote that breaks a tied match, whoever your champion is. Unlocks Prestige Arcane Commander for Caitlyn',
-    icon: '🔫',
-    xp: 500,
-    category: 'companions',
-    hidden: false,
-    tier: 'legendary',
-    rarity: 'legendary',
-    condition: (stats) => stats.decidingVotes >= 1,
-    progress: (stats) => ({ current: stats.decidingVotes, target: 1 })
   }
 };
+
+// General achievements (above) plus every champion's own (js/champion-achievements). Existing code keeps using ACHIEVEMENTS.
+export const ACHIEVEMENTS = { ...GENERAL_ACHIEVEMENTS, ...CHAMPION_ACHIEVEMENTS_FLAT };
+
+export const getGeneralAchievements = () => Object.values(GENERAL_ACHIEVEMENTS);
+export const getChampionAchievements = packId => Object.values(CHAMPION_ACHIEVEMENTS[packId] || {});
+
+// Completion is reported separately, so adding a champion never lowers the general percentage:
+// { general: {unlocked, total, percentage}, byChampion: { jinx: {...}, caitlyn: {...} } }
+export function achievementCompletion(unlockedIds = []) {
+  const have = new Set(unlockedIds);
+  const count = list => {
+    const unlocked = list.filter(a => have.has(a.id)).length;
+    return { unlocked, total: list.length, percentage: list.length ? Math.round((unlocked / list.length) * 100) : 0 };
+  };
+  return {
+    general: count(getGeneralAchievements()),
+    byChampion: Object.fromEntries(Object.keys(CHAMPION_ACHIEVEMENTS).map(id => [id, count(getChampionAchievements(id))]))
+  };
+}
 
 // ========================================
 // ACHIEVEMENT CATEGORIES
@@ -899,13 +860,8 @@ export function getTotalAchievementXP() {
  * Get achievement completion percentage
  */
 export function getAchievementCompletion() {
-  const unlocked = getUnlockedAchievements();
-  const total = Object.keys(ACHIEVEMENTS).length;
-  return {
-    unlocked: unlocked.length,
-    total: total,
-    percentage: Math.round((unlocked.length / total) * 100)
-  };
+  const { general, byChampion } = achievementCompletion(getUnlockedAchievements());
+  return { ...general, byChampion };   // unlocked / total / percentage are the general set; champions are listed separately
 }
 
 /**
