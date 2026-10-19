@@ -1022,15 +1022,27 @@
     "default": {
       "messages": [
         "Achievement unlocked: {name}. Not bad.",
-        "Another one: {name}."
+        "Another one: {name}.",
+        "{name}. Ooh, shiny.",
+        "{name}. Didn't see that coming. Okay, I did.",
+        "You got {name}. I'm putting it on the fridge.",
+        "{name}! Look at you, collecting things.",
+        "Ha. {name}. Keep going, you're on a roll.",
+        "{name}. That's going straight on the pile.",
+        "Fine, {name} is pretty good. Don't let it go to your head.",
+        "{name}. I'd high-five you but I'm holding something."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description} +{xp} XP"
+        "{description} +{xp} XP",
+        "Shiny new thing. +{xp} XP",
+        "{description}. Easy, right? +{xp} XP"
       ],
       "buttons": [
         "View achievements",
-        "See all"
+        "See all",
+        "Show me",
+        "More, more"
       ]
     },
     "mastery-up": {

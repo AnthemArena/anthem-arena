@@ -1088,15 +1088,27 @@
     "default": {
       "messages": [
         "Achievement unlocked: {name}. Well done.",
-        "Another one on record: {name}."
+        "Another one on record: {name}.",
+        "{name}. Well earned.",
+        "{name}. Noted, and entered in the file.",
+        "That's {name}. A clean result.",
+        "{name}. Consistent work.",
+        "Good. {name} is yours.",
+        "{name}. I expected nothing less.",
+        "Another entry for the record: {name}.",
+        "{name}. Quietly done, and done well."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description} +{xp} XP"
+        "{description} +{xp} XP",
+        "Entered in the record. +{xp} XP",
+        "A fair result. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
-        "See all"
+        "See all",
+        "Review",
+        "Continue"
       ]
     },
     "mastery-up": {

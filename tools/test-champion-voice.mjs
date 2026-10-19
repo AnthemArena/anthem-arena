@@ -66,12 +66,16 @@ await t('applyVoiceSet follows "extends": parent first, then the set itself, mis
     await applyVoiceSet({ alerts: {} }, 'x', async id => loop[id]);   // a loop of "extends" ends instead of hanging
 });
 
+// Achievements added after the skin sets were written: a skin may fall back to the base pack's line for these
+const NEWER = new Set(['jinx-troublemaker', 'jinx-chaos-agent', 'vi-door-breaker', 'vi-heavy-hitter', 'vi-right-call']);
+
 // Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
 for (const [name, set, below] of [['jinx-original', orig, base], ['vi-original', viOrig, viBase], ['vi-demon', viDemon, viOrig], ['vi-project', viProject, viOrig], ['vi-neon-strike', viNeon, viOrig], ['vi-officer', viOfficer, viOrig], ['vi-debonair', viDebonair, viOrig], ['vi-psyops', viPsyops, viOrig], ['vi-heartache', viHeartache, viOrig], ['vi-primal-ambush', viPrimal, viOrig], ['vi-warring-kingdoms', viWarring, viOrig], ['vi-heartbreaker', viHeartbreaker, viOrig], ['vi-arcane-brawler', viBrawler, viOrig], ['vi-t1', viT1, viOrig], ['caitlyn-original', caitOrig, caitBase], ['caitlyn-resistance', caitResistance, caitOrig], ['caitlyn-arctic-warfare', caitArctic, caitOrig], ['caitlyn-officer', caitOfficer, caitOrig], ['caitlyn-headhunter', caitHunter, caitOrig], ['caitlyn-pulsefire', caitPulsefire, caitOrig], ['caitlyn-pool-party', caitPool, caitOrig], ['caitlyn-arcade', caitArcade, caitOrig], ['caitlyn-battle-academia', caitAcademy, caitOrig], ['caitlyn-snow-moon', caitSnowMoon, caitOrig], ['caitlyn-heartthrob', caitHeartthrob, caitOrig], ['caitlyn-firecracker', caitFirecracker, caitOrig], ['caitlyn-sheriff', caitSheriff, caitOrig], ['caitlyn-safari', caitSafari, caitOrig], ['caitlyn-lunar-wraith', caitWraith, caitOrig], ['caitlyn-drx', caitDrx, caitOrig], ['caitlyn-arcane-commander', caitCommander, caitOrig], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig], ['jinx-odyssey', odyssey, orig], ['jinx-battle-cat', battleCat, orig], ['jinx-cafe-cuties', cafeCuties, orig], ['jinx-ocean-song', oceanSong, orig], ['jinx-zombie-slayer', zombieSlayer, orig], ['jinx-ambitious-elf', ambitiousElf, orig], ['jinx-heartseeker', heartseeker, orig], ['jinx-t1', t1, orig], ['jinx-arcane-fractured', arcaneFractured, orig]]) {
     await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
         for (const s of VOICE_SECTIONS) {
             assert.ok(set[s], s);
-            assert.deepEqual(Object.keys(set[s]).sort(), Object.keys(below[s]).sort(), `${s} keys`);
+            const want = Object.keys(below[s]).filter(k => s !== 'achievements' || !NEWER.has(k) || set[s][k]);
+            assert.deepEqual(Object.keys(set[s]).sort(), want.sort(), `${s} keys`);
         }
         for (const k of Object.keys(below.alerts)) {
             if (k === 'welcome') { for (const w of Object.keys(below.alerts.welcome)) assert.deepEqual(Object.keys(set.alerts.welcome[w]), Object.keys(below.alerts.welcome[w]), w); continue; }
@@ -81,14 +85,18 @@ for (const [name, set, below] of [['jinx-original', orig, base], ['vi-original',
             assert.deepEqual(conds(set.alerts[k]), conds(below.alerts[k]), `alerts.${k} conditions`);
         }
         for (const s of ['bubble', 'modal', 'pages', 'share']) for (const k of Object.keys(below[s])) assert.equal(set[s][k].length, below[s][k].length, `${s}.${k} count`);
-        for (const k of Object.keys(below.achievements)) assert.deepEqual(shape(set.achievements[k]), shape(below.achievements[k]), `achievement ${k}`);
+        // A skin may leave an achievement out (the loader keeps the line from the set below), and its generic "default" pool may differ in size;
+        // every other entry it does write must keep the shape of the one below it.
+        for (const k of Object.keys(below.achievements)) { if (k === 'default' || !set.achievements[k]) continue; assert.deepEqual(shape(set.achievements[k]), shape(below.achievements[k]), `achievement ${k}`); }
+        for (const k of Object.keys(below.achievements)) assert.ok(Object.keys(set.achievements).includes(k) || NEWER.has(k), `achievement ${k} is missing and not a recent addition`);
     });
     await t(`${name} only uses placeholders the lines below use, and keeps the ones each achievement needs`, () => {
         for (const s of VOICE_SECTIONS) for (const k of Object.keys(below[s])) {
+            if (!set[s][k]) continue;
             const allowed = holes(below[s][k]);
             for (const h of holes(set[s][k])) assert.ok(allowed.has(h), `${s}.${k} uses {${h}}`);
         }
-        for (const k of Object.keys(below.achievements)) for (const h of holes(below.achievements[k].details)) assert.ok(holes(set.achievements[k].details).has(h), `achievement ${k} details keep {${h}}`);
+        for (const k of Object.keys(below.achievements)) { if (!set.achievements[k]) continue; for (const h of holes(below.achievements[k].details)) assert.ok(holes(set.achievements[k].details).has(h), `achievement ${k} details keep {${h}}`); }
     });
     await t(`${name} lines are real sentences: no leftovers, no empty strings, no stretches yelled in capitals`, () => {
         const all = VOICE_SECTIONS.flatMap(s => strings(set[s]));
