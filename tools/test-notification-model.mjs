@@ -1,7 +1,7 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { isMoveOnCta, eventButtonUrl, achievementButtonUrl, EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { dangerShouldAlert, wasShownOnce, markShownOnce, encouragementDue, isMoveOnCta, eventButtonUrl, achievementButtonUrl, EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -198,5 +198,24 @@ t('already-voted alerts (danger / nailbiter) never tell the player to vote (butt
         const pack = JSON.parse(fs.readFileSync(new URL('../champion-packs/' + f, import.meta.url), 'utf8'));
         for (const type of ['danger', 'nailbiter']) for (const m of pack.alerts?.[type]?.messages || []) { assert.ok(!bad.test(m.cta || ''), `${f} ${type}: ${m.cta}`); assert.ok(!/\b(go vote|cast (it|your vote)|offer your vote|pick (one|yours|a target|a torch)|decide for me|and decide)\b/i.test(m.message || ''), `${f} ${type}: ${m.message}`); }
     }
+});
+t('danger alerts only when the gap gets worse than what was announced', () => {
+    assert.ok(dangerShouldAlert(undefined, 'trailing-1'), 'first time');
+    assert.ok(dangerShouldAlert(null, 'trailing-11plus'), 'after a recovery the slate is clean');
+    assert.ok(dangerShouldAlert('trailing-2-3', 'trailing-6-10'), 'worse');
+    assert.ok(!dangerShouldAlert('trailing-6-10', 'trailing-6-10'), 'same');
+    assert.ok(!dangerShouldAlert('trailing-11plus', 'trailing-4-5'), 'better is not a warning');
+});
+t('shown-once memory is per match and step', () => {
+    let m = {};
+    assert.ok(!wasShownOnce(m, 'a', '24h'));
+    m = markShownOnce(m, 'a', '24h', 5);
+    assert.ok(wasShownOnce(m, 'a', '24h') && !wasShownOnce(m, 'a', '3h') && !wasShownOnce(m, 'b', '24h'));
+    assert.ok(!wasShownOnce(undefined, 'a', '24h'));
+});
+t('encouragement nudges are spaced out', () => {
+    assert.ok(encouragementDue('gentle', Date.now()), 'never shown');
+    assert.ok(!encouragementDue('gentle', 5 * 60000) && !encouragementDue('gentle', 44 * 60000) && encouragementDue('gentle', 45 * 60000));
+    assert.ok(!encouragementDue('urgent', 29 * 60000) && encouragementDue('urgent', 30 * 60000));
 });
 console.log(`${pass} passed`);

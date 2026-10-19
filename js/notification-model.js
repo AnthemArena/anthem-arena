@@ -221,6 +221,22 @@ export function achievementButtonUrl(n) {
     return isMoveOnCta(ctaLabel(n)) ? '/matches.html' : (n?.targetUrl || '/profile#achievements');
 }
 
+// ---------- When an alert may fire again (the rules the poller in js/global-notifications.js uses) ----------
+// "Your pick is behind" is announced when the gap gets worse than what was last announced, not when it merely changes: climbing from
+// 12 behind to 8 behind is good news, not a new warning. Tiers are ordered mild to severe.
+export const DANGER_TIERS = ['trailing-1', 'trailing-2-3', 'trailing-4-5', 'trailing-6-10', 'trailing-11plus'];
+export function dangerShouldAlert(previousTier, tier) {
+    if (!previousTier) return true;
+    return DANGER_TIERS.indexOf(tier) > DANGER_TIERS.indexOf(previousTier);
+}
+// "Told once" memory for steps like closing 24h / 3h / final or winning small / large: a map { 'matchId:step': timestamp }.
+export const onceKey = (matchId, step) => `${matchId}:${step}`;
+export const wasShownOnce = (map, matchId, step) => !!map && Object.prototype.hasOwnProperty.call(map, onceKey(matchId, step));
+export const markShownOnce = (map, matchId, step, at = Date.now()) => ({ ...(map || {}), [onceKey(matchId, step)]: at });
+// The nudges for people who have not voted yet: a gentle one at most every 45 minutes, the closing-soon one every 30.
+export const ENCOURAGEMENT_GAP_MS = { gentle: 45 * 60000, urgent: 30 * 60000 };
+export const encouragementDue = (kind, msSinceLast) => msSinceLast >= (ENCOURAGEMENT_GAP_MS[kind] ?? ENCOURAGEMENT_GAP_MS.gentle);
+
 // A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
 export function eventChips(n) {
     const chips = [];
