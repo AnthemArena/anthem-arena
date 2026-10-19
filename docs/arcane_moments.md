@@ -915,5 +915,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   docking, crew and collateral damage).
 - **Done:** Battle Cat Jinx (`jinx-battle-cat`, skin 38, also used by Prestige Battle Cat, skin 40: the Anima Squad's one-cat demolitions squad;
   pounces, claws, nine lives, ignored orders and explosive results). Prestige can get its own layer later.
+- **Done:** Cafe Cuties Jinx (`jinx-cafe-cuties`, skin 51: a competition pastry chef who specialises in savoury treats, with the occasional
+  sugar rush; ovens, patrons, orders, plating and burnt edges).
+- **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
 - **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
