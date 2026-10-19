@@ -214,6 +214,7 @@ export function championStats(allVotes) {
         votes: votes.length,
         underdogVotes: votes.filter(v => factsOf(v).underdog).length,
         closeVotes: votes.filter(v => factsOf(v).close).length,
+        againstTideVotes: votes.filter(v => factsOf(v).againstTide).length,
         earlyVotes: votes.filter(v => factsOf(v).early).length,
         decidingVotes: votes.filter(v => factsOf(v).tiedBefore).length,
         streak: streakFromVotes(votes)

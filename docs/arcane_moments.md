@@ -1098,3 +1098,10 @@ The profile's Achievements tab (`js/achievements-view-model.js`, rendered by `lo
 - Cards for champion achievements say which skin they unlock (one note, instead of repeating it in the description).
 - Saved ids that no longer exist in the code are ignored (they used to render as an "undefined" card and inflate the count). The tab count uses the same rule.
 - Tests: `tools/test-achievements-view-model.mjs`.
+
+## Shared achievement rules, Vi and Jinx additions (19 October 2026)
+
+- **Shared rules** (`js/champion-achievements/templates.js`): `rule('early', 10, { packId: 'vi' })` returns the condition and progress for a rule. Rules: `votes, underdog, close, againstTide, early, deciding, streak`. Scope `champion` (default) counts only votes cast with that companion active; scope `all` counts every vote. Champion files choose rules, thresholds, names and icons; new rules are added once (templates + `championStats`) and tested.
+- **Distinct signatures per champion**, so each champion's set feels like theirs: Jinx = backing underdogs and the losing side, Caitlyn = close matches, streaks, tied-match votes, Vi = first through the door and volume. Repeating a rule across champions is only a fallback once the list runs out; the library can grow (backing the winner, final votes, a champion's own cup).
+- **New**: `vi-door-breaker` (first 10 voters in 10 matches with Vi, 300 XP, Vault Breaker icon from Data Dragon), `vi-heavy-hitter` (30 votes with Vi, 250 XP), `jinx-chaos-agent` (5 edits behind 60-40, 250 XP). Loose Cannon now counts only Jinx votes (it counted every vote before). Vi has no prestige skin in the game, so her achievements are marked `noSkin` (XP and a title); the registry test accepts `noSkin` or a skin that names the achievement, never both or neither.
+- If the Door Breaker icon fails to load, the profile and post-vote modal fall back to a trophy.

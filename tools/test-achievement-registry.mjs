@@ -41,7 +41,9 @@ for (const [packId, pack] of Object.entries(SKIN_UNLOCKS)) {
     }
 }
 for (const a of Object.values(ACHIEVEMENTS).filter(x => x.champion)) {
-    assert.ok(SKIN_UNLOCKS[a.champion]?.skins.some(s => s.achievement === a.id), `${a.id} unlocks no skin (add it to SKIN_UNLOCKS or make it a general achievement)`);
+    const unlocksSkin = SKIN_UNLOCKS[a.champion]?.skins.some(s => s.achievement === a.id);
+    assert.ok(unlocksSkin || a.noSkin, `${a.id} unlocks no skin: add it to SKIN_UNLOCKS or mark it noSkin: true`);
+    assert.ok(!(unlocksSkin && a.noSkin), `${a.id} is marked noSkin but a skin names it`);
 }
 
 // completion is separate: a champion's achievements never change the general percentage
@@ -65,6 +67,7 @@ assert.deepEqual([by.jinx.votes, by.jinx.underdogVotes], [2, 2]);
 assert.equal(companionStats(votes).caitlynCloseVotes, 2);
 assert.equal(by.vi, undefined);
 const stats = { byChampion: by };
+assert.equal(by.caitlyn.againstTideVotes, 0);
 assert.equal(ACHIEVEMENTS['caitlyn-close-calls'].progress(stats).current, 2);
 assert.equal(ACHIEVEMENTS['caitlyn-steady-aim'].progress({}).current, 0);   // no champion data: zero, not a crash
 

@@ -100,7 +100,7 @@ export function buildProgressHtml(progress, championName = '') {
         }
     }
     for (const a of progress.achievements || []) {
-        const icon = isUrl(a.icon) ? `<img class="pvm-unlock-img" src="${esc(a.icon)}" alt="" width="44" height="44" loading="lazy">` : `<span class="pvm-unlock-icon" aria-hidden="true">${esc(a.icon || '\u{1F3C6}')}</span>`;
+        const icon = isUrl(a.icon) ? `<img class="pvm-unlock-img" src="${esc(a.icon)}" alt="" width="44" height="44" loading="lazy" onerror="this.outerHTML='<span class=&quot;pvm-unlock-icon&quot; aria-hidden=&quot;true&quot;>&#127942;</span>'">` : `<span class="pvm-unlock-icon" aria-hidden="true">${esc(a.icon || '\u{1F3C6}')}</span>`;
         const skinLine = (a.skins || []).map(sk => `Unlocks the ${esc(sk.name)} skin for ${esc(capital(sk.packId))}`).join('; ');
         const wear = (a.skins || [])[0];
         items.push(`<li class="pvm-unlock pvm-unlock--achievement${a.rarity ? ` pvm-unlock--${esc(a.rarity)}` : ''}">

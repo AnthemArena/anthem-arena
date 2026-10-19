@@ -17,7 +17,7 @@ assert.equal(v.sections[0].hiddenLeft, 0);
 
 // own profile: every champion, locked visible ones greyed with progress, hidden ones as a count
 v = buildAchievementsView({ unlockedIds: [], own: true, stats: { totalVotes: 3, underdogVotes: 4, byChampion: { caitlyn: { closeVotes: 4, streak: 2 } } } });
-assert.deepEqual(v.sections.map(s => s.key), ['general', 'jinx', 'caitlyn']);
+assert.deepEqual(v.sections.map(s => s.key), ['general', 'jinx', 'caitlyn', 'vi']);
 const caitlyn = v.sections[2];
 assert.equal(caitlyn.items.length, 3);
 assert.ok(caitlyn.items.every(i => !i.unlocked));

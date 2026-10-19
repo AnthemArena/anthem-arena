@@ -2,6 +2,10 @@
 // Ids start with the pack id. Read per-champion numbers from stats.byChampion.caitlyn (votes cast with Caitlyn active); the
 // general vote numbers (stats.underdogVotes ...) count every vote whoever the companion was.
 
+import { rule } from './templates.js';
+
+const caitlyn = (metric, target, opts) => rule(metric, target, { packId: 'caitlyn', ...opts });
+
 export const CAITLYN_ACHIEVEMENTS = {
   'caitlyn-close-calls': {
     id: 'caitlyn-close-calls',
@@ -12,8 +16,7 @@ export const CAITLYN_ACHIEVEMENTS = {
     hidden: false,
     tier: 'gold',
     rarity: 'epic',
-    condition: (stats) => (stats.byChampion?.caitlyn?.closeVotes || 0) >= 10,
-    progress: (stats) => ({ current: stats.byChampion?.caitlyn?.closeVotes || 0, target: 10 })
+    ...caitlyn('close', 10)
   },
 
   'caitlyn-steady-aim': {
@@ -25,8 +28,7 @@ export const CAITLYN_ACHIEVEMENTS = {
     hidden: false,
     tier: 'gold',
     rarity: 'epic',
-    condition: (stats) => (stats.byChampion?.caitlyn?.streak || 0) >= 7,
-    progress: (stats) => ({ current: stats.byChampion?.caitlyn?.streak || 0, target: 7 })
+    ...caitlyn('streak', 7)
   },
 
   'caitlyn-deciding-shot': {
@@ -38,7 +40,6 @@ export const CAITLYN_ACHIEVEMENTS = {
     hidden: false,
     tier: 'legendary',
     rarity: 'legendary',
-    condition: (stats) => stats.decidingVotes >= 1,
-    progress: (stats) => ({ current: stats.decidingVotes, target: 1 })
+    ...caitlyn('deciding', 1, { scope: 'all' })   // counts every vote, whoever the companion was
   }
 };

@@ -43,9 +43,9 @@ t('the four pack achievements exist, are visible, belong to a category and match
     for (const id of ids) {
         const a = ACHIEVEMENTS[id];
         assert.ok(a, id + ' missing'); assert.equal(a.hidden, false); assert.ok(ACHIEVEMENT_CATEGORIES[a.category], id + ' category');
-        assert.equal(a.condition({ underdogVotes: 99, decidingVotes: 99, byChampion: { caitlyn: { closeVotes: 99, streak: 99 } } }), true);
+        assert.equal(a.condition({ underdogVotes: 99, decidingVotes: 99, byChampion: { caitlyn: { closeVotes: 99, streak: 99 }, jinx: { underdogVotes: 99 } } }), true);
         assert.equal(a.condition({ decidingVotes: 0, byChampion: { caitlyn: { closeVotes: 0, streak: 0 } } }), false);
-        assert.ok(a.progress({ underdogVotes: 1, decidingVotes: 0, byChampion: { caitlyn: { closeVotes: 1, streak: 1 } } }).target >= 1);
+        assert.ok(a.progress({ underdogVotes: 1, decidingVotes: 0, byChampion: { caitlyn: { closeVotes: 1, streak: 1 }, jinx: { underdogVotes: 1 } } }).target >= 1);
     }
 });
 t('look: the test-page switch opens every skin, including the prestige one, and only when set to 1', () => {
