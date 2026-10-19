@@ -131,8 +131,16 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll(['userId', 'matchId', 'tournament', 'choice'])
         && request.resource.data.keys().hasOnly([
              'tournament', 'matchId', 'userId', 'username', 'avatar', 'championId',
-             'choice', 'timestamp', 'round', 'votedForSeed', 'votedForName'
+             'choice', 'timestamp', 'round', 'votedForSeed', 'votedForName',
+             'votedForVideoId', 'facts', 'sharePct', 'totalVotesAtTime'
            ])
+        // What was true at vote time (js/vote-facts.js). Only ever used for the voter's own progress, never for anything shared.
+        && (!('facts' in request.resource.data) || (
+              request.resource.data.facts is map
+              && request.resource.data.facts.keys().hasOnly(['underdog', 'close', 'againstTide', 'early', 'tiedBefore'])))
+        && (!('sharePct' in request.resource.data) || (request.resource.data.sharePct is number && request.resource.data.sharePct >= 0 && request.resource.data.sharePct <= 100))
+        && (!('totalVotesAtTime' in request.resource.data) || (request.resource.data.totalVotesAtTime is number && request.resource.data.totalVotesAtTime >= 0))
+        && (!('votedForVideoId' in request.resource.data) || request.resource.data.votedForVideoId == null || (request.resource.data.votedForVideoId is string && request.resource.data.votedForVideoId.size() <= 64))
         && get(/databases/$(database)/documents/tournaments/$(activeTournament())/matches/$(request.resource.data.matchId)).data.status == 'live';
 
       // The owner may refresh display details and outcome flags, never the

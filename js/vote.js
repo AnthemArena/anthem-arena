@@ -33,7 +33,7 @@ import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTil
 import { lookSkin } from './companion-look.js';
 import { activePackId, streakFromVotes, readPackXp } from './xp-ledger.js';
 import { beginVoteProgress, endVoteProgress, buildProgressSummary } from './vote-progress.js';
-import { voteFacts, achievementVote, utcDay } from './vote-facts.js';
+import { voteFacts, achievementVote, utcDay, buildVoteRecord } from './vote-facts.js';
 import { checkAchievements } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
@@ -916,7 +916,12 @@ async function checkVoteStatus() {
 
             // Store in localStorage for next time
             localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
-            saveVoteForOtherPages(currentMatch.id, voteData.choice);
+            saveVoteForOtherPages(currentMatch.id, voteData.choice, {
+                // facts saved with the vote (documents from before this have none and are read the old, share-based way)
+                facts: voteData.facts ? { ...voteData.facts, sharePct: voteData.sharePct, totalVotesAtTime: voteData.totalVotesAtTime } : null,
+                timestamp: voteData.timestamp, championId: voteData.championId,
+                votedForSeed: voteData.votedForSeed ?? null, votedForVideoId: voteData.votedForVideoId ?? null
+            });
 
             updateVoteCountsUI();
             disableVoting(voteData.choice);
@@ -1740,6 +1745,12 @@ async function submitVote(songId) {
 // The vote document and the match counters are written in ONE batch:
 // firestore.rules only allows the +1 when the same batch creates the vote doc.
 const voteBatch = writeBatch(db);
+// What was true at the moment of this vote, judged from the counts before it is counted (see js/vote-facts.js). Saved on the
+// vote document too, so a new device (or cleared storage) gets the same facts back instead of losing them.
+const castVotedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+const castOtherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
+const castFacts = voteFacts({ voted: castVotedSong, other: castOtherSong });
+const castTimestamp = Date.now();
 voteBatch.set(voteRef, {
     tournament: ACTIVE_TOURNAMENT,
     matchId: currentMatch.id,
@@ -1748,11 +1759,15 @@ voteBatch.set(voteRef, {
     avatar: avatar,      // ✅ From guaranteed profile
     championId: profile.championPackId || 'jinx',  // ✅ ADD THIS LINE
     choice: songId,
-    timestamp: Date.now(),
+    timestamp: castTimestamp,
     round: currentMatch.round,
     // Store song details for analytics
     votedForSeed: (votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed) ?? null,
-    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name,
+    votedForVideoId: castVotedSong.videoId ?? null,
+    facts: { underdog: castFacts.underdog, close: castFacts.close, againstTide: castFacts.againstTide, early: castFacts.early, tiedBefore: castFacts.tiedBefore },
+    sharePct: castFacts.sharePct,
+    totalVotesAtTime: castFacts.totalVotesAtTime
 });
 
         // Counter increment for the edit that was voted for (same batch as the vote doc)
@@ -1769,7 +1784,7 @@ voteBatch.set(voteRef, {
         localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
 
         // ✅ Also save in userVotes format for homepage/matches pages
-        saveVoteForOtherPages(currentMatch.id, songId, true);
+        saveVoteForOtherPages(currentMatch.id, songId, { facts: castFacts, timestamp: castTimestamp, votedForSeed: castVotedSong.seed ?? null, votedForVideoId: castVotedSong.videoId ?? null });
         console.log('✅ CHECKPOINT 3: LocalStorage saved');
         console.log('✅ CHECKPOINT 4: About to enter activity block');
 
@@ -2131,40 +2146,21 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
  * ✅ FIXED: Save vote to userVotes format for homepage/matches pages
  * Now includes songTitle and opponentTitle for alert messages
  */
-// `isNewVote` is true only for the vote just cast: its facts are judged from the counts as they stood before it was counted
-// (currentMatch is still the pre-vote snapshot there). A record restored on a revisit is never rewritten, so a vote keeps the
-// facts it had when it was cast.
-function saveVoteForOtherPages(matchId, songId, isNewVote = false) {
+// `cast` carries what was true when the vote was cast: { facts, timestamp, championId, votedForSeed, votedForVideoId }. For the
+// vote just cast it is judged from the counts before the vote; on a revisit it comes from the saved vote document. With no
+// `cast` (a plain revisit) an existing record is left exactly as it is, so a vote keeps the facts it had when it was cast.
+function saveVoteForOtherPages(matchId, songId, cast = null) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    const existing = userVotes[matchId];
-    if (existing && existing.songId === songId && !isNewVote) return existing;
-
     const votedSong = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
     const opponentSong = songId === 'song1' ? currentMatch.competitor2 : currentMatch.competitor1;
-
-    const record = {
-        songId: songId,
-        songTitle: votedSong.name,
-        opponentTitle: opponentSong.name,
-        timestamp: Date.now(),
-        championId: activePackId(localStorage),   // the companion that was active (pack achievements, Champions tab)
-        round: currentMatch.round
-    };
-    if (isNewVote) {
-        const { sharePct, totalVotesAtTime, ...flags } = voteFacts({ voted: votedSong, other: opponentSong });
-        record.facts = flags;
-        record.sharePct = sharePct;
-        record.totalVotesAtTime = totalVotesAtTime;
-        record.tiedBefore = flags.tiedBefore;
-        record.votedForSeed = votedSong.seed ?? null;
-        record.votedForVideoId = votedSong.videoId ?? null;
-        // kept for older readers of this record (alerts, matches page)
-        record.voteType = flags.underdog || flags.againstTide ? 'underdog' : flags.close ? 'closeCall' : sharePct > 60 ? 'mainstream' : 'balanced';
-    } else {
-        record.voteType = 'balanced';
+    const record = buildVoteRecord({
+        existing: userVotes[matchId], songId, votedSong, opponentSong, round: currentMatch.round, cast,
+        activePack: activePackId(localStorage)   // the companion that was active (pack achievements, Champions tab)
+    });
+    if (record !== userVotes[matchId]) {
+        userVotes[matchId] = record;
+        localStorage.setItem('userVotes', JSON.stringify(userVotes));
     }
-    userVotes[matchId] = record;
-    localStorage.setItem('userVotes', JSON.stringify(userVotes));
     return record;
 }
 

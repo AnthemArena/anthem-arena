@@ -97,3 +97,34 @@ export function achievementVote(matchId, saved, match) {
         match: match || {}
     };
 }
+
+// ---------- the saved vote record (localStorage 'userVotes'), pure ----------
+// cast: what was true when the vote was cast { facts, timestamp, championId, votedForSeed, votedForVideoId }. For the vote just
+// cast it is judged from the counts before the vote; on a revisit it comes from the saved vote document. With no `cast`
+// (a plain revisit) an existing record is returned exactly as it is, so a vote keeps the facts it had when it was cast.
+export function buildVoteRecord({ existing = null, songId, votedSong = {}, opponentSong = {}, round = 1, cast = null, activePack = 'jinx', now = Date.now() }) {
+    const same = existing && existing.songId === songId ? existing : null;   // a different pick is a different vote
+    if (same && (same.facts || !cast?.facts)) return same;   // keep the record; only fill in facts a new device did not have yet
+    const record = {
+        songId,
+        songTitle: votedSong.name,
+        opponentTitle: opponentSong.name,
+        timestamp: Number(cast?.timestamp) || same?.timestamp || now,
+        championId: cast?.championId || same?.championId || activePack,
+        round
+    };
+    if (cast?.votedForSeed != null) record.votedForSeed = cast.votedForSeed;
+    if (cast?.votedForVideoId) record.votedForVideoId = cast.votedForVideoId;
+    if (cast?.facts) {
+        const { sharePct, totalVotesAtTime, ...flags } = cast.facts;
+        record.facts = { underdog: !!flags.underdog, close: !!flags.close, againstTide: !!flags.againstTide, early: !!flags.early, tiedBefore: !!flags.tiedBefore };
+        if (Number.isFinite(sharePct)) record.sharePct = sharePct;
+        if (Number.isFinite(totalVotesAtTime)) record.totalVotesAtTime = totalVotesAtTime;
+        record.tiedBefore = record.facts.tiedBefore;
+        // kept for older readers of this record (alerts, matches page)
+        record.voteType = record.facts.underdog || record.facts.againstTide ? 'underdog' : record.facts.close ? 'closeCall' : sharePct > 60 ? 'mainstream' : 'balanced';
+    } else {
+        record.voteType = 'balanced';
+    }
+    return record;
+}

@@ -1132,3 +1132,11 @@ Also: the vote-counting part of `calculateAchievementStats` is now `computeVoteS
 ## Jinx: Troublemaker (19 October 2026)
 
 New rule `underdogDays` (champion scope only): the number of different UTC days on which an underdog was backed with that champion. Jinx gets `jinx-troublemaker` (back an underdog on 5 different days, 250 XP, no skin), so her three differ in what they ask: Loose Cannon (how many underdogs), Troublemaker (on how many different days), Chaos Agent (backing the side that is behind). Jinx's total is 700 XP, inside the 1,000 budget.
+
+## Vote facts saved on the vote document (19 October 2026)
+
+The facts judged when a vote is cast (`facts`: underdog, close, againstTide, early, tiedBefore; plus `sharePct`, `totalVotesAtTime`, `votedForVideoId`) are now written on the Firestore vote document in the same batch as the vote, and read back when a new device (or cleared storage) restores the vote. Before, they lived only in the browser, so a restored vote lost them and was judged the old, share-based way. The facts are computed once, before the vote is counted, and used for the document, the saved record, and the XP. Vote documents from before this have no facts and are still read the old way. The restored record also keeps the vote's original time and companion.
+
+**Deploy the rules with this change.** `firestore.rules` now allows those four fields on a new vote (and checks `facts` is a map with only the five known keys, `sharePct` is 0-100, `totalVotesAtTime` is not negative, `votedForVideoId` is a short string). If the site is running the old rules, a vote carrying the new fields is rejected; publish the new rules in the Firebase console at the same time as the code (the rules were not tested in the emulator). The facts are only used for the voter's own progress, never for anything shared, because a person can write their own.
+
+The record builder is now `buildVoteRecord` in `js/vote-facts.js` (tested in `tools/test-vote-facts.mjs`, including the restore cases); it also fixes a pick change inheriting the old record's time.

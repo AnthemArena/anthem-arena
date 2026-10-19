@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { voteFacts, factsOf, isUnderdog, voteXpAward, utcDay, achievementVote } from '../js/vote-facts.js';
+import { voteFacts, factsOf, isUnderdog, voteXpAward, utcDay, achievementVote, buildVoteRecord } from '../js/vote-facts.js';
 
 const e = (votes, seed, pot) => ({ votes, seed, pot });
 
@@ -52,5 +52,30 @@ assert.equal(utcDay(Date.UTC(2026, 0, 2, 23, 59)), '2026-01-02');
 // achievement vote shape
 const v = achievementVote('m1', { songId: 'song1', facts: { close: true }, timestamp: 5, championId: 'jinx', votedForSeed: 4 }, { round: 2 });
 assert.equal(v.round, 2); assert.equal(v.facts.close, true); assert.equal(v.votedForSeed, 4);
+
+// ---- the saved vote record ----
+const song = { name: 'Edit A' }, other = { name: 'Edit B' };
+const cast = { facts: { underdog: true, close: false, againstTide: true, early: false, tiedBefore: false, sharePct: 35, totalVotesAtTime: 20 }, timestamp: 1000, votedForSeed: 9, votedForVideoId: 'vid1' };
+let rec = buildVoteRecord({ songId: 'song1', votedSong: song, opponentSong: other, round: 2, cast, activePack: 'vi', now: 5 });
+assert.deepEqual(rec.facts, { underdog: true, close: false, againstTide: true, early: false, tiedBefore: false });
+assert.equal(rec.sharePct, 35); assert.equal(rec.totalVotesAtTime, 20); assert.equal(rec.timestamp, 1000);
+assert.equal(rec.votedForVideoId, 'vid1'); assert.equal(rec.votedForSeed, 9); assert.equal(rec.voteType, 'underdog'); assert.equal(rec.championId, 'vi');
+// a plain revisit leaves an existing record alone (same object, same facts)
+assert.equal(buildVoteRecord({ existing: rec, songId: 'song1', votedSong: song, opponentSong: other, activePack: 'jinx' }), rec);
+// a new device: the saved vote document brings the facts and the original time and companion
+rec = buildVoteRecord({ songId: 'song2', votedSong: song, opponentSong: other, cast: { facts: { close: true, sharePct: 50, totalVotesAtTime: 12 }, timestamp: 777, championId: 'caitlyn' }, activePack: 'jinx', now: 5 });
+assert.equal(rec.facts.close, true); assert.equal(rec.timestamp, 777); assert.equal(rec.championId, 'caitlyn'); assert.equal(rec.voteType, 'closeCall');
+// an old vote document has no facts: record is saved without them (read the old way), with the document's time
+rec = buildVoteRecord({ songId: 'song1', votedSong: song, opponentSong: other, cast: { facts: null, timestamp: 321, championId: 'jinx' }, now: 5 });
+assert.equal(rec.facts, undefined); assert.equal(rec.timestamp, 321); assert.equal(rec.voteType, 'balanced');
+// an existing record without facts is upgraded when the document has them; one with facts is never replaced
+const legacy = { songId: 'song1', timestamp: 50, championId: 'jinx', voteType: 'balanced' };
+rec = buildVoteRecord({ existing: legacy, songId: 'song1', votedSong: song, opponentSong: other, cast: { facts: { early: true, totalVotesAtTime: 3, sharePct: 50 }, timestamp: 900 }, now: 5 });
+assert.equal(rec.facts.early, true); assert.equal(rec.championId, 'jinx');
+const full = { songId: 'song1', facts: { early: false }, timestamp: 1 };
+assert.equal(buildVoteRecord({ existing: full, songId: 'song1', votedSong: song, opponentSong: other, cast: { facts: { early: true } } }), full);
+// switching the pick on the same match is a different vote: a fresh record
+rec = buildVoteRecord({ existing: full, songId: 'song2', votedSong: song, opponentSong: other, cast: null, now: 42 });
+assert.equal(rec.songId, 'song2'); assert.equal(rec.timestamp, 42);
 
 console.log('vote-facts tests passed');
