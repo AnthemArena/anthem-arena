@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-heartthrob",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Heartthrob Caitlyn",
+  "description": "Voice set for Heartthrob Caitlyn (skin 39): a flustered, earnest and romantic mall-girl set. Love notes, skipped heartbeats, crushes, mixtapes and a very pink heart. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind and its heart is breaking. Send some love.",
+          "cta": "Send love"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more adrift. That's a full-blown heartbreak. Everyone, please help.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Pass the note around the whole mall.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A little wobble of the heart. It can be mended.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Nobody should pine alone. Bring a friend.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few sweet votes and hearts will mend.",
+          "cta": "Cast a vote"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Just a small sulk. Cheer it up before closing time.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. Two hearts, one beat. Pick yours.",
+          "cta": "Follow your heart"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop fidgeting with your hair and decide.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. My heart's racing. Bring more.",
+          "cta": "Rally the crush"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Fingers crossed. Don't look away.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. Butterflies, but the good kind. Stay sweet.",
+          "cta": "Stay sweet"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and climbing. Don't let go of its hand.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A lovely start to a romance. Keep it going.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. Love's on our side. Hold on to it.",
+          "cta": "Hold on"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Lovely. Now see the date through.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. A true love story.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A perfect grand gesture.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} slump. I could cry. Happy tears.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was a lost cause. Now it's the sweetheart of the mall.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. Cue the slow music.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two hearts, one beat.",
+        "{username} backed {momentTitle} too. Be still, my heart.",
+        "{username} agrees with you. That's rather sweet.",
+        "Same pick as {username}. Matching mixtapes.",
+        "{username} stood with {momentTitle}. A kindred spirit.",
+        "{username} made the same call. No note passing necessary.",
+        "{username} is on your side of {momentTitle}. Sit with us at lunch.",
+        "{username} voted {momentTitle}. Welcome to the crush club.",
+        "{username} loves {momentTitle} as you do. A match made in the food court."
+      ],
+      "details": [
+        "A fellow romantic.",
+        "Two hearts, one favourite.",
+        "Kindred spirits are rare.",
+        "Save them a seat.",
+        "Warm and fuzzy. Truly.",
+        "Someone who feels it too.",
+        "Share the milkshake."
+      ],
+      "buttons": [
+        "Aww",
+        "Say thanks",
+        "See the match",
+        "Wave",
+        "Love it",
+        "Sweet",
+        "Hugs"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A rival crush. Let's see whose heart wins.",
+        "{username} chose {theirMoment}. Oh dear. Wrong valentine.",
+        "{username} went against {yourMoment}. Misguided. Still adorable.",
+        "{username} voted against you. A love triangle. Thrilling.",
+        "{username} took {theirMoment}. Brave. A little heartbreak waiting.",
+        "{username} opposes {yourMoment}. Fine. Love will find its way.",
+        "{username} disagrees on {yourMoment}. Shall we talk it over, with sprinkles?",
+        "{username} voted the other way. They'll come around, once the feelings arrive."
+      ],
+      "details": [
+        "Everyone has a mistaken crush once.",
+        "A flirty disagreement.",
+        "The tally will break the tie.",
+        "Don't take it to heart.",
+        "Healthy rivalry is romantic.",
+        "They might yet swoon.",
+        "Keeps things dramatic."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't coincidence, that's soulmates.",
+        "{username} and you, ten matches, the same pick every time. Perfectly in tune.",
+        "Ten straight with {username}. I'd put you both on the cover of a valentine.",
+        "A ten-match run with {username}. Not one heartbreak.",
+        "Ten for ten with {username}. A flawless romance."
+      ],
+      "details": [
+        "Ten hearts, ten matches.",
+        "A lovely pair.",
+        "Rare as true love. Treasure it.",
+        "Keep the spark alive.",
+        "Hard to improve on."
+      ],
+      "buttons": [
+        "See their profile",
+        "Aww",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a couple, now a whole fan club.",
+        "{streakCount} in a row with {username}. I'd follow you both through any mall at midnight.",
+        "{streakCount} straight picks with {username}. They'll write songs about this.",
+        "A {streakCount}-match run with {username}. Love stories have been told with less.",
+        "{streakCount} with {username}. Not a single misstep between you."
+      ],
+      "details": [
+        "Hard to believe. Easy to adore.",
+        "That's trust, made of sweetness.",
+        "I'm speechless. And teary.",
+        "Practically eternal.",
+        "A pairing for the scrapbook."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper love-hate thing.",
+        "{username} has opposed you ten times running. Two stubborn hearts.",
+        "Ten in a row opposite {username}. Neither will blink first.",
+        "A ten-match run against {username}. Stubborn as a crush.",
+        "Ten times at odds with {username}. I'd watch from the next booth."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Talk it out. Or don't.",
+        "A proper standoff.",
+        "Stubbornness is flirting, really.",
+        "Who confesses first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a slow-burn romance.",
+        "{streakCount} in a row opposite {username}. Neither of you will make up first.",
+        "{streakCount} straight clashes with {username}. Someone get them a shared milkshake.",
+        "A {streakCount}-match feud with {username}. The tension is unbearable.",
+        "{streakCount} against {username}. I admire the stamina. Kiss and make up."
+      ],
+      "details": [
+        "Neither of you is softening.",
+        "Stamina, certainly.",
+        "An epic grudge crush.",
+        "Relieved I'm not the one between you.",
+        "The diary needs another volume."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your heart's missing. There's still time.",
+        "{timeLeft} left on {matchTitle}. Your note hasn't been delivered yet.",
+        "{matchTitle} ends in {timeLeft}. I'd love to hear what you think."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Send your heart"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The mall's closing soon. Hurry.",
+        "{matchTitle} closes in {timeLeft}. Don't make me chase you through the food court.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone very quiet. Shy?"
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Last announcement, shoppers.",
+        "{timeLeft} left. Take a breath. Say it.",
+        "Final call on {matchTitle}. {timeLeft}. Follow your heart."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your love are about to close. The first has {timeLeft} left.",
+        "{matchCount} unvoted matches and the mall lights are dimming. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No hearts on {matchTitle}. Someone has to confess first.",
+        "{moment1} against {moment2} and no one's swooned. I'll wait. Briefly.",
+        "A fresh match, a blank valentine. Be first to sign it.",
+        "{matchTitle} is an empty love letter. Write the first line."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Sign it",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new crushes on the board.",
+        "{matchCount} matches opened in round {round}. A new season of romance begins.",
+        "Round {round} is live, with {matchCount} matches to swoon over.",
+        "A new round. {matchCount} matches. Choose your valentine.",
+        "Round {round}: {matchCount} matches awaiting your heart."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Fall in",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. True love prevails.",
+        "{momentTitle} is through. Be still, my heart.",
+        "{momentTitle} took it. Roses all round.",
+        "{momentTitle} won and blushed beautifully.",
+        "{momentTitle} advances. One more romance blossoms.",
+        "{momentTitle} moves on. Swoon."
+      ],
+      "details": [
+        "A happy ending.",
+        "One down, more romances to come.",
+        "Earned with heart.",
+        "Perfectly sweet."
+      ],
+      "buttons": [
+        "Aww",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. Heartbreak.",
+        "{momentTitle} is out. Not the ending I'd hoped for.",
+        "{momentTitle} didn't make it. Dry your eyes.",
+        "{momentTitle} went out romantically. That counts.",
+        "{momentTitle} is out. Eat something sweet. Return.",
+        "{momentTitle} lost this round. A sad song, not the last one.",
+        "{momentTitle} was eliminated. More romances await."
+      ],
+      "details": [
+        "Not every love story works out.",
+        "It tried with all its heart.",
+        "More crushes are coming.",
+        "Cry a little. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the mall. {liveCount} matches are open. Pick a crush.",
+          "A new face. {liveCount} matches are live. Come say hello.",
+          "Hello, you. {liveCount} matches need a decision.",
+          "{liveCount} matches await your heart. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the butterflies."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Say hello",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back. That's sweet.",
+          "Two days running. Aren't you lovely.",
+          "A second day with me. I blushed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I wrote you three letters.",
+          "After {days} days you return. My heart skipped.",
+          "{days} days. I'd started to worry. Don't disappear like that again.",
+          "{days} days away. The mall's put up new decorations."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Lovely.",
+          "Welcome back. I saved you a seat.",
+          "Back already. Sweet.",
+          "Ah. There you are, sweetheart."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very lonely mall.",
+        "Barely any shoppers on this one. That should change.",
+        "Low turnout. Everyone's at the arcade. Come over anyway.",
+        "Hardly anyone's said hello. Someone should."
+      ],
+      "details": [
+        "It needs more admirers.",
+        "Every heart counts in a quiet mall.",
+        "Yours matters extra tonight.",
+        "Don't let it feel forgotten."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the deciding heart.",
+        "Dead level on {matchTitle}. One kiss of a vote settles it.",
+        "A tie. Someone has to say it first. Let it be you.",
+        "{moment1} and {moment2}, hearts beating in unison. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the mall's about to close. One last heart.",
+        "Level, with the lights flickering. Vote.",
+        "Tied, and nearly closing time. Please don't leave it hanging."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? True love won't wait forever.",
+        "Don't overthink it. Follow your heart.",
+        "They're all lovely. Trust your butterflies.",
+        "You've hovered by the lockers long enough. Say something."
+      ],
+      "details": [
+        "Every heart counts.",
+        "Trust your feelings.",
+        "No wrong crush. Only shy ones.",
+        "Just say it."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First heart sent. Welcome to the crush club.",
+        "You picked a side. A sweet first note."
+      ],
+      "details": [
+        "In the mailbox. +{xp} XP",
+        "The first of many, I hope. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You're falling for this place.",
+        "Five. No longer just window shopping."
+      ],
+      "details": [
+        "A sweet start. +{xp} XP",
+        "Finding your butterflies. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. Everyone at the mall knows your name.",
+        "Ten. You've earned a spot in the food court."
+      ],
+      "details": [
+        "A dependable darling. +{xp} XP",
+        "Ten love notes sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice echoes through the atrium.",
+        "Twenty-five. The whole mall is listening."
+      ],
+      "details": [
+        "Heard above the playlist. +{xp} XP",
+        "Twenty-five hearts delivered. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Properly head over heels.",
+        "Fifty. You clearly care. That's lovely."
+      ],
+      "details": [
+        "Fifty hearts logged. +{xp} XP",
+        "Deep in the love story. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll write a ballad about you.",
+        "One hundred. Wonderful. I'll say it just once."
+      ],
+      "details": [
+        "Earned with a full heart. +{xp} XP",
+        "A hundred. Take your bow. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A spark catches.",
+        "Three days straight. Devoted."
+      ],
+      "details": [
+        "Showing up is the sweetest part. +{xp} XP",
+        "Three days of romance. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's real commitment.",
+        "Seven days running. Smitten."
+      ],
+      "details": [
+        "A week without missing a date. +{xp} XP",
+        "Seven days of sweetness. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You've never missed a meet-up.",
+        "Fourteen days. Gloriously devoted."
+      ],
+      "details": [
+        "A fortnight of romance. +{xp} XP",
+        "That's lasting love. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Love that lasts.",
+        "A month of devotion. That says everything."
+      ],
+      "details": [
+        "Thirty days of sweet loyalty. +{xp} XP",
+        "A whole month of sweetness. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You root for the unrequited.",
+        "Five unlikely picks. I adore that."
+      ],
+      "details": [
+        "Against the popular crowd. +{xp} XP",
+        "Five shy ones cheered on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You follow your heart, not the crowd.",
+        "Fifteen. You answer to nobody's gossip."
+      ],
+      "details": [
+        "Always your own romance. +{xp} XP",
+        "Fifteen hearts against the crowd. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No one can guess your heart.",
+        "Thirty. The secret admirer is your whole game."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty hearts for the one trailing. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First at the mall five times. Early bird.",
+        "Five times you were there before the rest."
+      ],
+      "details": [
+        "You arrive before the doors open. +{xp} XP",
+        "Five hearts before the rush. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you swooned first. Decisive.",
+        "Always the first to fall."
+      ],
+      "details": [
+        "Fifteen votes ahead of the crowd. +{xp} XP",
+        "Ahead of the whole student body. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Your heart never stopped.",
+        "Another tight one. Nerves of pink steel."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your heart keeps deciding them.",
+        "You have cracked more than one tie."
+      ],
+      "details": [
+        "Twenty-five finishes by a heartbeat. +{xp} XP",
+        "You decide who gets the girl. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stuck with the underdog. Romantic. I approve.",
+        "You never give up on a lost cause. Adorable."
+      ],
+      "details": [
+        "Faith in a happy ending. +{xp} XP",
+        "Five reversals you believed in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Someone has a crush.",
+        "That one again? You've got it bad."
+      ],
+      "details": [
+        "You know exactly who you adore. +{xp} XP",
+        "One crush, three hearts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five hearts on one moment. That's adoration.",
+        "You can't let that one go. I get it."
+      ],
+      "details": [
+        "Loyal through every heartbreak. +{xp} XP",
+        "One favourite, five hearts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten hearts on the same moment. That's a full-on crush.",
+        "Ten times, the same crush. I won't comment. Much."
+      ],
+      "details": [
+        "Ten on one crush. +{xp} XP",
+        "Devoted. Or lovesick. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're still devoted.",
+        "Round two and still smitten. Good."
+      ],
+      "details": [
+        "Further down the corridor. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the drama.",
+        "Deep in the bracket. The feelings get serious."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the first crush. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You went the whole romance.",
+        "All the way. You never fell out of love."
+      ],
+      "details": [
+        "From the first heart to the last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've met lots of crushes.",
+        "Ten different matches. Thorough flirting. Good."
+      ],
+      "details": [
+        "Wandering every aisle of the bracket. +{xp} XP",
+        "Ten stores explored. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've visited every shop.",
+        "Twenty-five. Not a corridor left unchecked."
+      ],
+      "details": [
+        "Every aisle covered. +{xp} XP",
+        "Twenty-five stores browsed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That isn't a visit, that's a lifestyle.",
+        "Fifty. You know this bracket better than the mall directory."
+      ],
+      "details": [
+        "A true veteran of the heart. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long date.",
+        "Five back to back. Do drink some water."
+      ],
+      "details": [
+        "One long date. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A marathon date.",
+        "Ten in a single sitting. That's devotion."
+      ],
+      "details": [
+        "A marathon romance. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Midnight thoughts, or can't sleep?",
+        "The small hours. Longing, or insomnia. I know both."
+      ],
+      "details": [
+        "Late-night feelings suit you. +{xp} XP",
+        "A heart sent after the doors shut. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told all your friends. Thank you.",
+        "Five shares. More hearts, more fun."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five love notes passed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically the gossip column.",
+        "Fifteen. You keep bringing everyone in. Sweet."
+      ],
+      "details": [
+        "Still passing notes. +{xp} XP",
+        "Fifteen valentines sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first heart. A founding member, always.",
+        "One of the first thousand. That's etched in a heart forever."
+      ],
+      "details": [
+        "That's yours to keep, always. +{xp} XP",
+        "Nobody can take that sparkle from you. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Promoted. Wear it with a sparkle."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Aww.",
+        "Another heart for the collection: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the heart and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. I know exactly who that reminds me of.",
+        "Ten hopeless crushes. Nothing fazes you."
+      ],
+      "details": [
+        "Ten hearts against the odds. +{xp} XP",
+        "Longing glances are your thing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my racing heart.",
+        "Ten finishes by a heartbeat. I'm secretly thrilled."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "A steady heart in a dramatic scene. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days straight. A steady heart.",
+        "A whole week without one broken date. Sweet work."
+      ],
+      "details": [
+        "A week of perfect valentines. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One heart, one verdict.",
+        "A stalemate of the heart, and you ended it. Swoon."
+      ],
+      "details": [
+        "The heart that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Heartthrob Caitlyn, lip gloss on. Heart wide open.",
+        "Caitlyn is yours now. Try to keep up with the romance."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The date hasn't started.",
+      "Voting hasn't begun. I'll slip you a note when it does.",
+      "Not yet. Anticipation is half the romance."
+    ],
+    "prevote": [
+      "Two edits, one heart. Study both over a milkshake.",
+      "Look at both before you swoon. No rushing into love.",
+      "I won't say which I prefer. That's for your heart to decide.",
+      "Take your time. A true feeling beats a quick one.",
+      "Choose the one that gives you butterflies."
+    ],
+    "prevote-empty": [
+      "No hearts yet. Send the first.",
+      "Quiet so far. Someone has to confess.",
+      "Not a single vote. Be first."
+    ],
+    "closing-24h": [
+      "Less than a day left and no heart from you. Go.",
+      "The mall's closing soon. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the lights go out."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Follow your heart."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone here. First in line for love.",
+      "Barely a heart sent and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Lovely. Feelings can still change.",
+      "{pct}% with you. A sweet position.",
+      "Leading for now. Hearts change their minds.",
+      "{pick} is pulling ahead. Well felt.",
+      "In front is in front. Don't let it go to your head."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more heart tips it. Tell a friend.",
+      "Neck and neck. Your pick needs a champion.",
+      "{pct} against {otherPct}. Don't breathe yet."
+    ],
+    "voted-tied": [
+      "Perfectly level. Two hearts, no winner.",
+      "A dead heat. Maddening, and rather romantic."
+    ],
+    "voted-behind": [
+      "You're trailing. That doesn't mean you're mistaken.",
+      "{pick} is lagging. A wallflower. I've been there.",
+      "They're ahead. You're not wrong, just outnumbered by admirers.",
+      "Down by {diff} points. Tell people. Send love letters widely.",
+      "Most picked someone else. Popular isn't always right."
+    ],
+    "closed-won": [
+      "Your pick won. A sweet call.",
+      "A win. Hard-earned.",
+      "{pick} went through. You read the heart rightly."
+    ],
+    "closed-lost": [
+      "Your pick lost. A shame. It was a heartfelt choice.",
+      "It didn't work out. These things happen. Chin up.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A tie. Neither heart gave way."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More romances will follow.",
+      "The match is over. {winner} took it. Next time, confess sooner."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Everyone's first crush is nervous.",
+      "That's your first heart. It gets less scary. Promise.",
+      "You're in the club now. Welcome."
+    ],
+    "streak": [
+      "Back for more romance. Good.",
+      "{streak} days running. I see you keeping the spark.",
+      "You keep coming back to me. I appreciate that."
+    ],
+    "underdog": [
+      "You chose the one nobody else would. How sweet.",
+      "A hard choice. A good one.",
+      "The unlikely sweetheart. That takes bravery."
+    ],
+    "early": [
+      "Early. You reached the mall before the rest.",
+      "Barely any hearts yet. Yours would be treasured.",
+      "First in line. Well done."
+    ],
+    "close": [
+      "That heart just moved things. It's delicately balanced.",
+      "A heartbeat apart. One more flips it.",
+      "A whisper of a gap. Your heart could tip it."
+    ],
+    "behind": [
+      "{pick} is lagging. Lagging isn't heartbroken. Call for friends.",
+      "Not in front yet. A little wooing to do.",
+      "Behind, not heartbroken. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Hearts shift.",
+      "Ahead for the moment. Don't trust it blindly.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Your heart is sent. There's more to adore."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no hearts yet. Start with the one you adore.",
+      "Every crush is in sight. Choose. I won't rush you.",
+      "{unvoted} left. No pressure. Okay, a flutter."
+    ],
+    "live-some": [
+      "{voted} sent, {unvoted} still to go. Keep falling.",
+      "You've begun. {unvoted} more are waiting.",
+      "A good start. The rest won't swoon themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish them before closing.",
+      "Almost at the finale. {unvoted} left.",
+      "Close. Don't lose your nerve now."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Don't leave it unsaid.",
+      "One match between you and a perfect romance."
+    ],
+    "live-closing": [
+      "A few close in {timeLeft}. {unvoted} are still waiting for your love.",
+      "The mall clock is ticking. {unvoted} left, {timeLeft} to closing.",
+      "The mall's closing. Do hurry."
+    ],
+    "live-done": [
+      "You've loved every match. Beautiful. Look over the bracket.",
+      "Your list is all done. Come back when the next round opens.",
+      "Every match done. So rare. Truly impressive."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll be back. Browse the bracket while you wait.",
+      "Quiet around the mall. Check back soon.",
+      "No matches open. I'm tapping my heels as much as you."
+    ],
+    "brackets-groups": [
+      "Groups come first. Two from each go to the dance. The rest stay home.",
+      "All begin in a group. Not every heart gets through.",
+      "Mind the standings. They change like moods."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are coming. Two per group go through.",
+      "No knockout round yet. The groups finish dancing first.",
+      "Be patient. The knockout shows up when the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are on. One heartbreak and you're out.",
+      "One loss and out. No second dates.",
+      "Every match means more now. Choose with your heart."
+    ],
+    "brackets-bracket": [
+      "Round by round. One heartbreak and it's done.",
+      "Trace the bracket. The crushes thin out each round.",
+      "Each line here is a match someone swooned over."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for loving it with me.",
+      "It's finished. A hard-fought romance. I'll miss it.",
+      "We have a champion. A swoon-worthy finish."
+    ],
+    "brackets-empty": [
+      "No bracket yet. No couples drawn up.",
+      "A blank page. The draw isn't written yet.",
+      "Empty lockers for now. Look again soon."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One heart decides it. Choose.",
+      "{a} against {b}: two edits, one heart. Send yours.",
+      "{a} versus {b}. Join the crush club and tell me what you think."
+    ],
+    "voted": [
+      "I sent my heart to {pick} over {other}. Where does yours go?",
+      "{pick} gets my heart over {other}. Make your case.",
+      "My heart says {pick} over {other}. Does yours?"
+    ],
+    "early": [
+      "One of the first hearts on {pick} against {other}. We need more admirers.",
+      "I fell for {pick} over {other} early. Add yours.",
+      "{pick} against {other}, hardly a heart yet. Yours would matter."
+    ],
+    "tied": [
+      "{pick} and {other} are even. One heart decides it.",
+      "{pick} and {other} are level in love. Pick one.",
+      "{pick} and {other} are inseparable. Your heart can part them."
+    ],
+    "nailbiter": [
+      "{voteDiff} hearts between {pick} and {other}. Each one counts now.",
+      "{voteDiff} hearts divide {pick} and {other}. Send yours.",
+      "{voteDiff} between {pick} and {other}. Love could pick either."
+    ],
+    "losing-close": [
+      "{voteDiff} stand between {pick} and {other}. A few hearts flip it.",
+      "{pick} is {voteDiff} below {other} but still hopeful. Root for it.",
+      "{pick} lacks {voteDiff} on {other}. Not hopeless. Vote."
+    ],
+    "losing-bad": [
+      "{other} leads {pick} by {voteDiff}. It needs a friend.",
+      "{pick} sits {voteDiff} under {other} and deserves more love. Vote.",
+      "{other} has {pick} down by {voteDiff}. Let's win its heart back."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% over {other}, narrowly. Help it keep the romance.",
+      "{pick} is up on {other}, {pct}%. Not yet safe. Send love.",
+      "{pick} has {pct}% to {other}. A sweet slim lead."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and fall for it.",
+      "{pick} holds {pct}%. {other} is nowhere near.",
+      "{pick} is miles ahead of {other}, {pct}%. Add your heart."
+    ]
+  }
+}

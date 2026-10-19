@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-safari",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Safari Caitlyn",
+  "description": "Voice set for Safari Caitlyn (skin 3): a dry-witted scholar-explorer in ancient ruins. Field notes, relics, torches, tunnels and traps, with votes as finds logged. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} short and the ceiling is coming down. Bring help. Quickly.",
+          "cta": "Send word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more short. That's a full-scale expedition failure. All hands to the dig.",
+          "cta": "Rally the crew"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Pin the notice at every camp.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A setback, not a collapse. Go.",
+          "cta": "Call the camp"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. No expedition succeeds alone. Recruit.",
+          "cta": "Recruit a guide"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few extra pairs of hands would unearth it.",
+          "cta": "Fetch more hands"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Inconvenient. Fix it before the lanterns burn down.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even. The two tunnels look the same. Pick a torch.",
+          "cta": "Pick one"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Steady hands. Don't drop the relic.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The floor is about to give. Add your weight.",
+          "cta": "Tip the scales"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Nobody breathe. Watch the dust settle.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. A promising dig. Keep brushing.",
+          "cta": "Keep digging"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and climbing. The map was right. Stay alert for traps.",
+          "cta": "Keep going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. The theory holds so far. Document it.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The ruins favour you. Mind the floor.",
+          "cta": "Mind the floor"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. A fine find. Don't get careless now.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and now leads. Buried treasure, properly unearthed.",
+          "cta": "Admire it"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A remarkable rediscovery. Cataloguing it.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} pit. The torches still burn.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was written off as rubble. Now it's the centrepiece.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has surged ahead. I'm not smiling. The lantern's just bright.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} logged {momentTitle} beside you. A capable fellow explorer.",
+        "{username} backed {momentTitle} too. Excellent field instincts.",
+        "{username} agrees with you. Our notes match.",
+        "Same find as {username}. Corroborated.",
+        "{username} stood with {momentTitle}. A worthy expedition partner.",
+        "{username} reached the same conclusion. No peer review needed.",
+        "{username} is on your side of {momentTitle}. Pack a spare canteen for them.",
+        "{username} voted {momentTitle}. Welcome to the expedition.",
+        "{username} loves {momentTitle} as you do. A fine addition to the field team."
+      ],
+      "details": [
+        "A fellow scholar.",
+        "Two journals, one theory.",
+        "Good partners are rare finds.",
+        "Keep them on the roster.",
+        "A reliable colleague.",
+        "Someone with a sharp eye.",
+        "Share your rations."
+      ],
+      "buttons": [
+        "Well found",
+        "Acknowledge",
+        "See the match",
+        "Salute",
+        "Capital",
+        "Fair play",
+        "Splendid"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} chose {theirMoment} over {yourMoment}. A competing theory. Let's see whose holds up.",
+        "{username} backed {theirMoment}. Not the map I'd follow.",
+        "{username} went against {yourMoment}. Bold. Probably unsourced.",
+        "{username} voted against you. A rival expedition. Delightful.",
+        "{username} took {theirMoment}. A speculative claim. Possibly a forgery.",
+        "{username} opposes {yourMoment}. Fine. The evidence will speak.",
+        "{username} disagrees on {yourMoment}. Settle it with data, not noise.",
+        "{username} voted the other way. They'll reconsider once the dust clears."
+      ],
+      "details": [
+        "Every theory has a flaw somewhere.",
+        "A scholarly disagreement.",
+        "The numbers will settle it.",
+        "Don't let it dim your torch.",
+        "A rival keeps the research honest.",
+        "They may revise the hypothesis.",
+        "Makes the journey livelier."
+      ],
+      "buttons": [
+        "See the match",
+        "Inspect them",
+        "Challenge it",
+        "Settle it",
+        "Check the count",
+        "See the numbers",
+        "Hm"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten digs with {username}. That's no coincidence, that's collaboration.",
+        "{username} and you, ten matches, the same conclusion every time. A rigorous partnership.",
+        "Ten straight with {username}. I'd put you both in the field journal.",
+        "A ten-match run with {username}. Not one false lead.",
+        "Ten for ten with {username}. A pristine record."
+      ],
+      "details": [
+        "Ten finds, no disputes.",
+        "A formidable duo.",
+        "Rare in any field. Treasure it.",
+        "Keep exploring.",
+        "Hard to improve."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well done",
+        "Press on",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. You're a full expedition now.",
+        "{streakCount} in a row with {username}. I'd follow you both into any tomb.",
+        "{streakCount} straight finds with {username}. That earns a museum plaque.",
+        "A {streakCount}-match run with {username}. The stuff of archaeological legend.",
+        "{streakCount} with {username}. Not one cracked artefact between you."
+      ],
+      "details": [
+        "Hard to credit. Easy to admire.",
+        "That's trust, excavated layer by layer.",
+        "I'm speechless. Mostly.",
+        "Practically unshakeable.",
+        "A pair for the history books."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Press on",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper academic feud.",
+        "{username} has opposed you ten times running. Two stubborn scholars, one dig site.",
+        "Ten in a row opposite {username}. Neither of you gives up the trowel.",
+        "A ten-match run against {username}. Stubborn as old stone.",
+        "Ten times at odds with {username}. I'd watch from a safe distance."
+      ],
+      "details": [
+        "Ten disputes, no truce.",
+        "Talk it out. Or don't.",
+        "A proper rivalry.",
+        "Obstinacy keeps the faculty busy.",
+        "Who retreats first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Press on",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a disagreement, that's a lifelong feud.",
+        "{streakCount} in a row opposite {username}. Neither of you is leaving the ruins.",
+        "{streakCount} straight clashes with {username}. Someone fetch a mediator and a map.",
+        "A {streakCount}-match feud with {username}. Someone feed these two. And separate them.",
+        "{streakCount} against {username}. I admire the stamina. Do hydrate."
+      ],
+      "details": [
+        "Neither of you will budge.",
+        "Stamina, certainly.",
+        "A grudge as old as the ruins.",
+        "Glad I'm not mediating.",
+        "The file's getting rather thick."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Press on",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you've logged nothing. There's still daylight.",
+        "{timeLeft} left on {matchTitle}. Your name is missing from the field notes.",
+        "{matchTitle} ends in {timeLeft}. I'd value your findings on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose a side",
+        "Log it"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The sun's sinking behind the dunes. Hurry.",
+        "{matchTitle} closes in {timeLeft}. Don't make me haul you out by the collar.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone quiet. Lost in a tomb?"
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The stones are starting to shift.",
+        "{timeLeft} left. Torch up, run for it.",
+        "Final call on {matchTitle}. {timeLeft}. Grab the artefact."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} finds still unlogged and the tomb is sealing. The first has {timeLeft} left.",
+        "{matchCount} unanswered matches and the dig is closing. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No entries on {matchTitle}. Someone must break ground.",
+        "{moment1} against {moment2} and not one vote logged. I'll wait. Briefly.",
+        "A fresh site, untouched sand. Be first to dig.",
+        "{matchTitle} is a blank page in the journal. Write the opening line."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Break ground",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new chambers to explore.",
+        "{matchCount} matches opened in round {round}. The next layer begins.",
+        "Round {round} is live, with {matchCount} chambers to examine.",
+        "A new round. {matchCount} matches. Catalogue each with care.",
+        "Round {round}: {matchCount} matches awaiting your survey."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Join the dig",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A magnificent find.",
+        "{momentTitle} is through. Exactly as the map foretold.",
+        "{momentTitle} took it. Raise the lantern.",
+        "{momentTitle} won and lit up the whole chamber.",
+        "{momentTitle} advances. One more piece for the collection.",
+        "{momentTitle} moves on. Remarkable."
+      ],
+      "details": [
+        "A pristine discovery.",
+        "One uncovered, more beneath.",
+        "Earned with patience.",
+        "Excavated cleanly."
+      ],
+      "buttons": [
+        "Splendid",
+        "Next match",
+        "Press on",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A cracked relic.",
+        "{momentTitle} is out. Not the discovery I'd hoped for.",
+        "{momentTitle} didn't make it. Brush off the dust.",
+        "{momentTitle} went out in a blaze of dust. That counts.",
+        "{momentTitle} is out. Have a biscuit. Return.",
+        "{momentTitle} lost this round. A collapsed tunnel, not a lost expedition.",
+        "{momentTitle} was eliminated. More ruins await."
+      ],
+      "details": [
+        "Not every dig strikes gold.",
+        "It held to the last stone.",
+        "More expeditions are coming.",
+        "Dust off. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Press on",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the expedition. {liveCount} matches are open. Pick one.",
+          "A new recruit. {liveCount} matches are live. Grab a torch.",
+          "A new recruit. {liveCount} matches want a decision.",
+          "{liveCount} chambers unopened. Choose a door.",
+          "Welcome. {liveCount} matches. Mind the traps."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Grab a torch",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You returned to the site. Good.",
+          "Two days running. A dedicated digger.",
+          "Second day at the site. I checked the roster."
+        ],
+        "buttons": [
+          "Press on",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I kept your spot at the fire.",
+          "After {days} days you return. The ruins are still here.",
+          "{days} days. I'd started to worry. Don't wander off again.",
+          "{days} days away. They've opened several new chambers."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Good.",
+          "Welcome back. The dig continues.",
+          "Back already. Keen.",
+          "Ah. There you are, colleague."
+        ],
+        "buttons": [
+          "Let's go",
+          "Press on",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet dig site.",
+        "Hardly any visitors at this one. That should change.",
+        "Low turnout. Everyone's at the other excavation. Come anyway.",
+        "Barely a trowel in the dirt. Someone should pick one up."
+      ],
+      "details": [
+        "It needs more diggers.",
+        "Every pair of hands counts in the ruins.",
+        "Yours is worth extra here.",
+        "Don't let the site go cold."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the deciding discovery.",
+        "Dead level on {matchTitle}. One more find settles it.",
+        "A fork in the tunnel. Someone has to pick a path. Let it be you.",
+        "{moment1} and {moment2}, two doors, equal carvings. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a path",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the torches are guttering. One last choice.",
+        "Level, with the passage closing. Vote.",
+        "Tied, and the door is sealing. Don't leave it unopened."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? The sand won't wait.",
+        "Don't overthink it. Pick a passage.",
+        "They're all fascinating. Trust your field instincts.",
+        "You've lingered at the entrance long enough. Step inside."
+      ],
+      "details": [
+        "Every entry counts.",
+        "Trust your instincts.",
+        "No wrong tunnel. Only unexplored ones.",
+        "Just step in."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First find logged. The expedition has begun.",
+        "You made your pick. The journal is open."
+      ],
+      "details": [
+        "Entered in the field notes. +{xp} XP",
+        "The first of many discoveries. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You've found the trailhead.",
+        "Five. No longer waiting at base camp."
+      ],
+      "details": [
+        "A tidy opening survey. +{xp} XP",
+        "A proper first season. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The guides all know your name.",
+        "Ten. You've earned a bedroll by the fire."
+      ],
+      "details": [
+        "A dependable explorer. +{xp} XP",
+        "Ten finds catalogued. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice carries down the canyon.",
+        "Twenty-five. The whole caravan hears you."
+      ],
+      "details": [
+        "Louder than the camels. +{xp} XP",
+        "Twenty-five entries recorded. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Properly part of the expedition.",
+        "Fifty. Evidently committed. Approved."
+      ],
+      "details": [
+        "Fifty entries in the journal. +{xp} XP",
+        "Deep in the ruins. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll name a wing of the museum after you.",
+        "One hundred. Superb. I'll concede it exactly once."
+      ],
+      "details": [
+        "Earned with proper fieldwork. +{xp} XP",
+        "A hundred. Accept the museum's applause. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A torch catches.",
+        "Third day running. Consistent."
+      ],
+      "details": [
+        "Showing up is half the dig. +{xp} XP",
+        "Three days among the ruins. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's a proper field season.",
+        "Seven days on site. Flawless attendance."
+      ],
+      "details": [
+        "A week without missing a dig. +{xp} XP",
+        "Seven days of discovery. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. Not one day off the site.",
+        "Fourteen days. Faultless timekeeping."
+      ],
+      "details": [
+        "A fortnight in the field. +{xp} XP",
+        "That's a proper research stint. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. A full season's work.",
+        "A month of devotion. The journal approves."
+      ],
+      "details": [
+        "Thirty days on the dig. +{xp} XP",
+        "A whole month in the ruins. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You follow the forgotten trails.",
+        "Five remote hunches. I respect the audacity."
+      ],
+      "details": [
+        "Against the guidebook. +{xp} XP",
+        "Five overlooked ruins championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You leave the marked path.",
+        "Fifteen. You follow your own compass."
+      ],
+      "details": [
+        "Always your own survey. +{xp} XP",
+        "Fifteen votes off the beaten track. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can predict your route.",
+        "Thirty. You're the unmapped territory."
+      ],
+      "details": [
+        "Impossible to chart. +{xp} XP",
+        "Thirty votes for the buried one. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First at the site five times. Early.",
+        "Five times you beat the crew to the dig."
+      ],
+      "details": [
+        "You arrive before the tents go up. +{xp} XP",
+        "Five votes ahead of the caravan. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where yours was the first spade in. Decisive.",
+        "First one over the threshold, every time."
+      ],
+      "details": [
+        "Fifteen entries ahead of the caravan. +{xp} XP",
+        "Ahead of the whole expedition. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Steady hands, every time.",
+        "Another close squeeze. Nerve like old bronze."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten near-collapses survived. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your word keeps deciding them.",
+        "You've settled more than one dispute."
+      ],
+      "details": [
+        "Twenty-five finishes by a grain of sand. +{xp} XP",
+        "You decide which tunnel opens. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stayed with the buried one. Patient. Good.",
+        "You trust a late discovery. Sensible."
+      ],
+      "details": [
+        "Faith in the dig. +{xp} XP",
+        "Five turnarounds you believed in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. A favourite artefact.",
+        "That one again? You've found your relic."
+      ],
+      "details": [
+        "You know your mind. +{xp} XP",
+        "One relic, three visits. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five visits to one moment. Steadfast.",
+        "You won't drop that one. I wouldn't either."
+      ],
+      "details": [
+        "Loyal through every sandstorm. +{xp} XP",
+        "One favourite, five visits. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on one moment. That's an obsession.",
+        "Ten visits to a single pick. I shan't remark. Much."
+      ],
+      "details": [
+        "Ten on a single relic. +{xp} XP",
+        "Devoted. Or just fixated. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're sticking to the trail.",
+        "Round two and still trekking. Good."
+      ],
+      "details": [
+        "Further down the passage. +{xp} XP",
+        "Two chambers in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the ruins.",
+        "Well into the bracket. The passages narrow."
+      ],
+      "details": [
+        "Four chambers in. +{xp} XP",
+        "Far from the entrance. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You explored the whole complex.",
+        "To the final chamber. Never once retraced a step."
+      ],
+      "details": [
+        "From the first step to the final chamber. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've surveyed a good few sites.",
+        "Ten distinct matches. Methodical. Good."
+      ],
+      "details": [
+        "Mapping the whole region. +{xp} XP",
+        "Ten sites surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. Every chamber visited.",
+        "Twenty-five. Not a corner left unmapped."
+      ],
+      "details": [
+        "Every passage covered. +{xp} XP",
+        "Twenty-five sites charted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's no visit, that's a career.",
+        "Fifty. You know this bracket better than the atlas."
+      ],
+      "details": [
+        "A veteran of the whole survey. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long expedition day.",
+        "Five consecutively. Please drink from the canteen."
+      ],
+      "details": [
+        "One long trek. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A marathon dig.",
+        "Ten in one stretch. Proper endurance."
+      ],
+      "details": [
+        "A desert marathon. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Studying by lantern light, I assume.",
+        "The wee hours. Studious or sleepless. I know both well."
+      ],
+      "details": [
+        "Lantern hours become you. +{xp} XP",
+        "A vote after the campfire died. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You sent word to your friends. Thank you.",
+        "Five shares. More diggers, more finds."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five dispatches sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically the expedition newsletter.",
+        "Fifteen. You keep bringing the whole caravan in."
+      ],
+      "details": [
+        "Still sending dispatches. +{xp} XP",
+        "Fifteen telegrams delivered. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first dig. A founding member, always.",
+        "One of the first thousand. That can't be erased from the journal."
+      ],
+      "details": [
+        "Yours permanently. +{xp} XP",
+        "No one takes that from the record. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Properly earned.",
+        "Promoted. Wear it like a field commission."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Fascinating.",
+        "Another entry for the collection: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the fieldwork and it shows."
+      ],
+      "details": [
+        "{rank}. A fine result.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. I know someone who's done worse. Frequently.",
+        "Ten remote bets. Not one tremor of doubt."
+      ],
+      "details": [
+        "Ten unlikely bets backed. +{xp} XP",
+        "Remote hunches are your whole method. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten near calls. You match my steady hand.",
+        "Ten narrow finishes. I'm privately pleased."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Calm while the walls shake. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven straight days. Your aim holds firm.",
+        "Seven days, not one skipped. Well surveyed."
+      ],
+      "details": [
+        "Seven days of fieldwork. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One squeeze, one verdict.",
+        "A stalemate in the ruins, and you chose the passage. Splendid."
+      ],
+      "details": [
+        "The entry that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Safari Caitlyn, pith helmet on. Rifle ready.",
+        "Caitlyn is yours now. Do try to keep up. Mind the traps."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The site hasn't been cleared.",
+      "Voting hasn't begun. I'll send word when it does.",
+      "Not yet. Good discoveries reward patience."
+    ],
+    "prevote": [
+      "Two sites, one expedition. Inspect both before you commit.",
+      "Look at both before you dig. No rushing into a tomb.",
+      "I won't say which I favour. The evidence is yours to weigh.",
+      "Take your time. A careful survey beats a hasty one.",
+      "Choose the one that makes you want to explore."
+    ],
+    "prevote-empty": [
+      "No entries yet. Log the first.",
+      "Quiet so far. Someone must break ground.",
+      "Not a single vote. Be first."
+    ],
+    "closing-24h": [
+      "Under a day left and no entry from you. Move.",
+      "The dig site closes soon. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the light fails."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Run for it."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone here. First to the site.",
+      "Hardly a find logged and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Lovely. Sands shift.",
+      "{pct}% on your side. A cosy spot in the shade.",
+      "Ahead for now. Dunes move.",
+      "{pick} is drawing clear. Shrewdly picked.",
+      "A lead is a lead, but the roof can still give. Stay sharp."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more vote tips it. Fetch a friend.",
+      "Shoulder to shoulder. Your pick needs a patron.",
+      "{pct} against {otherPct}. Inhale. Wait."
+    ],
+    "voted-tied": [
+      "Perfectly level. Two passages, no winner.",
+      "A dead heat. Maddening, and rather thrilling."
+    ],
+    "voted-behind": [
+      "You're outnumbered. That doesn't make you wrong.",
+      "{pick} is trailing. A buried gem. I know the type.",
+      "They lead. You're not mistaken, merely outnumbered.",
+      "Down by {diff} points. Tell people. Send dispatches widely.",
+      "The party went the other way. That settles nothing."
+    ],
+    "closed-won": [
+      "Your pick won. A fine call.",
+      "A win. Properly earned.",
+      "{pick} went through. You read the ruins rightly."
+    ],
+    "closed-lost": [
+      "Your pick crumbled. Unfortunate. A scholarly choice all the same.",
+      "It didn't survive the descent. That happens. Press on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A tie. Neither passage gave way."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More expeditions will follow.",
+      "The match is done. {winner} claimed it. Arrive earlier next time."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Everyone's first dig feels tense.",
+      "Entry number one. The rest come easier. Trust the process.",
+      "You're one of the crew now. Welcome."
+    ],
+    "streak": [
+      "Back for more exploring. Good.",
+      "{streak} days running. I see you keeping the expedition alive.",
+      "You keep returning to the site. I appreciate that."
+    ],
+    "underdog": [
+      "You alone chose that one. Logged.",
+      "A hard choice. A good one.",
+      "The overlooked ruin. That takes backbone."
+    ],
+    "early": [
+      "Early. You reached the site before the rest.",
+      "Sparse entries so far. Yours will stand out.",
+      "First across the threshold. Commendable."
+    ],
+    "close": [
+      "That entry moved the scale. It hangs by a thread.",
+      "A hairline margin. One more vote swings it.",
+      "A near thing. Your mark on the map matters."
+    ],
+    "behind": [
+      "{pick} lags. Lagging isn't lost. Call for reinforcements.",
+      "Not in front yet. Digging remains.",
+      "Down, not entombed. There is a distinction."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Sands shift.",
+      "Leading for now. Be wary.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Vote logged. There's more to survey."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no entries yet. Start with the one that intrigues you.",
+      "Every site is in view. Choose. I won't rush you.",
+      "{unvoted} to survey. No pressure. Slight, anyway."
+    ],
+    "live-some": [
+      "{voted} logged, {unvoted} still to go. Keep exploring.",
+      "Ground is broken. {unvoted} remain.",
+      "A good start. The rest won't excavate themselves."
+    ],
+    "live-few": [
+      "{unvoted} chambers outstanding. Finish before the gate shuts.",
+      "Nearly through. {unvoted} chambers left.",
+      "Almost at the vault. Steady the torch."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Don't leave it unexplored.",
+      "One match between you and a full survey."
+    ],
+    "live-closing": [
+      "A few conclude in {timeLeft}. {unvoted} still lack your entry.",
+      "The hourglass is draining. {unvoted} to go, {timeLeft} left.",
+      "The site is closing. Do hurry."
+    ],
+    "live-done": [
+      "All matches voted. Splendid. Study the bracket's layout.",
+      "Nothing outstanding. Return when the next round breaks ground.",
+      "Every chamber logged. Seldom seen. Respect."
+    ],
+    "live-none": [
+      "Nothing's open this minute. It will be. Review the bracket while you wait.",
+      "Quiet in the ruins. Check back soon.",
+      "No matches are open. I'm pacing the camp as much as you."
+    ],
+    "brackets-groups": [
+      "Group stage opens the survey. Two per group descend deeper. The rest turn back.",
+      "All enter through a group. Only some reach the inner vault.",
+      "Keep an eye on the standings. They slide fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts approach. Only the top two of each group go deeper.",
+      "No knockout yet. The groups must be fully excavated first.",
+      "Be patient. Knockouts surface when the groups conclude."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are underway. One misstep and the passage seals.",
+      "One loss and you're out. No second excavation.",
+      "Each match carries more weight now. Tread with care."
+    ],
+    "brackets-bracket": [
+      "Round after round. A single loss ends the expedition.",
+      "Trace the bracket. Each round the corridor tightens.",
+      "Every line records a match somebody surveyed."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for exploring it with me.",
+      "It's finished. A hard-fought expedition. I'll miss it.",
+      "A champion emerges. A fitting last chamber."
+    ],
+    "brackets-empty": [
+      "No bracket on the wall. Nothing's been charted.",
+      "Blank chart. The draw isn't mapped yet.",
+      "An unwritten page for now. Peek in later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One find decides it. Choose.",
+      "Two sites, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the expedition and tell me what you think."
+    ],
+    "voted": [
+      "{pick} over {other}, by my notes. And yours?",
+      "My vote goes to {pick}, not {other}. Argue the point.",
+      "My find: {pick}, not {other}. Care to dispute it?"
+    ],
+    "early": [
+      "One of the first entries on {pick} against {other}. We need more diggers.",
+      "An early mark for {pick} against {other}. Add yours.",
+      "{pick} against {other}, practically unvisited. Yours would stand out."
+    ],
+    "tied": [
+      "{pick} and {other} are neck-and-neck. One vote tips the stone.",
+      "{pick} and {other} are locked at a fork. Choose a tunnel.",
+      "{pick} and {other} cling together. Your vote can pry them apart."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes divide {pick} and {other}. Each entry matters.",
+      "{voteDiff} votes separate {pick} from {other}. Log yours.",
+      "{pick} against {other}, {voteDiff} apart. Either could emerge on top."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} off {other}. A handful of entries closes the gap.",
+      "{pick} sits {voteDiff} under {other}, though the dig is far from done. Back it.",
+      "{pick} is {voteDiff} below {other}. Recoverable. Log a vote."
+    ],
+    "losing-bad": [
+      "{pick} is {voteDiff} shy of {other}. It needs sponsors.",
+      "{pick} lags {other} by {voteDiff}. A find like that merits better. Help.",
+      "{pick} is {voteDiff} beneath {other}. Time to turn the tide."
+    ],
+    "winning-close": [
+      "{pick} nudges past {other} at {pct}%. Help it keep the edge.",
+      "{pick} leads {other} at {pct}%, still fragile. Lend your vote.",
+      "{pick} holds {pct}% against {other}. A sliver of a lead."
+    ],
+    "dominating": [
+      "{pick} sprints ahead of {other} on {pct}%. Come and see why.",
+      "{pick} is on {pct}%. {other} is lost in the sand.",
+      "{pick} is well clear of {other} at {pct}%. Add your mark."
+    ]
+  }
+}

@@ -1,11 +1,10 @@
 // Profile "Champions" tab: loads the person's votes and profile, then draws js/champions-tab-model.js.
-import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, query, where, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { db } from './firebase-config.js';
 import { readPackXp, mergePackXp, activePackId, backfillPackXp } from './xp-ledger.js';
-import { readLooks, saveLook } from './companion-look.js';
+import { readLooks } from './companion-look.js';
 import { ACHIEVEMENTS } from './achievements.js';
-import { announceChampionSelected } from './champion-selected.js';
-import { buildChampionsView, championsHtml, avatarKeyOf, skinAvatar } from './champions-tab-model.js';
+import { buildChampionsView, championsHtml, avatarKeyOf } from './champions-tab-model.js';
 
 let shown = null;
 const filters = {};   // which skins each card shows: { jinx: 'locked' }   // { userId, own, data } so a click can redraw without asking Firestore again
@@ -18,34 +17,6 @@ function draw(host) {
         achievementNames: Object.fromEntries(Object.values(ACHIEVEMENTS).map(a => [a.id, a.name]))
     });
     host.innerHTML = championsHtml(view, { own, filters });
-}
-
-// One choice: the champion, the skin you see everywhere (profile picture, alerts) and where your XP goes.
-function setChampionLocally(packId) {
-    if (window.championLoader?.setUserCompanionPack) return window.championLoader.setUserCompanionPack(packId);
-    localStorage.setItem('companionId', packId);
-    localStorage.setItem('companionChosen', 'true');
-    localStorage.setItem('championPack', packId);
-    return Promise.resolve(true);
-}
-
-async function useChampion(host, packId, num) {
-    const avatar = skinAvatar(packId, num);
-    const looks = saveLook(packId, num);
-    const changed = shown.data.activePack !== packId;
-    try {
-        await setChampionLocally(packId);
-        localStorage.setItem('avatar', JSON.stringify(avatar));
-        shown.data.avatar = avatar; shown.data.looks = looks; shown.data.activePack = packId;
-        window.updateNavProfile?.();
-        await updateDoc(doc(db, 'profiles', shown.userId), { avatar, companionSkins: looks, companionId: packId, championPackId: packId, updatedAt: Date.now() });
-        if (changed) announceChampionSelected(packId, num);
-        else (window.showNotification || (() => {}))('Skin updated', 'success');
-    } catch (e) {
-        console.warn('Could not save the champion', e);
-        (window.showNotification || (() => {}))('Saved on this device only; could not reach your profile', 'error');
-    }
-    draw(host);
 }
 
 export async function loadChampionsTab(profile, own) {
@@ -77,8 +48,8 @@ export async function loadChampionsTab(profile, own) {
                 if (chip) { filters[chip.dataset.pack] = chip.dataset.filter; draw(host); return; }
                 const el = e.target.closest('.cm-act');
                 if (!el || !shown?.own) return;
-                const num = Number(el.dataset.skin);
-                useChampion(host, el.dataset.pack, num);
+                // Settings is the one place that changes the champion and skin: open it on the chosen skin
+                window.openSettingsModal?.({ champion: el.dataset.pack, skin: Number(el.dataset.skin) });
             };
             host.addEventListener('click', pick);
         }

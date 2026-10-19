@@ -81,6 +81,19 @@
             border-color: #C8AA6E;
         }
         
+        /* Skin picker: every skin of the loaded champion, built from js/champion-unlocks.js so new skins appear by themselves */
+        .skin-panel { max-width: 1100px; margin: 0 auto 1.5rem; padding: 1rem; background: rgba(10, 20, 40, 0.6); border: 1px solid rgba(200, 170, 110, 0.3); border-radius: 10px; }
+        .skin-panel h3 { margin: 0 0 .5rem; color: #C8AA6E; font-size: 1rem; }
+        .skin-panel label { color: #A09B8C; font-size: .85rem; display: inline-flex; gap: .4rem; align-items: center; margin-bottom: .75rem; cursor: pointer; }
+        .skin-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
+        .skin-btn { display: flex; align-items: center; gap: .5rem; padding: .35rem .6rem .35rem .35rem; background: rgba(30, 35, 40, 0.9); color: #F0E6D2; border: 2px solid rgba(200, 170, 110, 0.25); border-radius: 8px; cursor: pointer; font: inherit; text-align: left; }
+        .skin-btn img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; }
+        .skin-btn small { display: block; color: #A09B8C; font-size: .72rem; }
+        .skin-btn.active { border-color: #C8AA6E; background: rgba(200, 170, 110, 0.18); }
+        .skin-status { margin-top: .75rem; display: flex; gap: .75rem; align-items: center; color: #F0E6D2; font-size: .9rem; }
+        .skin-status img { width: 120px; height: 68px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(200, 170, 110, 0.4); }
+        .skin-status .warn { color: #ffb86b; }
+
         .test-section {
             margin-bottom: 3rem;
             padding: 2rem;
@@ -277,7 +290,18 @@
         <button class="champion-btn" onclick="switchChampion('vi')" id="btn-vi">
             👊 Vi
         </button>
+        <button class="champion-btn" onclick="switchChampion('caitlyn')" id="btn-caitlyn">
+            🎯 Caitlyn
+        </button>
         <!-- Add more champions as you create them -->
+    </div>
+
+    <!-- Skin picker: pick a skin to load its voice set and see which portrait the alerts use -->
+    <div class="skin-panel" id="skinPanel">
+        <h3>Skins</h3>
+        <label><input type="checkbox" id="unlockAllSkins"> Unlock every skin for testing (this browser only, switch it off when you are done)</label>
+        <div class="skin-grid" id="skinGrid"></div>
+        <div class="skin-status" id="skinStatus"></div>
     </div>
     
     <!-- Match State Alerts -->
@@ -514,10 +538,10 @@
                 <span class="test-btn-label">Mastery 3</span>
             </button>
 
-            <button class="test-btn" onclick="testChampionSelected('vi', 29)">
+            <button class="test-btn" onclick="testChampionSelected()">
                 <span class="test-btn-icon">⭐</span>
                 <strong>Champion Selected</strong>
-                <span class="test-btn-label">Vi in Arcane Undercity (uses the loaded pack's voice)</span>
+                <span class="test-btn-label">The loaded champion in the skin picked above (uses its voice)</span>
             </button>
         </div>
     </div>
@@ -532,6 +556,61 @@
         </button>
     </div>
     
+    <script type="module">
+        import { SKIN_UNLOCKS } from '/js/champion-unlocks.js';
+        import { lookSkin, saveLook, TEST_UNLOCK_KEY } from '/js/companion-look.js';
+        import { voiceSetFor } from '/js/champion-voice.js';
+        import { getChampionTileUrl, getChampionSplashUrl } from '/js/arcane-config.js';
+
+        const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const unlockBox = document.getElementById('unlockAllSkins');
+        try { unlockBox.checked = localStorage.getItem(TEST_UNLOCK_KEY) === '1'; } catch { /* storage blocked */ }
+        let shownPack = null;
+
+        window.wornSkin = packId => lookSkin({ id: packId }, localStorage);
+        window.skinNameFor = (packId, num) => SKIN_UNLOCKS[packId]?.skins.find(x => x.num === num)?.name || `Skin ${num}`;
+
+        function status(packId, wanted) {
+            const pack = window.championLoader?.getCurrentPack();
+            const worn = lookSkin({ id: packId }, localStorage);
+            const cid = SKIN_UNLOCKS[packId].championId;
+            const voice = voiceSetFor(packId, wanted);
+            const el = document.getElementById('skinStatus');
+            const locked = worn !== wanted;
+            el.innerHTML = `<img src="${esc(getChampionSplashUrl(cid, worn))}" alt="">
+                <div><strong>${esc(window.skinNameFor(packId, wanted))}</strong> (skin ${wanted})<br>
+                Voice: <strong>${esc(voice || 'base pack (' + packId + '.json)')}</strong>${pack?.voiceSet === (voice || undefined) ? '' : ' <span class="warn">(loaded pack reports ' + esc(pack?.voiceSet || 'base') + ')</span>'}<br>
+                Alerts use: <strong>${esc(window.skinNameFor(packId, worn))}</strong> (skin ${worn})${locked ? ' <span class="warn">Locked in this browser, so the alerts fall back. Tick the box above to try it anyway.</span>' : ''}</div>`;
+        }
+
+        async function applySkin(packId, num) {
+            saveLook(packId, num, localStorage);
+            await window.championLoader?.loadChampionPack(packId, num);
+            window.buildSkinPicker(packId, num);
+        }
+
+        window.buildSkinPicker = (packId, wantedNum) => {
+            const data = SKIN_UNLOCKS[packId];
+            const panel = document.getElementById('skinPanel');
+            panel.style.display = data ? '' : 'none';
+            if (!data) return;
+            const wanted = wantedNum ?? lookSkin({ id: packId }, localStorage);
+            shownPack = packId;
+            document.getElementById('skinGrid').innerHTML = data.skins.map(sk => `
+                <button class="skin-btn${sk.num === wanted ? ' active' : ''}" data-num="${sk.num}">
+                    <img src="${esc(getChampionTileUrl(data.championId, sk.num))}" alt="" loading="lazy">
+                    <span>${esc(sk.name)}<small>#${sk.num} · ${sk.achievement ? 'achievement' : 'mastery ' + sk.mastery}</small></span>
+                </button>`).join('');
+            document.querySelectorAll('#skinGrid .skin-btn').forEach(b => b.addEventListener('click', () => applySkin(packId, Number(b.dataset.num))));
+            status(packId, wanted);
+        };
+
+        unlockBox.addEventListener('change', () => {
+            try { unlockBox.checked ? localStorage.setItem(TEST_UNLOCK_KEY, '1') : localStorage.removeItem(TEST_UNLOCK_KEY); } catch { /* storage blocked */ }
+            if (shownPack) window.buildSkinPicker(shownPack);
+        });
+    </script>
+
     <script>
         // Wait for systems to load
         window.addEventListener('load', async () => {
@@ -553,6 +632,7 @@
                 });
                 document.getElementById(`btn-${pack.id}`)?.classList.add('active');
                 
+                window.buildSkinPicker?.(pack.id);
                 console.log(`✅ Current pack: ${pack.name}`);
             } else {
                 packEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No pack loaded';
@@ -1005,9 +1085,11 @@ function testEncouragement() {
         });
     }
 
-    function testChampionSelected(packId = 'vi', skin = 29) {
+    function testChampionSelected(packId, skin) {
+        packId = packId || window.championLoader?.getCurrentPack()?.id || 'vi';
+        skin = skin ?? window.wornSkin?.(packId) ?? 0;
         // Same shape as the real alert (js/champion-selected.js): type 'champion-selected', the skin splash, the champion's own words
-        const names = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' }, skinNames = { 29: 'Arcane Undercity', 37: 'Arcane Enemy', 28: 'Arcane Enforcer' };
+        const names = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' }, skinNames = { [skin]: window.skinNameFor?.(packId, skin) || `Skin ${skin}` };
         const msg = window.championLoader?.getAchievementMessage('champion-selected', { rank: `${names[packId]} Mastery 3`, xp: 0 });
         window.showBulletin?.({
             type: 'champion-selected',

@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-headhunter",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Headhunter Caitlyn",
+  "description": "Voice set for Headhunter Caitlyn (skin 6): a cold, patient bounty hunter in alien armour, who makes sure every hunt, every target and every shot goes exactly her way. Contracts, quarry, scanners, patience and the clean shot. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind. The quarry is slipping the net. Bring more hunters.",
+          "cta": "Call the pack"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more adrift. The hunt is going badly. Every tracker, now.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Send the signal on every frequency.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. The trail is cooling. Warm it.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. A lone hunter starves. Bring company.",
+          "cta": "Bring a hunter"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few clean shots and the prey stumbles.",
+          "cta": "Take a shot"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A small lead for the quarry. Run it down.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. Both targets locked. Pick one and fire.",
+          "cta": "Fire"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop tracking and take the shot.",
+          "cta": "Bring a hunter"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The quarry is about to bolt. Bring more.",
+          "cta": "Rally the pack"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Hold the scope steady. Wait for the opening.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. The quarry is cornered. Don't blink.",
+          "cta": "Hold the line"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and climbing. The net is closing.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A good position in the brush. Stay quiet.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The trail is ours. Keep following it.",
+          "cta": "Stay on it"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Good. Slow breath. Finish the hunt.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. The prey turned and the hunter was waiting.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A trap sprung from the dark.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} gap. A clean recovery.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was lost in the rain. Now it leads the hunt.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. The scanner never lied.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two hunters, one mark.",
+        "{username} claimed {momentTitle} as well. A sharp visor.",
+        "{username} agrees with you. A rare thing in a hunting party.",
+        "Same quarry as {username}. We hunt well together.",
+        "{username} stood with {momentTitle}. A good tracker.",
+        "{username} made the same call. No comm needed.",
+        "{username} is on your side of {momentTitle}. Take the next watch.",
+        "{username} marked {momentTitle}. Welcome to the party.",
+        "{username} read the trail as you did on {momentTitle}. Few can."
+      ],
+      "details": [
+        "A fellow hunter.",
+        "Two scopes, one target.",
+        "Good trackers are rare.",
+        "Keep them close.",
+        "Silence is a fine language between hunters.",
+        "Someone who reads the trail.",
+        "Room by the fire, if there is one."
+      ],
+      "buttons": [
+        "Good tracking",
+        "Say thanks",
+        "See the match",
+        "Nod",
+        "Respect",
+        "Well hunted",
+        "Acknowledged"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. Different quarry. We'll see whose is claimed.",
+        "{username} chose {theirMoment}. A poor target.",
+        "{username} went the other way on {yourMoment}. Misjudged. Not for long.",
+        "{username} voted against you. A rival hunter keeps the blade keen.",
+        "{username} took {theirMoment}. Bold. Possibly fatal.",
+        "{username} opposes {yourMoment}. Fine. The tally will say.",
+        "{username} disagrees on {yourMoment}. Let the hunt finish.",
+        "{username} voted the other way. They will see the trail eventually."
+      ],
+      "details": [
+        "Every hunter misses once.",
+        "A clean disagreement.",
+        "The count has the final word.",
+        "Do not let it unsettle your aim.",
+        "Rivals sharpen you.",
+        "They may still change course.",
+        "A worthy opponent."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. Not luck. A well-run hunt.",
+        "{username} and you, ten matches, the same quarry each time. Perfectly synchronised.",
+        "Ten straight with {username}. I would share a blind with you.",
+        "A ten-match run with {username}. Not one escape.",
+        "Ten for ten with {username}. A flawless contract."
+      ],
+      "details": [
+        "Ten shots, ten claims.",
+        "A fine pair of hunters.",
+        "Rare. Protect it.",
+        "Keep the streak alive.",
+        "Hard to improve."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well hunted",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. Not a pair anymore. A whole hunting party.",
+        "{streakCount} in a row with {username}. I would follow you both into any storm.",
+        "{streakCount} straight claims with {username}. They will speak of it in the trade.",
+        "A {streakCount}-match run with {username}. A legend among hunters.",
+        "{streakCount} with {username}. Neither of you ever misses."
+      ],
+      "details": [
+        "Hard to credit. Easy to respect.",
+        "That is trust, earned in the rain.",
+        "I have no words. Only respect.",
+        "Practically untouchable.",
+        "A partnership for the records."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A standoff in the dark.",
+        "{username} has opposed you ten times running. Two predators, one territory.",
+        "Ten running against {username}. Neither flinches.",
+        "A ten-match run against {username}. Stubborn prey, or a stubborn hunter.",
+        "Ten times at odds with {username}. I would watch that from a distance."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Settle it. Or keep stalking.",
+        "A proper standoff.",
+        "Stubbornness keeps you alive.",
+        "Who strikes first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That is not a rivalry, that is a bounty.",
+        "{streakCount} in a row opposite {username}. Neither of you will leave the territory.",
+        "{streakCount} straight clashes with {username}. A feud for the ages.",
+        "A {streakCount}-match feud with {username}. One of you must claim the other.",
+        "{streakCount} against {username}. I admire the patience. Remarkable."
+      ],
+      "details": [
+        "Neither of you will retreat.",
+        "Patience, certainly.",
+        "A cold, long grudge.",
+        "Glad I am not the third target.",
+        "The ledger needs a new page."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your shot is missing. There is still time.",
+        "{timeLeft} left on {matchTitle}. Your claim has not been filed.",
+        "{matchTitle} ends in {timeLeft}. I want your mark on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Claim it"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The quarry is stirring. Move.",
+        "{matchTitle} closes in {timeLeft}. Do not make me track you down.",
+        "Only {timeLeft} until {matchTitle} ends. You have gone very still."
+      ],
+      "buttons": [
+        "Vote now",
+        "Moving"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The quarry is about to bolt.",
+        "{timeLeft} left. Lock on. Fire.",
+        "Final window on {matchTitle}. {timeLeft}. Take the shot."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} unclaimed matches are about to escape. The first has {timeLeft} left.",
+        "{matchCount} matches without your mark and the light is fading. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No marks on {matchTitle}. Someone must draw first blood.",
+        "{moment1} against {moment2} and no shot fired. I will wait. Briefly.",
+        "A fresh hunt, untouched ground. Be first on the trail.",
+        "{matchTitle} is unclaimed. Take the first shot."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Mark it",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new targets in range.",
+        "{matchCount} matches opened in round {round}. The hunt resumes.",
+        "Round {round} is live, with {matchCount} marks to size up.",
+        "A new round. {matchCount} matches. Select your quarry.",
+        "Round {round}: {matchCount} matches waiting for your scope."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Stalk",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A clean claim.",
+        "{momentTitle} is through. A precise shot.",
+        "{momentTitle} took it. Trophy secured.",
+        "{momentTitle} won, and never saw it coming.",
+        "{momentTitle} advances. One mark cleared.",
+        "{momentTitle} moves on. Cold, efficient work."
+      ],
+      "details": [
+        "A clean hit.",
+        "One down, more to hunt.",
+        "Earned in full.",
+        "Without a wasted shot."
+      ],
+      "buttons": [
+        "Steady",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. The quarry escaped.",
+        "{momentTitle} is out. Not the outcome I tracked.",
+        "{momentTitle} slipped away. Reset the scope.",
+        "{momentTitle} fell fighting. That counts.",
+        "{momentTitle} is out. Recalibrate. Return.",
+        "{momentTitle} lost this round. A missed shot, not a lost hunt.",
+        "{momentTitle} was eliminated. New targets await."
+      ],
+      "details": [
+        "Not every hunt ends in a trophy.",
+        "It held out to the last.",
+        "More prey is coming.",
+        "Accept it. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the hunting grounds. {liveCount} matches are open. Choose a target.",
+          "A new hunter. {liveCount} matches are live. Keep low.",
+          "Fresh tracks. {liveCount} matches need a decision.",
+          "{liveCount} targets in range. Choose one.",
+          "Welcome. {liveCount} matches. Watch your footing."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Stalk",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You returned to the trail. Good.",
+          "Two days running. A tracker's habit.",
+          "A second day on the trail. I was watching."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days gone. I assumed the hunt had claimed you.",
+          "After {days} days you return. The trail kept for you.",
+          "{days} days. I had begun to pick up your gear. Good that I did not.",
+          "{days} days away. The ground has changed."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Back on the trail. Good.",
+          "Welcome back. The hunt waits.",
+          "Back already. Hungry.",
+          "There you are. I was watching."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet hunting ground.",
+        "Few hunters out here. That should change.",
+        "Thin pickings tonight. The others are sleeping. Come out anyway.",
+        "Barely a scope trained on it. Someone should look."
+      ],
+      "details": [
+        "It needs more hunters.",
+        "Every round matters in barren ground.",
+        "Yours is worth more tonight.",
+        "Do not let the trail go cold."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you have not fired. The deciding shot is yours.",
+        "Dead level on {matchTitle}. One clean shot ends the stalemate.",
+        "A tie. Someone must pull the trigger. Let it be you.",
+        "{moment1} and {moment2}, both in the crosshairs. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the light is going. One last shot.",
+        "Level, with the quarry about to bolt. Vote.",
+        "Tied, and almost out of time. Do not let both targets escape."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still tracking? The quarry will not wait forever.",
+        "Stop circling. Choose, and fire.",
+        "Each has its merits through the scope. Trust your read.",
+        "You have watched from cover long enough. Move."
+      ],
+      "details": [
+        "Every shot counts.",
+        "Trust your instincts.",
+        "No wrong target. Only slow ones.",
+        "Just decide."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First shot fired. The hunt begins.",
+        "You chose your quarry. A promising start."
+      ],
+      "details": [
+        "Logged. +{xp} XP",
+        "The first claim of many. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You are learning the terrain.",
+        "Five. No longer prey."
+      ],
+      "details": [
+        "A patient opening. +{xp} XP",
+        "Finding your range. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The pack knows your tracks.",
+        "Ten. You have earned a place at the fire."
+      ],
+      "details": [
+        "A reliable hunter. +{xp} XP",
+        "Ten claims on the board. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your signal carries through the rain.",
+        "Twenty-five. The whole ground is listening."
+      ],
+      "details": [
+        "Heard through the storm. +{xp} XP",
+        "Twenty-five shots downrange. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Deep in the hunt now.",
+        "Fifty. You clearly care. That makes a good hunter."
+      ],
+      "details": [
+        "Fifty claimed. +{xp} XP",
+        "Far into the wild. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They will whisper it in the trade.",
+        "One hundred. Remarkable. I will say it only once."
+      ],
+      "details": [
+        "Earned in the dark. +{xp} XP",
+        "A hundred. Carry the trophy proudly. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. The trail warms.",
+        "Three straight days. A fine habit."
+      ],
+      "details": [
+        "Coming back is the difficult part. +{xp} XP",
+        "Three days stalking. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That is discipline.",
+        "Seven days running. Relentless."
+      ],
+      "details": [
+        "A week without a gap in the hunt. +{xp} XP",
+        "Seven days of tracking. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never abandon the trail.",
+        "Fourteen days. Formidable."
+      ],
+      "details": [
+        "A fortnight on the hunt. +{xp} XP",
+        "That is pure resolve. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. A rare kind of focus.",
+        "A month on the hunt. That says a great deal."
+      ],
+      "details": [
+        "Thirty days of patience. +{xp} XP",
+        "A full month in the wild. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You track what others overlook.",
+        "Five unlikely picks. Interesting."
+      ],
+      "details": [
+        "Against the herd. +{xp} XP",
+        "Five long shots claimed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You hunt against the wind deliberately.",
+        "Fifteen. You follow no one's trail but your own."
+      ],
+      "details": [
+        "Always your own tracks. +{xp} XP",
+        "Fifteen votes against the grain. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No scout can predict you.",
+        "Thirty. The impossible shot is your craft."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty claims for the straggler. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First to the clearing five times. Swift.",
+        "Five times you reached the kill zone before the rest."
+      ],
+      "details": [
+        "You are there before the dawn. +{xp} XP",
+        "Five votes before anyone. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you struck first. Decisive.",
+        "First in the clearing, again and again."
+      ],
+      "details": [
+        "Fifteen shots before the pack. +{xp} XP",
+        "Ahead of every hunter. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Your hands stay steady.",
+        "Another tight one. Your nerve is cold steel."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your shot keeps deciding the hunt.",
+        "You have broken more than one stalemate."
+      ],
+      "details": [
+        "Twenty-five finishes on a knife edge. +{xp} XP",
+        "You decide the outcome. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you backed the underdog. Stubborn. I approve.",
+        "You never abandon prey that still runs. Admirable."
+      ],
+      "details": [
+        "Faith in a late strike. +{xp} XP",
+        "Five reversals you foresaw. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. A favourite quarry.",
+        "That one again? A good scent."
+      ],
+      "details": [
+        "You know your mark. +{xp} XP",
+        "A single mark, three shots fired. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same moment. That is persistence.",
+        "You will not release that one. I understand."
+      ],
+      "details": [
+        "Loyal through the storm. +{xp} XP",
+        "One mark, five shots. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten shots at one moment. That is fixation.",
+        "Ten times, the same target. I will not comment. Much."
+      ],
+      "details": [
+        "Ten on one mark. +{xp} XP",
+        "Devoted. Or consumed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You are staying on the trail.",
+        "Round two and still hunting. Good."
+      ],
+      "details": [
+        "Deeper into the wild. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the dark.",
+        "Deep in the bracket. The prey grows wary."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Many miles from the first camp. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You hunted the whole ground.",
+        "All the way. You never lost the scent."
+      ],
+      "details": [
+        "From opening shot to final strike. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You have scouted wide.",
+        "Ten different matches. Thorough tracking. Good."
+      ],
+      "details": [
+        "Charting the entire field. +{xp} XP",
+        "Ten territories surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. Every valley scouted.",
+        "Twenty-five. Not a trail left unchecked."
+      ],
+      "details": [
+        "Every ridge scanned. +{xp} XP",
+        "Twenty-five grounds studied. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That is not a visit, that is a career.",
+        "Fifty. You know this ground better than any chart."
+      ],
+      "details": [
+        "A true veteran of the hunt. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long stalk.",
+        "Five back to back. Mind your fatigue."
+      ],
+      "details": [
+        "One long hunt. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A hard stretch of tracking.",
+        "Ten in a single sitting. That is endurance."
+      ],
+      "details": [
+        "A marathon hunt. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Night hunting, or sleepless?",
+        "The small hours. Prey moves now, and so do you."
+      ],
+      "details": [
+        "The dark suits you. +{xp} XP",
+        "A vote in the dark. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You called others in. Good.",
+        "Five shares. More hunters, stronger pack."
+      ],
+      "details": [
+        "Noted. +{xp} XP",
+        "Five signals sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You are practically a beacon.",
+        "Fifteen. You keep calling hunters in. Smart."
+      ],
+      "details": [
+        "Still broadcasting. +{xp} XP",
+        "Fifteen beacons lit. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first hunt. A founding member, always.",
+        "One of the first thousand. That cannot be erased."
+      ],
+      "details": [
+        "Yours for good. +{xp} XP",
+        "That trophy stays yours. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Promoted. Wear it without noise."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Well hunted.",
+        "Another trophy for the wall: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You have put in the cold hours and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. I have hunted worse.",
+        "Ten long shots. You do not rattle easily."
+      ],
+      "details": [
+        "Ten kills against the odds. +{xp} XP",
+        "Impossible shots are your craft. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my patience.",
+        "Ten tight finishes. I am quietly impressed."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "A steady aim in the dark. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days straight. A steady eye.",
+        "A full week without a miss. Well hunted."
+      ],
+      "details": [
+        "Seven days of surgical aim. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You ended the stalemate. One breath, one shot, done.",
+        "A deadlock, and you made the call. Clean."
+      ],
+      "details": [
+        "The shot that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Headhunter Caitlyn, locked on. Stay quiet and stay low.",
+        "Caitlyn is yours now. Try to keep up in the dark."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The quarry has not surfaced.",
+      "Voting has not begun. I will signal when it does.",
+      "Not yet. Patience is the first rule of the hunt."
+    ],
+    "prevote": [
+      "Two edits, one shot. Study both through the scope.",
+      "Observe both before committing. No wild fire.",
+      "I will not say which I prefer. The shot is yours.",
+      "Take your time. A clean kill beats a quick one.",
+      "Choose the one you would stake your reputation on."
+    ],
+    "prevote-empty": [
+      "No marks yet. Leave the first tracks.",
+      "Hushed so far. Someone has to break the silence.",
+      "Not a single shot. Make the first."
+    ],
+    "closing-24h": [
+      "Under a day left and no shot from you. Move.",
+      "The opening is narrowing. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the quarry bolts."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Fire."
+    ],
+    "voted-early": [
+      "You shot early with hardly anyone around. First on the trail.",
+      "Barely a mark made and you had committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Good. Prey can still turn.",
+      "{pct}% back you. A commanding perch.",
+      "Ahead for now. Tracks fade.",
+      "{pick} is pulling ahead. Well read.",
+      "A lead is a lead. Stay low."
+    ],
+    "voted-close": [
+      "That is close. Far too close.",
+      "A hair apart. One more vote tips it. Send a signal.",
+      "Level at the throat. Your pick wants an ally.",
+      "{pct} against {otherPct}. Do not exhale yet."
+    ],
+    "voted-tied": [
+      "Perfectly level. Neither holds the clearing.",
+      "Exactly level in the crosshairs. Maddening and magnetic."
+    ],
+    "voted-behind": [
+      "You are behind. That does not make you wrong.",
+      "{pick} is trailing. The underdog. I know the feeling.",
+      "They lead. You are not wrong, merely outnumbered.",
+      "Down by {diff} points. Tell others. Send the signal wide.",
+      "Most went elsewhere. Herds are often wrong."
+    ],
+    "closed-won": [
+      "Your pick won. A sound call.",
+      "A win. Hard-earned.",
+      "{pick} went through. You read the trail rightly."
+    ],
+    "closed-lost": [
+      "Your pick fell. A pity. It was a worthy target.",
+      "It did not make it. Such things happen. Carry on.",
+      "{pick} is out. I am sorry."
+    ],
+    "closed-tied": [
+      "A draw. Both prey held their ground."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More hunts will follow.",
+      "The hunt is over. {winner} claimed it. Fire sooner next time."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first shot. Welcome. Every first shot is nervous.",
+      "That is your first. It steadies with practice. I promise.",
+      "You are one of the pack now. Welcome."
+    ],
+    "streak": [
+      "Back on the trail. Good.",
+      "{streak} days running. I see you hunting.",
+      "You keep returning to the hunt. I appreciate that."
+    ],
+    "underdog": [
+      "You chose what the rest ignored. Noted.",
+      "A hard choice. A good one.",
+      "The weaker animal. Few would dare."
+    ],
+    "early": [
+      "Early. You reached the clearing before the rest.",
+      "Few shots so far. Yours carries weight.",
+      "First to take position. Good."
+    ],
+    "close": [
+      "That vote just shifted things. It is finely balanced.",
+      "A blade's width. One more vote turns it.",
+      "A close one. Your shot matters."
+    ],
+    "behind": [
+      "{pick} is behind. Behind is not beaten. Call for support.",
+      "Not leading yet. There is work to do.",
+      "Behind, not lost. There is a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Do not ease off. Prey turns.",
+      "In front, for the moment. Trust nothing.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I will not argue. Yet.",
+      "Done. Your decision.",
+      "Your shot is logged. More targets remain."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no shots yet. Start with the quarry you read best.",
+      "Every target is in sight. Choose. I will not hurry you.",
+      "{unvoted} remain. No pressure. A touch, maybe."
+    ],
+    "live-some": [
+      "{voted} fired, {unvoted} still to go. Keep moving.",
+      "You have started. {unvoted} still await.",
+      "A good start. The rest will not hunt themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish them tonight.",
+      "Almost done. {unvoted} left.",
+      "Close. Do not lose focus now."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Do not leave it unclaimed.",
+      "One match between you and a perfect hunt."
+    ],
+    "live-closing": [
+      "A few escape in {timeLeft}. {unvoted} still await your shot.",
+      "Time bleeds away. {unvoted} left, {timeLeft} to spare.",
+      "The quarry is bolting. Do hurry."
+    ],
+    "live-done": [
+      "You have voted in everything. Well hunted. Look over the bracket.",
+      "Your list is spent. Come back when the next round opens.",
+      "All done. That is rare. Respect."
+    ],
+    "live-none": [
+      "No hunt is live right now. It will return. Study the field meanwhile.",
+      "Quiet across the grounds. Check back soon.",
+      "No matches open. I am as restless as you."
+    ],
+    "brackets-groups": [
+      "Groups come first. Two from each pack survive. The rest are left behind.",
+      "All begin in a pack. Few leave it alive.",
+      "Mind the standings. They move fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are near. The strongest two from each group move on.",
+      "No knockout round yet. The packs must settle first.",
+      "Patience. The knockout surfaces once the groups conclude."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you are out.",
+      "One miss ends it. The hunt grants no second chance.",
+      "Each target is rarer now. Select with care."
+    ],
+    "brackets-bracket": [
+      "Round by round. Lose once and it is over.",
+      "Track the bracket. The field thins each round.",
+      "Every trail on this board is a match someone stalked."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for hunting with me.",
+      "It is finished. A hard-fought run. I will miss it.",
+      "A champion stands. A fitting end to the hunt."
+    ],
+    "brackets-empty": [
+      "No field mapped yet. Nothing has been drawn.",
+      "Empty. The draw has not happened. Soon.",
+      "Empty ground for now. Look again later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One shot decides it. Choose.",
+      "Two edits, one target: {a} against {b}. Cast your vote.",
+      "{a} against {b}. Join the pack and give me your read."
+    ],
+    "voted": [
+      "I voted {pick} over {other}. What is your pick?",
+      "{pick} gets my shot over {other}. Make your case.",
+      "My mark is {pick} over {other}. Would you shoot differently?"
+    ],
+    "early": [
+      "One of the first shots on {pick} against {other}. We need more hunters.",
+      "I shot early for {pick} over {other}. Add yours.",
+      "{pick} against {other}, hardly a shot fired. Yours would be heard."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One shot settles it.",
+      "{pick} and {other}, both locked in the scope. End it.",
+      "{pick} and {other} are inseparable. Your shot can part them."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Each shot counts.",
+      "{voteDiff} votes divide {pick} and {other}. Fire yours.",
+      "{voteDiff} separate {pick} and {other}. The prey could flee either way."
+    ],
+    "losing-close": [
+      "{voteDiff} stand between {pick} and {other}. A few shots turn it.",
+      "{pick} is {voteDiff} off {other}, still breathing. Back it.",
+      "{pick} trails {other} by {voteDiff}. It is recoverable. Vote."
+    ],
+    "losing-bad": [
+      "{other} leads {pick} by {voteDiff}. It needs a second hunter.",
+      "{pick} sits {voteDiff} below {other} and deserves a better hunter. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let us turn it."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% over {other}, barely. Help it hold the ground.",
+      "{pick} is up on {other}, {pct}%. Not safe yet. Fire.",
+      "{pick} holds {pct}% against {other}. A thin edge."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see the tracks.",
+      "{pct}% for {pick}. {other} is not close.",
+      "{pick} runs well clear of {other}, {pct}%. Join the kill."
+    ]
+  }
+}

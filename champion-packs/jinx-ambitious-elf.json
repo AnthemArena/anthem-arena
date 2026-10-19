@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-ambitious-elf",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Ambitious Elf Jinx",
+  "description": "Voice set for Ambitious Elf Jinx (skin 12): a master toy maker and inventor who wants to be the greatest Santa ever, whose creations the other elves fear could count as weapons. Workshop, toys, wish lists and sleigh deliveries. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! That's the whole toy order on fire and the sleigh's still in pieces! Everybody to the workshop!",
+          "cta": "Rush the workshop"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? Somebody's been on the naughty list and gunning for my deliveries. I'm checking it twice!",
+          "cta": "Check the list"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind! Time to open the special-edition gift. The one the other elves lock away!",
+          "cta": "Open the gift"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. The sleigh's late and the bells are going silly. Wind up the next toy!",
+          "cta": "Wind it up"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. A little tinsel and a bigger bow and we're there!",
+          "cta": "Add a bow"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Underwrapped, that's all. Go vote and I'll fetch more ribbon!",
+          "cta": "Spread the cheer"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! Two presents, one bow, and a very long chimney. Decide for me!",
+          "cta": "Pick a present"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! One! A single jingle decides the whole delivery!",
+          "cta": "Ring the bell"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! My wind-up toys are all ticking! Somebody's about to go off!",
+          "cta": "Hold the toy"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either the perfect present or a very festive explosion. I'm wrapped for both!",
+          "cta": "Peek in the sack"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! That's not a win, that's the greatest Santa season ever! Ho ho ho!",
+          "cta": "Ho ho ho"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! The whole village is waving from the windows! Have a mince pie!",
+          "cta": "Eat a mince pie"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and rising! The sleigh's loaded. Don't shake the sack yet!",
+          "cta": "Mind the sack"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still ahead. Don't say 'snow day'. Saying 'snow day' invites a blizzard!",
+          "cta": "Watch the sky"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and dropped down the chimney like a perfect Christmas Eve! Master-elf wrapping!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Flipped a {voteDiff}-vote hole! Last-minute gift, glorious result. Tinsel for everybody!",
+          "cta": "Hand out tinsel"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Crept back from {voteDiff} behind! Wonky wrapping, wonderful surprise!",
+          "cta": "Unwrap it"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just slid into the lead like a sleigh on fresh snow. Smooth. Sparkly. Slightly suspicious!",
+          "cta": "See the toy list"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! A fellow elf! Don't touch my gift box, though!",
+        "{username} picked {momentTitle}. Same wish list! I call dibs on the shiny paper.",
+        "{username} is on your side with {momentTitle}. Welcome to the workshop. Mind the sharp toys!",
+        "{username} backed {momentTitle} as well. Two elves! Santa doesn't stand a chance!",
+        "Same pick as {username}! Two elves, one sleigh seat. Share it or get coal!",
+        "{username} agrees with you on {momentTitle}. Write it on the list, it's rare!",
+        "{username} voted {momentTitle}. Two of you! A tiny workshop! The North Pole's slightly brighter!",
+        "{username} has taste and it matches yours. Good gift sense, both of you!"
+      ],
+      "details": [
+        "Workshop's growing! I'm still head toy-maker.",
+        "Look at you, crafting in a team!",
+        "Don't tell the other elves I enjoy this.",
+        "A new friend! I'll make them a gift. A very loud one.",
+        "Teamwork! Fine! Quick, before the glue dries!",
+        "I give it a week before you fight over the last candy cane.",
+        "New apprentice! I'm drawing a pointy hat on your badge.",
+        "More elves, more toys, I mean votes!"
+      ],
+      "buttons": [
+        "Say hello",
+        "Send a present",
+        "See the match",
+        "Back them up",
+        "Merry cheers",
+        "Join the workshop"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival toy-maker on my bench! Glitter cannon ready!",
+        "{username} voted against {yourMoment}. Aww. A grinch! With opinions!",
+        "{username} chose {theirMoment}. Not worried. Just winding up a toy. With menace.",
+        "{username} went for {theirMoment}. New entry on the naughty list!",
+        "{username} is against you on {yourMoment}. Finally, a proper snowball fight!",
+        "{username} thinks {theirMoment} makes the better gift. A rival elf! Let's see whose toy breaks first.",
+        "{username} voted against you. Two elves, one workshop. Somebody's losing a bell off their hat!",
+        "{username} versus you! I'm grabbing the best bench, snacks, and the big jack-in-the-box."
+      ],
+      "details": [
+        "I'm not saying snowball ambush. I'm saying drifts are deep.",
+        "The big jack-in-the-box wants a word. It's been waiting under the tree.",
+        "They'll learn. Good toys take time and a lot of springs.",
+        "One workshop, two elves. Somebody's getting wrapped in ribbon.",
+        "I like them already. They've got festive spirit.",
+        "I don't care. Check the sack. I care a lot.",
+        "A little rivalry keeps the springs tight!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Load the glitter",
+        "Face them",
+        "Settle it",
+        "Take the bench"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! You two craft like one workshop! A noisy one!",
+        "{username} has agreed with you ten times running. Either teamwork or you share a wish list. Sweet!",
+        "Ten straight with {username}! The whole North Pole's talking about it. By North Pole I mean me."
+      ],
+      "details": [
+        "Ten! That's a whole sleigh team!",
+        "Don't let the tinsel tangle now!",
+        "Honestly? Magical.",
+        "Weird. Good weird. Jingle weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hello",
+        "Craft together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a legendary workshop pair! I'm sniffling. It's pine dust!",
+        "{streakCount} for you and {username}. Perfect timing, every time. I'd wrap a song but it'd go off.",
+        "{streakCount} straight with {username}! Somebody give you both a golden bell."
+      ],
+      "details": [
+        "I'm speechless and I never stop humming!",
+        "Is this healthy? Ask the nurse elf. She's on holiday!",
+        "That's not luck, that's craftsmanship."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Craft together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep fighting over the same workbench!",
+        "{username} has disagreed with you ten times running. That's not a grinch, that's a festive feud!",
+        "Ten toy-offs with {username}. I'm selling front-row seats at the sleigh port."
+      ],
+      "details": [
+        "This is the main event now.",
+        "Sleigh-port seats going fast!",
+        "The whole North Pole wants a look."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Toy-off again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a proper toy war! I LOVE toy wars!",
+        "{streakCount} toy-offs with {username}. Call a truce? Nah. Wind the springs!",
+        "{streakCount} against {username}. That's not a rivalry, that's an entire winter."
+      ],
+      "details": [
+        "Bigger than my last sleigh upgrade. Almost!",
+        "I'm nervous and a bit proud. And a bit glittery.",
+        "One of you has to run out of ribbon. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep crafting"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! The sleigh leaves soon, elf!",
+        "{timeLeft} left on {matchTitle}. Your gift tag's missing from the sack! Don't miss the delivery!",
+        "{matchTitle} ends in {timeLeft}. Voting takes ten seconds. I timed it with a snow globe."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the sleigh"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? The bells are ringing, elf! That's a warning!",
+        "Jingle, jingle, jingle! {matchTitle} closes in {timeLeft}. Don't miss the drop!",
+        "{timeLeft} until {matchTitle} closes and you're still wrapping. Get a move on!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, delivering"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! Last present! Tie the ribbon, then deliver!",
+        "{timeLeft}! That's the last of the night on {matchTitle}. Go go go!",
+        "Final delivery on {matchTitle}! {timeLeft} left. Stop nibbling the candy cane and vote!"
+      ],
+      "buttons": [
+        "Last present",
+        "Deliver it now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to miss the sleigh and you haven't wrapped any of them! First one leaves in {timeLeft}!",
+        "{matchCount} unvoted matches, all stuck at the sleigh port. The first one's gone in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, wrapping now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! A whole empty stocking! Somebody has to fill it first!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even the reindeer are bored!",
+        "Brand new match and not a single vote. Somebody has to open the first present. Pick me. Pick you!",
+        "{matchTitle} needs a first gift opener. I've got scissors. I mean, you've got a vote."
+      ],
+      "buttons": [
+        "Open the first present",
+        "Unlock the workshop",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. The emptiest stocking in the whole village!",
+        "Hardly anyone's wandered over here. What's wrong with the wrapping?",
+        "Low turnout. I blame the blizzard. And you. Equally. With glitter.",
+        "Barely any votes here. Somebody bring more elves!"
+      ],
+      "details": [
+        "Go on, give it a shake.",
+        "It deserves a bigger sack. So do I.",
+        "Make some noise, ring a bell!",
+        "Don't be shy. Shy is for reindeer. Joking!"
+      ],
+      "ctas": [
+        "Vote",
+        "Join the workshop",
+        "Go on",
+        "Shake it"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the sleigh. Funny, I know someone who hasn't unwrapped. Guess who!",
+        "Perfect tie on {matchTitle}. Two presents, equal weight. I'm looking at you, elf. Hehe!",
+        "Dead even and nobody's opening. You haven't voted. You're the last tag on the tree!",
+        "{moment1} and {moment2}, both under the tree, and you've been quiet by the fire. Fix that!"
+      ],
+      "buttons": [
+        "Open one",
+        "Be the deciding vote",
+        "Tip the sleigh",
+        "Choose a gift"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and midnight's coming! Last chance to open one!",
+        "Dead level, almost no time left. You're the only elf who can break it!",
+        "Still tied with the clock striking twelve. Pick a gift! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a gift",
+        "Make the call",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Hats on, springs wound! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new sack of surprises!",
+        "Round {round} just started! {matchCount} matches waiting by the tree. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even Santa!"
+      ],
+      "buttons": [
+        "Start unwrapping",
+        "See round {round}",
+        "Wind it up",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Sleigh landed perfectly! Called it!",
+        "{momentTitle} beat the competition! Next round's in for a face full of glitter.",
+        "{momentTitle} survived! I never doubted it. Okay, the elves doubted. Just a smidge.",
+        "{momentTitle} is through! Somebody's having a great Christmas. Hehe, you!",
+        "{momentTitle} moves up and the rest are broken toys. Very festively broken toys.",
+        "{momentTitle} won! Good call! Enjoy a candy cane!"
+      ],
+      "details": [
+        "Your pick's still on the sleigh!",
+        "One gift down, lots of sack left.",
+        "The bracket just shrank. Tidier! Sparklier!"
+      ],
+      "buttons": [
+        "Cheer loudly",
+        "See the result",
+        "Next present",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. A tear in the wrapping. I'll sulk about it later!",
+        "{momentTitle} lost. Everyone who voted against it gets a lump of coal.",
+        "Fine. {momentTitle} is gone. I'll ring one bell in its honour. Maybe three.",
+        "{momentTitle} was too naughty for this workshop anyway. Obviously.",
+        "{momentTitle} is out, and the workshop went quiet. I hate a quiet workshop. Somebody drop a hammer!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A tinsel-sized bit."
+      ],
+      "details": [
+        "They'll pay for this. In glitter.",
+        "It was good. The whole North Pole knows.",
+        "You'll find another gift. Good ones always turn up by morning.",
+        "Every Christmas ends. That's what makes the next one fun. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next present",
+        "Plan a payback",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still reading the wish list? Pick one! Any one! I'll wait. I'm lying, I'll tinker!",
+        "No pressure, but are you gonna vote or just stare at the tree?",
+        "They're all great gifts! Pick one! Unwrap first, regret later!",
+        "Decisions, decisions. Close your eyes, point at the sack, and hope."
+      ],
+      "details": [
+        "Every vote is a present!",
+        "Your opinion matters. Sort of. In a festive way.",
+        "Don't overthink it. Overthinking tangles the lights.",
+        "Trust your gut. Mine's mostly eggnog."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Unwrap",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New elf! Welcome! {liveCount} matches on the wish list and every one's a showdown!",
+          "{liveCount} edits battling it out in the snow and you just wandered in. Pick a side before they pick you!",
+          "Oooh, a newcomer! Workshop's warm, toys are wound, and {liveCount} matches are live. You'll love it.",
+          "No rules, {liveCount} live matches, and me on the workbench. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Come in",
+          "Wind the toy"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I kept your stool warm. Okay, I left a toy on it. But I kept it.",
+          "Two days running! Look at you, a workshop regular!",
+          "Back again? Day two! I could get used to this. Don't tell the other elves."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because your stool got dusty!",
+          "You're back after {days} days! The workshop kept humming without you. Mostly explosions. Festive ones.",
+          "{days} days away. I noticed. Your stool wobbled without you. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The workshop was getting dull!",
+          "Look who's here! Ready for another shift?",
+          "You came back! Let's go wrap something that goes bang."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! A tiny jingle. The first bell is always the sweetest.",
+        "One down. The workshop's got a new elf. You!"
+      ],
+      "details": [
+        "First toy wrapped. +{xp} XP",
+        "Welcome to the North Pole. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're staying past the first shift! Most elves clock off early.",
+        "Five votes! The glue's warm."
+      ],
+      "details": [
+        "Five toys on the bench. +{xp} XP",
+        "Not just a visitor after all. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular at my workbench now. Sit anywhere. Not there, that's the glitter cannon.",
+        "Ten votes. That's a proper little toy chest."
+      ],
+      "details": [
+        "A regular at the bench. +{xp} XP",
+        "Ten toys crafted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! The whole village knows your gift sense.",
+        "Twenty-five! Loud and proud, like a sleigh bell in a snowdrift."
+      ],
+      "details": [
+        "The village knows your taste. +{xp} XP",
+        "Twenty-five gifts picked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly in the workshop now.",
+        "Fifty! Past the door, past the shelves, right at the gearbox."
+      ],
+      "details": [
+        "Behind the workshop door. +{xp} XP",
+        "Fifty toys tested. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! Okay, that's a North Pole legend. Candy canes for everyone!",
+        "One hundred! They'll tell stories about this. Mostly tinsel. Mostly exaggerated."
+      ],
+      "details": [
+        "North Pole legend. +{xp} XP",
+        "One hundred toys tested. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! The fireplace is still lit.",
+        "Three days in a row! You've got the knack for it."
+      ],
+      "details": [
+        "Three days in the workshop. +{xp} XP",
+        "The fireplace crackles on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You clock in even without a shift. My kind of elf!",
+        "Seven days straight! That's a proper shift pattern. Boring. Impressive!"
+      ],
+      "details": [
+        "A week of crafting. +{xp} XP",
+        "Seven days to Christmas. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Not even a blizzard could stop you!",
+        "Fourteen days! Even Santa takes a nap by now."
+      ],
+      "details": [
+        "Two weeks of toy-making. +{xp} XP",
+        "Not even a snowdrift slowed you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! You've outlasted a few of my wind-up toys!",
+        "A whole month in the workshop. Give yourself a medal. I've got a gingerbread one."
+      ],
+      "details": [
+        "A month of crafting. +{xp} XP",
+        "Thirty days to the big night. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You go against the grain like a sanding block on pine!",
+        "Five long shots! The list says naughty. Your heart says nice."
+      ],
+      "details": [
+        "Off the nice list. +{xp} XP",
+        "Five odd toys backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You don't follow the workshop rules either. We should talk. Not about rules.",
+        "Fifteen picks nobody wished for! A true naughty-list elf."
+      ],
+      "details": [
+        "Naughty-list pays. +{xp} XP",
+        "Fifteen odd toys rescued. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! A dark-green elf in the dark workshop if I ever saw one!",
+        "Thirty! Nobody sees you coming. Not even me, and I'm on the roof."
+      ],
+      "details": [
+        "A dark horse in the snow. +{xp} XP",
+        "Thirty hidden toys found. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! Five times! You always reach the workbench before the whistle blows.",
+        "Five early votes! Quick fingers!"
+      ],
+      "details": [
+        "Quickest fingers at the bench. +{xp} XP",
+        "First through the snowy door. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you chose first! Not an elf, a toy inspector!",
+        "Fifteen early ones! You sniff out good gifts before the whole village does."
+      ],
+      "details": [
+        "Inspecting the toys. +{xp} XP",
+        "Fifteen first picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! Glue on the edge every time!",
+        "Ten photo finishes. You live for the last bow, don't you?"
+      ],
+      "details": [
+        "Close ones suit an elf. +{xp} XP",
+        "Ten last-ribbon finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! Where you go, the final bauble follows!",
+        "Your vote lands on the very last bauble. Twenty-five times!"
+      ],
+      "details": [
+        "The deciding bow. +{xp} XP",
+        "Twenty-five last-minute gifts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one trailing. Five times! Stubborn like a tangled string of lights.",
+        "You don't bin a toy because it's wonky. I love that."
+      ],
+      "details": [
+        "Faith in the wonky toy. +{xp} XP",
+        "Five toys saved from the bin. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've found your favourite toy!",
+        "That one again? Yeah. It's got great springs."
+      ],
+      "details": [
+        "Your favourite toy. +{xp} XP",
+        "Three picks, one present. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same one! That's loyalty! Like an elf to a favourite hammer.",
+        "Okay, you've adopted it. No gift receipts."
+      ],
+      "details": [
+        "Loyal to the last bauble. +{xp} XP",
+        "Five votes, one beloved toy. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a Christmas obsession!",
+        "Ten votes for the same one. I won't tell the workshop. I am the workshop."
+      ],
+      "details": [
+        "Ten for one beloved toy. +{xp} XP",
+        "Hopelessly smitten with a toy. Respect. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You see the whole season through, even without a sleigh!",
+        "Round two reached! Still wrapping!"
+      ],
+      "details": [
+        "Two weeks to Christmas. +{xp} XP",
+        "Two rounds wrapped. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly deep in the snow now!",
+        "Deep in the bracket! Hope you like chimneys."
+      ],
+      "details": [
+        "Four rounds down the chimney. +{xp} XP",
+        "Deep in the snowdrift. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the whole season through!",
+        "Six rounds! You never took off your hat! Wow!"
+      ],
+      "details": [
+        "The whole Christmas season. +{xp} XP",
+        "All six rounds wrapped. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're peeking into every present!",
+        "Ten different matches! Curious elf, huh?"
+      ],
+      "details": [
+        "Peeking into presents. +{xp} XP",
+        "Ten gifts shaken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been in every attic, every stocking, every sack!",
+        "Twenty-five! You've opened every cupboard in the workshop."
+      ],
+      "details": [
+        "Every stocking checked. +{xp} XP",
+        "Twenty-five gifts inspected. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not peeking, that's a whole winter in the workshop!",
+        "Fifty matches! You know this workshop better than I do."
+      ],
+      "details": [
+        "A true workshop veteran. +{xp} XP",
+        "A full winter of toys. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't leave the workbench, can you?",
+        "Five back to back! Keep the springs wound!"
+      ],
+      "details": [
+        "One long shift. +{xp} XP",
+        "Five toys in a row. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Drink some cocoa!",
+        "Ten matches without leaving the workbench! Wow!"
+      ],
+      "details": [
+        "Deep shift! +{xp} XP",
+        "Ten in one night! +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. Christmas Eve never sleeps.",
+        "Middle of the night! That's when the best toys get built."
+      ],
+      "details": [
+        "The night shift. +{xp} XP",
+        "Moonlit elf! +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Sleigh bells ringing across the whole village!",
+        "Five shares! You're calling in the elves! Good!"
+      ],
+      "details": [
+        "Thanks for rounding up the elves. +{xp} XP",
+        "Five wish lists sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically the village crier!",
+        "Fifteen! You keep telling every reindeer."
+      ],
+      "details": [
+        "Filling the workshop. +{xp} XP",
+        "Fifteen wish lists sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the snow! Founding elf! Yours forever!",
+        "One of the first elves in the snow! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever, bow and all. +{xp} XP",
+        "Nobody can unwrap that one. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! A shiny new bell on the hat!",
+        "Promoted! Bigger hat, louder bells. Don't let it go to your head!"
+      ],
+      "details": [
+        "{rank}. Bell on the hat. +{xp} XP",
+        "You've reached {rank}! Ho ho! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Something's gone bang! In a festive way!",
+        "Another one: {name}! Wrapped, perfect!"
+      ],
+      "details": [
+        "{description}. Wrapped with care. +{xp} XP",
+        "{description} Ho ho! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the shiny new tools!",
+        "Mastery up! Now the workshop gets properly busy."
+      ],
+      "details": [
+        "{rank}. Tools shiny and new. +{xp} XP",
+        "You've reached {rank}! Ho ho! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a festive disaster worth wrapping!",
+        "Ten long shots! Chaos in the workshop. Wonderful results too."
+      ],
+      "details": [
+        "A loose cannon with great ribbon. +{xp} XP",
+        "Ten wild wishes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. I'll make her a toy. One. It's not a weapon!",
+        "Ten tight finishes with her! Don't tell her I made her a toy!"
+      ],
+      "details": [
+        "Ten close calls, ten toys. +{xp} XP",
+        "Steady hands, steady bow! +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love the naughty-or-nice rules!",
+        "Seven days with a rule-lover! You're braver than any reindeer!"
+      ],
+      "details": [
+        "A week at the sheriff's fireside. +{xp} XP",
+        "Seven days to the big night. +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Wound the last spring! Boom!",
+        "A tied match and you picked the gift! Nice!"
+      ],
+      "details": [
+        "The vote that tipped the sleigh. +{xp} XP",
+        "Tie snapped like a candy cane! +{xp} XP"
+      ],
+      "buttons": [
+        "Next present",
+        "Keep crafting"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, the future greatest Santa? Good choice. Bad idea. Great choice!",
+        "Ambitious Elf Jinx! Don't ask if it's a weapon. Do ask if it's a gift."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet! I'm still gluing the sleigh together. Check back soon?",
+      "Shh! The bells are about to ring. I can feel it in my pointy hat.",
+      "Workshop's locked for now. Doesn't stop me sketching the next toy."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, the toy list is never easy.",
+      "Look at both. Then back the one that makes your bells jingle.",
+      "I won't tell the other elves who you picked. Probably. Tinsel gossips.",
+      "Take your time, elf! Actually, don't. The glue's drying.",
+      "Go on, nobody's judging. Okay, Santa is. A little.",
+      "Pick the one you'd wrap first for Christmas morning. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's come into the workshop yet. Be the first elf, I dare you!",
+      "Empty bench! Ring a bell with a vote.",
+      "Not one elf in the village! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still sketching. Pick a gift!",
+      "The night's nearly here. Don't make me ring the sleigh bell. I will."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Get on the sleigh before the sack closes!",
+      "Jingle, jingle, fizz. That's the last of the glitter pouring out."
+    ],
+    "closing-final": [
+      "Last present! Wrap now, admire later!",
+      "Any second now. Seriously. Ring the bell!"
+    ],
+    "voted-early": [
+      "One of the first elves at the bench! Bold! I love bold!",
+      "Hardly anybody's picked a toy and you chose anyway. Respect, elf!"
+    ],
+    "voted-ahead": [
+      "Look at you, backing the best-seller! Don't get comfy, trends melt like snow.",
+      "{pct}% with you! Great gift sense. I didn't say that. Forget it.",
+      "Your pick's ahead. The whole workshop's cheering for once. Odd!",
+      "{pick} is pulling away! Feels good? Hold the ribbon tight!",
+      "Ahead, for now. Wish lists change. So do elves."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm peeking through the snow globe!",
+      "A snowflake apart. One more vote could flip it. Tell a friend. Tell the whole village!",
+      "Neck and neck! Your pick needs you and every elf you know.",
+      "{pct} to {otherPct}. Something's warming up and it's the wind-up toy. Possibly me."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody tangled in tinsel!",
+      "A perfect tie. Honestly? Rude of the North Pole."
+    ],
+    "voted-behind": [
+      "You're behind! Don't sulk in the sack. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog toy! My favourite kind!",
+      "They're ahead. Doesn't make you wrong. Just late to the workshop!",
+      "Behind by {diff} points. Tell the village. Loudly. Ring every bell!",
+      "Everybody's wrapping the other present. Cool! Be the odd elf out."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got an elf's eye.",
+      "A win! A sneaky little stocking-stuffer of a victory. I'll take it!",
+      "{pick} went through! You called the delivery!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it melt, then wrap the next one!",
+      "Didn't make it. I've dropped bigger presents. So have you. Next one!",
+      "{pick} is out. Sorry. For real. I'll hang a bauble in its honour."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to drop the parcel first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Workshop's closed. You missed this one! There's always another Christmas.",
+      "All done here. {winner} took the sleigh. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first gift! The scary one. Now you've got a stocking. Welcome!",
+      "That's your first. Feels small, right? Wait for the morning.",
+      "You're an elf now. Try not to drop the baubles!"
+    ],
+    "streak": [
+      "Again? You keep coming back! I'm not complaining. I dusted your stool.",
+      "{streak} days running! Okay, now I'm pinning your name on the tree.",
+      "Back again! Good workshops keep their elves. Stay!"
+    ],
+    "underdog": [
+      "Backing the toy nobody's wrapping? Ooh. I see you, elf.",
+      "Bold! Everyone else is queuing for the big box. Love that.",
+      "Underdog, huh? Takes a certain kind of elf. A good kind."
+    ],
+    "early": [
+      "Early! You get first pick of the toy bench before the rush. Don't waste it!",
+      "Hardly anyone's here yet. Your vote's doing all the heavy gift-wrapping.",
+      "First one through the snowy door! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just tilted the sleigh! Feel it? Everything's close right now.",
+      "Snowflake-thin! One more elf and the whole sack flips.",
+      "Close one! Your ribbon tipped it. Really, truly tipped it."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't melted. Go fetch the rest of the elves!",
+      "Not winning yet. Good! Means there's still ribbon left.",
+      "Behind, but the springs are still wound. Not even close to done!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Snow shifts fast!",
+      "Winning, for now. Enjoy it. Quietly. Or ring a bell. I don't mind.",
+      "Look at that! Fine gift. Obviously."
+    ],
+    "default": [
+      "Noted! I'm not changing your wish. Not yet.",
+      "Done! That present's on you now, elf.",
+      "Your vote's in. Go and see what else is under the tree!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't wrapped a single one! Start with whichever one sparkles most.",
+      "Everything's open! Take your pick. I'll pretend I'm not tinkering.",
+      "{unvoted} to go. No pressure. Okay, a little tinsel!"
+    ],
+    "live-some": [
+      "{voted} wrapped, {unvoted} to go! Keep crafting!",
+      "You're in the swing now! {unvoted} more waiting on you.",
+      "Good start! The rest won't wrap themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole bench!",
+      "Almost there! {unvoted} more and the sack's full.",
+      "So close! Don't put the scissors down yet!"
+    ],
+    "live-one": [
+      "One left! Just one! Tie the bow!",
+      "Last one! Don't leave it unwrapped!",
+      "One match between you and the Christmas dinner!"
+    ],
+    "live-closing": [
+      "Some of these close in {timeLeft}! {unvoted} still need you. Hurry, elf!",
+      "The sleigh bells are loud now! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of night! Pick, quick!"
+    ],
+    "live-done": [
+      "You've cleared your whole list! Look at you! Off to the bracket with you!",
+      "Nothing left on your list. Come back when the next round opens!",
+      "All done! That's rare for an elf. Thanks!"
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll crank up again! Go and peek at the bracket.",
+      "Silent night. A bit too silent. Check back soon!",
+      "No matches open. I'm bored already. Might build a robot."
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest, well, back to sweeping!",
+      "Everyone starts in a team of elves. Not everyone leaves one.",
+      "Watch the tables. They change faster than a wind-up toy!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group go to the sleigh.",
+      "No knockout yet. The groups have to finish their toys first!",
+      "Patience! The knockout unwraps once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're back on the shelf!",
+      "Single elimination! No returns. Okay, almost none. Santa has a policy.",
+      "Every match counts more now. Pick carefully. Or don't, I'm not the elf foreman."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and the tree goes dark!",
+      "Follow the bracket. It narrows every round, like a chimney!",
+      "Every line here is a match someone voted on. Ooh, blueprints."
+    ],
+    "brackets-complete": [
+      "And that's the cup! Thanks for spending the season with me!",
+      "It's over! Good season! I'll miss it. A little. Don't tell the elves.",
+      "That's the champion! The whole sack, worth it!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's been wrapped. Give it a moment.",
+      "Empty! Nothing's come down the chimney yet. Soon!",
+      "Nothing under the tree yet. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no gift receipts. Join the workshop on Arcane Moments!",
+      "Two edits are fighting it out! {a} versus {b}. Come and pick a present.",
+      "{a} versus {b} and the whole workshop can't agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I wrapped {pick} over {other}. Come tell me my taste is off!",
+      "{pick} got my ribbon. {other} did not. Your turn!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, return it."
+    ],
+    "early": [
+      "I was one of the first elves in for {pick} versus {other}! Be quick, the workshop's empty.",
+      "Early vote for {pick} over {other}. Come make it a proper sleigh rush!",
+      "Hardly anyone's opened {pick} versus {other} yet. Fill the sack!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the sleigh. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm hiding in the sack. Come break it!",
+      "{pick} and {other} are exactly even. Somebody grab the scissors!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My bells are shaking. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This delivery's gonna be loud!",
+      "Snowflake-thin: {pick} versus {other}, {voteDiff} apart. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A bent bow, not a ruined present! Come straighten it!",
+      "Down {voteDiff} against {other}, but {pick} isn't melted. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me pull this sleigh alone!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Crushed under the tree. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole workshop, fast!",
+      "{pick} is getting buried by {other}. Rescue elf, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's tight! Come help me guard the sack.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the bells go quiet!",
+      "{pct}% for {pick} against {other}. Close enough to chew a candy cane!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the party, or join in!",
+      "{pick} is flattening {other}, {pct}%! Grab a seat on the sleigh before it's over.",
+      "{pct}% for {pick}! {other} never saw the glitter coming."
+    ]
+  }
+}

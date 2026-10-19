@@ -878,3 +878,138 @@ Saving settings now also fires a `profile-settings-saved` event. The feed page l
 ### Preview cycles through alerts (18 Oct 2026, night)
 
 Settings > Your Champion > the preview button now cycles through sample alerts in the champion's voice: nail-biter, winning, comeback, welcome back, achievement (Spark), level up and mastery up, then round again. The button says which one is next. The samples use made-up songs, and their buttons only close the card (they never open a page). The champion-selected card is no longer used for Preview; it is shown once after Save. Code: `js/champion-preview.js`.
+
+## Skins are changed in Settings only
+The Champions tab shows the whole collection (All is the default filter) but never changes anything itself. Unlocked skins on your own
+profile have a **Wear** button that opens Settings on that champion and skin (`openSettingsModal({ champion, skin })`); the worn skin shows
+"Wearing". The mastery-up alert's button reads "Wear it now" and does the same for the newest skin it unlocked. Nothing is saved until
+Save; choosing a champion in Settings no longer writes to the profile straight away, and closing with "discard" puts the previous
+champion back.
+
+## Voice sets (a skin picks its voice)
+A champion pack (`champion-packs/<id>.json`) is the base voice. A skin can speak with another **voice set** instead
+(`champion-packs/<set>.json`): a file that rewrites some sections (`alerts`, `achievements`, `bubble`, `modal`, `pages`, `share`) and leaves the rest
+to the base pack. `js/champion-voice.js` holds the table (`VOICES`) and the merge; `champion-loader.js` and `champion-bubble.js` both load
+through it, using the skin the person wears (`lookSkin`). Several skins share a set, so lines are never copied per skin.
+
+- **Jinx:** Arcane Enemy (37) and Arcane Fractured (60) keep the base (Arcane) voice. Every other Jinx skin, Classic and PROJECT included,
+  uses `jinx-original.json`. In League the two share every line, so they share a set.
+- **Original Jinx tone** (written from the in-game lines as a reference, nothing copied): short, bratty, playful. Fake-innocent set-ups
+  with a punchline, gun banter (Pow-Pow, Fishbones), pet names, cheerful menace. Single "!" is fine, no "!!" and no long stretches of capitals.
+  The "no !!" rule in `test-champion-achievements.mjs` still guards the base (Arcane) pack; the voice test only forbids shouted stretches.
+- **Previewing:** Settings > Preview alert loads the voice of the skin you have picked (saved or not), and cancelling puts the old voice back.
+- **To add a voice set:** write `champion-packs/<set>.json` (same shape as the base, only the sections you rewrite), then add the skin
+  numbers to `VOICES` in `champion-voice.js`. `tools/test-champion-voice.mjs` checks that a set has every entry and placeholder the base has.
+- **Every skin gets its own set.** Even when League gives two skins the same lines, each skin here has a voice written from its theme.
+  A set can name the set it builds on (`"extends": "jinx-original"`), so it is a full layer of its own (all 112 events, about 470 lines
+  of speech) on top of the parent. One skin at a time, to keep the writing quality up.
+- **Done:** Original Jinx (Classic and every skin without a set), Crime City Jinx (`jinx-crime-city`: showbiz gangster, violin case, recital,
+  duets, curtain calls, corks and toasts; written from the skin's theme, none of its in-game lines are reused; the test checks that).
+- **Done:** PROJECT Jinx (`jinx-project`, skin 20: a corrupted memory core, cold and calculating one second, manic the next; targets, reboots,
+  diagnostics and glitches). The test now checks every themed set against Original and against each other.
+- **Done:** Firecracker Jinx (`jinx-firecracker`, skin 2, Lunar Revel: fuses, lanterns, a dragon-shaped rocket, luck and "it's only a party
+  favour"; festival wording kept playful and about the fireworks).
+- **Done:** Star Guardian Jinx (`jinx-star-guardian`, skin 4: a reluctant, sarcastic hero in glitter who talks to her guns Shiro and Kuro;
+  duty versus mischief, stars and sparkles).
+- **Done:** Odyssey Jinx (`jinx-odyssey`, skin 13: the Morning Star's pilot and former mining-explosives tech; cockpits, thrusters, asteroid fields,
+  docking, crew and collateral damage).
+- **Done:** Battle Cat Jinx (`jinx-battle-cat`, skin 38, also used by Prestige Battle Cat, skin 40: the Anima Squad's one-cat demolitions squad;
+  pounces, claws, nine lives, ignored orders and explosive results). Prestige can get its own layer later.
+- **Done:** Cafe Cuties Jinx (`jinx-cafe-cuties`, skin 51: a competition pastry chef who specialises in savoury treats, with the occasional
+  sugar rush; ovens, patrons, orders, plating and burnt edges).
+- **Done:** Ocean Song Jinx (`jinx-ocean-song`, skin 65: a pyrotechnic artist who invited herself to the Ocean Song Festival; stages,
+  fireworks, crowds, encores and chaos as the missing opening act).
+- **Done:** Zombie Slayer Jinx (`jinx-zombie-slayer`, skin 3: the apocalypse as paradise; no laws, no civilization, a horde of slime-vomiting
+  bullet sponges and all the ammo she can forage).
+- **Done:** Ambitious Elf Jinx (`jinx-ambitious-elf`, skin 12: a master toy maker who wants to be the greatest Santa ever, whose creations the
+  other elves fear could count as weapons; workshop, toys, wish lists and sleigh deliveries).
+- **Done:** Heartseeker Jinx (`jinx-heartseeker`, skin 29: love as a battlefield, armed with Fishbones, ready to break hearts and bones but
+  maybe playing nice; valentines, suitors, balconies and chocolates).
+- **Done:** T1 Jinx (`jinx-t1`, skin 62: a championship-winning carry performance; draft, scrims, clutch plays, trophies and a roaring crowd.
+  Lines never name the real player).
+- **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
+- **Done:** Arcane Fractured Jinx (`jinx-arcane-fractured`, skin 60): three selves in one skin. Every event rotates Hero (weary, reluctant,
+  wry), Tinkerer (curious, soft, nervous) and Menace (manic, snarky, jumpy), one line each, so she changes personality mid-conversation.
+  Messages and details are chosen independently at random, so the three voices mix freely. No lore character names are used in any set
+  (the guard test blocks them).
+- **Jinx is complete.** Arcane Enemy (37) deliberately keeps the base Arcane voice; Prestige Battle Cat (40) shares Battle Cat's set.
+- **Next:** Vi (14 skins), then Caitlyn (21, Sheriff Caitlyn stricter).
+- **Later (Jinx achievements):** propose names, conditions and XP, each with an official Data Dragon ability icon (e.g. `img/spell/JinxQ.png`)
+  instead of emoji, plus one icon review page so every icon is approved in one place. Skin art is not used as an achievement icon.
+- **Vi plan:** Vi's base pack (`vi.json`, 41 achievements, same shape as Jinx's) becomes `vi-original` first, then 14 skins from her ladder
+  (Classic, Arcane Undercity, Neon Strike, Officer, Debonair, Demon, Warring Kingdoms, PROJECT, Heartbreaker, Heartache, PsyOps, Primal Ambush,
+  T1, Arcane Brawler). The user sends each skin card.
+- **Done:** Original Vi (`vi-original`, Classic and every Vi skin without its own set): a full rewrite of the Classic voice in her own words
+  (blunt, cocky, loyal; brawling, rounds, corners and jabs), tone only from the in-game list, nothing copied. Arcane Undercity (29) keeps the base
+  `vi.json` voice (its card has no theme to write from); Arcane Brawler (48) now has its own set. Next: Demon Vi (4) and PROJECT Vi (11), each with its own set extending `vi-original`.
+- **Done:** Demon Vi (`vi-demon`, skin 4): a bored infernal brawler summoned into the mortal realm who answers a good fight and only for so long.
+  Votes are offerings, matches are sentences, a closing match is a binding about to slip. Builds on `vi-original`.
+- **Done:** PROJECT Vi (`vi-project`, skin 11): a street-smart, blunt detective keeping the neon streets in line, with a lower-sector enforcer's toughness.
+  Patrols, cases, statements, stakeouts and badges.
+- **Done:** Neon Strike Vi (`vi-neon-strike`, skin 1; the card has no description, so the theme comes from the art and the wiki's theme tag, a retro vice-squad
+  look: shades, neon strip, sting operations, synth soundtrack and sunset showdowns). 
+- **Done:** Officer Vi (`vi-officer`, skin 2): a lone-wolf patrol cop who has burned through every partner in the department until a sharpshooting one kept up.
+  Squad cars, sirens, tickets, the bullpen's betting pool and a partner she pretends not to like. Kept apart from PROJECT (detective) and Neon Strike (vice).
+  
+- **Done:** Debonair Vi (`vi-debonair`, skin 3): an immaculate woman in charge of herself and her destiny, polite right up until she breaks something.
+  Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
+- **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
+  Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
+  Vi is now fully voiced (Arcane Undercity keeps the base voice); next is Caitlyn, one skin at a time (Sheriff Caitlyn stricter).
+- **Done:** Heartache Vi (`vi-heartache`, skin 30): a tough brawler who finds love letters in her locker (the card is a letter from Caitlyn), secretly flustered
+  and never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama; votes are valentines.
+- **Done:** Primal Ambush Vi (`vi-primal-ambush`, skin 39): the unfazed leader of a clan of beast-warriors, hungry for any challenger worthy of her fists.
+  Hunts, trails, claws, the pride and the den; votes are claw-marks and a closing match is the last light of the hunt.
+- **Done:** Warring Kingdoms Vi (`vi-warring-kingdoms`, skin 5): a ferocious enforcer of a ruler's will who thrills at any challenge, jade gauntlets hitting like cannons.
+  Decrees, banners, sieges, campaigns and warlords; votes are seals and a closing match is the last horn before the gates shut.
+- **Done:** Heartbreaker Vi (`vi-heartbreaker`, skin 12): a dashing, silver-haired flirt who plays fast and loose with the rules of love, now facing a rival worthy of her.
+  Jousts, favours, roses, suitors and tourney drama; votes are favours tossed and a closing match is the last trumpet. Kept apart from Heartache (school valentines).
+- **Done:** Arcane Brawler Vi (`vi-arcane-brawler`, skin 48): a bitter, bruised pit fighter from the underground cage fights, undefeated with a chip on her shoulder.
+  Rings, bets, crowds, purses and dive-bar mornings; votes are bets and a closing match is the final bell. Tone only from the in-game list, nothing copied.
+- **Done:** T1 Vi (`vi-t1`, skin 49): an esports-champion Vi on the world finals stage, a jungler with a winning mentality. Drafts, series, objectives,
+  tempo and trophy lifts; votes are picks and a closing match is the final game. No real player or team names appear in the lines.
+- **Done:** Original Caitlyn (`caitlyn-original`, Classic and every Caitlyn skin without its own set): a full rewrite of her Classic voice, tone only from her in-game list,
+  nothing copied. A composed, dry-witted sheriff-investigator with perfect aim and a taste for tea (traps, chases, evidence, the trail going cold). The old
+  `caitlyn.json` voice stays for Arcane Enforcer (28) and Arcane Commander (50). Next: Caitlyn's skins one at a time, each extending `caitlyn-original`.
+- **Done:** Resistance Caitlyn (`caitlyn-resistance`, skin 1): a haunted soldier who has never forgiven herself, set on firing the shot that ends the war.
+  The front line, rounds, spotters, last light and atonement; votes are rounds fired and a closing match is the last light. No lore names (no machine or ruler names).
+- **Done:** Arctic Warfare Caitlyn (`caitlyn-arctic-warfare`, skin 4): a sniper on the Arctic front, where the cold is unforgiving and the winds are harsh.
+  Tundra, whiteouts, patience, frost and the last shot before the storm; votes are shots and a closing match is the storm arriving. No lore names.
+- **Done:** Officer Caitlyn (`caitlyn-officer`, skin 5): a sharp-eyed beat cop who is routinely underestimated, with doughnuts, patrols, radios and stakeouts.
+  Votes are filed reports and a closing match is the end of shift. No lore names.
+- **Done:** Headhunter Caitlyn (`caitlyn-headhunter`, skin 6): a cold, patient bounty hunter in alien armour, where every hunt and every shot goes exactly her way.
+  Contracts, quarry, scanners and the clean shot; votes are claimed shots and a closing match is the quarry about to bolt. No lore names.
+- **Done:** Pulsefire Caitlyn (`caitlyn-pulsefire`, skin 11, a skin with its own in-game voice, so treated as high reward): a legendary chrono-law enforcer who protects the
+  fragile enigma that is time. Timelines, anomalies, paperwork and the clean correction; votes are entries in the record and a closing match is the window collapsing.
+  Tone only from her in-game list, nothing copied. No lore names.
+- **Done:** Pool Party Caitlyn (`caitlyn-pool-party`, skin 13): a sun-soaked, lazy, mischievous summer set. Poolside lounging, shaved ice, flamingo floats and squirt-gun
+  showdowns; votes are splashes and a closing match is the pool shutting for the night. No lore names.
+- **Done:** Arcade Caitlyn (`caitlyn-arcade`, skin 19): a retro rail-shooter hero with a sharp eye and a quick trigger finger. Scores, combos, extra lives, continues,
+  boss fights and reloads off-screen; votes are hits on the score and a closing match is the countdown timer. No lore names. (The Prestige Arcade skins keep the base voice.)
+- **Done:** Battle Academia Caitlyn (`caitlyn-battle-academia`, skin 22, the last skin with its own in-game voice, so treated as high reward): a stern, ambitious class
+  president and strategist. Exams, marks, revision, detention and the bell about to ring; votes are answers on the paper and a closing match is the deadline. Tone only from her
+  in-game list, nothing copied; no academy or teacher names.
+- **Done:** Snow Moon Caitlyn (`caitlyn-snow-moon`, skin 30): a pale, hushed, ritual sniper who serves the moon with a calculating chill and a faint memory of warmth.
+  Moonlight, vigils and stillness (lunar and serene, kept distinct from Arctic Warfare); votes are quiet marks and a closing match is the moon setting. No lore names.
+- **Done:** Heartthrob Caitlyn (`caitlyn-heartthrob`, skin 39): a flustered, earnest, romantic mall-girl set. Love notes, skipped heartbeats, crushes and mixtapes; votes are hearts
+  and a closing match is the mall closing for the night. Written from the theme only, not from the card's letter text; no character names.
+- **Done:** Firecracker Caitlyn (`caitlyn-firecracker`, skin 54): a meticulous festival organiser with a secret taste for celebration. Schedules, lanterns, fuses and fireworks;
+  votes are fuses lit and a closing match is the countdown to midnight. Written from the theme only, not from the card's text; no character names.
+- **Done:** Sheriff Caitlyn (`caitlyn-sheriff`, skin 2): a stern, terse frontier lawwoman, deliberately stricter than the other sets. Votes are verdicts, ties are standoffs,
+  and a closing match is sundown. Written from the theme only, not from the card's text; no character names.
+- **Done:** Safari Caitlyn (`caitlyn-safari`, skin 3): a dry-witted scholar-explorer in ancient ruins. Field notes, relics, torches and traps; votes are finds logged,
+  ties are forked tunnels and a closing match is the dig site shutting for the season. Written from the theme only, not from the card's text; no character names.
+- **Done:** Lunar Wraith Caitlyn (`caitlyn-lunar-wraith`, skin 10): a hushed, ill-omened spirit haunting by moonlight. Candles, crypts, mist and fading light; votes are omens cast,
+  ties are balanced curses and a closing match is the moon setting. Written from the theme only, not from the card's text; no character names.
+- **Done:** Arcane depth pass on the base voices (`jinx.json`, `caitlyn.json`): five lines each swapped in place for quieter, more vulnerable Jinx and guilt-tinged Caitlyn moments
+  (lost match, comeback, long absence, long ally streak, losing badly). Same events and counts; original lines only.
+- **Done:** DRX Caitlyn (`caitlyn-drx`, skin 48): a calm, exact championship marksman. Drafts, scrims, lanes, objectives, clean farm and a finals-stage trophy; votes are picks locked and
+  a closing match is game point. No real player or team names in any line.
+- **Done:** Arcane Commander Caitlyn (`caitlyn-arcane-commander`, skin 50): a cold, clipped, relentless pursuer with grief and guilt showing through the cracks; she may name her
+  target (Jinx) sparingly, no spoilers. Arcane Enforcer (28) is now the only Caitlyn skin on the original `caitlyn.json` voice, so every other non-prestige Caitlyn skin has its own set.
+  Prestige Arcade (20, 29) and Prestige Arcane Commander (51) use their base skin's voice.
+- **Done:** Arcane depth pass on Vi (`vi.json`, Arcane Undercity): seven lines swapped in place for her protective, guilt-and-second-chances side (losing, long absence, long ally streak, falling behind, comeback,
+  30-day streak). Reviewed against the Arcane dialogue list: no copied lines, no five-word overlap. Same events and counts; original lines only.
+- **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
+  voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
+  only; nothing else sets it), switch it off when done.

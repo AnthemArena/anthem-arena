@@ -47,7 +47,7 @@
               "gte": 20
             }
           },
-          "message": "Down {voteDiff} on {momentTitle}. Sit there or fix it. Your call.",
+          "message": "Down {voteDiff} on {momentTitle}. I've watched things fall apart from the sidelines before. Not again. Help me fix it.",
           "cta": "Share the match"
         },
         {
@@ -200,7 +200,7 @@
               "gte": 5
             }
           },
-          "message": "{momentTitle} was losing and now it isn't. Good.",
+          "message": "{momentTitle} was losing and now it isn't. Second chances work. Who knew.",
           "cta": "See the match"
         },
         {
@@ -300,7 +300,7 @@
         "{streakCount} in a row with {username}. I'd fight alongside you.",
         "{streakCount} straight picks with {username}. Ridiculous. Good ridiculous.",
         "A {streakCount}-match run with {username}. Nobody beats that.",
-        "{streakCount} with {username}. You two should be running this place."
+        "{streakCount} with {username}. Someone's got your back. Don't ever take that for granted."
       ],
       "details": [
         "Hard to believe. Great, though.",
@@ -512,12 +512,12 @@
         "{momentTitle} is out. Not the result I wanted.",
         "{momentTitle} didn't make it. Shake it off.",
         "{momentTitle} went down. It gave a good fight.",
-        "{momentTitle} is out. Move on.",
+        "{momentTitle} is out. I hate losing. Doesn't mean we quit.",
         "{momentTitle} lost this round. Annoying. Not the end of it.",
         "{momentTitle} got knocked out. We take the next one."
       ],
       "details": [
-        "You can't win them all.",
+        "Lose one, get back up. That's the whole trick.",
         "It had a fair shot.",
         "There's always another match.",
         "Take the hit. Keep moving."
@@ -562,7 +562,7 @@
         "messages": [
           "{days} days gone. Nice of you to show up.",
           "After {days} days you're back. Better late than never.",
-          "{days} days. Thought you'd quit. Glad you didn't.",
+          "{days} days. Thought you'd walked away. Glad you didn't. Seriously.",
           "{days} days away. Lots to catch up on."
         ],
         "buttons": [
@@ -737,7 +737,7 @@
     },
     "arcane-dedication": {
       "messages": [
-        "Thirty days. Honestly, thanks.",
+        "Thirty days. You stayed. Not everyone does. Thanks.",
         "A month of showing up. That counts."
       ],
       "details": [

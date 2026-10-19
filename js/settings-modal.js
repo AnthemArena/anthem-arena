@@ -29,12 +29,14 @@ let previewIndex = 0;   // which sample alert the Preview button shows next
 let packAtOpen = null;   // the champion they had when the window opened, to tell whether Save changes it
 let pendingLooks = {};   // skins chosen in this visit, saved with the rest of the settings: { vi: 29 }
 let modalElement = null;
+let companionAtOpen = null;   // { companionId, championPack, companionChosen } in localStorage when the window opened, put back if changes are discarded
 
 // ========================================
 // OPEN SETTINGS MODAL
 // ========================================
 
-export function openSettingsModal() {
+// options.champion / options.skin (from the Champions tab's Wear button) open the window with that champion and skin picked.
+export function openSettingsModal(options = {}) {
     console.log('⚙️ Opening settings modal...');
 
     // Create modal if it doesn't exist
@@ -45,6 +47,8 @@ export function openSettingsModal() {
     pendingLooks = {};
     previewIndex = 0;
     packAtOpen = window.championLoader?.getCurrentPack?.()?.id || null;
+    companionAtOpen = {};
+    try { ['companionId', 'championPack', 'companionChosen'].forEach(k => { companionAtOpen[k] = localStorage.getItem(k); }); } catch { /* storage blocked */ }
 
     // Load current profile
     loadCurrentProfile();
@@ -59,7 +63,30 @@ export function openSettingsModal() {
     setTimeout(() => {
         modalElement.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
+        if (options.champion && PACK_IDS.includes(options.champion)) wearFromOutside(options.champion, options.skin);
     }, 10);
+}
+
+// Picks the champion and skin asked for, marks the window as changed (Save applies it) and scrolls to Your Champion.
+async function wearFromOutside(packId, skinNum) {
+    if (Number.isFinite(skinNum)) pendingLooks[packId] = skinNum;
+    if (selectedPackId() !== packId) await selectChampionPack(packId);
+    else {
+        const art = skinAvatar(packId, currentSkinNum(packId));
+        selectedChampion = { name: art.name, displayName: selectedChampion?.displayName || art.name, url: art.value };
+        renderYourChampion();
+    }
+    hasChanges = true;
+    document.getElementById('yourChampion')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+}
+
+// Cancelling: the champion picked in this visit was applied to the page straight away, so put the old one back.
+function restoreCompanion() {
+    const before = companionAtOpen;
+    companionAtOpen = null;
+    if (!before) return;
+    try { Object.entries(before).forEach(([k, v]) => { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); }); } catch { /* storage blocked */ }
+    if (packAtOpen) window.championLoader?.loadChampionPack?.(packAtOpen);
 }
 
 // ========================================
@@ -78,6 +105,8 @@ function closeSettingsModal() {
 
     modalElement.classList.remove('active');
     document.body.style.overflow = ''; // Re-enable scroll
+
+    if (hasChanges) restoreCompanion();
 
     // Reset state
     hasChanges = false;
@@ -1134,27 +1163,9 @@ async function selectChampionPack(packId) {
     console.log(`🎭 User selected: ${packId}`);
     await window.championLoader.setUserCompanionPack(packId);
 
-    // ✅ Update Firebase profile with championPackId
-    const userId = localStorage.getItem('tournamentUserId') || localStorage.getItem('userId');
-    if (userId) {
-        try {
-            const { db } = await import('./firebase-config.js');
-            const { doc, updateDoc } = await import(
-                'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
-            );
+    // Nothing is written to the profile here: Save stores the champion with the rest of the settings
 
-            await updateDoc(doc(db, 'profiles', userId), {
-                championPackId: packId,
-                updatedAt: Date.now()
-            });
-
-            console.log(`✅ Updated Firebase profile with championPackId: ${packId}`);
-        } catch (error) {
-            console.warn('⚠️ Could not update Firebase profile:', error);
-        }
-    }
-
-    const pack = await window.championLoader.loadChampionPack(packId);
+    const pack = await window.championLoader.loadChampionPack(packId, currentSkinNum(packId));
 
     // Your champion is also your picture: wear the skin chosen for them (saved with the rest of the settings)
     const skin = skinAvatar(packId, currentSkinNum(packId));
@@ -1168,9 +1179,11 @@ async function selectChampionPack(packId) {
 
 // Each press shows the next sample alert in the champion's voice (nail-biter, winning, comeback, welcome, achievement, level up,
 // mastery up). The button only closes a card, so a preview never opens another page.
-function previewChampion(packId, button) {
+async function previewChampion(packId, button) {
     const loader = window.championLoader;
     if (!window.showBulletin || !loader) { showNotification('Alerts are not available on this page', 'info'); return; }
+    // The skin they are about to wear decides the voice (Jinx's Arcane skins and her other skins sound different)
+    await loader.loadChampionPack(packId, currentSkinNum(packId));
     const voice = {
         alert: (type, data) => loader.getChampionMessage?.(type, data),
         achievement: (id, data) => loader.getAchievementMessage?.(id, data),

@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-zombie-slayer",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Zombie Slayer Jinx",
+  "description": "Voice set for Zombie Slayer Jinx (skin 3): the apocalypse as paradise. No laws, no civilization, a numberless horde of slime-vomiting bullet sponges and all the ammo she can forage. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! That's not a few stragglers, that's the whole horde at the gate! Grab everything that goes bang!",
+          "cta": "Grab the ammo"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? They're climbing the fence! Good. I was getting bored of the quiet.",
+          "cta": "Hold the fence"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind! Barricades are splintering and I've got three bullets and a very loud idea!",
+          "cta": "Use the idea"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. I can hear the shuffling. It's rhythmic. I hate it!",
+          "cta": "Load up"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. A few stragglers, that's all. Go pop some heads!",
+          "cta": "Pop some heads"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Slow start, fast finish. Go vote and I'll go scavenging!",
+          "cta": "Raise the alarm"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! One bullet left, two targets. You pick. I'm too busy giggling!",
+          "cta": "Take the shot"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! One! Last bullet in the chamber, don't waste it!",
+          "cta": "Fire the last one"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! The horde's right behind the door! Somebody count the bullets!",
+          "cta": "Count the bullets"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either a clean headshot or a very slimy mess. I'm packed for both!",
+          "cta": "Check the perimeter"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! That's not a win, that's a cleared city! Dance on the rubble!",
+          "cta": "Dance on the rubble"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! The horde's thinning out! Time for a snack break. A canned one!",
+          "cta": "Crack a can"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and rising! The fence is holding. Don't stop shooting yet!",
+          "cta": "Keep shooting"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still ahead. Don't say it's quiet. Saying it's quiet is how you get eaten!",
+          "cta": "Watch the road"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just walked out of the horde without a scratch! I want its secret!",
+          "cta": "Raise a can"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Flipped a {voteDiff}-vote hole! Chewed up, spat out, still standing. Very zombie. Very good!",
+          "cta": "Count the survivors"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Crawled back from {voteDiff} behind! Slimy, crooked, absolutely alive!",
+          "cta": "Raise a fist"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just slipped over the wall while nobody was looking. Sneaky. Rude. Brilliant!",
+          "cta": "See the survivors"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! Another survivor! Keep your hands where I can see them, though!",
+        "{username} picked {momentTitle}. Same hideout! I call dibs on the shotgun.",
+        "{username} is on your side with {momentTitle}. Welcome to the bunker. Don't touch my snacks!",
+        "{username} backed {momentTitle} as well. Two survivors! The horde doesn't stand a chance!",
+        "Same pick as {username}! Two scavengers, one supply crate. Share it or lose a finger!",
+        "{username} agrees with you on {momentTitle}. Scratch it on the wall, it's rare!",
+        "{username} voted {momentTitle}. Two of you! A tiny camp! The apocalypse is slightly less lonely!",
+        "{username} has taste and it matches yours. Good survival instincts, both of you!"
+      ],
+      "details": [
+        "Camp's growing! I'm still in charge of the guns.",
+        "Look at you, surviving in a group!",
+        "Don't tell the others I enjoy the company.",
+        "A new friend! I'll save them a spare grenade.",
+        "Teamwork! Fine! Quick, before the door breaks!",
+        "I give it a week before you fight over the last tin of beans.",
+        "New recruit! I'm drawing a skull on your badge.",
+        "More survivors, more ammo, I mean votes!"
+      ],
+      "buttons": [
+        "Say hello",
+        "Toss them a can",
+        "See the match",
+        "Back them up",
+        "Cheers",
+        "Join the camp"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival survivor on my turf! Safety's off!",
+        "{username} voted against {yourMoment}. Aww. A scavenger! With sticky fingers!",
+        "{username} chose {theirMoment}. Not worried. Just oiling the barrel. With menace.",
+        "{username} went for {theirMoment}. New entry on the raider list!",
+        "{username} is against you on {yourMoment}. Finally, a proper land grab!",
+        "{username} thinks {theirMoment} is the better hideout. A rival camp! Let's see who gets overrun first.",
+        "{username} voted against you. Two camps, one road. Somebody's losing a barricade!",
+        "{username} versus you! I'm taking the best rooftop, snacks, and the big explosive."
+      ],
+      "details": [
+        "I'm not saying ambush. I'm saying ditches are deep.",
+        "The big explosive wants a word. It's been waiting in the crate.",
+        "They'll learn. Survival's a slow teacher with a loud voice.",
+        "One road, two camps. Somebody's getting slimed.",
+        "I like them already. They've got spirit.",
+        "I don't care. Check the supplies. I care a lot.",
+        "A little rivalry keeps the aim sharp!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Aim the gun",
+        "Face them",
+        "Settle it",
+        "Take the rooftop"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! You two fight like one squad! A messy one!",
+        "{username} has agreed with you ten times running. Either teamwork or you share a bunker. Cosy!",
+        "Ten straight with {username}! The whole camp's talking about it. By camp I mean me."
+      ],
+      "details": [
+        "Ten! That's a whole squad!",
+        "Don't get bitten now!",
+        "Honestly? Deadly.",
+        "Weird. Good weird. Mutation weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hello",
+        "Fight together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a legendary survival pair! I'm sniffling. It's the stench!",
+        "{streakCount} for you and {username}. Perfect aim, every time. I'd write a manual but I'd use it to start a fire.",
+        "{streakCount} straight with {username}! Somebody give you both a medal. Or a grenade."
+      ],
+      "details": [
+        "I'm speechless and I never stop cackling!",
+        "Is this healthy? Ask the doctor. We ate the doctor. Joking!",
+        "That's not luck, that's tactics."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Fight together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep raiding the same supply run!",
+        "{username} has disagreed with you ten times running. That's not a scavenger, that's a nemesis!",
+        "Ten stand-offs with {username}. I'm selling front-row rooftop spots."
+      ],
+      "details": [
+        "This is the main fight now.",
+        "Rooftop spots going fast!",
+        "The whole wasteland wants a seat."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Stand off again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a proper turf war! I LOVE turf wars!",
+        "{streakCount} stand-offs with {username}. Call a truce? Nah. Reload!",
+        "{streakCount} against {username}. That's not a rivalry, that's a whole warzone."
+      ],
+      "details": [
+        "Bigger than the zombie problem. Almost!",
+        "I'm nervous and a bit proud. And a bit slimed.",
+        "One of you has to run out of bullets. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep fighting"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! The road's closing behind you, survivor!",
+        "{timeLeft} left on {matchTitle}. Your vote's missing from the supply run! Don't stay in the bunker!",
+        "{matchTitle} ends in {timeLeft}. Voting takes ten seconds. I timed it between headshots."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the dusk"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? The sun's setting, survivor! That's a warning!",
+        "Groan, groan, groan! {matchTitle} closes in {timeLeft}. Don't miss the window!",
+        "{timeLeft} until {matchTitle} closes and you're still checking the lock. Out you come!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, heading out"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! Last light! Reload, then run!",
+        "{timeLeft}! That's the last of the sunset on {matchTitle}. Go go go!",
+        "Final stand on {matchTitle}! {timeLeft} left. Stop counting bullets and vote!"
+      ],
+      "buttons": [
+        "Last light",
+        "Run now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to be overrun and you haven't voted on any of them! First one falls in {timeLeft}!",
+        "{matchCount} unvoted matches, all shuffling toward the dark. The first one's gone in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, heading out now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! A whole empty street! Somebody has to walk it first!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even the groaning stopped!",
+        "Brand new match and not a single vote. Somebody has to take the first shot. Pick me. Pick you!",
+        "{matchTitle} needs a first survivor. I've got a gun. I mean, you've got a vote."
+      ],
+      "buttons": [
+        "Take the first shot",
+        "Open the gate",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. The emptiest ruin in the whole wasteland!",
+        "Hardly anyone's wandered over here. What's wrong with the street?",
+        "Low turnout. I blame the weather. And you. Equally. With grenades.",
+        "Barely any votes here. Somebody bring more survivors!"
+      ],
+      "details": [
+        "Go on, have a scavenge.",
+        "It deserves a bigger camp. So do I.",
+        "Make some noise, rattle a can!",
+        "Don't be shy. Shy gets eaten. Joking!"
+      ],
+      "ctas": [
+        "Vote",
+        "Join the camp",
+        "Go on",
+        "Scavenge"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the barricade. Funny, I know someone who hasn't aimed. Guess who!",
+        "Perfect tie on {matchTitle}. Two hordes, equal numbers. I'm looking at you, survivor. Hehe!",
+        "Dead even and nobody's shooting. You haven't voted. You're the last bullet in the clip!",
+        "{moment1} and {moment2}, both snarling at the gate, and you've been quiet in the bunker. Fix that!"
+      ],
+      "buttons": [
+        "Take the shot",
+        "Be the deciding vote",
+        "Tip the barricade",
+        "Choose a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the light's fading! Last chance to shoot!",
+        "Dead level, almost no time left. You're the only survivor who can break it!",
+        "Still tied and the sun's bleeding out. Pick a side! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Make the call",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Guns loaded, fence up! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new street to scavenge!",
+        "Round {round} just started! {matchCount} matches waiting in the ruins. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even the groaners!"
+      ],
+      "buttons": [
+        "Start scavenging",
+        "See round {round}",
+        "Load up",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Headshot! Called it!",
+        "{momentTitle} beat the competition! Next round's in for a face full of slime.",
+        "{momentTitle} survived! I never doubted it. Okay, the camp doubted. Just a smidge.",
+        "{momentTitle} is through! Somebody's having a great apocalypse. Hehe, you!",
+        "{momentTitle} moves up and the rest are shuffling corpses. Very slow corpses.",
+        "{momentTitle} won! Good call! Enjoy a tin of something questionable!"
+      ],
+      "details": [
+        "Your pick's still breathing!",
+        "One horde down, lots of road left.",
+        "The bracket just shrank. Tidier! Slimier!"
+      ],
+      "buttons": [
+        "Cheer loudly",
+        "See the result",
+        "Next target",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. A bite in the armour. I'll sulk about it later!",
+        "{momentTitle} lost. Everyone who voted against it gets a bag of dented tins.",
+        "Fine. {momentTitle} is gone. I'll fire one bullet in its honour. Maybe three.",
+        "{momentTitle} was too fresh for this wasteland anyway. Obviously.",
+        "{momentTitle} is out, and the road went quiet. I hate a quiet road. Somebody blow something up!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A rotting bit."
+      ],
+      "details": [
+        "They'll pay for this. In bullets.",
+        "It was good. The whole wasteland knows.",
+        "You'll find another one. Good survivors always turn up.",
+        "Every night ends. That's what makes the morning fun. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next target",
+        "Plan a raid",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still scouting? Pick one! Any one! I'll wait. I'm lying, I'll loot!",
+        "No pressure, but are you gonna vote or just stare out of the window?",
+        "They're all great targets! Pick one! Shoot first, regret later!",
+        "Decisions, decisions. Close your eyes, point at the horde, and hope."
+      ],
+      "details": [
+        "Every vote is a bullet!",
+        "Your opinion matters. Sort of. In a gory way.",
+        "Don't overthink it. Overthinking gets you bitten.",
+        "Trust your gut. Mine's mostly canned beans."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Take aim",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New survivor! Welcome! {liveCount} matches live and every one's a horde!",
+          "{liveCount} edits fighting it out in the ruins and you just wandered in. Pick a side before they pick you!",
+          "Oooh, a newcomer! Guns are loaded, fence is up, and {liveCount} matches are live. You'll love it.",
+          "No laws, {liveCount} live matches, and me on the roof. Welcome to paradise!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Come in",
+          "Load the gun"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You made it through the night! I saved your bunk. Okay, I put my boots on it. But I saved it.",
+          "Two days running! Look at you, a camp regular!",
+          "Back again? Day two! I could get used to this. Don't tell the other survivors."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because your bunk got slimy!",
+          "You're back after {days} days! The wasteland kept going without you. Mostly explosions.",
+          "{days} days away. I noticed. Your seat felt empty. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The wasteland was getting dull!",
+          "Look who crawled back! Ready for another scavenge?",
+          "You came back! Let's go blow something up. Something already dead."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! A little crack of gunfire. The first shot always echoes the longest.",
+        "One down. The camp's got a new survivor. You!"
+      ],
+      "details": [
+        "First shot fired. +{xp} XP",
+        "Welcome to paradise. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're surviving past the first night! Most don't.",
+        "Five votes! The barrel's warm."
+      ],
+      "details": [
+        "Five nights survived. +{xp} XP",
+        "Not zombie food after all. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular on my rooftop now. Sit anywhere. Not there, that's the grenade pile.",
+        "Ten votes. That's a proper little stockpile."
+      ],
+      "details": [
+        "A regular on the barricade. +{xp} XP",
+        "Ten tins stockpiled. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! The whole wasteland knows your name.",
+        "Twenty-five! Loud and proud, like a gunshot in a graveyard."
+      ],
+      "details": [
+        "The wasteland knows your name. +{xp} XP",
+        "Twenty-five shots. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly out in the ruins now.",
+        "Fifty! Past the gate, past the wall, deep in the dead zone."
+      ],
+      "details": [
+        "Deep in the dead zone. +{xp} XP",
+        "Fifty rounds fired. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! Okay, that's a wasteland legend. Fireworks for everyone! Made of explosives!",
+        "One hundred! They'll tell stories about this. Mostly slime. Mostly exaggerated."
+      ],
+      "details": [
+        "Wasteland legend. +{xp} XP",
+        "One hundred rounds fired. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! The campfire's still burning.",
+        "Three days in a row! You've got the hang of the apocalypse."
+      ],
+      "details": [
+        "Three days alive. +{xp} XP",
+        "The campfire crackles on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You survive even without a plan. My kind of survivor!",
+        "Seven days straight! That's endurance. Boring. Impressive!"
+      ],
+      "details": [
+        "A week of survival. +{xp} XP",
+        "Seven days past the outbreak. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Not even a horde could stop you!",
+        "Fourteen days! Even the dead would call it a night by now."
+      ],
+      "details": [
+        "Two weeks of scavenging. +{xp} XP",
+        "Not even a bite slowed you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! You've outlasted a few of my bunkers!",
+        "A whole month after the fall. Give yourself a medal. I've got a rusty one."
+      ],
+      "details": [
+        "A month in the wasteland. +{xp} XP",
+        "Thirty days of survival. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You go against the grain like a rusty knife through slime!",
+        "Five long shots! The map says no. Your gut says yes."
+      ],
+      "details": [
+        "Off the map. +{xp} XP",
+        "Five long shots backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You don't follow survival rules either. We should talk. Not about rules.",
+        "Fifteen picks nobody guarded! A true lawless scavenger."
+      ],
+      "details": [
+        "Lawlessness pays. +{xp} XP",
+        "Fifteen lost causes dragged home. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! A dark horse in the dead of night if I ever saw one!",
+        "Thirty! Nobody sees you coming. Not even me, and I've got a scope."
+      ],
+      "details": [
+        "A dark horse in the dark. +{xp} XP",
+        "Thirty hidden gems found. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! Five times! You always reach the supply crate before the corpses do.",
+        "Five early votes! Light on your feet, zombie bait!"
+      ],
+      "details": [
+        "Quickest feet in the ruins. +{xp} XP",
+        "First through the broken door. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you shot first! Not a survivor, a scout!",
+        "Fifteen early ones! You smell trouble before the whole camp does."
+      ],
+      "details": [
+        "Scouting the ruins. +{xp} XP",
+        "Fifteen first shots. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! Finger on the trigger every time!",
+        "Ten photo finishes. You live for the last bullet, don't you?"
+      ],
+      "details": [
+        "Close ones suit a survivor. +{xp} XP",
+        "Ten last-bullet finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! Where you go, the final bullet follows!",
+        "Your vote lands on the last bullet. Twenty-five times!"
+      ],
+      "details": [
+        "The deciding bullet. +{xp} XP",
+        "Twenty-five last-gasp calls. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one trailing. Five times! Stubborn like a corpse that won't stay down.",
+        "You don't abandon a survivor because they're limping. I love that."
+      ],
+      "details": [
+        "Faith in the limping. +{xp} XP",
+        "Five survivors dragged home. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've found your favourite shotgun!",
+        "That one again? Yeah. It's got a good kick."
+      ],
+      "details": [
+        "Your trusty shotgun. +{xp} XP",
+        "Three shots, one target. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same one! That's loyalty! Like a survivor to a favourite boot.",
+        "Okay, you've adopted it. No giving it back."
+      ],
+      "details": [
+        "Loyal to the last bullet. +{xp} XP",
+        "Five votes, one pet zombie. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's an infection!",
+        "Ten votes for the same one. I won't tell the camp. I am the camp."
+      ],
+      "details": [
+        "Ten for one infected favourite. +{xp} XP",
+        "Hopelessly infected. Respect. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You see the whole apocalypse through, even without orders!",
+        "Round two reached! Still breathing!"
+      ],
+      "details": [
+        "Two nights survived. +{xp} XP",
+        "Two rounds cleared. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly deep in the wasteland now!",
+        "Deep in the bracket! Hope you like crowded ruins."
+      ],
+      "details": [
+        "Four rounds into the dead zone. +{xp} XP",
+        "Deep in the horde. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the whole apocalypse through!",
+        "Six rounds! You never ran! Wow!"
+      ],
+      "details": [
+        "The whole apocalypse. +{xp} XP",
+        "All six rounds survived. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're poking into every ruin!",
+        "Ten different matches! Curious scavenger, huh?"
+      ],
+      "details": [
+        "Poking into ruins. +{xp} XP",
+        "Ten ruins searched. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been in every cellar, every crypt, every cupboard!",
+        "Twenty-five! You've lifted every dusty floorboard."
+      ],
+      "details": [
+        "Every cellar searched. +{xp} XP",
+        "Twenty-five ruins looted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not scavenging, that's a whole career in the wasteland!",
+        "Fifty matches! You know this wasteland better than I do."
+      ],
+      "details": [
+        "A true wasteland veteran. +{xp} XP",
+        "A full tour of the dead zone. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't leave the rooftop, can you?",
+        "Five back to back! Keep the barrel warm!"
+      ],
+      "details": [
+        "One long watch. +{xp} XP",
+        "Five kills in a row. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Check your ammo!",
+        "Ten matches without leaving the roof! Wow!"
+      ],
+      "details": [
+        "Deep raid! +{xp} XP",
+        "Ten in one siege! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. The dead don't sleep, so neither do I.",
+        "Middle of the night! That's when the best looting happens."
+      ],
+      "details": [
+        "The graveyard shift. +{xp} XP",
+        "Moonlit survivor! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Flare in the sky for the whole wasteland!",
+        "Five shares! You're calling in survivors! Good!"
+      ],
+      "details": [
+        "Thanks for flagging down survivors. +{xp} XP",
+        "Five flares fired. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically the camp's recruiter!",
+        "Fifteen! You keep telling every wanderer."
+      ],
+      "details": [
+        "Filling the camp. +{xp} XP",
+        "Fifteen flares fired. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the dead rose! Founding survivor! Yours forever!",
+        "One of the first through the gate! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever, rot and all. +{xp} XP",
+        "Nobody can loot that one. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! A shiny new patch on the jacket!",
+        "You moved up! Don't let it go to your head. It's a good head for headshots!"
+      ],
+      "details": [
+        "{rank}. Jacket looks good. +{xp} XP",
+        "You've reached {rank}! Reloaded! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Something's exploded! In a good way!",
+        "Another one: {name}! Nobody's bitten, everybody's happy!"
+      ],
+      "details": [
+        "{description}. Hardly even slimy. +{xp} XP",
+        "{description} Reloaded! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the shiny new weapons!",
+        "Mastery up! Now the apocalypse gets properly good."
+      ],
+      "details": [
+        "{rank}. Jacket looks good. +{xp} XP",
+        "You've reached {rank}! Reloaded! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a zombie-slaying spree!",
+        "Ten long shots! Chaos in the ruins. Gorgeous results too."
+      ],
+      "details": [
+        "A loose cannon with great aim. +{xp} XP",
+        "Ten wild shots! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. I'll leave her a spare tin. One.",
+        "Ten tight finishes with her! Don't tell her I left her a tin!"
+      ],
+      "details": [
+        "Ten close calls, ten shots. +{xp} XP",
+        "Steady hands, steady aim! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love following orders in a crisis!",
+        "Seven days with a rule-lover! You're braver than the horde!"
+      ],
+      "details": [
+        "A week beside the sheriff's watch. +{xp} XP",
+        "Seven days past the outbreak. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Last bullet, right on target! Boom!",
+        "A tied match and you squeezed the trigger! Boom again!"
+      ],
+      "details": [
+        "The vote that cracked the barricade. +{xp} XP",
+        "Tie blown to bits! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep scavenging"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, the zombie slayer? Good choice. Bad idea. Great choice!",
+        "Zombie Slayer Jinx! Don't ask about the laws. Do ask about the ammo."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet! I'm still stacking crates against the door. Check back soon?",
+      "Shh! Something's shuffling in the dark. I can hear it in my teeth.",
+      "Gate's locked for now. Doesn't stop me counting my bullets."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, nothing's easy after the outbreak.",
+      "Watch both. Then back the one that gives you goosebumps.",
+      "I won't tell the other survivors who you picked. Probably. The walls have ears. Rotting ones.",
+      "Take your time, survivor! Actually, don't. The groaning's getting louder.",
+      "Go on, nobody's judging. Okay, the horde is. A little.",
+      "Pick the one you'd defend from the roof. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's through the gate yet. Be the first survivor, I dare you!",
+      "Empty street! Rattle a can with a vote.",
+      "Not one soul in the camp! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still hiding in the bunker. Pick a side!",
+      "The sun's nearly gone. Don't make me yell the countdown over the wall. I will."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Get out there before dark falls!",
+      "Groan, groan, slime. That's the last of the daylight draining."
+    ],
+    "closing-final": [
+      "Last light! Shoot now, scavenge later!",
+      "Any second now. Seriously. Slam the door shut!"
+    ],
+    "voted-early": [
+      "One of the first out of the bunker! Bold! I love bold!",
+      "Hardly anybody's out here and you picked a side anyway. Respect, survivor!"
+    ],
+    "voted-ahead": [
+      "Look at you, backing the horde-slayer! Don't get comfy, the dead get back up.",
+      "{pct}% with you! Great aim. I didn't say that. Forget it.",
+      "Your pick's ahead. The whole camp's cheering with you for once. Odd!",
+      "{pick} is pulling away! Feels good? Steady on the trigger!",
+      "Ahead, for now. Hordes shift. So do survivors."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm peeking through the barricade!",
+      "A bullet apart. One more vote could flip it. Tell a friend. Tell the whole wasteland!",
+      "Neck and neck! Your pick needs you and every survivor you know.",
+      "{pct} to {otherPct}. Something's rotting and it's probably my nerves."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody covered in slime!",
+      "A perfect tie. Honestly? Rude of the apocalypse."
+    ],
+    "voted-behind": [
+      "You're behind! Don't sulk in the cellar. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog! My favourite kind of survivor!",
+      "They're ahead. Doesn't make you wrong. Just slow off the mark!",
+      "Behind by {diff} points. Tell the wasteland. Loudly. Fire a flare!",
+      "Everybody's running the other way. Cool! Be the odd one out."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got survivor's instincts.",
+      "A win! A sneaky little rooftop victory. I'll take it!",
+      "{pick} went through! You called the clearing!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it fester, then reload for the next one!",
+      "Didn't make it. I've lost whole bunkers over worse. Next one!",
+      "{pick} is out. Sorry. For real. I'll skip one bullet in its honour."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to run out of ammo first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Gate's closed. You missed this one! There's always another street.",
+      "All done here. {winner} took the barricade. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first shot! The scary one. Now you're in the camp. Welcome!",
+      "That's your first. Feels tiny, right? Wait for the echo.",
+      "You're a survivor now. Try not to wake the neighbours!"
+    ],
+    "streak": [
+      "Again? You keep coming back! I'm not complaining. I kept your bunk dry.",
+      "{streak} days running! Okay, now I'm scratching your name on the wall.",
+      "Back again! Good camps keep their people. Stay!"
+    ],
+    "underdog": [
+      "Backing the one nobody's guarding? Ooh. I see you, scavenger.",
+      "Bold! Everyone else is hiding behind the favourite. Love that.",
+      "Underdog, huh? Takes a certain kind of survivor. A good kind."
+    ],
+    "early": [
+      "Early! You get first pick of the supplies before the camp wakes. Don't waste it!",
+      "Hardly anyone's up yet. Your vote's doing all the heavy shooting.",
+      "First one over the wall! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just shifted the barricade! Feel it? Everything's close right now.",
+      "Razor-wire thin! One more survivor and the whole fence flips.",
+      "Close one! Your shot tipped it. Really, truly tipped it."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't bitten. Go fetch the rest of the camp!",
+      "Not winning yet. Good! Means there's still ammo to spend.",
+      "Behind, but the guns are still loaded. Not even close to dead!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. The dead never stay down!",
+      "Winning, for now. Enjoy it. Quietly. Or with a firework. I don't mind.",
+      "Look at that! Fine shot. Obviously."
+    ],
+    "default": [
+      "Noted! I'm not changing your target. Not yet.",
+      "Done! That one's on you now, survivor.",
+      "Your vote's in. Go and see what else is rotting out there!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't fired a shot yet! Start with whichever one smells freshest.",
+      "Everything's open! Take your pick. I'll pretend I'm not loading.",
+      "{unvoted} to go. No pressure. Okay, a little gunfire!"
+    ],
+    "live-some": [
+      "{voted} cleared, {unvoted} to go! Keep moving!",
+      "You're in the thick of it now! {unvoted} more waiting on you.",
+      "Good start! The rest won't shoot themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole street!",
+      "Almost there! {unvoted} more and the block's yours.",
+      "So close! Don't drop the shotgun now!"
+    ],
+    "live-one": [
+      "One left! Just one! Take the shot!",
+      "Last one! Don't leave it twitching in the road!",
+      "One match between you and a tin of peaches!"
+    ],
+    "live-closing": [
+      "Some of these close in {timeLeft}! {unvoted} still need you. Run!",
+      "The sunset's loud now! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of sunset! Pick, quick!"
+    ],
+    "live-done": [
+      "You've voted on everything! Look at you! Off you go to the bracket!",
+      "Nothing left on your supply list. Come back when the next round opens!",
+      "All done! That's rare for a survivor. Thanks!"
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll crank back up! Go and peek at the bracket.",
+      "Dead street. I'm bored already. Might poke a corpse.",
+      "No matches open. Wait around. Count your tins."
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest, well, they get eaten!",
+      "Everyone starts in a mob. Not everyone leaves one.",
+      "Watch the tables. They change faster than a zombie's mood!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group move on.",
+      "No knockout yet. The groups have to finish the fight first!",
+      "Patience! The knockout unlocks once the groups run dry."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're lunch!",
+      "Single elimination! No respawns. Okay, almost none. The dead do come back.",
+      "Every match counts more now. Pick carefully. Or don't, I'm not the camp leader."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and you're a chew toy!",
+      "Follow the bracket. It narrows every round, like a funnel of hungry corpses!",
+      "Every line here is a match someone voted on. Ooh, a map."
+    ],
+    "brackets-complete": [
+      "And that's the cup! Thanks for surviving the apocalypse with me!",
+      "It's over! Good fight! I'll miss it. A little. Don't tell the camp.",
+      "That's the champion! The whole wasteland, worth it!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nobody's been drawn. Give it a moment.",
+      "Empty! Nothing's crawled out yet. Soon!",
+      "Nothing in the ruins yet. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no respawns. Join the camp on Arcane Moments!",
+      "Two edits are fighting it out! {a} versus {b}. Come and pick a barricade.",
+      "{a} versus {b} and the whole camp can't agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I shot for {pick} over {other}. Come tell me my aim's off!",
+      "{pick} got my bullet. {other} did not. Your turn!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, come and bite me."
+    ],
+    "early": [
+      "I was one of the first out of the bunker for {pick} versus {other}! Be quick, the street's empty.",
+      "Early vote for {pick} over {other}. Come make it a proper horde!",
+      "Hardly anyone's scavenged {pick} versus {other} yet. Fill the camp!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the barricade. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm hiding under the truck. Come break it!",
+      "{pick} and {other} are exactly even. Somebody grab a gun!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My trigger finger's shaking. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This stand-off's gonna get messy!",
+      "Razor-wire thin: {pick} versus {other}, {voteDiff} apart. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A scratch, not a bite! Come patch it up!",
+      "Down {voteDiff} against {other}, but {pick} isn't dead. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me hold this fence alone!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Overrun. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole camp, fast!",
+      "{pick} is getting trampled by {other}. Rescue party, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's tight! Come help me hold the gate.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the fence fall!",
+      "{pct}% for {pick} against {other}. Close enough to chew a bullet!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the massacre, or join in!",
+      "{pick} is flattening {other}, {pct}%! Grab a rooftop before it's over.",
+      "{pct}% for {pick}! {other} never smelled it coming."
+    ]
+  }
+}
