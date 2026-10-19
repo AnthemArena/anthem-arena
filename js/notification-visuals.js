@@ -2,6 +2,7 @@ import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
 import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
+import { readToastStyle } from './notification-prefs.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -163,6 +164,7 @@ export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, qui
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
+        ${n.matchTitle ? `<div class="nv-caption">${escapeHtml(n.matchTitle)}</div>` : ''}
         ${toastHeadlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent)}
         ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
@@ -379,6 +381,7 @@ export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jin
     return `
     <div class="nv-body" onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        ${n.matchTitle || (!leadHtml && tag) ? `<div class="nv-caption">${escapeHtml(n.matchTitle || tag)}</div>` : ''}
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
         ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
         ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
@@ -422,7 +425,13 @@ function socialHeadlineFor(n) {
 
 
 let stylesAdded = false;
+// The viewer's chosen toast style goes on <html> so the CSS below can restyle every pop-up without touching their markup.
+export function applyToastStyle(style = readToastStyle()) {
+    if (typeof document !== 'undefined') document.documentElement.dataset.toastStyle = style;
+}
+
 export function ensureVersusStyles() {
+    applyToastStyle();
     if (stylesAdded || typeof document === 'undefined' || document.getElementById('versus-styles')) { stylesAdded = true; return; }
     stylesAdded = true;
     const s = document.createElement('style');
@@ -458,6 +467,19 @@ export function ensureVersusStyles() {
 /* the same splash, stretched and heavily blurred, tints the card body so the fade picks up the art's own colours (kept dim so the text stays readable) */
 .versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
+/* toast styles (Settings > Notifications): classic is the rules above; the others override them */
+.versus-toast .nv-caption{display:none}
+/* full art: the splash fills the whole card and everything sits on top of it, over a darkening fade */
+html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:128px}
+html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 12%}
+html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,.15) 28%,rgba(18,10,24,.68) 52%,rgba(18,10,24,.9) 100%)}
+@media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:96px}}
+/* minimal: no art, no match thumbnails or pills; a one-line caption says which match it is about */
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:14px 16px 12px}
+html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-caption{display:block;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:6px}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}

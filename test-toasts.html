@@ -301,6 +301,10 @@
         <h3>Skins</h3>
         <label><input type="checkbox" id="unlockAllSkins"> Unlock every skin for testing (this browser only, switch it off when you are done)</label>
         <div class="skin-grid" id="skinGrid"></div>
+        <div style="margin:10px 0 4px"><strong>Pop-up style:</strong>
+            <label><input type="radio" name="tsStyle" value="classic"> Classic</label>
+            <label><input type="radio" name="tsStyle" value="full"> Full art</label>
+            <label><input type="radio" name="tsStyle" value="minimal"> Minimal</label></div>
         <div class="skin-status" id="skinStatus"></div>
     </div>
     
@@ -559,6 +563,12 @@
     <script type="module">
         import { SKIN_UNLOCKS } from '/js/champion-unlocks.js';
         import { lookSkin, saveLook, TEST_UNLOCK_KEY } from '/js/companion-look.js';
+        import { readToastStyle } from '/js/notification-prefs.js';
+        import { applyToastStyle } from '/js/notification-visuals.js';
+        document.querySelectorAll('input[name=tsStyle]').forEach(r => {
+            r.checked = r.value === readToastStyle();
+            r.addEventListener('change', () => { try { localStorage.setItem('toastStyle', r.value); } catch { /* storage blocked */ } applyToastStyle(r.value); });
+        });
         import { voiceSetFor } from '/js/champion-voice.js';
         import { getChampionTileUrl, getChampionSplashUrl } from '/js/arcane-config.js';
 

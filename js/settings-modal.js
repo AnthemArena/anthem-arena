@@ -13,7 +13,8 @@ import { buildPreview } from './champion-preview.js';
 import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { masteryLevel } from './champion-unlocks.js';
-import { readNotificationPrefs } from './notification-prefs.js';
+import { readNotificationPrefs, readToastStyle } from './notification-prefs.js';
+import { applyToastStyle } from './notification-visuals.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -344,6 +345,35 @@ function createModalHTML() {
     </div>
 </div>
 
+<!-- Pop-up style (js/notification-prefs.js readToastStyle; saved on this browser) -->
+<div class="settings-section">
+    <h3><i class="fas fa-palette"></i> Pop-up style</h3>
+    <p class="section-description">How alerts look when they pop up. The words and buttons are the same in every style.</p>
+    <div class="toast-style-options" role="radiogroup" aria-label="Pop-up style">
+        <label class="toast-style-option"><input type="radio" name="toastStyle" value="classic" checked />
+            <span class="toast-style-card"><span class="tsm tsm-classic"><i></i><b></b><b></b></span><strong>Classic</strong><small>Splash art on top</small></span></label>
+        <label class="toast-style-option"><input type="radio" name="toastStyle" value="full" />
+            <span class="toast-style-card"><span class="tsm tsm-full"><b></b><b></b></span><strong>Full art</strong><small>Art behind everything</small></span></label>
+        <label class="toast-style-option"><input type="radio" name="toastStyle" value="minimal" />
+            <span class="toast-style-card"><span class="tsm tsm-minimal"><b></b><b></b></span><strong>Minimal</strong><small>Just their words</small></span></label>
+    </div>
+    <style>
+        .toast-style-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+        .toast-style-option{position:relative;cursor:pointer}
+        .toast-style-option input{position:absolute;opacity:0;pointer-events:none}
+        .toast-style-card{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);text-align:center}
+        .toast-style-card strong{font-size:13px}.toast-style-card small{font-size:11px;opacity:.7}
+        .toast-style-option input:checked+.toast-style-card{border-color:var(--gold,#c8aa6e);background:rgba(200,170,110,.12)}
+        .toast-style-option input:focus-visible+.toast-style-card{outline:2px solid var(--gold,#c8aa6e)}
+        .tsm{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;height:54px;padding:5px;border-radius:6px;background:#120a18;overflow:hidden;border:1px solid rgba(255,105,180,.5)}
+        .tsm b{display:block;height:7px;border-radius:4px;background:rgba(255,255,255,.28)}.tsm b+b{width:60%}
+        .tsm i{position:absolute;left:0;right:0;top:0;height:24px;background:linear-gradient(135deg,#7b3fe4,#ff69b4);-webkit-mask-image:linear-gradient(180deg,#000 40%,transparent);mask-image:linear-gradient(180deg,#000 40%,transparent)}
+        .tsm-full{background:linear-gradient(180deg,#7b3fe4,#ff69b4 40%,#120a18)}
+        .tsm-minimal b:first-child{width:45%;height:5px;background:#ff9bd6}
+        @media (max-width:480px){.toast-style-options{grid-template-columns:1fr}}
+    </style>
+</div>
+
                         <!-- Form Actions -->
                         <div class="form-actions">
                             <button type="submit" class="btn-save">
@@ -449,6 +479,7 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
         document.getElementById('notifyFromSelect').value = np.notifyFrom;
         document.getElementById('toastFromSelect').value = np.toastFrom;
         document.getElementById('matchAlertsToggle').checked = np.matchAlerts;
+        const ts = readToastStyle(); document.querySelectorAll('input[name="toastStyle"]').forEach(r => { r.checked = r.value === ts; });
     }
 
     // Show selected avatar if exists
@@ -612,6 +643,8 @@ function setupEventListeners() {
             element.addEventListener(eventType, trackChanges);
         }
     });
+
+    document.querySelectorAll('input[name="toastStyle"]').forEach(r => { r.removeEventListener('change', trackChanges); r.addEventListener('change', trackChanges); });
 
     // ESC key to close
     document.removeEventListener('keydown', handleEscapeKey);
@@ -813,6 +846,8 @@ localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
             localStorage.setItem('notifyFrom', document.getElementById('notifyFromSelect')?.value ?? 'everyone');
             localStorage.setItem('toastFrom', document.getElementById('toastFromSelect')?.value ?? 'everyone');
             localStorage.setItem('matchAlerts', document.getElementById('matchAlertsToggle')?.checked === false ? 'false' : 'true');
+            const pickedStyle = document.querySelector('input[name="toastStyle"]:checked')?.value;
+            if (pickedStyle) { localStorage.setItem('toastStyle', pickedStyle); applyToastStyle(pickedStyle); }
         } catch (e) { console.warn('Could not save notification preferences', e); }
 
         // Save all privacy settings
