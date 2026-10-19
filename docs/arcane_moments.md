@@ -925,6 +925,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   other elves fear could count as weapons; workshop, toys, wish lists and sleigh deliveries).
 - **Done:** Heartseeker Jinx (`jinx-heartseeker`, skin 29: love as a battlefield, armed with Fishbones, ready to break hearts and bones but
   maybe playing nice; valentines, suitors, balconies and chocolates).
+- **Done:** T1 Jinx (`jinx-t1`, skin 62: a championship-winning carry performance; draft, scrims, clutch plays, trophies and a roaring crowd.
+  Lines never name the real player).
 - **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
-- **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
-  (Sheriff Caitlyn stricter).
+- **Jinx is complete.** Arcane Enemy (37) and Arcane Fractured (60) deliberately keep the base Arcane voice; Prestige Battle Cat (40) shares
+  Battle Cat's set.
+- **Next:** Vi (14 skins), then Caitlyn (21, Sheriff Caitlyn stricter).
