@@ -1009,7 +1009,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   target (Jinx) sparingly, no spoilers. Arcane Enforcer (28) is now the only Caitlyn skin on the original `caitlyn.json` voice, so every other non-prestige Caitlyn skin has its own set.
   Prestige Arcade (20, 29) and Prestige Arcane Commander (51) use their base skin's voice.
 - **Done:** Toast splash art: pop-up toasts now keep a clear band at the top (`--nv-art`, 120px, 84px on phones) so the champion's splash shows, with the dark fade starting below it.
-  Change `--nv-art` on `.versus-toast .nv-body` to show more or less art. Bell-list rows are unchanged.
+  Change `--nv-art` on `.versus-toast .nv-body` to show more or less art. Bell-list rows are unchanged. The splash is sized to the full toast width (top-anchored) so off-centre art is no longer cropped at the sides.
 - **Done:** Arcane depth pass on Vi (`vi.json`, Arcane Undercity): seven lines swapped in place for her protective, guilt-and-second-chances side (losing, long absence, long ally streak, falling behind, comeback,
   30-day streak). Reviewed against the Arcane dialogue list: no copied lines, no five-word overlap. Same events and counts; original lines only.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
