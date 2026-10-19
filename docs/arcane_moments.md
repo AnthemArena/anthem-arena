@@ -986,6 +986,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   showdowns; votes are splashes and a closing match is the pool shutting for the night. No lore names.
 - **Done:** Arcade Caitlyn (`caitlyn-arcade`, skin 19): a retro rail-shooter hero with a sharp eye and a quick trigger finger. Scores, combos, extra lives, continues,
   boss fights and reloads off-screen; votes are hits on the score and a closing match is the countdown timer. No lore names. (The Prestige Arcade skins keep the base voice.)
+- **Done:** Battle Academia Caitlyn (`caitlyn-battle-academia`, skin 22, the last skin with its own in-game voice, so treated as high reward): a stern, ambitious class
+  president and strategist. Exams, marks, revision, detention and the bell about to ring; votes are answers on the paper and a closing match is the deadline. Tone only from her
+  in-game list, nothing copied; no academy or teacher names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
