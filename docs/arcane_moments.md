@@ -982,6 +982,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Done:** Pulsefire Caitlyn (`caitlyn-pulsefire`, skin 11, a skin with its own in-game voice, so treated as high reward): a legendary chrono-law enforcer who protects the
   fragile enigma that is time. Timelines, anomalies, paperwork and the clean correction; votes are entries in the record and a closing match is the window collapsing.
   Tone only from her in-game list, nothing copied. No lore names.
+- **Done:** Pool Party Caitlyn (`caitlyn-pool-party`, skin 13): a sun-soaked, lazy, mischievous summer set. Poolside lounging, shaved ice, flamingo floats and squirt-gun
+  showdowns; votes are splashes and a closing match is the pool shutting for the night. No lore names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
