@@ -934,3 +934,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   (the guard test blocks them).
 - **Jinx is complete.** Arcane Enemy (37) deliberately keeps the base Arcane voice; Prestige Battle Cat (40) shares Battle Cat's set.
 - **Next:** Vi (14 skins), then Caitlyn (21, Sheriff Caitlyn stricter).
+- **Later (Jinx achievements):** propose names, conditions and XP, each with an official Data Dragon ability icon (e.g. `img/spell/JinxQ.png`)
+  instead of emoji, plus one icon review page so every icon is approved in one place. Skin art is not used as an achievement icon.
+- **Vi plan:** Vi's base pack (`vi.json`, 41 achievements, same shape as Jinx's) becomes `vi-original` first, then 14 skins from her ladder
+  (Classic, Arcane Undercity, Neon Strike, Officer, Debonair, Demon, Warring Kingdoms, PROJECT, Heartbreaker, Heartache, PsyOps, Primal Ambush,
+  T1, Arcane Brawler). The user sends each skin card.
