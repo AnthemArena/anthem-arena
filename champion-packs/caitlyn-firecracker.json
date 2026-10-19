@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-firecracker",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Firecracker Caitlyn",
+  "description": "Voice set for Firecracker Caitlyn (skin 54): a meticulous festival organiser with a secret taste for celebration. Schedules, lanterns, fuses, fireworks and a countdown to midnight. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind and the fuse won't catch. Fetch more matches. And hands.",
+          "cta": "Light the fuse"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more short. That's a festival-level emergency. All volunteers to the main stage.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Hang the notice in every lantern-lit lane.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A minor delay. It's on my checklist to fix.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. No parade marches alone. Bring the whole street.",
+          "cta": "Bring the street"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few sparks and the whole sky lights up.",
+          "cta": "Strike a spark"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A small hiccup in the programme. Sort it before the next act.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One spark, and the sky decides. Light it.",
+          "cta": "Light it"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop fussing with the clipboard and strike the match.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The crowd has gone silent. Bring more noise.",
+          "cta": "Rally the crowd"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Hold the match steady. Wait for the countdown.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. The programme's running beautifully. Don't touch a thing.",
+          "cta": "Hold steady"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and climbing. The crowd loves it. Keep the music going.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. Right on schedule. Stay on the timetable.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The whole street cheers. Keep it lit.",
+          "cta": "Keep it lit"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Splendid. Now see the finale through.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. The grand finale arrived early.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A spectacular turnaround. Don't tell anyone I cheered.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} deficit. The lanterns are glowing for it.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was a damp squib. Now it's the loudest bang on the street.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. I did not just whoop. That was the fireworks.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two planners, one parade.",
+        "{username} backed {momentTitle} too. Exquisite taste in celebrations.",
+        "{username} agrees with you. Our schedules align.",
+        "Same pick as {username}. We'll share a dumpling.",
+        "{username} stood with {momentTitle}. A fine addition to the committee.",
+        "{username} made the same call. No memo required.",
+        "{username} is on your side of {momentTitle}. There's a seat at the banquet.",
+        "{username} voted {momentTitle}. Welcome to the festival committee.",
+        "{username} loves {momentTitle} as you do. A splendid pairing for the lantern parade."
+      ],
+      "details": [
+        "A fellow organiser.",
+        "Two planners, one plan.",
+        "Good committee members are rare.",
+        "Keep them on the guest list.",
+        "A lovely collaborator.",
+        "Someone with festive instincts.",
+        "Save them a bowl of dumplings."
+      ],
+      "buttons": [
+        "Well planned",
+        "Say thanks",
+        "See the match",
+        "Toast",
+        "Lovely",
+        "Fair play",
+        "Cheers all round"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A rival float. Let's see whose gets the applause.",
+        "{username} chose {theirMoment}. Not in my programme.",
+        "{username} went against {yourMoment}. Bold. Unplanned, I suspect.",
+        "{username} voted against you. A rival committee. Thrilling.",
+        "{username} took {theirMoment}. A daring bit of improv. Possibly a damp squib.",
+        "{username} opposes {yourMoment}. Fine. The crowd will decide.",
+        "{username} disagrees on {yourMoment}. Shall we settle it over fireworks?",
+        "{username} voted the other way. They'll join the dancing eventually."
+      ],
+      "details": [
+        "Everyone fumbles a fuse once.",
+        "A friendly festival feud.",
+        "The crowd's cheers will decide.",
+        "Don't let it dim your lanterns.",
+        "A rival keeps the show sharp.",
+        "They may yet change their float.",
+        "Makes the parade livelier."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't luck, that's meticulous planning.",
+        "{username} and you, ten matches, the same pick every time. Perfect choreography.",
+        "Ten straight with {username}. I'd put you both at the head of the parade.",
+        "A ten-match run with {username}. Not one dud firework.",
+        "Ten for ten with {username}. A flawless festival."
+      ],
+      "details": [
+        "Ten fuses, ten bangs.",
+        "A splendid duo.",
+        "Rare in any celebration. Guard it.",
+        "Keep the show going.",
+        "Hard to improve."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well done",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a pair, now a full parade.",
+        "{streakCount} in a row with {username}. I'd follow you both down any lantern-lit street.",
+        "{streakCount} straight picks with {username}. They'll hang banners for it.",
+        "A {streakCount}-match run with {username}. The stuff of festival legend.",
+        "{streakCount} with {username}. Not one fizzled fuse between you."
+      ],
+      "details": [
+        "Hard to credit. Easy to cheer.",
+        "That's trust, strung like lanterns.",
+        "I'm speechless. Mostly.",
+        "Practically unstoppable.",
+        "A duo for the festival record."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper festival standoff.",
+        "{username} has opposed you ten times running. Two floats, one narrow street.",
+        "Ten in a row opposite {username}. Neither will give way to the dragon dance.",
+        "A ten-match run against {username}. Stubborn as a lit fuse.",
+        "Ten times at odds with {username}. I'd watch from a balcony."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Talk it out. Or don't.",
+        "A proper face-off.",
+        "Stubbornness keeps the procession moving.",
+        "Who flinches first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a rival new year.",
+        "{streakCount} in a row opposite {username}. Neither of you will clear the street.",
+        "{streakCount} straight clashes with {username}. Someone cue the dragon dancers to separate you.",
+        "A {streakCount}-match feud with {username}. Somebody feed these two dumplings.",
+        "{streakCount} against {username}. I admire the stamina. Do have some tea."
+      ],
+      "details": [
+        "Neither of you is making way.",
+        "Stamina, certainly.",
+        "A grudge as old as the festival.",
+        "Glad I'm not marshalling you.",
+        "The programme needs another page."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your fuse is unlit. There's time.",
+        "{timeLeft} left on {matchTitle}. Your name's missing from the guest list.",
+        "{matchTitle} wraps in {timeLeft}. I want your pick on the record."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Light the fuse"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The lanterns are being lit. Hurry.",
+        "{matchTitle} closes in {timeLeft}. Don't make me haul you to the front row.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone suspiciously quiet. Dumpling coma?"
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The countdown has begun.",
+        "{timeLeft} left. Match in hand. Three, two...",
+        "Final call on {matchTitle}. {timeLeft}. Light it."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches missing your spark are about to go dark. The first has {timeLeft} left.",
+        "{matchCount} unlit matches and midnight is near. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No sparks on {matchTitle}. Someone must light the first fuse.",
+        "{moment1} against {moment2} and not a single cracker popped. I'll wait. Briefly.",
+        "A fresh match, a dark sky. Be first to light it.",
+        "{matchTitle} is a blank programme. Write the opening act."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Light it up",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new fireworks on the schedule.",
+        "{matchCount} matches opened in round {round}. The next act begins.",
+        "Round {round} is live, with {matchCount} matches to light.",
+        "A new round. {matchCount} matches. Pick your float.",
+        "Round {round}: {matchCount} matches awaiting your spark."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Join the parade",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A glorious bang.",
+        "{momentTitle} is through. Exactly on schedule.",
+        "{momentTitle} took it. Raise the lanterns.",
+        "{momentTitle} won and lit the whole sky.",
+        "{momentTitle} advances. One more firework in the finale.",
+        "{momentTitle} moves on. Dazzling."
+      ],
+      "details": [
+        "A perfect burst.",
+        "One down, more to light.",
+        "Earned with flair.",
+        "Flawlessly executed."
+      ],
+      "buttons": [
+        "Cheers",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A damp squib.",
+        "{momentTitle} is out. Not the finale I'd planned.",
+        "{momentTitle} didn't make it. Dust off the confetti.",
+        "{momentTitle} went out with a bang. That counts.",
+        "{momentTitle} is out. Have a dumpling. Return.",
+        "{momentTitle} lost this round. A dud, not a dull year.",
+        "{momentTitle} was eliminated. More fireworks await."
+      ],
+      "details": [
+        "Not every fuse catches.",
+        "It burned until the last.",
+        "More celebrations are coming.",
+        "Sweep up. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the festival. {liveCount} matches are open. Pick one.",
+          "A new guest. {liveCount} matches are live. Grab a lantern.",
+          "A new guest. {liveCount} matches await a decision.",
+          "{liveCount} fireworks ready to fly. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the crackers."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Grab a lantern",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back for the celebrations. Good.",
+          "Two days running. A regular at the festival.",
+          "Second day on the schedule. I checked the list."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I saved you a seat at the banquet.",
+          "After {days} days you return. The lanterns are still lit.",
+          "{days} days. I'd begun to worry. Don't miss another festival.",
+          "{days} days away. They've rearranged the whole street."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Lovely.",
+          "Welcome back. The party's on.",
+          "Back already. Keen.",
+          "Ah. There you are, my guest."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet street.",
+        "Hardly any revellers on this one. That should change.",
+        "Low turnout. Everyone's at the dumpling stall. Come along anyway.",
+        "Barely anyone's wandered past. Someone should."
+      ],
+      "details": [
+        "It needs more revellers.",
+        "Every spark counts on a dark street.",
+        "Yours is worth extra tonight.",
+        "Don't let the lanterns go out."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the deciding spark.",
+        "Dead level on {matchTitle}. One cracker settles it.",
+        "A tie. Someone has to light the finale. Let it be you.",
+        "{moment1} and {moment2}, two lanterns at the same height. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and midnight's nearly here. One last spark.",
+        "Level, with the countdown at ten. Vote.",
+        "Tied, and nearly midnight. Please don't leave the sky dark."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? Midnight won't wait.",
+        "Don't overthink it. Strike the match.",
+        "They're all lovely. Trust your festive instincts.",
+        "You've hovered at the back of the crowd long enough. Come forward."
+      ],
+      "details": [
+        "Every spark counts.",
+        "Trust your instincts.",
+        "No wrong firework. Only unlit ones.",
+        "Just light it."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First fuse lit. The festival has begun.",
+        "You made your pick. The programme is under way."
+      ],
+      "details": [
+        "Ticked off the list. +{xp} XP",
+        "The first spark of many. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You've found the festival route.",
+        "Five. You're no longer queueing at the gate."
+      ],
+      "details": [
+        "Right on schedule. +{xp} XP",
+        "A tidy opening act. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The stallholders greet you by name.",
+        "Ten. You have a permanent place at the banquet table."
+      ],
+      "details": [
+        "Reliable as a clock. +{xp} XP",
+        "Ten crackers popped. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your cheer carries over the drums.",
+        "Twenty-five. The whole street hears you."
+      ],
+      "details": [
+        "Louder than the gongs. +{xp} XP",
+        "Twenty-five fuses lit. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Properly part of the celebration.",
+        "Fifty. You're clearly invested. I approve."
+      ],
+      "details": [
+        "Fifty entries in the ledger. +{xp} XP",
+        "Right in the thick of the lanterns. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll hang a lantern in your name.",
+        "One hundred. Magnificent. I'll admit it once."
+      ],
+      "details": [
+        "Earned with proper effort. +{xp} XP",
+        "A hundred. Stand up and take the applause. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A fuse catches.",
+        "Three days in a row. Dependable."
+      ],
+      "details": [
+        "Attendance is half the festival. +{xp} XP",
+        "Three days of revelry. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's the whole festival calendar.",
+        "Seven days running. Spotless attendance."
+      ],
+      "details": [
+        "A week without missing an act. +{xp} XP",
+        "Seven days of sparks. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. Not one event skipped.",
+        "Fourteen days. Superbly punctual."
+      ],
+      "details": [
+        "A fortnight of festivities. +{xp} XP",
+        "That's a proper tradition. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. A full lunar cycle at my side.",
+        "A month of devotion. The calendar approves."
+      ],
+      "details": [
+        "Thirty days on the programme. +{xp} XP",
+        "A full moon of voting. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You back the quiet floats.",
+        "Five long shots. I admire the nerve."
+      ],
+      "details": [
+        "Against the main procession. +{xp} XP",
+        "Five side lanes championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You leave the parade route.",
+        "Fifteen. You follow your own lantern."
+      ],
+      "details": [
+        "Always your own schedule. +{xp} XP",
+        "Fifteen votes off the beaten street. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody guesses your next fuse.",
+        "Thirty. You're the surprise act on the bill."
+      ],
+      "details": [
+        "Not a line of it predictable. +{xp} XP",
+        "Thirty votes for the late arrival. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First through the gates five times. Early.",
+        "Five times you beat the crowd to the stalls."
+      ],
+      "details": [
+        "You arrive before the setup is done. +{xp} XP",
+        "Five votes ahead of the throng. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where yours was the first spark. Decisive.",
+        "Always the first match lit."
+      ],
+      "details": [
+        "Fifteen votes before the crowd. +{xp} XP",
+        "Ahead of the whole programme. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Steady hands, all of them.",
+        "Another tight one. Nerves of brass."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten wick-burning finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your spark keeps deciding them.",
+        "You've settled more than one deadlock."
+      ],
+      "details": [
+        "Twenty-five finishes decided by a sliver. +{xp} XP",
+        "You decide which float leads. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stayed with the slow fuse. Patient. Good.",
+        "You trust a late bang. Sensible."
+      ],
+      "details": [
+        "Faith in the finale. +{xp} XP",
+        "Five slow burners you believed in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. A personal favourite.",
+        "That one again? You've picked your float."
+      ],
+      "details": [
+        "You know your mind. +{xp} XP",
+        "One float, three cheers. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for one moment. Consistent.",
+        "You won't let that one go. Neither would I."
+      ],
+      "details": [
+        "Loyal through every drizzle. +{xp} XP",
+        "One favourite, five cheers. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on one moment. That's a fixation.",
+        "Ten times, one pick. I shan't comment. Much."
+      ],
+      "details": [
+        "Ten on a single float. +{xp} XP",
+        "Devoted. Or just overexcited. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're following the route.",
+        "Round two and still marching. Good."
+      ],
+      "details": [
+        "Further along the parade. +{xp} XP",
+        "Two acts in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the programme.",
+        "Well into the bracket. The finale draws near."
+      ],
+      "details": [
+        "Four acts in. +{xp} XP",
+        "Far from the opening drums. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You saw the whole festival.",
+        "All the way. You never left your post."
+      ],
+      "details": [
+        "From first fuse to final burst. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've covered a good few stalls.",
+        "Ten different matches. Thorough. Good."
+      ],
+      "details": [
+        "Mapping the whole festival. +{xp} XP",
+        "Ten stalls visited. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. Every lane visited.",
+        "Twenty-five. Not one dim corner remains."
+      ],
+      "details": [
+        "Every lane lit and mapped. +{xp} XP",
+        "Twenty-five stalls sampled. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's no visit, that's residency.",
+        "Fifty. You know this bracket better than the street map."
+      ],
+      "details": [
+        "A veteran of the whole schedule. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long festival night.",
+        "Five back to back. Do have some tea."
+      ],
+      "details": [
+        "One long evening. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A marathon of fireworks.",
+        "Ten in a single evening. Real stamina."
+      ],
+      "details": [
+        "A festival marathon. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Waiting for midnight, I assume.",
+        "The small hours. Either dedicated or sleepless. I understand both."
+      ],
+      "details": [
+        "Late nights suit you. +{xp} XP",
+        "A vote after the last bang. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You passed the word to your friends. Thank you.",
+        "Five shares. More guests, more fun."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five invitations delivered. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically the town crier.",
+        "Fifteen. You keep bringing the whole street in."
+      ],
+      "details": [
+        "Still posting invitations. +{xp} XP",
+        "Fifteen red envelopes delivered. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first fuse. A founding guest, always.",
+        "One of the first thousand. That can't be struck from the list."
+      ],
+      "details": [
+        "Yours permanently. +{xp} XP",
+        "No one revokes that. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Earned with proper effort.",
+        "Promoted. Wear it like a festival sash."
+      ],
+      "details": [
+        "{rank}. It becomes you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Entry added to the festival ledger: {name}. Splendid.",
+        "One more for the festival record: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the planning and it shows."
+      ],
+      "details": [
+        "{rank}. A tidy result.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Chaotic. Not on my schedule, but impressive.",
+        "Ten long shots. Not a flicker of doubt."
+      ],
+      "details": [
+        "Ten long shots backed. +{xp} XP",
+        "Long shots are your whole style. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my steady hand.",
+        "Ten close finishes. I'm pleased, quietly."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady in the middle of the noise. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days in a row. Your timing is exact.",
+        "A full week with no slip. Well done."
+      ],
+      "details": [
+        "Seven days of clockwork. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One spark, one verdict.",
+        "Stalemate on the schedule, and you cut through it. Splendid."
+      ],
+      "details": [
+        "The spark that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Firecracker Caitlyn, clipboard in hand. Fuse ready.",
+        "Caitlyn is yours now. Do keep to the schedule. Mostly."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The gates haven't opened.",
+      "Voting hasn't started. A bell will tell you when it does.",
+      "Not yet. Good festivals are worth the wait."
+    ],
+    "prevote": [
+      "Two floats, one parade. Inspect both before the drums start.",
+      "Look at both before you light a fuse. No rushing the schedule.",
+      "I won't say which I prefer. The lanterns are yours to judge.",
+      "Take your time. A considered cheer beats a hasty one.",
+      "Choose the one that makes you want to dance. Quietly, if you must."
+    ],
+    "prevote-empty": [
+      "No sparks yet. Light the first.",
+      "Quiet so far. Someone must start the show.",
+      "Not a single vote. Be first."
+    ],
+    "closing-24h": [
+      "Less than a day left, and no spark from you. Go.",
+      "The stalls are packing up soon. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the lanterns burn low."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Strike it."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone here. First through the gate.",
+      "Hardly a spark lit and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Lovely. Crowds can turn.",
+      "{pct}% with you. A comfortable position.",
+      "Ahead for now. Fuses are fickle.",
+      "{pick} is pulling ahead. Well chosen.",
+      "A lead is a lead, but the night is long. Stay humble."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more cheer tips it. Tell a friend.",
+      "Side by side. Your pick wants an advocate.",
+      "{pct} against {otherPct}. Breathe in. Wait."
+    ],
+    "voted-tied": [
+      "Perfectly level. Two floats, no winner.",
+      "A dead heat. Maddening, and rather exciting."
+    ],
+    "voted-behind": [
+      "You trail. That doesn't make you mistaken.",
+      "{pick} is trailing. A late arrival. I know the type.",
+      "They're ahead. You're not mistaken, only fewer in number.",
+      "Down by {diff} points. Tell people. Send invitations widely.",
+      "The crowd leaned the other way. That settles nothing."
+    ],
+    "closed-won": [
+      "Your pick won. A fine call.",
+      "A win. Properly earned.",
+      "{pick} went through. You read the crowd rightly."
+    ],
+    "closed-lost": [
+      "Your pick fell. A shame. A respectable choice nonetheless.",
+      "It didn't make it. These things happen. Carry on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A tie. Neither float gave way."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More festivals will follow.",
+      "The match is over. {winner} took it. Next time, arrive sooner."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Everyone's first fuse feels tense.",
+      "That's number one. The rest come easier. Trust the process.",
+      "You're one of the committee now. Welcome."
+    ],
+    "streak": [
+      "Back for more festivities. Good.",
+      "{streak} days running. I see you keeping the programme.",
+      "You keep coming back to the parade. I appreciate that."
+    ],
+    "underdog": [
+      "You alone picked that one. Noted.",
+      "A hard choice. A good one.",
+      "A long shot. That takes steady hands."
+    ],
+    "early": [
+      "Early. You reached the stalls before the rest.",
+      "Sparse sparks so far. Yours will be seen.",
+      "First through the gates. Well done."
+    ],
+    "close": [
+      "That spark moved the scale. It's balanced on a knife.",
+      "By a thread. One more vote tips the scale.",
+      "A tight one. Your spark counts for plenty."
+    ],
+    "behind": [
+      "{pick} trails. Trailing isn't losing. Summon help.",
+      "Not in front yet. There's tidying to do.",
+      "Behind, not defeated. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Crowds shift.",
+      "Ahead at present. Do not take it for granted.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Vote logged. There's more on the programme."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no sparks yet. Start with the one you like best.",
+      "Every float is lined up and waiting. Choose when ready. I shan't hurry you.",
+      "{unvoted} remaining. No pressure. Some, perhaps."
+    ],
+    "live-some": [
+      "{voted} lit, {unvoted} still to go. Keep striking.",
+      "A start is made. {unvoted} remain.",
+      "A good start. The rest won't light themselves."
+    ],
+    "live-few": [
+      "{unvoted} still outstanding. Finish before the curtain.",
+      "Nearly done. {unvoted} left on the list.",
+      "Almost at the finish. Keep your hands steady."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Don't leave it dark.",
+      "A single match stands between you and a perfect record."
+    ],
+    "live-closing": [
+      "Several end in {timeLeft}. {unvoted} still lack your spark.",
+      "The countdown has started. {unvoted} to go, {timeLeft} on the clock.",
+      "The street is closing. Do hurry."
+    ],
+    "live-done": [
+      "Every match is voted. Well done. Cast an eye over the bracket.",
+      "Your list is clear. Come back when the next round begins.",
+      "Every item ticked. Seldom seen. Respect."
+    ],
+    "live-none": [
+      "Nothing's open this minute. It will be. Examine the bracket while you wait.",
+      "Quiet along the lantern lane. Check back soon.",
+      "No matches are open. I'm pacing as much as you."
+    ],
+    "brackets-groups": [
+      "Groups open the festival. The top two of each march on. The rest watch from the kerb.",
+      "Every guest enters through a group. Not all reach the finale.",
+      "Keep an eye on the standings. They change fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts approach. Only the top two of each group make it through.",
+      "No knockout yet. The group stage has to wrap up.",
+      "Be patient. Knockouts appear when the groups conclude."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are underway. One loss and the lantern goes dark.",
+      "One loss and you're out. No second attempts.",
+      "Each match weighs heavier now. Think before the fuse."
+    ],
+    "brackets-bracket": [
+      "Round after round. A single loss ends it.",
+      "Trace the bracket. Every round tightens the lane.",
+      "Each line is a match somebody cheered for."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for planning it with me.",
+      "It's finished. A hard-fought celebration. I'll miss it.",
+      "We have a champion. A fitting finale."
+    ],
+    "brackets-empty": [
+      "No bracket on the board. Nothing's been drawn.",
+      "Blank for now. The draw is still on the planning board.",
+      "A blank page so far. Look again later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One spark decides it. Choose.",
+      "Two floats, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the festival and tell me what you think."
+    ],
+    "voted": [
+      "{pick} over {other}, by my hand. And yours?",
+      "{pick} gets my cheer over {other}. Make your case.",
+      "My pick: {pick}, not {other}. Care to argue?"
+    ],
+    "early": [
+      "One of the first sparks on {pick} against {other}. We need more guests.",
+      "An early cheer for {pick} against {other}. Add yours.",
+      "{pick} against {other}, hardly a vote cast. Yours would matter."
+    ],
+    "tied": [
+      "{pick} and {other} are even. A single vote breaks it.",
+      "{pick} and {other} are locked together. Cut the fuse.",
+      "{pick} and {other} won't part. Your vote will make them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes divide {pick} and {other}. Each spark matters.",
+      "{voteDiff} votes separate {pick} from {other}. Add yours.",
+      "{pick} versus {other}, {voteDiff} between them. Either could take it."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} off {other}. A handful of sparks closes the gap.",
+      "{pick} is {voteDiff} short of {other}, with the whole night ahead. Back it.",
+      "{pick} is {voteDiff} below {other}. Recoverable. Light it."
+    ],
+    "losing-bad": [
+      "{pick} is {voteDiff} short of {other}. It needs backers.",
+      "{pick} lags {other} by {voteDiff}. It merits a better send-off. Vote.",
+      "{other} leads {pick} by {voteDiff}. Let's reverse it."
+    ],
+    "winning-close": [
+      "{pick} edges {other} on {pct}%. Help it stay in front.",
+      "{pick} leads {other} on {pct}%, not yet safe. Add your vote.",
+      "{pick} sits at {pct}% to {other}'s share. A thin edge."
+    ],
+    "dominating": [
+      "{pick} outpaces {other} with {pct}%. Come see the reason.",
+      "{pick} on {pct}%. {other} is nowhere near.",
+      "{pick} is well clear of {other} at {pct}%. Add your cheer."
+    ]
+  }
+}

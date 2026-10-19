@@ -993,6 +993,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Moonlight, vigils and stillness (lunar and serene, kept distinct from Arctic Warfare); votes are quiet marks and a closing match is the moon setting. No lore names.
 - **Done:** Heartthrob Caitlyn (`caitlyn-heartthrob`, skin 39): a flustered, earnest, romantic mall-girl set. Love notes, skipped heartbeats, crushes and mixtapes; votes are hearts
   and a closing match is the mall closing for the night. Written from the theme only, not from the card's letter text; no character names.
+- **Done:** Firecracker Caitlyn (`caitlyn-firecracker`, skin 54): a meticulous festival organiser with a secret taste for celebration. Schedules, lanterns, fuses and fireworks;
+  votes are fuses lit and a closing match is the countdown to midnight. Written from the theme only, not from the card's text; no character names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
