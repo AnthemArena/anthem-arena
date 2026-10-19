@@ -53,7 +53,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. I did the maths. Then I set the maths on fire. Go vote!",
+          "message": "Down {voteDiff}. I did the maths. Then I set the maths on fire. Rally some votes!",
           "cta": "Share it around"
         }
       ]

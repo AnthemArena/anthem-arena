@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Slow start, fast finish. Go vote and I'll go scavenging!",
+          "message": "Down {voteDiff}. Slow start, fast finish. Rally some votes and I'll go scavenging!",
           "cta": "Raise the alarm"
         }
       ]
@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! One bullet left, two targets. You pick. I'm too busy giggling!",
+          "message": "Dead even! One bullet left, two targets. You rally. I'm too busy giggling!",
           "cta": "Take the shot"
         },
         {

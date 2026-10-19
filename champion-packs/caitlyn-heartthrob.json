@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few sweet votes and hearts will mend.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",
@@ -76,7 +76,7 @@
               "eq": 0
             }
           },
-          "message": "Dead level. Two hearts, one beat. Pick yours.",
+          "message": "Dead level. Two hearts, one beat. Back yours.",
           "cta": "Follow your heart"
         },
         {
@@ -85,7 +85,7 @@
               "eq": 1
             }
           },
-          "message": "One vote apart. Stop fidgeting with your hair and decide.",
+          "message": "One vote apart. Stop fidgeting with your hair and rally a friend.",
           "cta": "Bring a friend"
         },
         {

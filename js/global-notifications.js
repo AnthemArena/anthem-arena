@@ -5,10 +5,11 @@ import './champion-loader.js';
 
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
+import { fillWelcomeText } from './champion-lines.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView, eventButtonUrl, achievementButtonUrl, dangerShouldAlert, onceKey, wasShownOnce, markShownOnce, encouragementDue } from './notification-model.js';
+import { setCenteredSplash, avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -69,8 +70,8 @@ function getMatchId(match) {
 // ========================================
 
 const POLL_CONFIG = {
-    BASE_INTERVAL: 120000,      // 2 minutes base
-ACTIVE_INTERVAL: 120000,    // 2 minutes when active (still responsive)
+    BASE_INTERVAL: 300000,      // 5 minutes when the person has stopped touching the page
+    ACTIVE_INTERVAL: 120000,    // 2 minutes while they are active (still responsive)
     INACTIVE_THRESHOLD: 300000, // 5 minutes = inactive
     MAX_INTERVAL: 300000        // 5 minutes max
 };
@@ -377,7 +378,7 @@ function buildClosingNotification(items) {
             : (count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`),
         cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
         action: 'navigate',
-        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/#vote'
+        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/matches.html'
     };
 }
 
@@ -418,16 +419,31 @@ function buildTieBreakerNotification(item) {
 // FIRESTORE DATA FETCHING (USE EDGE CACHE)
 // ========================================
 
+// One /api/matches read per poll, however many matches the person voted in (it used to be one per vote, plus more below).
+// "Shown once" memory on this device: { 'matchId:step': timestamp }
+function readOnceMap(key) { try { return JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { return {}; } }
+function writeOnceMap(key, map) {
+    try {
+        const keep = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 300);   // newest 300, so it never grows without end
+        localStorage.setItem(key, JSON.stringify(Object.fromEntries(keep)));
+    } catch (e) { /* storage unavailable: the cooldown still applies */ }
+}
+
+let matchListMemo = { at: 0, promise: null };
+function fetchMatchList(maxAgeMs = 20000) {
+    if (matchListMemo.promise && Date.now() - matchListMemo.at < maxAgeMs) return matchListMemo.promise;
+    const promise = fetch('/api/matches').then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+    });
+    matchListMemo = { at: Date.now(), promise };
+    promise.catch(() => { if (matchListMemo.promise === promise) matchListMemo = { at: 0, promise: null }; });
+    return promise;
+}
+
 async function getMatchData(matchId) {
     try {
-        // ✅ Use edge cache instead of direct Firestore
-        const response = await fetch('/api/matches');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const allMatches = await response.json();
+        const allMatches = await fetchMatchList();
         
         // Find the specific match
         const match = allMatches.find(m => m.matchId === matchId || m.id === matchId);
@@ -456,7 +472,9 @@ async function getMatchData(matchId) {
 
 async function checkAndShowBulletin() {
     try {
-        if (document.hidden) return;     // nobody can see a toast in a background tab; the return-to-tab handler catches up
+        if (document.hidden) return;
+        adjustPollingRate();             // drop to the slow rate once the person has gone idle (it only re-armed on activity before)
+        matchListMemo = { at: 0, promise: null };   // each poll reads the match list afresh, then shares that one read between its checks     // nobody can see a toast in a background tab; the return-to-tab handler catches up
         // ========================================
         // PRIORITY 0: CHECK FOR NEW ROUNDS/BATCHES
         // ========================================
@@ -508,6 +526,7 @@ async function checkAndShowBulletin() {
 
         const saveMatchState = (matchId, state) => {
             lastMatchStates[matchId] = {
+                ...lastMatchStates[matchId],   // keep the other alert kinds' memory (danger vs nailbiter used to wipe each other)
                 ...state,
                 updatedAt: Date.now()
             };
@@ -564,12 +583,13 @@ async function checkAndShowBulletin() {
             }
             
             const welcomeShown = sessionStorage.getItem('welcomeToastShown') || localStorage.getItem('lastWelcomeToast');
-            if (welcomeShown && timeOnSite > 120000 && timeSinceLastPrompt > 120000) {
+            // "Still deciding?" at most every 45 minutes (it came back every poll, i.e. every 2-5 minutes, for as long as the page stayed open)
+            if (welcomeShown && timeOnSite > 120000 && encouragementDue('gentle', timeSinceLastPrompt)) {
                 await showEncouragementToast('gentle');
                 return;
             }
             
-            if (timeOnSite > 300000 && timeSinceLastPrompt > 180000) {
+            if (timeOnSite > 300000 && encouragementDue('urgent', timeSinceLastPrompt)) {
                 const hasUrgentMatches = await checkForClosingMatches();
                 if (hasUrgentMatches) {
                     await showEncouragementToast('urgent');
@@ -581,6 +601,9 @@ async function checkAndShowBulletin() {
         }
         
         const notifications = [];
+        // An alert only counts as "told" once it really showed: only one toast shows per check, so anything that lost that slot
+        // must still be there next time (it used to be marked as seen the moment it was queued, and was lost).
+        const withCommit = (n, fn) => { Object.defineProperty(n, '_commit', { value: fn, enumerable: false }); return n; };
         
         // ========================================
         // PRIORITY 1: Check user's picks for danger/nailbiter/comeback/winning
@@ -612,14 +635,19 @@ async function checkAndShowBulletin() {
             const userPct = totalVotes > 0 ? Math.round((userSongVotes / totalVotes) * 100) : 50;
             const opponentPct = totalVotes > 0 ? 100 - userPct : 50;
             
-            const previousState = matchStates[matchId];
             const isCurrentlyLosing = userSongVotes < opponentVotes;
-            const wasLosing = previousState?.wasLosing || false;
+            // Remembered on this device (the site is several pages: an in-memory flag forgot it on every page change, so a comeback
+            // was only seen when the person happened to stay on one page through both the dip and the recovery)
+            const wasLosing = lastMatchStates[getMatchId(match)]?.wasLosing ?? matchStates[matchId]?.wasLosing ?? false;
+            const stillInDanger = userPct < BULLETIN_THRESHOLDS.DANGER && isCurrentlyLosing;
+            if (!stillInDanger && lastMatchStates[getMatchId(match)]?.dangerTier) saveMatchState(getMatchId(match), { dangerTier: null });   // recovered: a later dip may alert again
             
             matchStates[matchId] = {
                 wasLosing: isCurrentlyLosing,
                 lastCheck: Date.now()
             };
+            const comebackNow = wasLosing && !isCurrentlyLosing && voteDiff >= BULLETIN_THRESHOLDS.COMEBACK_MIN;
+            if (!comebackNow && lastMatchStates[getMatchId(match)]?.wasLosing !== isCurrentlyLosing) saveMatchState(getMatchId(match), { wasLosing: isCurrentlyLosing });
             
                    // ========================================
             // DANGER: User's pick is losing badly → ONLY if severity changed
@@ -633,10 +661,13 @@ async function checkAndShowBulletin() {
                                   voteDiff <= 10 ? 'trailing-6-10' : 'trailing-11plus';
 
                 const previous = lastMatchStates[normalizedMatchId];
-                if (previous?.dangerTier === currentTier) {
-                    console.log(`No change in danger state for ${normalizedMatchId} (${currentTier})`);
+                if (!dangerShouldAlert(previous?.dangerTier, currentTier)) {
+                    // same or better than what was already announced: note it quietly (a later slide back down alerts again)
+                    if (previous?.dangerTier && previous.dangerTier !== currentTier) saveMatchState(normalizedMatchId, { dangerTier: currentTier });
                     continue;
                 }
+                // slipped back into danger soon after recovering: not again within half an hour
+                if (!previous?.dangerTier && previous?.dangerAlertAt && Date.now() - previous.dangerAlertAt < 30 * 60000) continue;
 
                 let severityTier = currentTier;
                 const bulletinKey = `danger-${normalizedMatchId}-${severityTier}`;
@@ -665,7 +696,7 @@ async function checkAndShowBulletin() {
                     opponentPct: opponentPct
                 });
 
-                notifications.push({
+                notifications.push(withCommit({
                     priority: 1,
                     type: notificationType,
                     matchId: normalizedMatchId,
@@ -679,12 +710,10 @@ async function checkAndShowBulletin() {
                     message: championMessage?.message || `Your pick is in danger!`,
                     detail: championMessage?.detail || `Behind by ${voteDiff} vote${voteDiff !== 1 ? 's' : ''}`,
                     cta: championMessage?.cta || 'View Match Now!'
-                });
-
-                localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
-
-                // SAVE NEW STATE
-                saveMatchState(normalizedMatchId, { dangerTier: currentTier });
+                }, () => {
+                    localStorage.setItem(dangerAlertKey, (alertCount + 1).toString());
+                    saveMatchState(normalizedMatchId, { dangerTier: currentTier, dangerAlertAt: Date.now(), wasLosing: true });
+                }));
             }
             
             // ========================================
@@ -720,7 +749,7 @@ async function checkAndShowBulletin() {
                     opponentPct: opponentPct
                 });
                 
-                notifications.push({
+                notifications.push(withCommit({
                     priority: 2,
                     type: 'comeback',
                     matchId: normalizedMatchId,
@@ -733,7 +762,7 @@ async function checkAndShowBulletin() {
                     message: championMessage?.message || `🎉 Comeback complete!`,
                     detail: championMessage?.detail || `Now leading by ${voteDiff}!`,
                     cta: championMessage?.cta || 'View Match!'
-                });
+                }, () => saveMatchState(normalizedMatchId, { wasLosing: false })));
             }
             
                       // ========================================
@@ -764,7 +793,7 @@ async function checkAndShowBulletin() {
                     opponentPct: opponentPct
                 });
 
-                notifications.push({
+                notifications.push(withCommit({
                     priority: 3,
                     type: 'nailbiter',
                     matchId: normalizedMatchId,
@@ -778,9 +807,7 @@ async function checkAndShowBulletin() {
                     message: championMessage?.message || `Too close!`,
                     detail: championMessage?.detail || `${voteDiff === 0 ? 'Perfectly tied!' : `Just ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart!`}`,
                     cta: championMessage?.cta || 'View Match!'
-                });
-
-                saveMatchState(normalizedMatchId, { nailbiterTier: currentTier });
+                }, () => saveMatchState(normalizedMatchId, { nailbiterTier: currentTier })));
             }
             
             // ========================================
@@ -804,6 +831,12 @@ async function checkAndShowBulletin() {
                 
                 const bulletinKey = `winning-${normalizedMatchId}-${winTier}`;
                 
+                // Once per match per level of lead on this device, and no more than one "you're winning" an hour overall
+                // (before it came back every 20 minutes, for every match, in every new tab)
+                const winSeen = readOnceMap('winningShown');
+                if (wasShownOnce(winSeen, normalizedMatchId, winTier)) continue;
+                if (Date.now() - parseInt(localStorage.getItem('lastWinningToast') || '0') < 60 * 60000) continue;
+                
                 if (dismissedBulletins.has(bulletinKey)) {
                     console.log(`⏭️ Skipping winning alert (${winTier} dismissed): ${bulletinKey}`);
                     continue;
@@ -816,7 +849,7 @@ async function checkAndShowBulletin() {
                     voteDiff: voteDiff
                 });
                 
-                notifications.push({
+                notifications.push(withCommit({
                     priority: 4,
                     type: 'winning',
                     matchId: normalizedMatchId,
@@ -829,7 +862,10 @@ async function checkAndShowBulletin() {
                     message: championMessage?.message || `🎯 Dominating!`,
                     detail: championMessage?.detail || `Leading ${userPct}% to ${opponentPct}%`,
                     cta: championMessage?.cta || 'View Match!'
-                });
+                }, () => {
+                    writeOnceMap('winningShown', markShownOnce(readOnceMap('winningShown'), normalizedMatchId, winTier));
+                    try { localStorage.setItem('lastWinningToast', String(Date.now())); } catch (e) { /* ignore */ }
+                }));
             }
         }
         
@@ -873,11 +909,17 @@ async function checkAndShowBulletin() {
         let zeroVoteCount = 0;
         let lowVoteCount = 0;
         
-        const allLiveResponse = await fetch('/api/matches');
-        const allMatches = await allLiveResponse.json();
+        const allMatches = await fetchMatchList();
         const liveMatches = allMatches.filter(m => m.status === 'live');
         
-        for (const match of liveMatches) {
+        // Soonest-closing first, and every match is looked at (a `break` after the first alert used to skip the rest, so a
+        // low-votes match early in the list hid a zero-votes match later on)
+        const bySoonest = [...liveMatches].sort((x, y) => (getMsUntilClose(x, true) ?? Infinity) - (getMsUntilClose(y, true) ?? Infinity));
+        const zeroVoteMatches = bySoonest.filter(m => {
+            const h = getHoursUntilClose(m);
+            return h && h > 0 && h <= 6 && ((m.song1?.votes || 0) + (m.song2?.votes || 0)) === 0;
+        }).length;
+        for (const match of bySoonest) {
             const matchId = match.matchId || match.id;
             const totalVotes = (match.song1?.votes || 0) + (match.song2?.votes || 0);
             const hoursLeft = getHoursUntilClose(match);
@@ -903,7 +945,7 @@ async function checkAndShowBulletin() {
                         moment2: match.song2?.shortTitle || match.song2?.title,
                         hoursLeft
                     });
-                    notifications.push({
+                    notifications.push(withCommit({
                         priority: 1,
                         type: 'novotes',
                         matchId: matchId,
@@ -916,13 +958,10 @@ async function checkAndShowBulletin() {
                         cta: noVotesVoice?.cta || 'Cast First Vote!',
                         action: 'navigate',
                         targetUrl: `/vote.html?match=${matchId}`
-                    });
-                    
-                    localStorage.setItem(alertKey, Date.now().toString());
-                    break;
+                    }, () => localStorage.setItem(alertKey, Date.now().toString())));
                 }
             }
-            else if (totalVotes > 0 && totalVotes < 5 && hoursLeft <= 3) {
+            else if (totalVotes > 0 && totalVotes < 5 && hoursLeft <= 3 && !userVotes[matchId]) {   // "vote now" makes no sense where you already have
                 lowVoteCount++;
                 
                 const dismissKey = `lowvotes-${matchId}`;
@@ -934,13 +973,13 @@ async function checkAndShowBulletin() {
                 const lastAlerted = localStorage.getItem(alertKey);
                 const hoursSinceAlert = lastAlerted ? (Date.now() - parseInt(lastAlerted)) / (1000 * 60 * 60) : 999;
                 
-                if (zeroVoteCount === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
+                if (zeroVoteMatches === 0 && hoursSinceAlert >= 2 && notifications.filter(n => n.type === 'lowvotes').length === 0) {
                     const lowVotesVoice = getPackVoice('lowvotes', {
                         matchTitle: `${match.song1?.shortTitle || match.song1?.title} vs ${match.song2?.shortTitle || match.song2?.title}`,
                         totalVotes,
                         hoursLeft
                     });
-                    notifications.push({
+                    notifications.push(withCommit({
                         priority: 6,
                         type: 'lowvotes',
                         matchId: matchId,
@@ -954,10 +993,7 @@ async function checkAndShowBulletin() {
                         cta: lowVotesVoice?.cta || 'Vote Now!',
                         action: 'navigate',
                         targetUrl: `/vote.html?match=${matchId}`
-                    });
-                    
-                    localStorage.setItem(alertKey, Date.now().toString());
-                    break;
+                    }, () => localStorage.setItem(alertKey, Date.now().toString())));
                 }
             }
         }
@@ -987,6 +1023,7 @@ async function checkAndShowBulletin() {
         
         try {
             const closingSoon = [];
+            const closingSeen = readOnceMap('closingShown');
             for (const match of liveMatches) {
                 const matchId = getMatchId(match);
                 if (userVotes[matchId]) continue;
@@ -997,13 +1034,19 @@ async function checkAndShowBulletin() {
                 
                 const tier = getClosingTier(msLeft);
                 if (!tier) continue;
+                if (wasShownOnce(closingSeen, matchId, tier)) continue;   // each step (24h, 3h, final) is announced once per match
                 
                 closingSoon.push({ match, matchId, msLeft, tier });
             }
             
             if (closingSoon.length > 0) {
                 closingSoon.sort((x, y) => x.msLeft - y.msLeft);
-                notifications.push(buildClosingNotification(closingSoon));
+                // everything the alert mentions counts as announced, so a "3 matches closing" alert is not followed by three singles
+                notifications.push(withCommit(buildClosingNotification(closingSoon), () => {
+                    let map = readOnceMap('closingShown');
+                    for (const it of closingSoon) map = markShownOnce(map, it.matchId, it.tier);
+                    writeOnceMap('closingShown', map);
+                }));
             }
         } catch (error) {
             console.error('⚠️ Error checking closing-soon matches:', error);
@@ -1038,7 +1081,15 @@ async function checkAndShowBulletin() {
                 }
             }
             
+            // The vote page's modal (after a vote, or the share window opened from an alert) owns the screen: an alert would sit on top
+            // of it. Not shown means not recorded as shown, so the next poll shows it once the modal is closed.
+            if (document.querySelector('#vote-modal.active')) {
+                console.log('⏸️ Held while the vote modal is open:', notification.type);
+                continue;
+            }
+
             showBulletin(notification);
+            try { notification._commit?.(); } catch (e) { console.warn('Could not record the alert as shown:', e); }
             recentlyShownBulletins.set(bulletinKey, Date.now());
             if (notification.type === 'tiebreaker') {
                 try {   // once per match per step on this device
@@ -1129,8 +1180,14 @@ async function checkRecentVotes() {
         // Throttle checks
         const now = Date.now();
         if (document.hidden) return;
-        if (now - lastActivityCheck < ACTIVITY_CHECK_INTERVAL) return;
+        // Idle (no mouse / key / scroll for 5 minutes): look every 3 minutes instead of every minute
+        const gap = now - lastActivity > POLL_CONFIG.INACTIVE_THRESHOLD ? ACTIVITY_CHECK_INTERVAL * 3 : ACTIVITY_CHECK_INTERVAL;
+        if (now - lastActivityCheck < gap) return;
         lastActivityCheck = now;
+        // Ally / rival alerts are about matches you voted in: with no votes (or no account) there is nothing to match, so skip the read
+        const uid = localStorage.getItem('tournamentUserId');
+        if (!uid || uid === 'anonymous') return;
+        try { if (!Object.keys(JSON.parse(localStorage.getItem('userVotes') || '{}')).length) return; } catch (e) { return; }
         
         // Get recent activity (increased from 10 to 50)
         let activities;
@@ -1720,12 +1777,6 @@ async function showWelcomeToast() {
         return;
     }
     
-    // Replace {days} placeholder for comeback messages
-    if (welcomeType === 'comeback' && daysSince > 0) {
-        welcomeData.message = welcomeData.message.replace('{days}', daysSince);
-        welcomeData.detail = welcomeData.detail.replace('{days}', daysSince);
-    }
-    
     try {
         // Count live matches
         const response = await fetch('/api/matches');
@@ -1746,8 +1797,8 @@ async function showWelcomeToast() {
             welcomeType,
             matchId: 'welcome',
             thumbnailUrl: thumbnailUrl,
-            message: welcomeData.message,
-            detail: welcomeData.detail,
+            message: fillWelcomeText(welcomeData.message, { days: daysSince, liveCount: liveMatches.length }),
+            detail: fillWelcomeText(welcomeData.detail, { days: daysSince, liveCount: liveMatches.length }),
             cta: welcomeData.cta,
             action: isOnMatchesPage ? 'dismiss' : 'navigate',
             targetUrl: '/matches.html',
@@ -1889,6 +1940,21 @@ async function checkForClosingMatches() {
     }
 }
 
+// Toasts that arrived while the vote modal was open; the newest is shown a moment after it closes.
+let toastHeldForModal = null, modalWatcher = null;
+function deferForVoteModal(notification) {
+    toastHeldForModal = notification;
+    const modal = document.getElementById('vote-modal');
+    if (!modal || modalWatcher) return;
+    modalWatcher = new MutationObserver(() => {
+        if (modal.classList.contains('active') || !toastHeldForModal) return;
+        const held = toastHeldForModal;
+        toastHeldForModal = null;
+        setTimeout(() => showBulletin(Object.assign(Object.create(Object.getPrototypeOf(held)), held, { _afterModal: true })), 700);
+    });
+    modalWatcher.observe(modal, { attributes: true, attributeFilter: ['class'] });
+}
+
 function showBulletin(notification) {
     notification = withoutEmoteCta(notification);      // emotes are off: a thanks / challenge button becomes "View match"
 
@@ -1899,6 +1965,13 @@ function showBulletin(notification) {
             console.warn('⚠️ Bulletin missing matchId:', notification.type);
             return;
         }
+    }
+
+    // The vote page's modal owns the screen while it is open: a toast would sit on top of it. Defer it, and show the newest one
+    // when the modal closes (callers save their bell copy themselves, so nothing is lost from the history).
+    if (!notification._afterModal && document.querySelector('#vote-modal.active')) {
+        deferForVoteModal(notification);
+        return;
     }
 
     // A champion the person just picked stays up for a few seconds: a routine alert (welcome, a match) that arrives on the same
@@ -2513,9 +2586,10 @@ if (championPack && championPack.theme) {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = eventToastHtml(notification, {
             tag: { 'mastery-up': 'Mastery up', 'champion-selected': 'Your champion' }[notification.type] || 'Level up', accent, jinxSrc: championBadgeUrl(pack),
-            ...(notification.type === 'champion-selected' ? { glyph: '⭐' } : { leadHtml: levelBadgeHtml(level, accent) }),
+            ...(notification.type === 'champion-selected' ? { glyph: '' } : { leadHtml: levelBadgeHtml(level, accent) }),
             strip: notification.strip || null,
             quip: notification.message, detail: notification.detail, cta: notification.cta || (notification.type === 'level-up' ? 'View progress' : 'View champions')
         });
@@ -2657,6 +2731,7 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = followToastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             jinxSrc: championBadgeUrl(pack),
@@ -2681,6 +2756,7 @@ else {
         // No champion speaking here: the backdrop is the splash of the person's own champion avatar (a crowd uses the first
         // face); someone without a champion avatar falls back to the viewer's profile banner
         banner.style.setProperty('--nv-splash', `url("${splashFromAvatarSrc(srcs[0]) || profileSplashUrl(pack)}")`);
+        setCenteredSplash(banner);
         banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
         banner.className = 'bulletin-banner versus-toast opponent';
     } else if (notification.type === 'achievement') {
@@ -2693,6 +2769,7 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url("${toastSplashUrl(pack)}")`);
+        setCenteredSplash(banner);
         const xpMatch = /\+(\d+)\s*XP/i.exec(`${notification.detail || ''}`);
         banner.innerHTML = achievementToastHtml(notification, {
             icon: notification.thumbnailUrl,
@@ -2717,6 +2794,7 @@ else {
         banner.style.setProperty('--nv-glow', ally ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', ally ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         const who = notification.triggerUsername || notification.username;
         const drawStreak = () => {
             banner.innerHTML = toastHtml({ ...notification, relationship: view.relationship, targetUrl: view.profileUrl }, {
@@ -2745,6 +2823,7 @@ else {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         const drawEvent = () => {
             banner.innerHTML = eventToastHtml(notification, {
                 tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(pack),
@@ -2770,6 +2849,7 @@ else {
         banner.style.setProperty('--nv-glow', notification.relationship === 'ally' ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', notification.relationship === 'ally' ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = toastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),
@@ -2800,6 +2880,7 @@ else {
 setTimeout(() => banner.classList.add('show'), 10);
 
 console.log(`📢 Bulletin shown: ${notification.type}`);
+window.lastShownBulletin = { type: notification.type, matchId: notification.matchId, severityTier: notification.severityTier };   // read by the browser tests
 }
 
 
@@ -2872,7 +2953,16 @@ window.dismissBulletin = function() {
 window.openBulletinMatch = function() {
     const b = currentBulletin;
     if (isStreakNotification(b)) { hideBulletin(); window.location.href = streakView(b).profileUrl; return; }
-    if (!b || !b.targetUrl) return;
+    if (!b) return;
+    // Level-up, mastery, champion-selected: the card does what the button does
+    if (typeof b.ctaAction === 'function') return window.handleBulletinCTA();
+    // Match-event alerts: the card opens the match (or the matches list for the alerts that show several edits)
+    if (isEventNotification(b) && b.matchId !== 'test-match' && b.action !== 'dismiss') {
+        if (isStripAlert(b) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
+        window.location.href = eventUrl(b);
+        return;
+    }
+    if (!b.targetUrl) return;
     hideBulletin();
     window.location.href = b.targetUrl;
 };
@@ -2937,7 +3027,13 @@ window.handleBulletinCTA = function() {
     if (isEventNotification(currentBulletin) && currentBulletin.matchId !== 'test-match' && currentBulletin.action !== 'dismiss') {
         // Alerts with a strip of edits open the matches list; when you are already on it, the button just closes the alert
         if (isStripAlert(currentBulletin) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
-        window.location.href = eventUrl(currentBulletin);
+        window.location.href = eventButtonUrl(currentBulletin);
+        return;
+    }
+
+    // Achievements: "View achievements" opens them; a move-on button ("Next match", "Keep going") opens the matches list
+    if (currentBulletin.type === 'achievement' && currentBulletin.action === 'navigate') {
+        window.location.href = achievementButtonUrl(currentBulletin);
         return;
     }
 

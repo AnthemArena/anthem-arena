@@ -1,6 +1,7 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
-import { EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import fs from 'node:fs';
+import { dangerShouldAlert, wasShownOnce, markShownOnce, encouragementDue, isMoveOnCta, eventButtonUrl, achievementButtonUrl, EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -131,7 +132,9 @@ t('event chips: percentages for a voted match, match count for a new round', () 
     assert.ok(isStripAlert({ type: 'welcome' }) && isStripAlert({ type: 'encouragement' }) && isStripAlert({ type: 'round-opening' }) && !isStripAlert({ type: 'danger' }));
     for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
     for (const k of ['closing', 'novotes', 'lowvotes']) assert.ok(!EVENT_KINDS[k].quiet, k);
-    for (const k of Object.keys(EVENT_KINDS)) assert.ok(eventGlyph({ type: k }), k);
+    for (const k of Object.keys(EVENT_KINDS)) assert.ok(typeof eventGlyph({ type: k }) === 'string', k);
+    assert.equal(eventGlyph({ type: 'round-opening' }), '', 'round opening has no symbol');
+    assert.equal(eventGlyph({ type: 'something-new' }), 'VS');
     assert.equal(eventGlyph({ type: 'danger' }), '▼'); assert.equal(eventGlyph({ type: 'winning' }), '▲'); assert.equal(eventGlyph({ type: 'match-lost' }), '✕'); assert.equal(eventGlyph({ type: 'nope' }), 'VS');
 });
 t('welcome and encouragement are event cards with their own tags', () => {
@@ -173,5 +176,46 @@ t('tie-breaker alert: tag, symbol, chips, link, both edits', () => {
     assert.equal(eventGlyph(n), '=');
     assert.deepEqual(eventChips(n), ['Level at 24–24']); assert.deepEqual(eventChips({ ...n, severityTier: 'final' }), ['Level at 24–24', 'Last chance']);
     assert.equal(eventUrl(n), '/vote.html?match=m9');
+});
+t('move-on labels are told apart from look-at-this labels', () => {
+    for (const s of ['Next match', 'Next target', 'Keep going', 'Keep hunting', 'Continue', 'Carry on', 'On to the next round', 'Press on', 'Light another', 'Encore', 'Run it again']) assert.ok(isMoveOnCta(s), s);
+    for (const s of ['See the result', 'View achievements', 'See all', 'Gloat', 'Show me', 'Take a bow', 'View progress', 'Revenge', 'Rally some votes', '']) assert.ok(!isMoveOnCta(s), s);
+});
+t('button targets: results open the match, move-on labels open the matches list, achievements open the profile tab', () => {
+    assert.equal(eventButtonUrl({ type: 'match-won', matchId: 'm1', cta: 'See the result' }), '/vote.html?match=m1');
+    assert.equal(eventButtonUrl({ type: 'match-won', matchId: 'm1', cta: 'Next match' }), '/matches.html');
+    assert.equal(eventButtonUrl({ type: 'match-lost', matchId: 'm1', ctaText: 'On to the next round' }), '/matches.html');
+    assert.equal(eventButtonUrl({ type: 'match-lost', matchId: 'm1', cta: 'View Bracket' }), '/brackets.html');
+    assert.equal(eventButtonUrl({ type: 'danger', matchId: 'm1', cta: 'Next match' }), '/vote.html?match=m1&share=1');   // only results are rerouted
+    assert.equal(achievementButtonUrl({ type: 'achievement', cta: 'Next match', targetUrl: '/profile#achievements' }), '/matches.html');
+    assert.equal(achievementButtonUrl({ type: 'achievement', cta: 'View achievements', targetUrl: '/profile#achievements' }), '/profile#achievements');
+    assert.equal(achievementButtonUrl({ type: 'achievement', cta: 'See all' }), '/profile#achievements');
+});
+t('already-voted alerts (danger / nailbiter) never tell the player to vote (button or line)', () => {
+    const bad = /^(cast a vote|make the pick|pick one|cast it|choose a fate|pick a present|pick a suitor|pick the direction|pick the heading|laugh and vote)$/i;
+    for (const f of fs.readdirSync(new URL('../champion-packs/', import.meta.url))) {
+        if (!f.endsWith('.json') || f.includes('manifest')) continue;
+        const pack = JSON.parse(fs.readFileSync(new URL('../champion-packs/' + f, import.meta.url), 'utf8'));
+        for (const type of ['danger', 'nailbiter']) for (const m of pack.alerts?.[type]?.messages || []) { assert.ok(!bad.test(m.cta || ''), `${f} ${type}: ${m.cta}`); assert.ok(!/\b(go vote|cast (it|your vote)|offer your vote|pick (one|yours|a target|a torch)|decide for me|and decide)\b/i.test(m.message || ''), `${f} ${type}: ${m.message}`); }
+    }
+});
+t('danger alerts only when the gap gets worse than what was announced', () => {
+    assert.ok(dangerShouldAlert(undefined, 'trailing-1'), 'first time');
+    assert.ok(dangerShouldAlert(null, 'trailing-11plus'), 'after a recovery the slate is clean');
+    assert.ok(dangerShouldAlert('trailing-2-3', 'trailing-6-10'), 'worse');
+    assert.ok(!dangerShouldAlert('trailing-6-10', 'trailing-6-10'), 'same');
+    assert.ok(!dangerShouldAlert('trailing-11plus', 'trailing-4-5'), 'better is not a warning');
+});
+t('shown-once memory is per match and step', () => {
+    let m = {};
+    assert.ok(!wasShownOnce(m, 'a', '24h'));
+    m = markShownOnce(m, 'a', '24h', 5);
+    assert.ok(wasShownOnce(m, 'a', '24h') && !wasShownOnce(m, 'a', '3h') && !wasShownOnce(m, 'b', '24h'));
+    assert.ok(!wasShownOnce(undefined, 'a', '24h'));
+});
+t('encouragement nudges are spaced out', () => {
+    assert.ok(encouragementDue('gentle', Date.now()), 'never shown');
+    assert.ok(!encouragementDue('gentle', 5 * 60000) && !encouragementDue('gentle', 44 * 60000) && encouragementDue('gentle', 45 * 60000));
+    assert.ok(!encouragementDue('urgent', 29 * 60000) && encouragementDue('urgent', 30 * 60000));
 });
 console.log(`${pass} passed`);

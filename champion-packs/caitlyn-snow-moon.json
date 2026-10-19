@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few quiet marks and the light returns.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",
@@ -76,7 +76,7 @@
               "eq": 0
             }
           },
-          "message": "Dead level. The moon holds its breath. Offer your vote.",
+          "message": "Dead level. The moon holds its breath. Call another watcher.",
           "cta": "Offer it"
         },
         {

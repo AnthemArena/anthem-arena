@@ -1088,15 +1088,27 @@
     "default": {
       "messages": [
         "Achievement unlocked: {name}. Nice one.",
-        "Another one down: {name}."
+        "Another one down: {name}.",
+        "{name}. Not bad. Not bad at all.",
+        "{name}. That's how you do it.",
+        "Ha, {name}. Told you you could.",
+        "{name}. Knew you had it in you.",
+        "Good work. {name} is yours.",
+        "{name}. Put that one on the wall.",
+        "{name}. Keep that up and we'll get along fine.",
+        "One more down: {name}. Keep swinging."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description} +{xp} XP"
+        "{description} +{xp} XP",
+        "Earned, not given. +{xp} XP",
+        "Solid work. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
-        "See all"
+        "See all",
+        "Show me",
+        "Keep swinging"
       ]
     },
     "mastery-up": {

@@ -14,9 +14,11 @@ import {
     limit 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
-import { getUnlockedAchievementsFromFirebase } from './achievement-tracker.js';
+import { getUnlockedAchievementsFromFirebase, calculateAchievementStats } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
-import { ARCANE_CONFIG, ddragonUrl } from './arcane-config.js';
+import { buildAchievementsView, renderAchievementsHtml } from './achievements-view-model.js';
+import { achievementVote } from './vote-facts.js';
+import { ARCANE_CONFIG, ddragonUrl, getCompanionPack } from './arcane-config.js';
 import { tidyNames } from './title-clean.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
@@ -254,7 +256,7 @@ async function preloadTabCounts(userId) {
     try {
         const profileDoc = await getDoc(doc(db, 'profiles', userId));
         counts.achievements = profileDoc.exists()
-            ? (profileDoc.data().unlockedAchievements || []).length
+            ? (profileDoc.data().unlockedAchievements || []).filter(id => ACHIEVEMENTS[id]).length
             : 0;
         document.getElementById('achievementsCount').textContent = counts.achievements;
     } catch (error) {
@@ -1309,54 +1311,26 @@ async function loadAllPosts(userId) {
 async function loadAllAchievements(userId) {
     try {
         const unlockedIds = await getUnlockedAchievementsFromFirebase(userId);
-        
-        // Update count
-        document.getElementById('achievementsCount').textContent = unlockedIds.length;
-        
-        if (unlockedIds.length === 0) {
-            return; // Keep no-content state
+        const own = userId === (localStorage.getItem('userId') || localStorage.getItem('tournamentUserId'));
+
+        // Own profile: progress for the locked ones, from the votes saved in this browser
+        let stats = null;
+        if (own) {
+            try {
+                const saved = JSON.parse(localStorage.getItem('userVotes') || '{}');
+                const votes = Object.keys(saved).map(id => achievementVote(id, saved[id], null));
+                stats = await calculateAchievementStats(votes);
+            } catch (e) { console.warn('Achievement progress unavailable:', e); }
         }
-        
-        const achievements = unlockedIds
-            .map(id => ({ ...ACHIEVEMENTS[id], id }))
-            .filter(Boolean)
-            .sort((a, b) => {
-                const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
-                const rarityA = rarityOrder[a.rarity] || 0;
-                const rarityB = rarityOrder[b.rarity] || 0;
-                if (rarityB !== rarityA) return rarityB - rarityA;
-                return (b.xp || 0) - (a.xp || 0);
-            });
-        
+
+        const view = buildAchievementsView({ unlockedIds, own, stats, packName: id => getCompanionPack(id)?.name || id.charAt(0).toUpperCase() + id.slice(1) });
+        document.getElementById('achievementsCount').textContent = view.unlockedTotal;
+        if (view.unlockedTotal === 0 && !own) return;   // keep the no-content state
+
         const container = document.getElementById('allAchievements');
-        // ✅ FIX: Check if icon is URL and render as image
-        container.innerHTML = achievements.map(ach => {
-            const isUrl = ach.icon && typeof ach.icon === 'string' && ach.icon.startsWith('http');
-            
-            return `
-                <div class="achievement-card">
-                    <div class="achievement-header">
-                        <div class="achievement-icon">
-                            ${isUrl 
-                                ? `<img src="${ach.icon}" 
-                                        alt="${ach.name}" 
-                                        class="achievement-icon-img"
-                                        style="width: 100%; height: 100%; object-fit: contain;"
-                                        onerror="this.style.display='none'; this.parentElement.textContent='🏆';">`
-                                : ach.icon
-                            }
-                        </div>
-                        <div class="achievement-info">
-                            <div class="achievement-name">${ach.name}</div>
-                            <span class="achievement-rarity ${ach.rarity}">${ach.rarity}</span>
-                        </div>
-                    </div>
-                    <div class="achievement-description">${ach.description}</div>
-                    <div class="achievement-xp">+${ach.xp} XP</div>
-                </div>
-            `;
-        }).join('');
-        
+        container.classList.remove('achievements-grid');
+        container.classList.add('ach-sections');
+        container.innerHTML = renderAchievementsHtml(view);
     } catch (error) {
         console.error('❌ Error loading all achievements:', error);
     }

@@ -301,6 +301,11 @@
         <h3>Skins</h3>
         <label><input type="checkbox" id="unlockAllSkins"> Unlock every skin for testing (this browser only, switch it off when you are done)</label>
         <div class="skin-grid" id="skinGrid"></div>
+        <div style="margin:10px 0 4px"><strong>Pop-up style:</strong>
+            <label><input type="radio" name="tsStyle" value="classic"> Classic</label>
+            <label><input type="radio" name="tsStyle" value="full"> Full art</label>
+            <label><input type="radio" name="tsStyle" value="side"> Side art</label>
+            <label><input type="radio" name="tsStyle" value="minimal"> Minimal</label></div>
         <div class="skin-status" id="skinStatus"></div>
     </div>
     
@@ -312,7 +317,7 @@
                 <button class="test-btn" onclick="testDanger(15)">
                     <span class="test-btn-icon">🚨</span>
                     <strong>Danger</strong>
-                    <span class="test-btn-label">Your song is losing</span>
+                    <span class="test-btn-label">Your pick is losing</span>
                 </button>
                 <div class="severity-selector">
                     <button class="severity-btn" onclick="testDanger(5)">-5 votes</button>
@@ -559,6 +564,12 @@
     <script type="module">
         import { SKIN_UNLOCKS } from '/js/champion-unlocks.js';
         import { lookSkin, saveLook, TEST_UNLOCK_KEY } from '/js/companion-look.js';
+        import { readToastStyle } from '/js/notification-prefs.js';
+        import { applyToastStyle } from '/js/notification-visuals.js';
+        document.querySelectorAll('input[name=tsStyle]').forEach(r => {
+            r.checked = r.value === readToastStyle();
+            r.addEventListener('change', () => { try { localStorage.setItem('toastStyle', r.value); } catch { /* storage blocked */ } applyToastStyle(r.value); });
+        });
         import { voiceSetFor } from '/js/champion-voice.js';
         import { getChampionTileUrl, getChampionSplashUrl } from '/js/arcane-config.js';
 
@@ -911,6 +922,7 @@ action: 'dismiss'
     
     function testWelcome(type = 'first-time') {
         const msg = window.championLoader?.getCustomMessage(`welcome-${type}`);
+        const fill = t => String(t ?? '').replace(/\{days\}/g, '5').replace(/\{liveCount\}/g, '15');   // the live site fills these in js/global-notifications.js (fillWelcomeText)
         
         const messages = {
             'first-time': { icon: '🎵', default: 'Welcome to Arcane Moments!' },
@@ -926,8 +938,8 @@ action: 'dismiss'
             welcomeType: type,
             matchId: 'welcome',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-            message: msg?.message || `${config.icon} ${config.default}`,
-            detail: msg?.detail || '15 live matches waiting for your vote!',
+            message: fill(msg?.message) || `${config.icon} ${config.default}`,
+            detail: fill(msg?.detail) || '15 live matches waiting for your vote!',
             cta: msg?.cta || 'Start Voting',
             action: 'dismiss'
         });
@@ -1007,6 +1019,7 @@ function testRoundOpening() {
 
 function testWelcomeBack() {
     const msg = window.championLoader?.getCustomMessage('welcome-back');
+    const fill = t => String(t ?? '').replace(/\{days\}/g, '5').replace(/\{liveCount\}/g, '15');   // the live site fills these in js/global-notifications.js (fillWelcomeText)
     
     window.showBulletin?.({
         priority: 5,
@@ -1014,8 +1027,8 @@ function testWelcomeBack() {
         welcomeType: 'back',
         matchId: 'welcome-back',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-        message: msg?.message || '👋 Welcome back!',
-        detail: msg?.detail || '12 matches waiting for your vote',
+        message: fill(msg?.message) || '👋 Welcome back!',
+        detail: fill(msg?.detail) || '12 matches waiting for your vote',
         cta: msg?.cta || 'Continue Voting',
         action: 'dismiss'
     });

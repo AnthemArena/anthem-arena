@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Time to reroute the power and find a shortcut through an asteroid belt. Go vote!",
+          "message": "Down {voteDiff}. Time to reroute the power and find a shortcut through an asteroid belt. Rally some votes!",
           "cta": "Share it around"
         }
       ]
@@ -68,7 +68,7 @@
             }
           },
           "message": "Dead even! We're hovering in the dock and one vote decides which way the ship turns!",
-          "cta": "Pick the heading"
+          "cta": "Find one more vote"
         },
         {
           "condition": {

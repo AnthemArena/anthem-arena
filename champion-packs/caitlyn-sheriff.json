@@ -76,8 +76,8 @@
               "eq": 0
             }
           },
-          "message": "Dead even. The whole town holds its breath. Cast your vote.",
-          "cta": "Cast it"
+          "message": "Dead even. The whole town holds its breath. Rally the posse.",
+          "cta": "Find one more vote"
         },
         {
           "condition": {
@@ -1356,7 +1356,7 @@
   "share": {
     "invite": [
       "{a} or {b}. One verdict decides it. Choose.",
-      "Two cases, one pick: {a} against {b}. Cast your vote.",
+      "Two cases, one pick: {a} against {b}. Rally the posse.",
       "{a} versus {b}. Join the posse and tell me what you think."
     ],
     "voted": [
