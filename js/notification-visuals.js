@@ -469,15 +469,21 @@ export function ensureVersusStyles() {
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
 /* toast styles (Settings > Notifications): classic is the rules above; the others override them */
 .versus-toast .nv-caption{display:none}
-/* full art: the splash fills the whole card and everything sits on top of it, over a darkening fade */
-html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:128px}
-html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 12%}
-html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,.15) 28%,rgba(18,10,24,.68) 52%,rgba(18,10,24,.9) 100%)}
-@media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:96px}}
-/* minimal: no art, no match thumbnails or pills; a one-line caption says which match it is about */
-html[data-toast-style="minimal"] .versus-toast .nv-body{padding:14px 16px 12px}
+/* full art: the splash is the whole card; no match thumbnails, a caption on the art, and the champion's words in a frosted bubble over it */
+html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
+html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 14%}
+html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 42%,rgba(18,10,24,.38) 64%,rgba(18,10,24,.82) 100%)}
+html[data-toast-style="full"] .versus-toast .nv-edits,html[data-toast-style="full"] .versus-toast .nv-strip,html[data-toast-style="full"] .versus-toast .nv-lead:has(.nv-edits){display:none}
+html[data-toast-style="full"] .versus-toast .nv-caption{display:block;position:absolute;top:10px;left:12px;max-width:calc(100% - 60px);padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-toast-style="full"] .versus-toast .nv-bubble{background:rgba(11,13,24,.55);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2)}
+html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(11,13,24,.55)}
+html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:110px}}
+/* minimal: no art, no match thumbnails or pills; a one-line caption names the match so the alert is never unclear */
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:12px 16px 10px;gap:8px}
 html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
-html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits){display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0}
 html[data-toast-style="minimal"] .versus-toast .nv-caption{display:block;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:6px}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
