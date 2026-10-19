@@ -4,6 +4,9 @@
 // ========================================
 
 const CACHE_DURATION = 30; // 30 seconds
+// The CDN keeps these answers (cache: "manual") and by default ignores the query string, so /api/matches?matchId=X was
+// answered with the cached full match list. Naming the parameters that change the answer gives each its own CDN entry.
+const CDN_VARY = "query=matchId|tournament|limit|_refresh";
 const STALE_OK_MS = 10 * 60 * 1000; // serve a copy up to 10 minutes old if Firestore refuses
 const FIREBASE_PROJECT = "arcane-moments";
 
@@ -92,6 +95,7 @@ export default async (request, context) => {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
+          "Netlify-Vary": CDN_VARY,
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -188,6 +192,7 @@ export default async (request, context) => {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
+        "Netlify-Vary": CDN_VARY,
         "X-Cache": bypassCache ? "REFRESH" : "MISS",
         "Access-Control-Allow-Origin": "*"
       }
@@ -480,6 +485,7 @@ async function handleTotalVotes(request) {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "public, max-age=30, s-maxage=30",
+          "Netlify-Vary": CDN_VARY,
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -561,6 +567,7 @@ async function handleTotalVotes(request) {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "public, max-age=30, s-maxage=30",
+        "Netlify-Vary": CDN_VARY,
         "X-Cache": "MISS",
         "Access-Control-Allow-Origin": "*"
       }
@@ -605,6 +612,7 @@ async function handleActivityFeed(request) {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
+          "Netlify-Vary": CDN_VARY,
           "X-Cache": "HIT",
           "Access-Control-Allow-Origin": "*"
         }
@@ -656,6 +664,7 @@ async function handleActivityFeed(request) {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": `public, max-age=${CACHE_DURATION}, s-maxage=${CACHE_DURATION}`,
+        "Netlify-Vary": CDN_VARY,
         "X-Cache": bypassCache ? "REFRESH" : "MISS",
         "Access-Control-Allow-Origin": "*"
       }

@@ -81,10 +81,16 @@ export async function getMatch(matchId, bypassCache = false) {
             throw new Error(`API error: ${response.status}`);
         }
         
-        const data = await response.json();
+        let data = await response.json();
         
         const cacheStatus = response.headers.get('X-Cache');
         console.log(`✅ Match loaded (Cache: ${cacheStatus || 'UNKNOWN'})`);
+        
+        // A cache in between once answered a single-match request with the whole match list: pick the match out of it
+        // instead of rendering a page full of "undefined".
+        if (Array.isArray(data)) {
+            data = data.find(m => m && (m.id === matchId || m.matchId === matchId)) || null;
+        }
         
         return data;
         
