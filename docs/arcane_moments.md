@@ -907,5 +907,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   duets, curtain calls, corks and toasts; written from the skin's theme, none of its in-game lines are reused; the test checks that).
 - **Done:** PROJECT Jinx (`jinx-project`, skin 20: a corrupted memory core, cold and calculating one second, manic the next; targets, reboots,
   diagnostics and glitches). The test now checks every themed set against Original and against each other.
-- **Next:** the other Jinx skins in mastery order (Firecracker, Zombie Slayer, Ambitious Elf, Odyssey, Heartseeker, ...), then Vi and Caitlyn
+- **Done:** Firecracker Jinx (`jinx-firecracker`, skin 2, Lunar Revel: fuses, lanterns, a dragon-shaped rocket, luck and "it's only a party
+  favour"; festival wording kept playful and about the fireworks).
+- **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Odyssey, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
