@@ -31,4 +31,13 @@ assert.deepEqual(ACHIEVEMENTS['vi-heavy-hitter'].progress(stats), { current: 10,
 assert.equal(ACHIEVEMENTS['jinx-chaos-agent'].condition(stats), true);
 assert.equal(ACHIEVEMENTS['jinx-loose-cannon'].condition(stats), false);        // 5 of 10 underdogs
 assert.ok(/^https:\/\/ddragon\.leagueoflegends\.com\/cdn\/[\d.]+\/img\/spell\/ViQ\.png$/.test(ACHIEVEMENTS['vi-door-breaker'].icon));
+// distinct days, not a count of votes
+const dayVotes = [1, 1, 1, 2, 3, 3].map((d, i) => ({ championId: 'jinx', timestamp: Date.UTC(2026, 0, d, 10 + i), facts: { underdog: true } }))
+    .concat([{ championId: 'jinx', timestamp: Date.UTC(2026, 0, 9), facts: {} }, { championId: 'vi', timestamp: Date.UTC(2026, 0, 10), facts: { underdog: true } }]);
+assert.equal(championStats(dayVotes).jinx.underdogDays, 3);
+assert.equal(championStats(dayVotes).vi.underdogDays, 1);
+const trouble = ACHIEVEMENTS['jinx-troublemaker'];
+assert.deepEqual(trouble.progress({ byChampion: championStats(dayVotes) }), { current: 3, target: 5 });
+assert.equal(trouble.condition({ byChampion: { jinx: { underdogDays: 5 } } }), true);
+assert.throws(() => rule('underdogDays', 1, { scope: 'all' }));
 console.log('achievement rules tests passed');

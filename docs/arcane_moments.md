@@ -1128,3 +1128,7 @@ Votes, streaks, underdogs, close matches and shares add up across cups, so their
 - Journey: "All the Way" (6 rounds) needs a 64+ entry cup; the live cup has 6 rounds, so it is reachable now but not in smaller cups. Left as is.
 
 Also: the vote-counting part of `calculateAchievementStats` is now `computeVoteStats` (pure, testable). Tests: `tools/test-achievement-reachability.mjs` fails if a "same moment" achievement asks for more than a 32-entry cup allows, or a journey achievement asks for more rounds than the 64-entry cup has.
+
+## Jinx: Troublemaker (19 October 2026)
+
+New rule `underdogDays` (champion scope only): the number of different UTC days on which an underdog was backed with that champion. Jinx gets `jinx-troublemaker` (back an underdog on 5 different days, 250 XP, no skin), so her three differ in what they ask: Loose Cannon (how many underdogs), Troublemaker (on how many different days), Chaos Agent (backing the side that is behind). Jinx's total is 700 XP, inside the 1,000 budget.

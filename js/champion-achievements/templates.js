@@ -11,6 +11,7 @@
 export const METRICS = {
     votes:       { champion: 'votes',          all: 'totalVotes' },
     underdog:    { champion: 'underdogVotes',  all: 'underdogVotes' },
+    underdogDays: { champion: 'underdogDays' },   // different days on which an underdog was backed (champion scope only)
     close:       { champion: 'closeVotes',     all: 'closeMatchVotes' },
     againstTide: { champion: 'againstTideVotes', all: 'comebackVotes' },
     early:       { champion: 'earlyVotes',     all: 'earlyVotes' },
@@ -22,6 +23,7 @@ export function rule(metric, target, { packId, scope = 'champion' } = {}) {
     const m = METRICS[metric];
     if (!m) throw new Error(`Unknown achievement rule: ${metric}`);
     if (scope === 'champion' && !packId) throw new Error('A champion rule needs a packId');
+    if (scope === 'all' && !m.all) throw new Error(`Rule ${metric} has no all-votes version`);
     const read = stats => Number(scope === 'champion' ? stats?.byChampion?.[packId]?.[m.champion] : stats?.[m.all]) || 0;
     return {
         metric, scope, target,
