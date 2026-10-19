@@ -943,7 +943,10 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   (blunt, cocky, loyal; brawling, rounds, corners and jabs), tone only from the in-game list, nothing copied. Arcane Undercity (29) and Arcane Brawler
   (48) keep the base `vi.json` voice until Brawler gets its own set. Next: Demon Vi (4) and PROJECT Vi (11), each with its own set extending `vi-original`.
 - **Done:** Demon Vi (`vi-demon`, skin 4): a bored infernal brawler summoned into the mortal realm who answers a good fight and only for so long.
-  Votes are offerings, matches are sentences, a closing match is a binding about to slip. Builds on `vi-original`. Next: PROJECT Vi (11).
+  Votes are offerings, matches are sentences, a closing match is a binding about to slip. Builds on `vi-original`.
+- **Done:** PROJECT Vi (`vi-project`, skin 11): a street-smart, blunt detective keeping the neon streets in line, with a lower-sector enforcer's toughness.
+  Patrols, cases, statements, stakeouts and badges. Next: the rest of Vi's ladder, one skin at a time (Neon Strike, Officer, Debonair, Warring Kingdoms,
+  Heartbreaker, Heartache, PsyOps, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
