@@ -66,7 +66,7 @@ export function splashFromAvatarSrc(src) {
 // The champion's speech bubble used inside pop-ups: same look as the vote modal (dark card, pink edge, tail at the portrait).
 export function bubbleHtml(text, jinxSrc, accent) {
     if (!text) return '';
-    return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}</div></div>`;
+    return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}<button class="nv-bubble-x" aria-label="Dismiss" onclick="event.stopPropagation(); window.dismissBulletin && window.dismissBulletin()">×</button></div></div>`;
 }
 
 // Achievement pop-up in the same family as the other alerts: icon, "Achievement unlocked", name, the champion's line, button.
@@ -482,6 +482,7 @@ export function ensureVersusStyles() {
 @media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
 /* toast styles (Settings > Notifications): classic is the rules above; the others override them */
 .versus-toast .nv-head-row{display:contents}
+.versus-toast .nv-bubble-x{display:none}
 .versus-toast .nv-caption{display:none}
 /* full art: the splash is the whole card; no match thumbnails, a caption on the art, and the champion's words in a frosted bubble over it */
 html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
@@ -513,7 +514,9 @@ html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px
 html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:10px;bottom:6px;font-size:22px;line-height:1;color:var(--nv-accent,#ff69b4)}
 html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0}
 html[data-toast-style="minimal"] .versus-toast .nv-follow-face,html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{order:-2}
-html[data-toast-style="minimal"] .versus-toast .bulletin-close{position:relative;top:auto;right:auto;order:-1;align-self:flex-end;flex:none;width:22px;height:22px;font-size:14px;margin:0 -8px -14px 0;z-index:4}
+html[data-toast-style="minimal"] .versus-toast .bulletin-close{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x{display:flex;position:absolute;top:-9px;right:-9px;z-index:4;width:22px;height:22px;padding:0;align-items:center;justify-content:center;border-radius:50%;font-size:14px;line-height:1;cursor:pointer;color:rgba(255,255,255,.9);background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.22)}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x:hover{background:rgba(0,0,0,.85);color:#fff}
 /* the "who did what" line (ally / rival / follow / achievement): no box, just their face and the words with a shadow, lined up with the bubble's left edge */
 html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{display:flex;width:fit-content;max-width:100%;align-items:center;justify-content:flex-start !important;text-align:left !important;gap:10px;margin:0 0 6px 90px;padding:0;background:none;border:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 12px rgba(0,0,0,.85)}
 html[data-toast-style="minimal"] .versus-toast .nv-toast-headline .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}

@@ -149,7 +149,7 @@ t('event toast: tag, bubble, chips, one button; the whole card and the button bo
     assert.ok(/aria-label="Your pick is behind"/.test(html) && html.includes('nv-mark-event') && html.includes('>▼<'), 'the symbol sits between the two edits');
     assert.ok(html.includes('Share the match') && html.includes('38% vs 62%') && html.includes('Fix it'));
     assert.ok(html.includes('Down 12. &lt;b&gt;hi&lt;/b&gt;'), 'text is escaped');
-    assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button/g) || []).length, 2);
+    assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button(?![^>]*nv-bubble-x)/g) || []).length, 2, 'one close and one action button (the bubble also carries a dismiss that only the Minimal style shows)'); assert.equal((html.match(/nv-bubble-x/g) || []).length, 1);
     const bare = eventToastHtml({ type: 'round-opening' }, { tag: 'Round 2 is open', edits: null, accent: '#ff69b4', jinxSrc: null, quip: 'Go', cta: 'Start' });
     assert.ok(!bare.includes('nv-edits') && bare.includes('nv-glyph'), 'no match: the symbol alone in a circle');
 });
