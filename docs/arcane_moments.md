@@ -952,8 +952,10 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Squad cars, sirens, tickets, the bullpen's betting pool and a partner she pretends not to like. Kept apart from PROJECT (detective) and Neon Strike (vice).
   
 - **Done:** Debonair Vi (`vi-debonair`, skin 3): an immaculate woman in charge of herself and her destiny, polite right up until she breaks something.
-  Lounges, deals, tables, tabs and velvet menace; votes are positions at the table. Next: the rest of Vi's ladder, one skin at a time (Warring Kingdoms,
-  Heartbreaker, Heartache, PsyOps, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
+  Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
+- **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
+  Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
+  one skin at a time (Warring Kingdoms, Heartbreaker, Heartache, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
