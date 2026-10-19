@@ -452,9 +452,10 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-/* the top band (--nv-art) is left clear so the splash art shows; the content sits below it on a darkening fade */
-.versus-toast .nv-body{position:relative;cursor:pointer;padding:var(--nv-art,120px) 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 26%,rgba(18,10,24,.7) 46%,rgba(18,10,24,.94) 64%,rgba(18,10,24,.97) 100%),var(--nv-splash,none) top center/100% auto no-repeat,linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint));background-color:#120a18}
-@media (max-width:480px){.versus-toast .nv-body{--nv-art:84px}}
+/* the splash is its own header strip (--nv-art tall, full toast width) that fades into the dark content below */
+.versus-toast .nv-body{position:relative;cursor:pointer;padding:calc(var(--nv-art,150px) + 6px) 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint)),#120a18}
+.versus-toast .nv-body::before{content:'';position:absolute;top:0;left:0;right:0;height:var(--nv-art,150px);pointer-events:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 62%,rgba(18,10,24,.85) 92%,#120a18 100%),var(--nv-splash,none) center 20%/cover no-repeat,#120a18;border-bottom:1px solid var(--nv-line,rgba(255,79,180,.35))}
+@media (max-width:480px){.versus-toast .nv-body{--nv-art:110px}}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
