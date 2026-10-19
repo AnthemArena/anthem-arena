@@ -950,7 +950,9 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   look: shades, neon strip, sting operations, synth soundtrack and sunset showdowns). 
 - **Done:** Officer Vi (`vi-officer`, skin 2): a lone-wolf patrol cop who has burned through every partner in the department until a sharpshooting one kept up.
   Squad cars, sirens, tickets, the bullpen's betting pool and a partner she pretends not to like. Kept apart from PROJECT (detective) and Neon Strike (vice).
-  Next: the rest of Vi's ladder, one skin at a time (Debonair, Warring Kingdoms,
+  
+- **Done:** Debonair Vi (`vi-debonair`, skin 3): an immaculate woman in charge of herself and her destiny, polite right up until she breaks something.
+  Lounges, deals, tables, tabs and velvet menace; votes are positions at the table. Next: the rest of Vi's ladder, one skin at a time (Warring Kingdoms,
   Heartbreaker, Heartache, PsyOps, Primal Ambush, T1, then Arcane Brawler), then Caitlyn.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
