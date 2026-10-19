@@ -921,6 +921,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   fireworks, crowds, encores and chaos as the missing opening act).
 - **Done:** Zombie Slayer Jinx (`jinx-zombie-slayer`, skin 3: the apocalypse as paradise; no laws, no civilization, a horde of slime-vomiting
   bullet sponges and all the ammo she can forage).
+- **Done:** Ambitious Elf Jinx (`jinx-ambitious-elf`, skin 12: a master toy maker who wants to be the greatest Santa ever, whose creations the
+  other elves fear could count as weapons; workshop, toys, wish lists and sleigh deliveries).
 - **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
 - **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
