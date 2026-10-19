@@ -493,13 +493,13 @@ html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(1
 html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 @media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:110px}}
 /* side art: a tall column of centred art on the left (faded into the card); caption, bubble and pills on the right */
-html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:112px;padding:14px 14px 12px 130px;min-height:150px;justify-content:center}
-html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
+html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:100px;padding:12px 12px 10px 114px;gap:8px;min-height:136px;justify-content:center}
+html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;filter:brightness(1.18) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
 html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx-face{display:none}
 html[data-toast-style="side"] .versus-toast .nv-caption{display:block;text-align:left;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
 html[data-toast-style="side"] .versus-toast .nv-chips{justify-content:flex-start}
-@media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:76px;padding-left:92px}}
+@media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:70px;padding-left:84px}}
 /* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
    a small arrow says so and the match name is the hover text. */
 html[data-toast-style="minimal"] .bulletin-banner.versus-toast{background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important}
