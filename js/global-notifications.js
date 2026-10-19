@@ -5,6 +5,7 @@ import './champion-loader.js';
 
 import { getActivityFeed } from './api-client.js';
 import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './notification-prefs.js';
+import { fillWelcomeText } from './champion-lines.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
 import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
@@ -1720,12 +1721,6 @@ async function showWelcomeToast() {
         return;
     }
     
-    // Replace {days} placeholder for comeback messages
-    if (welcomeType === 'comeback' && daysSince > 0) {
-        welcomeData.message = welcomeData.message.replace('{days}', daysSince);
-        welcomeData.detail = welcomeData.detail.replace('{days}', daysSince);
-    }
-    
     try {
         // Count live matches
         const response = await fetch('/api/matches');
@@ -1746,8 +1741,8 @@ async function showWelcomeToast() {
             welcomeType,
             matchId: 'welcome',
             thumbnailUrl: thumbnailUrl,
-            message: welcomeData.message,
-            detail: welcomeData.detail,
+            message: fillWelcomeText(welcomeData.message, { days: daysSince, liveCount: liveMatches.length }),
+            detail: fillWelcomeText(welcomeData.detail, { days: daysSince, liveCount: liveMatches.length }),
             cta: welcomeData.cta,
             action: isOnMatchesPage ? 'dismiss' : 'navigate',
             targetUrl: '/matches.html',

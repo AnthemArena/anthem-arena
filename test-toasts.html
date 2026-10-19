@@ -922,6 +922,7 @@ action: 'dismiss'
     
     function testWelcome(type = 'first-time') {
         const msg = window.championLoader?.getCustomMessage(`welcome-${type}`);
+        const fill = t => String(t ?? '').replace(/\{days\}/g, '5').replace(/\{liveCount\}/g, '15');   // the live site fills these in js/global-notifications.js (fillWelcomeText)
         
         const messages = {
             'first-time': { icon: '🎵', default: 'Welcome to Arcane Moments!' },
@@ -937,8 +938,8 @@ action: 'dismiss'
             welcomeType: type,
             matchId: 'welcome',
             thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-            message: msg?.message || `${config.icon} ${config.default}`,
-            detail: msg?.detail || '15 live matches waiting for your vote!',
+            message: fill(msg?.message) || `${config.icon} ${config.default}`,
+            detail: fill(msg?.detail) || '15 live matches waiting for your vote!',
             cta: msg?.cta || 'Start Voting',
             action: 'dismiss'
         });
@@ -1018,6 +1019,7 @@ function testRoundOpening() {
 
 function testWelcomeBack() {
     const msg = window.championLoader?.getCustomMessage('welcome-back');
+    const fill = t => String(t ?? '').replace(/\{days\}/g, '5').replace(/\{liveCount\}/g, '15');   // the live site fills these in js/global-notifications.js (fillWelcomeText)
     
     window.showBulletin?.({
         priority: 5,
@@ -1025,8 +1027,8 @@ function testWelcomeBack() {
         welcomeType: 'back',
         matchId: 'welcome-back',
         thumbnailUrl: 'https://img.youtube.com/vi/aR-KAldshAE/mqdefault.jpg',
-        message: msg?.message || '👋 Welcome back!',
-        detail: msg?.detail || '12 matches waiting for your vote',
+        message: fill(msg?.message) || '👋 Welcome back!',
+        detail: fill(msg?.detail) || '12 matches waiting for your vote',
         cta: msg?.cta || 'Continue Voting',
         action: 'dismiss'
     });
