@@ -971,6 +971,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Done:** Original Caitlyn (`caitlyn-original`, Classic and every Caitlyn skin without its own set): a full rewrite of her Classic voice, tone only from her in-game list,
   nothing copied. A composed, dry-witted sheriff-investigator with perfect aim and a taste for tea (traps, chases, evidence, the trail going cold). The old
   `caitlyn.json` voice stays for Arcane Enforcer (28) and Arcane Commander (50). Next: Caitlyn's skins one at a time, each extending `caitlyn-original`.
+- **Done:** Resistance Caitlyn (`caitlyn-resistance`, skin 1): a haunted soldier who has never forgiven herself, set on firing the shot that ends the war.
+  The front line, rounds, spotters, last light and atonement; votes are rounds fired and a closing match is the last light. No lore names (no machine or ruler names).
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
