@@ -913,5 +913,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   duty versus mischief, stars and sparkles).
 - **Done:** Odyssey Jinx (`jinx-odyssey`, skin 13: the Morning Star's pilot and former mining-explosives tech; cockpits, thrusters, asteroid fields,
   docking, crew and collateral damage).
+- **Done:** Battle Cat Jinx (`jinx-battle-cat`, skin 38, also used by Prestige Battle Cat, skin 40: the Anima Squad's one-cat demolitions squad;
+  pounces, claws, nine lives, ignored orders and explosive results). Prestige can get its own layer later.
 - **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).

@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-battle-cat",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Battle Cat Jinx",
+  "description": "Voice set for Battle Cat Jinx (skin 38, also used by Prestige Battle Cat): the Anima Squad's one-cat demolitions squad. Pounces, claws, nine lives, ignored orders and explosive results. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! That's not a scratch, that's a full-on hairball of doom! Unsheathe the claws!",
+          "cta": "Unsheathe the claws"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? Somebody's been knocking our stuff off the shelf. I'm going to find them. And knock them off a shelf.",
+          "cta": "Pounce back"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind! Time to ignore every order and do the thing that works. Which is explosions!",
+          "cta": "Ignore the orders"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. My tail's twitching and that's never good for somebody!",
+          "cta": "Twitch the tail"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. Just a little swat away! One good pounce will do it!",
+          "cta": "Make a pounce"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. I've got eight lives left and a lot of attitude. Go vote!",
+          "cta": "Yowl about it"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! Whiskers twitching, tail puffed, and one vote decides who gets the pounce!",
+          "cta": "Take the pounce"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! One! I'm crouched on the edge and I can't hold the wiggle in!",
+          "cta": "Make the leap"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! Every hair on my back is up! That includes the invisible ones!",
+          "cta": "Stand on guard"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either a perfect pounce or a gloriously messy tumble. I'm up for both!",
+          "cta": "Check the rooftop"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! That wasn't a win, that was a victory purr! The whole squad's flopping!",
+          "cta": "Purr proudly"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! You earned a nap in the sunny spot! Don't oversleep, though!",
+          "cta": "Take a nap"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and rising! Keep your claws sharp, don't relax yet!",
+          "cta": "Keep hunting"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still ahead. Don't jinx it. Too late, it's literally my name!",
+          "cta": "Watch the prey"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and landed on its feet! Of course it did! Cats always do!",
+          "cta": "Take a lap"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Burned one of nine lives and flipped a {voteDiff}-vote hole! Worth every life!",
+          "cta": "Purr awhile"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Clawed back from {voteDiff} behind! Messy, scrappy, absolutely purr-fect!",
+          "cta": "Good hunting"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just crept into the lead like a cat on a counter. Slow. Smug. Dangerous!",
+          "cta": "Check the alley"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! A squadmate! Don't expect me to follow your orders, though!",
+        "{username} picked {momentTitle}. Matching paw prints! Don't step on mine!",
+        "{username} is on your side with {momentTitle}. Welcome to the squad. The couch is mine.",
+        "{username} backed {momentTitle} as well. Two pouncers! The prey doesn't stand a chance!",
+        "Same pick as {username}! Two cats, one sunbeam. Share it or lose a sleeve!",
+        "{username} agrees with you on {momentTitle}. Put it in the squad log, it's rare!",
+        "{username} voted {momentTitle}. Two of you! A tiny pride! The world's slightly safer!",
+        "{username} has taste and it matches yours. Good instincts, both of you!"
+      ],
+      "details": [
+        "Squad's growing! I still don't take orders.",
+        "Look at you, hunting in a pack!",
+        "Don't tell them I purred.",
+        "A new friend! I'll knock something off a table for them.",
+        "Teamwork! Fine! Quick, before I change my mind!",
+        "I give it a week before one of you steals the sunny spot.",
+        "New squad member! I'm drawing whiskers on your badge.",
+        "More of us means more naps, I mean victories!"
+      ],
+      "buttons": [
+        "Say hi",
+        "Send a purr",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Join the pride"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival cat on my turf! Fur's up, claws out!",
+        "{username} voted against {yourMoment}. Aww. A stray! With opinions!",
+        "{username} chose {theirMoment}. Not worried. Just stalking from the shadows. And sharpening my claws.",
+        "{username} went for {theirMoment}. New entry in the stalk list!",
+        "{username} is against you on {yourMoment}. Finally, a proper turf war!",
+        "{username} thinks {theirMoment} is better. A rival cat! Let's see who lands on their feet.",
+        "{username} voted against you. Two cats, one rooftop. Somebody's losing a whisker!",
+        "{username} versus you! I'm getting the best fence post, snacks, and the big explosive."
+      ],
+      "details": [
+        "I'm not saying scratch. I'm saying claws are good.",
+        "The big boom wants a word. It's been waiting.",
+        "They'll learn. Cats teach slowly but loudly.",
+        "One rooftop, two cats. Somebody's getting hissed at.",
+        "I like them already. They're a great scratching post.",
+        "I don't care. Check the tail. I care a lot.",
+        "A little rivalry keeps the claws sharp!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Pounce",
+        "Face them",
+        "Settle it",
+        "Front fence"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! You two move like one pride! A loud one!",
+        "{username} has agreed with you ten times running. Either teamwork or you share a litter box. Gross. Great!",
+        "Ten straight with {username}! The squad's talking about it. By squad I mean me."
+      ],
+      "details": [
+        "Ten! That's a whole cat family!",
+        "Don't scratch it up now!",
+        "Honestly? Purr-fect.",
+        "Weird. Good weird. Whiskers weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hi",
+        "Hunt together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a legendary hunting pair! I'm sniffling. It's fur!",
+        "{streakCount} for you and {username}. Perfect pounce timing, every time. I'd write a song but I'd rather bat things around.",
+        "{streakCount} straight with {username}! Somebody give you both a medal. Or a laser pointer."
+      ],
+      "details": [
+        "I'm speechless and I never stop mewing!",
+        "Is this healthy? Ask the vet. We don't have one!",
+        "That's not luck, that's instinct."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Hunt together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep crossing the same alley!",
+        "{username} has disagreed with you ten times running. That's not a rival, that's a territory dispute!",
+        "Ten scraps with {username}. I'm selling front-row fence spots."
+      ],
+      "details": [
+        "This is the main hunt now.",
+        "Fence spots selling fast!",
+        "The whole alley wants a seat."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Scrap again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a turf war! I LOVE turf wars!",
+        "{streakCount} scraps with {username}. Call a truce? Nah. Sharpen the claws!",
+        "{streakCount} against {username}. That's not a rivalry, that's a whole city block."
+      ],
+      "details": [
+        "Bigger than the Primordian problem. Almost!",
+        "I'm nervous and a bit proud. And a bit hissy.",
+        "One of you has to run out of lives. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep scrapping"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! The mouse is running out of hole, hero!",
+        "{timeLeft} left on {matchTitle}. Your vote's missing from the hunt! Don't nap through it!",
+        "{matchTitle} ends in {timeLeft}. Voting takes ten seconds. I timed it with a wet paw."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the clock"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? My tail's twitching, captain! That's a warning!",
+        "Tick, tick, mew! {matchTitle} closes in {timeLeft}. Don't miss the pounce!",
+        "{timeLeft} until {matchTitle} closes and your paw's still tucked in. Out you come!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, paws out"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! Last chance to pounce! Wiggle your butt, then leap!",
+        "{timeLeft}! That's all the daylight left on {matchTitle}. Go go go!",
+        "Last pounce on {matchTitle}! {timeLeft} left. Stop licking your paw and vote!"
+      ],
+      "buttons": [
+        "Last chance",
+        "Pounce now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to scurry off and you haven't pounced on any of them! First one runs in {timeLeft}!",
+        "{matchCount} unvoted matches, all scurrying away. The first one's gone in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, hunting now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! A whole empty alley! Somebody has to pounce first!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even the mice are bored!",
+        "Brand new match and not a single vote. Somebody has to make the first leap. Pick me. Pick you!",
+        "{matchTitle} needs a first pounce. I've got claws. I mean, you've got a vote."
+      ],
+      "buttons": [
+        "Make the first pounce",
+        "Spring the trap",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. The loneliest corner of the whole alley!",
+        "Hardly anyone's prowled here. What's wrong with everybody?",
+        "Low turnout. I blame all of you. Equally. With hisses.",
+        "Barely any votes here. Somebody bring more cats!"
+      ],
+      "details": [
+        "Go on, give it a sniff.",
+        "It deserves a bigger pride. So do I.",
+        "Make some noise, mew loudly!",
+        "Don't be shy. I'm the shy one. Hiss. Joking!"
+      ],
+      "ctas": [
+        "Vote",
+        "Join the pride",
+        "Go on",
+        "Pounce"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the pounce. Funny, I know someone who hasn't leaped. Guess who!",
+        "Perfect tie on {matchTitle}. Two cats, equal speed. I'm looking at you, hunter. Hehe!",
+        "Dead even and nobody's moving. You haven't voted. You're the one who pounces last!",
+        "{moment1} and {moment2}, stalking each other, and you've been quiet on the fence. Fix that!"
+      ],
+      "buttons": [
+        "Make the pounce",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the daylight's almost gone! Last chance to pounce!",
+        "Dead level, almost no time left. You're the only cat who can break it!",
+        "Still tied with the sun going down. Pick a side! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Make the leap",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Claws out, tail up! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new alley to prowl!",
+        "Round {round} just started! {matchCount} matches waiting for a pounce. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even the mice!"
+      ],
+      "buttons": [
+        "Start prowling",
+        "See round {round}",
+        "Let's go",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Landed on its feet! Called it! Cats always do!",
+        "{momentTitle} beat the competition! Next round's in for a face full of claws.",
+        "{momentTitle} survived! I never doubted it. Okay, the squad doubted. Just a smidge.",
+        "{momentTitle} is through! Somebody's having a great hunt. Hehe, you!",
+        "{momentTitle} moves up and the rest are chew toys. Gnawed chew toys.",
+        "{momentTitle} won! Good call! Enjoy a nap in the sunbeam!"
+      ],
+      "details": [
+        "Your pick keeps prowling!",
+        "One down, lots of alley left.",
+        "The bracket just shrank. Tidier! Furrier!"
+      ],
+      "buttons": [
+        "Purr loudly",
+        "See the result",
+        "Next match",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. A scratch on the pride. I'll hiss about it later!",
+        "{momentTitle} lost. Everyone who voted against it gets a pile of shredded sofa.",
+        "Fine. {momentTitle} is gone. I'll knock one thing off a shelf in its honour. Maybe three.",
+        "{momentTitle} was too fast for this alley anyway. Obviously.",
+        "{momentTitle} is out, and the alley went quiet. I hate a quiet alley. Somebody knock something over!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A whisker bit."
+      ],
+      "details": [
+        "They'll pay for this. With scratches.",
+        "It was good. The whole alley knows.",
+        "You'll find another one. Good cats always come home.",
+        "Every hunt ends. That's what makes the next one fun. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next match",
+        "Take revenge",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still browsing? Pick one! Any one! I'll wait. I'm lying, I'll nap!",
+        "No pressure, but are you gonna vote or just stare at the screen like a cat at a wall?",
+        "They're all great prey! Pick one! Pounce first, purr later!",
+        "Decisions, decisions. Close your eyes, bat a paw at the screen, and hope."
+      ],
+      "details": [
+        "Every vote is a pounce!",
+        "Your opinion matters. Sort of. In a catty way.",
+        "Don't overthink it. Overthinking scares the prey.",
+        "Trust your gut. Mine's mostly hairball."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Pounce",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New kitten! Welcome! {liveCount} matches live and every one of them's a scrap!",
+          "{liveCount} edits fighting it out in the alley and you just wandered in. Pick a side before they pick you!",
+          "Oooh, a newcomer! Claws are sharp, tail's up, and {liveCount} matches are live. You'll love it.",
+          "No rules, {liveCount} live matches, and me on the fence. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Come in",
+          "Light it up"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I saved you a spot in the sunbeam. Okay, I sat in it. But I saved it.",
+          "Two days running! Look at you, a squad regular!",
+          "Back again? Day two! I could get used to this. Don't tell the other cats."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because your spot got cold!",
+          "You're back after {days} days! The alley kept scrapping without you. Mostly explosions.",
+          "{days} days away. I noticed. The sunbeam felt empty. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The alley was getting dull!",
+          "Look who's here! Ready for another hunt?",
+          "You came back! Let's go knock something over."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! A tiny pounce. The first blast is always the best.",
+        "One down. The squad of one just got a second member. You!"
+      ],
+      "details": [
+        "First pounce logged. +{xp} XP",
+        "Welcome to the squad. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're sticking around! Strays usually wander off.",
+        "Five votes! The fuse is lit."
+      ],
+      "details": [
+        "Five and still scrapping. +{xp} XP",
+        "Not a drifter after all. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular on my rooftop now. Sit anywhere. Not there.",
+        "Ten votes. That's a proper little mission."
+      ],
+      "details": [
+        "A regular on the roof. +{xp} XP",
+        "Ten pounces so far. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! The whole alley's got your scent now.",
+        "Twenty-five! Loud and proud, like a cat at 3am."
+      ],
+      "details": [
+        "The alley knows your name. +{xp} XP",
+        "Twenty-five yowls. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly out in the field now.",
+        "Fifty! Past the bins, past the fence, deep in the territory."
+      ],
+      "details": [
+        "Deep in enemy turf. +{xp} XP",
+        "Fifty strikes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! Okay, that's a squad legend. Medals for everyone!",
+        "One hundred! They'll tell stories of this. Mostly lies. Mostly exaggerated."
+      ],
+      "details": [
+        "Squad legend. +{xp} XP",
+        "One hundred blasts. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! The fuse is still burning.",
+        "Three days in a row! You've got the knack."
+      ],
+      "details": [
+        "Three days on the job. +{xp} XP",
+        "The fuse keeps burning. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You report for duty even without orders. My kind of recruit!",
+        "Seven days straight! That's discipline. Gross. Impressive!"
+      ],
+      "details": [
+        "A week of missions. +{xp} XP",
+        "Seven days on the front. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! The Primordians couldn't stop you!",
+        "Fourteen days! Even I'd take a nap by now."
+      ],
+      "details": [
+        "Two weeks of mayhem. +{xp} XP",
+        "Not even a fur ball stopped you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! You've outlasted a few of my nine lives!",
+        "A whole month on duty. Give yourself a medal. I've got one in my mouth."
+      ],
+      "details": [
+        "A month on the front line. +{xp} XP",
+        "Thirty days of results. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You go against the grain like a cat against a petting hand!",
+        "Five long shots! Orders say no. Results say yes."
+      ],
+      "details": [
+        "Against orders. +{xp} XP",
+        "Five strays backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You don't follow orders either. We should talk. Not about orders.",
+        "Fifteen picks nobody asked for! A true insubordinate."
+      ],
+      "details": [
+        "Insubordination pays. +{xp} XP",
+        "Fifteen strays rescued. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! A dark cat if I ever saw one!",
+        "Thirty! Nobody sees you coming. Not even me, and I see everything."
+      ],
+      "details": [
+        "A dark cat in the night. +{xp} XP",
+        "Thirty long shots. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! Five times! You always get to the mouse before the mouse knows it.",
+        "Five early votes! Quick paws!"
+      ],
+      "details": [
+        "Quickest paws. +{xp} XP",
+        "First to the scene. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you pounced first! Not a soldier, but a scout!",
+        "Fifteen early ones! You scout like a cat on a ledge."
+      ],
+      "details": [
+        "Scouting ahead. +{xp} XP",
+        "Fifteen firsts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! Claws on the edge every time!",
+        "Ten photo finishes. You live for the last second, don't you?"
+      ],
+      "details": [
+        "Tight finishes suit a pouncer. +{xp} XP",
+        "Ten near-misses. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! Where you go, the fuse follows!",
+        "Your vote lands where it matters. Twenty-five times!"
+      ],
+      "details": [
+        "The deciding paw. +{xp} XP",
+        "Twenty-five tight calls. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one trailing. Five times! Stubborn like a cat on a keyboard.",
+        "You don't leave a stray in a puddle. I love that."
+      ],
+      "details": [
+        "Faith in the underpaw. +{xp} XP",
+        "Five rescues. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've found your favourite scratching post!",
+        "That one again? Yeah. It's got good bark."
+      ],
+      "details": [
+        "Your favourite post. +{xp} XP",
+        "Three for the same target. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same one! That's loyalty! Like a cat to a particular box.",
+        "Okay, you adopted it. No take-backs."
+      ],
+      "details": [
+        "Loyal to the last blast. +{xp} XP",
+        "Five for one. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a nap spot!",
+        "Ten votes for the same one. I won't tell the squad. I'm squad."
+      ],
+      "details": [
+        "Ten for one. +{xp} XP",
+        "Fixated. Respect. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You see the mission through, even without orders!",
+        "Round two reached! Still hunting!"
+      ],
+      "details": [
+        "Two rounds scouted. +{xp} XP",
+        "Two missions down. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly deep in enemy territory now!",
+        "Deep in the bracket! Hope you like cramped alleys."
+      ],
+      "details": [
+        "Four rounds deep. +{xp} XP",
+        "Deep in the trenches. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the whole campaign through!",
+        "Six rounds! You never retreated! Wow!"
+      ],
+      "details": [
+        "The whole campaign. +{xp} XP",
+        "All six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're sniffing round every corner!",
+        "Ten different matches! Curious cat, huh?"
+      ],
+      "details": [
+        "Sniffing around. +{xp} XP",
+        "Ten matches scouted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been in every corner, every drain, every dumpster!",
+        "Twenty-five! You really do check everything."
+      ],
+      "details": [
+        "Every drain checked. +{xp} XP",
+        "Twenty-five matches. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not scouting, that's a whole tour of duty!",
+        "Fifty matches! You know this alley better than I do."
+      ],
+      "details": [
+        "A true veteran. +{xp} XP",
+        "A full tour. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't peel yourself off the sunbeam, can you?",
+        "Five back to back! Keep the fuse short!"
+      ],
+      "details": [
+        "One long prowl. +{xp} XP",
+        "Five in a stretch. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Lick a paw!",
+        "Ten matches in a single prowl! Wow!"
+      ],
+      "details": [
+        "Deep prowl! +{xp} XP",
+        "Ten in one prowl! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. Cats are nocturnal. Allegedly.",
+        "Middle of the night! That's when the best pouncing happens."
+      ],
+      "details": [
+        "Night patrol. +{xp} XP",
+        "Moonlight voter! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Signal flare to the whole alley!",
+        "Five shares! You're yowling loud! Good!"
+      ],
+      "details": [
+        "Thanks for calling the strays. +{xp} XP",
+        "Five yowls shared. +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically in recruitment for the squad!",
+        "Fifteen! You keep telling every stray."
+      ],
+      "details": [
+        "Recruiting for the squad. +{xp} XP",
+        "Fifteen yowls shared. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before it got loud! Founding squad member! Yours forever!",
+        "One of the first strays through the door! That counts, you know!"
+      ],
+      "details": [
+        "Yours for all nine lives. +{xp} XP",
+        "Nobody can swipe that one. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! Shiny stripes on the tail!",
+        "Promoted! No, I won't salute. Okay, a very small one."
+      ],
+      "details": [
+        "Promoted to {rank}. +{xp} XP",
+        "Now {rank}, soldier! Ha. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Everything's on fire! In a good way!",
+        "Another one: {name}! Boom, results!"
+      ],
+      "details": [
+        "{description}, no orders needed. +{xp} XP",
+        "{description} Results! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Bigger claws and louder bangs!",
+        "Mastery up! The mission gets way louder from here."
+      ],
+      "details": [
+        "Now {rank}, no orders needed. +{xp} XP",
+        "Promoted to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a one-cat demolition squad!",
+        "Ten long shots! Chaos in the field. Great results too."
+      ],
+      "details": [
+        "A loose cannon with results. +{xp} XP",
+        "Ten strays rescued! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. I'll salute. Once.",
+        "Ten tight finishes with her! She'd never believe I'm watching!"
+      ],
+      "details": [
+        "Ten near things, ten pounces. +{xp} XP",
+        "Good shot, big paws! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love taking orders!",
+        "Seven days with a rule-lover! You're braver than the Primordians!"
+      ],
+      "details": [
+        "A week beside the sheriff. +{xp} XP",
+        "Seven days on the beat! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Pounced right through! Boom!",
+        "A tied match and you took the shot! Nice!"
+      ],
+      "details": [
+        "The vote that tipped the cushion. +{xp} XP",
+        "Tie cracked open! +{xp} XP"
+      ],
+      "buttons": [
+        "Next target",
+        "Keep hunting"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, the one-cat squad? Good choice. Bad idea. Great choice!",
+        "Battle Cat Jinx! Don't give me orders. Do give me explosives."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet! I'm sharpening claws on the doorframe. Check back soon?",
+      "Shh! Something's about to move. My whiskers can tell.",
+      "Closed for now. Doesn't stop me stalking the door."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, easy is when the mouse limps.",
+      "Watch both. Then pounce on the one that makes your tail go bushy.",
+      "I won't tell the squad who you picked. Probably. I'm a cat, I forget things.",
+      "Take your time! Actually, don't. I'm crouched and my legs are cramping.",
+      "Go on, nobody's watching. Okay, I'm watching. From the top of the fridge.",
+      "Pick the one you'd chase across a rooftop. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's pounced yet. Be first, I dare you!",
+      "So quiet! Even the mice stayed home. Make some noise with a vote.",
+      "Empty alley! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still curled up. Pick something!",
+      "The sun's nearly down. Don't make me yowl the countdown. I will."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Leap before the window slams shut!",
+      "Tick, tick, mew. That's the daylight leaking out."
+    ],
+    "closing-final": [
+      "Last stretch! Pounce now, groom later!",
+      "Any second now. Seriously. Bat the button!"
+    ],
+    "voted-early": [
+      "One of the first paws in! Bold! I love bold!",
+      "Hardly anybody's out here and you pounced anyway. Respect!"
+    ],
+    "voted-ahead": [
+      "Look at you, hunting with the pack! Don't get comfy, prey bites back.",
+      "{pct}% with you! Great nose. I didn't say that. Forget it.",
+      "Your pick's ahead. The whole alley's purring along for once. Weird!",
+      "{pick} is pulling away! Feels good? Don't lick the fur yet!",
+      "Ahead, for now. Tides turn. So do cats."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm peeking between my paws!",
+      "A whisker apart. One more vote could flip it. Tell a friend. Tell the whole street!",
+      "Neck and neck! Your pick needs you and every stray you know.",
+      "{pct} to {otherPct}. My tail's lashing and that's not a good sign."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody hissing!",
+      "A perfect tie. I'm hissing at the sky."
+    ],
+    "voted-behind": [
+      "You're behind! Don't sulk in the box. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog! My favourite kind of stray!",
+      "They're ahead. Doesn't make you wrong. Just slow to pounce!",
+      "Behind by {diff} points. Tell the alley. Loudly. Knock something over!",
+      "Everybody went the other way. Good! Be the odd cat out."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You hunt like me.",
+      "A win! The mouse never stood a chance. I'll take it!",
+      "{pick} went through! You called the landing!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it sting, then pounce again!",
+      "Didn't make it. I've lost a life or two over worse. Next one!",
+      "{pick} is out. Sorry. For real. I'll skip one nap for it."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to blink and neither of us did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Voting's closed. You missed this one! There's always another mouse.",
+      "All done. {winner} took it while you were licking your paw. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first pounce! The scary one. Now you're in the squad. Welcome!",
+      "That's your first. Feels small, right? Wait for the aftershock.",
+      "You're in the squad. Try not to wreck the sofa!"
+    ],
+    "streak": [
+      "Again? You keep turning up! I'm not complaining. I warmed your spot.",
+      "{streak} days running! Okay, now I'm putting it in the squad log.",
+      "Back again! Strays stick around where the food is. Stay!"
+    ],
+    "underdog": [
+      "Backing the one nobody's feeding? Ooh. I see you, stray.",
+      "Bold! Everyone else is chasing the other mouse. Love that.",
+      "Underdog, huh? Takes a certain kind of cat. A good kind."
+    ],
+    "early": [
+      "Early! You get to claim the sunny spot before anyone else. Don't waste it!",
+      "Hardly anyone's here yet. Your vote's doing all the heavy pouncing.",
+      "First over the fence! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just tipped the cushion! Feel it? Everything's close right now.",
+      "Whisker-thin! One more cat and the whole pile flips.",
+      "Close one! Your paw tipped it. Really, truly tipped it."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't dead. I've got eight more lives, so does it!",
+      "Not winning yet. Good! Means there's still something to claw at.",
+      "Behind, but it's not over. Not even close!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Prey doubles back!",
+      "Winning, for now. Enjoy it. Quietly. Or loudly with a purr. I don't mind.",
+      "Look at that! A fine pounce. Obviously."
+    ],
+    "default": [
+      "Noted! I'm not changing your mind. I can't be bothered.",
+      "Done! That one's on you now, squad of one.",
+      "Your vote's in. Go and see what else needs clawing!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and your claws are still tucked in! Pick whichever one smells right.",
+      "Everything's open! Take your pick. I'll pretend I'm not looking.",
+      "{unvoted} to go. No orders, just advice. Start pouncing!"
+    ],
+    "live-some": [
+      "{voted} down, {unvoted} to go! Keep stalking!",
+      "You're in the hunt now! {unvoted} more waiting on you.",
+      "Good start! The rest won't pounce on themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole alley!",
+      "Nearly clear! {unvoted} more and the alley's yours.",
+      "So close! Don't wander off now!"
+    ],
+    "live-one": [
+      "One left! Just one! Pounce!",
+      "Last one! Don't leave it twitching!",
+      "One mouse between you and the nap!"
+    ],
+    "live-closing": [
+      "Some of these close in {timeLeft}! {unvoted} still need you. Scamper!",
+      "The window's closing! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of daylight! Pick, quick!"
+    ],
+    "live-done": [
+      "You've pounced on everything! Look at you! Go and see the bracket!",
+      "Nothing left to hunt here. Come back when the next round opens!",
+      "All done! That's rare for a stray. Thanks!"
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll open again! Go and sniff the bracket.",
+      "Quiet. Too quiet. I'm knocking a cup off the table. Check back soon!",
+      "No matches open. I'm bored already. Might demolish a chair."
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest, well, nap time!",
+      "Everyone starts in a pack. Not everyone leaves one.",
+      "Watch the tables. They shuffle like a cat on a keyboard!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group move up.",
+      "No knockout yet. The groups have to finish scrapping first!",
+      "Patience! The knockout drops once the groups stop scrapping."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're off the roof!",
+      "Single elimination! No second chances. Okay, almost none. I have nine lives.",
+      "Every match counts more now. Pick carefully. Or don't, I don't give orders."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and you're done!",
+      "Follow the bracket. It tightens every round, like a trap!",
+      "Every line here is a match someone voted on. Ooh, trails."
+    ],
+    "brackets-complete": [
+      "And that's the cup! Thanks for being in the squad!",
+      "It's over! Good hunt! I'll miss it. A little. Don't tell anyone.",
+      "That's the champion! Worth every single scratch!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nobody's drawn a thing. Give it a moment.",
+      "Empty! The draw hasn't happened. Soon, soon!",
+      "Bare as a bowl. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no take-backs. Pounce on Arcane Moments!",
+      "Two edits are scrapping! {a} versus {b}. Come and settle it.",
+      "{a} versus {b} and the whole alley can't agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I pounced on {pick} over {other}. Come tell me I missed!",
+      "{pick} got my paw. {other} did not. Your turn!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, swat at me."
+    ],
+    "early": [
+      "I got one of the first votes in on {pick} versus {other}! Be quick, it's quiet out here.",
+      "Early vote for {pick} over {other}. Come make it a real brawl!",
+      "Hardly any votes on {pick} versus {other} yet. Fix that!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips it. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm hiding under the sofa. Come break it!",
+      "{pick} and {other} are dead even. Somebody pounce!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My fur is standing up. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This is gonna get hissy!",
+      "A whisker apart: {pick} versus {other}, {voteDiff} votes. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. Fixable! Come give it a swat!",
+      "Down {voteDiff} against {other}, but {pick} still has lives left. Help me out!",
+      "{pick} is {voteDiff} short of {other}. Don't make me demolish this solo!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Somebody cheated. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole squad, fast!",
+      "{pick} is getting shredded by {other}. Rescue party, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's close! Come help me guard it.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let it slink off!",
+      "{pct}% for {pick} against {other}. Close enough to puff my tail!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the demolition, or join in!",
+      "{pick} is flattening {other}, {pct}%! Pick a side before it's over.",
+      "{pct}% for {pick}! {other} never heard it coming."
+    ]
+  }
+}
