@@ -2157,6 +2157,7 @@ function saveVoteForOtherPages(matchId, songId, isNewVote = false) {
         record.totalVotesAtTime = totalVotesAtTime;
         record.tiedBefore = flags.tiedBefore;
         record.votedForSeed = votedSong.seed ?? null;
+        record.votedForVideoId = votedSong.videoId ?? null;
         // kept for older readers of this record (alerts, matches page)
         record.voteType = flags.underdog || flags.againstTide ? 'underdog' : flags.close ? 'closeCall' : sharePct > 60 ? 'mainstream' : 'balanced';
     } else {

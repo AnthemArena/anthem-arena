@@ -231,15 +231,19 @@ export function companionStats(allVotes) {
 }
 
 export async function calculateAchievementStats(allVotes) {
+    // Founding member status comes from Firebase; everything else is worked out from the votes (computeVoteStats)
+    const isFoundingMember = await checkFoundingMemberStatus();
+    return computeVoteStats(allVotes, { isFoundingMember });
+}
+
+// Pure (no Firebase): every number the achievements read, from the vote history.
+export function computeVoteStats(allVotes, { isFoundingMember = false } = {}) {
 
     // ✅ Track votes in current session
     let sessionStart = parseInt(sessionStorage.getItem('sessionStart'));
     if (!Number.isFinite(sessionStart)) { sessionStart = Date.now(); try { sessionStorage.setItem('sessionStart', String(sessionStart)); } catch (e) {} }
     const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
 
-    // Check founding member status from Firebase
-    const isFoundingMember = await checkFoundingMemberStatus();
-  
     const stats = {
         totalVotes: allVotes.length,
         // All of these read what was true when the vote was cast (see vote-facts.js), not how the match stands now
@@ -276,7 +280,9 @@ export async function calculateAchievementStats(allVotes) {
     // Calculate max votes for a single song
     const songVoteCounts = {};
     allVotes.forEach(v => {
-        const songId = v.votedForSeed || v.votedForName;
+        // The edit itself: its video id, else its name. A seed alone is only a rank inside one cup, so two different edits
+        // (seed 5 in two cups) must not count as one.
+        const songId = v.votedForVideoId || v.votedForName || (v.votedForSeed != null ? `seed:${v.votedForSeed}` : null);
         if (songId) {
             songVoteCounts[songId] = (songVoteCounts[songId] || 0) + 1;
         }

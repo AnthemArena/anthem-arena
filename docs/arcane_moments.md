@@ -1109,3 +1109,22 @@ The profile's Achievements tab (`js/achievements-view-model.js`, rendered by `lo
 ## Removed the duplicate Explorer achievements (19 October 2026)
 
 Match Explorer, Every Corner and Bracket Veteran (vote in 10 / 25 / 50 unique matches) are removed, along with the Explorer category. You can vote once per match, so they counted exactly what Arcane Regular, Crowd Voice and Deep in the Story already count. General is now 30 achievements; with the champion sets (Jinx 2, Caitlyn 3, Vi 2) there are 37 in total, worth 8,150 XP. XP already paid for them stays; saved ids that no longer exist are ignored by the profile. `tools/test-achievement-registry.mjs` now fails if two general achievements count the same thing at the same target.
+
+## Cup-size audit of the general achievements (19 October 2026)
+
+What one voter can reach in one group cup (3 group matches per edit, then one match per knockout round):
+
+| Entries | Matches | Rounds | Most votes for one edit |
+|---|---|---|---|
+| 16 | 31 | 4 | 6 |
+| 32 | 63 | 5 | 7 |
+| 64 (the live cup) | 127 | 6 | 8 |
+| 128 | 255 | 7 | 9 |
+| 256 | 511 | 8 | 10 |
+
+Votes, streaks, underdogs, close matches and shares add up across cups, so their ladders are fine at any cup size. The problems were in the "same moment" ladder:
+- **Obsession needed 10 votes for one edit**, only possible in a 256-entry cup for an edit that goes all the way. It is now **7**, reachable from a 32-entry cup (and Die-Hard stays at 5, Repeat Favourite at 3).
+- **The edit was identified by its seed**, which is only a rank inside one cup, so two different edits with seed 5 in two cups counted as one. It now uses the edit's video id (saved with new votes), then its name, then the seed only for old records.
+- Journey: "All the Way" (6 rounds) needs a 64+ entry cup; the live cup has 6 rounds, so it is reachable now but not in smaller cups. Left as is.
+
+Also: the vote-counting part of `calculateAchievementStats` is now `computeVoteStats` (pure, testable). Tests: `tools/test-achievement-reachability.mjs` fails if a "same moment" achievement asks for more than a 32-entry cup allows, or a journey achievement asks for more rounds than the 64-entry cup has.

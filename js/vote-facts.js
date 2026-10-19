@@ -91,6 +91,7 @@ export function achievementVote(matchId, saved, match) {
         tiedBefore: f.tiedBefore,
         round: match?.round || saved.round || 1,
         votedForSeed: saved.votedForSeed ?? null,
+        votedForVideoId: saved.votedForVideoId ?? null,
         votedForName: saved.songTitle || null,
         choice: saved.songId,
         match: match || {}

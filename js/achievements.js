@@ -432,15 +432,15 @@ export const GENERAL_ACHIEVEMENTS = {
   'obsession': {
     id: 'obsession',
     name: 'Obsession',
-    description: 'Vote for the same moment 10 times',
+    description: 'Vote for the same moment 7 times (it has to go deep into the bracket)',
     icon: '💥',
     xp: 400,
     category: 'loyalty',
     hidden: true,
     tier: 'gold',
     rarity: 'epic',
-    condition: (stats) => stats.maxSongVotes >= 10,
-    progress: (stats) => ({ current: stats.maxSongVotes, target: 10 })
+    condition: (stats) => stats.maxSongVotes >= 7,
+    progress: (stats) => ({ current: stats.maxSongVotes, target: 7 })
   },
 
   // ========================================
