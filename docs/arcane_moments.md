@@ -973,6 +973,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   `caitlyn.json` voice stays for Arcane Enforcer (28) and Arcane Commander (50). Next: Caitlyn's skins one at a time, each extending `caitlyn-original`.
 - **Done:** Resistance Caitlyn (`caitlyn-resistance`, skin 1): a haunted soldier who has never forgiven herself, set on firing the shot that ends the war.
   The front line, rounds, spotters, last light and atonement; votes are rounds fired and a closing match is the last light. No lore names (no machine or ruler names).
+- **Done:** Arctic Warfare Caitlyn (`caitlyn-arctic-warfare`, skin 4): a sniper on the Arctic front, where the cold is unforgiving and the winds are harsh.
+  Tundra, whiteouts, patience, frost and the last shot before the storm; votes are shots and a closing match is the storm arriving. No lore names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
