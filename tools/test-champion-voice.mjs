@@ -5,7 +5,7 @@ import { voiceSetFor, mergeVoice, applyVoiceSet, loadVoicedPack, VOICES, VOICE_S
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let pass = 0; const t = async (n, f) => { await f(); console.log('  ok  ', n); pass++; };
 const read = id => JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
-const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project'), firecracker = read('jinx-firecracker');
+const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project'), firecracker = read('jinx-firecracker'), starGuardian = read('jinx-star-guardian');
 
 await t('Arcane skins keep the base voice, every other Jinx skin speaks with the original', () => {
     assert.equal(voiceSetFor('jinx', 37), null);
@@ -14,6 +14,7 @@ await t('Arcane skins keep the base voice, every other Jinx skin speaks with the
     assert.equal(voiceSetFor('jinx', 1), 'jinx-crime-city');
     assert.equal(voiceSetFor('jinx', 20), 'jinx-project');
     assert.equal(voiceSetFor('jinx', 2), 'jinx-firecracker');
+    assert.equal(voiceSetFor('jinx', 4), 'jinx-star-guardian');
     assert.equal(voiceSetFor('vi', 29), null);
     assert.equal(voiceSetFor('nobody', 0), null);
     assert.equal(voiceSetFor('jinx', '37'), null);
@@ -55,7 +56,7 @@ await t('applyVoiceSet follows "extends": parent first, then the set itself, mis
 });
 
 // Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
-for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig]]) {
+for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig]]) {
     await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
         for (const s of VOICE_SECTIONS) {
             assert.ok(set[s], s);
@@ -94,12 +95,12 @@ for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-ci
 // Lines from the League audio pages that Jinx's skins share: ours are written from the character, never copied
 const RIOT_PHRASES = ["what's in my violin case", 'who wants a solo', "i've got a recital", 'scream along if you know the words', 'pop the cork', 'drink up',
     'wreaking havoc', 'stands for jinx', "doctor's note", "guns don't kill people", 'fat hands', 'hat lady', 'snoresville', 'everybody, panic',
-    'gotta die sometime', 'favorite waste of bullets', 'no need to be scared', 'accidentally did that on purpose', 'gun play', "that could happen"];
+    'gotta die sometime', 'favorite waste of bullets', 'no need to be scared', 'accidentally did that on purpose', 'gun play', 'pandemonium with a purpose', 'glitter and guns', 'glitter bomb', 'that was stellar', 'star light, star bright', 'to infinity and', 'sparkle party', 'extreme makeover', 'mercy, or mayhem', 'guardian code', 'guardian handbook', 'first star made me', 'twinkle, twinkle', 'rising star', 'shooting star'];
 const lines = x => new Set(VOICE_SECTIONS.flatMap(s => strings(x[s])).filter(l => l.length > 28));
-for (const [name, set] of [['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker]]) {
+for (const [name, set] of [['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker], ['jinx-star-guardian', starGuardian]]) {
     await t(`${name} is its own voice: almost nothing shared with Original Jinx or the other skins, and no in-game lines`, () => {
         const mine = lines(set);
-        for (const [other, o2] of [['jinx-original', orig], ['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker]]) {
+        for (const [other, o2] of [['jinx-original', orig], ['jinx-crime-city', crime], ['jinx-project', project], ['jinx-firecracker', firecracker], ['jinx-star-guardian', starGuardian]]) {
             if (o2 === set) continue;
             const theirs = lines(o2), shared = [...mine].filter(l => theirs.has(l));
             assert.ok(shared.length < mine.size * 0.02, `${name} shares ${shared.length} lines with ${other}: ${shared.slice(0, 3).join(' | ')}`);

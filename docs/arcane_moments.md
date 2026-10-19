@@ -909,5 +909,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   diagnostics and glitches). The test now checks every themed set against Original and against each other.
 - **Done:** Firecracker Jinx (`jinx-firecracker`, skin 2, Lunar Revel: fuses, lanterns, a dragon-shaped rocket, luck and "it's only a party
   favour"; festival wording kept playful and about the fireworks).
+- **Done:** Star Guardian Jinx (`jinx-star-guardian`, skin 4: a reluctant, sarcastic hero in glitter who talks to her guns Shiro and Kuro;
+  duty versus mischief, stars and sparkles).
 - **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Odyssey, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).

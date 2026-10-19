@@ -6,7 +6,7 @@
 // a set of its own (`skins`: skin number -> set). A set can name the set it builds on with "extends" ("jinx-original"), so it only
 // has to rewrite what its theme gives it.
 export const VOICES = {
-    jinx: { baseSkins: [37, 60], skins: { 1: 'jinx-crime-city', 2: 'jinx-firecracker', 20: 'jinx-project' }, other: 'jinx-original' }
+    jinx: { baseSkins: [37, 60], skins: { 1: 'jinx-crime-city', 2: 'jinx-firecracker', 4: 'jinx-star-guardian', 20: 'jinx-project' }, other: 'jinx-original' }
 };
 
 // The sections a voice set may rewrite; anything it leaves out falls back to the base pack.
