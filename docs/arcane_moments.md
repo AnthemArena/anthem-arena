@@ -955,7 +955,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
 - **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
   Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
-  one skin at a time (T1 is the last Vi skin left), then Caitlyn.
+  Vi is now fully voiced (Arcane Undercity keeps the base voice); next is Caitlyn, one skin at a time.
 - **Done:** Heartache Vi (`vi-heartache`, skin 30): a tough brawler who finds love letters in her locker (the card is a letter from Caitlyn), secretly flustered
   and never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama; votes are valentines.
 - **Done:** Primal Ambush Vi (`vi-primal-ambush`, skin 39): the unfazed leader of a clan of beast-warriors, hungry for any challenger worthy of her fists.
@@ -966,6 +966,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Jousts, favours, roses, suitors and tourney drama; votes are favours tossed and a closing match is the last trumpet. Kept apart from Heartache (school valentines).
 - **Done:** Arcane Brawler Vi (`vi-arcane-brawler`, skin 48): a bitter, bruised pit fighter from the underground cage fights, undefeated with a chip on her shoulder.
   Rings, bets, crowds, purses and dive-bar mornings; votes are bets and a closing match is the final bell. Tone only from the in-game list, nothing copied.
+- **Done:** T1 Vi (`vi-t1`, skin 49): an esports-champion Vi on the world finals stage, a jungler with a winning mentality. Drafts, series, objectives,
+  tempo and trophy lifts; votes are picks and a closing match is the final game. No real player or team names appear in the lines.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
