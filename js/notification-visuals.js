@@ -484,12 +484,12 @@ export function ensureVersusStyles() {
 .versus-toast .nv-head-row{display:contents}
 .versus-toast .nv-bubble-x{display:none}
 .versus-toast .nv-caption{display:none}
-/* full art: the splash is the whole card; no match thumbnails, a caption on the art, and the champion's words in a frosted bubble over it */
+/* full art: the splash is the whole card; no match thumbnails, captions, sub-lines or pills, and the champion's words in a frosted bubble over it */
 html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
 html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 14%}
 html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 42%,rgba(18,10,24,.38) 64%,rgba(18,10,24,.82) 100%)}
 html[data-toast-style="full"] .versus-toast .nv-edits,html[data-toast-style="full"] .versus-toast .nv-strip,html[data-toast-style="full"] .versus-toast .nv-lead:has(.nv-edits){display:none}
-html[data-toast-style="full"] .versus-toast .nv-caption{display:block;position:absolute;top:10px;left:12px;max-width:calc(100% - 60px);padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-toast-style="full"] .versus-toast .nv-caption,html[data-toast-style="full"] .versus-toast .nv-event-detail,html[data-toast-style="full"] .versus-toast .nv-chips{display:none}
 html[data-toast-style="full"] .versus-toast .nv-bubble{background:rgba(11,13,24,.55);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2)}
 html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(11,13,24,.55)}
 html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
@@ -498,9 +498,8 @@ html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.5
 html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:100px;padding:12px 12px 10px 114px;gap:8px;min-height:136px;justify-content:center}
 html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;filter:brightness(1.18) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
 html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx .nv-av{display:none}
-html[data-toast-style="side"] .versus-toast .nv-caption{display:block;text-align:left;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-toast-style="side"] .versus-toast .nv-caption,html[data-toast-style="side"] .versus-toast .nv-event-detail,html[data-toast-style="side"] .versus-toast .nv-chips{display:none}
 html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
-html[data-toast-style="side"] .versus-toast .nv-chips{justify-content:flex-start}
 @media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:70px;padding-left:84px}}
 /* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
    a small arrow says so and the match name is the hover text. */
