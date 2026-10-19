@@ -2511,7 +2511,7 @@ if (championPack && championPack.theme) {
         setCenteredSplash(banner);
         banner.innerHTML = eventToastHtml(notification, {
             tag: { 'mastery-up': 'Mastery up', 'champion-selected': 'Your champion' }[notification.type] || 'Level up', accent, jinxSrc: championBadgeUrl(pack),
-            ...(notification.type === 'champion-selected' ? { glyph: '⭐' } : { leadHtml: levelBadgeHtml(level, accent) }),
+            ...(notification.type === 'champion-selected' ? { glyph: '' } : { leadHtml: levelBadgeHtml(level, accent) }),
             strip: notification.strip || null,
             quip: notification.message, detail: notification.detail, cta: notification.cta || (notification.type === 'level-up' ? 'View progress' : 'View champions')
         });

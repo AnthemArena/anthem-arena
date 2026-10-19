@@ -29,7 +29,7 @@ with sync_playwright() as p:
         check(f'{call}: neither edit highlighted (both even)', len(r) == 2 and r[0] == r[1] and pg.locator('#bulletin-banner .nv-edit.nv-dim').count() == 0, r)
     show('testRoundOpening()')
     n = pg.locator('#bulletin-banner .nv-strip .nv-strip-th').count()
-    check('round opening: a strip of the entering edits under the champion line, symbol kept', 1 <= n <= 5 and pg.locator('#bulletin-banner .nv-glyph').count() == 1 and pg.locator('#bulletin-banner .nv-chip', has_text='matches').count() == 0, n)
+    check('round opening: a strip of the entering edits under the champion line, no play symbol', 1 <= n <= 5 and pg.locator('#bulletin-banner .nv-glyph').count() == 0 and pg.locator('#bulletin-banner .nv-chip', has_text='matches').count() == 0, n)
     pg.screenshot(path=f'{SHOTS}/sample-round.png')
     check('round opening: no second line under the champion', pg.locator('#bulletin-banner .nv-event-detail').count() == 0)
     show('testDanger(15)')

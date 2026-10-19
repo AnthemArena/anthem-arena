@@ -169,10 +169,11 @@ export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type ==
 // It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close, ⇄ flipped, ✓ won, ✕ lost.
 const EVENT_GLYPHS = {
     danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
-    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
+    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '', 'new-matches': '+',
     'match-won': '✓', 'match-lost': '✕', welcome: '👋', encouragement: '👀'
 };
-export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
+// '' means no symbol at all (round-opening: the strip of entering edits says it); anything unknown falls back to VS.
+export const eventGlyph = n => (n && n.type in EVENT_GLYPHS ? EVENT_GLYPHS[n.type] : 'VS');
 
 // Matches you have not voted in that are exactly level and still open. covered = every such match (the closing-soon alert leaves
 // them alone); ties = the ones not yet announced at their current step ('tied', or 'final' inside the last hours), soonest first.

@@ -368,6 +368,7 @@ export function withoutLeadingGlyph(text, glyph) {
 // The picture at the top of a match-event card: the two edits with the state symbol between them, or, with no match to show,
 // the symbol alone in a ringed circle (same size, so the card does not jump when the edits arrive). label = hover / screen-reader text.
 export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
+    if (!edits && glyph === '') return '';   // an alert that wants no symbol (round opening, champion selected) gets no circle
     const g = glyph && glyph !== 'VS' ? glyph : null;
     const inner = edits
         ? editsPairHtml({ edits, relationship: 'event', size, accent, mark: g })

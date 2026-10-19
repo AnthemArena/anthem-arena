@@ -131,7 +131,9 @@ t('event chips: percentages for a voted match, match count for a new round', () 
     assert.ok(isStripAlert({ type: 'welcome' }) && isStripAlert({ type: 'encouragement' }) && isStripAlert({ type: 'round-opening' }) && !isStripAlert({ type: 'danger' }));
     for (const k of ['danger', 'nailbiter', 'winning', 'comeback', 'round-opening', 'new-matches', 'match-won', 'match-lost', 'welcome', 'encouragement']) assert.equal(EVENT_KINDS[k].quiet, true, k);
     for (const k of ['closing', 'novotes', 'lowvotes']) assert.ok(!EVENT_KINDS[k].quiet, k);
-    for (const k of Object.keys(EVENT_KINDS)) assert.ok(eventGlyph({ type: k }), k);
+    for (const k of Object.keys(EVENT_KINDS)) assert.ok(typeof eventGlyph({ type: k }) === 'string', k);
+    assert.equal(eventGlyph({ type: 'round-opening' }), '', 'round opening has no symbol');
+    assert.equal(eventGlyph({ type: 'something-new' }), 'VS');
     assert.equal(eventGlyph({ type: 'danger' }), '▼'); assert.equal(eventGlyph({ type: 'winning' }), '▲'); assert.equal(eventGlyph({ type: 'match-lost' }), '✕'); assert.equal(eventGlyph({ type: 'nope' }), 'VS');
 });
 t('welcome and encouragement are event cards with their own tags', () => {
