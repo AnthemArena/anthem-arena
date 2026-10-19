@@ -955,11 +955,13 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Lounges, deals, tables, tabs and velvet menace; votes are positions at the table.
 - **Done:** PsyOps Vi (`vi-psyops`, skin 20): a hand-to-hand specialist whose blows are psychically enhanced, who rushes ahead for her squad.
   Missions, briefings, comms, objectives and extraction; votes are strikes and a closing match is an extraction window. Next: the rest of Vi's ladder,
-  one skin at a time (Warring Kingdoms, Heartbreaker, T1, then Arcane Brawler), then Caitlyn.
+  one skin at a time (Heartbreaker, T1, then Arcane Brawler), then Caitlyn.
 - **Done:** Heartache Vi (`vi-heartache`, skin 30): a tough brawler who finds love letters in her locker (the card is a letter from Caitlyn), secretly flustered
   and never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama; votes are valentines.
 - **Done:** Primal Ambush Vi (`vi-primal-ambush`, skin 39): the unfazed leader of a clan of beast-warriors, hungry for any challenger worthy of her fists.
   Hunts, trails, claws, the pride and the den; votes are claw-marks and a closing match is the last light of the hunt.
+- **Done:** Warring Kingdoms Vi (`vi-warring-kingdoms`, skin 5): a ferocious enforcer of a ruler's will who thrills at any challenge, jade gauntlets hitting like cannons.
+  Decrees, banners, sieges, campaigns and warlords; votes are seals and a closing match is the last horn before the gates shut.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
