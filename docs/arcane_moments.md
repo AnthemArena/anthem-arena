@@ -1001,6 +1001,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   ties are forked tunnels and a closing match is the dig site shutting for the season. Written from the theme only, not from the card's text; no character names.
 - **Done:** Lunar Wraith Caitlyn (`caitlyn-lunar-wraith`, skin 10): a hushed, ill-omened spirit haunting by moonlight. Candles, crypts, mist and fading light; votes are omens cast,
   ties are balanced curses and a closing match is the moon setting. Written from the theme only, not from the card's text; no character names.
+- **Done:** Arcane depth pass on the base voices (`jinx.json`, `caitlyn.json`): five lines each swapped in place for quieter, more vulnerable Jinx and guilt-tinged Caitlyn moments
+  (lost match, comeback, long absence, long ally streak, losing badly). Same events and counts; original lines only.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.

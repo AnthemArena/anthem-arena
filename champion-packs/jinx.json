@@ -70,7 +70,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Do the maths. Then do something about it.",
+          "message": "Down {voteDiff}. Don't leave me alone with this one. Please.",
           "cta": "Share it around"
         }
       ]
@@ -263,7 +263,7 @@
     "streak-ally-20": {
       "messages": [
         "{streakCount} matches in a row with {username}. That's scary. In a good way.",
-        "{streakCount} for {username} and you. At this point you're one brain.",
+        "{streakCount} with {username}, same side every time. Must be nice, having someone who stays.",
         "{streakCount} straight with {username}. Somebody give you both a medal. Or a warning."
       ],
       "details": [
@@ -455,13 +455,13 @@
         "{momentTitle} is out. Somebody cheated. I'm sure of it.",
         "{momentTitle} lost. I'm adding everyone who voted against it to the list.",
         "Fine. {momentTitle} is gone. I'm not upset. I'm just loud.",
-        "{momentTitle} was too good for this place anyway.",
+        "{momentTitle} is out. Everything good leaves in the end. I should be used to it by now.",
         "{momentTitle} is out. And now it's quiet. I hate it when it's quiet.",
         "{momentTitle} didn't make it. Moving on. Not really."
       ],
       "details": [
         "They'll pay for this.",
-        "It was good. They'll know.",
+        "It was good. I'll remember it, even if nobody else does.",
         "You'll get another one. They always come back.",
         "Everyone leaves eventually. It's fine."
       ],
@@ -521,7 +521,7 @@
       "welcome-comeback": {
         "messages": [
           "{days} days. Where've you been? I'm not asking because I care.",
-          "You're back after {days} days. A lot happened. Mostly loud things.",
+          "{days} days. I kept thinking you'd stopped coming. People do. You didn't. Good.",
           "{days} days away. I noticed. I don't know why I said that."
         ],
         "buttons": [
