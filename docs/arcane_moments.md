@@ -923,6 +923,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   bullet sponges and all the ammo she can forage).
 - **Done:** Ambitious Elf Jinx (`jinx-ambitious-elf`, skin 12: a master toy maker who wants to be the greatest Santa ever, whose creations the
   other elves fear could count as weapons; workshop, toys, wish lists and sleigh deliveries).
+- **Done:** Heartseeker Jinx (`jinx-heartseeker`, skin 29: love as a battlefield, armed with Fishbones, ready to break hearts and bones but
+  maybe playing nice; valentines, suitors, balconies and chocolates).
 - **Rule:** prestige versions of a skin keep their base skin's voice set for now (Prestige Battle Cat uses `jinx-battle-cat`).
 - **Next:** the other Jinx skins in mastery order (Zombie Slayer, Ambitious Elf, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
