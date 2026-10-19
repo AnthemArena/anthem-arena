@@ -977,6 +977,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   Tundra, whiteouts, patience, frost and the last shot before the storm; votes are shots and a closing match is the storm arriving. No lore names.
 - **Done:** Officer Caitlyn (`caitlyn-officer`, skin 5): a sharp-eyed beat cop who is routinely underestimated, with doughnuts, patrols, radios and stakeouts.
   Votes are filed reports and a closing match is the end of shift. No lore names.
+- **Done:** Headhunter Caitlyn (`caitlyn-headhunter`, skin 6): a cold, patient bounty hunter in alien armour, where every hunt and every shot goes exactly her way.
+  Contracts, quarry, scanners and the clean shot; votes are claimed shots and a closing match is the quarry about to bolt. No lore names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
