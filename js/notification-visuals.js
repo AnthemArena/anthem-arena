@@ -500,13 +500,17 @@ html[data-toast-style="side"] .versus-toast .nv-caption{display:block;text-align
 html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
 html[data-toast-style="side"] .versus-toast .nv-chips{justify-content:flex-start}
 @media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:76px;padding-left:92px}}
-/* minimal: just the champion's portrait and words; the whole card opens the match (a small arrow says so), the match name is the hover text */
-html[data-toast-style="minimal"] .versus-toast .nv-body{padding:12px 34px 12px 14px;gap:0}
+/* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
+   a small arrow says so and the match name is the hover text. */
+html[data-toast-style="minimal"] .bulletin-banner.versus-toast{background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important}
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0;gap:0;background:transparent;overflow:visible;isolation:auto}
 html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
-html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0}
-html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:-24px;top:50%;transform:translateY(-50%);font-size:24px;line-height:1;color:var(--nv-accent,#ff69b4)}
-html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:4px;right:6px;width:20px;height:20px;font-size:13px}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0;gap:12px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx .nv-circle{width:78px !important;height:78px !important;font-size:32px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px 16px;background:rgba(14,10,24,.94)}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:10px;bottom:6px;font-size:22px;line-height:1;color:var(--nv-accent,#ff69b4)}
+html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:0;right:0;width:22px;height:22px;font-size:14px}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
