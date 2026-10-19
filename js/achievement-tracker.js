@@ -12,7 +12,7 @@ import {
 } from './achievements.js';
 import { addXP } from './rank-system.js';
 import { streakFromVotes } from './xp-ledger.js';
-import { factsOf } from './vote-facts.js';
+import { factsOf, backedWinner } from './vote-facts.js';
 import { recordProgress } from './vote-progress.js';
 import { ddragonUrl } from './arcane-config.js';
 
@@ -215,6 +215,7 @@ export function championStats(allVotes) {
         underdogVotes: votes.filter(v => factsOf(v).underdog).length,
         closeVotes: votes.filter(v => factsOf(v).close).length,
         againstTideVotes: votes.filter(v => factsOf(v).againstTide).length,
+        backedWinners: votes.filter(backedWinner).length,
         underdogDays: new Set(votes.filter(v => factsOf(v).underdog).map(v => new Date(v.timestamp).toISOString().slice(0, 10))).size,
         earlyVotes: votes.filter(v => factsOf(v).early).length,
         decidingVotes: votes.filter(v => factsOf(v).tiedBefore).length,

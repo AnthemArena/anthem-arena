@@ -128,3 +128,22 @@ export function buildVoteRecord({ existing = null, songId, votedSong = {}, oppon
     }
     return record;
 }
+
+// ---------- who won a finished match ----------
+// Which side won: 'song1', 'song2', or null (not finished, no winner yet, or it cannot be told). Matches name their winner in a
+// few shapes across the site (the song's id, its video id, or the slot name), so all of them are accepted.
+export function winningSide(match) {
+    if (!match || !match.winnerId) return null;
+    if (match.status && match.status !== 'completed') return null;   // an old winnerId on a match that was reopened does not count
+    const w = match.winnerId;
+    const s1 = match.song1 || match.competitor1 || {}, s2 = match.song2 || match.competitor2 || {};
+    const is = (s, slot) => w === slot || (s.id != null && w === s.id) || (s.videoId != null && w === s.videoId);
+    const one = is(s1, 'song1'), two = is(s2, 'song2');
+    return one && !two ? 'song1' : two && !one ? 'song2' : null;
+}
+
+// Did this vote back the winner of its (finished) match? `vote.choice` is 'song1' | 'song2' and `vote.match` the match.
+export const backedWinner = vote => {
+    const side = winningSide(vote?.match);
+    return !!side && side === vote.choice;
+};

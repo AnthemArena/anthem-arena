@@ -40,4 +40,11 @@ const trouble = ACHIEVEMENTS['jinx-troublemaker'];
 assert.deepEqual(trouble.progress({ byChampion: championStats(dayVotes) }), { current: 3, target: 5 });
 assert.equal(trouble.condition({ byChampion: { jinx: { underdogDays: 5 } } }), true);
 assert.throws(() => rule('underdogDays', 1, { scope: 'all' }));
+// Right Call: backing the winner, per champion, only for finished matches
+const finished = (win, choice, champ) => ({ championId: champ, timestamp: 1, choice, facts: {}, match: { status: 'completed', winnerId: win, song1: { id: 'a' }, song2: { id: 'b' } } });
+const rc = [...Array.from({ length: 15 }, () => finished('a', 'song1', 'vi')), finished('a', 'song2', 'vi'), finished('a', 'song1', 'jinx'), { championId: 'vi', timestamp: 1, choice: 'song1', facts: {} }];
+assert.equal(championStats(rc).vi.backedWinners, 15); assert.equal(championStats(rc).jinx.backedWinners, 1);
+assert.equal(ACHIEVEMENTS['vi-right-call'].condition({ byChampion: championStats(rc) }), true);
+assert.deepEqual(ACHIEVEMENTS['vi-right-call'].progress({ byChampion: championStats(rc.slice(0, 5)) }), { current: 5, target: 15 });
+assert.throws(() => rule('backedWinner', 1, { scope: 'all' }));
 console.log('achievement rules tests passed');

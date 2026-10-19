@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { voteFacts, factsOf, isUnderdog, voteXpAward, utcDay, achievementVote, buildVoteRecord } from '../js/vote-facts.js';
+import { voteFacts, factsOf, isUnderdog, voteXpAward, utcDay, achievementVote, buildVoteRecord, winningSide, backedWinner } from '../js/vote-facts.js';
 
 const e = (votes, seed, pot) => ({ votes, seed, pot });
 
@@ -77,5 +77,21 @@ assert.equal(buildVoteRecord({ existing: full, songId: 'song1', votedSong: song,
 // switching the pick on the same match is a different vote: a fresh record
 rec = buildVoteRecord({ existing: full, songId: 'song2', votedSong: song, opponentSong: other, cast: null, now: 42 });
 assert.equal(rec.songId, 'song2'); assert.equal(rec.timestamp, 42);
+
+// ---- who won ----
+const done = (winnerId, extra = {}) => ({ status: 'completed', winnerId, song1: { id: 'a', videoId: 'va' }, song2: { id: 'b', videoId: 'vb' }, ...extra });
+assert.equal(winningSide(done('a')), 'song1');                       // the song's id
+assert.equal(winningSide(done('vb')), 'song2');                      // the video id
+assert.equal(winningSide(done('song2')), 'song2');                   // the slot name
+assert.equal(winningSide({ status: 'completed', winnerId: 'vb', competitor1: { videoId: 'va' }, competitor2: { videoId: 'vb' } }), 'song2');   // the vote page's shape
+assert.equal(winningSide(done('zzz')), null);                        // cannot be told
+assert.equal(winningSide(done(null)), null);
+assert.equal(winningSide(done('a', { status: 'live' })), null);      // reopened: an old winner does not count
+assert.equal(winningSide(null), null);
+assert.equal(winningSide({ winnerId: 'a', song1: { id: 'a' }, song2: { id: 'b' } }), 'song1');   // old docs with no status
+assert.equal(backedWinner({ choice: 'song1', match: done('a') }), true);
+assert.equal(backedWinner({ choice: 'song2', match: done('a') }), false);
+assert.equal(backedWinner({ choice: 'song1' }), false);              // match no longer available
+assert.equal(backedWinner({ choice: 'song1', match: done('a', { status: 'live' }) }), false);
 
 console.log('vote-facts tests passed');

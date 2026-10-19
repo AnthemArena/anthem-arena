@@ -11,6 +11,7 @@
 export const METRICS = {
     votes:       { champion: 'votes',          all: 'totalVotes' },
     underdog:    { champion: 'underdogVotes',  all: 'underdogVotes' },
+    backedWinner: { champion: 'backedWinners' },   // finished matches where the edit you backed won (champion scope only)
     underdogDays: { champion: 'underdogDays' },   // different days on which an underdog was backed (champion scope only)
     close:       { champion: 'closeVotes',     all: 'closeMatchVotes' },
     againstTide: { champion: 'againstTideVotes', all: 'comebackVotes' },
