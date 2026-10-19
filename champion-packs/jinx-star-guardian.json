@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Cue the dramatic heroic music. I'm humming it already. Go vote!",
+          "message": "Down {voteDiff}. Cue the dramatic heroic music. I'm humming it already. Rally some votes!",
           "cta": "Share it around"
         }
       ]

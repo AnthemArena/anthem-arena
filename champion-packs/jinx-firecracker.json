@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Time to hang more lanterns and make a lot more noise. Go vote!",
+          "message": "Down {voteDiff}. Time to hang more lanterns and make a lot more noise. Rally some votes!",
           "cta": "Spread the glow"
         }
       ]

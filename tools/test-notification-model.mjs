@@ -191,12 +191,12 @@ t('button targets: results open the match, move-on labels open the matches list,
     assert.equal(achievementButtonUrl({ type: 'achievement', cta: 'View achievements', targetUrl: '/profile#achievements' }), '/profile#achievements');
     assert.equal(achievementButtonUrl({ type: 'achievement', cta: 'See all' }), '/profile#achievements');
 });
-t('already-voted alerts (danger / nailbiter) never offer a button that says to vote', () => {
+t('already-voted alerts (danger / nailbiter) never tell the player to vote (button or line)', () => {
     const bad = /^(cast a vote|make the pick|pick one|cast it|choose a fate|pick a present|pick a suitor|pick the direction|pick the heading|laugh and vote)$/i;
     for (const f of fs.readdirSync(new URL('../champion-packs/', import.meta.url))) {
         if (!f.endsWith('.json') || f.includes('manifest')) continue;
         const pack = JSON.parse(fs.readFileSync(new URL('../champion-packs/' + f, import.meta.url), 'utf8'));
-        for (const type of ['danger', 'nailbiter']) for (const m of pack.alerts?.[type]?.messages || []) assert.ok(!bad.test(m.cta || ''), `${f} ${type}: ${m.cta}`);
+        for (const type of ['danger', 'nailbiter']) for (const m of pack.alerts?.[type]?.messages || []) { assert.ok(!bad.test(m.cta || ''), `${f} ${type}: ${m.cta}`); assert.ok(!/\b(go vote|cast (it|your vote)|offer your vote|pick (one|yours|a target|a torch)|decide for me|and decide)\b/i.test(m.message || ''), `${f} ${type}: ${m.message}`); }
     }
 });
 console.log(`${pass} passed`);

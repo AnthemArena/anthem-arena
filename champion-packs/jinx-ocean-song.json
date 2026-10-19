@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Warm-up crowd, that's all. Go vote and I'll light the main stage!",
+          "message": "Down {voteDiff}. Warm-up crowd, that's all. Rally some votes and I'll light the main stage!",
           "cta": "Tell the festival"
         }
       ]
@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Two acts, one stage, and the sound desk won't pick. Take the mic and decide!",
+          "message": "Dead even! Two acts, one stage, and the sound desk won't pick. Take the mic and rally!",
           "cta": "Grab the mic"
         },
         {

@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Time to reroute the power and find a shortcut through an asteroid belt. Go vote!",
+          "message": "Down {voteDiff}. Time to reroute the power and find a shortcut through an asteroid belt. Rally some votes!",
           "cta": "Share it around"
         }
       ]

@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Playing hard to get, that's all. Go vote and I'll make them blush!",
+          "message": "Down {voteDiff}. Playing hard to get, that's all. Rally some votes and I'll make them blush!",
           "cta": "Spread the love"
         }
       ]
@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Two suitors, one rose, and me with a rocket launcher. Somebody pick, quick!",
+          "message": "Dead even! Two suitors, one rose, and me with a rocket launcher. Somebody rally, quick!",
           "cta": "Find one more vote"
         },
         {
