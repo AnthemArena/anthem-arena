@@ -5,13 +5,14 @@ import { voiceSetFor, mergeVoice, applyVoiceSet, loadVoicedPack, VOICES, VOICE_S
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let pass = 0; const t = async (n, f) => { await f(); console.log('  ok  ', n); pass++; };
 const read = id => JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
-const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city');
+const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project');
 
 await t('Arcane skins keep the base voice, every other Jinx skin speaks with the original', () => {
     assert.equal(voiceSetFor('jinx', 37), null);
     assert.equal(voiceSetFor('jinx', 60), null);
-    for (const n of [0, 20, 40, 62]) assert.equal(voiceSetFor('jinx', n), 'jinx-original', `skin ${n}`);
+    for (const n of [0, 40, 62]) assert.equal(voiceSetFor('jinx', n), 'jinx-original', `skin ${n}`);
     assert.equal(voiceSetFor('jinx', 1), 'jinx-crime-city');
+    assert.equal(voiceSetFor('jinx', 20), 'jinx-project');
     assert.equal(voiceSetFor('vi', 29), null);
     assert.equal(voiceSetFor('nobody', 0), null);
     assert.equal(voiceSetFor('jinx', '37'), null);
@@ -33,7 +34,7 @@ await t('loadVoicedPack: right set per skin, cached, a missing voice file keeps 
     const cache = new Map();
     assert.equal((await loadVoicedPack('jinx', 37, fetchJson, cache)).alerts.danger, 'arcane');
     assert.equal((await loadVoicedPack('jinx', 0, fetchJson, cache)).alerts.danger, 'loud');
-    const n = calls.length; await loadVoicedPack('jinx', 20, fetchJson, cache); assert.equal(calls.length, n, 'second loud skin is served from the cache');
+    const n = calls.length; await loadVoicedPack('jinx', 62, fetchJson, cache); assert.equal(calls.length, n, 'second loud skin is served from the cache');
     assert.equal((await loadVoicedPack('jinx', 0, async id => (id === 'jinx' ? files.jinx : null), new Map())).alerts.danger, 'arcane');
     assert.equal(await loadVoicedPack('jinx', 0, async () => null, new Map()), null);
 });
@@ -53,7 +54,7 @@ await t('applyVoiceSet follows "extends": parent first, then the set itself, mis
 });
 
 // Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
-for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig]]) {
+for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig]]) {
     await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
         for (const s of VOICE_SECTIONS) {
             assert.ok(set[s], s);
@@ -89,12 +90,21 @@ for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-ci
         assert.ok(new Set(long).size >= long.length - 3, 'almost no repeated lines (buttons repeat on purpose)');
     });
 }
-await t('a themed set really is different from the one it builds on, and copies none of the in-game lines', () => {
-    const lines = x => new Set(VOICE_SECTIONS.flatMap(s => strings(x[s])).filter(l => l.length > 28));
-    const mine = lines(crime), theirs = lines(orig);
-    const shared = [...mine].filter(l => theirs.has(l));
-    assert.ok(shared.length < mine.size * 0.02, `only ${shared.length} shared lines`);
-    const text = [...mine].join('\n').toLowerCase();
-    for (const quote of ["what's in my violin case", 'who wants a solo', "i've got a recital", 'scream along if you know the words', 'pop the cork', 'drink up']) assert.ok(!text.includes(quote), quote);
-});
+// Lines from the League audio pages that Jinx's skins share: ours are written from the character, never copied
+const RIOT_PHRASES = ["what's in my violin case", 'who wants a solo', "i've got a recital", 'scream along if you know the words', 'pop the cork', 'drink up',
+    'wreaking havoc', 'stands for jinx', "doctor's note", "guns don't kill people", 'fat hands', 'hat lady', 'snoresville', 'everybody, panic',
+    'gotta die sometime', 'favorite waste of bullets', 'no need to be scared', 'accidentally did that on purpose', 'gun play', "that could happen"];
+const lines = x => new Set(VOICE_SECTIONS.flatMap(s => strings(x[s])).filter(l => l.length > 28));
+for (const [name, set] of [['jinx-crime-city', crime], ['jinx-project', project]]) {
+    await t(`${name} is its own voice: almost nothing shared with Original Jinx or the other skins, and no in-game lines`, () => {
+        const mine = lines(set);
+        for (const [other, o2] of [['jinx-original', orig], ['jinx-crime-city', crime], ['jinx-project', project]]) {
+            if (o2 === set) continue;
+            const theirs = lines(o2), shared = [...mine].filter(l => theirs.has(l));
+            assert.ok(shared.length < mine.size * 0.02, `${name} shares ${shared.length} lines with ${other}: ${shared.slice(0, 3).join(' | ')}`);
+        }
+        const text = [...VOICE_SECTIONS.flatMap(s => strings(set[s]))].join('\n').toLowerCase();
+        for (const quote of RIOT_PHRASES) assert.ok(!text.includes(quote), quote);
+    });
+}
 console.log(`${pass} passed`);

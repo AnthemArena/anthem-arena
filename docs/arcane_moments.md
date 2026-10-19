@@ -905,5 +905,7 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   of speech) on top of the parent. One skin at a time, to keep the writing quality up.
 - **Done:** Original Jinx (Classic and every skin without a set), Crime City Jinx (`jinx-crime-city`: showbiz gangster, violin case, recital,
   duets, curtain calls, corks and toasts; written from the skin's theme, none of its in-game lines are reused; the test checks that).
-- **Next:** PROJECT Jinx (corrupted memory core, system words), then the other Jinx skins in mastery order, then Vi and Caitlyn
+- **Done:** PROJECT Jinx (`jinx-project`, skin 20: a corrupted memory core, cold and calculating one second, manic the next; targets, reboots,
+  diagnostics and glitches). The test now checks every themed set against Original and against each other.
+- **Next:** the other Jinx skins in mastery order (Firecracker, Zombie Slayer, Ambitious Elf, Odyssey, Heartseeker, ...), then Vi and Caitlyn
   (Sheriff Caitlyn stricter).
