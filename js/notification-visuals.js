@@ -495,22 +495,27 @@ html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.5
 /* side art: a tall column of centred art on the left (faded into the card); caption, bubble and pills on the right */
 html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:100px;padding:12px 12px 10px 114px;gap:8px;min-height:136px;justify-content:center}
 html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;filter:brightness(1.18) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
-html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx-face{display:none}
+html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx .nv-av{display:none}
 html[data-toast-style="side"] .versus-toast .nv-caption{display:block;text-align:left;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
 html[data-toast-style="side"] .versus-toast .nv-chips{justify-content:flex-start}
 @media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:70px;padding-left:84px}}
 /* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
    a small arrow says so and the match name is the hover text. */
-html[data-toast-style="minimal"] .bulletin-banner.versus-toast{background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important}
+html[data-toast-style="minimal"] .bulletin-banner.versus-toast{background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
 html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0;gap:0;background:transparent;overflow:visible;isolation:auto}
 html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
-html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-pair,html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0;gap:12px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx .nv-circle{width:78px !important;height:78px !important;font-size:32px !important}
 html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px 16px;background:rgba(14,10,24,.94)}
 html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:10px;bottom:6px;font-size:22px;line-height:1;color:var(--nv-accent,#ff69b4)}
 html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:0;right:0;width:22px;height:22px;font-size:14px}
+/* the "who did what" line of ally / rival / follow alerts: their face and the words in a small dark pill, left-aligned over the champion's bubble */
+html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{display:flex;width:fit-content;max-width:100%;align-items:center;justify-content:flex-start;gap:10px;margin:0 0 8px;padding:5px 16px 5px 5px;border-radius:999px;background:rgba(14,10,24,.94);border:1px solid var(--nv-line,rgba(255,79,180,.35));filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
+html[data-toast-style="minimal"] .versus-toast .nv-toast-headline:not(:has(.nv-circle)){padding-left:16px}
+html[data-toast-style="minimal"] .versus-toast .nv-toast-headline .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-follow-face{justify-content:flex-start;padding-bottom:6px}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
