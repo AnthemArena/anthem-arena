@@ -24,9 +24,10 @@ t('toast rule (never toasts what is not saved)', () => {
 });
 
 t('toast style: classic by default, saved choice kept, junk ignored', () => {
-    assert.deepEqual(TOAST_STYLES, ['classic', 'full', 'minimal']);
+    assert.deepEqual(TOAST_STYLES, ['classic', 'full', 'side', 'minimal']);
     assert.equal(readToastStyle(store({})), 'classic');
     assert.equal(readToastStyle(store({ toastStyle: 'full' })), 'full');
+    assert.equal(readToastStyle(store({ toastStyle: 'side' })), 'side');
     assert.equal(readToastStyle(store({ toastStyle: 'minimal' })), 'minimal');
     assert.equal(readToastStyle(store({ toastStyle: 'banana' })), 'classic');
     assert.equal(readToastStyle(null), 'classic');

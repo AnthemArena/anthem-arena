@@ -8,7 +8,7 @@ import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './no
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
 import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
-import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
+import { setCenteredSplash, avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -2513,6 +2513,7 @@ if (championPack && championPack.theme) {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = eventToastHtml(notification, {
             tag: { 'mastery-up': 'Mastery up', 'champion-selected': 'Your champion' }[notification.type] || 'Level up', accent, jinxSrc: championBadgeUrl(pack),
             ...(notification.type === 'champion-selected' ? { glyph: '⭐' } : { leadHtml: levelBadgeHtml(level, accent) }),
@@ -2657,6 +2658,7 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = followToastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             jinxSrc: championBadgeUrl(pack),
@@ -2681,6 +2683,7 @@ else {
         // No champion speaking here: the backdrop is the splash of the person's own champion avatar (a crowd uses the first
         // face); someone without a champion avatar falls back to the viewer's profile banner
         banner.style.setProperty('--nv-splash', `url("${splashFromAvatarSrc(srcs[0]) || profileSplashUrl(pack)}")`);
+        setCenteredSplash(banner);
         banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
         banner.className = 'bulletin-banner versus-toast opponent';
     } else if (notification.type === 'achievement') {
@@ -2693,6 +2696,7 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url("${toastSplashUrl(pack)}")`);
+        setCenteredSplash(banner);
         const xpMatch = /\+(\d+)\s*XP/i.exec(`${notification.detail || ''}`);
         banner.innerHTML = achievementToastHtml(notification, {
             icon: notification.thumbnailUrl,
@@ -2717,6 +2721,7 @@ else {
         banner.style.setProperty('--nv-glow', ally ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', ally ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         const who = notification.triggerUsername || notification.username;
         const drawStreak = () => {
             banner.innerHTML = toastHtml({ ...notification, relationship: view.relationship, targetUrl: view.profileUrl }, {
@@ -2745,6 +2750,7 @@ else {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         const drawEvent = () => {
             banner.innerHTML = eventToastHtml(notification, {
                 tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(pack),
@@ -2770,6 +2776,7 @@ else {
         banner.style.setProperty('--nv-glow', notification.relationship === 'ally' ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', notification.relationship === 'ally' ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
+        setCenteredSplash(banner);
         banner.innerHTML = toastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),

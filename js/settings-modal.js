@@ -354,11 +354,13 @@ function createModalHTML() {
             <span class="toast-style-card"><span class="tsm tsm-classic"><i></i><b></b><b></b></span><strong>Classic</strong><small>Splash art on top</small></span></label>
         <label class="toast-style-option"><input type="radio" name="toastStyle" value="full" />
             <span class="toast-style-card"><span class="tsm tsm-full"><b></b><b></b></span><strong>Full art</strong><small>Art behind everything</small></span></label>
+        <label class="toast-style-option"><input type="radio" name="toastStyle" value="side" />
+            <span class="toast-style-card"><span class="tsm tsm-side"><i></i><b></b><b></b></span><strong>Side art</strong><small>Art on the left</small></span></label>
         <label class="toast-style-option"><input type="radio" name="toastStyle" value="minimal" />
-            <span class="toast-style-card"><span class="tsm tsm-minimal"><b></b><b></b></span><strong>Minimal</strong><small>Just their words</small></span></label>
+            <span class="toast-style-card"><span class="tsm tsm-minimal"><b></b></span><strong>Minimal</strong><small>Just portrait and words</small></span></label>
     </div>
     <style>
-        .toast-style-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+        .toast-style-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-top:8px}
         .toast-style-option{position:relative;cursor:pointer}
         .toast-style-option input{position:absolute;opacity:0;pointer-events:none}
         .toast-style-card{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);text-align:center}
@@ -369,8 +371,8 @@ function createModalHTML() {
         .tsm b{display:block;height:7px;border-radius:4px;background:rgba(255,255,255,.28)}.tsm b+b{width:60%}
         .tsm i{position:absolute;left:0;right:0;top:0;height:24px;background:linear-gradient(135deg,#7b3fe4,#ff69b4);-webkit-mask-image:linear-gradient(180deg,#000 40%,transparent);mask-image:linear-gradient(180deg,#000 40%,transparent)}
         .tsm-full{background:linear-gradient(180deg,#7b3fe4,#ff69b4 40%,#120a18)}
-        .tsm-minimal b:first-child{width:45%;height:5px;background:#ff9bd6}
-        @media (max-width:480px){.toast-style-options{grid-template-columns:1fr}}
+        .tsm-side{padding-left:30px}.tsm-side i{right:auto;bottom:0;width:24px;height:auto;-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent);mask-image:linear-gradient(90deg,#000 55%,transparent)}
+        .tsm-minimal{justify-content:center}.tsm-minimal b{width:100%;height:16px}
     </style>
 </div>
 

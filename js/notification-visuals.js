@@ -161,7 +161,7 @@ export function toastHeadlineHtml(headline, src, name, accent, { avatar = true }
 
 export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, quip, cta }) {
     return `
-    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
+    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
         ${n.matchTitle ? `<div class="nv-caption">${escapeHtml(n.matchTitle)}</div>` : ''}
@@ -379,7 +379,7 @@ export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
 export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
     if (strip) chips = chips.filter(c => !/^\d+ matches?$/.test(c));   // the picture strip says it better
     return `
-    <div class="nv-body" onclick="window.handleBulletinCTA()">
+    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.handleBulletinCTA()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.matchTitle || (!leadHtml && tag) ? `<div class="nv-caption">${escapeHtml(n.matchTitle || tag)}</div>` : ''}
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
@@ -426,6 +426,19 @@ function socialHeadlineFor(n) {
 
 let stylesAdded = false;
 // The viewer's chosen toast style goes on <html> so the CSS below can restyle every pop-up without touching their markup.
+// Side art wants the splash cropped around the champion (Data Dragon's "centered" version of the same skin); falls back to the normal splash if that file is missing.
+export function setCenteredSplash(banner) {
+    const normal = banner?.style?.getPropertyValue('--nv-splash') || '';
+    const m = /url\(["']?([^"')]+)["']?\)/.exec(normal);
+    if (!m || typeof Image === 'undefined') return;
+    const centered = m[1].replace('/champion/splash/', '/champion/centered/');
+    if (centered === m[1]) { banner.style.setProperty('--nv-splash-c', normal); return; }
+    banner.style.setProperty('--nv-splash-c', normal);
+    const img = new Image();
+    img.onload = () => banner.style.setProperty('--nv-splash-c', `url("${centered}")`);
+    img.src = centered;
+}
+
 export function applyToastStyle(style = readToastStyle()) {
     if (typeof document !== 'undefined') document.documentElement.dataset.toastStyle = style;
 }
@@ -479,13 +492,21 @@ html[data-toast-style="full"] .versus-toast .nv-bubble{background:rgba(11,13,24,
 html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(11,13,24,.55)}
 html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 @media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:110px}}
-/* minimal: no art, no match thumbnails or pills; a one-line caption names the match so the alert is never unclear */
-html[data-toast-style="minimal"] .versus-toast .nv-body{padding:12px 16px 10px;gap:8px}
+/* side art: a tall column of centred art on the left (faded into the card); caption, bubble and pills on the right */
+html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:112px;padding:14px 14px 12px 130px;min-height:150px;justify-content:center}
+html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
+html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx-face{display:none}
+html[data-toast-style="side"] .versus-toast .nv-caption{display:block;text-align:left;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
+html[data-toast-style="side"] .versus-toast .nv-chips{justify-content:flex-start}
+@media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:76px;padding-left:92px}}
+/* minimal: just the champion's portrait and words; the whole card opens the match (a small arrow says so), the match name is the hover text */
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:12px 34px 12px 14px;gap:0}
 html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
-html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits){display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0}
-html[data-toast-style="minimal"] .versus-toast .nv-caption{display:block;padding-right:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--nv-accent-text,#ff9bd6);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:6px}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:-24px;top:50%;transform:translateY(-50%);font-size:24px;line-height:1;color:var(--nv-accent,#ff69b4)}
+html[data-toast-style="minimal"] .versus-toast .bulletin-close{top:4px;right:6px;width:20px;height:20px;font-size:13px}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}

@@ -20,8 +20,9 @@ export const shouldToastSocial = (prefs, isFollowed) =>
     shouldSaveSocial(prefs, isFollowed) && (prefs.toastFrom === 'everyone' || (prefs.toastFrom === 'following' && !!isFollowed));
 
 // How pop-up alerts look (this browser only; the same words and buttons in every style).
-//   classic: splash art as a header strip   full: art behind the whole card   minimal: no art, no thumbnails, just the champion's words
-export const TOAST_STYLES = ['classic', 'full', 'minimal'];
+//   classic: splash art as a header strip   full: art behind the whole card   side: a tall art column on the left
+//   minimal: no art, no thumbnails, no button: just the champion's portrait and words
+export const TOAST_STYLES = ['classic', 'full', 'side', 'minimal'];
 export const DEFAULT_TOAST_STYLE = 'classic';
 export function readToastStyle(storage = globalThis.localStorage) {
     try { const v = storage?.getItem('toastStyle'); return TOAST_STYLES.includes(v) ? v : DEFAULT_TOAST_STYLE; } catch { return DEFAULT_TOAST_STYLE; }
