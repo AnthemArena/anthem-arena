@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-snow-moon",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Snow Moon Caitlyn",
+  "description": "Voice set for Snow Moon Caitlyn (skin 30): a pale, hushed and ritual sniper who serves the moon with a calculating chill, and keeps only a faint memory of warmth. Moonlight, vigils, stillness and the quiet mark. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind. The tide runs against us. Summon more.",
+          "cta": "Call the circle"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more adrift. The moon is nearly lost. Every voice, now.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Send the call across the frozen lake.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A thin cloud. It will clear.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. The vigil is lonely. Bring another watcher.",
+          "cta": "Bring a watcher"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few quiet marks and the light returns.",
+          "cta": "Cast a vote"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A faint shadow. Remove it before moonset.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. The moon holds its breath. Offer your vote.",
+          "cta": "Offer it"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop standing in the silence and speak.",
+          "cta": "Bring a watcher"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The ice could crack either way. Bring more.",
+          "cta": "Rally the circle"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Still as frost. Wait for the opening.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. The light favours us. Remain still.",
+          "cta": "Hold still"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and rising. The tide is ours. Don't disturb it.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A calm sky. Keep it that way.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The vigil rewards patience. Keep it.",
+          "cta": "Stay watchful"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Good. Breathe out. Finish the ritual.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. The moon turned its face to us.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A silent reversal.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Rose out of a {voteDiff} deficit. Like breath on glass.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was buried under frost. Now it leads.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. Even ice gives way eventually.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two watchers, one moon.",
+        "{username} chose {momentTitle} as well. A quiet mind.",
+        "{username} agrees with you. A rare warmth.",
+        "Same pick as {username}. Our silences match.",
+        "{username} stood with {momentTitle}. Steady in the dark.",
+        "{username} reached the same view. No words were needed.",
+        "{username} stands on your side of {momentTitle}. Share the vigil.",
+        "{username} voted {momentTitle}. Welcome to the circle.",
+        "{username} reads {momentTitle} as you do. Few can."
+      ],
+      "details": [
+        "A fellow watcher.",
+        "Two eyes, one target.",
+        "Quiet allies are rare.",
+        "Keep them near.",
+        "A small comfort in the cold.",
+        "Someone who reads the night.",
+        "There is room beside the lake."
+      ],
+      "buttons": [
+        "Well seen",
+        "Say thanks",
+        "See the match",
+        "Nod",
+        "Respect",
+        "Fair",
+        "Acknowledged"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A different offering. We shall see which the moon accepts.",
+        "{username} chose {theirMoment}. A poor choice.",
+        "{username} went the other way on {yourMoment}. Unwise. Not unforgivable.",
+        "{username} voted against you. A rival keeps the mind sharp.",
+        "{username} took {theirMoment}. Bold. Possibly hollow.",
+        "{username} opposes {yourMoment}. Very well. The tally will speak.",
+        "{username} disagrees on {yourMoment}. Let the frost settle.",
+        "{username} voted the other way. They will see clearly after the thaw."
+      ],
+      "details": [
+        "Everyone misjudges the moonlight once.",
+        "A cold disagreement.",
+        "The count decides.",
+        "Don't let it stir you.",
+        "A rival sharpens the edge.",
+        "They may yet turn.",
+        "A worthy adversary."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't chance, that's a shared stillness.",
+        "{username} and you, ten matches, the same answer each time. Perfectly attuned.",
+        "Ten straight with {username}. I would share a vigil with you both.",
+        "A ten-match run with {username}. Not a single ripple.",
+        "Ten for ten with {username}. A flawless night."
+      ],
+      "details": [
+        "Ten marks, ten hits.",
+        "A fine pairing.",
+        "Rare in the dark. Guard it.",
+        "Keep the stillness.",
+        "Hard to improve."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well done",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a pair, a whole circle.",
+        "{streakCount} in a row with {username}. I would follow you both under any moon.",
+        "{streakCount} straight marks with {username}. They will whisper of it.",
+        "A {streakCount}-match run with {username}. Spoken of in hushed voices.",
+        "{streakCount} with {username}. Not one shadow between you."
+      ],
+      "details": [
+        "Hard to credit. Easy to honour.",
+        "That is trust, forged in silence.",
+        "Words fail me. Only reverence remains.",
+        "Quite untouchable.",
+        "A pairing for the legends."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A standoff on thin ice.",
+        "{username} has opposed you ten times running. Two cold minds.",
+        "Ten running against {username}. Neither stirs.",
+        "A ten-match run against {username}. Stubborn as winter.",
+        "Ten times at odds with {username}. I would watch from the shore."
+      ],
+      "details": [
+        "Ten rounds, no thaw.",
+        "Speak, or stay silent.",
+        "A proper standoff.",
+        "Stubbornness keeps the cold out.",
+        "Who cracks first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That is not a rivalry, that is an ice age.",
+        "{streakCount} in a row opposite {username}. Neither of you will bend.",
+        "{streakCount} straight clashes with {username}. The lake is frozen solid.",
+        "A {streakCount}-match feud with {username}. Someone should light a candle between you.",
+        "{streakCount} against {username}. I admire the patience. Come inside."
+      ],
+      "details": [
+        "Neither of you is softening.",
+        "Patience, certainly.",
+        "A grudge as old as winter.",
+        "Glad I am not between you.",
+        "The chronicle needs another leaf."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your mark is missing. There is time.",
+        "{timeLeft} left on {matchTitle}. Your vote is absent from the vigil.",
+        "{matchTitle} ends in {timeLeft}. I want your offering on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Make your mark"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The moon is sinking. Move.",
+        "{matchTitle} closes in {timeLeft}. Do not make me wake you.",
+        "{timeLeft} until {matchTitle} ends. Even stiller than I am."
+      ],
+      "buttons": [
+        "Vote now",
+        "Moving"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The moon is setting.",
+        "{timeLeft} left. Exhale. Release.",
+        "Last light on {matchTitle}. {timeLeft}. Choose."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} unmarked matches are about to slip into shadow. The first has {timeLeft} left.",
+        "{matchCount} matches without your vote and the moon is low. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No marks on {matchTitle}. Someone must disturb the surface.",
+        "{moment1} against {moment2} and not a whisper. I will wait. Briefly.",
+        "A fresh match, unbroken ice. Be first to touch it.",
+        "{matchTitle} is silent. Make the first mark."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Break the ice",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new matches under the moon.",
+        "{matchCount} matches opened in round {round}. A fresh vigil begins.",
+        "Round {round} is live, with {matchCount} matches to observe.",
+        "A new round. {matchCount} matches. Choose your mark.",
+        "Round {round}: {matchCount} matches awaiting your offering."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Begin the vigil",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A clean, quiet victory.",
+        "{momentTitle} is through. As foreseen.",
+        "{momentTitle} took it. The moon approves.",
+        "{momentTitle} won without a sound.",
+        "{momentTitle} advances. One ritual complete.",
+        "{momentTitle} crosses. Quiet, exact work."
+      ],
+      "details": [
+        "A clean mark.",
+        "One down, more to come.",
+        "Earned in full.",
+        "Without flaw."
+      ],
+      "buttons": [
+        "Steady",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} fell. A bitter frost.",
+        "{momentTitle} is out. Not the night I foresaw.",
+        "{momentTitle} faded. Let it go.",
+        "{momentTitle} fell in silence. That counts.",
+        "{momentTitle} is out. Be still. Return.",
+        "{momentTitle} lost this round. A shadow, not an end.",
+        "{momentTitle} was eliminated. More nights await."
+      ],
+      "details": [
+        "Not every mark lands.",
+        "It lasted until the dawn.",
+        "More moons are coming.",
+        "Accept it. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome beneath the moon. {liveCount} matches are open. Choose one.",
+          "A new visitor. {liveCount} matches are live. Step lightly.",
+          "A fresh presence. {liveCount} matches need a decision.",
+          "{liveCount} matches under pale light. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the thin ice."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Step lightly",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You returned to the vigil. Good.",
+          "Two nights running. A quiet constancy.",
+          "Back for a second night. I noticed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days gone. I thought the frost had taken you.",
+          "After {days} days you return. The moon kept your place.",
+          "{days} days. I had begun to worry. Do not vanish like that again.",
+          "{days} days away. The lake has frozen and thawed."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You are back. Good.",
+          "Welcome back. The moon waits.",
+          "Back already. Quiet, as ever.",
+          "Ah. There you are."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet night.",
+        "Few watchers out here. That should change.",
+        "Low attendance. The cold keeps them indoors. Come anyway.",
+        "Hardly anyone has looked. Someone should."
+      ],
+      "details": [
+        "It needs more watchers.",
+        "Every mark counts under a thin moon.",
+        "Yours weighs more tonight.",
+        "Do not let it fade."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you have not voted. The deciding offering is yours.",
+        "Dead level on {matchTitle}. One mark settles the stillness.",
+        "A tie. Someone must break the silence. Let it be you.",
+        "{moment1} and {moment2}, balanced like a still lake. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the moon is nearly down. One last mark.",
+        "Level, with moonset close. Vote.",
+        "Tied, and nearly dark. Please do not leave it frozen."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? The moon will not wait.",
+        "Do not overthink. Choose, and release.",
+        "Each has its merits in the pale light. Trust yourself.",
+        "You have watched from the shore long enough. Step onto the ice."
+      ],
+      "details": [
+        "Every mark counts.",
+        "Trust your sight.",
+        "No wrong target. Only late ones.",
+        "Just decide."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First mark made. Welcome to the vigil.",
+        "You chose a side. A quiet beginning."
+      ],
+      "details": [
+        "Under the moon. +{xp} XP",
+        "The first of a long chain, I suspect. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You are learning the stillness.",
+        "Five. No longer a stranger to the dark."
+      ],
+      "details": [
+        "A calm opening. +{xp} XP",
+        "Finding your silence. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The moon knows your face.",
+        "Ten. You have earned a place by the lake."
+      ],
+      "details": [
+        "A steady watcher. +{xp} XP",
+        "Ten marks under the moon. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice carries over the ice.",
+        "Twenty-five. The night is listening."
+      ],
+      "details": [
+        "Heard across the frozen lake. +{xp} XP",
+        "Twenty-five marks echoing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Deep into the long night.",
+        "Fifty. You clearly care. A rare warmth."
+      ],
+      "details": [
+        "Fifty marks logged. +{xp} XP",
+        "Far into the moonlit hours. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They will whisper of it by the water.",
+        "One hundred. Extraordinary. I speak that praise once."
+      ],
+      "details": [
+        "Earned in the pale light. +{xp} XP",
+        "A hundred. Stand beneath the full moon. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three nights running. A flicker of warmth.",
+        "Three nights straight. Constant."
+      ],
+      "details": [
+        "Returning through the snow is the hard part. +{xp} XP",
+        "Three nights of vigil. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That is devotion.",
+        "Seven nights running. Immovable."
+      ],
+      "details": [
+        "A week without a gap in the vigil. +{xp} XP",
+        "Seven nights beneath the moon. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never leave your watch.",
+        "Fourteen nights. Formidable."
+      ],
+      "details": [
+        "A fortnight of stillness. +{xp} XP",
+        "That is silent resolve. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty nights. A rare constancy.",
+        "A full moon cycle at your post. That says much."
+      ],
+      "details": [
+        "Thirty nights of devotion. +{xp} XP",
+        "A whole month of frost. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You favour what the moon forgot.",
+        "Five improbable choices. Curious."
+      ],
+      "details": [
+        "Against the tide. +{xp} XP",
+        "Five dim stars championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You walk against the tide on purpose.",
+        "Fifteen. You follow no one's light but your own."
+      ],
+      "details": [
+        "Always your own trail across the snow. +{xp} XP",
+        "Fifteen marks against the tide. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No watcher can predict you.",
+        "Thirty. The impossible mark is your art."
+      ],
+      "details": [
+        "Unreadable. +{xp} XP",
+        "Thirty marks for the one fading. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First at the lake five times. Swift and silent.",
+        "Five times you were at the water before the others."
+      ],
+      "details": [
+        "You reach the shore before the dusk. +{xp} XP",
+        "Five marks before any other footprints. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen times you stepped onto the ice first. Resolute.",
+        "First onto the ice, again and again."
+      ],
+      "details": [
+        "Fifteen votes ahead of the circle. +{xp} XP",
+        "Ahead of every watcher. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Your hands stayed frost-still.",
+        "Another narrow one. Your nerve is ice."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your mark keeps deciding them.",
+        "You have broken more than one stillness."
+      ],
+      "details": [
+        "Twenty-five finishes by a snowflake. +{xp} XP",
+        "You shape the outcome. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you kept faith with the one fading. Obstinate. Approved.",
+        "You never abandon what is still in the dark. Admirable."
+      ],
+      "details": [
+        "Belief in a late melting. +{xp} XP",
+        "Five turnings of the tide you read early. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. A favourite constellation.",
+        "That one again? A pleasing glow."
+      ],
+      "details": [
+        "You know your star. +{xp} XP",
+        "One mark, three times. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five marks on a single moment. That is constancy.",
+        "You will not let that one go. Understood."
+      ],
+      "details": [
+        "Loyal through the winter. +{xp} XP",
+        "A single favourite, marked five times. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten marks on a single moment. That is fixation.",
+        "Ten marks, one target. I shall not remark. Mostly."
+      ],
+      "details": [
+        "Ten on one mark. +{xp} XP",
+        "Devoted. Or moonstruck. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You keep to the path.",
+        "Round two and still watching. Good."
+      ],
+      "details": [
+        "Deeper onto the frozen lake. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the cold.",
+        "Deep in the bracket. The frost bites harder now."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the first shore. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You crossed the whole lake.",
+        "To the far shore. You never looked behind."
+      ],
+      "details": [
+        "From the first mark to the last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You have crossed much frozen ground.",
+        "Ten different matches. Thorough watching. Good."
+      ],
+      "details": [
+        "Charting the whole bracket by moonlight. +{xp} XP",
+        "Ten shores surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. Every shore visited.",
+        "Twenty-five. Not a frozen bay unchecked."
+      ],
+      "details": [
+        "Every corner of the night seen. +{xp} XP",
+        "Twenty-five lakes studied. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That is not a visit, that is a winter.",
+        "Fifty. You know this bracket better than the stars."
+      ],
+      "details": [
+        "A true veteran of the vigil. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in a single stretch. A long night's watch.",
+        "Five without a pause. Do warm your fingers."
+      ],
+      "details": [
+        "One long vigil. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A hard stretch of night.",
+        "Ten in one stretch. That is hardiness."
+      ],
+      "details": [
+        "A marathon vigil. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? The moon's hour. Quiet, and yours.",
+        "The small hours. Duty, or sleeplessness. I know both."
+      ],
+      "details": [
+        "The deepest night suits you. +{xp} XP",
+        "A vote beneath the stars. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told others. Thank you.",
+        "Five shares. More watchers, more light."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five whispers sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You are practically a lantern.",
+        "Fifteen. You keep calling watchers in. Wise."
+      ],
+      "details": [
+        "Still carrying the light. +{xp} XP",
+        "Fifteen whispers sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first frost. A founding member, always.",
+        "One of the first thousand. That cannot melt away."
+      ],
+      "details": [
+        "Yours for good. +{xp} XP",
+        "Nothing melts that from you. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Ascended. Wear it quietly."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Quietly earned.",
+        "Another mark in the moonlight: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You have kept the cold vigil and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. Once, I might have laughed.",
+        "Ten long shots. You do not chill easily."
+      ],
+      "details": [
+        "Ten marks against the odds. +{xp} XP",
+        "Distant marks are your art. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my stillness.",
+        "Ten tight finishes. I am quietly moved."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "A steady hand in the pale light. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days straight. A cold, true eye.",
+        "Seven nights without a stray ripple. Commendable."
+      ],
+      "details": [
+        "A week of silver precision. +{xp} XP",
+        "Seven nights running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One breath, one mark.",
+        "A deadlock, and you made the call. Cleanly."
+      ],
+      "details": [
+        "The mark that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Snow Moon Caitlyn, in position. Stay silent. Stay cold.",
+        "Caitlyn is yours now. Try to keep up beneath the moon."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The moon has not risen.",
+      "Voting has yet to dawn. I will signal when it does.",
+      "Not yet. Stillness is half the discipline."
+    ],
+    "prevote": [
+      "Two edits, one mark. Study both in the pale light.",
+      "Observe both before you commit. No hurried shots.",
+      "I will not say which I prefer. That is yours to choose.",
+      "Take your time. A still hand beats a quick one.",
+      "Pick the one you would keep vigil for."
+    ],
+    "prevote-empty": [
+      "No marks yet. Leave the first prints in the snow.",
+      "Hushed so far. Someone must stir the water.",
+      "Not one mark yet. Make the first."
+    ],
+    "closing-24h": [
+      "A day or less remains and your mark is missing. Go.",
+      "The moon is sinking. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before moonset."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Release."
+    ],
+    "voted-early": [
+      "You voted early with hardly anyone here. First across the ice.",
+      "Hardly a footprint on the ice and you had chosen. Resolute."
+    ],
+    "voted-ahead": [
+      "Your pick leads. Good. The moon may still shift.",
+      "{pct}% stand with you. Firm footing.",
+      "Ahead for now. Moons wane.",
+      "{pick} is pulling ahead. Well seen.",
+      "A lead is a lead. Stay still."
+    ],
+    "voted-close": [
+      "That is tight. Unbearably tight.",
+      "A hair apart. One more vote tips it. Send a whisper.",
+      "Level at the throat of winter. Your pick wants an ally.",
+      "{pct} against {otherPct}. Let no breath fog the glass."
+    ],
+    "voted-tied": [
+      "Perfectly level. Neither holds the shore.",
+      "Perfectly level under the moon. Maddening, and hypnotic."
+    ],
+    "voted-behind": [
+      "You are trailing. That alone does not make you mistaken.",
+      "{pick} lags. A lesser light. I remember the feeling.",
+      "They are ahead. You are not mistaken, only outweighed.",
+      "Down by {diff} points. Tell others. Send word across the water.",
+      "Most turned elsewhere. The crowd misjudges the moon."
+    ],
+    "closed-won": [
+      "Your pick won. A sound call.",
+      "A win. Hard-earned.",
+      "{pick} went through. You read the night rightly."
+    ],
+    "closed-lost": [
+      "Your pick fell. A pity. It was a worthy mark.",
+      "It faded. The cold takes some. Carry on.",
+      "{pick} is out. I am sorry."
+    ],
+    "closed-tied": [
+      "A draw. Both shores held."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More nights will come.",
+      "The match is over. {winner} took it. Next time, mark sooner."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Every first mark is nervous.",
+      "That is your first mark. It steadies with time. I assure you.",
+      "You are one of the circle now. Welcome."
+    ],
+    "streak": [
+      "Back at the vigil. Good.",
+      "{streak} nights unbroken. I see you keep the watch.",
+      "You keep coming back to the vigil. I value it."
+    ],
+    "underdog": [
+      "You chose what everyone else passed by. Noted.",
+      "A hard choice. A good one.",
+      "The dimmer star. Few would choose it."
+    ],
+    "early": [
+      "Early. You reached the lake before the rest.",
+      "The lake is barely disturbed. Your mark would ripple far.",
+      "First to the shore. Quietly done."
+    ],
+    "close": [
+      "That mark moved the ice. It is balanced on a thread.",
+      "A single snowflake apart. One more mark turns it.",
+      "A margin like frost on glass. Your mark could shatter it."
+    ],
+    "behind": [
+      "{pick} is fading. Fading is not gone. Call for help.",
+      "Not ahead yet. The night is long.",
+      "Behind, not frozen out. There is a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Do not ease off. Moons wane.",
+      "Ahead for the moment. Do not trust the light.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Heard. I shall not contest it. For now.",
+      "Done. Your decision.",
+      "Your mark is placed. More waits beyond it."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no marks yet. Start with the one you read best.",
+      "All are in the pale light. Choose. I shall not rush you.",
+      "{unvoted} remain. No pressure. A faint chill, perhaps."
+    ],
+    "live-some": [
+      "{voted} placed, {unvoted} still ahead. Keep walking.",
+      "You have begun. {unvoted} lie ahead.",
+      "A good start. The rest will not clear themselves."
+    ],
+    "live-few": [
+      "{unvoted} remain. Close them before dawn.",
+      "Nearing the far bank. {unvoted} left.",
+      "Near the shore. Keep your stillness."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Do not leave it undone.",
+      "One match between you and a perfect vigil."
+    ],
+    "live-closing": [
+      "A few sink into shadow in {timeLeft}. {unvoted} still await your mark.",
+      "The moon is sinking. {unvoted} left, {timeLeft} before it sets.",
+      "The moon is sinking. Do hurry."
+    ],
+    "live-done": [
+      "You have voted in everything. Well done. Look over the bracket.",
+      "Your list lies empty. Come back when the next round rises.",
+      "Every match marked. Uncommon. Honoured."
+    ],
+    "live-none": [
+      "No match is awake just now. It will return. Study the bracket while you wait.",
+      "Hushed across the lake. Look again soon.",
+      "No matches open. I am as still, and as impatient, as you."
+    ],
+    "brackets-groups": [
+      "Groups come first. Two from each cross the lake. The rest stay on the bank.",
+      "All begin in a group. Few cross the frozen lake.",
+      "Mind the standings. They drift like snow."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts draw near. Two from each group cross.",
+      "No knockout stage yet. The groups must settle first.",
+      "Patience. The knockout rises once the groups conclude."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are upon us. One fall and you remain in the cold.",
+      "One loss ends it. The moon grants no second.",
+      "Each match is colder now. Choose with care."
+    ],
+    "brackets-bracket": [
+      "Round after round. One fall and the vigil ends.",
+      "Trace the bracket. The ice narrows each round.",
+      "Each line here is a match someone marked."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for keeping the vigil with me.",
+      "It is finished. A hard-fought winter. I will miss it.",
+      "A champion stands. A fitting end to the long night."
+    ],
+    "brackets-empty": [
+      "No bracket in the sky yet. Nothing has been traced.",
+      "A bare sky. The draw has not risen yet.",
+      "Bare ice for now. Return later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One mark decides it. Choose.",
+      "{a} against {b}: two edits, one mark. Place it.",
+      "{a} versus {b}. Join the vigil and tell me what you think."
+    ],
+    "voted": [
+      "My mark falls on {pick} over {other}. Where does yours fall?",
+      "{pick} gets my mark over {other}. Make your case.",
+      "My mark is {pick} over {other}. Would you place yours elsewhere?"
+    ],
+    "early": [
+      "One of the first marks on {pick} against {other}. We need more watchers.",
+      "I marked {pick} over {other} early. Add your own.",
+      "{pick} against {other}, scarcely a mark yet. Yours would be seen."
+    ],
+    "tied": [
+      "{pick} and {other} are even. One mark ends it.",
+      "{pick} and {other} lie still together. Disturb the water.",
+      "{pick} and {other} lie frozen together. Your mark can part them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes between {pick} and {other}. Each mark weighs now.",
+      "{voteDiff} votes sit between {pick} and {other}. Place yours.",
+      "{voteDiff} divide {pick} and {other}. The ice could break either way."
+    ],
+    "losing-close": [
+      "{voteDiff} stand between {pick} and {other}. A few marks turn it.",
+      "{pick} is {voteDiff} beneath {other}, still glowing. Back it.",
+      "{pick} is {voteDiff} short of {other}. Still mendable. Vote."
+    ],
+    "losing-bad": [
+      "{other} leads {pick} by {voteDiff}. It needs a kinder light.",
+      "{pick} lags {voteDiff} behind {other} and deserves a kinder moon. Vote.",
+      "{other} has {pick} down by {voteDiff}. Let us turn the tide."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% against {other}, barely. Help it hold the shore.",
+      "{pick} is up on {other}, {pct}%. Not safe yet. Mark it.",
+      "{pick} holds {pct}% to {other}. A slender silver edge."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see by moonlight.",
+      "{pick} sits at {pct}%. {other} is lost in the dark.",
+      "{pick} is far beyond {other}, {pct}%. Add your mark."
+    ]
+  }
+}
