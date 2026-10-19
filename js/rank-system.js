@@ -2,6 +2,7 @@ import { masteryLevel, skinsUnlockedBetween } from './champion-unlocks.js';
 import { getChampionSplashUrl } from './arcane-config.js';
 import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes, backfillPackXp } from './xp-ledger.js';
 import { factsOf, voteXpAward, utcDay } from './vote-facts.js';
+import { recordProgress } from './vote-progress.js';
 
 // ========================================
 // RANK PROGRESSION SYSTEM
@@ -179,8 +180,10 @@ export function getUserXPFromStorage() {
 
 // A companion reached a new mastery level: one alert saying so, with the skins it unlocked (their splash art as a strip).
 function announceMastery(packId, from, to, xp) {
-    if (!window.showBulletin) return;
     const unlocked = skinsUnlockedBetween(packId, from, to);
+    // During a vote the post-vote modal reports this (js/vote-progress.js); no toast on top of it
+    if (recordProgress({ type: 'mastery', packId, from, to, skins: unlocked.map(x => ({ num: x.num, name: x.name })) })) return;
+    if (!window.showBulletin) return;
     const name = window.championLoader?.getCurrentPack?.()?.name || packId;
     const rank = `${name} Mastery ${to}`;
     const voiced = window.championLoader?.getAchievementMessage('mastery-up', { rank, xp });
@@ -220,9 +223,10 @@ export function addXP(xpToAdd, source = 'vote') {
     // ✅ Check for level-up
     if (newLevel > oldLevel) {
         console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}`);
-        
-      // ✅ Show level-up toast notification
-        if (window.showBulletin) {
+        const captured = recordProgress({ type: 'level', from: oldLevel, to: newLevel, title: newRank.currentLevel.title });
+
+      // ✅ Show level-up toast notification (during a vote the post-vote modal says it instead)
+        if (window.showBulletin && !captured) {
             const voiced = window.championLoader?.getAchievementMessage('level-up', {
                 rank: newRank.currentLevel.title, xp: xpToAdd
             });

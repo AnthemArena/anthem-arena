@@ -12,6 +12,7 @@ import {
 import { addXP } from './rank-system.js';
 import { streakFromVotes } from './xp-ledger.js';
 import { factsOf } from './vote-facts.js';
+import { recordProgress } from './vote-progress.js';
 import { ddragonUrl } from './arcane-config.js';
 
 // ========================================
@@ -386,7 +387,12 @@ async function _checkAchievements(allVotes, context = {}) {
                     console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
                 }
       
-                showAchievementUnlock(achievement);
+                // During a vote the post-vote modal lists the unlock; otherwise it toasts as before
+                const captured = recordProgress({
+                    type: 'achievement', id: achievement.id, name: achievement.name, icon: achievement.icon,
+                    xp: achievement.xp, rarity: achievement.rarity
+                });
+                if (!captured) showAchievementUnlock(achievement);
             } else {
                 console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
             }

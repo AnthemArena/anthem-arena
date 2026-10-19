@@ -31,7 +31,8 @@ import { mountShareBox } from './share-box.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, buildShareModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
-import { activePackId, streakFromVotes } from './xp-ledger.js';
+import { activePackId, streakFromVotes, readPackXp } from './xp-ledger.js';
+import { beginVoteProgress, endVoteProgress, buildProgressSummary } from './vote-progress.js';
 import { voteFacts, achievementVote, utcDay } from './vote-facts.js';
 import { checkAchievements } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
@@ -1887,6 +1888,8 @@ const thisVote = savedVotes[currentMatch.id] || {};
 const voteStreak = streakFromVotes(Object.values(savedVotes));
 const xpData = calculateVoteXP({ facts: thisVote.facts || {}, streak: voteStreak });
 
+// Level-ups, mastery-ups and achievement unlocks from here on are collected for the post-vote modal instead of toasting
+beginVoteProgress();
 const newTotalXP = addXP(xpData.totalXP);
 
 // Kept for the profile and the post-vote line
@@ -1904,6 +1907,7 @@ const finalTotalXP = parseInt(
 );
 
 const rank = getUserRank(finalTotalXP);
+const progressEvents = endVoteProgress();
 
 console.log(
     `📈 Final XP after achievements: ${finalTotalXP} XP (Level ${rank.currentLevel.level})`
@@ -1995,7 +1999,7 @@ console.log(
             showNotification(`Vote cast for "${cleanTitle(songName || '')}"`, 'success');
         } else {
             // Show modal with correct numbers
-            showPostVoteModal(songName, songData, xpData, rank);
+            showPostVoteModal(songName, songData, xpData, rank, progressEvents);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
 
@@ -2003,6 +2007,7 @@ console.log(
         console.log('✅ Vote submitted successfully!');
 
     } catch (error) { // ✅ NOW THE CATCH PROPERLY PAIRS WITH TRY
+        endVoteProgress();   // never leave a capture open: it would hide later toasts
         hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
@@ -2482,7 +2487,7 @@ function showNotification(message, type = 'success') {
  * @param {object} xpData - XP earned data from calculateVoteXP
  * @param {object} rank - User's rank data from getUserRank
  */
-async function showPostVoteModal(songName, songData, xpData, rank) {
+async function showPostVoteModal(songName, songData, xpData, rank, progressEvents = []) {
 
     // ✨ Calculate voting situation
     // Prefer the explicit slot; fall back to seed only when both seeds exist and differ.
@@ -2837,13 +2842,24 @@ else {
     const nextEl = document.querySelector('#next-match-bar [data-next-match]');
     const next = nextEl ? { href: nextEl.getAttribute('href'), label: 'Next match' } : null;
 
+    // What this vote changed: level, mastery, skins and achievements (events were collected while the vote was processed)
+    const progressPack = activePackId(localStorage);
+    const progress = buildProgressSummary({ events: progressEvents, xpData, packId: progressPack, packXp: readPackXp(localStorage)[progressPack] || 0 });
+    const thumbFor = (packId, num) => getChampionTileUrl(getCompanionPack(packId)?.championId || (packId.charAt(0).toUpperCase() + packId.slice(1)), num);
+    for (const mu of progress.masteryUps) for (const sk of mu.skins) sk.thumb = thumbFor(mu.packId, sk.num);
+
     const modal = document.getElementById('vote-modal');
     modal.innerHTML = buildPostVoteModalHtml({
         situationType, line, tag: TAG_FOR_KEY[modalKey] || '', championName: pack?.name || champKey,
         portraitUrl: getChampionTileUrl(champKey, skin), splashUrl: getChampionSplashUrl(champKey, skin),
         voteTitle: shortTitle(songName, 46), songNameRaw: songName, shareContext,
-        xp: xpData, rank, next, bracketHref: 'brackets'
+        xp: xpData, rank, next, bracketHref: 'brackets', progress
     });
+    modal.querySelectorAll('[data-wear-pack]').forEach(btn => btn.addEventListener('click', () => {
+        const opts = { champion: btn.dataset.wearPack, skin: Number(btn.dataset.wearSkin) };
+        if (window.openSettingsModal) { window.closePostVoteModal?.(); window.openSettingsModal(opts); }
+        else window.location.href = '/profile#champions';
+    }));
     const portraitImg = modal.querySelector('.pvm-portrait');
     if (portraitImg) portraitImg.onerror = () => { portraitImg.onerror = null; portraitImg.src = getChampionTileUrl(champKey, 0); };
     const modalShare = modal.querySelector('[data-share-box]');
