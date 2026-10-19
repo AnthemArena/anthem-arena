@@ -77,7 +77,7 @@
             }
           },
           "message": "Dead even. The two tunnels look the same. Pick a torch.",
-          "cta": "Pick one"
+          "cta": "Find one more vote"
         },
         {
           "condition": {

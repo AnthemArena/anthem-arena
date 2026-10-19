@@ -204,6 +204,23 @@ export function eventUrl(n) {
     return url;
 }
 
+// Pack button labels come in two kinds: "look at this" (See the result, View achievements, Gloat) and "move on" (Next match, Keep going,
+// Carry on). A move-on label must not open the thing that was just announced, so its button goes to the matches list instead; the
+// alert itself (the card) still opens the thing it is about.
+export const isMoveOnCta = t => /^(next\b|on to the next|keep\b|continue\b|carry on|press on|onward|encore|again\b|run it again|go again|light another|rebel on)/i.test(String(t || '').trim());
+export const ctaLabel = n => String(n?.ctaText || n?.cta || '');
+// Where the button goes (the card goes to eventUrl / the alert's own targetUrl).
+export function eventButtonUrl(n) {
+    if ((n?.type === 'match-won' || n?.type === 'match-lost')) {
+        if (isMoveOnCta(ctaLabel(n))) return '/matches.html';
+        if (/bracket/i.test(ctaLabel(n))) return '/brackets.html';
+    }
+    return eventUrl(n);
+}
+export function achievementButtonUrl(n) {
+    return isMoveOnCta(ctaLabel(n)) ? '/matches.html' : (n?.targetUrl || '/profile#achievements');
+}
+
 // A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
 export function eventChips(n) {
     const chips = [];

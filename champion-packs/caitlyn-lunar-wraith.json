@@ -95,7 +95,7 @@
             }
           },
           "message": "{voteDiff} votes between them. The candles gutter. Choose.",
-          "cta": "Choose a fate"
+          "cta": "Find one more vote"
         },
         {
           "condition": "default",

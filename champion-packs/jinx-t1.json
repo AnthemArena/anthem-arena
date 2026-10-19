@@ -23,7 +23,7 @@
             }
           },
           "message": "Down {voteDiff}? Their draft read ours. Fine. Time for the pick they'll never ban!",
-          "cta": "Make the pick"
+          "cta": "Rally some votes"
         },
         {
           "condition": {

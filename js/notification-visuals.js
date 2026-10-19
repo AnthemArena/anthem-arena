@@ -72,7 +72,7 @@ export function bubbleHtml(text, jinxSrc, accent) {
 // Achievement pop-up in the same family as the other alerts: icon, "Achievement unlocked", name, the champion's line, button.
 export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc, accent, cta }) {
     return `
-    <div class="nv-body" onclick="window.handleBulletinCTA()">
+    <div class="nv-body" onclick="window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
         <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div></div>
@@ -380,7 +380,7 @@ export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
 // shows the percentages, so `chips` is accepted for old callers but not drawn.)
 export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
     return `
-    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.handleBulletinCTA()">
+    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.matchTitle || (!leadHtml && tag) ? `<div class="nv-caption">${escapeHtml(n.matchTitle || tag)}</div>` : ''}
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}

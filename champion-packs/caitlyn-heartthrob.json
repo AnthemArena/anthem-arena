@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few sweet votes and hearts will mend.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",

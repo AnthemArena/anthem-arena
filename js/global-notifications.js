@@ -8,7 +8,7 @@ import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './no
 import { fillWelcomeText } from './champion-lines.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView } from './notification-model.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView, eventButtonUrl, achievementButtonUrl } from './notification-model.js';
 import { setCenteredSplash, avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
@@ -378,7 +378,7 @@ function buildClosingNotification(items) {
             : (count === 1 ? `${title} • Closes in ${timeLeft}` : `Soonest closes in ${timeLeft}`),
         cta: voice?.cta || (count === 1 ? 'Cast Your Vote' : 'See Live Matches'),
         action: 'navigate',
-        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/#vote'
+        targetUrl: count === 1 ? `/vote.html?match=${next.matchId}` : '/matches.html'
     };
 }
 
@@ -2874,7 +2874,16 @@ window.dismissBulletin = function() {
 window.openBulletinMatch = function() {
     const b = currentBulletin;
     if (isStreakNotification(b)) { hideBulletin(); window.location.href = streakView(b).profileUrl; return; }
-    if (!b || !b.targetUrl) return;
+    if (!b) return;
+    // Level-up, mastery, champion-selected: the card does what the button does
+    if (typeof b.ctaAction === 'function') return window.handleBulletinCTA();
+    // Match-event alerts: the card opens the match (or the matches list for the alerts that show several edits)
+    if (isEventNotification(b) && b.matchId !== 'test-match' && b.action !== 'dismiss') {
+        if (isStripAlert(b) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
+        window.location.href = eventUrl(b);
+        return;
+    }
+    if (!b.targetUrl) return;
     hideBulletin();
     window.location.href = b.targetUrl;
 };
@@ -2939,7 +2948,13 @@ window.handleBulletinCTA = function() {
     if (isEventNotification(currentBulletin) && currentBulletin.matchId !== 'test-match' && currentBulletin.action !== 'dismiss') {
         // Alerts with a strip of edits open the matches list; when you are already on it, the button just closes the alert
         if (isStripAlert(currentBulletin) && /\/matches(\.html)?\/?$/.test(window.location.pathname)) { hideBulletin(); return; }
-        window.location.href = eventUrl(currentBulletin);
+        window.location.href = eventButtonUrl(currentBulletin);
+        return;
+    }
+
+    // Achievements: "View achievements" opens them; a move-on button ("Next match", "Keep going") opens the matches list
+    if (currentBulletin.type === 'achievement' && currentBulletin.action === 'navigate') {
+        window.location.href = achievementButtonUrl(currentBulletin);
         return;
     }
 

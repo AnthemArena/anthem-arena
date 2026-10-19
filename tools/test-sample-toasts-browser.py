@@ -76,6 +76,23 @@ with sync_playwright() as p:
         u0 = pg.url; pg.click('#bulletin-banner .nv-cta'); pg.wait_for_timeout(700)
         check(f'{typ}: already on the matches list, the button just closes the alert', pg.url == u0 and not pg.evaluate("document.querySelector('#bulletin-banner')?.classList.contains('show')"), pg.url)
     check('no page errors', not errs, errs)
+    # where a click goes: the card opens the thing the alert is about, the button follows what its label promises
+    def route(n_json, sel):
+        pg.goto(f'http://127.0.0.1:{PORT}/index.html'); pg.wait_for_timeout(2500)
+        pg.evaluate("(n)=>window.showBulletin(n)", n_json); pg.wait_for_timeout(900)
+        with pg.expect_navigation(timeout=6000, wait_until='commit'): pg.click(sel)
+        return pg.url.replace(f'http://127.0.0.1:{PORT}', '')
+    won = lambda cta: {'priority': 2, 'type': 'match-won', 'matchId': 'm-real', 'message': 'You won.', 'detail': '', 'cta': cta, 'action': 'navigate', 'targetUrl': '/vote.html?match=m-real'}
+    check('match won, "See the result": button opens the match', route(won('See the result'), '#bulletin-banner .nv-cta') == '/vote.html?match=m-real')
+    check('match won, "Next match": button opens the matches list', route(won('Next match'), '#bulletin-banner .nv-cta').startswith('/matches.html'))
+    check('match won, "Next match": the card still opens the match', route(won('Next match'), '#bulletin-banner .nv-bubble') == '/vote.html?match=m-real')
+    danger = {'priority': 1, 'type': 'danger', 'matchId': 'm-real', 'message': 'Behind.', 'detail': '', 'cta': 'Rally some votes', 'action': 'navigate', 'targetUrl': '/vote.html?match=m-real', 'voteDiff': 5}
+    check('danger: button and card both open the match with the share panel', route(danger, '#bulletin-banner .nv-cta') == '/vote.html?match=m-real&share=1' and route(danger, '#bulletin-banner .nv-bubble') == '/vote.html?match=m-real&share=1')
+    ach = lambda cta: {'priority': 2, 'type': 'achievement', 'matchId': 'achievement-x', 'achievementName': 'Spark', 'message': 'Nice.', 'detail': 'x \u2022 +50 XP', 'cta': cta, 'action': 'navigate', 'targetUrl': '/profile#achievements', 'rarity': 'common'}
+    check('achievement, "View achievements": button opens the profile achievements tab', route(ach('View achievements'), '#bulletin-banner .nv-cta').endswith('/profile#achievements'))
+    check('achievement, "Next match": button opens the matches list', route(ach('Next match'), '#bulletin-banner .nv-cta').startswith('/matches.html'))
+    check('achievement, "Next match": the card opens the achievements tab', route(ach('Next match'), '#bulletin-banner .nv-bubble').endswith('/profile#achievements'))
+    check('closing (several matches): opens the matches list, not the home page anchor', route({'priority': 1, 'type': 'closing', 'matchId': 'm-real', 'message': 'Closing.', 'detail': '', 'cta': 'Show me', 'action': 'navigate', 'targetUrl': '/matches.html'}, '#bulletin-banner .nv-cta').startswith('/matches.html'))
     b.close()
 print('\nFAILED: ' + ', '.join(failed) if failed else '\nALL CHECKS PASSED')
 sys.exit(1 if failed else 0)

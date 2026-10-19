@@ -2233,7 +2233,7 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
                             message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
                             detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
                             cta: 'View All Achievements',
-                            ctaAction: () => window.location.href = '/profile#votes',
+                            ctaAction: () => window.location.href = '/profile#achievements',
                             duration: 4000
                         });
                     }

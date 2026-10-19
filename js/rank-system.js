@@ -257,7 +257,7 @@ export function addXP(xpToAdd, source = 'vote') {
                 message: voiced?.message || `⬆️ New Arcane Rank!`,
 detail: voiced?.detail || `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
 cta: voiced?.cta || 'View Progress',
-                ctaAction: () => window.location.href = '/profile#votes',
+                ctaAction: () => window.location.href = '/profile#overview',
                 duration: 5000
             });
         }

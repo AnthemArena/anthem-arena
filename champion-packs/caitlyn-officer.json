@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few good votes and we're back on pace.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",
