@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-arcade",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Arcade Caitlyn",
+  "description": "Voice set for Arcade Caitlyn (skin 19): a retro rail-shooter hero with a sharp eye and a quick trigger finger. Scores, combos, extra lives, continues, boss fights and reloads off-screen. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} down and the health bar is flashing red. Insert a friend.",
+          "cta": "Add a player"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more short. That's a boss-level deficit. Player two, join in!",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Send the co-op request to everyone you know.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd points behind. A minor setback. Hit the power-up.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Solo runs are hard. Press start on player two.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few clean hits and the combo meter climbs again.",
+          "cta": "Take a shot"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Just a scratch. Heal up before the next wave.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Tied score. One hit decides the round. Aim and fire.",
+          "cta": "Fire"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "A single point apart. Stop button-mashing and pick a target.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} points between them. Final stage. Drop another coin.",
+          "cta": "Rally the arcade"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. The timer's ticking. Steady thumbs.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. High score territory. Don't blink.",
+          "cta": "Hold steady"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and the combo's building. Keep the streak alive.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A comfortable lead on the leaderboard. Stay focused.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. We own this stage. Keep shooting.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Nice. Finish the level.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. A last-second comeback!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. Bonus points for style.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} hole on one health pip. Absolute legend.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was nearly game over. Now it's top of the board.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. Somebody grabbed the extra life.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Co-op mode, engaged.",
+        "{username} backed {momentTitle} too. Player two ready.",
+        "{username} agrees with you. Matching scores. Lovely.",
+        "Same pick as {username}. Two controllers, one target.",
+        "{username} joined you on {momentTitle}. Nice aim, player two.",
+        "{username} made the same call. No chat needed. Pure reflexes.",
+        "{username} is on your side of {momentTitle}. Share the joystick.",
+        "{username} voted {momentTitle}. Welcome to the cabinet.",
+        "{username} read {momentTitle} just like you did. That's a perfect sync."
+      ],
+      "details": [
+        "A fellow high-scorer.",
+        "Two players, one screen.",
+        "Good co-op partners are rare.",
+        "Keep them on the roster.",
+        "Always handy, a reliable wingmate.",
+        "Someone who reads the level.",
+        "Pull up a stool."
+      ],
+      "buttons": [
+        "Nice aim",
+        "Say thanks",
+        "See the match",
+        "High five",
+        "Combo!",
+        "Good game",
+        "Player two!"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. Versus mode. Let's see who scores.",
+        "{username} chose {theirMoment}. Wrong target, in my opinion.",
+        "{username} went against {yourMoment}. Brave. Dangerously low on health.",
+        "{username} voted against you. Rival detected. Leaderboard updated.",
+        "{username} took {theirMoment}. A risky play. Possibly a miss.",
+        "{username} opposes {yourMoment}. Fine. The scoreboard decides.",
+        "{username} disagrees on {yourMoment}. Rematch at the final screen?",
+        "{username} voted the other way. They'll continue to the same ending eventually."
+      ],
+      "details": [
+        "Everyone misses a shot sometimes.",
+        "A friendly versus match.",
+        "The leaderboard will rule.",
+        "Don't let it tilt you.",
+        "A rival keeps you sharp.",
+        "They may switch players yet.",
+        "Makes the high-score race interesting."
+      ],
+      "buttons": [
+        "See the match",
+        "Check their score",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't luck, that's a perfect combo chain.",
+        "{username} and you, ten matches, identical picks. A flawless co-op run.",
+        "Ten straight with {username}. I'd put you both on the leaderboard.",
+        "A ten-match run with {username}. Not a single life lost.",
+        "Ten for ten with {username}. A spotless scorecard."
+      ],
+      "details": [
+        "Ten shots, ten hits.",
+        "A top-tier duo.",
+        "Rare in any arcade. Protect it.",
+        "Keep the chain going.",
+        "Hard to beat, that score."
+      ],
+      "buttons": [
+        "See their profile",
+        "Great run",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a duo, now the whole arcade.",
+        "{streakCount} in a row with {username}. I'd follow you both into any final stage.",
+        "{streakCount} straight picks with {username}. Your initials are on every cabinet.",
+        "A {streakCount}-match run with {username}. The kind of score people photograph.",
+        "{streakCount} with {username}. Zero misses between you."
+      ],
+      "details": [
+        "Tough to believe. Simple to applaud.",
+        "That's co-op trust, earned token by token.",
+        "I'm speechless. Only respect.",
+        "Practically invincible.",
+        "A duo for the hall of fame."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper versus rivalry.",
+        "{username} has opposed you ten times running. Two players, one leaderboard.",
+        "Ten in a row opposite {username}. Neither will drop a coin out.",
+        "A ten-match run against {username}. Stubborn as a stuck joystick.",
+        "Ten times at odds with {username}. I'd watch from the next cabinet."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Settle it, or keep playing.",
+        "A proper face-off.",
+        "Stubbornness is a power-up.",
+        "Who hits continue first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a tournament.",
+        "{streakCount} in a row opposite {username}. Neither of you will press quit.",
+        "{streakCount} straight clashes with {username}. Someone unplug the cabinet.",
+        "A {streakCount}-match feud with {username}. Somebody buy these two a soda.",
+        "{streakCount} against {username}. Impressive endurance. Do take a break."
+      ],
+      "details": [
+        "Neither of you is giving up the stick.",
+        "Stamina, certainly.",
+        "A grudge match for the ages.",
+        "Glad I'm not the referee.",
+        "The score table needs another page."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't taken your shot. Plenty of credits left.",
+        "{timeLeft} left on {matchTitle}. Your score is missing from the board.",
+        "{matchTitle} ends in {timeLeft}. I want your hit on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Take your shot"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The timer's turning red. Move.",
+        "{matchTitle} closes in {timeLeft}. Don't make me press continue for you.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone suspiciously idle."
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Final countdown. Ten, nine...",
+        "{timeLeft} left. Thumbs on the buttons. Fire.",
+        "Last-chance window on {matchTitle}. {timeLeft}. Hit it."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your vote are about to time out. The first has {timeLeft} left.",
+        "{matchCount} unvoted matches and the clock's draining. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Someone has to take the first shot.",
+        "{moment1} against {moment2} and the score's at zero. I'll wait. Briefly.",
+        "A fresh stage, no hits yet. Be first on the board.",
+        "{matchTitle} is a blank scoreboard. Start the tally."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Score one",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new targets on screen.",
+        "{matchCount} matches opened in round {round}. Next level loading.",
+        "Round {round} is live, with {matchCount} matches to clear.",
+        "A new round. {matchCount} matches. Pick your stage.",
+        "Round {round}: {matchCount} matches waiting on your crosshair."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Press start",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Perfect clear.",
+        "{momentTitle} is through. Stage complete.",
+        "{momentTitle} took it. Bonus points awarded.",
+        "{momentTitle} won, and took zero damage.",
+        "{momentTitle} advances. One level down.",
+        "{momentTitle} moves on. Clean sweep."
+      ],
+      "details": [
+        "A headshot bonus.",
+        "One stage down, more to clear.",
+        "High score earned.",
+        "No continues used."
+      ],
+      "buttons": [
+        "Nice",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. Game over for that one.",
+        "{momentTitle} is out. Not the final screen I wanted.",
+        "{momentTitle} didn't make it. Insert a coin and try again.",
+        "{momentTitle} went down fighting. That counts as a high score.",
+        "{momentTitle} is out. Reload. Return.",
+        "{momentTitle} lost this round. A bad stage, not a bad run.",
+        "{momentTitle} was eliminated. More stages are waiting."
+      ],
+      "details": [
+        "Not every run ends in victory.",
+        "It lasted to the final boss.",
+        "More levels are coming.",
+        "Shake it off. Continue."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the arcade. {liveCount} matches are open. Pick a stage.",
+          "New challenger. {liveCount} matches are live. Insert a coin.",
+          "Fresh player. {liveCount} matches need a decision.",
+          "{liveCount} targets on screen. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the boss fights."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Press start",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back for another round. Good.",
+          "Two days running. Your name's still on the board.",
+          "Back for a second day. High score noted."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I thought the cabinet had eaten your save.",
+          "After {days} days you return. Your high score's still here.",
+          "{days} days. I was about to put up a missing-player poster.",
+          "{days} days away. The leaderboard has moved on a bit."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Player one has entered the game. Good.",
+          "Welcome back. Press start.",
+          "Back already. Eager.",
+          "Ah. There you are, champ."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very empty arcade.",
+        "Hardly any players on this one. That should change.",
+        "Low turnout. Everyone's at the claw machine. Come play anyway.",
+        "Barely anyone's tried this level. Someone should."
+      ],
+      "details": [
+        "It needs more players.",
+        "Every hit counts on a quiet cabinet.",
+        "Yours scores extra here.",
+        "Don't let it go dark."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. The final hit is yours.",
+        "Dead level on {matchTitle}. One shot breaks the deadlock.",
+        "A tie. Someone has to land the winning hit. Let it be you.",
+        "{moment1} and {moment2}, same score. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the timer's nearly gone. One last hit.",
+        "Level, with the clock at zero. Vote.",
+        "Tied, and almost out of coins. Please don't leave it unfinished."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? The timer won't pause for you.",
+        "Don't overthink it. Pick a target and fire.",
+        "Every target is worth a hit. Trust your reflexes.",
+        "You've stared at the title screen long enough. Press start."
+      ],
+      "details": [
+        "Every hit counts.",
+        "Trust your aim.",
+        "There's no wrong target. Just slow thumbs.",
+        "Just press the button."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First hit scored. Welcome to the arcade.",
+        "You picked a target. A strong opening move."
+      ],
+      "details": [
+        "On the scoreboard. +{xp} XP",
+        "The first of many, I reckon. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You're getting the controls down.",
+        "Five. No longer a button-masher."
+      ],
+      "details": [
+        "A smooth opening. +{xp} XP",
+        "Locking in your timing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The whole arcade knows your tag.",
+        "Ten. You've earned your initials on the board."
+      ],
+      "details": [
+        "A dependable player. +{xp} XP",
+        "Ten on the leaderboard. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your score echoes through the hall.",
+        "Twenty-five. Every cabinet is listening."
+      ],
+      "details": [
+        "Heard above the chiptunes. +{xp} XP",
+        "Twenty-five hits on the board. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Deep into the final stages.",
+        "Fifty. You clearly love it. That's the spirit."
+      ],
+      "details": [
+        "Fifty hits logged. +{xp} XP",
+        "Deep in the pixel jungle. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll build a cabinet in your honour.",
+        "One hundred. Brilliant. I'll say it once."
+      ],
+      "details": [
+        "Earned token by token. +{xp} XP",
+        "A hundred. Claim the top spot. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. The cabinet's warming up.",
+        "Three days straight. Consistent."
+      ],
+      "details": [
+        "Showing up is the first boss. +{xp} XP",
+        "Three days of play. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's a proper winning streak.",
+        "Seven days running. Locked in."
+      ],
+      "details": [
+        "A week without dropping a life. +{xp} XP",
+        "Seven days of high scores. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never leave the cabinet.",
+        "Fourteen days. Magnificently committed."
+      ],
+      "details": [
+        "A fortnight at the controls. +{xp} XP",
+        "That's true arcade spirit. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. An endless run.",
+        "A month at the arcade. That says it all."
+      ],
+      "details": [
+        "Thirty days of play. +{xp} XP",
+        "A full month without a game over. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You back the targets nobody else shoots.",
+        "Five unlikely picks. Love it."
+      ],
+      "details": [
+        "Off the usual route. +{xp} XP",
+        "Five long shots supported. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You ignore the walkthrough on purpose.",
+        "Fifteen. You answer to no strategy guide."
+      ],
+      "details": [
+        "Always your own route. +{xp} XP",
+        "Fifteen votes off the main path. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No player can predict you.",
+        "Thirty. The secret level is your whole game."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty votes for the one on low health. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on screen five times. Lightning reflexes.",
+        "Five times you reached the target before the rest."
+      ],
+      "details": [
+        "You're there before the title screen. +{xp} XP",
+        "Five votes before the queue formed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you shot first. Decisive.",
+        "First to fire, again and again."
+      ],
+      "details": [
+        "Fifteen votes before anyone else queued. +{xp} XP",
+        "Ahead of the whole arcade. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Your thumbs never shook.",
+        "Another narrow one. Reflexes like steel."
+      ],
+      "details": [
+        "Pressure suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your hit keeps swinging the score.",
+        "You've cracked more than one deadlock."
+      ],
+      "details": [
+        "Twenty-five finishes by a hair. +{xp} XP",
+        "You decide the high score. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you backed the one on low health. Stubborn. Approved.",
+        "You never abandon a player on one life. Admirable."
+      ],
+      "details": [
+        "Faith in a last-second comeback. +{xp} XP",
+        "Five comeback runs you called early. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Someone has a favourite cabinet.",
+        "That one again? Must be a good game."
+      ],
+      "details": [
+        "You know your favourite level. +{xp} XP",
+        "One pick, three hits. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five hits on one moment. That's loyalty.",
+        "You can't quit that one. Fair enough."
+      ],
+      "details": [
+        "Loyal through every game over. +{xp} XP",
+        "One favourite, five hits. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten hits on one moment. That's fixation.",
+        "Ten hits, same target. I shan't say a word. Mostly."
+      ],
+      "details": [
+        "Ten on one target. +{xp} XP",
+        "Devoted. Or just addicted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying in the game.",
+        "Round two and still playing. Good."
+      ],
+      "details": [
+        "Further through the levels. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the final world.",
+        "Deep in the bracket. The bosses get tougher now."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the first level. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You cleared the whole game.",
+        "All the way. You never hit continue."
+      ],
+      "details": [
+        "From the first hit to the last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've tried a lot of stages.",
+        "Ten different matches. Thorough play. Good."
+      ],
+      "details": [
+        "Exploring every stage of the bracket. +{xp} XP",
+        "Ten levels cleared. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've found every secret room.",
+        "Twenty-five. Not a stage left unplayed."
+      ],
+      "details": [
+        "Every level explored. +{xp} XP",
+        "Twenty-five stages studied. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That isn't a visit, that's a high-score habit.",
+        "Fifty. You know this bracket better than the manual."
+      ],
+      "details": [
+        "A true veteran of the cabinet. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long session.",
+        "Five back to back. Do rest your thumbs."
+      ],
+      "details": [
+        "One long session. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A marathon run.",
+        "Ten in one go. Proper arcade stamina."
+      ],
+      "details": [
+        "A marathon session. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Late-night session, or can't sleep?",
+        "The small hours. Dedication, or insomnia. I know both."
+      ],
+      "details": [
+        "The midnight arcade suits you. +{xp} XP",
+        "A vote after closing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You brought your friends. Thanks.",
+        "Five shares. More players, more fun."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five invites sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically the arcade owner.",
+        "Fifteen. You keep bringing people in. Splendid."
+      ],
+      "details": [
+        "Still recruiting players. +{xp} XP",
+        "Fifteen friends invited in. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first coin. A founding member, always.",
+        "One of the first thousand. That can't be reset."
+      ],
+      "details": [
+        "That score is saved for good. +{xp} XP",
+        "Nobody can wipe that score. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Promoted. Wear it like a high score."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Bonus points!",
+        "Another trophy for the cabinet: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the credits and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. Reminds me of a certain wild-card character.",
+        "Ten wild shots. Nothing makes your thumbs shake."
+      ],
+      "details": [
+        "Ten hits against the odds. +{xp} XP",
+        "Impossible shots are your thing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my steady thumbs.",
+        "Ten finishes by a pixel. Secretly impressed."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady aim at the final boss. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days straight. Rock-steady aim.",
+        "A whole week with no misses. Nicely played."
+      ],
+      "details": [
+        "A week of pixel-perfect aim. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One hit, one verdict.",
+        "A frozen scoreboard, until you hit it. Brilliant."
+      ],
+      "details": [
+        "The hit that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Arcade Caitlyn, player one. Press start.",
+        "Caitlyn is yours now. Try to keep up with the combo."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The cabinet's still booting.",
+      "Voting hasn't begun. I'll flash the screen when it does.",
+      "Not yet. Waiting for the next round is part of the game."
+    ],
+    "prevote": [
+      "Two edits, one shot. Look at both before you fire.",
+      "Study both before you commit. No wild button-mashing.",
+      "I'm keeping my favourite off the scoreboard. The shot is yours.",
+      "Take your time. A clean hit beats a quick one.",
+      "Pick the one you'd put your initials on."
+    ],
+    "prevote-empty": [
+      "No hits yet. Take the first shot.",
+      "Quiet so far. Someone has to start the score.",
+      "Not a single vote. Be the first."
+    ],
+    "closing-24h": [
+      "Less than a day left and no hit from you. Go.",
+      "The timer's running out. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the clock hits zero."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Fire."
+    ],
+    "voted-early": [
+      "You voted early with hardly anyone playing. First on the board.",
+      "Barely a hit scored and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Good. The score can still flip.",
+      "{pct}% with you. A strong lead.",
+      "Ahead for now. Scores change.",
+      "{pick} is sliding into first. Sharp read.",
+      "A lead is a lead. Keep shooting."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more hit tips it. Call a friend.",
+      "Dead level in the final round. Your pick needs a co-op partner.",
+      "{pct} against {otherPct}. Stop button-mashing a second."
+    ],
+    "voted-tied": [
+      "Perfectly level. Neither player leads.",
+      "Identical scores. Infuriating, and weirdly addictive."
+    ],
+    "voted-behind": [
+      "You're trailing. That doesn't make you mistaken.",
+      "{pick} is lagging. Underdog. I know that health bar.",
+      "They're ahead. You're not wrong, just out-scored.",
+      "Down by {diff} points. Tell people. Send the invite widely.",
+      "Most went the other way. High scores aren't proof."
+    ],
+    "closed-won": [
+      "Your pick won. A sound call.",
+      "A win. Hard-earned.",
+      "{pick} went through. You read the level rightly."
+    ],
+    "closed-lost": [
+      "Your pick got a game over. A pity. It was a fair target.",
+      "It hit game over. It happens. Keep playing.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A draw. Neither player lost a pixel."
+    ],
+    "closed-unvoted": [
+      "The round timed out and you missed it. More stages are coming.",
+      "Round over. {winner} took it. Fire quicker next time."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first hit. Welcome. Nobody's first shot is calm.",
+      "That's your first shot. Your aim settles with practice. Promise.",
+      "You're on the cabinet now. Welcome."
+    ],
+    "streak": [
+      "Back at the cabinet. Good.",
+      "{streak} days running. I see you keeping the high score.",
+      "You keep returning to the arcade. I appreciate that."
+    ],
+    "underdog": [
+      "You took the target nobody else would. Noted.",
+      "A hard choice. A good one.",
+      "The low-health side. That takes nerve."
+    ],
+    "early": [
+      "Early. You reached the cabinet before the rest.",
+      "The scoreboard's nearly empty. Your hit would show up big.",
+      "First on the board. Well done."
+    ],
+    "close": [
+      "That hit moved the score. It's delicately poised.",
+      "A single pixel apart. One more hit flips it.",
+      "Neck and neck on the leaderboard. Your hit could decide it."
+    ],
+    "behind": [
+      "{pick} is trailing. Trailing isn't game over. Call player two.",
+      "Not top of the board yet. More stages to clear.",
+      "Behind, not game over. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Scores shift.",
+      "On top for now. Don't trust the leaderboard.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Your hit is logged. More stages to explore."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and a zero score. Start with the one you read best.",
+      "Every target is on screen. Choose. I won't hurry you.",
+      "{unvoted} left. No pressure. Maybe a smidge."
+    ],
+    "live-some": [
+      "{voted} cast, {unvoted} still to go. Keep shooting.",
+      "You've pressed start. {unvoted} stages remain.",
+      "A decent first level. The rest won't beat themselves."
+    ],
+    "live-few": [
+      "{unvoted} stages left. Clear them today.",
+      "Almost at the credits. {unvoted} left.",
+      "Close. Don't lose focus now."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "One stage left. Don't walk away from the cabinet.",
+      "One match between you and a perfect run."
+    ],
+    "live-closing": [
+      "A few time out in {timeLeft}. {unvoted} still need your hit.",
+      "The timer's draining. {unvoted} left, {timeLeft} to go.",
+      "The timer's flashing. Do hurry."
+    ],
+    "live-done": [
+      "You've cleared every match. Great work. Check the bracket.",
+      "Your list is cleared. Come back when the next round loads.",
+      "Every stage cleared. Seriously rare. Respect."
+    ],
+    "live-none": [
+      "No match is live right now. It'll respawn. Browse the bracket while you wait.",
+      "Quiet around the cabinet. Check back soon.",
+      "No matches open. I'm tapping the cabinet as impatiently as you."
+    ],
+    "brackets-groups": [
+      "Groups come first. Two per group reach the next world. The rest hit game over.",
+      "All players start in a group. Few reach the next world.",
+      "Mind the leaderboard. It changes fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are loading. Two from each group go on.",
+      "No knockout stage yet. The groups must finish loading.",
+      "Hang on. The knockout boots up once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are live. One game over and you're done.",
+      "One life only. No continues.",
+      "Each stage is tougher now. Pick wisely."
+    ],
+    "brackets-bracket": [
+      "Stage by stage. One game over ends it.",
+      "Trace the bracket. The levels thin out every round.",
+      "Every row on this board is a match someone shot at."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for playing with me.",
+      "The credits are rolling. A tough run. I'll miss the cabinet.",
+      "We have a champion. A fitting final boss."
+    ],
+    "brackets-empty": [
+      "No bracket on the screen. Nothing's been generated.",
+      "Blank screen. The draw hasn't loaded yet.",
+      "A blank cabinet for now. Look again later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One hit decides it. Choose.",
+      "{a} against {b}: two edits, one hit. Fire away.",
+      "{a} versus {b}. Join the game and tell me what you think."
+    ],
+    "voted": [
+      "My hit goes to {pick} over {other}. Where's yours?",
+      "{pick} gets my hit over {other}. Change my mind.",
+      "My target is {pick} over {other}. Fancy a rematch?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more players.",
+      "I called {pick} over {other} early. Add your hit.",
+      "{pick} against {other}, hardly a hit on the board. Yours would register."
+    ],
+    "tied": [
+      "{pick} and {other} are even. One hit ends it.",
+      "{pick} and {other} share one score. Break the tie.",
+      "{pick} and {other} are locked together. Your hit can split them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes between {pick} and {other}. Every hit counts.",
+      "{voteDiff} votes split {pick} and {other}. Land yours.",
+      "{voteDiff} separate {pick} and {other}. The score could swing either way."
+    ],
+    "losing-close": [
+      "{voteDiff} stand between {pick} and {other}. A few hits flip it.",
+      "{pick} is {voteDiff} below {other} but still on its feet. Back it.",
+      "{pick} is {voteDiff} off {other}. Still fixable. Shoot."
+    ],
+    "losing-bad": [
+      "{other} leads {pick} by {voteDiff}. It needs a power-up.",
+      "{pick} is {voteDiff} short of {other} and deserves a better run. Vote.",
+      "{other} has {pick} down by {voteDiff}. Let's flip the score."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% over {other}, narrowly. Help it keep the lead.",
+      "{pick} is up on {other}, {pct}%. Not safe yet. Shoot.",
+      "{pick} has {pct}% over {other}. A slim lead."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see the replay.",
+      "{pick} sits on {pct}%. {other} is off-screen.",
+      "{pick} is far ahead of {other}, {pct}%. Add your hit."
+    ]
+  }
+}
