@@ -6,6 +6,7 @@ import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let pass = 0; const t = async (n, f) => { await f(); console.log('  ok  ', n); pass++; };
 const read = id => JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
 const base = read('jinx'), orig = read('jinx-original'), crime = read('jinx-crime-city'), project = read('jinx-project'), firecracker = read('jinx-firecracker'), starGuardian = read('jinx-star-guardian'), odyssey = read('jinx-odyssey'), battleCat = read('jinx-battle-cat'), cafeCuties = read('jinx-cafe-cuties'), oceanSong = read('jinx-ocean-song'), zombieSlayer = read('jinx-zombie-slayer'), ambitiousElf = read('jinx-ambitious-elf'), heartseeker = read('jinx-heartseeker'), t1 = read('jinx-t1'), arcaneFractured = read('jinx-arcane-fractured');
+const viBase = read('vi'), viOrig = read('vi-original');
 
 await t('Arcane Enemy keeps the base voice, every other Jinx skin has its own set or speaks with the original', () => {
     assert.equal(voiceSetFor('jinx', 37), null);
@@ -65,7 +66,7 @@ await t('applyVoiceSet follows "extends": parent first, then the set itself, mis
 });
 
 // Each set must have the same entries as the set below it (so a skin never loses a line) and the same placeholders
-for (const [name, set, below] of [['jinx-original', orig, base], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig], ['jinx-odyssey', odyssey, orig], ['jinx-battle-cat', battleCat, orig], ['jinx-cafe-cuties', cafeCuties, orig], ['jinx-ocean-song', oceanSong, orig], ['jinx-zombie-slayer', zombieSlayer, orig], ['jinx-ambitious-elf', ambitiousElf, orig], ['jinx-heartseeker', heartseeker, orig], ['jinx-t1', t1, orig], ['jinx-arcane-fractured', arcaneFractured, orig]]) {
+for (const [name, set, below] of [['jinx-original', orig, base], ['vi-original', viOrig, viBase], ['jinx-crime-city', crime, orig], ['jinx-project', project, orig], ['jinx-firecracker', firecracker, orig], ['jinx-star-guardian', starGuardian, orig], ['jinx-odyssey', odyssey, orig], ['jinx-battle-cat', battleCat, orig], ['jinx-cafe-cuties', cafeCuties, orig], ['jinx-ocean-song', oceanSong, orig], ['jinx-zombie-slayer', zombieSlayer, orig], ['jinx-ambitious-elf', ambitiousElf, orig], ['jinx-heartseeker', heartseeker, orig], ['jinx-t1', t1, orig], ['jinx-arcane-fractured', arcaneFractured, orig]]) {
     await t(`${name} has every section and entry of the set below it, in the same shape`, () => {
         for (const s of VOICE_SECTIONS) {
             assert.ok(set[s], s);
@@ -120,4 +121,16 @@ for (const [name, set] of THEMED) {
         for (const quote of RIOT_PHRASES) assert.ok(!text.includes(quote), quote);
     });
 }
+// Vi: Arcane Undercity and Arcane Brawler keep her base pack, every other skin speaks with Original Vi
+await t('Vi: the Arcane skins keep the base voice, every other skin speaks with the original', () => {
+    for (const n of [29, 48]) assert.equal(voiceSetFor('vi', n), null, `skin ${n}`);
+    for (const n of [0, 1, 4, 11, 999]) assert.equal(voiceSetFor('vi', n), 'vi-original', `skin ${n}`);
+});
+// Lines from the League audio pages for Vi: ours are written from the character, never copied
+const VI_RIOT_PHRASES = ['save the day... or wreck it', "doing this my way", 'hands do the talking', "piltover's finest", "let's get crackin", 'who needs a beatdown', 'make a door', 'my own backup', 'fun part', 'hit a wall', 'what hit', "don't need a plan", 'spot of tea', 'spot of punch', 'as far as i can throw', 'five reasons', "beat it out of you", 'hard way or', 'gives me something to aim at', 'makes a nice target', 'try the punch', 'straight answer', 'resist arrest', 'put a dent', 'smash and grab', 'punchline', 'freeze! or', 'wrecking crew', 'stands for', 'eat this', 'get dunked', 'boom, baby', 'power slam', 'high five', 'boom! headshot', 'cupcake', 'supposed to hurt'];
+await t('vi-original is its own voice: no in-game lines, no lore names', () => {
+    const text = VOICE_SECTIONS.flatMap(s => strings(viOrig[s])).join('\n').toLowerCase();
+    for (const q of VI_RIOT_PHRASES) assert.ok(!text.includes(q), q);
+    for (const n of ['silco', 'vander', 'ekko', 'sevika', 'stillwater', 'ambessa', 'heimerdinger', 'warwick', 'jayce']) assert.ok(!text.includes(n), n);
+});
 console.log(`${pass} passed`);

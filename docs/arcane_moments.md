@@ -939,3 +939,6 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **Vi plan:** Vi's base pack (`vi.json`, 41 achievements, same shape as Jinx's) becomes `vi-original` first, then 14 skins from her ladder
   (Classic, Arcane Undercity, Neon Strike, Officer, Debonair, Demon, Warring Kingdoms, PROJECT, Heartbreaker, Heartache, PsyOps, Primal Ambush,
   T1, Arcane Brawler). The user sends each skin card.
+- **Done:** Original Vi (`vi-original`, Classic and every Vi skin without its own set): a full rewrite of the Classic voice in her own words
+  (blunt, cocky, loyal; brawling, rounds, corners and jabs), tone only from the in-game list, nothing copied. Arcane Undercity (29) and Arcane Brawler
+  (48) keep the base `vi.json` voice until Brawler gets its own set. Next: Demon Vi (4) and PROJECT Vi (11), each with its own set extending `vi-original`.
