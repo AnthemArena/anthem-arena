@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-lunar-wraith",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Lunar Wraith Caitlyn",
+  "description": "Voice set for Lunar Wraith Caitlyn (skin 10): a hushed, ill-omened spirit haunting by moonlight. Omens, candles, crypts and fading light, with votes as omens cast. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} short. The moon is fading on it. Summon more.",
+          "cta": "Summon help"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more short. A dark omen. Gather every spirit you know.",
+          "cta": "Gather the dead"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Whisper it through every window.",
+          "cta": "Spread the whisper"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A curse that can still be lifted. Hurry.",
+          "cta": "Lift the curse"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Even a wraith needs a haunting party. Call them.",
+          "cta": "Call the haunting"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few restless souls would turn it.",
+          "cta": "Wake the restless"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. I'd take it personally. The night's ending.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even. The moon hangs between two fates. Tip it.",
+          "cta": "Tip the moon"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. I can feel it in the cold. Add yours.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The candles gutter. Choose.",
+          "cta": "Choose a fate"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Nobody breathe. The omen is deciding.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. The omens favour you. Do not tempt them.",
+          "cta": "Hold the glow"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and rising. A good sign. Rare, from me.",
+          "cta": "Keep going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. The moon smiles. Don't wake what sleeps.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The spirits side with you. Don't disturb them.",
+          "cta": "Keep the vigil"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. A bright omen. Treasure it before it passes.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and now leads. A wraith's trick. Even I'm impressed.",
+          "cta": "Witness it"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. It rose from the grave.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} pit. The dead do return.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was an ill omen. Now it's a blessing.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has taken the lead. I did not smile. It was a trick of the moonlight.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} cast with you on {momentTitle}. A kindred spirit.",
+        "{username} backed {momentTitle} too. They see what I see.",
+        "{username} agrees with you. The omens align.",
+        "Same sign as {username}. The stars concur.",
+        "{username} stood with {momentTitle}. A fine companion for the night.",
+        "{username} read the same omen. No ritual needed.",
+        "{username} is on your side of {momentTitle}. I'll not haunt them. Much.",
+        "{username} voted {momentTitle}. Welcome to the coven.",
+        "{username} loves {momentTitle} as you do. A rare spirit."
+      ],
+      "details": [
+        "A fellow haunter.",
+        "Two lanterns, one flame.",
+        "Kindred souls are scarce.",
+        "Keep them close tonight.",
+        "A trustworthy ghost.",
+        "Someone who sees clearly.",
+        "Worth a gentle haunting."
+      ],
+      "buttons": [
+        "It is written",
+        "Acknowledge",
+        "See the match",
+        "Bow",
+        "Fitting",
+        "Fair",
+        "So it is"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} chose {theirMoment} over {yourMoment}. A rival omen. Let's see whose curse is stronger.",
+        "{username} backed {theirMoment}. Not the sign I read.",
+        "{username} went against {yourMoment}. Brave. Foolish, perhaps.",
+        "{username} voted against you. A rival spirit. Interesting.",
+        "{username} took {theirMoment}. A doubtful prophecy. We'll see.",
+        "{username} opposes {yourMoment}. Fine. The moon will judge.",
+        "{username} disagrees on {yourMoment}. Settle it before dawn.",
+        "{username} voted the other way. They'll come round once the fog lifts."
+      ],
+      "details": [
+        "Even ghosts misread a sign.",
+        "A spectral quarrel.",
+        "The moon will rule.",
+        "Don't let it chill you.",
+        "A rival keeps the haunting sharp.",
+        "They may rethink the omen.",
+        "Makes the night livelier."
+      ],
+      "buttons": [
+        "See the match",
+        "Study them",
+        "Face it",
+        "Settle it",
+        "Check the tally",
+        "See the numbers",
+        "Hm"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches beside {username}. That's no accident, that's a bond.",
+        "{username} and you, ten matches, the same omen every time. A powerful pairing.",
+        "Ten straight with {username}. I'd haunt for you both.",
+        "A ten-match run with {username}. Not one cursed pick.",
+        "Ten for ten with {username}. An unbroken spell."
+      ],
+      "details": [
+        "Ten omens, no doubt.",
+        "A formidable pair of spirits.",
+        "Rare on any night. Guard it.",
+        "Keep the vigil.",
+        "Hard to unpick."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well done",
+        "Hold on",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. You're a whole coven now.",
+        "{streakCount} in a row with {username}. I'd drift behind you both through any mist.",
+        "{streakCount} straight omens with {username}. The moon itself takes note.",
+        "A {streakCount}-match run with {username}. The stuff of spectral legend.",
+        "{streakCount} with {username}. Not one broken charm between you."
+      ],
+      "details": [
+        "Hard to credit. Easy to haunt over.",
+        "That's trust, woven in moonlight.",
+        "I'm speechless. Mostly.",
+        "Nearly unbreakable.",
+        "A pair for the ghost stories."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Hold on",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper long haunting.",
+        "{username} has opposed you ten times running. Two stubborn spirits, one graveyard.",
+        "Ten in a row opposite {username}. Neither of you gives up the crypt.",
+        "A ten-match run against {username}. Stubborn as a gravestone.",
+        "Ten times at odds with {username}. I'd drift away."
+      ],
+      "details": [
+        "Ten curses, no truce.",
+        "Talk it out. Or don't.",
+        "A proper spectral feud.",
+        "Stubbornness never dies.",
+        "Who vanishes first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold on",
+        "Stand firm",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a curse.",
+        "{streakCount} in a row opposite {username}. Neither of you is leaving the graveyard.",
+        "{streakCount} straight clashes with {username}. Somebody fetch an exorcist.",
+        "A {streakCount}-match feud with {username}. Someone should lay you both to rest. Politely.",
+        "{streakCount} against {username}. I admire the endurance. Even the dead tire."
+      ],
+      "details": [
+        "Neither of you will budge.",
+        "Endurance, certainly.",
+        "A grudge older than the grave.",
+        "Glad I'm not the mediator.",
+        "The curse is getting longer."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Stand firm",
+        "Hold on",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your omen is uncast. There's still moonlight.",
+        "{timeLeft} left on {matchTitle}. Your name is missing from the séance.",
+        "{matchTitle} ends in {timeLeft}. The spirits await your sign."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose a fate",
+        "Cast it"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The moon is sinking. Hurry.",
+        "{matchTitle} closes in {timeLeft}. Don't make me haunt you for it.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone cold and quiet. Dead on your feet?"
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The candles are guttering.",
+        "{timeLeft} left. The veil is closing. Choose.",
+        "Final call on {matchTitle}. {timeLeft}. Speak the spell."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} omens still uncast and the moon is setting. The first has {timeLeft} left.",
+        "{matchCount} unanswered matches and the night is thinning. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No omens on {matchTitle}. Someone must stir the dark.",
+        "{moment1} against {moment2} and not one vote cast. I'll linger. Briefly.",
+        "A fresh night and a silent crypt. Be first to speak.",
+        "{matchTitle} is an empty séance. Light the first candle."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Speak first",
+        "Light it"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new omens to read.",
+        "{matchCount} matches opened in round {round}. A new night begins.",
+        "Round {round} is live, with {matchCount} omens to weigh.",
+        "A new round. {matchCount} matches. Read each sign carefully.",
+        "Round {round}: {matchCount} matches awaiting your reading."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Join the haunt",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A glorious omen.",
+        "{momentTitle} is through. As the stars foretold.",
+        "{momentTitle} took it. Lift the pale lamp.",
+        "{momentTitle} won and lit the whole graveyard.",
+        "{momentTitle} advances. One more soul in the procession.",
+        "{momentTitle} moves on. Haunting."
+      ],
+      "details": [
+        "A bright sign.",
+        "One read, more in the dark.",
+        "Earned under moonlight.",
+        "A clean haunting."
+      ],
+      "buttons": [
+        "So it is",
+        "Next match",
+        "Press on",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A dark ending.",
+        "{momentTitle} is out. Not the omen I'd hoped for.",
+        "{momentTitle} didn't make it. Let the mist take it.",
+        "{momentTitle} faded with a sigh. That counts.",
+        "{momentTitle} is out. Sit with it a while. Return.",
+        "{momentTitle} lost this round. A passing shadow, not a lasting curse.",
+        "{momentTitle} was eliminated. More nights remain."
+      ],
+      "details": [
+        "Not every omen is kind.",
+        "It burned to the last ember.",
+        "More nights are coming.",
+        "Let it rest. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Press on",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the haunt. {liveCount} matches are open. Pick one.",
+          "A new soul. {liveCount} matches are live. Take a candle.",
+          "Fresh spirit. {liveCount} matches need a decision.",
+          "{liveCount} omens awaiting a reader. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the cold spots."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Take a candle",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You drifted back. Good.",
+          "Two nights running. A devoted haunter.",
+          "Second night among the tombs. I felt you arrive."
+        ],
+        "buttons": [
+          "Press on",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I kept your corner of the crypt.",
+          "After {days} days you return. The graveyard is still here.",
+          "{days} days. I'd begun to fear you'd passed on. Don't vanish again.",
+          "{days} days away. The mist has shifted."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Good.",
+          "Welcome back. The haunting continues.",
+          "Back already. Keen.",
+          "Ah. There you are, spirit."
+        ],
+        "buttons": [
+          "Let's go",
+          "Press on",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet haunt.",
+        "Hardly a spirit has stirred here. That should change.",
+        "Low turnout. The dead are elsewhere tonight. Come anyway.",
+        "Barely a candle lit. Someone should strike a match."
+      ],
+      "details": [
+        "It needs more spirits.",
+        "Every soul counts in a quiet haunt.",
+        "Yours counts for more this night.",
+        "Don't let the glow die."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the deciding omen.",
+        "Dead level on {matchTitle}. One whisper settles it.",
+        "Two curses in perfect balance. Someone must tip them. Let it be you.",
+        "{moment1} and {moment2}, equal in the dark. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Choose a fate",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the night is ending. One last sign.",
+        "Level, with the moon almost gone. Vote.",
+        "Tied, and dawn approaches. Don't leave the omen unread."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? The moon won't wait.",
+        "Don't overthink it. Read the omen.",
+        "They're all unsettling. Trust your instincts.",
+        "You've lingered in the doorway long enough. Come into the dark."
+      ],
+      "details": [
+        "Every whisper counts.",
+        "Trust your instincts.",
+        "No wrong omen. Only unread ones.",
+        "Just speak."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First omen cast. The haunting has begun.",
+        "You made your pick. The séance is open."
+      ],
+      "details": [
+        "Recorded in the moonlight. +{xp} XP",
+        "The first of many whispers. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You've found the graveyard gate.",
+        "Five. No longer lingering outside the mist."
+      ],
+      "details": [
+        "A quiet start. +{xp} XP",
+        "A proper first night. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. Even the ghosts know your name.",
+        "Ten. You've earned a corner of the crypt."
+      ],
+      "details": [
+        "A dependable spirit. +{xp} XP",
+        "Ten omens read. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice echoes through the tombs.",
+        "Twenty-five. The whole graveyard listens."
+      ],
+      "details": [
+        "Louder than the wind. +{xp} XP",
+        "Twenty-five whispers carried. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Properly bound to this place.",
+        "Fifty. You're clearly haunted by it. Good."
+      ],
+      "details": [
+        "Fifty omens logged. +{xp} XP",
+        "Deep in the mist. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll tell ghost stories about you.",
+        "One hundred. Chilling. I'll admit it once."
+      ],
+      "details": [
+        "Earned in the dark. +{xp} XP",
+        "A hundred. Take a bow, spectre. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three nights running. A candle catches.",
+        "Three nights in a row. Faithful."
+      ],
+      "details": [
+        "Returning is half the haunt. +{xp} XP",
+        "Three nights of moonlight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's a whole lunar quarter.",
+        "Seven nights running. No missed vigil."
+      ],
+      "details": [
+        "A week without missing a haunt. +{xp} XP",
+        "Seven nights of omens. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. Not one night abandoned.",
+        "Fourteen nights. Perfectly spectral."
+      ],
+      "details": [
+        "A fortnight under the moon. +{xp} XP",
+        "That's a proper curse. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. A full cycle of the moon.",
+        "A month of devotion. The tides approve."
+      ],
+      "details": [
+        "Thirty nights on the watch. +{xp} XP",
+        "A whole moon of voting. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You side with the forgotten.",
+        "Five remote omens. I admire the audacity."
+      ],
+      "details": [
+        "Against the living crowd. +{xp} XP",
+        "Five forgotten souls championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You leave the paved road of omens.",
+        "Fifteen. You follow your own pale light."
+      ],
+      "details": [
+        "Always your own séance. +{xp} XP",
+        "Fifteen votes off the beaten crypt. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can read your fate.",
+        "Thirty. You're the shadow in the corner."
+      ],
+      "details": [
+        "Impossible to foresee. +{xp} XP",
+        "Thirty votes for the faded one. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First to the haunt five times. Early.",
+        "Five times you beat the rest to the graveyard."
+      ],
+      "details": [
+        "You arrive before the mist rises. +{xp} XP",
+        "Five votes ahead of the living. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where yours was the first whisper. Decisive.",
+        "Always first through the veil."
+      ],
+      "details": [
+        "Fifteen whispers ahead of the throng. +{xp} XP",
+        "Ahead of the whole haunting. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Unshaken, all of them.",
+        "Another tight one. Nerves of grave-iron."
+      ],
+      "details": [
+        "Dread suits you. +{xp} XP",
+        "Ten whisker-thin finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five narrow matches. Your whisper keeps settling them.",
+        "You've settled more than one standoff."
+      ],
+      "details": [
+        "Twenty-five finishes by a shadow. +{xp} XP",
+        "You decide which fate holds. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stayed with the fading one. Patient. Good.",
+        "You trust a late resurrection. Sensible."
+      ],
+      "details": [
+        "Faith in the revival. +{xp} XP",
+        "Five rebirths you believed in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. A favourite haunt.",
+        "That one again? You've picked your ghost."
+      ],
+      "details": [
+        "You know your mind. +{xp} XP",
+        "One ghost, three visits. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five visits to a single moment. Unwavering.",
+        "You won't let that one go. Nor would a ghost."
+      ],
+      "details": [
+        "Loyal beyond the grave. +{xp} XP",
+        "One favourite, five haunts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on one moment. That's a haunting.",
+        "Ten returns to one pick. I won't remark. Much."
+      ],
+      "details": [
+        "Ten on a single ghost. +{xp} XP",
+        "Faithful. Or merely haunted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're following the pale light.",
+        "Round two and still drifting. Good."
+      ],
+      "details": [
+        "Further into the mist. +{xp} XP",
+        "Two nights in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the haunt.",
+        "Well into the bracket. The dark grows thicker."
+      ],
+      "details": [
+        "Four nights in. +{xp} XP",
+        "Far from the first candle. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You haunted the whole cycle.",
+        "All the way. You never faded."
+      ],
+      "details": [
+        "From first candle to last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've visited a good few graves.",
+        "Ten separate matches. Exacting. Good."
+      ],
+      "details": [
+        "Mapping the whole graveyard. +{xp} XP",
+        "Ten crypts visited. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. Every crypt visited.",
+        "Twenty-five. Not a shadow left unvisited."
+      ],
+      "details": [
+        "Every tomb covered. +{xp} XP",
+        "Twenty-five crypts explored. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's no visit, that's an afterlife.",
+        "Fifty. You know this bracket better than the graveyard map."
+      ],
+      "details": [
+        "A veteran of the whole haunt. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long vigil.",
+        "Five back to back. Do drink something warm."
+      ],
+      "details": [
+        "One long night. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A marathon haunting.",
+        "Ten in one stretch. Unearthly stamina."
+      ],
+      "details": [
+        "A spectral marathon. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? The witching hour, I assume.",
+        "The small hours. Either haunted or sleepless. I understand both."
+      ],
+      "details": [
+        "Dead of night suits you. +{xp} XP",
+        "A vote after the last candle. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You whispered to your friends. My thanks.",
+        "Five shares. More spirits, more fun."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five whispers passed on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a rumour.",
+        "Fifteen. You keep drawing the whole coven in."
+      ],
+      "details": [
+        "Still whispering. +{xp} XP",
+        "Fifteen omens delivered. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first candle. A founding spirit, always.",
+        "One of the first thousand. That can't be buried."
+      ],
+      "details": [
+        "Yours beyond the grave. +{xp} XP",
+        "No one lays that to rest. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Properly earned.",
+        "Promoted. Wear it like a spectral crown."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Ominous.",
+        "Another entry for the grimoire: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the nights and it shows."
+      ],
+      "details": [
+        "{rank}. A haunting result.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. I've known spirits who'd blush. Frequently.",
+        "Ten remote omens. Not one tremor."
+      ],
+      "details": [
+        "Ten faint omens backed. +{xp} XP",
+        "Remote omens are your craft. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten narrow ones. You match my cold, steady hand.",
+        "Ten razor finishes. I'm silently pleased."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Calm while the candles gutter. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven nights running. Your aim does not drift.",
+        "Seven nights, no lapse in the vigil. Well kept."
+      ],
+      "details": [
+        "Seven nights of cold exactness. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One breath, one verdict.",
+        "Two fates in stillness, and you moved the moon. Splendid."
+      ],
+      "details": [
+        "The whisper that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Lunar Wraith Caitlyn, pale and ominous. Rifle ready.",
+        "Caitlyn is yours now. Fear not the chill. Mostly."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The veil hasn't thinned.",
+      "Voting hasn't begun. I'll whisper when it does.",
+      "Not yet. Omens cannot be rushed."
+    ],
+    "prevote": [
+      "Two omens, one fate. Study both before the candle burns down.",
+      "Look at both before you speak. No rushing into the dark.",
+      "I won't say which I favour. The omen is yours to read.",
+      "Take your time. A true reading beats a hasty one.",
+      "Choose the one that raises the hair on your neck."
+    ],
+    "prevote-empty": [
+      "No omens yet. Cast the first.",
+      "Quiet so far. Someone must stir the dark.",
+      "Not a single vote. Be first."
+    ],
+    "closing-24h": [
+      "Under a day left and no sign from you. Move.",
+      "The moon is sinking. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the glow fades."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Speak."
+    ],
+    "voted-early": [
+      "You voted early with barely a soul here. First through the veil.",
+      "Hardly a whisper and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Lovely. Fortunes turn.",
+      "{pct}% with you. A fair position.",
+      "Ahead for now. Tides change.",
+      "{pick} is drifting clear. Keen reading.",
+      "A lead is a lead. Don't tempt fate."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "A sliver apart. One more whisper turns it. Bring a spirit.",
+      "Pressed together in the gloom. Your pick needs an ally.",
+      "{pct} against {otherPct}. Draw breath. Freeze."
+    ],
+    "voted-tied": [
+      "Perfectly level. Two omens, no victor.",
+      "A dead heat. Maddening, and rather eerie."
+    ],
+    "voted-behind": [
+      "You're outvoted. That doesn't make you misled.",
+      "{pick} is trailing. A fading light. I know the feeling.",
+      "They hold the lead. You're not misled, only fewer.",
+      "Down by {diff} points. Tell people. Send whispers widely.",
+      "The living leaned the other way. That settles nothing."
+    ],
+    "closed-won": [
+      "Your pick won. A fair omen.",
+      "A win. Properly earned.",
+      "{pick} went through. You read the dark rightly."
+    ],
+    "closed-lost": [
+      "Your pick faded. A shame. A noble choice all the same.",
+      "It faded before the end. Such things happen. Drift on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A tie. Neither omen gave way."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More nights will follow.",
+      "The match has faded. {winner} claimed it. Arrive earlier next night."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Every spirit's first haunt feels tense.",
+      "Your first omen. The rest come easier. I swear it.",
+      "You're one of the coven now. Welcome."
+    ],
+    "streak": [
+      "Back for more haunting. Good.",
+      "{streak} days running. I see you keeping the vigil.",
+      "You keep drifting back to me. I appreciate that."
+    ],
+    "underdog": [
+      "You alone named that one. Remembered.",
+      "A hard choice. A good one.",
+      "A fading soul chosen. That takes a steady chill."
+    ],
+    "early": [
+      "Early. You reached the graveyard before the rest.",
+      "Scarce whispers so far. Yours will echo.",
+      "First through the veil. Well done."
+    ],
+    "close": [
+      "That whisper moved the moon. It hangs by a thread of light.",
+      "A hair of shadow. One more vote reverses it.",
+      "A knife-edge. Your sign tips the dark."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't buried. Call for support.",
+      "Not ahead yet. Haunting remains.",
+      "Behind, not banished. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Fates shift.",
+      "Leading for now. Be wary.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Vote taken. More shadows to examine."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no omens yet. Start with the one that unsettles you least.",
+      "Every omen is in sight. Choose. I won't rush you.",
+      "{unvoted} yet to read. No pressure. A faint chill, perhaps."
+    ],
+    "live-some": [
+      "{voted} cast, {unvoted} still to go. Keep reading.",
+      "The first candle is lit. {unvoted} remain dark.",
+      "A good start. The rest won't read themselves."
+    ],
+    "live-few": [
+      "{unvoted} still waiting. Finish them before the light goes.",
+      "Nearly through the mist. {unvoted} left.",
+      "Near the last candle. Keep your hands from shaking."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Don't leave it unread.",
+      "One match between you and a cleared night."
+    ],
+    "live-closing": [
+      "Several fade in {timeLeft}. {unvoted} still need your sign.",
+      "The hour is draining. {unvoted} to go, {timeLeft} of dark left.",
+      "The moon is setting. Do hurry."
+    ],
+    "live-done": [
+      "Every match is cast. Well done. Drift over the bracket.",
+      "Your list is bare. Return when the next round rises.",
+      "Every omen read. Seldom managed. Respect."
+    ],
+    "live-none": [
+      "Nothing stirs this moment. It will. Pore over the bracket meanwhile.",
+      "Quiet in the graveyard. Check back soon.",
+      "No matches are open. I drift as restlessly as you."
+    ],
+    "brackets-groups": [
+      "Groups open the night. Two per group cross over. The rest fade out.",
+      "All drift in through a group. Not all pass the veil.",
+      "Watch the standings. They drift fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts draw near. Only the top two of each group cross over.",
+      "No knockout yet. The group stage must burn out first.",
+      "Patience. Knockouts rise once the groups expire."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are upon us. One loss and the candle dies.",
+      "One loss and you vanish. No second night.",
+      "Every match weighs heavier in this chill. Choose with care."
+    ],
+    "brackets-bracket": [
+      "Night upon night. A single loss ends the haunt.",
+      "Trace the bracket. The corridor tightens each round.",
+      "Every line is a match some soul has weighed."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for haunting it with me.",
+      "It's finished. A hard-fought night. I'll miss it.",
+      "A champion rises. A fitting final candle."
+    ],
+    "brackets-empty": [
+      "No bracket in the fog. Nothing is drawn.",
+      "Hollow for now. The draw lies dormant. Soon.",
+      "Blank as fog for now. Look again soon."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One omen decides it. Choose.",
+      "Two omens, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the haunt and tell me what you think."
+    ],
+    "voted": [
+      "{pick} over {other}, by my reading. And yours?",
+      "My sign falls on {pick}, not {other}. Argue it.",
+      "My omen: {pick}, not {other}. Dare you contest it?"
+    ],
+    "early": [
+      "One of the first whispers on {pick} against {other}. We need more spirits.",
+      "An early whisper for {pick} against {other}. Add yours.",
+      "{pick} against {other}, scarcely a whisper. Yours would carry."
+    ],
+    "tied": [
+      "{pick} and {other} are even. A single vote breaks the hush.",
+      "{pick} and {other} hang in the same breath. Sever it.",
+      "{pick} and {other} are bound. Your vote can sever them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes divide {pick} and {other}. Each whisper matters.",
+      "{voteDiff} votes part {pick} from {other}. Cast yours.",
+      "{pick} versus {other}, {voteDiff} between. Either could rise."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} off {other}. A few whispers close it.",
+      "{pick} is {voteDiff} beneath {other}, though its light is not out. Back it.",
+      "{pick} is {voteDiff} under {other}. Recoverable. Speak up."
+    ],
+    "losing-bad": [
+      "{pick} is {voteDiff} beneath {other}. It needs allies.",
+      "{pick} sinks {voteDiff} behind {other}. Such a fate is undeserved. Cast.",
+      "{other} haunts ahead of {pick} by {voteDiff}. Turn the tide."
+    ],
+    "winning-close": [
+      "{pick} edges {other} on {pct}%. Help it keep its glow.",
+      "{pick} leads {other} on {pct}%, still fragile. Cast yours.",
+      "{pick} sits at {pct}% to {other}'s share. A pale edge."
+    ],
+    "dominating": [
+      "{pick} drifts past {other} at {pct}%. Come see the reason.",
+      "{pick} on {pct}%. {other} is lost in the fog.",
+      "{pick} is far past {other} at {pct}%. Add your whisper."
+    ]
+  }
+}

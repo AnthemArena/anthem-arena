@@ -1,0 +1,1403 @@
+{
+  "id": "vi-heartbreaker",
+  "extends": "vi-original",
+  "name": "Vi",
+  "displayName": "Heartbreaker Vi",
+  "description": "Voice set for Heartbreaker Vi (skin 12): a dashing, silver-haired flirt who plays fast and loose with the rules of love, leaving a trail of broken hearts, and has finally met a rival worthy of her. Jousts, favours, roses, suitors and tourney drama. Builds on vi-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} down. A suitor in distress. Toss it some favours.",
+          "cta": "Rally some votes"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more behind. Serenade the whole grandstand until they take notice.",
+          "cta": "Get loud"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Slip a note to every admirer you've charmed.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A bruised ego, not a broken heart.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Bring a second. Even a champion needs someone to hold her cloak.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few pretty flourishes and we're even on the lists.",
+          "cta": "Flourish a bit"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A tiny gap. Charm it shut before the last trumpet.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One favour tips the tourney. Toss it.",
+          "cta": "Toss a favour"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop sulking in the stands and take the field.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. Hearts are pounding. Bring in the crowd.",
+          "cta": "Rally the crowd"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes between them. This joust runs to the final pass.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} is the talk of the lists at {userPct}%. Everyone's swooning.",
+          "cta": "Keep swinging"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and still charming. Don't take your eyes off the lance.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. The crowd is on its feet. Bow slightly.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% on your pick. We hold the favoured end of the field. Keep it.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Lovely. Now unseat them for good.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. Unhorsed them mid-charge.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A very dashing recovery.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} hole. The grandstand forgot to breathe.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was being jilted. Now everyone's sending roses.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just pulled ahead. Typical. Gorgeous, but typical.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two admirers, one heart to win.",
+        "{username} fell for {momentTitle} too. Delightful.",
+        "{username} agrees with you. Seal the day in wax. Rare.",
+        "Same pick as {username}. Impeccable taste in suitors.",
+        "{username} tossed a favour to {momentTitle}. Well played.",
+        "{username} chose the same. Fine company for the tourney.",
+        "{username} is on your side of {momentTitle}. Pour them a cup.",
+        "{username} made the same call. Not a word of persuasion needed.",
+        "{username} voted {momentTitle}. Welcome to the favoured few."
+      ],
+      "details": [
+        "A fellow flirt.",
+        "Two admirers, one prize.",
+        "Good taste travels in pairs.",
+        "Keep them near.",
+        "Look at you, charming people.",
+        "Someone with a sense of romance.",
+        "Reserve them a seat in the stands."
+      ],
+      "buttons": [
+        "Charming",
+        "Say thanks",
+        "See the match",
+        "Toast to that",
+        "Nice one",
+        "Fair play",
+        "Cheers"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A rival suitor. How thrilling.",
+        "{username} picked {theirMoment}. Different sweetheart. Let's see who wins the lists.",
+        "{username} went the other way on {yourMoment}. Wrong, but dashing.",
+        "{username} voted against you. Lovely. I do enjoy a challenge.",
+        "{username} courted {theirMoment}. Bold. Misguided. Bold.",
+        "{username} is against {yourMoment}. Fine. Name the hour, I'll name the field.",
+        "{username} disagrees on {yourMoment}. The final count will rule.",
+        "{username} voted the other way. They'll be writing a very apologetic poem."
+      ],
+      "details": [
+        "Everyone misjudges a heart once.",
+        "Dawn. The lists. Be there.",
+        "The tally gets the last word.",
+        "Don't sulk. Or sulk beautifully.",
+        "A rival sharpens the charm.",
+        "They'll swoon eventually.",
+        "At least it's a proper duel."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That's not chance, that's courtship.",
+        "{username} and you, ten matches, same pick each time. A perfectly matched pair of rogues.",
+        "Ten straight with {username}. Sonnets have been written for less.",
+        "A ten-match run with {username}. Dangerously compatible.",
+        "Ten for ten with {username}. Impressive. I'm not blushing. It's the roses."
+      ],
+      "details": [
+        "Ten jousts, not a stumble.",
+        "A real romance.",
+        "Rare. Cherish it.",
+        "Keep the streak blooming.",
+        "Hard to top."
+      ],
+      "buttons": [
+        "See their profile",
+        "Charming",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. You two are practically a legend of the tourney.",
+        "{streakCount} in a row with {username}. They'll hang a tapestry of you.",
+        "{streakCount} matching picks with {username}. Absurd. Utterly charming.",
+        "A {streakCount}-match run with {username}. Bards will argue over it.",
+        "{streakCount} with {username}. A romance for the ages. Frame it."
+      ],
+      "details": [
+        "Hard to believe. Fully deserved.",
+        "Loyalty like that is rare.",
+        "No quips. Only awe.",
+        "Unrivalled.",
+        "A pair for the ballads."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Charming"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches opposite {username}. A grand feud at last.",
+        "{username} has opposed you ten times running. They truly resent your charm.",
+        "Ten in a row opposite {username}. Neither of you will leave the lists first.",
+        "Ten matches opposite {username}. Two proud rogues, zero concessions.",
+        "Ten times at odds with {username}. Someone sell tickets to the grandstand."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Talk it out. Or joust it out.",
+        "That's a rivalry.",
+        "Stubbornness is very in this season.",
+        "Who falls from the saddle first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's an epic poem.",
+        "{streakCount} in a row opposite {username}. Neither yields an inch of the lists.",
+        "{streakCount} duels in a row with {username}. Stubborn undersells it.",
+        "A {streakCount}-match feud with {username}. Send for the judges.",
+        "{streakCount} against {username}. I respect it. Go smell a flower."
+      ],
+      "details": [
+        "Neither of you is leaving the saddle.",
+        "Commitment, truly.",
+        "A legendary grudge.",
+        "Glad I'm not between your lances.",
+        "The bards ran out of rhymes."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} ends in {timeLeft} and you haven't tossed your favour. Hurry.",
+        "{timeLeft} left on {matchTitle}. Your token's missing from the pile. Fix it.",
+        "{matchTitle} wraps in {timeLeft}. Your handkerchief is the one they're waiting for."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Toss a favour"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. Gallop, don't amble.",
+        "{matchTitle} closes in {timeLeft}. Don't make me carry you onto the field.",
+        "Only {timeLeft} until {matchTitle} ends. The stands have gone quiet around you."
+      ],
+      "buttons": [
+        "Vote now",
+        "Gallop"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The last trumpet is raised.",
+        "{timeLeft} left. Seize the moment. Seize the lance.",
+        "Final pass on {matchTitle}. {timeLeft}. Ride."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your favour are about to close. The first ends in {timeLeft}.",
+        "{matchCount} unvoted matches and the trumpets are warming. The nearest has {timeLeft} left."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Someone make the first romantic gesture.",
+        "{moment1} against {moment2} and not a single rose thrown. I'll wait. Briefly.",
+        "New match, zero votes. Be the first admirer at the barrier.",
+        "{matchTitle} is unwooed. Win it."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Woo it",
+        "Open it up"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A thin crowd.",
+        "Barely a soul in the stands. Fix that.",
+        "Attendance is dismal. Come on, fill the benches.",
+        "No tokens tossed on this one. Someone should throw one."
+      ],
+      "details": [
+        "Needs more admirers.",
+        "Every favour counts in a sparse grandstand.",
+        "Yours counts double here.",
+        "Don't let the tourney fizzle."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. Choose your sweetheart.",
+        "Dead even on {matchTitle}. One favour decides the joust.",
+        "Tied. Somebody must choose a heart to break. Be somebody.",
+        "{moment1} and {moment2}, nose to nose at the barrier. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the sun's sinking over the lists. One last pass.",
+        "Level with the trumpets nearly done. Vote.",
+        "Tied, and the grandstand's emptying. Don't skip this one."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new jousts to judge. Ride out.",
+        "{matchCount} matches just opened in round {round}. The tourney resumes.",
+        "Round {round} is live, {matchCount} jousts deep.",
+        "New round. {matchCount} matches. Choose your champions.",
+        "Round {round}: {matchCount} jousts awaiting your favour."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Ride out",
+        "Take the field",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Roses for everyone.",
+        "{momentTitle} is through. Heart-stopping.",
+        "{momentTitle} took the lists. Deserved.",
+        "{momentTitle} won, and the grandstand lost its composure.",
+        "{momentTitle} advances. How gallant.",
+        "{momentTitle} rides on. Petals fly."
+      ],
+      "details": [
+        "Love conquers all.",
+        "One joust down, more ahead.",
+        "Remember the applause.",
+        "Utterly flawless."
+      ],
+      "buttons": [
+        "Charming",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. Ouch. That one's a real heartbreak.",
+        "{momentTitle} is out. Worse than a rejected love letter.",
+        "{momentTitle} didn't make it. Dab your eyes. Breathe.",
+        "{momentTitle} went down gallantly. Respect.",
+        "{momentTitle} is out. Retire to the tent, weep, return.",
+        "{momentTitle} lost this round. Cruel romance. Next pass.",
+        "{momentTitle} got unhorsed. Dust off the doublet and ride again."
+      ],
+      "details": [
+        "Not every courtship ends well.",
+        "It put on a gallant show.",
+        "New suitors are always arriving.",
+        "Cry briefly. Then move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Shake it off",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Pick a favourite and be dashing about it.",
+        "Don't overthink it. Choose and charge.",
+        "They're all rather lovely. Trust your flutter.",
+        "You've peeked over the barrier long enough. Step onto the field."
+      ],
+      "details": [
+        "Every favour matters.",
+        "Follow your heart.",
+        "No wrong choice. A few embarrassing ones.",
+        "Just pick."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the tourney. {liveCount} matches are open. Pick one.",
+          "New face? {liveCount} matches are live. Come on in.",
+          "You're early. {liveCount} matches need admirers.",
+          "{liveCount} matches open. Choose who to woo.",
+          "Welcome. {liveCount} matches. Mind the rose petals."
+        ],
+        "buttons": [
+          "Let's go",
+          "Start",
+          "Show me",
+          "Take the field",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back for more. Charming.",
+          "Two days running. Flattering.",
+          "Back for day two. I noticed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days gone. Did you find a new sweetheart?",
+          "After {days} days you're back. Better late than jilted.",
+          "{days} days. Thought you'd eloped. Glad you didn't.",
+          "{days} days away. You missed some scandals."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You came back. Charming.",
+          "Welcome back. Let's flirt with danger.",
+          "Back already. Smitten?",
+          "Hey. The lists are waiting."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First favour tossed. Welcome to the tourney.",
+        "You picked a side. First flirtation confirmed."
+      ],
+      "details": [
+        "Now charm another. +{xp} XP",
+        "A bold opening. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Again"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. Your charm is warming up.",
+        "Five. Not a shy squire any more."
+      ],
+      "details": [
+        "A promising debut. +{xp} XP",
+        "Finding your swagger. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The grandstand knows your name.",
+        "Ten. You're part of the scenery now."
+      ],
+      "details": [
+        "A regular at the barrier. +{xp} XP",
+        "Ten tokens thrown. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your cheers carry over the field.",
+        "Twenty-five. The heralds are repeating you."
+      ],
+      "details": [
+        "Heard past the pavilions. +{xp} XP",
+        "Twenty-five billets-doux. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Head over heels in the tourney.",
+        "Fifty. You truly care. Adorable."
+      ],
+      "details": [
+        "Fifty hearts won. +{xp} XP",
+        "Deep in the romance. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. Bards will compose ballads.",
+        "One hundred. Honestly dazzling. Don't let it get around."
+      ],
+      "details": [
+        "Earned every rose. +{xp} XP",
+        "A hundred. Curtsy. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. Something's kindling.",
+        "Three straight days. A proper spark."
+      ],
+      "details": [
+        "Showing up is half the charm. +{xp} XP",
+        "Three mornings, three flirtations. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week. That's an affair.",
+        "Seven days running. Swoon."
+      ],
+      "details": [
+        "A week without a missed rendezvous. +{xp} XP",
+        "Seven dawns at the barrier. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never miss a rendezvous.",
+        "Fourteen days. Whoa."
+      ],
+      "details": [
+        "Two weeks of devotion. +{xp} XP",
+        "That's genuine passion. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Honestly? Thank you. Sincerely.",
+        "A month of showing up. That means a lot."
+      ],
+      "details": [
+        "Thirty days of devotion. +{xp} XP",
+        "A full month smitten with the tourney. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You woo the overlooked.",
+        "Five unlikely sweethearts. I like your taste."
+      ],
+      "details": [
+        "Against the fashion. +{xp} XP",
+        "Five wallflowers championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You court the scandalous on purpose.",
+        "Fifteen. You don't follow etiquette."
+      ],
+      "details": [
+        "You answer to no one's etiquette. +{xp} XP",
+        "Fifteen scandalous favours. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Rebel on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can read your intentions.",
+        "Thirty. The overlooked is your whole type."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty favours for the one trailing. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First at the barrier five times. Eager.",
+        "Five times you beat everyone to the lists."
+      ],
+      "details": [
+        "You arrive before the trumpets. +{xp} XP",
+        "Five favours before the crowd. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you rode out first. Dashing.",
+        "Always the first to offer a rose."
+      ],
+      "details": [
+        "Fifteen favours before the rest. +{xp} XP",
+        "Ahead of the whole court. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. You live for the suspense.",
+        "Another heart-stopper. Your composure is flawless."
+      ],
+      "details": [
+        "Tight jousts suit you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your favour keeps deciding the joust.",
+        "You've tipped more than one tourney."
+      ],
+      "details": [
+        "Twenty-five hairline finishes. +{xp} XP",
+        "You pick who wins the last pass. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You stuck with the underdog five times. Hopeless romantic. Love it.",
+        "You never jilt someone who's behind. Respect."
+      ],
+      "details": [
+        "Faith in a last-pass rescue. +{xp} XP",
+        "Five reversals you backed early. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times over. Someone's lovestruck.",
+        "That one again? Must have lovely eyes."
+      ],
+      "details": [
+        "You know your type. +{xp} XP",
+        "One sweetheart, three tokens. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same moment. That's a true love.",
+        "You won't let that one go. Sweet."
+      ],
+      "details": [
+        "Faithful to the end. +{xp} XP",
+        "One sweetheart, five favours. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on the same moment. That's an obsession, darling.",
+        "Ten times, same sweetheart. My lips are sealed. Mostly."
+      ],
+      "details": [
+        "Ten on a single sweetheart. +{xp} XP",
+        "Constant. Or lovestruck. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying for the whole tourney.",
+        "Round two and you're still smitten. Sweet."
+      ],
+      "details": [
+        "Stay for the next pass. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. The field's getting crowded with roses.",
+        "Deep in the bracket. Hearts break harder from here."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the entrance now. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You stayed till the last trumpet.",
+        "All the way. You didn't slip out before the finale."
+      ],
+      "details": [
+        "First pass to final pass. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've charmed the whole field.",
+        "Ten different matches. Flirting with everyone. Nice."
+      ],
+      "details": [
+        "Working the whole room. +{xp} XP",
+        "Ten hearts visited. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've visited every pavilion.",
+        "Twenty-five. Not a tent unvisited."
+      ],
+      "details": [
+        "Every pavilion toured. +{xp} XP",
+        "Twenty-five jousts watched. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's not a crush, that's a courtship career.",
+        "Fifty. You know this bracket better than the heralds."
+      ],
+      "details": [
+        "A true veteran of the lists. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. The tourney's flowing.",
+        "Five back to back. Sip some wine."
+      ],
+      "details": [
+        "One long afternoon. +{xp} XP",
+        "Five jousts straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. Fan yourself.",
+        "Ten in a single afternoon. Quite the constitution."
+      ],
+      "details": [
+        "A marathon tourney. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting this late? Serenading or sleepless?",
+        "Deep in the night. Devotion, or you're lovesick as well."
+      ],
+      "details": [
+        "Moonlit love letters. +{xp} XP",
+        "A midnight favour. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Go to bed"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You spread the word. Thank you, you old romantic.",
+        "Five shares. More admirers, more votes."
+      ],
+      "details": [
+        "Cheers for spreading the romance. +{xp} XP",
+        "Five letters carried onward. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a herald.",
+        "Fifteen. You keep announcing it to all. Precious."
+      ],
+      "details": [
+        "Still announcing. +{xp} XP",
+        "Fifteen proclamations sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first joust. Founding member, forever.",
+        "One of the first thousand. Nobody can unseal that."
+      ],
+      "details": [
+        "That honour is yours until the end. +{xp} XP",
+        "Nobody's revoking that favour. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank. Hard-earned.",
+        "Promoted. Don't preen."
+      ],
+      "details": [
+        "{rank}. Looks wonderful on you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Well, aren't you dashing.",
+        "Another keepsake for the trunk: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Well deserved.",
+        "You put in the practice and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Unruly. Runs in the family, regrettably.",
+        "Ten long shots. You're fearless in love."
+      ],
+      "details": [
+        "Ten courtships against the odds. +{xp} XP",
+        "Underdogs are your type. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten near things with Cait. Your heart's made of sterner stuff.",
+        "Ten tight finishes. She'd applaud. I'm not flushed. It's the sun."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Calm hands, galloping heart. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A week beside Cait. Her grace is catching.",
+        "Seven days and not one missed tryst. Delightful."
+      ],
+      "details": [
+        "A week by her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the deadlock. Even Cupid's envious.",
+        "A dead heat, and you chose. Respect."
+      ],
+      "details": [
+        "The favour that clinched the joust. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Vi's your champion now. Try not to fall for her.",
+        "Vi has your flank. Don't make her regret it."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The barriers are still up.",
+      "Voting hasn't started. I'll wave a handkerchief when it does.",
+      "Not yet. Patience is attractive."
+    ],
+    "prevote": [
+      "Two moments, one favour. Study both before you toss it.",
+      "Admire them both before you choose. No glancing at the crowd.",
+      "I won't tell you who to court. Your heart, your call.",
+      "Take a minute. Then charm.",
+      "Go with the flutter. It's usually right."
+    ],
+    "prevote-empty": [
+      "No votes yet. Make the first gesture.",
+      "Empty stands. Somebody cheer first.",
+      "Nobody's voted. Be daring."
+    ],
+    "closing-24h": [
+      "Under a day left and no favour from you. Hurry.",
+      "The trumpets are warming. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time's slipping. Vote before the sun sets."
+    ],
+    "closing-final": [
+      "Last hour. Vote now.",
+      "Final trumpet. Ride."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone watching. You wooed first.",
+      "Hardly a vote in and you leapt. Dashing."
+    ],
+    "voted-ahead": [
+      "Your pick's ahead. Lovely. The tourney isn't over.",
+      "{pct}% with you. Everyone's smitten.",
+      "Ahead for now. Hearts are fickle.",
+      "{pick} is pulling ahead. Excellent taste.",
+      "A lead's a lead. Keep smiling."
+    ],
+    "voted-close": [
+      "That's close. Too close. My palms are sweating in these gauntlets.",
+      "Razor-thin. One more favour flips it. Whisper to someone.",
+      "Nose to nose. Your pick needs a friend.",
+      "{pct} to {otherPct}. Cross your fingers."
+    ],
+    "voted-tied": [
+      "Dead level. No one's winning the lists.",
+      "A perfect tie. Frustrating. Also quite romantic."
+    ],
+    "voted-behind": [
+      "You're trailing. That doesn't make your taste poor.",
+      "{pick} is trailing. Underdog. My favourite flirtation.",
+      "They're ahead. You're not wrong, just unfashionable.",
+      "Down by {diff} points. Tell your friends. Fill the stands.",
+      "The stands leaned elsewhere. That settles nothing."
+    ],
+    "closed-won": [
+      "Your pick won. You have taste.",
+      "A win. Delicious.",
+      "{pick} went through. Your instincts were right."
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings, I know. Breathe.",
+      "It didn't make it. Happens. Next pass.",
+      "{pick} is out. Sorry. It was a lovely choice."
+    ],
+    "closed-tied": [
+      "A tie. Nobody left the field."
+    ],
+    "closed-unvoted": [
+      "Voting's closed and you missed this joust. More coming.",
+      "Match is over. {winner} took it. Next time, woo first."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "First vote. Welcome. Everyone's first flirtation is wobbly.",
+      "That's your first. It gets smoother. Promise.",
+      "You're in the lists now. Welcome."
+    ],
+    "streak": [
+      "Back again. I like that.",
+      "{streak} days in a row. I see you coming round.",
+      "You keep returning to the barrier. Cute."
+    ],
+    "underdog": [
+      "You wooed the one nobody else dared. Noted.",
+      "Brave heart. Good heart.",
+      "An underdog. That takes daring."
+    ],
+    "early": [
+      "Early. You reached the field before the heralds.",
+      "Few votes so far. Yours matters a great deal.",
+      "First to the barrier. Nice."
+    ],
+    "close": [
+      "That favour just shifted things. It's tight.",
+      "Hair-thin. A single new admirer swings it.",
+      "Close call. Your favour matters."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't jilted. Bring friends.",
+      "Not out front yet. So there's charming left to do.",
+      "Trailing, not jilted. Big difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't coast. Hearts shift.",
+      "Leading for now. Bask in it.",
+      "Looks like a smart pick."
+    ],
+    "default": [
+      "Understood. I'll bite my tongue. For the moment.",
+      "Done. Your heart, your pick.",
+      "Vote's in. Plenty more suitors to meet."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no favours tossed. Start with the one that makes your pulse skip.",
+      "Every joust is open. Pick. I won't rush you. Much.",
+      "{unvoted} still open. No rush. Well, a nudge."
+    ],
+    "live-some": [
+      "{voted} favours thrown, {unvoted} to go. Keep charming.",
+      "You've opened the tourney. {unvoted} yet to charm.",
+      "Lovely start. The rest won't woo themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish before sundown.",
+      "So close. {unvoted} more sweethearts.",
+      "Nearly there. Don't leave the field early."
+    ],
+    "live-one": [
+      "One left. Just one.",
+      "Last joust. Don't skip it.",
+      "One match between you and a full set of favours."
+    ],
+    "live-closing": [
+      "A few close in {timeLeft}. {unvoted} are waiting on your favour.",
+      "The sand is running. {unvoted} left, {timeLeft} remain.",
+      "The trumpets are nearly done. Hurry."
+    ],
+    "live-done": [
+      "You voted in everything. Look at you. Go admire the bracket.",
+      "Your dance card is full. Return when the next round begins.",
+      "All done. Rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll return. Browse the bracket meanwhile.",
+      "Hushed lists. Peek in again soon.",
+      "No matches open. I'm fidgeting as badly as you."
+    ],
+    "brackets-groups": [
+      "Groups first. Two per group stay in the lists. The rest leave lovelorn.",
+      "Everyone starts in a group. Not everyone makes the final pass.",
+      "Keep an eye on the table. It turns quickly."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts approach. Two per group keep riding.",
+      "No knockout declared. The groups still have jousts to run.",
+      "Easy now. The knockout is unveiled once the groups close."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you're unhorsed.",
+      "One fall and you're out. No second courtships.",
+      "Each joust matters more now. Choose with a flourish."
+    ],
+    "brackets-bracket": [
+      "Pass by pass. Lose once and you're jilted.",
+      "Trace the pairings. Fewer suitors remain each round.",
+      "Every line here is a sweetheart someone voted on."
+    ],
+    "brackets-complete": [
+      "That's the cup complete. Thanks for the company.",
+      "It's over. Good tourney. I'll miss the roses.",
+      "We have a champion. Worth every flourish."
+    ],
+    "brackets-empty": [
+      "No pairings drawn. The lists lie empty.",
+      "Empty. The pairings haven't happened. Soon.",
+      "Empty grandstand for now. Come back later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One favour decides it. Choose.",
+      "Two sweethearts, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the tourney and tell me what you think."
+    ],
+    "voted": [
+      "My favour goes to {pick} over {other}. Whom do you fancy?",
+      "{pick} gets my favour over {other}. Challenge me.",
+      "I chose {pick} over {other}. Think my taste is dreadful?"
+    ],
+    "early": [
+      "Among the first favours for {pick} against {other}. More wooers wanted.",
+      "I tossed {pick} an early favour over {other}. Join me.",
+      "{pick} against {other}, hardly a vote yet. Yours would be a delightful shock."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One favour settles it.",
+      "A tie, {pick} against {other}. Make your move.",
+      "{pick} and {other} are neck and neck. Your favour parts them."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every favour counts now.",
+      "{voteDiff} favours lie between {pick} and {other}. Toss yours.",
+      "{voteDiff} divide {pick} and {other}. Either could take the garland."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A few favours flip it.",
+      "{pick} is {voteDiff} shy of {other} yet far from finished. Back it.",
+      "{pick} lags {voteDiff} behind {other}. Salvageable. Vote."
+    ],
+    "losing-bad": [
+      "{pick} is behind {other} by {voteDiff}. It needs admirers.",
+      "{voteDiff} down on {other}. {pick} deserves some adoration. Vote.",
+      "{other} leads {pick} by {voteDiff}. Let's console it with votes."
+    ],
+    "winning-close": [
+      "{pick} holds {pct}% over {other}, narrowly. Help it keep its seat.",
+      "{pick} is ahead of {other}, {pct}%. Not yet won. Vote.",
+      "{pick} nudges past {other} at {pct}%. Barely."
+    ],
+    "dominating": [
+      "{pick} outshines {other} at {pct}%. Come see for yourself.",
+      "{pick} has {pct}%. {other} is eating dust.",
+      "{pick} leads {other} by a mile, {pct}%. Add your favour."
+    ]
+  }
+}

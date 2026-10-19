@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-pool-party",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Pool Party Caitlyn",
+  "description": "Voice set for Pool Party Caitlyn (skin 13): a sun-soaked, lazy and mischievous summer set. Poolside lounging, shaved ice, flamingo floats, squirt-gun showdowns and a very pleased grin. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind and sinking. Throw it a float. Several, ideally.",
+          "cta": "Throw a lifeline"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more adrift. That's the deep end. Everybody in the water, please.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Shout across the whole pool.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A little drifting. Paddle harder.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Nobody swims alone at a party. Bring friends.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few good splashes and we're afloat again.",
+          "cta": "Make a splash"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Just a ripple. Smooth it out before the lifeguard notices.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level on the diving board. One vote tips it. Jump.",
+          "cta": "Dive in"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "A single vote apart. Quit dipping a toe and cannonball.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The whole pool's holding its breath. Bring more.",
+          "cta": "Rally the party"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Hold your drink steady. This is tense.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. Smooth water ahead. Keep floating.",
+          "cta": "Keep floating"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and rising. Don't spill the drink now.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A lovely spot in the sun. Stay put.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. The good lounger is ours. Defend it.",
+          "cta": "Hold the lounger"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Lovely. Now stay in the shade and finish the job.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. The tide just turned our way.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. A magnificent surge.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} gap. A flawless backstroke.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was drifting off. Now it's leading the swim.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. Somebody order a round of drinks.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two floats, one flamingo.",
+        "{username} backed {momentTitle} too. Excellent taste in poolside entertainment.",
+        "{username} agrees with you. Lovely. Pass the sunscreen.",
+        "Same pick as {username}. Sharing a sunbed, so to speak.",
+        "{username} splashed down beside you on {momentTitle}. Welcome to the shallow end.",
+        "{username} made the same call. No shouting across the pool needed.",
+        "{username} is on your side of {momentTitle}. There's room on the lilo.",
+        "{username} voted {momentTitle}. Welcome to the party.",
+        "{username} loves {momentTitle} as much as you do. A splendid afternoon ahead."
+      ],
+      "details": [
+        "A fellow sun-worshipper.",
+        "Two drinks, one toast.",
+        "Good company is rare at a crowded pool.",
+        "Keep them close. They have snacks.",
+        "Pleasant, sharing a parasol.",
+        "Someone with taste.",
+        "Pull up a deckchair."
+      ],
+      "buttons": [
+        "Cheers!",
+        "Say thanks",
+        "See the match",
+        "Toast",
+        "Love it",
+        "Fair play",
+        "Splash"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A different float. Let's see who gets splashed.",
+        "{username} chose {theirMoment}. Bold. A little sunburnt, perhaps.",
+        "{username} went against {yourMoment}. Brave. Wet, too, soon enough.",
+        "{username} voted against you. A water fight, then. Lovely.",
+        "{username} took {theirMoment}. A daring dive. Possibly a belly flop.",
+        "{username} opposes {yourMoment}. Fine. Pistols at the poolside.",
+        "{username} disagrees on {yourMoment}. Shall we settle it with squirt guns?",
+        "{username} voted the other way. They'll come round after a nap in the sun."
+      ],
+      "details": [
+        "Everyone belly-flops once.",
+        "A friendly splash war.",
+        "The tally will cool things down.",
+        "Don't let it dampen your day.",
+        "A rival keeps the fun competitive.",
+        "They may paddle over yet.",
+        "Makes for a livelier pool."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't luck, that's synchronised swimming.",
+        "{username} and you, ten matches, the same pick every time. Perfect poolside harmony.",
+        "Ten straight with {username}. I'd share a flamingo with you both.",
+        "A ten-match run with {username}. Not a single wipeout.",
+        "Ten for ten with {username}. A flawless summer."
+      ],
+      "details": [
+        "Ten dives, ten perfect entries.",
+        "A splendid pair.",
+        "Rare in the crowded shallows. Treasure it.",
+        "Keep the streak afloat.",
+        "Hard to top."
+      ],
+      "buttons": [
+        "See their profile",
+        "Nice dive",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a pair, now a whole pool party.",
+        "{streakCount} in a row with {username}. I'd follow you both off any diving board.",
+        "{streakCount} straight picks with {username}. They'll tell this one at every barbecue.",
+        "A {streakCount}-match run with {username}. A summer legend.",
+        "{streakCount} with {username}. Not one splash out of place."
+      ],
+      "details": [
+        "Hard to believe. Easy to cheer.",
+        "That's trust, built on sun loungers.",
+        "I'm speechless. Mostly.",
+        "Practically unsinkable.",
+        "A pair for the highlight reel."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper water fight.",
+        "{username} has opposed you ten times running. Two lilos, one narrow lane.",
+        "Ten in a row opposite {username}. Neither will get out of the pool.",
+        "A ten-match run against {username}. Stubborn as a limpet.",
+        "Ten times at odds with {username}. I'll watch from the sunbed. With popcorn."
+      ],
+      "details": [
+        "Ten rounds, no towel thrown in.",
+        "Talk it out. Or splash it out.",
+        "A proper poolside standoff.",
+        "Stubbornness keeps the party lively.",
+        "Who gets out first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a summer-long splash war.",
+        "{streakCount} in a row opposite {username}. Neither of you will leave the pool.",
+        "{streakCount} straight clashes with {username}. Someone fetch the lifeguard.",
+        "A {streakCount}-match feud with {username}. Somebody pour these two a drink.",
+        "{streakCount} against {username}. I admire the stamina. Do come out and dry off."
+      ],
+      "details": [
+        "Neither of you is drying off.",
+        "Stamina, certainly.",
+        "A sunburnt grudge.",
+        "Glad I'm not refereeing.",
+        "The scoreboard needs a second page."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and your splash is missing. There's time.",
+        "{timeLeft} left on {matchTitle}. Your vote isn't in the pool yet.",
+        "{matchTitle} ends in {timeLeft}. I'd love your pick on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Make a splash"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The sun's dropping. Hurry up.",
+        "{matchTitle} closes in {timeLeft}. Don't make me splash you awake.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone suspiciously quiet. Asleep on the lilo?"
+      ],
+      "buttons": [
+        "Vote now",
+        "Awake"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Last call at the pool bar.",
+        "{timeLeft} left. Jump. Now.",
+        "Final call on {matchTitle}. {timeLeft}. Make a splash."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your vote are about to close for the night. The first has {timeLeft} left.",
+        "{matchCount} unvoted matches and the sun's going down. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Someone has to jump in first.",
+        "{moment1} against {moment2} and not a ripple. I'll wait. Briefly.",
+        "A fresh match, glassy water. Be first to splash.",
+        "{matchTitle} is a mirror-flat pool. Break the surface."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Make waves",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new matches in the water.",
+        "{matchCount} matches opened in round {round}. The party moves to a fresh pool.",
+        "Round {round} is live, with {matchCount} matches to splash around in.",
+        "A new round. {matchCount} matches. Choose your float.",
+        "Round {round}: {matchCount} matches awaiting your pick."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Dive in",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A beautiful dive.",
+        "{momentTitle} is through. Smooth as sunscreen.",
+        "{momentTitle} took it. Raise your glass.",
+        "{momentTitle} won and barely got wet.",
+        "{momentTitle} advances. Another round of drinks.",
+        "{momentTitle} moves on. Splashing good."
+      ],
+      "details": [
+        "A perfect ten.",
+        "One down, more fun to come.",
+        "Earned fair and square.",
+        "Not a drop out of place."
+      ],
+      "buttons": [
+        "Cheers",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A belly flop.",
+        "{momentTitle} is out. Not the result I wanted at my party.",
+        "{momentTitle} didn't make it. Dry off and shake it off.",
+        "{momentTitle} went out swinging. That counts.",
+        "{momentTitle} is out. Grab a drink. Return.",
+        "{momentTitle} lost this round. A bad splash, not a bad summer.",
+        "{momentTitle} was eliminated. More fun is waiting."
+      ],
+      "details": [
+        "Not every dive is perfect.",
+        "It floated to the very end.",
+        "More sunshine is coming.",
+        "Towel off. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the pool party. {liveCount} matches are open. Pick one.",
+          "A new guest. {liveCount} matches are live. Grab a drink.",
+          "Fresh face. {liveCount} matches need a decision.",
+          "{liveCount} matches in the sun. Choose a side.",
+          "Welcome. {liveCount} matches. Mind the wet floor."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Dive in",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back for more sun. Good.",
+          "Two days running. A regular at the poolside.",
+          "A second day in the sun. I spotted you."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I thought you'd drifted out to sea.",
+          "After {days} days you return. Your lilo's still here.",
+          "{days} days. I nearly sent a search party. Don't disappear again.",
+          "{days} days away. The pool's had a refill."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Lovely.",
+          "Welcome back. Grab a lounger.",
+          "Back already. Keen.",
+          "Ah. There you are, sunshine."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet pool party.",
+        "Hardly anyone in the water. That should change.",
+        "Low turnout. Everyone's stuck at the snack table. Come swim anyway.",
+        "Barely anyone's dipped in. Someone should."
+      ],
+      "details": [
+        "It needs more swimmers.",
+        "Every splash counts in a quiet pool.",
+        "Yours matters more this afternoon.",
+        "Don't let it go flat."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the lifeguard's whistle.",
+        "Dead level on {matchTitle}. One splash settles it.",
+        "A tie. Someone has to break the surface. Let it be you.",
+        "{moment1} and {moment2}, floating side by side. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the pool's about to close. One last splash.",
+        "Level, with the whistle about to blow. Vote.",
+        "Tied, and nearly closing time. Please don't leave it floating."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still dithering? The sun won't stay up forever.",
+        "Don't overthink it. Jump in.",
+        "They're all lovely. Trust your gut and splash.",
+        "You've sunbathed long enough. Dive in."
+      ],
+      "details": [
+        "Every splash counts.",
+        "Trust your instincts.",
+        "No wrong float. Only dry ones.",
+        "Just pick."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First splash. Welcome to the party.",
+        "You picked a side. A lovely first dive."
+      ],
+      "details": [
+        "In the pool. +{xp} XP",
+        "The first of plenty, I reckon. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You're getting your sea legs.",
+        "Five. No longer a poolside newcomer."
+      ],
+      "details": [
+        "A breezy start. +{xp} XP",
+        "Finding your float. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The whole pool knows your name.",
+        "Ten. You've earned a reserved lounger."
+      ],
+      "details": [
+        "A dependable guest. +{xp} XP",
+        "Ten dives down. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice carries over the splashing.",
+        "Twenty-five. The whole poolside is listening."
+      ],
+      "details": [
+        "Heard above the music. +{xp} XP",
+        "Twenty-five splashes echoing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Well into the deep end.",
+        "Fifty. You clearly love it here. That's the spirit."
+      ],
+      "details": [
+        "Fifty dives logged. +{xp} XP",
+        "Deep in the shimmering water. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll name a cocktail after you.",
+        "One hundred. Wonderful. I'll say it just the once."
+      ],
+      "details": [
+        "Earned in the summer sun. +{xp} XP",
+        "A hundred. Stand on the high board. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. Summer's properly started.",
+        "Three days in a row. Reliable."
+      ],
+      "details": [
+        "Showing up is the hardest dive. +{xp} XP",
+        "Three days of sunshine. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's a proper holiday.",
+        "Seven days running. Beautifully tanned."
+      ],
+      "details": [
+        "A week without missing a dip. +{xp} XP",
+        "Seven days of sunshine. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never leave the poolside.",
+        "Fourteen days. Gloriously dedicated."
+      ],
+      "details": [
+        "A fortnight of summer. +{xp} XP",
+        "That's holiday spirit. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. An endless summer.",
+        "A month at the pool. That says it all."
+      ],
+      "details": [
+        "Thirty days of sunshine. +{xp} XP",
+        "A whole month in the water. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You back the lonely floats.",
+        "Five unlikely picks. I love that."
+      ],
+      "details": [
+        "Against the tide. +{xp} XP",
+        "Five lonely floats cheered on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You swim against the current on purpose.",
+        "Fifteen. You answer to nobody's lifeguard."
+      ],
+      "details": [
+        "Always your own stroke. +{xp} XP",
+        "Fifteen votes upstream. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can predict your dive.",
+        "Thirty. The wild card is your whole routine."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty votes for the one sinking. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First in the pool five times. Quick off the blocks.",
+        "Five times you were splashing before the rest."
+      ],
+      "details": [
+        "You arrive before the sun's up. +{xp} XP",
+        "Five votes before the crowd arrived. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you dove first. Decisive.",
+        "First off the board, again and again."
+      ],
+      "details": [
+        "Fifteen votes before anyone else dipped in. +{xp} XP",
+        "Ahead of the whole party. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Your drink never spilled.",
+        "Another tight one. Nerves of steel, in a bikini."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your splash keeps tipping the float.",
+        "You've settled more than one dead heat."
+      ],
+      "details": [
+        "Twenty-five tight finishes. +{xp} XP",
+        "You decide who gets wet. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stuck with the underdog. Stubborn. I approve.",
+        "You never leave a float that's sinking. Admirable."
+      ],
+      "details": [
+        "Faith in a late surge. +{xp} XP",
+        "Five comebacks you called early. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Someone has a favourite float.",
+        "That one again? Lovely view, I suppose."
+      ],
+      "details": [
+        "You know which float is yours. +{xp} XP",
+        "One pick, three splashes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes on a single moment. That's commitment.",
+        "You won't leave that one alone. I get it."
+      ],
+      "details": [
+        "Loyal through every splash. +{xp} XP",
+        "One favourite, five dives. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten dives at the same moment. That's fixation.",
+        "Ten times, same float. I shan't say a word. Mostly."
+      ],
+      "details": [
+        "Ten on one pick. +{xp} XP",
+        "Devoted. Or sunstruck. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying afloat.",
+        "Round two and still splashing. Lovely."
+      ],
+      "details": [
+        "Further across the pool. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the deep end.",
+        "Deep in the bracket. The water's getting choppy."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the shallow end. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You swam the whole pool.",
+        "All the way. You never got out."
+      ],
+      "details": [
+        "From the first splash to the last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've explored plenty of pools.",
+        "Ten different matches. Thorough sunbathing. Good."
+      ],
+      "details": [
+        "Exploring every corner of the bracket. +{xp} XP",
+        "Ten pools surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've visited every cabana.",
+        "Twenty-five. Not a lounger left unchecked."
+      ],
+      "details": [
+        "Every poolside covered. +{xp} XP",
+        "Twenty-five loungers tested. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That isn't a holiday, that's a residency.",
+        "Fifty. You know this bracket better than the pool map."
+      ],
+      "details": [
+        "A true veteran of the poolside. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long afternoon.",
+        "Five back to back. Do apply sunscreen."
+      ],
+      "details": [
+        "One long afternoon. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A proper deep-dive.",
+        "Ten in one sunbathing session. Stamina!"
+      ],
+      "details": [
+        "A marathon swim. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Midnight swim, or can't sleep?",
+        "The small hours. A moonlit dip, or sleeplessness. I know both."
+      ],
+      "details": [
+        "A night swim suits you. +{xp} XP",
+        "A vote under the moon. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told your friends. Thank you.",
+        "Five shares. More swimmers, more fun."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five party invites handed out. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically the party host.",
+        "Fifteen. You keep inviting people in. Splendid."
+      ],
+      "details": [
+        "Still handing out invitations. +{xp} XP",
+        "Fifteen party invites handed out. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first splash. A founding member, always.",
+        "One of the first thousand. That can't be dried off."
+      ],
+      "details": [
+        "That's yours to keep. +{xp} XP",
+        "That towel stays yours. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Promoted. Wear it with sunglasses."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Splendid.",
+        "Another trophy for the pool house: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the sunbathing hours and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. Reminds me of someone at the water-balloon stand.",
+        "Ten long shots. Nothing ruffles you."
+      ],
+      "details": [
+        "Ten floats against the odds. +{xp} XP",
+        "Wild-card picks are your thing. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You've got my steady wrist.",
+        "Ten tight finishes. I'm secretly proud."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady aim over a wobbly lilo. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days on the trot. A steady squirt.",
+        "A whole week without a wipeout. Lovely work."
+      ],
+      "details": [
+        "A week of perfect squirts. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One splash, one verdict.",
+        "Stuck in a stalemate until you stepped in. Super."
+      ],
+      "details": [
+        "The splash that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Pool Party Caitlyn, sun cream on. Water gun loaded.",
+        "Caitlyn is yours now. Try to keep up poolside."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The pool's still being filled.",
+      "Voting hasn't started. I'll blow the whistle when it does.",
+      "Not yet. Relaxing is half the fun."
+    ],
+    "prevote": [
+      "Two edits, one splash. Study both from your sunbed.",
+      "Look at both before you jump. No belly flops.",
+      "I'm keeping my favourite to myself. The dive is yours.",
+      "Take your time. A graceful dive beats a hasty one.",
+      "Pick the one you'd happily share a drink with."
+    ],
+    "prevote-empty": [
+      "No votes yet. Make the first splash.",
+      "Quiet so far. Somebody has to jump in.",
+      "Not one vote. Be first off the board."
+    ],
+    "closing-24h": [
+      "Under a day left and no vote from you. Move it.",
+      "The pool's closing soon. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time's short. Vote before the sun sets."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Jump."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone here. First off the diving board.",
+      "Hardly a splash and you'd committed. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Lovely. The tide can still turn.",
+      "{pct}% with you. A cushy position.",
+      "Ahead for now. Waves change.",
+      "{pick} is drifting in front. Nicely read.",
+      "A lead is a lead. Don't spill the drink."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more splash tips it. Wave someone over.",
+      "Stroke for stroke. Your pick wants a buddy.",
+      "{pct} to {otherPct}. Hold your breath. Underwater."
+    ],
+    "voted-tied": [
+      "Perfectly level. Nobody's winning the lilo battle.",
+      "A dead heat. Maddening, and rather fun."
+    ],
+    "voted-behind": [
+      "You're trailing. Doesn't mean you're mistaken.",
+      "{pick} is bobbing behind. Underdog. I've been there.",
+      "They're ahead. You're not wrong, just out-floated.",
+      "Down by {diff} points. Tell people. Invite the whole pool.",
+      "Most swam the other way. Crowds float badly."
+    ],
+    "closed-won": [
+      "Your pick won. A sound call.",
+      "A win. Splendid.",
+      "{pick} went through. You read the water rightly."
+    ],
+    "closed-lost": [
+      "Your pick lost. A pity. It was a good float.",
+      "It sank. Happens at every party. Carry on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A draw. Both floats stayed put."
+    ],
+    "closed-unvoted": [
+      "Voting has closed and you missed this one. More matches will follow.",
+      "The match is over. {winner} took it. Next time, splash sooner."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Everyone's first dive is nervous.",
+      "That's your first. It gets easier with practice. I promise.",
+      "You're one of the party now. Welcome."
+    ],
+    "streak": [
+      "Back at the pool. Lovely.",
+      "{streak} days running. I see you keeping the tan.",
+      "You keep returning to the poolside. I appreciate that."
+    ],
+    "underdog": [
+      "You picked the one nobody else would. Noted.",
+      "A hard choice. A good one.",
+      "The sinking float. That takes guts."
+    ],
+    "early": [
+      "Early. You reached the pool before the rest.",
+      "Few votes so far. Yours makes a big splash.",
+      "First in the water. Well done."
+    ],
+    "close": [
+      "That vote rocked the lilo. It's delicately balanced.",
+      "A whisker apart. One more splash turns it.",
+      "A photo finish at the pool edge. Your vote could tip it."
+    ],
+    "behind": [
+      "{pick} is lagging. Lagging isn't sunk. Shout for friends.",
+      "Not out front yet. Plenty of laps left.",
+      "Behind, not drowned. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Tides shift.",
+      "Ahead for the moment. Don't get comfy.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Your vote is in. There's more to see."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and not a dive yet. Begin with the one you know best.",
+      "Every float is in sight. Choose. I won't rush you.",
+      "{unvoted} left. No pressure. Okay, a tiny bit."
+    ],
+    "live-some": [
+      "{voted} cast, {unvoted} still to go. Keep swimming.",
+      "You've dived in. {unvoted} more are waiting.",
+      "A good start. The rest won't swim themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish them before the pool closes.",
+      "Almost out of the water. {unvoted} to go.",
+      "Close. Don't get sleepy now."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "A final match. Don't leave it floating.",
+      "A single match stands between you and a perfect swim."
+    ],
+    "live-closing": [
+      "A few shut in {timeLeft}. {unvoted} are still waiting for your splash.",
+      "The sun's sinking. {unvoted} left, {timeLeft} to go.",
+      "The sun's setting. Do hurry."
+    ],
+    "live-done": [
+      "Every match is done. Lovely. Have a look at the bracket.",
+      "Your list is soaked through. Come back when the next round opens.",
+      "Every match done. Seriously rare. Hats off."
+    ],
+    "live-none": [
+      "No match is live right now. It'll be back. Browse the bracket in the meantime.",
+      "Quiet around the pool. Check back soon.",
+      "No matches open. I'm drumming my fingers on the sunbed too."
+    ],
+    "brackets-groups": [
+      "Groups come first. Two from each get to the deep end. The rest stay in the paddling pool.",
+      "Everyone begins in a group. Not everyone climbs out.",
+      "Mind the standings. They shift like tides."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are coming. Two per group dive on through.",
+      "No knockout round yet. The groups finish splashing first.",
+      "Relax. The knockout surfaces when the groups wrap up."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are on. One loss and you're out of the pool.",
+      "One loss and out of the pool. No rematches.",
+      "Each match is deeper now. Pick with care."
+    ],
+    "brackets-bracket": [
+      "Lap by lap. One slip and you're out.",
+      "Trace the bracket. The pool shrinks every round.",
+      "Every row here is a match somebody splashed on."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for sharing the sun with me.",
+      "It's finished. A glorious summer. I'll miss it.",
+      "We have a champion. A glorious finish to the summer."
+    ],
+    "brackets-empty": [
+      "No bracket in the pool yet. Nothing's drawn.",
+      "Bare poolside. The draw's yet to be made.",
+      "Empty deck chairs for now. Look in later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One splash decides it. Choose.",
+      "{a} against {b}: two edits, one dive. Take it.",
+      "{a} versus {b}. Join the party and tell me what you think."
+    ],
+    "voted": [
+      "My vote goes to {pick} over {other}. Where's yours?",
+      "{pick} gets my splash over {other}. Convince me otherwise.",
+      "My float is {pick} over {other}. Fancy arguing?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more swimmers.",
+      "I dove for {pick} over {other} early. Add your splash.",
+      "{pick} against {other}, hardly a ripple so far. Yours would register."
+    ],
+    "tied": [
+      "{pick} and {other} are neck and neck. One splash decides it.",
+      "{pick} and {other} are bobbing level. Make a wave.",
+      "{pick} and {other} are glued together. Your splash can part them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes between {pick} and {other}. Every drop matters.",
+      "{voteDiff} votes lie between {pick} and {other}. Make a splash.",
+      "{voteDiff} separate {pick} and {other}. Either could float."
+    ],
+    "losing-close": [
+      "{voteDiff} divide {pick} from {other}. A few splashes flip it.",
+      "{pick} is {voteDiff} under {other} yet still kicking. Cheer it on.",
+      "{pick} is {voteDiff} short of {other}. Still fixable. Vote."
+    ],
+    "losing-bad": [
+      "{other} has {pick} beat by {voteDiff}. It needs a boost.",
+      "{pick} sits {voteDiff} under {other} and deserves a better afternoon. Vote.",
+      "{other} is ahead of {pick} by {voteDiff}. Let's turn the tide."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% over {other}, barely. Help it stay afloat.",
+      "{pick} is up on {other}, {pct}%. Not safe yet. Splash.",
+      "{pick} has {pct}% on {other}. A slender edge."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see why it floats.",
+      "{pick} holds {pct}%. {other} is barely in the pool.",
+      "{pick} is far ahead of {other}, {pct}%. Add your splash."
+    ]
+  }
+}

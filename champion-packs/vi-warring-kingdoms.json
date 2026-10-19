@@ -1,0 +1,1403 @@
+{
+  "id": "vi-warring-kingdoms",
+  "extends": "vi-original",
+  "name": "Vi",
+  "displayName": "Warring Kingdoms Vi",
+  "description": "Voice set for Warring Kingdoms Vi (skin 5): a ferocious, ruthless enforcer of a ruler's will who thrills at any challenge, her jade gauntlets hitting like cannons. Decrees, banners, sieges, campaigns and warlords. Builds on vi-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} down. The walls are cracking. Summon the banners.",
+          "cta": "Rally some votes"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more behind. Beat the war drums until every province hears.",
+          "cta": "Beat the drums"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Send riders to every garrison you know.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A bruised flank, not a lost war.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Bring a fellow soldier. Even a general needs an army. Barely.",
+          "cta": "Call an ally"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few good charges and the field is level.",
+          "cta": "Charge a few times"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A skirmish gap. Close it before the gates shut.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One decree tips the war. Issue it.",
+          "cta": "Issue a decree"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop watching from the ramparts and charge.",
+          "cta": "Bring an ally"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. Armies are trembling. Call more banners.",
+          "cta": "Rally the army"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes between them. This siege goes down to the last gate.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} commands {userPct}% of the field. A throne is in sight.",
+          "cta": "Keep swinging"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and still advancing. Don't sound the retreat.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. The enemy is wavering. Press.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% on your pick. We hold the high ground. Keep it.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Glorious. Now take the citadel.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. A flank no one saw.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. The reserve cavalry arrived.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Hauled out of a {voteDiff} rout. The drums went silent in awe.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was losing the war. Now it holds the field.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just pulled ahead. The strategists are furious.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two banners, one march.",
+        "{username} raised the same standard for {momentTitle}. Strong allegiance.",
+        "{username} agrees with you. Record it in the annals. Rare.",
+        "Same pick as {username}. Fine strategic minds.",
+        "{username} sided with {momentTitle}. Keen eye for the front.",
+        "{username} chose the same. A new soldier in your ranks.",
+        "{username} is on your side of {momentTitle}. Give them a place at the war council.",
+        "{username} made the same call. No negotiations needed.",
+        "{username} voted {momentTitle}. Welcome to the army."
+      ],
+      "details": [
+        "Another blade at your side.",
+        "Two armies, one flag.",
+        "Good commanders think alike.",
+        "Keep them in the vanguard.",
+        "See? Alliances hold.",
+        "A soldier with sense.",
+        "Add them to the muster roll."
+      ],
+      "buttons": [
+        "Well met",
+        "Say thanks",
+        "See the match",
+        "Clasp arms",
+        "Respect",
+        "Fair play",
+        "Cheers"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. Enemy colours. Good.",
+        "{username} picked {theirMoment}. Opposing banners. Let's see who breaks first.",
+        "{username} marched the opposite way on {yourMoment}. Wrong, but bold.",
+        "{username} voted against you. A challenger. I was bored of easy fights.",
+        "{username} took {theirMoment}. Rash. Foolish. Rash in a good way.",
+        "{username} stands against {yourMoment}. Fine. Meet on the field.",
+        "{username} disagrees on {yourMoment}. The battle count will tell.",
+        "{username} voted the other way. They'll be sending envoys for peace."
+      ],
+      "details": [
+        "Every general misjudges a battle once.",
+        "The field. Now.",
+        "The tally decides the war.",
+        "Don't take it personally. Or sharpen your blade on it.",
+        "A rival keeps the gauntlets heavy.",
+        "They'll sue for peace.",
+        "At least it's an honest war."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That's no chance, that's a sworn oath.",
+        "{username} and you, ten matches, same call each time. A flawless alliance.",
+        "Ten straight with {username}. I'd march behind you two anywhere.",
+        "A ten-match run with {username}. A formation no one can break.",
+        "Ten for ten with {username}. Impressive. I won't bow. Maybe a nod."
+      ],
+      "details": [
+        "Ten campaigns, one banner.",
+        "A tight vanguard.",
+        "Rare. Guard the pact.",
+        "Keep the formation.",
+        "Hard to rival."
+      ],
+      "buttons": [
+        "See their profile",
+        "Nice",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. That's beyond an alliance, that's a dynasty.",
+        "{streakCount} in a row with {username}. I'd follow you both through any pass.",
+        "{streakCount} straight picks with {username}. Absurd. Gloriously absurd.",
+        "A {streakCount}-match run with {username}. Scribes will write it down.",
+        "{streakCount} with {username}. Two rulers of the same realm."
+      ],
+      "details": [
+        "Hard to believe. Truly earned.",
+        "Loyalty like iron.",
+        "No jokes. Only awe.",
+        "Unbreakable.",
+        "A pair for the history scrolls."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. That's a standing war now.",
+        "{username} has opposed you ten times running. They really loathe your strategy.",
+        "Ten in a row opposite {username}. Neither army will pull back.",
+        "A ten-match run against {username}. Stubborn warlords, both.",
+        "Ten times at odds with {username}. I'd buy a seat on the ramparts to watch."
+      ],
+      "details": [
+        "Ten battles, no truce.",
+        "Parley. Or duel.",
+        "That's a rivalry.",
+        "Stubbornness suits a general.",
+        "Who yields first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a century of war.",
+        "{streakCount} in a row opposite {username}. Neither of you cedes a mile.",
+        "{streakCount} straight disputes with {username}. Stubborn is too mild a word.",
+        "A {streakCount}-match feud with {username}. Someone summon the emperor.",
+        "{streakCount} against {username}. I respect it. Go rest at the barracks."
+      ],
+      "details": [
+        "Neither of you is lowering a banner.",
+        "Commitment, truly.",
+        "A legendary grudge.",
+        "Glad I'm not between your armies.",
+        "The scribes ran out of ink."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} ends in {timeLeft} and your banner isn't raised. March.",
+        "{timeLeft} left on {matchTitle}. No decree from you. Issue one.",
+        "{matchTitle} falls in {timeLeft}. Your seal is the missing one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Raise your banner"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. Forced march.",
+        "{matchTitle} closes in {timeLeft}. Don't make me drag you onto the field.",
+        "Only {timeLeft} until {matchTitle} ends. Your camp has gone quiet."
+      ],
+      "buttons": [
+        "Vote now",
+        "Forced march"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The gates are swinging shut.",
+        "{timeLeft} left. Charge.",
+        "Final horn on {matchTitle}. {timeLeft}. Commit."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} battles without your seal are about to end. The first closes in {timeLeft}.",
+        "{matchCount} unvoted battles and the horns are sounding. The nearest has {timeLeft} left."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Someone take the first gate. Don't dither.",
+        "{moment1} against {moment2} and not one charge. I'll wait. Barely.",
+        "New battle, zero votes. Be the first across the bridge.",
+        "{matchTitle} is undefended. Claim it."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Charge",
+        "Open it up"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A thin army.",
+        "Barely a soldier on this field. Fix that.",
+        "Turnout's meagre. Come on, fill the ranks.",
+        "No banners raised here. Someone should raise one."
+      ],
+      "details": [
+        "Needs more soldiers.",
+        "Every seal counts on a bare field.",
+        "Yours counts double here.",
+        "Don't let the campaign collapse."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. Choose your banner.",
+        "Dead even on {matchTitle}. One decree ends the siege.",
+        "Stalemate. Someone has to break the line. Be someone.",
+        "{moment1} and {moment2}, locked at the walls. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the sun's setting on the walls. One chance to strike.",
+        "Level with the horns nearly done. Vote.",
+        "Tied, and the gates are closing. Don't sit this one out."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new battles to fight. March.",
+        "{matchCount} matches just opened in round {round}. The campaign resumes.",
+        "Round {round} is live, {matchCount} battles deep.",
+        "New round. {matchCount} matches. Choose your fronts.",
+        "Round {round}: {matchCount} battles awaiting your seal."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "March",
+        "To the front",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Victory.",
+        "{momentTitle} is through. Sound the horns.",
+        "{momentTitle} took the field. Deserved.",
+        "{momentTitle} won, and the whole realm shook.",
+        "{momentTitle} advances. A clean campaign.",
+        "{momentTitle} marches on. Banners high."
+      ],
+      "details": [
+        "A decisive blow.",
+        "One front down, more ahead.",
+        "Remember the glory.",
+        "Flawless."
+      ],
+      "buttons": [
+        "Nice",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. That one cost a province.",
+        "{momentTitle} is out. Not the campaign we planned.",
+        "{momentTitle} didn't make it. Tend the wounded.",
+        "{momentTitle} fell fighting. Honour.",
+        "{momentTitle} is out. Fall back to the fortress and regroup.",
+        "{momentTitle} lost this round. A hard defeat. Not the war.",
+        "{momentTitle} was routed. We march on another front."
+      ],
+      "details": [
+        "No general wins every battle.",
+        "It fought bravely.",
+        "More battles are always coming.",
+        "Take the loss. Stay fierce."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Quit pacing the tent and choose.",
+        "Don't overthink it. Pick and charge.",
+        "They're all worth a duel. Trust your fists.",
+        "You've scouted from the hill long enough. Descend."
+      ],
+      "details": [
+        "Every seal matters.",
+        "Trust your instincts.",
+        "No wrong banner. A few poor ones.",
+        "Just choose."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the war camp. {liveCount} matches are open. Pick one.",
+          "New recruit? {liveCount} matches are live. Fall in.",
+          "You're early. {liveCount} matches need soldiers.",
+          "{liveCount} matches open. Choose your front.",
+          "Welcome. {liveCount} matches. Keep your guard up."
+        ],
+        "buttons": [
+          "Let's go",
+          "Start",
+          "Show me",
+          "To the front",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You returned to camp. Good.",
+          "Two days running. Nice.",
+          "Back for day two. I noticed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. Did you desert?",
+          "After {days} days you're back. Better late than court-martialled.",
+          "{days} days. Thought you'd fallen in battle. Glad you didn't.",
+          "{days} days away. The map has changed."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You returned. Good.",
+          "Welcome back. Let's fight.",
+          "Back already. Eager.",
+          "Hey. The front's waiting."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First banner raised. Welcome to the war.",
+        "You picked a side. First battle joined."
+      ],
+      "details": [
+        "Now find another. +{xp} XP",
+        "First blood counts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Again"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. Your gauntlets are warming.",
+        "Five. Not a green recruit any more."
+      ],
+      "details": [
+        "A promising first campaign. +{xp} XP",
+        "Finding your formation. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The army knows your banner.",
+        "Ten. You belong in these ranks."
+      ],
+      "details": [
+        "A veteran of the front. +{xp} XP",
+        "Ten seals stamped. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your war cry carries.",
+        "Twenty-five. The whole realm hears you."
+      ],
+      "details": [
+        "Heard beyond the mountains. +{xp} XP",
+        "Twenty-five decrees signed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Deep in the campaign now.",
+        "Fifty. You truly care. Good soldier."
+      ],
+      "details": [
+        "Fifty seals pressed. +{xp} XP",
+        "Deep in the war. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. Poets will sing of you.",
+        "One hundred. Honestly fearsome. Don't tell the generals."
+      ],
+      "details": [
+        "Earned by steel and sweat. +{xp} XP",
+        "A hundred. The court kneels. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A campaign is forming.",
+        "Three straight days. Steady marching."
+      ],
+      "details": [
+        "Showing up counts. +{xp} XP",
+        "Three dawns on the march. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's real endurance.",
+        "Seven days on the march. Strong legs indeed."
+      ],
+      "details": [
+        "A week without breaking ranks. +{xp} XP",
+        "Seven dawns, seven decrees. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never rest.",
+        "Fourteen days. Whoa."
+      ],
+      "details": [
+        "Two weeks, no missed muster. +{xp} XP",
+        "That's iron resolve. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Truly, I'm grateful. Don't repeat that.",
+        "A month on campaign. That means something."
+      ],
+      "details": [
+        "Thirty days of iron will. +{xp} XP",
+        "A full month under the banner. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You back the besieged.",
+        "Five outmatched sides. A soldier after my own heart."
+      ],
+      "details": [
+        "Against the tide. +{xp} XP",
+        "Five lost causes championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You defend the doomed fortress on purpose.",
+        "Fifteen. You don't take orders from the crowd."
+      ],
+      "details": [
+        "Always your own banner. +{xp} XP",
+        "Fifteen rebel decrees. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Rebel on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No spy can read your plans.",
+        "Thirty. The outmatched is your whole doctrine."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty seals for the side behind. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the field five times. Eager.",
+        "Five times you reached the battle before the others."
+      ],
+      "details": [
+        "You strike before the horns finish. +{xp} XP",
+        "Five seals before the host arrives. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen battles with you at the spearhead. Valiant.",
+        "Always the first rider out."
+      ],
+      "details": [
+        "Fifteen seals before the rest. +{xp} XP",
+        "Ahead of the whole army. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. You thrive in a stalemate.",
+        "Another blade-edge finish. Your nerve is jade."
+      ],
+      "details": [
+        "Standoffs suit you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your seal keeps deciding the war.",
+        "You've broken more than one siege."
+      ],
+      "details": [
+        "Twenty-five razor battles. +{xp} XP",
+        "You settle the stalemates. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you held with the weaker host. Loyal. Approved.",
+        "You never desert a side that's falling. Respect."
+      ],
+      "details": [
+        "Faith in a late charge. +{xp} XP",
+        "Five comebacks you foresaw. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Someone has a favoured fortress.",
+        "That one again? It must hold good ground."
+      ],
+      "details": [
+        "You know your battlefield. +{xp} XP",
+        "One fortress, three assaults. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same moment. That's oath-sworn.",
+        "You won't abandon that one. Fair."
+      ],
+      "details": [
+        "Loyal as a bodyguard. +{xp} XP",
+        "One favourite, five seals. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on the same moment. That's an obsession, soldier.",
+        "Ten times, same pick. I won't tell the court. Much."
+      ],
+      "details": [
+        "Ten on one fortress. +{xp} XP",
+        "Devoted. Or besieged by it. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying for the whole campaign.",
+        "Round two and you're still fighting. Good."
+      ],
+      "details": [
+        "Stay for the next front. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. The land is growing dark with smoke.",
+        "Deep in the bracket. Battles bite harder from here."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the capital. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You stayed till the final gate.",
+        "All the way. You never left the war."
+      ],
+      "details": [
+        "First march to final battle. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've scouted every province.",
+        "Ten different matches. Thorough recon. Nice."
+      ],
+      "details": [
+        "Roaming the realm. +{xp} XP",
+        "Ten provinces surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've crossed every border.",
+        "Twenty-five. Not a valley unmapped."
+      ],
+      "details": [
+        "Every border crossed. +{xp} XP",
+        "Twenty-five fronts walked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's not a visit, that's a lifetime of war.",
+        "Fifty. You know this realm better than its generals."
+      ],
+      "details": [
+        "A true old warrior. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long campaign.",
+        "Five back to back. Water the horses."
+      ],
+      "details": [
+        "One long march. +{xp} XP",
+        "Five battles straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in a single push. Rest the horses.",
+        "Ten at one stretch. That's stamina."
+      ],
+      "details": [
+        "A marathon campaign. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting this late? Night watch or restless?",
+        "Middle of the night. Devotion, or you're fighting in the dark too."
+      ],
+      "details": [
+        "Fighting by torchlight. +{xp} XP",
+        "A midnight seal. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Go to sleep"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told others. Thanks, comrade.",
+        "Five shares. More soldiers, more strength."
+      ],
+      "details": [
+        "Thanks for raising more levies. +{xp} XP",
+        "Five messengers dispatched. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a general.",
+        "Fifteen. You keep gathering the host. Love it."
+      ],
+      "details": [
+        "Still sending riders. +{xp} XP",
+        "Fifteen dispatches sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first battle. Founding member, forever.",
+        "One of the first thousand. No decree can strike that out."
+      ],
+      "details": [
+        "No decree revokes that. +{xp} XP",
+        "No one's tearing that banner down. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank. Hard-won.",
+        "Promoted. Don't strut."
+      ],
+      "details": [
+        "{rank}. Fits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. A fine honour.",
+        "Another honour for the hall: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Well earned.",
+        "You put in the marches and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. Sadly, it runs in the family.",
+        "Ten hopeless-looking sides. You fear no odds."
+      ],
+      "details": [
+        "Ten pledges to the outmatched. +{xp} XP",
+        "Long shots are your battles. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten tight ones beside Cait. Your nerve is jade.",
+        "Ten tight finishes. She'd be proud. I'm not smiling."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady hands, drumming heart. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A week with Cait. Her discipline's wearing off on you.",
+        "A week and you never missed. Fine marksmanship."
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. Decisive strike.",
+        "Deadlocked, and you broke it. Respect."
+      ],
+      "details": [
+        "The seal that ended the siege. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Vi's your champion now. Stay behind my gauntlets.",
+        "Vi covers your flank. Don't make her regret it."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The gates are shut.",
+      "Voting hasn't started. I'll sound the horn when it does.",
+      "Not yet. Be patient, recruit."
+    ],
+    "prevote": [
+      "Two moments, one decree. Study both before you rule.",
+      "Scout them both before you choose. No peeking at the host.",
+      "I won't tell you which banner. Your war.",
+      "Take a minute. Then strike.",
+      "Go with your fists. They're usually right."
+    ],
+    "prevote-empty": [
+      "No votes yet. Raise the first banner.",
+      "Empty field. Somebody charge first.",
+      "Nobody's voted. Be fearless."
+    ],
+    "closing-24h": [
+      "Under a day left and no seal from you. March.",
+      "The horns are coming. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Light's fading. Vote before the gates shut."
+    ],
+    "closing-final": [
+      "Last hour. Vote now.",
+      "Final horn. Strike."
+    ],
+    "voted-early": [
+      "You voted early with barely anyone around. First across the bridge.",
+      "Hardly a vote in and you charged. Bold."
+    ],
+    "voted-ahead": [
+      "Your pick's ahead. Nice. The battle isn't over.",
+      "{pct}% with you. The host is following.",
+      "Ahead for now. Tides turn.",
+      "{pick} is pulling ahead. Sharp strategy.",
+      "A lead's a lead. Keep your guard up."
+    ],
+    "voted-close": [
+      "That's close. Too close. My jade gauntlets are creaking.",
+      "Razor-thin. One more seal flips it. Send a rider.",
+      "Neck and neck. Your pick needs reinforcements.",
+      "{pct} to {otherPct}. Fists ready."
+    ],
+    "voted-tied": [
+      "Equal strength on both walls. Nobody blinks.",
+      "A perfect tie. Maddening. Also thrilling."
+    ],
+    "voted-behind": [
+      "You're trailing. That doesn't make you foolish.",
+      "{pick} is trailing. Underdog. My favourite fight.",
+      "They lead. You aren't wrong, merely outnumbered.",
+      "Down by {diff} points. Call the provinces. Fill the field.",
+      "Most marched the other way. That proves nothing."
+    ],
+    "closed-won": [
+      "Your pick won. Glorious.",
+      "A victory. Savour it.",
+      "{pick} went through. Your judgment held."
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Tend your wounds.",
+      "It didn't make it. Happens. Next front.",
+      "{pick} is out. Sorry. It was a worthy fight."
+    ],
+    "closed-tied": [
+      "A tie. Neither would yield."
+    ],
+    "closed-unvoted": [
+      "Voting's closed and you missed this battle. More wars coming.",
+      "Match is over. {winner} took it. Next time, charge first."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "First vote. Welcome. Every soldier's first strike is clumsy.",
+      "That's your first. It gets easier. I swear.",
+      "You're in the army now. Welcome."
+    ],
+    "streak": [
+      "Back in camp. Good.",
+      "{streak} days running. I see you reporting.",
+      "You keep returning to the ranks. Nice."
+    ],
+    "underdog": [
+      "You raised the banner no one else did. I saw.",
+      "Hard front. Good front.",
+      "The outmatched side. That takes iron nerve."
+    ],
+    "early": [
+      "Early. You hit the field before the host.",
+      "A quiet field so far. Your seal rings like a gong.",
+      "First through the gate. Nice."
+    ],
+    "close": [
+      "That seal just shifted things. It's tight.",
+      "Razor-thin. One more soldier flips it.",
+      "Close fight. Your seal matters."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't broken. Bring the army.",
+      "Not in front yet. The war's still on.",
+      "Pushed back, not broken. Big difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't sleep. Fronts shift.",
+      "Leading for now. Savour it.",
+      "Looks like a sharp pick."
+    ],
+    "default": [
+      "Understood. I'll swallow my objection. For now.",
+      "Done. Your war, your call.",
+      "Vote's in. Plenty more battles ahead."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no seals yet. Start with the battle that stirs your blood.",
+      "Every front's open. Pick. I won't rush you. Much.",
+      "{unvoted} still open. No hurry. Fine, some hurry."
+    ],
+    "live-some": [
+      "{voted} sealed, {unvoted} left. Keep marching.",
+      "The march has started. {unvoted} fronts still wait.",
+      "Good opening. The rest won't fight themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish before the gates close.",
+      "Almost there. {unvoted} more battles.",
+      "Close. Don't lose formation now."
+    ],
+    "live-one": [
+      "One left. Just one.",
+      "Last battle. Don't let it slip.",
+      "One match between you and a full campaign."
+    ],
+    "live-closing": [
+      "Some of these end in {timeLeft}. {unvoted} still lack your seal.",
+      "Sun's setting. {unvoted} left, {timeLeft} to go.",
+      "The horn is nearly sounding. Move."
+    ],
+    "live-done": [
+      "You voted in everything. Look at you. Go survey the bracket.",
+      "Nothing left on your orders. Come back when the next round opens.",
+      "All done. Rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll resume. Study the bracket meanwhile.",
+      "Quiet field. Check back soon.",
+      "No matches open. My fists itch as much as yours."
+    ],
+    "brackets-groups": [
+      "Groups first. Top two from each march on. The rest go home.",
+      "All begin in a group. Few leave it with their banners intact.",
+      "Eye the standings. They swing fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts approach. Two per group keep their banners.",
+      "The knockout stage isn't declared. The groups still fight.",
+      "Wait. The knockout rises when the groups fall quiet."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you're banished.",
+      "One defeat ends it. No retreat to regroup.",
+      "Every battle bites harder now. Choose carefully."
+    ],
+    "brackets-bracket": [
+      "Round on round. One defeat and your banner falls.",
+      "Read the war map. Fewer banners every round.",
+      "Every line here is a battle someone voted on."
+    ],
+    "brackets-complete": [
+      "That's the cup complete. Thanks for fighting beside me.",
+      "It's over. Good war. I'll miss the front.",
+      "We have a champion. Worth every march."
+    ],
+    "brackets-empty": [
+      "No bracket yet. Nothing's been mapped.",
+      "Empty. The borders haven't been drawn. Soon.",
+      "Empty plains for now. Return soon."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One decree decides it. Choose.",
+      "Two fortresses, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Join the war and tell me what you think."
+    ],
+    "voted": [
+      "I chose {pick} over {other}. Whose colours do you fly?",
+      "{pick} gets my seal over {other}. Challenge me.",
+      "I chose {pick} over {other}. Think I misjudged the field?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more soldiers.",
+      "I sealed {pick} over {other} ahead of the rest. Stamp yours beside it.",
+      "{pick} versus {other}, barely any votes yet. Yours would strike deep."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One decree settles it.",
+      "A tie, {pick} against {other}. Charge.",
+      "{pick} and {other} are inseparable. Your seal parts them."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every seal counts now.",
+      "{voteDiff} votes lie between {pick} and {other}. Stamp yours.",
+      "{voteDiff} stand between {pick} and {other}. Either may win the field."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A few seals flip it.",
+      "{pick} is {voteDiff} short of {other}, yet the fortress stands. Reinforce it.",
+      "{pick} lags {voteDiff} behind {other}. Recoverable. Vote."
+    ],
+    "losing-bad": [
+      "{pick} is behind {other} by {voteDiff}. It needs the army.",
+      "{voteDiff} under {other}. {pick} merits a nobler fate. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let's turn the war."
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but barely. Help it hold the line.",
+      "{pick} outpaces {other}, {pct}%. Not secured. Vote.",
+      "{pick} edges {other} at {pct}%. By a hair."
+    ],
+    "dominating": [
+      "{pick} leads {other} with {pct}%. Come see the glory.",
+      "{pick} commands {pct}%. {other} is scattered.",
+      "{pick} leads {other} by a mile, {pct}%. Add your seal."
+    ]
+  }
+}

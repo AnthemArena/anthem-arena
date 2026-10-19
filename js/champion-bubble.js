@@ -12,6 +12,7 @@
 
 import { ARCANE_CONFIG, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionImageUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
+import { loadVoicedPack } from './champion-voice.js';
 
 export const BUBBLE_STATES = [
     'upcoming', 'prevote', 'prevote-empty', 'closing-24h', 'closing-3h', 'closing-final',
@@ -116,15 +117,18 @@ export function chooseLine(pack, state, vars, seed = '', bump = 0) {
 // ---------------- DOM ----------------
 
 const packCache = new Map();
-async function fetchPack(id) {
-    if (packCache.has(id)) return packCache.get(id);
-    let pack = null;
+async function fetchJson(id) {
     try {
         const res = await fetch(`/champion-packs/${encodeURIComponent(id)}.json`);
-        if (res.ok) pack = await res.json();
+        if (res.ok) return await res.json();
     } catch (e) { /* the bubble just uses the plain lines */ }
-    packCache.set(id, pack);
-    return pack;
+    return null;
+}
+// The pack for this champion in the skin the person wears (a skin can speak with its own voice set, see champion-voice.js).
+async function fetchPack(id, skinNum = null) {
+    let skin = skinNum;
+    if (skin == null) { try { skin = lookSkin({ id }, localStorage); } catch (e) { skin = 0; } }
+    return loadVoicedPack(id, skin, fetchJson, packCache);
 }
 
 let bump = 0, lastKey = '', lastCtx = null, wired = false;

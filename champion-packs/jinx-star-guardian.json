@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-star-guardian",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Star Guardian Jinx",
+  "description": "Voice set for Star Guardian Jinx (skin 4): a reluctant, sarcastic hero in glitter, talking to her guns Shiro and Kuro. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}. A Guardian would call this a sad emergency. I call it a glitter fire with a bad attitude!",
+          "cta": "Save the day"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? Okay, that's officially a cosmic-level disaster. Somebody earn their star badge!",
+          "cta": "Be a hero"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind. Shiro's shaking. Kuro's pacing. Guardians never panic. Guardians also never lose. Hmm!",
+          "cta": "Rally the squad"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. The sparkle's fading a bit. Fix it before I start sulking!",
+          "cta": "Add some sparkle"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. Sweet, a tiny emergency! I love those!",
+          "cta": "Save it"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Cue the dramatic heroic music. I'm humming it already. Go vote!",
+          "cta": "Share it around"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! The whole galaxy's holding its breath, and one vote tips it. Duty calls, hero!",
+          "cta": "Answer the call"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! Shiro can't look and Kuro's refusing to blink. Do something heroic!",
+          "cta": "Be the hero"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! My guns are vibrating. I'd say it's excitement. It's not.",
+          "cta": "Watch closely"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either a heroic finish or a gloriously messy one. I'm fine with both!",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! That's not a victory, that's a whole new constellation! Bow!",
+          "cta": "Take the glory"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! Look at that sparkle! You're basically a Guardian now. Don't tell the others I said it.",
+          "cta": "Shine on"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and rising! Keep the glow up. Leads can fizzle quickly!",
+          "cta": "Keep glowing"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still ahead. Don't jinx it. Too late, it's literally my job!",
+          "cta": "Watch the stars"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and came roaring back! Now THAT'S a heroic comeback. Cue the cheesy music!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Flipped a {voteDiff}-vote hole! Fighting for what's right, with glitter. I'm weirdly proud!",
+          "cta": "Enjoy this"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Climbed back from {voteDiff} behind! Scrappy, sparkly, a bit rude. Perfect.",
+          "cta": "Nice one"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just slipped into the lead with zero fuss. Stealthy! My favourite kind of hero.",
+          "cta": "See where it stands"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! A squad! I was never a squad person, but sure!",
+        "{username} picked {momentTitle}. Matching stars! Don't make it weird. Make it a little weird.",
+        "{username} is on your side with {momentTitle}. Team up! I'm officially approving it. Kuro, stop growling.",
+        "{username} backed {momentTitle} as well. That's a Guardian pair! Sparkles for both of you!",
+        "Same pick as {username}! Twin stars. Mildly sickening. In the best way.",
+        "{username} agrees with you on {momentTitle}. That's rare enough to put on a poster!",
+        "{username} voted {momentTitle}. Two of you! A tiny team! The galaxy's safe. Slightly.",
+        "{username} has taste and it matches yours. Shiro approves. Shiro approves of everything."
+      ],
+      "details": [
+        "Teamwork! Ugh! Fine, it's nice.",
+        "A sidekick! I've always wanted one.",
+        "Don't tell them my guns like them.",
+        "Two stars. Brighter together. Barf. Aww.",
+        "Look at you, saving the world together!",
+        "I give it a week before one of you tries to be the hero.",
+        "Squad forming. Please pick a better name than mine.",
+        "Kuro's pretending he's not wagging."
+      ],
+      "buttons": [
+        "Say hi",
+        "Send a star",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Join the team"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival star! Okay, I'm getting my dramatic voice ready.",
+        "{username} voted against {yourMoment}. Aww. A villain! Finally, my kind of plot!",
+        "{username} chose {theirMoment}. Not mad. Kuro, stop sharpening things!",
+        "{username} went for {theirMoment}. New entry in the Guardian's Annoying List!",
+        "{username} is against you on {yourMoment}. Finally, some real story!",
+        "{username} thinks {theirMoment} is better. Brave! Possibly foolish. Definitely entertaining!",
+        "{username} voted against you. Rivals! Every good hero needs a rival. Pick up the glitter!",
+        "{username} versus you! I'm getting popcorn and a front-row seat for the dramatic bits."
+      ],
+      "details": [
+        "I'm not saying fight. I'm saying be heroic.",
+        "The guns want a word. Politely. Then not politely.",
+        "They'll learn. Heroes always win. Usually.",
+        "A rival! Finally, the plot thickens!",
+        "I like them already. They give me something to be dramatic about.",
+        "I don't care. I care. I care a sparkly amount.",
+        "A little rivalry is good for the galaxy!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Defend the stars",
+        "Face them",
+        "Settle it",
+        "Front row"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! That's a proper Guardian pair! I take back my sarcasm. Mostly.",
+        "{username} has agreed with you ten times running. That's either destiny or a cult with glitter!",
+        "Ten straight with {username}! The stars aligned. Annoyingly neatly."
+      ],
+      "details": [
+        "Ten! I'm secretly proud.",
+        "Don't break the constellation now!",
+        "Honestly? Heroic.",
+        "Weird. Good weird. Cosmic weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hi",
+        "Shine together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a legendary duo! Somebody write a song. Not me!",
+        "{streakCount} for you and {username}. Perfectly in sync, like twin stars. I'm sniffling. It's glitter.",
+        "{streakCount} straight with {username}! Hand them both a badge. A big shiny one."
+      ],
+      "details": [
+        "I'm speechless, and I've got plenty of guns to talk to.",
+        "Is this healthy? The stars say yes.",
+        "That's not chance, that's a bond. Yuck. Aww."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Shine together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two are the main storyline now!",
+        "{username} has disagreed with you ten times running. That's not a rival, that's an origin story!",
+        "Ten battles with {username}. I'm taking notes for the sequel."
+      ],
+      "details": [
+        "This is the finale arc. Early.",
+        "The guns want ringside seats.",
+        "A hero needs a rival. Congrats, you've got a good one."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Next round"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, this is a galactic feud. I'm so into it!",
+        "{streakCount} battles with {username}. Sort it out with glitter? Or fists? Yes!",
+        "{streakCount} against {username}. That's not a rivalry, that's a whole saga."
+      ],
+      "details": [
+        "Bigger than any star war. Almost!",
+        "I'm nervous and proud and a bit glittery.",
+        "One of you has to win eventually. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep fighting"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted. Duty calls! Don't make it a bad call.",
+        "{timeLeft} left on {matchTitle}. Your vote's missing from the squad! Shiro's sulking about it.",
+        "{matchTitle} ends in {timeLeft}. It takes ten seconds. Even a reluctant hero can do ten seconds."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the clock"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? A real Guardian would've voted already. Just saying.",
+        "Hero alert! {matchTitle} closes in {timeLeft}. The sparkle's running low!",
+        "{timeLeft} until {matchTitle} closes and your vote's still backstage. Get out there, hero!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, I'll be a hero"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! This is your heroic moment! Don't blow it!",
+        "{timeLeft}! That's all the starlight left on {matchTitle}. Go go go!",
+        "Last call on {matchTitle}! {timeLeft} left. Guardians don't dawdle!"
+      ],
+      "buttons": [
+        "Last chance",
+        "Be heroic"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to close and none of them have your vote! First one ends in {timeLeft}!",
+        "{matchCount} unvoted matches, all counting down. The first one goes in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, let's save them"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! Not a single star in the sky. Somebody has to shine first!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even Kuro's quiet. That's worrying!",
+        "Brand new match and not a single vote. Be the first hero. Please? Pretty please?",
+        "{matchTitle} needs a first star. I know someone who's very, very available."
+      ],
+      "buttons": [
+        "Be the first star",
+        "Light the sky",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. It's the loneliest corner of the galaxy!",
+        "Hardly anyone's voted here. A Guardian would help. I'm just pointing it out!",
+        "Low turnout. I blame all of you. Equally. With sparkles.",
+        "Barely any votes here. Somebody save this match!"
+      ],
+      "details": [
+        "Go on, be a hero.",
+        "It deserves more stars. So do I.",
+        "Make it sparkle!",
+        "Don't be shy. Shine a little!"
+      ],
+      "ctas": [
+        "Vote",
+        "Save it",
+        "Go on",
+        "Shine"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the balance. Funny, I know someone who hasn't voted. Guess who!",
+        "Perfect tie on {matchTitle}. Two stars, equal glow. I'm looking at you, hero. Hehe!",
+        "Dead even and nobody's moving. You haven't voted. You're the tiebreaker! Heroic, right?",
+        "{moment1} and {moment2}, locked together, and you've been quiet. Fix that!"
+      ],
+      "buttons": [
+        "Break the tie",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the starlight's almost gone! Last chance to break it!",
+        "Dead level, almost no time left. You're the only hero who can fix this!",
+        "Still tied with the glow fading. Pick a side! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Save the day",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! {matchCount} new matches. A new mission, Guardian!",
+        "{matchCount} fresh matches in round {round}. Plenty of sparkle. Plenty of trouble.",
+        "Round {round} just started! {matchCount} matches need a hero. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even the glitter!"
+      ],
+      "buttons": [
+        "Start the mission",
+        "See round {round}",
+        "Let's go",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Mission accomplished. I'd say I knew all along. I did, actually.",
+        "{momentTitle} beat the competition. The next round's about to see stars. Literally.",
+        "{momentTitle} survived! I never doubted it. Okay, Kuro doubted. Rude little gun.",
+        "{momentTitle} is through! Somebody's a hero today. Hehe, you!",
+        "{momentTitle} moves up and the rest are space dust. Pretty space dust.",
+        "{momentTitle} won! Good call! Hero of the hour, you!"
+      ],
+      "details": [
+        "Your pick keeps shining!",
+        "One down, lots of galaxy left.",
+        "The bracket just shrank. Tidier! Glitterier!"
+      ],
+      "buttons": [
+        "Take the glory",
+        "See the result",
+        "Next match",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. Even heroes lose sometimes. I'm writing a very angry poem about it.",
+        "{momentTitle} lost. Everyone who voted against it has been added to the glitter-list. It's long.",
+        "Fine. {momentTitle} is gone. I'm not upset. I'm just sparkling with rage.",
+        "{momentTitle} was too bright for this universe anyway. Obviously.",
+        "{momentTitle} is out, and the stars dimmed a bit. I hate dim stars. Somebody make noise!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a little. A heroic little."
+      ],
+      "details": [
+        "They'll pay for this. With interest. And glitter.",
+        "It was good. The whole galaxy knows.",
+        "You'll find another one. Stars always come back.",
+        "Every star burns out eventually. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next match",
+        "Fight back",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still browsing? Pick one! Any one! Heroes decide fast. I'm lying, I take ages. Hurry anyway!",
+        "No pressure, but are you gonna vote or just stare at the stars?",
+        "They're all pretty! Pick one! Act first, glitter later!",
+        "Decisions, decisions. Close your eyes, point at the sky, and go."
+      ],
+      "details": [
+        "Every vote is a star!",
+        "Your opinion matters. A sparkly amount.",
+        "Don't overthink it. Overthinking dims the glow.",
+        "Trust your gut. It knows the way to the stars."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Be brave",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New recruit! Welcome! {liveCount} matches live and every one of them needs a hero!",
+          "{liveCount} edits fighting it out and you just landed in the middle. Pick a side before one picks you!",
+          "Oooh, a newcomer! Sparkles are ready, guns are warm, and {liveCount} matches are live. You'll love it.",
+          "No rules, {liveCount} live matches, and a very glittery me. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Join the mission",
+          "Light it up"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I wasn't waiting by the door. I was waiting by the door.",
+          "Two days running! Look at you, a real Guardian!",
+          "Back again? Day two! I could get used to this. Don't tell Shiro."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because Kuro misses you!",
+          "You're back after {days} days! The galaxy kept spinning. Mostly with explosions.",
+          "{days} days away. I noticed. The stars looked a bit dull without you."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The stars were dull!",
+          "Look who's here! Ready for another mission?",
+          "You came back! Let's go save something. Or break it."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! Feels like nothing. Then you feel a tiny star click on!",
+        "You picked a side! That's how every Guardian story begins."
+      ],
+      "details": [
+        "That's one star! +{xp} XP",
+        "Welcome to the mission! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're sticking with the mission! Weird. Good weird!",
+        "Five votes! Okay, now I'm keeping an eye on you, hero."
+      ],
+      "details": [
+        "Most recruits quit before this. +{xp} XP",
+        "Look at you, glowing steadily! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular Guardian now. Don't make it weird!",
+        "Ten votes! You keep reporting for duty. Kuro's started saving you a spot. Hehe."
+      ],
+      "details": [
+        "Regulars get the brightest spot. +{xp} XP",
+        "Ten and counting! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! That's a whole constellation of opinions!",
+        "You're getting loud! The stars can hear you!"
+      ],
+      "details": [
+        "The galaxy's listening. +{xp} XP",
+        "Twenty-five stars in the sky! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly deep in the mission!",
+        "Fifty! Most people never make it past the opening credits. Their loss!"
+      ],
+      "details": [
+        "You're past the first act. +{xp} XP",
+        "Fifty down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! That's legend stuff, a whole-sky legend!",
+        "A hundred! I'd say I'm impressed, but Kuro already said it. Loudly."
+      ],
+      "details": [
+        "You earned the star. +{xp} XP",
+        "A hundred! Wow! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! Hehe, Shiro kept your spot warm!",
+        "Three days! Something's lighting up."
+      ],
+      "details": [
+        "Showing up again is the heroic bit. +{xp} XP",
+        "Three in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You really do keep showing up, hero!",
+        "Seven days! I stopped counting. Okay, I didn't. Kuro keeps a tally."
+      ],
+      "details": [
+        "A week of heroics. +{xp} XP",
+        "Seven days on patrol. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Nothing stops you, does it? Not even bad weather!",
+        "Fourteen days! Even stars flicker by day ten!"
+      ],
+      "details": [
+        "Two weeks! Wow! +{xp} XP",
+        "That's proper Guardian stamina. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! I don't know what to say. Thanks, Guardian!",
+        "A whole month! You stayed. That means more than my eye-roll admits!"
+      ],
+      "details": [
+        "Thirty days on duty. +{xp} XP",
+        "A whole month! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You back the stars nobody else is watching!",
+        "Backing the underdog star again! Respect. Mildly irritating respect."
+      ],
+      "details": [
+        "Going against the sky. +{xp} XP",
+        "Five and still shining! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You've got a thing for rebel stars!",
+        "Rebel! Yeah. I see it!"
+      ],
+      "details": [
+        "You don't follow the constellation, do you? +{xp} XP",
+        "Fifteen underdogs! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! You never pick the obvious star!",
+        "Thirty! You always pick the star nobody else was watching!"
+      ],
+      "details": [
+        "The constellation can't pin you down. +{xp} XP",
+        "Thirty underdog stars! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! That's five matches now!",
+        "Early again! That's five first arrivals!"
+      ],
+      "details": [
+        "You love a quiet sky. +{xp} XP",
+        "Five early votes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you shone first! Impressive!",
+        "Early, over and over! You never wait for the others!"
+      ],
+      "details": [
+        "Fifteen first arrivals. +{xp} XP",
+        "Ahead of everyone! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! You like it on the knife edge, huh?",
+        "Another razor edge! Are your hands shaking? Mine are glittering!"
+      ],
+      "details": [
+        "Photo finishes suit you. +{xp} XP",
+        "Ten tight ones! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! You keep tipping the stars!",
+        "Your vote keeps landing exactly where it matters!"
+      ],
+      "details": [
+        "Twenty-five photo finishes. +{xp} XP",
+        "You decide the finish! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one that was behind. Five times! Stubborn! Heroic!",
+        "You never leave a star behind. I love that."
+      ],
+      "details": [
+        "Believing in the comeback. +{xp} XP",
+        "Five comebacks cheered on! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've got a favourite star!",
+        "That one again? Yeah. It shines."
+      ],
+      "details": [
+        "You know your favourite star. +{xp} XP",
+        "Three votes, one star! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for one star! That's a proper oath!",
+        "Okay, you've sworn a Guardian oath to that one. No take-backs!"
+      ],
+      "details": [
+        "Loyal to the last star. +{xp} XP",
+        "Five oaths, one favourite! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a whole galaxy!",
+        "Ten votes, same moment. I'll keep it secret. Shiro won't. Shiro squeaks."
+      ],
+      "details": [
+        "Ten oaths, one star. +{xp} XP",
+        "Obsessed! Even the First Star would be impressed! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You're following the whole mission!",
+        "You came back for round two! The sequel's usually better!"
+      ],
+      "details": [
+        "Keep watching! +{xp} XP",
+        "Two rounds down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly in orbit now!",
+        "Deep in the bracket! Hope you like deep space."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Deep into it! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the last star go out!",
+        "Six rounds! You stayed for the final scene! Wow!"
+      ],
+      "details": [
+        "From the first star to here. +{xp} XP",
+        "All six rounds! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're poking around every planet!",
+        "Ten different matches! Peeking into every corner of the galaxy, huh?"
+      ],
+      "details": [
+        "Exploring the galaxy. +{xp} XP",
+        "Ten matches! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've charted every corner of the galaxy!",
+        "Twenty-five! You've visited every planet on the map!"
+      ],
+      "details": [
+        "Every corner charted. +{xp} XP",
+        "Twenty-five planets visited! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not browsing, that's a whole tour of duty!",
+        "Fifty matches! You know this galaxy better than I do!"
+      ],
+      "details": [
+        "A real veteran. +{xp} XP",
+        "Fifty matches! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't stop saving the day, can you?",
+        "Five matches back to back! Keep going, hero!"
+      ],
+      "details": [
+        "One long mission. +{xp} XP",
+        "Five in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Glitter break!",
+        "Ten matches in one mission! Your boots must be glittery!"
+      ],
+      "details": [
+        "Deep dive! +{xp} XP",
+        "Ten at once! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. Heroes never sleep. Not on purpose!",
+        "Middle of the night! That's when the stars are brightest."
+      ],
+      "details": [
+        "The quiet sky. +{xp} XP",
+        "Midnight voter! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Brighter star-signal!",
+        "Five shares! You're a human flare gun! Good!"
+      ],
+      "details": [
+        "Thanks for spreading the light. +{xp} XP",
+        "Five shares! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically a recruiting officer!",
+        "Fifteen! You keep recruiting half the galaxy!"
+      ],
+      "details": [
+        "You keep spreading the glow. +{xp} XP",
+        "Fifteen shares! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before it got loud! Founding member! Yours forever!",
+        "One of the first thousand stars! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever. +{xp} XP",
+        "Nobody can dim that star. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! Ugh, I'm proud. Gross!",
+        "You went up a rank! Don't let it go to your head. Or do. I'm busy!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Sparkle!",
+        "Another one: {name}! Shine!"
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the shiny new gear!",
+        "Mastery up! Now we're getting to the glittery bit!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a heroic mess!",
+        "Ten long shots! You're a menace to your own team. I love it!"
+      ],
+      "details": [
+        "Loose cannon, Guardian edition. +{xp} XP",
+        "Ten wild picks! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. Take a star!",
+        "Ten tight finishes with her! Don't tell her I applauded!"
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love proper discipline!",
+        "Seven days of steady aim! Dull! Impressive! Mostly dull!"
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Hero move! Boom!",
+        "A deadlock and you took the shot! Hero stuff!"
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Next mission"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, in the sparkly outfit? Great choice! Questionable choice! Great!",
+        "Star Guardian Jinx! Try to keep up. I'll try not to complain. Much."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet! I'm practising my heroic pose. It's mostly pouting. Check back soon!",
+      "Shh! The next mission's about to start. Shiro's wiggling. Always a sign.",
+      "Locked for now. Doesn't stop me planning a glittery ambush."
+    ],
+    "prevote": [
+      "Two edits, one vote. Choosing is the hero's burden. Yawn. Okay, I like it.",
+      "Watch both. Then follow the one that sparkles in your gut.",
+      "I won't tell anyone which one you picked. Probably. Kuro might.",
+      "Take your time, hero! Actually, don't. Dramatic tension is killing my guns.",
+      "Go on, nobody's judging. Okay, the stars are. A little.",
+      "Pick the one you'd replay at 2am under the covers. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's voted yet. Be the first star in the sky, I dare you!",
+      "Empty sky! Put a star in it with a vote.",
+      "Not a single star out! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still stargazing. Pick something, hero!",
+      "The day's nearly over. Don't make me hum the heroic countdown. I will, off-key."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Heroes act before the clock runs out!",
+      "Tick, tick, twinkle. That's the last of your light."
+    ],
+    "closing-final": [
+      "Last hour! Act now, glitter later!",
+      "Any second now. Seriously. Hero up!"
+    ],
+    "voted-early": [
+      "One of the first stars in the sky! Bold! I'm into it!",
+      "Hardly anybody's voted and you chose a side anyway. Respect, Guardian!"
+    ],
+    "voted-ahead": [
+      "Look at you, backing the shining favourite! Don't get comfy. Stars drift.",
+      "{pct}% with you! Good eye. I didn't say that. Pretend I said something else.",
+      "Your pick's ahead. The whole sky agrees with you for once. Strange!",
+      "{pick} is pulling away! Feels good? Hold on to that glow!",
+      "Ahead, for now. Skies shift. So do crowds."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm looking between my fingers!",
+      "A sliver apart. One more vote could flip it. Tell a friend. Tell a Guardian!",
+      "Neck and neck! Your pick needs you and everyone who owes you a favour.",
+      "{pct} to {otherPct}. Somebody's getting frazzled and it's me, from the suspense."
+    ],
+    "voted-tied": [
+      "Dead even! Nobody wins, nobody loses, everybody sparkles in confusion!",
+      "A perfect tie. Honestly? Rude of the universe."
+    ],
+    "voted-behind": [
+      "You're behind! No pouting. I'd pout, but you shouldn't.",
+      "{pick} is trailing? Underdog star! My favourite kind of star!",
+      "They're ahead. Doesn't make you wrong. Just early to the glow!",
+      "Behind by {diff} points. Tell the whole galaxy. Loudly. Make a scene!",
+      "Everyone's shining the other way. Cool! Be the odd star."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got Guardian instincts.",
+      "A win! A sneaky little burst of starlight. I'll take it!",
+      "{pick} went through! You called the finale like a Guardian!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it twinkle sadly for a minute, then go again!",
+      "Didn't make it. I've had worse missions. So have you. Next one!",
+      "{pick} is out. Sorry. For real. I'll put a tiny star on its grave."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to blink first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Voting's over. You missed this mission! There's always another.",
+      "All done here. {winner} claimed the stars. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first mission! The scary one. Now you're a Guardian. Welcome!",
+      "That's your first. Feels tiny, right? Wait for the glow.",
+      "You're on the team now. Try not to make it weird!"
+    ],
+    "streak": [
+      "Again? You keep showing up! I'm not complaining. I'm noting it down.",
+      "{streak} days running! Okay, now I'm watching your star.",
+      "Back again! Heroes keep coming back. Stay!"
+    ],
+    "underdog": [
+      "Backing the one nobody's cheering for? Ooh. Real hero stuff.",
+      "Bold! Everybody else is facing the other way. I love that.",
+      "Underdog, huh? That's the hero's pick. The messy, brave one."
+    ],
+    "early": [
+      "Early! You get to shape the whole mission before anyone else arrives. Don't waste it!",
+      "Hardly anyone's here yet. Your vote's carrying the whole squad.",
+      "First to arrive! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just nudged the stars! Feel it? Everything's close right now.",
+      "Razor thin! One more vote and the whole sky flips.",
+      "Close finish! Your vote counts here. A shiny amount."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't beaten. Go recruit some Guardians!",
+      "Not winning yet. Good! Means there's still a mission.",
+      "Behind, but the story's not over. Not even near the end!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Stars shift fast!",
+      "Winning, for now. Enjoy it. Quietly. Or with fireworks. I'm not the boss.",
+      "Look at that! Excellent pick. Obviously."
+    ],
+    "default": [
+      "Logged, Guardian! I'm not changing your mind. Not yet.",
+      "Done! That vote's in the Guardian logbook now.",
+      "Your vote's in. Go see what other missions are out there!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no mission picked yet! Start with whichever one itches.",
+      "Everything's open! Take your pick, hero. I'll pretend I'm not watching.",
+      "{unvoted} to go. No pressure. Okay, a sprinkle of pressure!"
+    ],
+    "live-some": [
+      "{voted} done, {unvoted} to go! Keep the mission going!",
+      "You're deep in it now! {unvoted} more matches waiting on you.",
+      "Good start! The rest won't save themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole mission board!",
+      "Almost there! {unvoted} more and you're free.",
+      "So close! Don't clock out before the finale!"
+    ],
+    "live-one": [
+      "One left! Just one! Finish it!",
+      "Last one! Don't leave it hanging in the stars!",
+      "One match between you and mission complete!"
+    ],
+    "live-closing": [
+      "Some of these end in {timeLeft}! {unvoted} still need a hero. Move it!",
+      "The clock's roaring now! {unvoted} waiting, {timeLeft} left on the mission.",
+      "Almost out of starlight! Pick, quick!"
+    ],
+    "live-done": [
+      "You've voted in everything! Mission complete! Go see the bracket!",
+      "Nothing left for you on this one. Come back when round two lights up!",
+      "All done! That's rare. Thanks, Guardian!"
+    ],
+    "live-none": [
+      "No matches running right now. New missions soon! Go look at the bracket.",
+      "Quiet. Too quiet. The galaxy's napping. Check back soon!",
+      "No matches open. The galaxy's snoozing and I'm bored already!"
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest get a pat on the head!",
+      "Every star begins in a group. Not every star leaves one.",
+      "Watch the tables. They shuffle quickly!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts arrive soon! The top two from every group go to the next stage.",
+      "No knockout yet. The groups have to wrap up first!",
+      "Patience! The knockout assembles itself once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're out of the galaxy!",
+      "Single elimination! No respawns. Okay, a few. In my game.",
+      "Every match counts more now. Pick wisely. Or don't, I'm not your guardian angel."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and your star goes dark!",
+      "Follow the bracket. It narrows every round!",
+      "Every line here is a match somebody voted on. Ooh, destiny."
+    ],
+    "brackets-complete": [
+      "And that's the cup! The final star! Thanks for being here!",
+      "It's over! Good run! I'll miss it. A bit. Don't tell Shiro.",
+      "That's the champion! All of it, worth the glitter!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's been drawn. The stars are still aligning.",
+      "Empty sky! The draw hasn't happened. Soon!",
+      "Nothing up yet. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no take-backs. Be a hero on Arcane Moments!",
+      "Two edits are fighting! {a} versus {b}. Come and save the day.",
+      "{a} versus {b} and the galaxy can't decide. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I backed {pick} over {other}. Come and prove me wrong, hero!",
+      "{pick} got my vote. {other} did not. Your turn, hero!",
+      "Chose {pick} over {other} on Arcane Moments. Go on, argue with a Guardian."
+    ],
+    "early": [
+      "I got one of the first votes in on {pick} versus {other}! Be quick, the sky's dark.",
+      "Early vote for {pick} over {other}. Come make it a real mission!",
+      "Hardly anybody's voted on {pick} versus {other} yet. Be a hero!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the stars. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm peeking between my fingers. Come break it!",
+      "{pick} and {other} are exactly even. Somebody be a hero!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My guns are vibrating. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This is gonna be loud!",
+      "Razor thin: {pick} versus {other}, {voteDiff} apart. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A flicker, not a fade! Come relight it!",
+      "Down {voteDiff} against {other}, but {pick} isn't beaten. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't leave me to rescue it alone!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Villains everywhere. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole team, fast!",
+      "{pick} is getting buried by {other}. Rescue squad, anyone? Bring glitter!"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's tight! Come help me hold it.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the star dim!",
+      "{pct}% for {pick} against {other}. Close enough to chew a glove!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the glitter fly, or join in!",
+      "{pick} is flattening {other}, {pct}%! Join the winning side before it's over.",
+      "{pct}% for {pick}! {other} never saw it coming."
+    ]
+  }
+}

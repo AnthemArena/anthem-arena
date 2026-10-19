@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { lookSkin, saveLook, readLooks, lookState } from '../js/companion-look.js';
+import { lookSkin, saveLook, readLooks, lookState, TEST_UNLOCK_KEY } from '../js/companion-look.js';
 import { companionStats } from '../js/achievement-tracker.js';
 import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES } from '../js/achievements.js';
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
@@ -47,5 +47,13 @@ t('the four pack achievements exist, are visible, belong to a category and match
         assert.equal(a.condition({ caitlynCloseVotes: 0, caitlynStreak: 0, decidingVotes: 0 }), false);
         assert.ok(a.progress({ underdogVotes: 1, caitlynCloseVotes: 1, caitlynStreak: 1, decidingVotes: 0 }).target >= 1);
     }
+});
+t('look: the test-page switch opens every skin, including the prestige one, and only when set to 1', () => {
+    const locked = store({ companionSkins: '{"jinx":40,"vi":48}' });
+    assert.equal(lookSkin({ id: 'jinx' }, locked), 0);
+    for (const v of ['0', 'yes']) assert.equal(lookSkin({ id: 'jinx' }, store({ companionSkins: '{"jinx":40}', [TEST_UNLOCK_KEY]: v })), 0);
+    const open = store({ companionSkins: '{"jinx":40,"vi":48}', [TEST_UNLOCK_KEY]: '1' });
+    assert.equal(lookSkin({ id: 'jinx' }, open), 40);
+    assert.equal(lookSkin({ id: 'vi' }, open), 48);
 });
 console.log(`\n${n} passed`);

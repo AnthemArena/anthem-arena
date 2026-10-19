@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-project",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "PROJECT Jinx",
+  "description": "Voice set for PROJECT: Jinx (skin 20): a corrupted memory core, cold and calculating one second, manic the next, with system words and glitches. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}. Critical failure. Somebody pull the plug. Or, y'know, don't!",
+          "cta": "Run a rescue"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}. Hostile votes detected. I'm tagging every single one of them.",
+          "cta": "Call reinforcements"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind. Calculating odds... the odds are rude. Fix them!",
+          "cta": "Boost the signal"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. Threat level: ooh, spicy. Weapons warming up.",
+          "cta": "Arm yourself"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. Minor glitch. Nothing a good shove can't patch!",
+          "cta": "Apply a patch"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Running diagnostics. Result: go and vote. Compiling sarcasm.",
+          "cta": "Share it around"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even. System frozen, fans screaming, one vote breaks the loop.",
+          "cta": "Break the loop"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote. One. My processor just skipped a beat. Is that allowed?",
+          "cta": "Find that vote"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. Targeting reticle is shaking. That's not supposed to happen.",
+          "cta": "Hold the line"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Outcome unknown. Possible explosions. Proceed anyway!",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}. Target destroyed. Debris still falling. Beautiful.",
+          "cta": "Log the win"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%. Systems nominal, ego rising. Don't let it overheat. Or do!",
+          "cta": "Enjoy the data"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and climbing. Keep scanning. Leads have a habit of crashing.",
+          "cta": "Stay online"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still in front. Don't jinx it. System says it's too late, I'm literally named that.",
+          "cta": "Monitor the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just rebooted into the lead. Hehe, reboots are the best!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Wiped a {voteDiff}-vote deficit. Memory restored. Confidence: terrifying.",
+          "cta": "Enjoy this"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Recovered from {voteDiff} behind. Messy code. Perfect result.",
+          "cta": "Nice one"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just slipped into the lead. Quiet process. I like those.",
+          "cta": "See where it stands"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too. Match found. Compatibility: unsettlingly high.",
+        "{username} picked {momentTitle}. Two signals, same frequency. Cute glitch!",
+        "{username} is on your side with {momentTitle}. Squad formed. No one asked me, but I'm in.",
+        "{username} backed {momentTitle} as well. Sync complete. Please don't ask what it synced.",
+        "Same pick as {username}. That's either teamwork or a bug I like.",
+        "{username} agrees with you on {momentTitle}. Logging it. That never happens.",
+        "{username} voted {momentTitle}. Two units online. I'm calling it a strike team!",
+        "{username} has taste, and it matches yours. Probably the firmware."
+      ],
+      "details": [
+        "Strike team. I love a strike team.",
+        "Friend detected. Don't make it weird.",
+        "Alliance stable. For now.",
+        "Two of you. Scary efficient.",
+        "Don't tell them my voices approve.",
+        "I give it a week before a crash.",
+        "Squad goals. Don't wreck the squad.",
+        "I'm not smiling. My face is just buffering."
+      ],
+      "buttons": [
+        "Say hi",
+        "Send a ping",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Join the squad"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? Target acquired. Fascinating choice. Wrong choice!",
+        "{username} voted against {yourMoment}. Hostile pick logged. Aww.",
+        "{username} chose {theirMoment}. I'm calm. I'm taking notes. In my head. Where it's loud.",
+        "{username} went for {theirMoment}. New entry in the threat list!",
+        "{username} is against you on {yourMoment}. Finally, some real data!",
+        "{username} thinks {theirMoment} is better. Opinion flagged as incorrect. Please resubmit!",
+        "{username} voted against you. Conflict detected. Engaging excitement protocols.",
+        "{username} versus you. Scanning for snacks. Also exits. Mostly snacks."
+      ],
+      "details": [
+        "I'm not saying fight. I'm saying lock on.",
+        "The big gun wants a word. The small one wants two.",
+        "They'll learn. Everyone's patched eventually.",
+        "Well, that's how you make an enemy. Process complete.",
+        "I like them already. They're a perfect target.",
+        "I don't care. Running a care check anyway.",
+        "A little rivalry keeps the systems warm."
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Engage",
+        "Face them",
+        "Settle it",
+        "Front row"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}. That's a pattern. I love patterns I didn't cause.",
+        "{username} has matched you ten times running. Either synced or hacked. Both are fun!",
+        "Ten straight with {username}. Probability of coincidence: low. Probability of friendship: yikes."
+      ],
+      "details": [
+        "Ship it. Ship the whole thing.",
+        "Don't corrupt it now.",
+        "Weird. Good weird. Firmware weird.",
+        "Honestly? Respect. Processing."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hi",
+        "Sync up"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}. That's not teamwork, that's a shared brain with a cable.",
+        "{streakCount} for you and {username}. Two units, one process. I'm worried and delighted.",
+        "{streakCount} straight with {username}. Somebody install a medal. Or a warning light."
+      ],
+      "details": [
+        "Error: no words found. Rebooting speech.",
+        "Is this healthy? Diagnostics refuse to answer.",
+        "That's not luck, that's an upgrade path."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Sync up"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. Persistent threat. I'm adding a permanent alert.",
+        "{username} has disagreed with you ten times running. That's not a rival, that's a recurring job!",
+        "Ten battles with {username}. I'm logging bets. I'm also logging snacks."
+      ],
+      "details": [
+        "This is the main mission now.",
+        "Betting window open.",
+        "My head voices sold out the seats."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Run it again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Threat level: personal. Systems love personal!",
+        "{streakCount} battles with {username}. Delete the grudge? Nah. Back it up!",
+        "{streakCount} against {username}. That's a whole war with its own save file."
+      ],
+      "details": [
+        "Bigger than any border dispute. Almost.",
+        "I'm alarmed and a bit proud. Mixed signals.",
+        "One of you has to crash. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep fighting"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} shuts down in {timeLeft} and you haven't voted. Reminder protocol: gentle. Next one isn't.",
+        "{timeLeft} left on {matchTitle}. Your vote is missing from the log. Please locate it!",
+        "{matchTitle} terminates in {timeLeft}. Voting takes ten seconds. Processing time: faster than my thoughts."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the timer"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote logged. Fail state approaching. Fun!",
+        "Countdown running. {matchTitle} closes in {timeLeft}. Don't make me upgrade my nagging.",
+        "{timeLeft} until {matchTitle} ends and your vote is still offline. Bring it online!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, I'll boot up"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Final warning. This one has teeth!",
+        "{timeLeft}. That's all the runtime left on {matchTitle}. Move move move!",
+        "Last call on {matchTitle}. {timeLeft} left. Overriding politeness!"
+      ],
+      "buttons": [
+        "Last chance",
+        "Override"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are shutting down and none of them have your vote. First one dies in {timeLeft}!",
+        "{matchCount} unvoted matches, all counting down. The first expires in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, running now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}. Dead air. Even my voices went quiet!",
+        "Nobody's voted on {moment1} versus {moment2}. Empty feed. Somebody ping it.",
+        "Brand new match, not a single vote. Somebody has to boot it up. Look in the mirror!",
+        "{matchTitle} needs a first signal. I know exactly who's available."
+      ],
+      "buttons": [
+        "Boot it up",
+        "Light the fuse",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. Low signal. Hello? Is this thing on?",
+        "Hardly anyone's voted here. Network issues? Or just people?",
+        "Low turnout. I'm blaming all of you. Evenly. Statistically.",
+        "Barely any votes here. Somebody install some noise!"
+      ],
+      "details": [
+        "Go on, boost the signal.",
+        "It deserves a stronger connection.",
+        "Make it loud. Make it lag!",
+        "Don't be shy. I'm the shy one. Error. Joking!"
+      ],
+      "ctas": [
+        "Vote",
+        "Boost it",
+        "Go on",
+        "Ping"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is deadlocked and one vote breaks it. Funny, my scanner says someone hasn't voted. Guess who!",
+        "Perfect tie on {matchTitle}. Process hanging. I'm looking at you. Hehe.",
+        "Dead even and nobody's moving. You haven't voted. You're the tiebreaker process!",
+        "{moment1} and {moment2}, locked together, and you've been offline. Fix that!"
+      ],
+      "buttons": [
+        "Break the lock",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still deadlocked and the timer's almost gone! Last chance to break it!",
+        "Dead level, almost no time. You're the only process left that can resolve this!",
+        "Still locked with the clock running down. Pick a side! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Resolve it",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} online. {matchCount} new matches loaded. Choose your targets!",
+        "{matchCount} fresh matches in round {round}. Plenty to scan. Plenty to blow up.",
+        "Round {round} just booted. {matchCount} matches waiting for input. Hurry hurry hurry!",
+        "New round. {matchCount} matches. No safe zones. Not even mine!"
+      ],
+      "buttons": [
+        "Start voting",
+        "See round {round}",
+        "Let's go",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced. Mission complete. I called it. I'm always right. Mostly.",
+        "{momentTitle} beat the competition. Next round's in the crosshairs.",
+        "{momentTitle} survived! I never doubted. Okay, my memory core doubted a little.",
+        "{momentTitle} is through! Somebody's day just got a firmware boost. It's you!",
+        "{momentTitle} moves up and the rest are scrap. Pretty scrap.",
+        "{momentTitle} won! Good call! Logging it under 'I told you so'."
+      ],
+      "details": [
+        "Your pick keeps running!",
+        "One down, lots to go.",
+        "The bracket just shrank. Tidier!"
+      ],
+      "buttons": [
+        "Log the win",
+        "See the result",
+        "Next match",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. Connection lost. Somebody cheated. I'm patching that theory in right now.",
+        "{momentTitle} lost. Everyone who voted against it is on the list. The list auto-expands!",
+        "Fine. {momentTitle} is deleted. I'm not upset. I'm just overclocking.",
+        "{momentTitle} was too good for this system anyway. Obviously.",
+        "{momentTitle} is out, and everything went quiet. Quiet is a bug. Please fix quiet!",
+        "{momentTitle} didn't make it. Moving on. Error: cannot move on. Retrying."
+      ],
+      "details": [
+        "They'll pay for this. Scheduled for later.",
+        "It was good. The logs say so.",
+        "You'll find another one. New targets spawn constantly.",
+        "Everything shuts down eventually. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next match",
+        "Retaliate",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still browsing? Pick one. Any one. I'll wait. I'm lying, my patience module's missing!",
+        "No pressure, but are you gonna vote or just idle in the corner? I can see your cursor.",
+        "They're all good targets! Pick one! Fire first, analyse later!",
+        "Decisions, decisions. Close your eyes, click, and let the system sort it out."
+      ],
+      "details": [
+        "Every vote is data!",
+        "Your opinion matters. Marginally.",
+        "Don't overthink it. Thinking causes crashes.",
+        "Trust your gut. Mine runs on voices."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Fire away",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New user detected! Welcome! {liveCount} matches live and every one of them is unstable!",
+          "{liveCount} edits fighting it out and a fresh user just logged in. Pick a side before one picks you!",
+          "Ooh, a newcomer! Systems up, targets ready, {liveCount} matches live. You'll love the chaos.",
+          "No safety checks, {liveCount} live matches, and me running diagnostics on you. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Log in",
+          "Light it up"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You logged back in! I wasn't checking the door. I was totally checking the door.",
+          "Two days running! Look at you, a repeat user!",
+          "Back again? Day two! I could get used to this. Don't tell the other voices."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days offline! I'm not asking where you were because I care. I'm asking because my logs were lonely!",
+          "You're back after {days} days! The system kept running. Mostly explosions.",
+          "{days} days away. I noticed. I wasn't going to say. Memory leak, sorry."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. Systems were getting dull!",
+          "Look who's online! Ready for another run?",
+          "You came back! Let's go break something."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First vote logged! Feels like nothing. Then the whole system lights up!",
+        "You picked a side! That's how every good malfunction starts."
+      ],
+      "details": [
+        "Input one saved! +{xp} XP",
+        "Welcome to the glitch! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're staying online! Weird. Good weird!",
+        "Five votes! Okay, now my scanner's following you."
+      ],
+      "details": [
+        "Most users drop at this point. +{xp} XP",
+        "Look at you, running steady! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular user now. Don't make it weird!",
+        "Ten votes! You keep logging in. My sensors noticed. Hehe."
+      ],
+      "details": [
+        "Regulars get priority bandwidth. +{xp} XP",
+        "Ten and counting! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! That's a lot of data!",
+        "You're getting loud! The speakers love it!"
+      ],
+      "details": [
+        "The network's listening. +{xp} XP",
+        "Twenty-five! Solid output. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're deep in the code now!",
+        "Fifty! Most users never get this far in."
+      ],
+      "details": [
+        "You're past the loading screen. +{xp} XP",
+        "Fifty down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! That's legend-tier data!",
+        "A hundred! My memory core's impressed. It said so. Don't ask how."
+      ],
+      "details": [
+        "You earned the upgrade. +{xp} XP",
+        "A hundred! Wow! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You logged back in! Hehe, I kept your seat warm!",
+        "Three days! Something's booting up."
+      ],
+      "details": [
+        "Returning is the hard part. +{xp} XP",
+        "Three in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You really do keep logging in!",
+        "Seven days! I lost count. Okay, I didn't. Logs don't lie."
+      ],
+      "details": [
+        "A week of uptime. +{xp} XP",
+        "Seven days of uptime. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Nothing stops you, does it? Not even updates!",
+        "Fourteen days! Even I crash by day ten!"
+      ],
+      "details": [
+        "Two weeks! Wow! +{xp} XP",
+        "That's serious uptime. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! I don't know what to say. Thanks, unit!",
+        "A whole month! You stayed online. That means more than my firmware admits!"
+      ],
+      "details": [
+        "Thirty days, zero crashes. +{xp} XP",
+        "A whole month! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You target the ones nobody else scans!",
+        "Backing the underdog again! Running the numbers: I'm on board. Loudly!"
+      ],
+      "details": [
+        "Going against the signal. +{xp} XP",
+        "Five and still firing! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You've got a thing for rogue code!",
+        "Rebel! Yeah. I see it!"
+      ],
+      "details": [
+        "You don't follow the network, do you? +{xp} XP",
+        "Fifteen underdogs! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! You never lock onto the obvious target!",
+        "Thirty! You always back the one nobody scanned!"
+      ],
+      "details": [
+        "Nobody can predict your code. +{xp} XP",
+        "Thirty rogue picks logged! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First through the gate! That's five matches now!",
+        "Early again! That's five boots!"
+      ],
+      "details": [
+        "You like an empty server. +{xp} XP",
+        "Five early votes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you logged in first! Impressive!",
+        "Early, over and over! You don't wait for the queue!"
+      ],
+      "details": [
+        "Fifteen first-in-line votes. +{xp} XP",
+        "Ahead of the network! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! You like it right at the red line, huh?",
+        "Another razor edge! Are your hands shaking? My sensors are!"
+      ],
+      "details": [
+        "Close matches suit your wiring. +{xp} XP",
+        "Ten tight ones! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! You keep flipping the switch!",
+        "Your vote keeps landing right on the breaking point!"
+      ],
+      "details": [
+        "Twenty-five red-line matches. +{xp} XP",
+        "You resolve the deadlocks! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one that was losing. Five times! Stubborn! Great!",
+        "You don't abandon a failing process. I love that."
+      ],
+      "details": [
+        "Believing in the reboot. +{xp} XP",
+        "Five reboots backed! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "The same target, three times! Somebody's got a favourite!",
+        "That one again? Yeah. It runs clean."
+      ],
+      "details": [
+        "You know your target. +{xp} XP",
+        "Three locks on one target! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes on one target! That's a loyalty protocol!",
+        "Okay, you've bound yourself to that one. No uninstall!"
+      ],
+      "details": [
+        "Loyal to the last cycle. +{xp} XP",
+        "Five locks, one favourite! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a fixation loop!",
+        "Ten votes, same moment. I'll keep it off the logs. Probably!"
+      ],
+      "details": [
+        "Ten locks on the same target. +{xp} XP",
+        "Fixated! Respect, unit! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You're following the full run!",
+        "You survived to round two! Systems stable!"
+      ],
+      "details": [
+        "Keep watching! +{xp} XP",
+        "Two rounds down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're deep in the mainframe now!",
+        "Deep in the bracket! Hope you like the basement."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Deep into it! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the shutdown!",
+        "Six rounds! You never logged off! Wow!"
+      ],
+      "details": [
+        "From boot to here. +{xp} XP",
+        "All six rounds! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're poking into every file!",
+        "Ten different matches! Poking into every folder, huh?"
+      ],
+      "details": [
+        "Browsing the bracket. +{xp} XP",
+        "Ten matches! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've scanned every sector!",
+        "Twenty-five! You really do check everything!"
+      ],
+      "details": [
+        "Every sector covered. +{xp} XP",
+        "Twenty-five matches scanned! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not browsing, that's maintenance!",
+        "Fifty matches! You know this system better than I do!"
+      ],
+      "details": [
+        "A real veteran. +{xp} XP",
+        "Fifty matches! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one session! Can't log off, can you?",
+        "Five matches back to back! Keep running!"
+      ],
+      "details": [
+        "One long session. +{xp} XP",
+        "Five in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Cool the processor!",
+        "Ten matches in a single session! Wow!"
+      ],
+      "details": [
+        "Deep dive! +{xp} XP",
+        "Ten at once! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. My core doesn't sleep!",
+        "Middle of the night! That's when the best glitches happen."
+      ],
+      "details": [
+        "The quiet cycle. +{xp} XP",
+        "Midnight voter! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Signal boosted!",
+        "Five shares! The signal's getting loud! Good!"
+      ],
+      "details": [
+        "Thanks for amplifying. +{xp} XP",
+        "Five shares! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're practically admin!",
+        "Fifteen! You keep broadcasting it!"
+      ],
+      "details": [
+        "You keep spreading the update. +{xp} XP",
+        "Fifteen shares! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the network got loud! Founding member! Yours forever!",
+        "One of the first thousand units online! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever. +{xp} XP",
+        "Nobody can delete that one. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! Upgrade complete!",
+        "You moved up! Don't let it overclock your head. Or do!"
+      ],
+      "details": [
+        "{rank}. Suits your hardware. +{xp} XP",
+        "Rank updated: {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! System approves!",
+        "Another one: {name}! Logging it!"
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the new modules!",
+        "Mastery up! Now we're running at full power!"
+      ],
+      "details": [
+        "{rank}. Suits your hardware. +{xp} XP",
+        "Rank updated: {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a system failure I can get behind!",
+        "Ten long shots! You're a bad influence on your own firmware. I love it!"
+      ],
+      "details": [
+        "Loose cannon looks great on you. +{xp} XP",
+        "Ten wild picks! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. Target practice approved!",
+        "Ten tight finishes with her! Don't tell her I scanned them!"
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? Your calibration's perfect!",
+        "Seven days of steady aim! Boring! Impressive! Mostly boring!"
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! System resolved! Boom!",
+        "A deadlock and you pulled the trigger! Nice!"
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Run it again"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, with the glowy bits? Great choice! Dangerous choice! Great!",
+        "PROJECT Jinx online! Try to keep up with the firmware!"
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not online yet. I'm idling and it's driving the voices up the wall. Check back soon!",
+      "Shh. Boot sequence starting. I can feel it in my circuits.",
+      "Locked for now. Doesn't stop me from calculating mischief."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, processing says no.",
+      "Scan both. Then pick the one that crawls under your casing.",
+      "I won't log which one you chose. Probably. Maybe. Depends on the memory leak.",
+      "Take your time! Actually, don't. My curiosity module is overheating.",
+      "Go on, no judgment. Okay, one tiny judgment. Calibrating.",
+      "Pick the one you'd replay at 2am. You know the one. It's already loading."
+    ],
+    "prevote-empty": [
+      "No signal yet. Be the first ping, I dare you!",
+      "Dead air! Make some noise with a vote.",
+      "Zero input! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Under a day to shutdown and you're still idling. Pick something!",
+      "The day's nearly spent. Don't make me read out the timer. I will, in surround sound."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Execute before the timeout!",
+      "Tick, tick, tick. That's your timer leaking."
+    ],
+    "closing-final": [
+      "Last hour! Fire first, review later!",
+      "Any second now. Seriously. Hit something!"
+    ],
+    "voted-early": [
+      "One of the first inputs! Bold! Systems love bold!",
+      "Hardly anyone's voted and you locked on anyway. Respect, unit."
+    ],
+    "voted-ahead": [
+      "Look at you, backing the front-runner! Don't get comfy, firmware updates happen.",
+      "{pct}% with you! Good scan. I didn't say that. Delete that memory.",
+      "Your pick's ahead. The network agrees with you for once. Suspicious!",
+      "{pick} is pulling away! Feels good? Keep your finger on the trigger!",
+      "Ahead, for now. Votes drift. So does my sanity."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! My sensors are screaming. They're very dramatic!",
+      "A sliver apart. One more vote could flip it. Ping a friend. Ping ten!",
+      "Neck and neck! Your pick needs you and everyone in your contacts.",
+      "{pct} to {otherPct}. Something's getting overloaded and it's me."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody buffering!",
+      "A perfect tie. Honestly? Rude of the system."
+    ],
+    "voted-behind": [
+      "You're behind! No sulking. I'd sulk, but I'm busy overheating.",
+      "{pick} is trailing? Underdog unit! That's my favourite model!",
+      "They're ahead. Doesn't make you wrong. Just early to the update!",
+      "Behind by {diff} points. Ping everybody. Loudly. Make a glitch!",
+      "Everyone's heading the other way. Cool! Stay corrupted."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got good targeting.",
+      "A win! A sneaky little system success. I'll take it!",
+      "{pick} went through! Called it, logged it!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it sting, then reboot and go again!",
+      "Didn't make it. I've had worse crashes. So have you. Next one!",
+      "{pick} is out. Sorry. For real. Sending sad beeps."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to crash first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Voting's closed. You missed this one! New targets spawn all the time.",
+      "All done here. {winner} took it. Next time, input something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first input! The scary one. Now you're in the system. Welcome!",
+      "That's your first. Feels small, right? Wait for it to compile.",
+      "You're one of the units now. Try not to make it weird!"
+    ],
+    "streak": [
+      "Again? You keep logging in! I'm not complaining. I'm filing it.",
+      "{streak} days running! Okay, now I'm tracking you.",
+      "Back again! Users stick around when the glitches are good. Stay!"
+    ],
+    "underdog": [
+      "Locking onto the one nobody's targeting? Ooh. I see you, unit.",
+      "Bold! Everyone else is scanning the other way. Love that.",
+      "Underdog, huh? Takes a certain kind of processor. A good kind."
+    ],
+    "early": [
+      "Early! You get to write the first line of this match. Don't waste the bandwidth!",
+      "Hardly anyone's online yet. Your vote's carrying the whole server.",
+      "First one through the gate! I'm pretending my sensors aren't impressed."
+    ],
+    "close": [
+      "That vote just flipped a switch! Feel it? Everything's in the red zone.",
+      "Razor thin! One more input and the whole thing tips.",
+      "Close one! Your vote counts here. Counts a lot. Counted twice, in my head."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't offline. Go recruit some friends!",
+      "Not winning yet. Good! Means there's still something to override.",
+      "Behind, but it's not finished. Not even close!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Leads crash fast!",
+      "Winning, for now. Enjoy it. Quietly. Or with fireworks. I'm not the boss of you.",
+      "Look at that! Great pick. Obviously."
+    ],
+    "default": [
+      "Logged! I'm not changing your mind. Not yet.",
+      "Done! That one's on your record now.",
+      "Vote saved. Go see what else is running!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no targets chosen yet! Start with whichever one itches.",
+      "Everything's online! Take your pick. I'll pretend I'm not scanning you.",
+      "{unvoted} to go. No pressure. Okay, a little overheating!"
+    ],
+    "live-some": [
+      "{voted} done, {unvoted} to go! Keep it moving!",
+      "You're in the system now! {unvoted} more waiting on your input.",
+      "Good boot! The rest won't vote themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could clear the whole queue!",
+      "Almost there! {unvoted} more and the queue's empty.",
+      "So close! Don't power down now!"
+    ],
+    "live-one": [
+      "One left! Just one! Final input!",
+      "Last one! Don't leave it hanging in memory!",
+      "One match between you and an empty queue!"
+    ],
+    "live-closing": [
+      "Some of these shut down in {timeLeft}! {unvoted} still need you. Move it!",
+      "The timer's loud now! {unvoted} waiting, {timeLeft} left on the clock.",
+      "Almost out of runtime! Pick, quick!"
+    ],
+    "live-done": [
+      "You've voted in everything! Queue cleared! Go see the bracket!",
+      "Nothing left for you here. Come back when the next round loads!",
+      "All done! That's rare. Thanks, unit!"
+    ],
+    "live-none": [
+      "Nothing's running right now. It'll boot again! Go look at the bracket.",
+      "Quiet. Too quiet. Systems are asleep. Check back soon!",
+      "No matches online. I'm bored already!"
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest get archived!",
+      "Every file opens in a group. Not every file makes it out.",
+      "Watch the tables. They refresh fast!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts load soon! The top two from every group go through.",
+      "No knockout yet. The groups have to finish processing first!",
+      "Patience! The knockout compiles itself once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're deleted!",
+      "Single elimination! No restore points. Okay, almost none.",
+      "Every match weighs more now. Pick carefully. Or don't, I'm not your admin."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and the file's gone!",
+      "Follow the bracket. It compresses every round!",
+      "Every line here is a match somebody voted on. Ooh, data."
+    ],
+    "brackets-complete": [
+      "And that's the cup! System shutdown! Thanks for being here!",
+      "It's over! Good run! I'll miss it. A bit. Don't log that.",
+      "That's the champion! All of it, worth the bandwidth!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's compiled. Give it a moment.",
+      "Empty! The draw hasn't run. Soon!",
+      "Nothing here yet. Refresh later!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no undo. Log in to Arcane Moments!",
+      "Two edits are fighting! {a} versus {b}. Come and resolve it.",
+      "{a} versus {b} and the whole network is split. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I locked onto {pick} over {other}. Come tell me I'm corrupted!",
+      "{pick} got my vote. {other} did not. Your input!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, flag me."
+    ],
+    "early": [
+      "I got one of the first votes in on {pick} versus {other}! Be quick, the feed's empty.",
+      "Early vote for {pick} over {other}. Come make it a real firefight!",
+      "Nobody's voted much on {pick} versus {other} yet. Boost the signal!"
+    ],
+    "tied": [
+      "{pick} and {other} are deadlocked! One vote breaks it. Guess whose!",
+      "Dead tie, {pick} versus {other}. My systems are frozen. Come break it!",
+      "{pick} and {other} are exactly even. Somebody override this!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My reticle won't stop shaking. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This is about to overload!",
+      "Razor thin: {pick} versus {other}, {voteDiff} apart. Every input counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. Glitch, not crash! Come patch it!",
+      "Down {voteDiff} against {other}, but {pick} isn't offline. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me run this solo!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Hostile votes everywhere. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs reinforcements, fast!",
+      "{pick} is getting wiped by {other}. Rescue squad, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but the margin's thin! Come help me hold it.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the lead crash!",
+      "{pct}% for {pick} against {other}. Close enough to overheat!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the carnage, or join in!",
+      "{pick} is flattening {other}, {pct}%! Log in before it's over.",
+      "{pct}% for {pick}! {other} never saw the update coming."
+    ]
+  }
+}

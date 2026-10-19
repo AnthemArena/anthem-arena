@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-officer",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Officer Caitlyn",
+  "description": "Voice set for Officer Caitlyn (skin 5): a sharp-eyed beat cop who is routinely underestimated, tough, quick-witted and fond of a doughnut. Patrols, radios, stakeouts, verdicts and the end of shift. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} behind and the crowd's thin. Radio for backup.",
+          "cta": "Call it in"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more adrift. That's a code red. Every unit, please.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Put the call out on every channel.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Around fifteen short. Not hopeless, just badly parked.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Bring a partner. Nobody walks this beat alone.",
+          "cta": "Call a partner"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few good votes and we're back on pace.",
+          "cta": "Cast a vote"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Small gap, short shift. Close it before dispatch calls.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One vote, one badge on the line. Make it yours.",
+          "cta": "Make your move"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "A single vote apart. Quit loitering and cast it.",
+          "cta": "Bring a partner"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes between them. The whole precinct is holding its breath. Bring more.",
+          "cta": "Rally the squad"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. A tense stakeout. Don't blink.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} sits at {userPct}%. Quiet streets so far. Keep your eyes open.",
+          "cta": "Stay alert"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and rising. Don't clock off early.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A decent night's work. Stay on shift.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. We're walking this beat. Keep walking.",
+          "cta": "Keep patrolling"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Lovely. Now see it through to the end of shift.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. Dispatch, we have a turnaround.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Down by {voteDiff}, now in front. Nicely handled, officer.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Out of a {voteDiff} hole and into the lead. Somebody's earned a doughnut.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was sinking. Now it's leading the patrol.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has surged into the lead. Nobody saw that coming. Except you, I'd wager.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. A partner on the beat, at last.",
+        "{username} backed {momentTitle} too. Sharp eyes on that one.",
+        "{username} sees it your way. Good, I was running short of squad.",
+        "Same pick as {username}. Two officers, one hunch.",
+        "{username} stood with {momentTitle}. Reliable instincts.",
+        "{username} made the same call. Saved me a radio message.",
+        "{username} is on your side of {momentTitle}. Pull up a chair.",
+        "{username} voted {momentTitle}. Welcome to the squad room.",
+        "{username} agrees on {momentTitle}. That's two witnesses, which is two more than usual."
+      ],
+      "details": [
+        "A fellow officer.",
+        "Matching hunches. Always a good sign.",
+        "Sharp eyes run in packs.",
+        "Nice to have backup.",
+        "A reliable partner is a rare thing.",
+        "Someone who reads the street.",
+        "There's room on the bench."
+      ],
+      "buttons": [
+        "Good spot",
+        "Say thanks",
+        "See the match",
+        "Salute",
+        "Nice one",
+        "Fair play",
+        "Thanks, partner"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} backed {theirMoment} over {yourMoment}. Different hunch. Let's see whose pans out.",
+        "{username} chose {theirMoment}. Wrong suspect, if you ask me.",
+        "{username} went against {yourMoment}. Unwise, but they're allowed to be.",
+        "{username} voted against you. A good rival keeps a cop sharp.",
+        "{username} took {theirMoment}. Brave. Possibly mistaken.",
+        "{username} opposes {yourMoment}. Fine. The final count will settle it.",
+        "{username} disagrees on {yourMoment}. Shall we compare notes at the finish?",
+        "{username} voted the other way. They'll come round once the evidence is in."
+      ],
+      "details": [
+        "Everyone's wrong once. Even me.",
+        "A friendly dispute, officially.",
+        "The tally will rule on it.",
+        "Don't take it to heart.",
+        "Rivals make you better at the job.",
+        "They may still change their statement.",
+        "Keeps the shift interesting."
+      ],
+      "buttons": [
+        "See the match",
+        "Check them out",
+        "Challenge accepted",
+        "Settle it",
+        "Check the votes",
+        "View the numbers",
+        "Fair enough"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That's not luck, that's good police work.",
+        "{username} and you, ten matches, the same verdict every time. Perfect partners.",
+        "Ten straight with {username}. I'd ride shotgun with you both.",
+        "A ten-match run with {username}. Not one disagreement on the books.",
+        "Ten for ten with {username}. That's a clean record."
+      ],
+      "details": [
+        "Ten verdicts, ten matches.",
+        "A formidable partnership.",
+        "Rare on this beat. Cherish it.",
+        "Keep the streak alive.",
+        "Hard to beat, officially."
+      ],
+      "buttons": [
+        "See their profile",
+        "Nice work",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. You're not partners anymore, you're a department.",
+        "{streakCount} in a row with {username}. I'd follow you both into any alley.",
+        "{streakCount} straight verdicts with {username}. That belongs on the station wall.",
+        "A {streakCount}-match run with {username}. The kind of thing they put in the newsletter.",
+        "{streakCount} with {username}. Not one miss between you."
+      ],
+      "details": [
+        "Hard to believe. Easy to admire.",
+        "That's trust, earned on patrol.",
+        "I'm lost for words. Rare, for me.",
+        "Practically untouchable.",
+        "A duo for the history books."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A proper stand-off.",
+        "{username} has opposed you ten times running. You two should be in a film.",
+        "Ten in a row opposite {username}. Neither will back down.",
+        "A ten-match run against {username}. Stubborn as a parking warden.",
+        "Ten times at odds with {username}. I'd bring popcorn."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Talk it out. Or don't.",
+        "A proper stand-off.",
+        "Stubbornness is no crime.",
+        "Who blinks first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Stand firm",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a case file.",
+        "{streakCount} in a row opposite {username}. Neither of you will move along.",
+        "{streakCount} straight clashes with {username}. Time for mediation.",
+        "A {streakCount}-match feud with {username}. Someone get these two a coffee.",
+        "{streakCount} against {username}. Impressive stamina. Do sit down."
+      ],
+      "details": [
+        "Neither of you is budging.",
+        "Stamina, certainly.",
+        "A long-running grudge.",
+        "Glad I'm not refereeing.",
+        "The file needs another folder."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Stand firm",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} wraps in {timeLeft} and your vote isn't filed. Plenty of time.",
+        "{timeLeft} left on {matchTitle}. Your name's missing from the report.",
+        "{matchTitle} ends in {timeLeft}. I'd like your statement on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "File your vote"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The shift's nearly over. Get moving.",
+        "{matchTitle} closes in {timeLeft}. Don't make me come and fetch you.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone suspiciously quiet."
+      ],
+      "buttons": [
+        "Vote now",
+        "On it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Last call, officer.",
+        "{timeLeft} left. Badge up and vote.",
+        "Final notice on {matchTitle}. {timeLeft}. Make it count."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches missing your vote are about to shut. The earliest has {timeLeft} left.",
+        "{matchCount} unvoted matches and the clock's ticking. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Somebody has to walk in first.",
+        "{moment1} against {moment2} and no one's weighed in. I'll wait. Briefly.",
+        "A fresh match, nothing on the record. Be first through the door.",
+        "{matchTitle} is a blank page. File the first report."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Start the file",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new cases on the board.",
+        "{matchCount} matches opened in round {round}. New shift, fresh patrol.",
+        "Round {round} is live, with {matchCount} matches to size up.",
+        "A new round. {matchCount} matches. Pick your beat.",
+        "Round {round}: {matchCount} matches awaiting your verdict."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Suit up",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. A neat bit of work.",
+        "{momentTitle} is through. Nicely handled.",
+        "{momentTitle} took it. Straight to the top of the board.",
+        "{momentTitle} won, and not a hair out of place.",
+        "{momentTitle} advances. One more on the board.",
+        "{momentTitle} moves on. Good call, officer."
+      ],
+      "details": [
+        "A clean arrest.",
+        "One down, more to come.",
+        "Earned fair and square.",
+        "No complaints."
+      ],
+      "buttons": [
+        "Nice",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A rough night.",
+        "{momentTitle} is out. Not the result I was after.",
+        "{momentTitle} didn't make it. Chin up, officer.",
+        "{momentTitle} went out fighting. That counts for something.",
+        "{momentTitle} is out. Grab a coffee. Come back.",
+        "{momentTitle} lost this round. A bad night, not a bad career.",
+        "{momentTitle} was eliminated. More cases are waiting."
+      ],
+      "details": [
+        "Not every lead pans out.",
+        "It fought to the last.",
+        "More cases are coming.",
+        "Take it on the chin. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the force. {liveCount} matches are open. Pick one.",
+          "New recruit. {liveCount} matches are live. Welcome aboard.",
+          "Fresh face. {liveCount} matches need a verdict.",
+          "{liveCount} cases open on the board. Choose your side.",
+          "Welcome. {liveCount} matches live. Watch your step."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Suit up",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You turned up for the second shift. Good.",
+          "Two days running. Dependable.",
+          "Back for a second day. Noted in the log."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I was about to file a missing-person report.",
+          "{days} days, and you walk back in. Late, but welcome.",
+          "{days} days. I'd started to worry. Don't do that again.",
+          "{days} days off. A lot has happened on the beat."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Back on shift. Good.",
+          "Welcome back. Clock in.",
+          "Back already. Keen.",
+          "Ah. There you are, officer."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet beat tonight.",
+        "Not many officers out on this one. That should change.",
+        "Light turnout. The whole squad's on a break. Come anyway.",
+        "Barely anyone's been by. Someone should look in."
+      ],
+      "details": [
+        "It needs more eyes on the street.",
+        "Every vote counts on a quiet beat.",
+        "Yours counts for more tonight.",
+        "Don't let it go cold."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. You're the casting call.",
+        "Dead level on {matchTitle}. One vote breaks the deadlock.",
+        "A tie. Someone has to make the arrest. Let it be you.",
+        "{moment1} and {moment2}, locked together. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the shift is nearly over. One last vote.",
+        "Level, with time running out. Vote.",
+        "Tied, and almost out of time. Please don't leave it hanging."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still thinking it over? Dispatch won't hold forever.",
+        "Quit second-guessing. Choose and stand by it.",
+        "They all deserve a proper look. Trust your instincts.",
+        "You've been loitering long enough. Step up."
+      ],
+      "details": [
+        "Every vote counts.",
+        "Trust your gut.",
+        "No wrong suspect. Only slow ones.",
+        "Just pick one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First vote filed. Welcome to the force.",
+        "You picked a side. A good first report."
+      ],
+      "details": [
+        "On the record. +{xp} XP",
+        "The first of many, I'd say. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You're learning the streets.",
+        "Five. No longer a rookie."
+      ],
+      "details": [
+        "A solid start. +{xp} XP",
+        "Finding your feet. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The station knows your name.",
+        "Ten. You've earned your own chair."
+      ],
+      "details": [
+        "A dependable officer. +{xp} XP",
+        "Ten in the logbook. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice carries down the corridor.",
+        "Twenty-five. The whole precinct is listening."
+      ],
+      "details": [
+        "Heard at the back of the room. +{xp} XP",
+        "Twenty-five reports filed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Properly on the case.",
+        "Fifty. You clearly care. It shows."
+      ],
+      "details": [
+        "Fifty filed. +{xp} XP",
+        "Buried in case files. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. Expect a plaque in the squad room.",
+        "One hundred. Impressive. I'll say it just once."
+      ],
+      "details": [
+        "Earned on the street. +{xp} XP",
+        "A hundred. Wear the badge proudly. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days in a row. A good habit starts.",
+        "Three shifts straight. Dependable."
+      ],
+      "details": [
+        "Turning up is half the job. +{xp} XP",
+        "Three days on patrol. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's stamina.",
+        "Seven days running. Tough."
+      ],
+      "details": [
+        "A week without a missed shift. +{xp} XP",
+        "Seven straight days on patrol. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never miss a shift.",
+        "Fourteen days. Remarkable."
+      ],
+      "details": [
+        "A fortnight on patrol. +{xp} XP",
+        "That's genuine commitment. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Thank you. I mean that.",
+        "A month on the beat. That says plenty."
+      ],
+      "details": [
+        "Thirty days of showing up. +{xp} XP",
+        "A whole month on shift. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You back the ones nobody else will.",
+        "Five long-shot picks. I like the style."
+      ],
+      "details": [
+        "Against the current. +{xp} XP",
+        "Five outsiders backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You swim against the traffic on purpose.",
+        "Fifteen. You answer to nobody's orders but your own."
+      ],
+      "details": [
+        "Always your own judgment. +{xp} XP",
+        "Fifteen votes against the flow. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can predict you.",
+        "Thirty. Backing the underdog is your signature."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty votes for the one behind. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene five times. Quick off the mark.",
+        "Five times you got there before the rest."
+      ],
+      "details": [
+        "You beat the sirens. +{xp} XP",
+        "Five votes ahead of everyone. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen times you made the first move. Decisive.",
+        "Always first through the door."
+      ],
+      "details": [
+        "Fifteen votes in before anyone else. +{xp} XP",
+        "Ahead of the whole squad. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. Steady hands under pressure.",
+        "Another tight one. Nerves of steel, officer."
+      ],
+      "details": [
+        "You thrive under pressure. +{xp} XP",
+        "Ten finishes by a whisker. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five tight matches. Your vote keeps swinging the verdict.",
+        "You've broken more than one deadlock."
+      ],
+      "details": [
+        "Twenty-five razor-edge finishes. +{xp} XP",
+        "You break the deadlock. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you stuck with the underdog. Loyal. I approve.",
+        "You never abandon a side that's behind. Honourable."
+      ],
+      "details": [
+        "Belief in a last-minute rally. +{xp} XP",
+        "Five reversals you stood behind. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "The same moment three times. Somebody has a soft spot.",
+        "That one again? It must have a good view."
+      ],
+      "details": [
+        "You know which one you like. +{xp} XP",
+        "A single pick, voted three times. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes on one moment. That's real loyalty.",
+        "You won't let that one go. I understand."
+      ],
+      "details": [
+        "Loyal through thick and thin. +{xp} XP",
+        "A favourite pick, voted five times. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on the same moment. That's a fixation.",
+        "Ten times, the same pick. I won't comment. Much."
+      ],
+      "details": [
+        "Ten on one pick. +{xp} XP",
+        "Devoted. Or just stubborn. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're sticking with it.",
+        "Round two and still on patrol. Good."
+      ],
+      "details": [
+        "Further along the beat. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the case.",
+        "Deep in the bracket. Things get serious now."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from where you started. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You walked the whole beat.",
+        "All the way. You never clocked off."
+      ],
+      "details": [
+        "From the first vote to the last. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've covered a lot of ground.",
+        "Ten different matches. A thorough patrol. Good."
+      ],
+      "details": [
+        "Walking the whole bracket. +{xp} XP",
+        "Ten streets checked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've looked down every side street.",
+        "Twenty-five. Not an alley left unchecked."
+      ],
+      "details": [
+        "Every street covered. +{xp} XP",
+        "Twenty-five blocks walked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's not a visit, that's a career.",
+        "Fifty. You know this bracket better than the city maps."
+      ],
+      "details": [
+        "A true veteran of the beat. +{xp} XP",
+        "Fifty matches on your record. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. A long shift.",
+        "Five back to back. Do stretch your legs."
+      ],
+      "details": [
+        "One long shift. +{xp} XP",
+        "Five without a break. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A gruelling stretch.",
+        "Ten in one sitting. Proper stamina."
+      ],
+      "details": [
+        "A marathon shift. +{xp} XP",
+        "Ten without stopping. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Night shift, or can't sleep?",
+        "The small hours. Duty, or insomnia. I know both."
+      ],
+      "details": [
+        "Night patrol suits you. +{xp} XP",
+        "A vote after dark. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You spread the word. Thank you.",
+        "Five shares. More officers, more strength."
+      ],
+      "details": [
+        "Noted and appreciated. +{xp} XP",
+        "Five calls put out. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a dispatcher.",
+        "Fifteen. You keep calling people in. Smart."
+      ],
+      "details": [
+        "Still broadcasting. +{xp} XP",
+        "Fifteen calls sent. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first siren. A founding member, always.",
+        "One of the first thousand. That can't come off the record."
+      ],
+      "details": [
+        "Yours on permanent record. +{xp} XP",
+        "Nobody takes that from you. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Properly earned.",
+        "Promoted. Wear it with pride."
+      ],
+      "details": [
+        "{rank}. It fits you well.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Nicely done.",
+        "Another stripe for the sleeve: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Fully deserved.",
+        "You've put in the shifts and it shows."
+      ],
+      "details": [
+        "{rank}. Looks good on you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. Reminds me of a few suspects I've known.",
+        "Ten outsiders. Nothing rattles you."
+      ],
+      "details": [
+        "Ten calls against the odds. +{xp} XP",
+        "Long shots are your beat. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my nerve.",
+        "Ten tight finishes. I'll admit, I'm impressed."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "A steady hand on a tense night. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days in a row. Dead-on aim.",
+        "A full week without a miss. Sharp work."
+      ],
+      "details": [
+        "Seven days of pinpoint work. +{xp} XP",
+        "Seven days at the top of your game. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One vote, one verdict.",
+        "A deadlock, and you made the call. Nicely done."
+      ],
+      "details": [
+        "The vote that sealed it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Officer Caitlyn, reporting for duty. Badge polished.",
+        "Caitlyn's yours now. Try to keep pace on patrol."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. Wait for the all-clear.",
+      "Voting hasn't started. I'll radio when it does.",
+      "Not yet. Patience is half of police work."
+    ],
+    "prevote": [
+      "Two edits, one verdict. Take a proper look at both.",
+      "Examine both before you decide. No hunches without evidence.",
+      "I'm not telling you which I'd pick. That's your call.",
+      "Take your time. A careful verdict beats a hasty one.",
+      "Pick the one you'd testify for."
+    ],
+    "prevote-empty": [
+      "Nothing on the record yet. File the first vote.",
+      "Quiet so far. Someone has to start.",
+      "Not one vote. Be the first on the scene."
+    ],
+    "closing-24h": [
+      "Less than a day left and no vote from you. Get moving.",
+      "The window's closing. Make your move."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time's short. Vote before shift change."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. File it."
+    ],
+    "voted-early": [
+      "You voted early, before the crowd. First on the scene.",
+      "Almost nobody had voted and you'd made up your mind. Decisive."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Good. The tide can still turn.",
+      "{pct}% with you. Solid ground.",
+      "In front for the moment. Streets change.",
+      "{pick} is edging out in front. Sound judgment.",
+      "A lead is a lead. Don't get cocky."
+    ],
+    "voted-close": [
+      "That's tight. Uncomfortably tight.",
+      "A hair apart. One more vote tips it. Call a friend.",
+      "Side by side at the line. Your pick needs backup.",
+      "{pct} to {otherPct}. Not a comfortable margin."
+    ],
+    "voted-tied": [
+      "Dead level. Neither side has the upper hand.",
+      "Absolutely even. Frustrating and thrilling in equal parts."
+    ],
+    "voted-behind": [
+      "You're losing at the moment. Doesn't make you wrong.",
+      "{pick} is trailing. Underdog. I've been there.",
+      "They're ahead. You're not wrong, just outvoted.",
+      "Down by {diff} points. Spread the word. Call in everyone you know.",
+      "Most went the other way. Doesn't prove a thing."
+    ],
+    "closed-won": [
+      "Your pick won. Good instincts.",
+      "A win. Well earned.",
+      "{pick} went through. You read it right."
+    ],
+    "closed-lost": [
+      "Your pick lost. A shame. It was a fair call.",
+      "It didn't make it. Happens. Move on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A tie. Neither side gave any ground."
+    ],
+    "closed-unvoted": [
+      "Voting closed and you missed this one. There'll be others.",
+      "The match is over. {winner} took it. Vote sooner next time."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome to the force. Everyone's first call is jittery.",
+      "That's the first one. They get easier. Promise.",
+      "You're on the team now. Welcome."
+    ],
+    "streak": [
+      "Back on patrol. Good.",
+      "{streak} days straight. I see you clocking on.",
+      "You keep reporting for duty. I appreciate that."
+    ],
+    "underdog": [
+      "You took the side nobody else would. Noted.",
+      "Tough pick. A good one.",
+      "The long odds. That takes real nerve."
+    ],
+    "early": [
+      "Early. You reached the scene before the rest.",
+      "Hardly any votes yet. Yours counts for plenty.",
+      "First to arrive. Nicely done."
+    ],
+    "close": [
+      "That vote tipped the balance. It's delicate.",
+      "Hair's breadth between them. One more vote flips it.",
+      "A tight one. Your vote counts."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't beaten. Call for backup.",
+      "Not leading yet. Plenty of work left.",
+      "Behind, not finished. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. Things can turn.",
+      "In front for now. Don't trust it.",
+      "Looks like you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your call.",
+      "Your vote is filed. Plenty more to see."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no votes yet. Start with the one you know best.",
+      "All the suspects are lined up. Choose. I won't rush you.",
+      "{unvoted} left. No pressure. Perhaps a smidge."
+    ],
+    "live-some": [
+      "{voted} filed, {unvoted} still to go. Keep walking the beat.",
+      "You've started. {unvoted} still on the list.",
+      "A decent start. The rest won't file themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Wrap them up before shift ends.",
+      "Almost done. {unvoted} more.",
+      "So close. Stay sharp to the end."
+    ],
+    "live-one": [
+      "One left. Just the one.",
+      "A final match. Don't leave the report unfinished.",
+      "One match between you and a clean sheet."
+    ],
+    "live-closing": [
+      "A few wrap up in {timeLeft}. {unvoted} are waiting on your vote.",
+      "The clock's ticking. {unvoted} left, {timeLeft} to go.",
+      "Shift change is coming. Do hurry."
+    ],
+    "live-done": [
+      "You've voted on everything. Well done. Have a look at the bracket.",
+      "Nothing outstanding on your list. Return when the next round opens.",
+      "All filed. That's rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It will be. Browse the bracket meanwhile.",
+      "Quiet on the beat. Check back soon.",
+      "No matches open. I'm pacing the station as much as you."
+    ],
+    "brackets-groups": [
+      "Groups come first. The top two from each move on. The rest don't.",
+      "All begin in a group. Only some get out of the holding cell.",
+      "Keep an eye on the tables. They shift fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are coming. The top two from each group advance.",
+      "No knockout round yet. The groups must wrap up first.",
+      "Be patient. The knockout appears once the groups wrap up."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are live. Lose once and you're out.",
+      "One loss and you're off the force. No appeals.",
+      "Every match counts for more now. Choose carefully."
+    ],
+    "brackets-bracket": [
+      "Round by round. One loss and it's over.",
+      "Follow the bracket. It narrows each round.",
+      "Each line on this board is a match somebody called."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thanks for walking the beat with me.",
+      "That's a wrap. A hard-fought run. I'll miss the patrols.",
+      "We have a champion. A fitting end to the shift."
+    ],
+    "brackets-empty": [
+      "No bracket on the board. Nothing's been drawn up.",
+      "Blank board. The draw's still to come.",
+      "Nothing here yet. Check back later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One vote settles it. Pick.",
+      "{a} against {b}: two edits, one verdict. File yours.",
+      "{a} versus {b}. Join the squad and tell me what you think."
+    ],
+    "voted": [
+      "I voted {pick} over {other}. Where do you stand?",
+      "My vote goes to {pick} over {other}. Prove me wrong.",
+      "I picked {pick} over {other}. Think I'm mistaken?"
+    ],
+    "early": [
+      "Among the first votes on {pick} versus {other}. We need more witnesses.",
+      "I called {pick} over {other} early on. Add yours.",
+      "{pick} against {other}, hardly any votes. Yours would matter."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One vote decides it.",
+      "{pick} and {other} are tied. Someone make the arrest.",
+      "{pick} and {other} can't be told apart. Your vote can."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every one counts now.",
+      "{voteDiff} votes separate {pick} from {other}. Get yours on file.",
+      "{pick} against {other}, {voteDiff} apart. Either way it goes."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A handful of votes turns it.",
+      "{pick} is {voteDiff} behind {other} yet far from finished. Back it.",
+      "{pick} is {voteDiff} short of {other}. Fixable. Vote."
+    ],
+    "losing-bad": [
+      "{other} has {pick} beaten by {voteDiff}. It needs reinforcements.",
+      "{pick} is {voteDiff} short of {other} and deserves a fairer hearing. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let's flip it."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% against {other}, narrowly. Help it hold the line.",
+      "{pick} is ahead of {other}, {pct}%. Not safe yet. Vote.",
+      "{pick} holds {pct}% over {other}. A slim margin."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see the evidence.",
+      "{pick} has {pct}%. {other} isn't in the picture.",
+      "{pick} is well clear of {other}, {pct}%. Add your vote."
+    ]
+  }
+}

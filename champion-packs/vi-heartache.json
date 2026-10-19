@@ -1,0 +1,1403 @@
+{
+  "id": "vi-heartache",
+  "extends": "vi-original",
+  "name": "Vi",
+  "displayName": "Heartache Vi",
+  "description": "Voice set for Heartache Vi (skin 30): a tough brawler who gets love letters in her locker, secretly flustered but never admitting it. School hallways, lockers, valentines, slow songs and glitter-pen drama. Builds on vi-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} short. Somebody's heart is getting stomped. Slip a few valentines in.",
+          "cta": "Rally some votes"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more behind. Tell the whole hallway. Tape it to every locker.",
+          "cta": "Get loud"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Text everyone who ever signed your yearbook.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. Bruised, not broken. Chin up.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Drag a friend to the gym. Safer than going solo. Mostly.",
+          "cta": "Call a teammate"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few good notes passed along and we're even.",
+          "cta": "Pass a few notes"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Small crush, small gap. Fix it before the last bell.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even. One valentine tips it. Slip it in.",
+          "cta": "Slip it in"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Quit lurking by the bleachers and cross the floor.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. Hearts are hammering. Rope in more people.",
+          "cta": "Rally the crew"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes between them. This one lasts till the final song.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} is basking at {userPct}%. Somebody's the crush of the year.",
+          "cta": "Keep swinging"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and glowing. Don't let it go to its head.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. Heads are turning. Stay cool.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% on your pick. Prom-court material. Hold the crown.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Cute. Now close the deal.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the lead. Last-song rescue.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now in front. A real second-chance romance.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} hole. Cue the slow clap in the gym.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was getting dumped. Now it's getting flowers.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just pulled ahead. Nobody saw that plot twist coming.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Matching taste, matching sparkles.",
+        "{username} fell for {momentTitle} too. Cute.",
+        "{username} agrees with you. Circle the date on a calendar. Rare.",
+        "Same pick as {username}. Looks like you share a locker neighbour's taste.",
+        "{username} swooned for {momentTitle}. Good eye.",
+        "{username} chose the same. Friendship bracelet time.",
+        "{username} is on your side of {momentTitle}. Save them a seat.",
+        "{username} made the same call. Zero awkward small talk needed.",
+        "{username} voted {momentTitle}. Welcome to the lunch table."
+      ],
+      "details": [
+        "A fellow romantic.",
+        "Two hearts, one pick.",
+        "Good taste runs in packs.",
+        "Keep them close.",
+        "Look at you, making friends.",
+        "Someone who gets it.",
+        "Pencil them into your dance card."
+      ],
+      "buttons": [
+        "Aww",
+        "Say thanks",
+        "See the match",
+        "Sparkle fist",
+        "Nice one",
+        "Fair play",
+        "Cheers"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. Awkward. Love triangles are tricky.",
+        "{username} picked {theirMoment}. Different crush. Let's see who gets the dance.",
+        "{username} went the other way on {yourMoment}. Wrong, but passionate.",
+        "{username} voted against you. Tell them to meet me behind the gym.",
+        "{username} fell for {theirMoment}. Bold. Wrong. Bold.",
+        "{username} is against {yourMoment}. Fine. Cold shoulder in the hallway.",
+        "{username} disagrees on {yourMoment}. The final tally breaks the tie.",
+        "{username} voted the other way. They'll be passing apology notes soon."
+      ],
+      "details": [
+        "Everyone has a bad crush at least once.",
+        "Meet by the lockers. Now.",
+        "The tally has the last word.",
+        "Don't take it to heart. Or do. Dramatically.",
+        "A rival makes the dance more fun.",
+        "They'll come around.",
+        "At least the drama's clean."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That's a couples' costume, not a coincidence.",
+        "{username} and you, ten matches, same pick every time. Prom king and queen energy.",
+        "Ten straight with {username}. You two are probably in each other's yearbook margins.",
+        "A ten-match streak with {username}. Eerily in sync. Adorable.",
+        "Ten for ten with {username}. Don't make it weird. Make it great."
+      ],
+      "details": [
+        "Ten dances, no stepped-on toes.",
+        "A real match.",
+        "Rare. Treasure it.",
+        "Keep the streak alive.",
+        "Hard to top."
+      ],
+      "buttons": [
+        "See their profile",
+        "Aww",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. You two are practically a school legend.",
+        "{streakCount} in a row with {username}. They'll name a hallway after you.",
+        "{streakCount} straight picks with {username}. Ridiculous. Wonderfully ridiculous.",
+        "A {streakCount}-match streak with {username}. Yearbook's calling.",
+        "{streakCount} with {username}. Best-friends-forever tier. Frame it."
+      ],
+      "details": [
+        "Hard to believe. Totally earned, though.",
+        "Loyalty like that is rare.",
+        "No jokes. Just awe.",
+        "Unbeatable pair.",
+        "Class-couple material."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Aww"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches opposite {username}. A real feud, now.",
+        "{username} has opposed you ten times running. They hate your handwriting too, probably.",
+        "Ten in a row opposite {username}. Neither of you will cross the gym floor first.",
+        "Ten matches against {username}. Two stubborn hearts, zero compromise.",
+        "Ten times at odds with {username}. Somebody sell tickets to this showdown."
+      ],
+      "details": [
+        "Ten rounds, no truce.",
+        "Talk it out. Or toss glitter at each other.",
+        "That's a rivalry.",
+        "Stubbornness looks good on you.",
+        "Who breaks first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's a telenovela.",
+        "{streakCount} in a row opposite {username}. Neither of you moves an inch on the dance floor.",
+        "{streakCount} straight clashes with {username}. Stubborn doesn't cover it.",
+        "A {streakCount}-match feud with {username}. Someone fetch the principal.",
+        "{streakCount} against {username}. I respect it. Go outside, though."
+      ],
+      "details": [
+        "Neither of you is leaving the floor.",
+        "Commitment, honestly.",
+        "Legendary grudge.",
+        "Not getting between you two. Too much glitter.",
+        "Going in the yearbook under 'most dramatic'."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} ends in {timeLeft} and you haven't slipped your note in. Hurry.",
+        "{timeLeft} left on {matchTitle}. Your locker's empty of votes. Fix it.",
+        "{matchTitle} wraps in {timeLeft}. Your valentine's the missing one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Slip it in"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. Run, don't walk.",
+        "{matchTitle} closes in {timeLeft}. Don't make me haul you off the bleachers.",
+        "Only {timeLeft} until {matchTitle} ends. Your seat's gone quiet."
+      ],
+      "buttons": [
+        "Vote now",
+        "Run for it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. Last song of the night.",
+        "{timeLeft} left. Ask them to dance. Now.",
+        "Final bell on {matchTitle}. {timeLeft}. Go."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches without your vote are about to wrap. The first one ends in {timeLeft}.",
+        "{matchCount} unvoted matches and the bell's ringing. The nearest has {timeLeft} left."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Somebody ask first. Don't be shy.",
+        "{moment1} against {moment2} and not a single note passed. I'll wait. Barely.",
+        "New match, zero votes. Be the one who starts the slow dance.",
+        "{matchTitle} is a wallflower. Walk over."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Ask them",
+        "Open it up"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A quiet dance floor.",
+        "Barely anyone's here. Fix that.",
+        "Turnout's low. Come on, fill the gym.",
+        "No notes passed on this one. Someone should write one."
+      ],
+      "details": [
+        "Needs more admirers.",
+        "Every note counts in a quiet gym.",
+        "Yours counts double here.",
+        "Don't let the music die."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. Pick a dance partner.",
+        "Dead even on {matchTitle}. One valentine decides it.",
+        "Tied. Somebody has to ask. Be somebody.",
+        "{moment1} and {moment2}, neck and neck at the punch bowl. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the last song is playing. One chance to cut in.",
+        "Level with the lights going up. Vote.",
+        "Tied, and the janitor's waiting. Don't skip this one."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new crushes to judge. Go.",
+        "{matchCount} matches just opened in round {round}. Doors are open, dance floor's empty.",
+        "Round {round} is live, {matchCount} deep.",
+        "New round. {matchCount} matches. Choose your dance partners.",
+        "Round {round}: {matchCount} valentines waiting on you."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Let's dance",
+        "Walk in",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Cue the confetti.",
+        "{momentTitle} is through. Heart-eyes everywhere.",
+        "{momentTitle} took the crown. Deserved.",
+        "{momentTitle} won, and the gym lost its mind.",
+        "{momentTitle} advances. Swoon.",
+        "{momentTitle} moves on. Sparkles all around."
+      ],
+      "details": [
+        "Love wins.",
+        "One dance down, more to go.",
+        "Make a note of that.",
+        "Perfect."
+      ],
+      "buttons": [
+        "Aww",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. Ouch. Heartache for real.",
+        "{momentTitle} is out. That one stung worse than detention.",
+        "{momentTitle} didn't make it. Lean on a locker. Breathe.",
+        "{momentTitle} went down swinging. Respect.",
+        "{momentTitle} is out. Go cry in the bathroom. Then come back.",
+        "{momentTitle} lost this round. Rough breakup. Next song.",
+        "{momentTitle} got knocked out. Wipe off the mascara and keep dancing."
+      ],
+      "details": [
+        "Not every crush works out.",
+        "It put up a decent fight.",
+        "New crushes are always arriving.",
+        "Cry. Then move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Shake it off",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Write the note already.",
+        "Don't overthink it. Pick and go.",
+        "They're all kind of cute. Trust your gut.",
+        "You've stared across the gym long enough. Cross it."
+      ],
+      "details": [
+        "Every vote matters.",
+        "Follow your heart.",
+        "No wrong answers. A few bad ones.",
+        "Just pick."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the dance. {liveCount} matches are open. Pick one.",
+          "New kid? {liveCount} matches are live. Come on in.",
+          "You're early. {liveCount} matches need valentines.",
+          "{liveCount} matches open. Choose who to fall for.",
+          "Welcome. {liveCount} matches. Don't trip on the way in."
+        ],
+        "buttons": [
+          "Let's go",
+          "Start",
+          "Show me",
+          "Walk in",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back. Cute.",
+          "Two days running. Sweet.",
+          "Back for day two. I like that."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days gone. Did you ghost me?",
+          "After {days} days you're back. Better late than stood up.",
+          "{days} days. Thought you'd moved schools. Glad you didn't.",
+          "{days} days away. You missed a lot of drama."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You came back. Good.",
+          "Welcome back. Let's dance.",
+          "Back already. Cute.",
+          "Hey. The floor's waiting."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First valentine slipped in. Welcome to the dance.",
+        "You picked a side. First crush confirmed."
+      ],
+      "details": [
+        "Now find another. +{xp} XP",
+        "Breaking the ice counts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Again"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. Look who's got a dance card now.",
+        "Five. You're not just lurking by the punch anymore."
+      ],
+      "details": [
+        "A promising start. +{xp} XP",
+        "Warming up on the floor. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The hallway knows your face.",
+        "Ten. You're a fixture at the gym doors."
+      ],
+      "details": [
+        "A regular at every dance. +{xp} XP",
+        "Ten notes passed. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. The whole gym can hear you.",
+        "Twenty-five. You're the loudest voice at the bleachers."
+      ],
+      "details": [
+        "Heard over the music. +{xp} XP",
+        "Twenty-five love notes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Fully head over heels.",
+        "Fifty. You actually care. Adorable."
+      ],
+      "details": [
+        "Fifty hearts on record. +{xp} XP",
+        "Deep in the drama. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll write songs about you.",
+        "One hundred. Honestly iconic. Pretend I didn't say that."
+      ],
+      "details": [
+        "Earned every sparkle. +{xp} XP",
+        "A hundred. Bow. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days in a row. Something's brewing.",
+        "Three straight days. A real spark."
+      ],
+      "details": [
+        "Showing up counts. +{xp} XP",
+        "Three days of butterflies. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week. That's real commitment.",
+        "Seven days in a row. Swoon."
+      ],
+      "details": [
+        "A week and never late. +{xp} XP",
+        "Seven mornings at the lockers. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks. You never miss a day.",
+        "Fourteen days. Whoa."
+      ],
+      "details": [
+        "Two weeks, perfect attendance. +{xp} XP",
+        "That's true devotion. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Nice"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Honestly? Thank you. For real.",
+        "A month of showing up. That means something."
+      ],
+      "details": [
+        "Thirty days of heart. +{xp} XP",
+        "A whole month in love with the game. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You fall for the unpopular ones.",
+        "Five unlikely crushes. I like your style."
+      ],
+      "details": [
+        "Against the crowd. +{xp} XP",
+        "Five outsiders championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You pick the misfits on purpose.",
+        "Fifteen. You don't take advice from the hallway."
+      ],
+      "details": [
+        "Always your own heart. +{xp} XP",
+        "Fifteen rebel valentines. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Rebel on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. Nobody can read your handwriting.",
+        "Thirty. The misfit is your whole type."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty hearts for the one behind. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First to the dance floor five times. Eager.",
+        "Five times you arrived before everyone."
+      ],
+      "details": [
+        "You beat the doors open. +{xp} XP",
+        "Five valentines before the rush. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you led the slow dance. Brave.",
+        "First to ask, again and again."
+      ],
+      "details": [
+        "Fifteen votes before the rest. +{xp} XP",
+        "Ahead of the whole school. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. You live for the drama.",
+        "Another heart-stopper. Your nerves are made of steel."
+      ],
+      "details": [
+        "Slow songs suit you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your valentine keeps tipping it.",
+        "You've broken more than one tie."
+      ],
+      "details": [
+        "Twenty-five skin-of-the-teeth finishes. +{xp} XP",
+        "You decide who gets the last dance. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the underdog five times. Hopeless romantic. Love it.",
+        "You never dump a crush who's behind. Respect."
+      ],
+      "details": [
+        "Faith in the last-song rescue. +{xp} XP",
+        "Five comebacks you believed in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Somebody's smitten.",
+        "That one again? Must have a good smile."
+      ],
+      "details": [
+        "You know your type. +{xp} XP",
+        "One crush, three notes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five notes to the same moment. That's a full-on crush.",
+        "You're not letting that one go. Cute."
+      ],
+      "details": [
+        "Loyal to the end. +{xp} XP",
+        "One crush, five valentines. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten votes on the same moment. That's an obsession, sweetheart.",
+        "Ten times, same pick. I'll keep it secret. Barely."
+      ],
+      "details": [
+        "Ten on a single crush. +{xp} XP",
+        "Faithful. Or smitten. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're staying for the whole dance.",
+        "Round two and you're still here. Sweet."
+      ],
+      "details": [
+        "Stay for the next song. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. The gym's getting crowded.",
+        "Deep in the bracket. Things get dramatic from here."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the doors now. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You stayed till the lights came up.",
+        "All the way. You never left early."
+      ],
+      "details": [
+        "First song to last song. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've worked the whole room.",
+        "Ten different matches. Chatting up everyone. Nice."
+      ],
+      "details": [
+        "Mingling with the bracket. +{xp} XP",
+        "Ten dance partners. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've been in every corner of the gym.",
+        "Twenty-five. Not a wall left unvisited."
+      ],
+      "details": [
+        "Every nook of the gym visited. +{xp} XP",
+        "Twenty-five dances. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That's not a crush, that's a school career.",
+        "Fifty. You know this bracket better than the chaperones."
+      ],
+      "details": [
+        "A true senior. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting. The dance is flowing.",
+        "Five back to back. Drink some punch."
+      ],
+      "details": [
+        "One long night. +{xp} XP",
+        "Five dances straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. Sit down, sip some punch.",
+        "Ten in one sitting. That's stamina."
+      ],
+      "details": [
+        "A marathon dance. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting this late? Heartache or insomnia?",
+        "Middle of the night. Devotion, or you're pining too."
+      ],
+      "details": [
+        "Late-night love letters. +{xp} XP",
+        "A midnight valentine. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Go to bed"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people. Thanks, you big softie.",
+        "Five shares. More friends, more votes."
+      ],
+      "details": [
+        "Cheers for spreading the love. +{xp} XP",
+        "Five notes passed along. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're basically the class president.",
+        "Fifteen. You keep telling everyone. Adorable."
+      ],
+      "details": [
+        "Still handing out flyers. +{xp} XP",
+        "Fifteen notes circulated. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first dance. Founding member, forever.",
+        "One of the first thousand. Nobody can erase that."
+      ],
+      "details": [
+        "That's yours for life. +{xp} XP",
+        "Nobody's taking that back. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank. Hard-earned.",
+        "Promoted. Don't swagger."
+      ],
+      "details": [
+        "{rank}. Looks great on you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Aww, look at you.",
+        "Another keepsake for the scrapbook: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Well deserved.",
+        "You put in the work and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Chaotic. Runs in the family, sadly.",
+        "Ten long shots. Not a nerve in you."
+      ],
+      "details": [
+        "Ten crushes nobody saw coming. +{xp} XP",
+        "Long shots are your type. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cait. Your heart can take it.",
+        "Ten tight finishes. She'd be proud. I'm not blushing."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady hands, racing pulse. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days with Cait. Her patience is rubbing off.",
+        "A week and you never missed. Sweet."
+      ],
+      "details": [
+        "A week by her side. +{xp} XP",
+        "Seven days in a row. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. Cupid would be jealous.",
+        "Stalemate, and you cut in. Respect."
+      ],
+      "details": [
+        "The valentine that settled it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Vi's your champion now. Don't break my heart.",
+        "Vi's got your back. Don't make me regret it."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. The doors are still locked.",
+      "Voting hasn't started. I'll wave when it does.",
+      "Not yet. Be patient, sweetheart."
+    ],
+    "prevote": [
+      "Two moments, one valentine. Look at both before you decide.",
+      "Check them both out before you choose. No peeking at the crowd.",
+      "I'm not telling you who to like. Your heart, your call.",
+      "Take a minute. Then pick.",
+      "Trust the flutter in your chest. It's rarely wrong."
+    ],
+    "prevote-empty": [
+      "No votes yet. Make the first move.",
+      "Empty gym. Somebody ask first.",
+      "Nobody's voted. Be brave."
+    ],
+    "closing-24h": [
+      "Under a day left and no note from you. Hurry.",
+      "The bell's about to ring. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time's running out. Vote before the lights go up."
+    ],
+    "closing-final": [
+      "Last hour. Vote now.",
+      "Final song. Go."
+    ],
+    "voted-early": [
+      "You voted early with hardly anyone around. You asked first.",
+      "Barely a vote in and you jumped. Bold."
+    ],
+    "voted-ahead": [
+      "Your pick's ahead. Nice. Songs aren't over yet.",
+      "{pct}% with you. Everyone's crushing on it.",
+      "Ahead for now. Crushes fade.",
+      "{pick} is pulling ahead. Good taste.",
+      "A lead's a lead. Don't get cocky in the hallway."
+    ],
+    "voted-close": [
+      "That's close. Too close. My hands are sweating inside the gauntlets.",
+      "Razor-thin. One more note flips it. Tell someone.",
+      "Neck and neck. Your pick needs a friend.",
+      "{pct} to {otherPct}. Fingers crossed."
+    ],
+    "voted-tied": [
+      "Dead even. No one's winning the dance.",
+      "A perfect tie. Frustrating. Also kinda romantic."
+    ],
+    "voted-behind": [
+      "You're trailing. Doesn't make your taste bad.",
+      "{pick} is trailing. Underdog. My kind of crush.",
+      "They're ahead. You're not wrong, just unpopular.",
+      "Down by {diff} points. Tell your friends. Fill the gym.",
+      "Most of the gym went elsewhere. Doesn't prove a thing."
+    ],
+    "closed-won": [
+      "Your pick won. You've got taste.",
+      "A win. Sweet.",
+      "{pick} went through. Your heart knew."
+    ],
+    "closed-lost": [
+      "Your pick lost. Hurts, I know. Breathe.",
+      "It didn't make it. Happens. Next dance.",
+      "{pick} is out. Sorry. It was a good crush."
+    ],
+    "closed-tied": [
+      "A tie. Nobody left the floor."
+    ],
+    "closed-unvoted": [
+      "Voting's closed and you missed this dance. More coming.",
+      "Match is over. {winner} took it. Next time, ask first."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "First vote. Welcome. Everyone's first note is shaky.",
+      "That's your first. It gets easier. Promise.",
+      "You're on the dance floor now. Welcome."
+    ],
+    "streak": [
+      "Back again. I like that.",
+      "{streak} days straight. I see you strolling in.",
+      "You keep coming back. Cute."
+    ],
+    "underdog": [
+      "You liked the one nobody else did. I noticed.",
+      "Brave crush. Good crush.",
+      "An underdog. That takes heart."
+    ],
+    "early": [
+      "Early. You got to the gym before the lights.",
+      "Few votes so far. Yours counts a lot.",
+      "First to walk across the floor. Nice."
+    ],
+    "close": [
+      "That note just shifted things. It's tight.",
+      "Razor-thin. One more admirer flips it.",
+      "Close call. Your note matters."
+    ],
+    "behind": [
+      "{pick} is behind. Behind isn't out. Bring friends.",
+      "Not leading yet. So there's work to do.",
+      "Behind, not dumped. Big difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't coast. Crushes shift.",
+      "Leading for now. Soak it up.",
+      "Looks like a smart pick."
+    ],
+    "default": [
+      "Got it. I'll hold my tongue. For now.",
+      "Done. Your heart, your pick.",
+      "Vote's in. Plenty more to meet."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and no valentines yet. Start with the one that makes your heart skip.",
+      "Everything's open. Pick. I won't rush you. Much.",
+      "{unvoted} waiting. No pressure. Okay, a little pressure."
+    ],
+    "live-some": [
+      "{voted} notes passed, {unvoted} left. Keep going.",
+      "You've started. {unvoted} still waiting.",
+      "Nice opening. The rest won't dance themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left. Finish tonight.",
+      "So close. {unvoted} more crushes.",
+      "Almost done. Don't leave early now."
+    ],
+    "live-one": [
+      "One left. Just one.",
+      "Last dance. Don't skip it.",
+      "One match between you and a full dance card."
+    ],
+    "live-closing": [
+      "Some of these end in {timeLeft}. {unvoted} still need you.",
+      "Clock's ticking. {unvoted} left, {timeLeft} to go.",
+      "The bell's nearly ringing. Hurry."
+    ],
+    "live-done": [
+      "You voted in everything. Look at you. Go check the bracket.",
+      "Nothing left on your card. Come back when the next round opens.",
+      "All done. Rare. Respect."
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll come back. Browse the bracket meanwhile.",
+      "Quiet gym. Check back soon.",
+      "No matches open. I'm tapping my foot as much as you are."
+    ],
+    "brackets-groups": [
+      "Groups first. Top two from each go through. The rest go home with a broken heart.",
+      "Everyone starts in a group. Not everyone makes the last dance.",
+      "Watch the standings. They change fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts are coming. Top two per group get the last dance.",
+      "No knockout yet. The groups need to finish.",
+      "Patience. The knockout appears once the groups end."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now. Lose once and you're out of the dance.",
+      "One slip and you're dumped. No do-overs.",
+      "Every match counts more now. Choose with your heart."
+    ],
+    "brackets-bracket": [
+      "Round by round. Lose once and you're dumped.",
+      "Trace the lines. The crowd thins every round.",
+      "Every line here is a crush someone voted on."
+    ],
+    "brackets-complete": [
+      "That's the cup complete. Thanks for dancing with me.",
+      "It's over. Good run. I'll miss the music.",
+      "We have a champion. Worth every sparkle."
+    ],
+    "brackets-empty": [
+      "No bracket yet. Nobody's been paired.",
+      "Empty. The pairing hasn't happened. Soon.",
+      "Empty hallway for now. Pop back later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. One valentine decides it. Choose.",
+      "Two crushes, one pick: {a} against {b}. Cast your vote.",
+      "{a} versus {b}. Come to the dance and tell me what you think."
+    ],
+    "voted": [
+      "I voted {pick} over {other}. What's your pick?",
+      "{pick} gets my valentine over {other}. Fight me.",
+      "I chose {pick} over {other}. Think I've got bad taste?"
+    ],
+    "early": [
+      "One of the first votes on {pick} against {other}. We need more admirers.",
+      "I gave {pick} an early valentine over {other}. Slip yours in.",
+      "{pick} versus {other}, barely any votes yet. Yours would be a lovely surprise."
+    ],
+    "tied": [
+      "{pick} and {other} are level. One valentine settles it.",
+      "A tie, {pick} against {other}. Cut in.",
+      "{pick} and {other} are a tie. Your valentine breaks it."
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart. Every note counts now.",
+      "{voteDiff} votes keep {pick} and {other} apart. Send yours.",
+      "{voteDiff} between {pick} and {other}. Either could win the dance."
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A few notes flip it.",
+      "Down {voteDiff} against {other}, but {pick} can still win. Back it.",
+      "{pick} trails {other} by {voteDiff}. It's fixable. Vote."
+    ],
+    "losing-bad": [
+      "{pick} is behind {other} by {voteDiff}. It needs friends.",
+      "Down {voteDiff} against {other}. {pick} deserves love. Vote.",
+      "{pick} is losing to {other} by {voteDiff}. Let's cheer it up."
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but barely. Help it hold on.",
+      "{pick} leads {other}, {pct}%. Not locked in. Vote.",
+      "{pick} edges {other} with {pct}%. Barely."
+    ],
+    "dominating": [
+      "{pick} is ahead of {other} with {pct}%. Come see the fuss.",
+      "{pick} owns {pct}%. {other} isn't even in the running.",
+      "{pick} leads {other} by a mile, {pct}%. Add your note."
+    ]
+  }
+}

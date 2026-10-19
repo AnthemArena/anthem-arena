@@ -217,8 +217,11 @@ function announceMastery(packId, from, to, xp) {
         message: voiced?.message || `${rank}!`,
         detail: unlocked.length ? `Unlocked: ${unlocked.map(x => x.name).join(', ')}` : (voiced?.detail || rank),
         strip: unlocked.length ? { thumbs: unlocked.slice(0, 3).map(x => getChampionSplashUrl(champ, x.num)), more: Math.max(0, unlocked.length - 3) } : null,
-        cta: voiced?.cta || 'View champions',
-        ctaAction: () => { window.location.href = '/profile#champions'; },
+        cta: unlocked.length ? 'Wear it now' : (voiced?.cta || 'View champions'),
+        ctaAction: () => {
+            if (unlocked.length && window.openSettingsModal) window.openSettingsModal({ champion: packId, skin: unlocked[unlocked.length - 1].num });
+            else window.location.href = '/profile#champions';
+        },
         duration: 6000
     });
 }

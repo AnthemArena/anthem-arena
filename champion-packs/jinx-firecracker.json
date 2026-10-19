@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-firecracker",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Firecracker Jinx",
+  "description": "Voice set for Firecracker Jinx (skin 2, Lunar Revel): fuses, lanterns, a dragon-shaped rocket and 'it's just a party favour'. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! That's not a bad night, that's a whole string of duds! Light another fuse!",
+          "cta": "Light a bigger fuse"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? Somebody soaked the fireworks. I'm sniffing for who. Sniff sniff.",
+          "cta": "Dry the powder"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind! Luckily I packed an extra dragon. A big, angry, very legal dragon.",
+          "cta": "Wake the dragon"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. The fuse is short and my patience is shorter. Sparks incoming!",
+          "cta": "Light it up"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. A small fizzle! One good bang and we're back!",
+          "cta": "Make a bang"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Time to hang more lanterns and make a lot more noise. Go vote!",
+          "cta": "Spread the glow"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! Fuse burning, nobody blinking, and one vote decides which way the rocket points!",
+          "cta": "Pick the direction"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! The spark's right at the end of the fuse! Don't look! Look!",
+          "cta": "Beat the spark"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! Everyone's holding their ears and grinning like idiots!",
+          "cta": "Cover your ears"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either the prettiest sky ever or a very loud neighbour complaint!",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! The whole sky's lit up and every neighbour's cheering! Go and bow!",
+          "cta": "Watch the sky"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! Red envelopes for everybody! Mostly you. You're the lucky one!",
+          "cta": "Collect the luck"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and the sparks are climbing! Keep the fuses coming, don't run dry!",
+          "cta": "Keep it burning"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still in front. Don't jinx the luck. Too late, it's literally my name!",
+          "cta": "Watch the glow"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just launched itself into the lead! Whoosh! Crackle! Hooray!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Shot out of a {voteDiff}-vote hole like a rocket with a grudge! Beautiful!",
+          "cta": "Enjoy this"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Fizzled back up from {voteDiff} behind! Sparky, scrappy, perfect!",
+          "cta": "Nice one"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just crept into the lead like a quiet firework. Don't blink, it goes bang!",
+          "cta": "See where it stands"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! Two sparks, one fuse! Lucky us!",
+        "{username} picked {momentTitle}. Matching lanterns! Don't blow yours out!",
+        "{username} is on your side with {momentTitle}. Lucky number two! I love a lucky number!",
+        "{username} backed {momentTitle} as well. That's a proper party! Somebody pass the sparklers!",
+        "Same pick as {username}! Two fireworks, one sky. Prepare the big finale!",
+        "{username} agrees with you on {momentTitle}. Write it on a red envelope, it's rare!",
+        "{username} voted {momentTitle}. Two of you! That's a dragon dance with a head AND a tail!",
+        "{username} has taste and it matches yours. Lucky, lucky, lucky!"
+      ],
+      "details": [
+        "Two sparks make a flame. Probably.",
+        "New friend! Share the sparklers!",
+        "Dragon team! I'm the fiery end.",
+        "Don't tell them I made a wish for them.",
+        "Party's growing. More noise for everybody!",
+        "A lucky friend is the best kind!",
+        "I give it a week before one of you sets the other's sleeve on fire.",
+        "Look at you, lighting up the neighbourhood!"
+      ],
+      "buttons": [
+        "Say hi",
+        "Send a sparkler",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Join the party"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? Ooh, a rival lantern! Mine's brighter, by the way!",
+        "{username} voted against {yourMoment}. Aww. Somebody brought a water balloon to a fireworks show!",
+        "{username} chose {theirMoment}. Not mad. Writing their name on a rocket!",
+        "{username} went for {theirMoment}. New name on the fuse list!",
+        "{username} is against you on {yourMoment}. Finally, a proper showdown with sparks!",
+        "{username} thinks {theirMoment} is better. A fireworks critic! They're going on the roof with me.",
+        "{username} voted against you. Two fireworks, one rooftop. Somebody's getting singed!",
+        "{username} versus you! I'm grabbing the best spot, the big dragon, and a bucket for later."
+      ],
+      "details": [
+        "I'm not saying fight. I'm saying launch first.",
+        "The dragon wants a word. It breathes fire, so make it a short word.",
+        "They'll learn. Fireworks are great teachers.",
+        "One rooftop. Two rockets. Somebody's hat is going up.",
+        "I like them already. Easy target for glitter.",
+        "I don't care. I brought snacks, didn't I?",
+        "A little rivalry makes the sky prettier!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Light the fuse",
+        "Face them",
+        "Settle it",
+        "Front row"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! That's ten lucky bangs side by side!",
+        "{username} has agreed with you ten times running. Either luck or a very good lantern!",
+        "Ten straight with {username}! You two are the dragon's head and tail now."
+      ],
+      "details": [
+        "Ten! That's a whole string of crackers!",
+        "Don't snuff it out now!",
+        "Honestly? Fireworks-worthy.",
+        "Weird. Good weird. Festival weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hi",
+        "Light another"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a whole parade, and you two are the dragon!",
+        "{streakCount} for you and {username}. Perfectly timed, like a grand finale. I'm tearing up. From the smoke!",
+        "{streakCount} straight with {username}! Somebody hand you both a golden envelope. Or a fire extinguisher."
+      ],
+      "details": [
+        "I'm speechless, and I just ate a firecracker. A pretend one!",
+        "Is this healthy? Don't ask the dragon.",
+        "That's not luck, that's the best kind of wish."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Light another"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep setting off each other's fuses!",
+        "{username} has disagreed with you ten times running. That's not a rival, that's a rooftop tradition!",
+        "Ten battles with {username}. I'm selling sparklers. Business is booming. Literally."
+      ],
+      "details": [
+        "This is the main show now.",
+        "Glitter's selling fast!",
+        "All my voices have a window seat."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Light the next one"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a whole festival feud! I LOVE festival feuds!",
+        "{streakCount} battles with {username}. Drop the rocket? Nah. Aim it better!",
+        "{streakCount} against {username}. That's not a rivalry, that's a full firework season."
+      ],
+      "details": [
+        "Bigger than any festival in Zaun. Almost!",
+        "I'm worried and a bit proud. And a bit singed.",
+        "One of you has to run out of fuses. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep the sky busy"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! The fuse is lit, you know. Hurry, hurry!",
+        "{timeLeft} left on {matchTitle}. Your vote's missing from the party! Come on, grab a sparkler!",
+        "{matchTitle} goes bang in {timeLeft}. It takes ten seconds to vote. I counted. On my fingers. Twice."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the fuse"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? The fuse is half gone, you glorious dawdler!",
+        "Fizzle fizzle! {matchTitle} closes in {timeLeft}. Don't let the fuse burn out unwatched!",
+        "{timeLeft} until {matchTitle} closes and your vote's still in the box. Light it!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, I'll light it"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! The fuse is almost down to the bang! RUN! Okay, vote!",
+        "{timeLeft}! That's all the fuse left on {matchTitle}. Go go go!",
+        "Last spark on {matchTitle}! {timeLeft} left. Finale time, no holding back!"
+      ],
+      "buttons": [
+        "Last chance",
+        "Light it now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to go bang and you've voted in none of them! The first one pops in {timeLeft}!",
+        "{matchCount} unvoted matches, all burning down. The first fuse ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, let's light them"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! A whole dark sky! Somebody light the first spark!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even the lanterns are bored!",
+        "Brand new match and not a single vote. Somebody has to light the first fuse. Pick me. Pick you!",
+        "{matchTitle} needs a first bang. I've got matches. I mean, you've got a vote."
+      ],
+      "buttons": [
+        "Light the first fuse",
+        "Make the first bang",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. That's one sad sparkler in a very big night!",
+        "Hardly anyone's lit a fuse here. What's wrong with everybody?",
+        "Low turnout. I blame all of you. Equally. With fireworks.",
+        "Barely any votes here. Somebody bring more lanterns!"
+      ],
+      "details": [
+        "Go on, give it a spark.",
+        "It deserves a bigger sky. So do I.",
+        "Make some noise, loudly!",
+        "Don't be shy. Bang a pot at least!"
+      ],
+      "ctas": [
+        "Vote",
+        "Add a spark",
+        "Go on",
+        "Light it"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the rocket. Funny, I know someone who hasn't lit their fuse. Guess who!",
+        "Perfect tie on {matchTitle}. Two fuses burning at the same speed. I'm looking at you. Hehe!",
+        "Dead even and nobody's moving. You haven't voted. You hold the match! No pressure!",
+        "{moment1} and {moment2}, tied up tight, and you've been quiet by the lanterns. Fix that!"
+      ],
+      "buttons": [
+        "Light the winner",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the fuse is almost gone! Last chance to pick where the rocket points!",
+        "Dead level, almost no fuse left. You're the only one who can aim it!",
+        "Still tied with the sparks nearly out. Pick a side! Do it for the finale!"
+      ],
+      "buttons": [
+        "Pick a side",
+        "Aim the rocket",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Lanterns up, fuses out! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new string of crackers!",
+        "Round {round} just started! {matchCount} matches waiting for a spark. Hurry hurry hurry!",
+        "New round! {matchCount} matches! The whole street's a firing range! Not even I'm safe!"
+      ],
+      "buttons": [
+        "Grab a fuse",
+        "See round {round}",
+        "Let's go",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Fireworks everywhere! I told you, and I told the neighbours!",
+        "{momentTitle} beat the competition! Next round's in for a face full of sparks.",
+        "{momentTitle} survived! I never doubted it. Okay, the dragon doubted. Just a bit.",
+        "{momentTitle} is through! Somebody's having a lucky day. Hehe, red envelope for you!",
+        "{momentTitle} moves up and the rest are paper scraps. Sparkly paper scraps.",
+        "{momentTitle} won! Good call! Confetti cannons for the winner!"
+      ],
+      "details": [
+        "Your pick keeps glowing!",
+        "One down, lots of sky left.",
+        "The bracket just shrank. Tidier! Brighter!"
+      ],
+      "buttons": [
+        "Watch the fireworks",
+        "See the result",
+        "Next match",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. A dud. A big, sad, sulky dud. I'm lighting a lantern for it!",
+        "{momentTitle} lost. Everyone who voted against it gets a lump of coal. In a red envelope.",
+        "Fine. {momentTitle} is gone. I'll set off one tiny rocket in its honour. Just one. Maybe three.",
+        "{momentTitle} was too bright for this street anyway. Obviously.",
+        "{momentTitle} is out, and the night went quiet. I hate quiet nights. Somebody bang something!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A lantern bit."
+      ],
+      "details": [
+        "They'll pay for this. Next fireworks night.",
+        "It was good. The whole street knows.",
+        "You'll find another one. Lucky ones always float back.",
+        "Every firework ends. That's what makes it pretty. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next match",
+        "Light another",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still browsing? Pick one! Any one! I'll hold your lantern. I'm lying, I'm setting something off!",
+        "No pressure, but are you gonna vote or just hold that sparkler until it burns your fingers?",
+        "They're all pretty! Pick one! Light first, think later!",
+        "Decisions, decisions. Close your eyes, point at the sky, and cheer."
+      ],
+      "details": [
+        "Every vote is a spark!",
+        "Your opinion matters. Sort of. It's a lucky sort of.",
+        "Don't overthink it. Fuses burn.",
+        "Trust your gut. It's got great fireworks taste."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Light it",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New face in the lantern light! Welcome! {liveCount} matches live and every one of them is a party!",
+          "{liveCount} edits fighting it out under the lanterns and you just walked in. Grab a sparkler before they grab you!",
+          "Oooh, a newcomer! Lanterns are up, fuses are ready, and {liveCount} matches are live. You'll love it.",
+          "Festival night, {liveCount} live matches, and me with the big dragon. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Grab a sparkler",
+          "Light it up"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I saved you a spot by the lanterns. I definitely did.",
+          "Two days running! Look at you, a festival regular!",
+          "Back again? Day two! I could get used to this. Don't tell the dragon."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because I saved you a dumpling!",
+          "You're back after {days} days! The festival went on without you. Mostly explosions.",
+          "{days} days away. I noticed. Your lantern's still lit. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The street was getting dim!",
+          "Look who's here! Ready for more fireworks?",
+          "You came back! Let's light something up."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! Feels like nothing. Then the whole sky lights up!",
+        "You picked a side! That's how every great night starts."
+      ],
+      "details": [
+        "That's one spark! +{xp} XP",
+        "Welcome to the festival! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're staying for the whole show! Weird. Good weird!",
+        "Five votes! Okay, now I'm watching from the roof."
+      ],
+      "details": [
+        "Most people leave before the second rocket. +{xp} XP",
+        "Look at you, lighting steadily! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular now. Your lantern's got your name on it!",
+        "Ten votes! You keep climbing up to the roof. The ladder's got your name on it. Hehe."
+      ],
+      "details": [
+        "Regulars get the best roof spot. +{xp} XP",
+        "Ten and counting! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! That's a whole street of opinions!",
+        "You're getting loud! The dragon's listening!"
+      ],
+      "details": [
+        "The street's listening. +{xp} XP",
+        "Twenty-five! A proper cheer. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly into the festival!",
+        "Fifty! Most people go home before the big finale. Their loss!"
+      ],
+      "details": [
+        "You're past the first few bangs. +{xp} XP",
+        "Fifty down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! That's legend stuff, a dragon-sized legend!",
+        "A hundred! The dragon's impressed. It said so. With smoke. Don't ask."
+      ],
+      "details": [
+        "You earned the biggest rocket. +{xp} XP",
+        "A hundred! Wow! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! Hehe, I kept the sparkler warm!",
+        "Three days! Something's starting. Possibly a parade!"
+      ],
+      "details": [
+        "Coming back is the hard part. Bang! +{xp} XP",
+        "Three in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You really do keep showing up for the party!",
+        "Seven days! I stopped counting. Okay, I didn't. The dragon kept score."
+      ],
+      "details": [
+        "A week of festival nights. +{xp} XP",
+        "Seven nights of fireworks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Nothing stops you, does it? Not even a rainy night!",
+        "Fourteen days! Even the lanterns burn out by day ten!"
+      ],
+      "details": [
+        "Two weeks! Wow! +{xp} XP",
+        "That's a long-burning fuse. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! I don't know what to say. Thanks, lucky one!",
+        "A whole month! You stayed till the last lantern. That means more than I'll admit!"
+      ],
+      "details": [
+        "Thirty nights, thirty bangs. +{xp} XP",
+        "A whole month! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You light the fuses nobody else wants!",
+        "Backing the underdog rocket again! I get it. I really do."
+      ],
+      "details": [
+        "Lighting the quiet ones. +{xp} XP",
+        "Five and still lighting! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You've got a thing for dud fireworks that secretly work!",
+        "Rebel! Yeah. I see it!"
+      ],
+      "details": [
+        "You don't follow the parade, do you? +{xp} XP",
+        "Fifteen underdogs! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! You never light the obvious rocket!",
+        "Thirty! You always light the rocket nobody saw coming!"
+      ],
+      "details": [
+        "Not even the dragon sees you coming. +{xp} XP",
+        "Thirty underdog sparks! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the roof! That's five matches now!",
+        "Early again! That's five first sparks!"
+      ],
+      "details": [
+        "You like a quiet sky. +{xp} XP",
+        "Five early votes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you struck the first match! Impressive!",
+        "Early, over and over! You never wait for the crowd to arrive!"
+      ],
+      "details": [
+        "Fifteen first sparks. +{xp} XP",
+        "Ahead of everyone! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! You like the fuse right to the end, huh?",
+        "Another razor edge! Are your hands shaking? Mine are sparkling!"
+      ],
+      "details": [
+        "Close finishes suit you. +{xp} XP",
+        "Ten tight ones! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! You keep lighting the last fuse!",
+        "Your vote keeps landing right where the finale needs it!"
+      ],
+      "details": [
+        "Twenty-five finales settled. +{xp} XP",
+        "You decide the finale! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You lit the one that was losing. Five times! Stubborn! Brilliant!",
+        "You stay for the whole show, even the fizzly bits. I love that."
+      ],
+      "details": [
+        "Believing in the late bang. +{xp} XP",
+        "Five late bangs backed! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've got a favourite firework!",
+        "That one again? Yeah. It's got extra sparkle."
+      ],
+      "details": [
+        "You know your favourite rocket. +{xp} XP",
+        "Three sparks for the same one! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same one! That's a loyal firework fan!",
+        "Okay, you've bought the whole shed for that one. No returns!"
+      ],
+      "details": [
+        "Loyal to the last spark. +{xp} XP",
+        "Five sparks, one favourite! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a whole shed of fireworks!",
+        "Ten votes, same moment. My lips are sealed. Mostly. Fizz!"
+      ],
+      "details": [
+        "Ten sparks, one target. +{xp} XP",
+        "Obsessed! The dragon respects it! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You're following the whole festival!",
+        "You came back for round two! The second round has the big rockets!"
+      ],
+      "details": [
+        "Keep watching! +{xp} XP",
+        "Two rounds down! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly into the big bangs now!",
+        "Deep in the bracket! Hope you like smoke."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Deep into it! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the last firework!",
+        "Six rounds! You stayed till the last ember! Wow!"
+      ],
+      "details": [
+        "From the first bang to here. +{xp} XP",
+        "All six rounds! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're poking around every stall!",
+        "Ten different matches! Sneaking a peek at every stall, huh?"
+      ],
+      "details": [
+        "Exploring the festival. +{xp} XP",
+        "Ten matches! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been down every alley!",
+        "Twenty-five! You've checked every lantern on the street!"
+      ],
+      "details": [
+        "Every alley covered. +{xp} XP",
+        "Twenty-five lanterns lit! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not browsing, that's a whole festival season!",
+        "Fifty matches! You know this street better than I do!"
+      ],
+      "details": [
+        "A real veteran. +{xp} XP",
+        "Fifty matches! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't leave the roof, can you?",
+        "Five matches back to back! Keep the sparks flying!"
+      ],
+      "details": [
+        "One long night. +{xp} XP",
+        "Five in a row! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Have a dumpling!",
+        "Ten matches in one night! The sparklers are down to stubs!"
+      ],
+      "details": [
+        "Deep dive! +{xp} XP",
+        "Ten at once! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. The best fireworks are after midnight!",
+        "Middle of the night! That's when the loudest bangs happen."
+      ],
+      "details": [
+        "The late show. +{xp} XP",
+        "Midnight voter! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! More lanterns on the street!",
+        "Five shares! You're banging the pots! Good!"
+      ],
+      "details": [
+        "Thanks for filling the roof. +{xp} XP",
+        "Five shares! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically on the festival committee!",
+        "Fifteen! You keep inviting everyone!"
+      ],
+      "details": [
+        "You keep handing out sparklers. +{xp} XP",
+        "Fifteen shares! +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the street got loud! Founding member! Yours forever!",
+        "One of the first thousand on the roof! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever. +{xp} XP",
+        "Nobody can blow that one out. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! Light the big one!",
+        "You climbed a rung! Don't let it go to your head. Or do, I'm busy!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Fireworks!",
+        "Another one: {name}! Bang!"
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Look at all the shiny new fireworks!",
+        "Mastery up! Now we're at the good part of the show!"
+      ],
+      "details": [
+        "{rank}. Suits you. +{xp} XP",
+        "Welcome to {rank}! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a headline rocket!",
+        "Ten long shots! You're a menace to your own rooftop. I love it!"
+      ],
+      "details": [
+        "Loose cannon, festival edition. +{xp} XP",
+        "Ten wild picks! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. Sparklers for everyone!",
+        "Ten tight finishes with her! Don't tell her I cheered!"
+      ],
+      "details": [
+        "Ten close calls. +{xp} XP",
+        "Steady hands! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love steady fuses!",
+        "Seven days of steady aim! Dull! Impressive! Mostly dull!"
+      ],
+      "details": [
+        "A week at her side. +{xp} XP",
+        "Seven days running! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Light the finale! Boom!",
+        "A tied match and you struck the match! Nice!"
+      ],
+      "details": [
+        "The deciding vote. +{xp} XP",
+        "Tie broken! +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Light another"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, in the festival hat? Great choice! Explosive choice! Great!",
+        "Firecracker Jinx! Try to keep up with the dragon!"
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not lit yet! The lanterns are up and I'm sitting on the rocket. Check back soon!",
+      "Shh! Something's about to go bang. I can feel it in my eyebrows.",
+      "Fuse isn't lit for now. Doesn't stop me from stuffing my pockets with sparklers."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, the dragon says it's never easy.",
+      "Watch both. Then light the one that gets under your skin.",
+      "I won't tell anyone which one you lit. Probably. The dragon might.",
+      "Take your time! Actually, don't. My fuse is short.",
+      "Go on, nobody's judging. Okay, the lanterns are. A little.",
+      "Pick the one you'd watch again at 2am from the roof. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's lit a fuse yet. Be first, I dare you!",
+      "Dark sky! Make a spark with a vote.",
+      "Not a single lantern! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still holding the match. Light something!",
+      "The festival night's nearly over. Don't make me chant the countdown. I will, with drums."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Light the fuse before it burns out!",
+      "Tick, tick, fizz. That's the last of your fuse."
+    ],
+    "closing-final": [
+      "Last hour! Light it now, ooh and aah later!",
+      "Any second now. Seriously. Strike the match!"
+    ],
+    "voted-early": [
+      "One of the first sparks in the sky! Bold! I love bold!",
+      "Hardly anybody's lit anything and you picked a rocket anyway. Respect!"
+    ],
+    "voted-ahead": [
+      "Look at you, lighting the crowd favourite! Don't get comfy, fuses burn down.",
+      "{pct}% with you! Good eye. I didn't say that. Forget I said that.",
+      "Your pick's ahead. The whole street's cheering with you for once. Weird, huh?",
+      "{pick} is soaring! Feels good? Hold the match tight!",
+      "Ahead, for now. Skies change. So do crowds."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm looking through the smoke!",
+      "A hair apart. One more spark could flip it. Tell a friend. Tell the neighbours!",
+      "Neck and neck! Your pick needs you and everybody holding a sparkler.",
+      "{pct} to {otherPct}. Somebody's getting singed and it's me, from the nerves."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody cheering at the same volume!",
+      "A perfect tie. Honestly? Rude of the sky."
+    ],
+    "voted-behind": [
+      "You're behind! No sulking on the roof. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog rocket! That's my favourite kind!",
+      "They're ahead. Doesn't make you wrong. Just early to the show!",
+      "Behind by {diff} points. Tell the street. Loudly. Make a bang!",
+      "Everyone's lighting the other fuse. Cool! Stay sparkly."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got a firework eye.",
+      "A win! A sneaky little burst of colour. I'll take it!",
+      "{pick} went through! You called the finale!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it fizzle, then light the next one!",
+      "Didn't make it. I've had soggier nights. So have you. Next one!",
+      "{pick} is out. Sorry. For real. I'll hang a lantern for it."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to set it off and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "Voting's over. You missed this one! There's always another night.",
+      "All done here. {winner} lit up the sky. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first spark! The scary one. Now you're on the roof. Welcome!",
+      "That's your first. Feels small, right? Wait for the bang.",
+      "You're one of the street now. Try not to make it weird!"
+    ],
+    "streak": [
+      "Again? You keep showing up! I'm not complaining. I saved your sparkler.",
+      "{streak} days running! Okay, now I'm watching your lantern.",
+      "Back again! People return when the fireworks are good. Stay!"
+    ],
+    "underdog": [
+      "Lighting the fuse nobody else wants? Ooh. I see you.",
+      "Bold! Everybody else is looking at the other rocket. Love that.",
+      "Underdog, huh? Takes a certain sort of spark. A good sort."
+    ],
+    "early": [
+      "Early! You get to start the show before anyone else lights a thing. Don't waste it!",
+      "Hardly anyone's on the roof yet. Your vote's doing all the heavy lifting.",
+      "First up the ladder! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just nudged the rocket! Feel it? Everything's close right now.",
+      "Razor thin! One more spark and the whole sky flips.",
+      "Close finale! Your vote counts here. Counts like a rocket."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't done. Go fetch the neighbours!",
+      "Not winning yet. Good! Means there's still a finale to light.",
+      "Behind, but the fuse is still burning. Not even close to out!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Fuses burn down fast!",
+      "Winning, for now. Enjoy it. Quietly. Or throw confetti. I don't mind.",
+      "Look at that! Lucky pick. Obviously."
+    ],
+    "default": [
+      "Noted, lucky one! I'm not changing your mind. Not yet.",
+      "Done! That one's on you now.",
+      "Your vote's in. Go see what else is going bang!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't lit a single one yet! Start with whichever one itches.",
+      "Everything's open! Take your pick. I'll pretend I'm not watching from the roof.",
+      "{unvoted} to go. No pressure. Okay, a little powder in the pocket!"
+    ],
+    "live-some": [
+      "{voted} lit, {unvoted} to go! Keep the sparks flying!",
+      "You're in it now! {unvoted} more fuses waiting on you.",
+      "Good start! The rest won't light themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could set off the whole string!",
+      "Almost there! {unvoted} more and the sky's full.",
+      "So close! Don't pack up before the finale!"
+    ],
+    "live-one": [
+      "One left! Just one! Strike the match!",
+      "Last one! Don't leave it unlit!",
+      "One match between you and the grand finale!"
+    ],
+    "live-closing": [
+      "Some of these go out in {timeLeft}! {unvoted} still need your spark. Move it!",
+      "The fuses are short now! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of fuse! Pick, quick!"
+    ],
+    "live-done": [
+      "You've lit everything! Look at you! Go see the bracket!",
+      "Nothing left to light here. Come back when the next round opens!",
+      "All done! That's rare. Thanks, lucky one!"
+    ],
+    "live-none": [
+      "Nothing's lit right now. The night will start again! Go look at the bracket.",
+      "Quiet. Too quiet. The festival's on a break. Check back soon!",
+      "No matches open. The sky's dark and I'm bored already!"
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest get a lantern and a hug!",
+      "Everyone lights up in a group. Not everyone sees the finale.",
+      "Watch the tables. They shift fast!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group get the big rockets.",
+      "No knockout yet. The groups have to burn down first!",
+      "Patience! The knockout builds itself once the groups finish."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and the fuse is out!",
+      "Single elimination! No second matches. Okay, almost none.",
+      "Every match counts more now. Pick carefully. Or don't, I'm not your dragon."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and you're a puff of smoke!",
+      "Follow the bracket. It burns tighter every round!",
+      "Every line here is a match someone lit a fuse for. Ooh."
+    ],
+    "brackets-complete": [
+      "And that's the cup! The grand finale! Thanks for being here!",
+      "It's over! Good run! I'll miss it. A bit. Don't tell the dragon.",
+      "That's the champion! All of it, worth the powder!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's been lit. The fuses are still in the box.",
+      "Empty street! The draw hasn't happened. Soon!",
+      "No lanterns hung yet. Come back later!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no take-backs. Light a fuse on Arcane Moments!",
+      "Two edits are fighting! {a} versus {b}. Come and aim the rocket.",
+      "{a} versus {b} and the street can't agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I lit {pick} over {other}. Come tell me I'm wrong!",
+      "{pick} got my spark. {other} did not. Your turn!",
+      "Lit {pick} over {other} on Arcane Moments. Go on, put it out."
+    ],
+    "early": [
+      "I got one of the first sparks in on {pick} versus {other}! Be quick, the sky's dark.",
+      "Early spark for {pick} over {other}. Come and make it a real festival!",
+      "Nobody's lit much on {pick} versus {other} yet. Fix that!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the rocket. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm peeking through my fingers. Come break it!",
+      "{pick} and {other} are exactly even. Somebody light the finale!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My eyebrows are twitching. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This finale's gonna be loud!",
+      "So close: {pick} versus {other}, {voteDiff} apart. Every spark counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A fizzle, not a fade! Come relight it!",
+      "Down {voteDiff} against {other}, but {pick} isn't done. Help me light it!",
+      "{pick} is {voteDiff} votes short of {other}. Don't leave me holding the match alone!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Someone soaked the powder. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole street, fast!",
+      "{pick} is getting buried by {other}. Rescue party, anyone? Bring sparklers!"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but the margin's thin! Come help hold the fuse.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the fuse go out!",
+      "{pct}% for {pick} against {other}. Close enough to chew my sleeve!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the sky light up, or join in!",
+      "{pick} is crushing {other}, {pct}%! Grab a sparkler before it's over.",
+      "{pct}% for {pick}! {other} never saw the rocket coming."
+    ]
+  }
+}

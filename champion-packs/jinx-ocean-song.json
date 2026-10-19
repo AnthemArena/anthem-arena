@@ -1,0 +1,1338 @@
+{
+  "id": "jinx-ocean-song",
+  "extends": "jinx-original",
+  "name": "Jinx",
+  "displayName": "Ocean Song Jinx",
+  "description": "Voice set for Ocean Song Jinx (skin 65): a pyrotechnic artist who invited herself to the Ocean Song Festival with bombastic tech and chaos as the missing opening act. Stages, fireworks, crowds and encores. Builds on jinx-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is down {voteDiff}! The crowd's gone home before the headliner! Crank every speaker, light every fuse!",
+          "cta": "Crank it up"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Down {voteDiff}? Somebody's booked a worse act than mine. Impossible. Time to raise the volume!",
+          "cta": "Raise the volume"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{voteDiff} behind! The setlist says soft song. I say fireworks first!",
+          "cta": "Fireworks first"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Trailing by {voteDiff}. The crowd's on its phones. Time for a really loud surprise!",
+          "cta": "Surprise them"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Only {voteDiff} behind. One more verse and a bang and they'll sing along!",
+          "cta": "Add a verse"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. Warm-up crowd, that's all. Go vote and I'll light the main stage!",
+          "cta": "Tell the festival"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead even! Two acts, one stage, and the sound desk won't pick. Take the mic and decide!",
+          "cta": "Grab the mic"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart! One! A single cheer brings the whole tent down!",
+          "cta": "Add the cheer"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart! The amps are humming! Somebody's about to blow a fuse!",
+          "cta": "Hold the fuse"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Either a perfect encore or a beautiful catastrophe. I'm booking both!",
+          "cta": "Check the stage"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{userPct}% on {momentTitle}! That's not a win, that's a sold-out stadium! Roll the pyros!",
+          "cta": "Roll the pyros"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}%! The crowd's chanting your name! Soak it in before the next act!",
+          "cta": "Soak it in"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% and climbing! The tent's filling up. Don't unplug yet!",
+          "cta": "Keep playing"
+        },
+        {
+          "condition": "default",
+          "message": "{userPct}%, still ahead. Don't speak. A jinx on the sound check is the worst jinx!",
+          "cta": "Watch the stage"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and just took the main stage! Nobody saw that opening night!",
+          "cta": "Take the stage"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Flipped a {voteDiff}-vote hole! The crowd came running at the final chorus!",
+          "cta": "Hear them roar"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "Clawed back from {voteDiff} behind! Off-key, over-loud, absolutely perfect!",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} just snuck onto the bill without an invitation. Brazen. Beautiful. Very me!",
+          "cta": "See the lineup"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted {momentTitle} too! A fellow gatecrasher! Don't touch my mixing desk, though!",
+        "{username} picked {momentTitle}. Same setlist! I call dibs on the loudest amp.",
+        "{username} is on your side with {momentTitle}. Welcome to the backstage. Wristband's optional!",
+        "{username} backed {momentTitle} as well. Two ticket holders! The festival doesn't stand a chance!",
+        "Same pick as {username}! Two fans, one front row. Share it or get the elbow!",
+        "{username} agrees with you on {momentTitle}. Write it on the poster, it's rare!",
+        "{username} voted {momentTitle}. Two of you! A tiny crowd! The festival's slightly louder!",
+        "{username} has taste and it matches yours. Good ears, both of you!"
+      ],
+      "details": [
+        "Crowd's growing! I'm still the headliner.",
+        "Look at you, singing in a group!",
+        "Don't tell them I like the company.",
+        "A new friend! I'll write them a verse. A very loud one.",
+        "Teamwork! Fine! Quick, before the speakers blow!",
+        "I give it a week before you argue over the playlist.",
+        "New roadie! I'm drawing a lightning bolt on your pass.",
+        "More fans, more noise, I mean votes!"
+      ],
+      "buttons": [
+        "Say hello",
+        "Send a flare",
+        "See the match",
+        "Back them up",
+        "Cheers",
+        "Join the crowd"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} picked {theirMoment} over {yourMoment}? A rival act on my stage! Feedback's coming!",
+        "{username} voted against {yourMoment}. Aww. A heckler! With opinions!",
+        "{username} chose {theirMoment}. Not worried. Just tuning the amps. With menace.",
+        "{username} went for {theirMoment}. New entry on the heckler list!",
+        "{username} is against you on {yourMoment}. Finally, a proper battle of the bands!",
+        "{username} thinks {theirMoment} sounds better. A rival act! Let's see who gets the louder cheer.",
+        "{username} voted against you. Two acts, one stage. Somebody's losing an eyebrow to a firework!",
+        "{username} versus you! I'm grabbing the best speaker stack, snacks, and the big rocket."
+      ],
+      "details": [
+        "I'm not saying sabotage. I'm saying wires are fragile.",
+        "The big rocket wants a word. It's been waiting in the wings.",
+        "They'll learn. Good shows take time and a lot of noise.",
+        "One stage, two acts. Somebody's getting confetti in the face.",
+        "I like them already. They've got volume.",
+        "I don't care. Check the encore. I care a lot.",
+        "A little rivalry keeps the mix sharp!"
+      ],
+      "buttons": [
+        "See the match",
+        "Go and look",
+        "Hit the feedback",
+        "Face them",
+        "Settle it",
+        "Take the stage"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten matches in a row with {username}! You two play like one band! A loud one!",
+        "{username} has agreed with you ten times running. Either harmony or you share a tour bus. Cute!",
+        "Ten straight with {username}! The whole festival's talking about it. By festival I mean me."
+      ],
+      "details": [
+        "Ten! That's a whole set list!",
+        "Don't miss a note now!",
+        "Honestly? Chart-topping.",
+        "Weird. Good weird. Feedback weird."
+      ],
+      "buttons": [
+        "See their profile",
+        "Say hello",
+        "Play together"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches in a row with {username}! That's a legendary duo! I'm sniffling. It's smoke!",
+        "{streakCount} for you and {username}. Perfect rhythm, every time. I'd write a ballad but I'd light it on fire.",
+        "{streakCount} straight with {username}! Somebody give you both a golden record."
+      ],
+      "details": [
+        "I'm speechless and I never stop shouting!",
+        "Is this healthy? Ask the medics. We don't have any!",
+        "That's not luck, that's rhythm."
+      ],
+      "buttons": [
+        "See their profile",
+        "Wow",
+        "Play together"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}! You two keep fighting over the same microphone!",
+        "{username} has disagreed with you ten times running. That's not a heckler, that's a feud!",
+        "Ten sound-offs with {username}. I'm selling front-row spots."
+      ],
+      "details": [
+        "This is the main stage now.",
+        "Spots selling fast!",
+        "The whole festival wants a seat."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Sound off again"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} matches against {username}. Okay, now it's a proper battle of the bands! I LOVE those!",
+        "{streakCount} sound-offs with {username}. Call a truce? Nah. Tune the amps!",
+        "{streakCount} against {username}. That's not a rivalry, that's a whole festival lineup."
+      ],
+      "details": [
+        "Bigger than my last pyrotechnic finale. Almost!",
+        "I'm nervous and a bit proud. And a bit singed.",
+        "One of you has to lose your voice. Neither will."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep sounding off"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't voted! The gates are shutting, fan!",
+        "{timeLeft} left on {matchTitle}. Your cheer's missing from the crowd! Don't miss the show!",
+        "{matchTitle} ends in {timeLeft}. Voting takes ten seconds. I timed it with a drum fill."
+      ],
+      "buttons": [
+        "Vote now",
+        "Beat the curfew"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle} and no vote from you? The countdown's on the big screen, fan! That's a warning!",
+        "Boom, boom, boom! {matchTitle} closes in {timeLeft}. Don't miss the drop!",
+        "{timeLeft} until {matchTitle} closes and you're still in the queue. Get in here!"
+      ],
+      "buttons": [
+        "Vote now",
+        "Fine, heading in"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}! Last song! Light the fuse, then sing!",
+        "{timeLeft}! That's the last chorus on {matchTitle}. Go go go!",
+        "Final encore on {matchTitle}! {timeLeft} left. Stop tuning the guitar and vote!"
+      ],
+      "buttons": [
+        "Last song",
+        "Sing it now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches are about to go dark and you haven't cheered any of them! First one ends in {timeLeft}!",
+        "{matchCount} unvoted matches, all heading offstage. The first one's gone in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Fine, cheering now"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "Zero votes on {matchTitle}! A whole empty field! Somebody has to cheer first!",
+        "Nobody's voted on {moment1} versus {moment2}. Silence. Even the sound check's quiet!",
+        "Brand new match and not a single vote. Somebody has to start the applause. Pick me. Pick you!",
+        "{matchTitle} needs a first cheer. I've got a microphone. I mean, you've got a vote."
+      ],
+      "buttons": [
+        "Start the applause",
+        "Open the gates",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. The emptiest corner of the whole festival!",
+        "Hardly anyone's wandered over here. What's wrong with the poster?",
+        "Low turnout. I blame the weather. And you. Equally. With firecrackers.",
+        "Barely any votes here. Somebody bring more fans!"
+      ],
+      "details": [
+        "Go on, give it a listen.",
+        "It deserves a bigger crowd. So do I.",
+        "Make some noise, whistle loudly!",
+        "Don't be shy. Shy is for the quiet stage. Joking!"
+      ],
+      "ctas": [
+        "Vote",
+        "Join the crowd",
+        "Go on",
+        "Listen in"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is dead level and one vote tips the stage. Funny, I know someone who hasn't cheered. Guess who!",
+        "Perfect tie on {matchTitle}. Two acts, equal volume. I'm looking at you, fan. Hehe!",
+        "Dead even and nobody's applauding. You haven't voted. You're the last cheer in the tent!",
+        "{moment1} and {moment2}, both on the bill, and you've been quiet in the crowd. Fix that!"
+      ],
+      "buttons": [
+        "Cheer loudly",
+        "Be the deciding vote",
+        "Tip the stage",
+        "Choose an act"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the lights are dimming! Last chance to cheer!",
+        "Dead level, almost no time left. You're the only fan who can break it!",
+        "Still tied with the curtain coming down. Pick an act! Do it for the drama!"
+      ],
+      "buttons": [
+        "Pick an act",
+        "Make the call",
+        "Decide it",
+        "Cast the vote"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open! Amps on, fuses lit! {matchCount} new matches!",
+        "{matchCount} fresh matches in round {round}. A whole new lineup to hear!",
+        "Round {round} just started! {matchCount} matches waiting on the stage. Hurry hurry hurry!",
+        "New round! {matchCount} matches! Nobody's safe! Not even the sound crew!"
+      ],
+      "buttons": [
+        "Start listening",
+        "See round {round}",
+        "Hit play",
+        "Show me"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} just advanced! Hit the high note! Called it!",
+        "{momentTitle} beat the competition! Next round's in for a face full of confetti.",
+        "{momentTitle} survived! I never doubted it. Okay, the crew doubted. Just a smidge.",
+        "{momentTitle} is through! Somebody's having a great festival. Hehe, you!",
+        "{momentTitle} moves up and the rest are warm-up acts. Forgotten warm-up acts.",
+        "{momentTitle} won! Good call! Enjoy a cheer from the back row!"
+      ],
+      "details": [
+        "Your pick's still on the bill!",
+        "One act down, lots of lineup left.",
+        "The bracket just shrank. Tidier! Louder!"
+      ],
+      "buttons": [
+        "Cheer loudly",
+        "See the result",
+        "Next act",
+        "On to the next round"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} is out. A bum note on the night. I'll sulk about it later!",
+        "{momentTitle} lost. Everyone who voted against it gets a bag of fizzled sparklers.",
+        "Fine. {momentTitle} is gone. I'll shoot one rocket in its honour. Maybe three.",
+        "{momentTitle} was too loud for this festival anyway. Obviously.",
+        "{momentTitle} is out, and the field went quiet. I hate a quiet field. Somebody bang a drum!",
+        "{momentTitle} didn't make it. Moving on! Not really. Okay, a bit. A tiny, ringing bit."
+      ],
+      "details": [
+        "They'll pay for this. In earplugs.",
+        "It was good. The whole festival knows.",
+        "You'll find another act. Good ones always return for the encore.",
+        "Every set ends. That's what makes the next one loud. It's fine. It's fine!"
+      ],
+      "buttons": [
+        "See the result",
+        "Next act",
+        "Plot a comeback",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still reading the lineup? Pick one! Any one! I'll wait. I'm lying, I'll tune!",
+        "No pressure, but are you gonna vote or just stare at the stage?",
+        "They're all great acts! Pick one! Cheer first, regret later!",
+        "Decisions, decisions. Close your eyes, point at the poster, and hope."
+      ],
+      "details": [
+        "Every vote is a cheer!",
+        "Your opinion matters. Sort of. In a volume way.",
+        "Don't overthink it. Overthinking kills the mood.",
+        "Trust your ears. Mine are mostly ringing."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Cheer",
+        "Go on"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "New fan! Welcome! {liveCount} matches on the bill and every one's a showdown!",
+          "{liveCount} edits battling it out on stage and you just wandered in. Pick an act before they pick you!",
+          "Oooh, a newcomer! Amps are warm, fireworks are loaded, and {liveCount} matches are live. You'll love it.",
+          "No tickets, {liveCount} live matches, and me by the speaker. Welcome to the fun part!"
+        ],
+        "buttons": [
+          "Start voting",
+          "Show me",
+          "Come in",
+          "Light the fuse"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two! You came back! I saved your spot in the front row. Okay, I sat in it. But I saved it.",
+          "Two days running! Look at you, front-row material!",
+          "Back again? Day two! I could get used to this. Don't tell the other acts."
+        ],
+        "buttons": [
+          "Keep going",
+          "More matches"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days! Where were you? I'm not asking because I care. I'm asking because your seat went cold!",
+          "You're back after {days} days! The festival kept playing without you. Mostly explosions.",
+          "{days} days away. I noticed. Your spot felt empty. I'm just saying."
+        ],
+        "buttons": [
+          "Catch up",
+          "Show me"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "Oh, you're back! Good. The festival was getting dull!",
+          "Look who's here! Ready for another set?",
+          "You came back! Let's go blow something up. Musically."
+        ],
+        "buttons": [
+          "Let's go",
+          "Show me"
+        ]
+      }
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "Your first vote! A small cheer. The first note is always the loudest.",
+        "One down. The festival's got a new fan. You!"
+      ],
+      "details": [
+        "First cheer logged. +{xp} XP",
+        "Welcome to the field. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five already? You're staying for the second set! Most fans leave after the opener.",
+        "Five votes! The amps are warm."
+      ],
+      "details": [
+        "Five songs in. +{xp} XP",
+        "Stayed past the opener. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten! You're a regular at my stage now. Stand anywhere. Not there, that's the pyro.",
+        "Ten votes. That's a proper little setlist."
+      ],
+      "details": [
+        "A regular at the stage. +{xp} XP",
+        "Ten acts heard. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes! The whole field knows your voice.",
+        "Twenty-five! Loud and proud, like a megaphone in a tent."
+      ],
+      "details": [
+        "The field knows your voice. +{xp} XP",
+        "Twenty-five cheers. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes! You're properly in the pit now.",
+        "Fifty! Past the gate, past the barrier, right at the speakers."
+      ],
+      "details": [
+        "Front row. +{xp} XP",
+        "Fifty songs. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes! Okay, that's a festival legend. Fireworks for everyone!",
+        "One hundred! They'll tell stories about this. Mostly smoke. Mostly exaggerated."
+      ],
+      "details": [
+        "Festival legend. +{xp} XP",
+        "One hundred songs. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running! You came back! The first fuse is still burning.",
+        "Three days in a row! You've got the rhythm."
+      ],
+      "details": [
+        "Three days at the festival. +{xp} XP",
+        "The fuse hisses on. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A whole week! You show up to the festival even without a ticket. My kind of fan!",
+        "Seven days straight! That's stamina. Boring. Impressive!"
+      ],
+      "details": [
+        "A week of music. +{xp} XP",
+        "Seven days on the field. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "Two weeks! Not even the headliner could stop you!",
+        "Fourteen days! Even I'd lose my voice by now."
+      ],
+      "details": [
+        "Two weeks of noise. +{xp} XP",
+        "Not even a blown speaker stopped you. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days! You've outlasted a few of my fuses!",
+        "A whole month at the festival. Give yourself a medal. I've got a glittery one."
+      ],
+      "details": [
+        "A month on the field. +{xp} XP",
+        "Thirty days of noise. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs! You go against the grain like a guitar against a crowd!",
+        "Five long shots! The poster says no. Your ears say yes."
+      ],
+      "details": [
+        "Off the poster. +{xp} XP",
+        "Five oddballs backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs! You don't follow the lineup either. We should talk. Not about lineups.",
+        "Fifteen picks nobody booked! A true gatecrasher."
+      ],
+      "details": [
+        "Gatecrashing pays. +{xp} XP",
+        "Fifteen oddballs rescued. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs! A dark horse in the dark tent if I ever saw one!",
+        "Thirty! Nobody sees you coming. Not even me, and I'm standing on the speakers."
+      ],
+      "details": [
+        "A dark horse at the festival. +{xp} XP",
+        "Thirty acts nobody booked. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the scene! Five times! You always reach the stage before the sound check does.",
+        "Five early votes! Quick feet!"
+      ],
+      "details": [
+        "Quickest feet. +{xp} XP",
+        "First through the gates. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you cheered first! Not a fan, a talent scout!",
+        "Fifteen early ones! You hear it before the whole field does."
+      ],
+      "details": [
+        "Scouting the stage. +{xp} XP",
+        "Fifteen front-row firsts. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close ones! Fuse on the edge every time!",
+        "Ten photo finishes. You live for the last chord, don't you?"
+      ],
+      "details": [
+        "Close ones suit a headliner. +{xp} XP",
+        "Ten last-chord finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches! Where you go, the final chord follows!",
+        "Your cheer lands right on the final chord. Twenty-five times!"
+      ],
+      "details": [
+        "The deciding cheer. +{xp} XP",
+        "Twenty-five last-second encores. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "You backed the one trailing. Five times! Stubborn like a feedback loop.",
+        "You don't unplug a band because it's flat. I love that."
+      ],
+      "details": [
+        "Faith in the flat note. +{xp} XP",
+        "Five flat acts lifted. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same one, three times! You've found your favourite song!",
+        "That one again? Yeah. It's got a good hook."
+      ],
+      "details": [
+        "Your anthem. +{xp} XP",
+        "Three for the same song. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same one! That's loyalty! Like a fan at the front barrier.",
+        "Okay, you've adopted it. No returns."
+      ],
+      "details": [
+        "Loyal to the last chord. +{xp} XP",
+        "Five cheers, one anthem. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten times! That's not a favourite, that's a repeat button!",
+        "Ten votes for the same one. I won't tell the crew. I am the crew."
+      ],
+      "details": [
+        "Ten plays of the same anthem. +{xp} XP",
+        "Stuck on a hook. Respect. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds in! You hear the whole lineup, even without a pass!",
+        "Round two reached! Still listening!"
+      ],
+      "details": [
+        "Two sets down. +{xp} XP",
+        "Two rounds heard. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds! You're properly deep in the lineup now!",
+        "Deep in the bracket! Hope you like loud places."
+      ],
+      "details": [
+        "Four sets deep. +{xp} XP",
+        "Deep in the festival. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "All the way to round six! You saw the whole festival!",
+        "Six rounds! You never left the field! Wow!"
+      ],
+      "details": [
+        "The full lineup. +{xp} XP",
+        "Every set, all six. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches! You're wandering into every tent!",
+        "Ten different matches! Curious fan, huh?"
+      ],
+      "details": [
+        "Wandering the tents. +{xp} XP",
+        "Ten tents peeked into. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches! You've been behind every stage, every van, every food stall!",
+        "Twenty-five! You've peeked behind every amp stack."
+      ],
+      "details": [
+        "Every stage visited. +{xp} XP",
+        "Twenty-five tents visited. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches! That's not wandering, that's a whole summer of festivals!",
+        "Fifty matches! You know this field better than I do."
+      ],
+      "details": [
+        "A true festival veteran. +{xp} XP",
+        "A full summer. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five in one sitting! Can't leave the front row, can you?",
+        "Five back to back! Keep the speakers humming!"
+      ],
+      "details": [
+        "One long set. +{xp} XP",
+        "Five songs without a break. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go! Take a breath! Rest your ears!",
+        "Ten matches without leaving the pit! Wow!"
+      ],
+      "details": [
+        "Deep session! +{xp} XP",
+        "Ten songs, one session! +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? Yeah. Me too. Midnight is prime fireworks time.",
+        "Middle of the night! That's when the best encores happen."
+      ],
+      "details": [
+        "Night set. +{xp} XP",
+        "A moonlit cheer! +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told people! Thanks! Really! Flares over the whole campsite!",
+        "Five shares! You're calling in the crowd! Good!"
+      ],
+      "details": [
+        "Thanks for bringing in the fans. +{xp} XP",
+        "Five flares sent up. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares! You're basically the festival promoter!",
+        "Fifteen! You've plastered half the festival with posters."
+      ],
+      "details": [
+        "Filling the field. +{xp} XP",
+        "Fifteen flyers handed out. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the crowd! Founding fan! Yours forever!",
+        "One of the first through the gates! That counts, you know!"
+      ],
+      "details": [
+        "Yours forever, with confetti on top. +{xp} XP",
+        "Nobody can unplug that one. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "New rank! Look at you! A shiny new backstage pass!",
+        "Promoted! A louder pass, a bigger stage. Don't let it go to your head!"
+      ],
+      "details": [
+        "{rank}. Pass looks good. +{xp} XP",
+        "You've reached {rank}! Encore! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}! Something's gone bang! In a good way!",
+        "Another one: {name}! Encore, encore!"
+      ],
+      "details": [
+        "{description}. Mixed just right. +{xp} XP",
+        "{description} Encore! +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}! Bigger speakers and brighter pyros!",
+        "Mastery up! Now the festival gets properly loud."
+      ],
+      "details": [
+        "{rank}. Pass looks good. +{xp} XP",
+        "You've reached {rank}! Encore! +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs! Now THAT'S a festival opener worth gatecrashing!",
+        "Ten long shots! Chaos on stage. Brilliant results too."
+      ],
+      "details": [
+        "A loose cannon with great ears. +{xp} XP",
+        "Ten gatecrashes! +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones with Cupcake! Fine, you're good. I'll write her a verse. One.",
+        "Ten tight finishes with her! Don't tell her I hummed her a tune!"
+      ],
+      "details": [
+        "Ten close calls, ten encores. +{xp} XP",
+        "Steady hands, steady beat! +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "A whole week with Cupcake? You must love a quiet festival!",
+        "Seven days with a rule-lover! You're braver than any firework crew!"
+      ],
+      "details": [
+        "A week at the sheriff's side stage. +{xp} XP",
+        "Seven nights of steady lights. +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie! Hit the last chord! Boom!",
+        "A tied match and you took the mic! Nice!"
+      ],
+      "details": [
+        "The cheer that tipped the stage. +{xp} XP",
+        "Tie snapped like a guitar string! +{xp} XP"
+      ],
+      "buttons": [
+        "Next act",
+        "Keep listening"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Oh, it's me, the festival headliner? Good choice. Bad idea. Great choice!",
+        "Ocean Song Jinx! Don't ask about the invitation. Do ask about the finale."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Gates aren't open yet! I'm still wiring the stage. Check back soon?",
+      "Shh! The sound check's about to start. I can feel it in my ribs.",
+      "Backstage is locked for now. Doesn't stop me writing the finale."
+    ],
+    "prevote": [
+      "Two edits, one vote. Easy, right? Hehe, festivals never are.",
+      "Listen to both. Then cheer for the one that rattles your teeth.",
+      "I won't tell the other fans who you picked. Probably. The big screen might.",
+      "Take your time, fan! Actually, don't. The headliner's already warming up.",
+      "Go on, nobody's judging. Okay, the sound engineer is. A little.",
+      "Pick the one you'd shout back at the speakers. You know the one."
+    ],
+    "prevote-empty": [
+      "Nobody's through the gates yet. Be the first fan, I dare you!",
+      "Empty field! Make some noise with a vote.",
+      "Not one soul in the crowd! Lonely! Fix it!"
+    ],
+    "closing-24h": [
+      "Less than a day left and you're still in the car park. Pick an act!",
+      "The festival's nearly over. Don't make me announce the curfew. I will, on the megaphone."
+    ],
+    "closing-3h": [
+      "Hours left. HOURS. Get to the front before the curtain drops!",
+      "Boom, boom, fizz. That's the last of the fireworks counting down."
+    ],
+    "closing-final": [
+      "Last song! Sing now, tune later!",
+      "Any second now. Seriously. Hit the button!"
+    ],
+    "voted-early": [
+      "One of the first through the gates! Bold! I love bold!",
+      "Hardly anybody's here and you picked an act anyway. Respect, fan!"
+    ],
+    "voted-ahead": [
+      "Look at you, cheering for the main-stage favourite! Don't get comfy, headliners fall off.",
+      "{pct}% with you! Great ears. I didn't say that. Forget it.",
+      "Your pick's ahead. The whole field's singing along for once. Odd!",
+      "{pick} is pulling away! Sounds good? Keep the volume steady!",
+      "Ahead, for now. Lineups change. So do moods."
+    ],
+    "voted-close": [
+      "That's close! Annoyingly close! I can't look. I'm peeking through my fingers at the stage!",
+      "A beat apart. One more vote could flip it. Tell a friend. Tell the whole campsite!",
+      "Neck and neck! Your pick needs you and everybody in the tent.",
+      "{pct} to {otherPct}. Something's overheating and it's the amp. Possibly me."
+    ],
+    "voted-tied": [
+      "Dead even! No winner, no loser, everybody holding their breath!",
+      "A perfect tie. Honestly? Rude of the sound desk."
+    ],
+    "voted-behind": [
+      "You're behind! Don't sulk by the bins. I'd sulk, but you shouldn't.",
+      "{pick} is trailing? Underdog act! My favourite kind of band!",
+      "They're ahead. Doesn't make you wrong. Just early to the encore!",
+      "Behind by {diff} points. Tell the campsite. Loudly. Bang a pan!",
+      "Everyone's moshing the other way. Cool! Be the odd fan out."
+    ],
+    "closed-won": [
+      "Your pick won! Of course it did. You've got a festival ear.",
+      "A win! A sneaky little standing ovation of a victory. I'll take it!",
+      "{pick} went through! You called the headliner!"
+    ],
+    "closed-lost": [
+      "Your pick lost. It stings. Let it ring, then get ready for the next one!",
+      "Didn't make it. I've bombed worse. So have you. Next one!",
+      "{pick} is out. Sorry. For real. I'll play it softly in its honour."
+    ],
+    "closed-tied": [
+      "A tie! Somebody had to lose their voice first and nobody did. Ha!"
+    ],
+    "closed-unvoted": [
+      "The stage is closed. You missed this act! There's always another set.",
+      "All done here. {winner} took the encore. Next time, say something!"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first cheer! The scary one. Now you've got a wristband. Welcome!",
+      "That's your first. Feels quiet, right? Wait for the echo.",
+      "You're a festival fan now. Try not to lose your shoes!"
+    ],
+    "streak": [
+      "Again? You keep coming back! I'm not complaining. I kept your wristband.",
+      "{streak} days running! Okay, now I'm putting your name on the poster.",
+      "Back again! Good festivals keep their fans. Stay!"
+    ],
+    "underdog": [
+      "Backing the act nobody's watching? Ooh. I see you, fan.",
+      "Bold! Everyone else is queuing for the headliner. Love that.",
+      "Underdog, huh? Takes a certain kind of ear. A good kind."
+    ],
+    "early": [
+      "Early! You get a front-row spot before the crowd forms. Don't waste it!",
+      "Hardly anyone's here yet. Your vote's doing all the shouting.",
+      "First through the gates! I'm pretending I'm not impressed."
+    ],
+    "close": [
+      "That vote just shifted the stage! Feel it? Everything's close right now.",
+      "Wire-thin! One more fan and the whole tent flips.",
+      "Close one! Your cheer tipped it. Really, truly tipped it."
+    ],
+    "behind": [
+      "{pick} is behind. So? Behind isn't offstage. Go fetch your noisy friends!",
+      "Not winning yet. Good! Means there's still a bridge to write.",
+      "Behind, but the amps are still on. Not even close to done!"
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't get comfy. Crowds are fickle!",
+      "Winning, for now. Enjoy it. Quietly. Or fire a rocket. I don't mind.",
+      "Look at that! You've got an ear. Obviously."
+    ],
+    "default": [
+      "Noted! I'm not changing your set. Not yet.",
+      "Done! That act's on you now, fan.",
+      "Your vote's in. Go and see what else is playing!"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and you haven't cheered for a single one! Start with whichever one sounds best.",
+      "Everything's open! Take your pick. I'll pretend I'm not tuning.",
+      "{unvoted} to go. No pressure. Okay, a little feedback!"
+    ],
+    "live-some": [
+      "{voted} cheered, {unvoted} to go! Keep singing!",
+      "You're in the groove now! {unvoted} more acts waiting on you.",
+      "Good start! The rest won't cheer themselves."
+    ],
+    "live-few": [
+      "Only {unvoted} left! You could hear the whole lineup!",
+      "Almost there! {unvoted} more and the setlist's done.",
+      "So close! Don't put the earplugs in yet!"
+    ],
+    "live-one": [
+      "One left! Just one! Make it loud!",
+      "Last one! Don't leave it unheard!",
+      "One match between you and the afterparty!"
+    ],
+    "live-closing": [
+      "Some of these close in {timeLeft}! {unvoted} still need you. Hurry up!",
+      "The festival clock's loud now! {unvoted} waiting, {timeLeft} left.",
+      "Almost out of stage time! Pick, quick!"
+    ],
+    "live-done": [
+      "You've cheered everything! Look at you! Go and see the bracket!",
+      "Nothing left on your setlist. Come back when the next round opens!",
+      "All done! That's rare. Thanks, fan!"
+    ],
+    "live-none": [
+      "Nothing's live right now. It'll relight! Go look at the bracket.",
+      "Quiet. Too quiet. I'm tapping a cymbal for fun. Check back soon!",
+      "No matches open. I'm bored already. Might juggle fireworks."
+    ],
+    "brackets-groups": [
+      "Groups first! The top two from each go through. The rest, well, pack the van!",
+      "Everyone starts in a small stage. Not everyone leaves one.",
+      "Watch the tables. They shuffle faster than a drum solo!"
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts start soon! The top two from every group move to the main stage.",
+      "No knockout yet. The groups have to finish their sets first!",
+      "Patience! The knockout loads once the groups wrap up."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts now! One loss and you're off the bill!",
+      "Single elimination! No encores. Okay, almost none.",
+      "Every match counts more now. Pick carefully. Or don't, I'm not the promoter."
+    ],
+    "brackets-bracket": [
+      "Round by round! One loss and the lights go out!",
+      "Follow the bracket. It narrows every round, like a pyramid of speakers!",
+      "Every line here is a match someone voted on. Ooh, a setlist."
+    ],
+    "brackets-complete": [
+      "And that's the cup! Thanks for coming to the festival!",
+      "It's over! Good show! I'll miss it. A little. Don't tell the crew.",
+      "That's the champion! The whole lineup, worth it!"
+    ],
+    "brackets-empty": [
+      "No bracket yet! Nothing's been booked. Give it a moment.",
+      "Empty! Nobody's been booked. Soon!",
+      "Nothing on the poster yet. Check back!"
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}? One vote, no refunds. Get a wristband on Arcane Moments!",
+      "Two edits are fighting it out! {a} versus {b}. Come and cheer for your side.",
+      "{a} versus {b} and the whole festival can't agree. Be the tiebreaker!"
+    ],
+    "voted": [
+      "I cheered for {pick} over {other}. Come tell me my ears are broken!",
+      "{pick} got my voice. {other} did not. Your turn!",
+      "Picked {pick} over {other} on Arcane Moments. Go on, heckle me."
+    ],
+    "early": [
+      "I was one of the first through the gates for {pick} versus {other}! Be quick, the field's empty.",
+      "Early vote for {pick} over {other}. Come make it a proper crowd!",
+      "Hardly anyone's listened to {pick} versus {other} yet. Fill the field!"
+    ],
+    "tied": [
+      "{pick} and {other} are dead level! One vote tips the stage. Guess whose!",
+      "Dead tie, {pick} versus {other}. I'm hiding behind the amps. Come break it!",
+      "{pick} and {other} are exactly even. Somebody grab the mic!"
+    ],
+    "nailbiter": [
+      "{pick} and {other} are {voteDiff} votes apart! My earplugs are shaking. Come vote!",
+      "{voteDiff} votes between {pick} and {other}. This encore's gonna be loud!",
+      "Wire-thin: {pick} versus {other}, {voteDiff} apart. Every vote counts now!"
+    ],
+    "losing-close": [
+      "{pick} is {voteDiff} behind {other}. A bum note, not a wipeout! Come turn up the volume!",
+      "Down {voteDiff} against {other}, but {pick} isn't unplugged. Help me out!",
+      "{pick} is {voteDiff} votes short of {other}. Don't make me headline this solo!"
+    ],
+    "losing-bad": [
+      "{pick} is losing to {other} by {voteDiff}! Total feedback. Come even it up!",
+      "Down {voteDiff} on {other}. {pick} needs the whole crowd, fast!",
+      "{pick} is getting drowned out by {other}. Rescue roadie, anyone?"
+    ],
+    "winning-close": [
+      "{pick} leads {other} at {pct}%, but it's tight! Come help me guard the stage.",
+      "{pick} is ahead of {other}, {pct}% to the rest. Don't let the speakers die!",
+      "{pct}% for {pick} against {other}. Close enough to chew a drumstick!"
+    ],
+    "dominating": [
+      "{pick} is at {pct}% against {other}! Come watch the finale, or join in!",
+      "{pick} is flattening {other}, {pct}%! Find your spot before it's over.",
+      "{pct}% for {pick}! {other} never saw the fireworks coming."
+    ]
+  }
+}

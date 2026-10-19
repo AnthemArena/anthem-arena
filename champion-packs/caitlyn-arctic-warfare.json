@@ -1,0 +1,1403 @@
+{
+  "id": "caitlyn-arctic-warfare",
+  "extends": "caitlyn-original",
+  "name": "Caitlyn",
+  "displayName": "Arctic Warfare Caitlyn",
+  "description": "Voice set for Arctic Warfare Caitlyn (skin 4): a sniper on the Arctic front, where the cold is unforgiving and the winds are harsh, with deadly aim and a killer instinct. Tundra, whiteouts, patience, frost and the last shot before the storm. Builds on caitlyn-original.json.",
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "{momentTitle} is {voteDiff} down. A blizzard against us. Bring warmth, and votes.",
+          "cta": "Rally support"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "Thirty or more behind. Send word across the tundra. Every outpost.",
+          "cta": "Spread the word"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "{momentTitle} trails by {voteDiff}. Signal anyone within range of a radio.",
+          "cta": "Share the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "Fifteen-odd short. A cold patch. It will pass.",
+          "cta": "Call for backup"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Down {voteDiff}. Bring company. Nobody should freeze out here alone.",
+          "cta": "Call a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{voteDiff} behind. A few patient shots, and the wind changes.",
+          "cta": "Take a shot"
+        },
+        {
+          "condition": "default",
+          "message": "Down {voteDiff}. A small drift. Clear it before the next squall.",
+          "cta": "Share the match"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "Dead level. One breath, one shot, one vote. Make it count.",
+          "cta": "Take the shot"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "One vote apart. Stop crouching in the snow and fire.",
+          "cta": "Bring a friend"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "{voteDiff} votes apart. The ice is holding by a thread. Bring more.",
+          "cta": "Rally the crew"
+        },
+        {
+          "condition": "default",
+          "message": "{voteDiff} votes between them. The wind decides at the last.",
+          "cta": "Watch it close"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "{momentTitle} holds {userPct}%. A clear sight line. Keep your hands steady.",
+          "cta": "Hold steady"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "{userPct}% and climbing. Don't let the cold get to you.",
+          "cta": "Keep it going"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "{userPct}%. A good position in poor weather. Stay patient.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "{userPct}% behind your pick. We hold the ridge. Keep it.",
+          "cta": "Stay sharp"
+        },
+        {
+          "condition": "default",
+          "message": "Up at {userPct}%. Good. Breathe out. Finish it.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "{momentTitle} was {voteDiff} down and has taken the lead. A thaw at exactly the right moment.",
+          "cta": "Take a bow"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "{voteDiff} behind, now ahead. It turned like the wind.",
+          "cta": "See how"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "Climbed out of a {voteDiff} drift. Impressive in this cold.",
+          "cta": "See the match"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "{momentTitle} was buried. Now it stands above the snow.",
+          "cta": "See the match"
+        },
+        {
+          "condition": "default",
+          "message": "{momentTitle} has pulled ahead. The ice cracked in our favour.",
+          "cta": "See the match"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "{username} voted with you on {momentTitle}. Two shooters, one target.",
+        "{username} chose {momentTitle} as well. A steady eye in this weather.",
+        "{username} agrees with you. Warmth is where you find it.",
+        "Same pick as {username}. A welcome ally in the white.",
+        "{username} stood with {momentTitle}. Well spotted.",
+        "{username} reached the same view. A sound read of the wind.",
+        "{username} is on your side of {momentTitle}. Share the fire.",
+        "{username} made the same call. No radio needed.",
+        "{username} voted {momentTitle}. Welcome to the outpost."
+      ],
+      "details": [
+        "A fellow sniper.",
+        "Two rifles, one sight line.",
+        "Good eyes are rare in a blizzard.",
+        "Keep them close.",
+        "Pleasant, having company in the cold.",
+        "Someone who reads the weather.",
+        "Make room by the fire."
+      ],
+      "buttons": [
+        "Well spotted",
+        "Say thanks",
+        "See the match",
+        "Nod",
+        "Respect",
+        "Fair play",
+        "Cheers"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "{username} voted {theirMoment} against {yourMoment}. A different shot. Let's see whose lands.",
+        "{username} picked {theirMoment}. Different target. Different wind.",
+        "{username} went the other way on {yourMoment}. Mistaken, but patient about it.",
+        "{username} voted against you. I respect a steady rival.",
+        "{username} took {theirMoment}. A bold shot. Possibly a miss.",
+        "{username} opposes {yourMoment}. Very well. The count will tell.",
+        "{username} disagrees on {yourMoment}. Let the snow settle.",
+        "{username} voted the other way. They'll see differently once it clears."
+      ],
+      "details": [
+        "Everyone misreads the wind once.",
+        "A polite disagreement. In the cold.",
+        "The tally has the last word.",
+        "Don't let it chill you.",
+        "A rival keeps the aim sharp.",
+        "They may yet turn.",
+        "At least it's a fair fight."
+      ],
+      "buttons": [
+        "See the match",
+        "Size them up",
+        "Bring it",
+        "Settle it",
+        "Check the votes",
+        "See the numbers",
+        "Fine"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "Ten in a row with {username}. That isn't chance, that's long-range chemistry.",
+        "{username} and you, ten matches, the same call each time. Perfectly in step.",
+        "Ten straight with {username}. I'd share a hide with you.",
+        "A ten-match run with {username}. Not a single miss in the snow.",
+        "Ten for ten with {username}. Remarkable. I'm nearly warm."
+      ],
+      "details": [
+        "Ten shots, ten hits.",
+        "A fine pair.",
+        "Rare in this cold. Look after it.",
+        "Keep the streak going.",
+        "Difficult to better."
+      ],
+      "buttons": [
+        "See their profile",
+        "Well done",
+        "Keep going",
+        "Ten strong",
+        "Respect"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "{streakCount} matches with {username}. No longer a pair, now a whole outpost.",
+        "{streakCount} in a row with {username}. I'd follow you both across any ice.",
+        "{streakCount} matching picks with {username}. Scarcely believable.",
+        "A {streakCount}-match run with {username}. The kind they tell by the fire.",
+        "{streakCount} with {username}. Not one miss. Either of you."
+      ],
+      "details": [
+        "Hard to credit. Yet earned.",
+        "That's trust, forged in the cold.",
+        "I've no words. Only respect.",
+        "Quite untouchable.",
+        "A pair worth remembering."
+      ],
+      "buttons": [
+        "See their profile",
+        "Respect",
+        "Legends",
+        "Keep going",
+        "Well done"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "Ten matches against {username}. A standoff, frozen solid.",
+        "{username} has opposed you ten times running. Both of you are made of ice.",
+        "Ten in a row opposite {username}. Neither will blink.",
+        "A ten-match run against {username}. Stubborn as permafrost.",
+        "Ten times at odds with {username}. I'd watch that from a safe ridge."
+      ],
+      "details": [
+        "Ten rounds, no thaw.",
+        "Talk it through. Or don't.",
+        "A proper standoff.",
+        "Stubbornness keeps you warm.",
+        "Who thaws first?"
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Keep going",
+        "Hold your ground",
+        "Check the record"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "{streakCount} against {username}. That's not a rivalry, that's an ice age.",
+        "{streakCount} in a row opposite {username}. Neither of you gives up a single drift.",
+        "{streakCount} straight disagreements with {username}. Frozen doesn't cover it.",
+        "A {streakCount}-match feud with {username}. Someone should light a fire between you.",
+        "{streakCount} against {username}. I admire the endurance. Do come inside."
+      ],
+      "details": [
+        "Neither of you is thawing.",
+        "Endurance, certainly.",
+        "A glacial grudge.",
+        "Glad I'm not between you.",
+        "The record needs another page."
+      ],
+      "buttons": [
+        "See their profile",
+        "Face them",
+        "Hold your ground",
+        "Keep going",
+        "Respect"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft} and you haven't taken your shot. There's time.",
+        "{timeLeft} left on {matchTitle}. Your vote is missing from the snow.",
+        "{matchTitle} ends in {timeLeft}. I'd like your vote on this one."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick a side",
+        "Take your shot"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "{timeLeft} left on {matchTitle}. The weather's turning. Move.",
+        "{matchTitle} closes in {timeLeft}. Don't make me come and dig you out.",
+        "Only {timeLeft} until {matchTitle} ends. You've gone very still."
+      ],
+      "buttons": [
+        "Vote now",
+        "Moving"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "{matchTitle} closes in {timeLeft}. The storm is almost here.",
+        "{timeLeft} left. Breathe out. Fire.",
+        "Last light on {matchTitle}. {timeLeft}. Squeeze gently."
+      ],
+      "buttons": [
+        "Last chance",
+        "Vote now"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "{matchCount} matches missing your vote will shut soon. The first has {timeLeft} remaining.",
+        "{matchCount} unvoted matches and the sky is darkening. The nearest ends in {timeLeft}."
+      ],
+      "buttons": [
+        "Show me",
+        "Get it done"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "No votes on {matchTitle}. Someone must leave the first tracks.",
+        "{moment1} against {moment2} and not a single shot. I'll wait. Briefly.",
+        "A new match, untouched snow. Be first across it.",
+        "{matchTitle} is unmarked. Take the first shot."
+      ],
+      "buttons": [
+        "Go first",
+        "Be first",
+        "Break the snow",
+        "Open it up"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "Round {round} is open. {matchCount} new targets in the white.",
+        "{matchCount} matches have opened in round {round}. The thaw begins.",
+        "Round {round} is live, with {matchCount} targets to scope.",
+        "A new round. {matchCount} matches. Find your shots.",
+        "Round {round}: {matchCount} matches awaiting your aim."
+      ],
+      "buttons": [
+        "Start round {round}",
+        "Advance",
+        "Take cover",
+        "Show me",
+        "Do it"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "{momentTitle} won. Clean through the snow.",
+        "{momentTitle} is through. A fine shot.",
+        "{momentTitle} won it. Rightly so.",
+        "{momentTitle} won, and without a flinch.",
+        "{momentTitle} advances. One target down.",
+        "{momentTitle} moves on. Steady hands."
+      ],
+      "details": [
+        "A clean hit.",
+        "One down, more in the white.",
+        "Earned in full.",
+        "Without fault."
+      ],
+      "buttons": [
+        "Steady",
+        "Next match",
+        "Keep going",
+        "Onward"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "{momentTitle} lost. A cold result.",
+        "{momentTitle} is out. Not the outcome I'd aimed for.",
+        "{momentTitle} didn't make it. Pull your collar up.",
+        "{momentTitle} went down standing. That counts.",
+        "{momentTitle} is out. Warm your hands. Return.",
+        "{momentTitle} lost this round. A hard frost. Not winter.",
+        "{momentTitle} was eliminated. More targets lie ahead."
+      ],
+      "details": [
+        "Not every shot lands.",
+        "It held out to the end.",
+        "More weather is coming.",
+        "Accept it. Move on."
+      ],
+      "buttons": [
+        "Next match",
+        "Regroup",
+        "Keep going",
+        "See the result"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "Welcome to the tundra. {liveCount} matches are open. Choose one.",
+          "A new arrival. {liveCount} matches are live. Come in from the cold.",
+          "You're ahead of the thaw. {liveCount} matches need a decision.",
+          "{liveCount} matches are open. Pick your side of the ridge.",
+          "Welcome. {liveCount} matches. Mind the ice."
+        ],
+        "buttons": [
+          "Let's go",
+          "Begin",
+          "Show me",
+          "Take cover",
+          "Ready"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "Day two. You came back through the snow. Good.",
+          "Two days in a row. Heartening.",
+          "A second day out in the cold. I noticed."
+        ],
+        "buttons": [
+          "Keep going",
+          "Let's go",
+          "Show me"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "{days} days away. I'd feared the cold had taken you.",
+          "After {days} days you return. Better late than buried.",
+          "{days} days. I'd begun to think the snow had claimed you. I'm glad it hadn't.",
+          "{days} days away. The drifts have shifted."
+        ],
+        "buttons": [
+          "I'm back",
+          "Catch up",
+          "Show me",
+          "Let's go"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "You're back. Good.",
+          "Welcome back. Let's get to work.",
+          "Back already. Steady.",
+          "Ah. There you are."
+        ],
+        "buttons": [
+          "Let's go",
+          "Keep going",
+          "Show me",
+          "Do it"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural}. A very quiet tundra.",
+        "Few shooters out here. That should change.",
+        "Low turnout. The cold keeps them indoors. Come out anyway.",
+        "Hardly anyone's taken a look. Someone should."
+      ],
+      "details": [
+        "It needs more watchers.",
+        "Every shot counts in empty country.",
+        "Yours counts for more on this stretch.",
+        "Don't let it freeze over."
+      ],
+      "ctas": [
+        "Vote",
+        "Weigh in",
+        "Add your vote",
+        "See the match"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied and you haven't voted. The deciding shot is yours.",
+        "Dead level on {matchTitle}. A single shot breaks the ice.",
+        "A tie. Someone must fire. Let it be you.",
+        "{moment1} and {moment2}, frozen in place. Choose."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Pick a side",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "Still tied and the weather is closing in. One last shot.",
+        "Level, with the storm arriving. Vote.",
+        "Tied, and almost out of time. Please don't leave it frozen."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it",
+        "Cast the vote",
+        "Decide it"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deliberating? The wind won't wait forever.",
+        "Don't dwell on it. Choose and hold your aim.",
+        "Each deserves a look through the scope. Trust your eye.",
+        "You've watched from the ridge long enough. Descend."
+      ],
+      "details": [
+        "Every shot counts.",
+        "Trust your aim.",
+        "No wrong target. Only costly ones.",
+        "Just decide."
+      ],
+      "buttons": [
+        "Vote now",
+        "Choose one",
+        "Decide",
+        "Cast your vote"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "First shot taken. Welcome to the cold.",
+        "You chose a target. A fine start."
+      ],
+      "details": [
+        "One in the log. +{xp} XP",
+        "The first of many, I think. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "Five votes. You're finding your range in the wind.",
+        "Five. No longer a stranger to the snow."
+      ],
+      "details": [
+        "A steady opening. +{xp} XP",
+        "Warming to the work. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "Ten votes. The outpost knows your boots.",
+        "Ten. You've earned a spot by the fire."
+      ],
+      "details": [
+        "A dependable shot. +{xp} XP",
+        "Ten on the board. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "Twenty-five votes. Your voice carries across the ice.",
+        "Twenty-five. The tundra is listening."
+      ],
+      "details": [
+        "Heard over the wind. +{xp} XP",
+        "Twenty-five shots down the range. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Louder"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "Fifty votes. Well into the white.",
+        "Fifty. You clearly care. That keeps a person warm."
+      ],
+      "details": [
+        "Fifty logged. +{xp} XP",
+        "Deep in the snowfields. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "A hundred votes. They'll tell tales about it in the barracks.",
+        "One hundred. Remarkable. I'll say it only once."
+      ],
+      "details": [
+        "Earned in the cold. +{xp} XP",
+        "A hundred. Stand against the wind. +{xp} XP"
+      ],
+      "buttons": [
+        "Take a bow",
+        "Next match"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "Three days running. A fire catches.",
+        "Three days on the ridge. Dependable."
+      ],
+      "details": [
+        "Turning up is the hard part. +{xp} XP",
+        "Three days of snow. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep it up",
+        "Next match"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "A full week. That's endurance.",
+        "Seven days running. Hardy."
+      ],
+      "details": [
+        "A week without a gap in the watch. +{xp} XP",
+        "Seven mornings in the cold. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep rolling",
+        "Next match"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "A fortnight. You've never left the ridge.",
+        "A fortnight in the snow. Extraordinary."
+      ],
+      "details": [
+        "A fortnight at the ridge. +{xp} XP",
+        "That is true resolve. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Steady"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "Thirty days. Thank you. I mean it.",
+        "A month at your post. That says a great deal."
+      ],
+      "details": [
+        "Thirty days of frost and grit. +{xp} XP",
+        "A full month in the freeze. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "Five underdogs. You favour what the cold forgot.",
+        "Five unlikely picks. I like that."
+      ],
+      "details": [
+        "Against the drift. +{xp} XP",
+        "Five stragglers championed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "Fifteen underdogs. You walk into the wind deliberately.",
+        "Fifteen. You answer to nobody's weather report."
+      ],
+      "details": [
+        "Always your own bearing. +{xp} XP",
+        "Fifteen votes against the gale. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Carry on"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "Thirty underdogs. No scout can read your tracks.",
+        "Thirty. The long shot is your whole discipline."
+      ],
+      "details": [
+        "Unpredictable. +{xp} XP",
+        "Thirty votes for the one lagging. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "First on the ridge five times. Quick off the mark.",
+        "Five times you beat the others to the hide."
+      ],
+      "details": [
+        "You arrive before the sun. +{xp} XP",
+        "Five votes before the rest. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "Fifteen matches where you led the way. Decisive.",
+        "Always first out into the snow."
+      ],
+      "details": [
+        "Fifteen votes ahead of the pack. +{xp} XP",
+        "Ahead of the whole patrol. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "Ten close matches. You keep your hands warm under pressure.",
+        "Another narrow one. Your nerve is frozen steel."
+      ],
+      "details": [
+        "Tension suits you. +{xp} XP",
+        "Ten photo finishes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "Twenty-five close matches. Your vote keeps tipping the ice.",
+        "You've cracked more than one freeze."
+      ],
+      "details": [
+        "Twenty-five finishes by a whisker. +{xp} XP",
+        "You break the freeze. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "Five times you held with the one behind. Stubborn. Approved.",
+        "You never leave a side stuck in a drift. Honourable."
+      ],
+      "details": [
+        "Faith in a late thaw. +{xp} XP",
+        "Five turnarounds you read early. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "Same moment, three times. Someone has a favourite hide.",
+        "That one again? It must be a good view."
+      ],
+      "details": [
+        "You know your mark. +{xp} XP",
+        "One target, three shots. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "Five votes for the same moment. That's staying power.",
+        "You won't leave that one. I understand."
+      ],
+      "details": [
+        "Loyal through the blizzard. +{xp} XP",
+        "One favourite, five shots. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "Ten shots at the same moment. That's fixation.",
+        "Ten times, the same target. I won't comment. Much."
+      ],
+      "details": [
+        "Ten on one mark. +{xp} XP",
+        "Devoted. Or snow-blind. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "Two rounds. You're holding your bearing.",
+        "Round two and still out here. Good."
+      ],
+      "details": [
+        "Further across the ice. +{xp} XP",
+        "Two rounds in. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "Four rounds. Deep into the whiteout.",
+        "Deep in the bracket. The wind grows harsher now."
+      ],
+      "details": [
+        "Four rounds in. +{xp} XP",
+        "Far from the first camp. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "Six rounds. You crossed the whole tundra.",
+        "All the way. You never turned back."
+      ],
+      "details": [
+        "First flake to final shot. +{xp} XP",
+        "Six rounds. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "Ten matches. You've covered a lot of ice.",
+        "Ten different matches. Thorough scouting. Good."
+      ],
+      "details": [
+        "Charting the whole bracket. +{xp} XP",
+        "Ten ridges surveyed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "Twenty-five matches. You've seen every valley.",
+        "Twenty-five. Not a drift left unchecked."
+      ],
+      "details": [
+        "Every ridge scouted. +{xp} XP",
+        "Twenty-five fields studied. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "Fifty matches. That isn't a visit, that's a winter posting.",
+        "Fifty. You know this bracket better than the maps do."
+      ],
+      "details": [
+        "A true veteran of the cold. +{xp} XP",
+        "Fifty matches deep. +{xp} XP"
+      ],
+      "buttons": [
+        "Respect",
+        "Next match"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "Five without a pause. A long cold watch.",
+        "Five back to back. Do warm your hands."
+      ],
+      "details": [
+        "One long watch. +{xp} XP",
+        "Five straight. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep going",
+        "Next match"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "Ten in one go. A hard stretch of cold.",
+        "Ten in one sitting. That's hardiness."
+      ],
+      "details": [
+        "A marathon watch. +{xp} XP",
+        "Ten in one go. +{xp} XP"
+      ],
+      "buttons": [
+        "Breathe",
+        "Next match"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "Voting at this hour? On watch, or just sleepless?",
+        "The dead of the night. Duty, or restlessness. I know both."
+      ],
+      "details": [
+        "The long polar night suits you. +{xp} XP",
+        "A vote in the dark. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Get some rest"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "You told others. Thank you.",
+        "Five shares. More shooters, more strength."
+      ],
+      "details": [
+        "Much appreciated. +{xp} XP",
+        "Five signals sent. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "Fifteen shares. You're practically a radio operator.",
+        "Fifteen. You keep calling them in from the cold. Splendid."
+      ],
+      "details": [
+        "Still signalling. +{xp} XP",
+        "Fifteen signals broadcast. +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "You were here before the first thaw. A founding member, always.",
+        "One of the first thousand. That can't be erased."
+      ],
+      "details": [
+        "That is yours to keep. +{xp} XP",
+        "No one takes that from you. +{xp} XP"
+      ],
+      "buttons": [
+        "See the badge",
+        "Show me"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "A new rank. Hard-earned.",
+        "Promoted. Wear it lightly."
+      ],
+      "details": [
+        "{rank}. It suits you.",
+        "Welcome to {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View progress",
+        "Show me"
+      ]
+    },
+    "default": {
+      "messages": [
+        "Achievement unlocked: {name}. Bravely won.",
+        "Another mark for the logbook: {name}."
+      ],
+      "details": [
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP"
+      ],
+      "buttons": [
+        "View achievements",
+        "See all"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "{rank}. Entirely deserved.",
+        "You've put in the cold hours and it shows."
+      ],
+      "details": [
+        "{rank}. Suits you.",
+        "Reached {rank}. +{xp} XP"
+      ],
+      "buttons": [
+        "View champions",
+        "Show me"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "Ten underdogs. Reckless. I know the type.",
+        "Ten long shots. Not easily chilled."
+      ],
+      "details": [
+        "Ten shots against the odds. +{xp} XP",
+        "Impossible distances are your speciality. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "Ten close ones. You share my steady hands.",
+        "Ten tight finishes. I'm privately pleased."
+      ],
+      "details": [
+        "Ten photo finishes. +{xp} XP",
+        "Steady aim in a bitter wind. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "Seven days straight. A true eye.",
+        "Seven days, not a miss. Well shot."
+      ],
+      "details": [
+        "A week of cold precision. +{xp} XP",
+        "Seven days running. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "You broke the tie. One breath, one shot.",
+        "A frozen stalemate, and you cracked it. Splendid."
+      ],
+      "details": [
+        "The shot that decided it. +{xp} XP",
+        "Deadlock broken. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Keep going"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "Caitlyn, in position. Stay low and keep warm.",
+        "Caitlyn is yours now. Do try to keep up in this cold."
+      ],
+      "details": [
+        "{rank}",
+        "{rank} · your champion"
+      ],
+      "buttons": [
+        "View champions",
+        "Let's go"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "Not open yet. Wait for the weather to clear.",
+      "Voting isn't open yet. I'll flash a signal when it is.",
+      "Not yet. Patience is half of marksmanship."
+    ],
+    "prevote": [
+      "Two edits and one shot. Scope them both first.",
+      "Observe them both before you commit. No guessing in this wind.",
+      "I'll keep my preference to myself. The shot is yours.",
+      "Take your time. A steady shot beats a fast one.",
+      "Choose the one you can stand behind."
+    ],
+    "prevote-empty": [
+      "No votes yet. Leave the first tracks.",
+      "Quiet so far. Someone has to break the hush.",
+      "Not one shot fired. Make the first."
+    ],
+    "closing-24h": [
+      "Under a day left and no vote from you. Move.",
+      "The clearing is closing. Commit."
+    ],
+    "closing-3h": [
+      "Three hours or less. Decide.",
+      "Time is short. Vote before the storm."
+    ],
+    "closing-final": [
+      "The final hour. Vote now.",
+      "Minutes left. Fire."
+    ],
+    "voted-early": [
+      "You voted early with hardly anyone here. First in the snow.",
+      "Hardly a vote in the snow and you'd already chosen. Firm."
+    ],
+    "voted-ahead": [
+      "Your pick is ahead. Good. The weather can still turn.",
+      "{pct}% back you. A firm footing.",
+      "Ahead for now. Winds shift.",
+      "{pick} is edging forward. Nicely read.",
+      "A lead is a lead. Stay low."
+    ],
+    "voted-close": [
+      "That's close. Far too close.",
+      "Razor-thin. One more vote tips it. Send a signal.",
+      "Dead heat. Your pick wants an ally.",
+      "{pct} to {otherPct}. Hold your breath."
+    ],
+    "voted-tied": [
+      "Perfectly level. Neither holds the ridge.",
+      "Dead level in the snow. Frustrating. Quite thrilling."
+    ],
+    "voted-behind": [
+      "You're trailing. That alone doesn't make you wrong.",
+      "{pick} is lagging. An underdog. I've been there.",
+      "They lead. You aren't wrong, only outnumbered.",
+      "Trailing by {diff} points. Signal everyone you can reach.",
+      "Most went the other way. Crowds misjudge wind."
+    ],
+    "closed-won": [
+      "Your pick won. A sound call.",
+      "A win. Hard-earned.",
+      "{pick} went through. You read the wind rightly."
+    ],
+    "closed-lost": [
+      "Your pick lost. A pity. It was a decent target.",
+      "It fell short. The cold takes some. Carry on.",
+      "{pick} is out. I'm sorry."
+    ],
+    "closed-tied": [
+      "A draw. Neither side lost a foot of snow."
+    ],
+    "closed-unvoted": [
+      "The window shut and you missed this one. Others will come.",
+      "The match is over. {winner} took it. Next time, shoot sooner."
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "Your first vote. Welcome. Nobody's first shot is steady.",
+      "That's your first shot. It steadies. I assure you.",
+      "You're one of the outpost now. Welcome."
+    ],
+    "streak": [
+      "Back on the ridge. Good.",
+      "{streak} days on the ridge. I see you keeping watch.",
+      "You keep coming back to the ridge. I value that."
+    ],
+    "underdog": [
+      "You chose the one nobody else would. I noticed.",
+      "A hard choice. A good one.",
+      "The trailing side. That takes some nerve."
+    ],
+    "early": [
+      "Early. You reached the ridge before the rest.",
+      "Little traffic so far. Your shot would be noticed.",
+      "First to reach the ridge. Well done."
+    ],
+    "close": [
+      "That vote moved the ice. It's balanced finely.",
+      "A sliver. One more vote turns it.",
+      "A near thing. Your vote could tip the ice."
+    ],
+    "behind": [
+      "{pick} is trailing. Trailing isn't dead. Send for help.",
+      "Not ahead yet. Still ground to cross.",
+      "Behind, not buried. There's a difference."
+    ],
+    "ahead": [
+      "{pick} is ahead. Don't ease off. The wind shifts.",
+      "In front for the moment. Don't trust it.",
+      "It appears you chose well."
+    ],
+    "default": [
+      "Noted. I won't argue. Yet.",
+      "Done. Your decision.",
+      "Your vote is logged. There's more country to cover."
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "{unvoted} matches and not a shot yet. Begin with the one you read best.",
+      "Every target is in sight. Choose. I won't hurry you.",
+      "{unvoted} remaining. No pressure. A little, maybe."
+    ],
+    "live-some": [
+      "{voted} fired, {unvoted} still to go. Keep walking.",
+      "You've begun. {unvoted} still lie ahead.",
+      "A fair beginning. The drifts won't shift themselves."
+    ],
+    "live-few": [
+      "{unvoted} left. Finish before the light fades.",
+      "Almost across. {unvoted} left.",
+      "Close. Don't lose focus now."
+    ],
+    "live-one": [
+      "One left. Only one.",
+      "One match left in the snow. Don't abandon it.",
+      "A single match between you and a clean sweep of the snow."
+    ],
+    "live-closing": [
+      "A few shut within {timeLeft}. {unvoted} are still waiting on you.",
+      "Time is thinning. {unvoted} left, {timeLeft} to go.",
+      "The storm is coming. Do hurry."
+    ],
+    "live-done": [
+      "Every match covered. Well done. Survey the bracket.",
+      "Your list is clear. Come back when the next round opens.",
+      "Every match cleared. Uncommon. Well done."
+    ],
+    "live-none": [
+      "No match is live right now. It will come back. Study the bracket while it's quiet.",
+      "Quiet across the ice. Check back soon.",
+      "No matches open. I'm as stiff with waiting as you."
+    ],
+    "brackets-groups": [
+      "Groups are first. Two per group cross over. The remainder stay in the snow.",
+      "All start in a group. Few cross the ice beyond it.",
+      "Mind the standings. They drift fast."
+    ],
+    "brackets-knockout-soon": [
+      "Knockouts approach. Two from each group make the crossing.",
+      "No knockout stage yet. The groups are still out in the snow.",
+      "Be patient. The knockout thaws out once the groups end."
+    ],
+    "brackets-knockout-live": [
+      "Knockouts are live. Lose once and you're left in the cold.",
+      "One loss ends it. The cold gives no second tries.",
+      "Each match is colder now. Choose wisely."
+    ],
+    "brackets-bracket": [
+      "Stage by stage. Lose once and it's over.",
+      "Trace the bracket. It narrows with every freeze.",
+      "Each line here is a match that someone sighted."
+    ],
+    "brackets-complete": [
+      "The cup is complete. Thank you for braving the cold with me.",
+      "It's done. A hard season. I'll miss the quiet.",
+      "We have a champion. A fitting end to the season."
+    ],
+    "brackets-empty": [
+      "No bracket on the map. Nothing has been charted.",
+      "Blank snow. The draw hasn't been made yet.",
+      "Bare snow for now. Look in again later."
+    ]
+  },
+  "share": {
+    "invite": [
+      "{a} or {b}. A single shot decides it. Choose.",
+      "{a} against {b}: two edits, one shot. Take it.",
+      "{a} versus {b}. Join the watch and give me your view."
+    ],
+    "voted": [
+      "My shot goes to {pick} over {other}. Where's yours?",
+      "{pick} gets my shot over {other}. Convince me otherwise.",
+      "I picked {pick} over {other}. Would you shoot differently?"
+    ],
+    "early": [
+      "Among the first shots for {pick} against {other}. More are needed.",
+      "I called {pick} over {other} early. Add your shot.",
+      "{pick} against {other}, barely a shot fired. Yours would matter."
+    ],
+    "tied": [
+      "{pick} and {other} are even. One shot ends it.",
+      "{pick} and {other} are frozen level. Break the ice.",
+      "{pick} and {other} are frozen together. Your shot can split them."
+    ],
+    "nailbiter": [
+      "{voteDiff} votes between {pick} and {other}. Every one counts.",
+      "{voteDiff} votes lie between {pick} and {other}. Fire yours.",
+      "{voteDiff} separate {pick} and {other}. The wind could favour either."
+    ],
+    "losing-close": [
+      "{voteDiff} divide {pick} from {other}. A few shots flip it.",
+      "{pick} sits {voteDiff} under {other}, still fighting. Lend it your vote.",
+      "{pick} is {voteDiff} short of {other}. Still recoverable. Vote."
+    ],
+    "losing-bad": [
+      "{other} leads {pick} by {voteDiff}. It needs a vote or two.",
+      "{voteDiff} adrift of {other}. {pick} deserves better weather. Vote.",
+      "{other} has {pick} down by {voteDiff}. Let's thaw this."
+    ],
+    "winning-close": [
+      "{pick} has {pct}% over {other}, narrowly. Help it hold the ridge.",
+      "{pick} is up on {other}, {pct}%. Not safe yet. Vote.",
+      "{pick} has {pct}% against {other}. A sliver."
+    ],
+    "dominating": [
+      "{pick} leads {other} on {pct}%. Come and see what the fuss is.",
+      "{pick} holds {pct}%. {other} is lost in the drift.",
+      "{pick} is far ahead of {other}, {pct}%. Add your shot."
+    ]
+  }
+}
