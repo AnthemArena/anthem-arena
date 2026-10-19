@@ -4,6 +4,7 @@
 
 import { 
     ACHIEVEMENTS, 
+    achievementCompletion,
     ACHIEVEMENT_CATEGORIES,
     getRarityColor,
     getRarityGlow,
@@ -11,6 +12,8 @@ import {
 } from './achievements.js';
 import { addXP } from './rank-system.js';
 import { streakFromVotes } from './xp-ledger.js';
+import { factsOf, backedWinner } from './vote-facts.js';
+import { recordProgress } from './vote-progress.js';
 import { ddragonUrl } from './arcane-config.js';
 
 // ========================================
@@ -201,30 +204,55 @@ export async function checkFoundingMemberStatus() {
 // Champion-specific stats count the votes cast while that companion was active (older votes without one count as Jinx, like
 // the Champions tab does). Account-wide ones (underdogs, ties) count every vote. "Tied" = the match was exactly tied
 // (10+ votes) when the vote was cast.
+export function championStats(allVotes) {
+    const out = {};
+    for (const v of allVotes) {
+        const id = v.championId || 'jinx';
+        (out[id] ||= []).push(v);
+    }
+    return Object.fromEntries(Object.entries(out).map(([id, votes]) => [id, {
+        votes: votes.length,
+        underdogVotes: votes.filter(v => factsOf(v).underdog).length,
+        closeVotes: votes.filter(v => factsOf(v).close).length,
+        againstTideVotes: votes.filter(v => factsOf(v).againstTide).length,
+        backedWinners: votes.filter(backedWinner).length,
+        underdogDays: new Set(votes.filter(v => factsOf(v).underdog).map(v => new Date(v.timestamp).toISOString().slice(0, 10))).size,
+        earlyVotes: votes.filter(v => factsOf(v).early).length,
+        decidingVotes: votes.filter(v => factsOf(v).tiedBefore).length,
+        streak: streakFromVotes(votes)
+    }]));
+}
+
 export function companionStats(allVotes) {
     const by = id => allVotes.filter(v => (v.championId || 'jinx') === id);
     return {
-        caitlynCloseVotes: by('caitlyn').filter(v => v.voteType === 'closeCall').length,
+        caitlynCloseVotes: by('caitlyn').filter(v => factsOf(v).close).length,
         caitlynStreak: streakFromVotes(by('caitlyn')),
-        decidingVotes: allVotes.filter(v => v.tiedBefore).length
+        decidingVotes: allVotes.filter(v => factsOf(v).tiedBefore).length
     };
 }
 
 export async function calculateAchievementStats(allVotes) {
+    // Founding member status comes from Firebase; everything else is worked out from the votes (computeVoteStats)
+    const isFoundingMember = await checkFoundingMemberStatus();
+    return computeVoteStats(allVotes, { isFoundingMember });
+}
+
+// Pure (no Firebase): every number the achievements read, from the vote history.
+export function computeVoteStats(allVotes, { isFoundingMember = false } = {}) {
 
     // ✅ Track votes in current session
-    const sessionStart = parseInt(sessionStorage.getItem('sessionStart') || Date.now());
+    let sessionStart = parseInt(sessionStorage.getItem('sessionStart'));
+    if (!Number.isFinite(sessionStart)) { sessionStart = Date.now(); try { sessionStorage.setItem('sessionStart', String(sessionStart)); } catch (e) {} }
     const votesThisSession = allVotes.filter(v => v.timestamp >= sessionStart);
 
-    // Check founding member status from Firebase
-    const isFoundingMember = await checkFoundingMemberStatus();
-  
     const stats = {
         totalVotes: allVotes.length,
-        underdogVotes: allVotes.filter(v => v.voteType === 'underdog').length,
-        closeMatchVotes: allVotes.filter(v => v.voteType === 'closeCall').length,
-        earlyVotes: 0,
-        votingStreak: parseInt(localStorage.getItem('votingStreak') || '0'),
+        // All of these read what was true when the vote was cast (see vote-facts.js), not how the match stands now
+        underdogVotes: allVotes.filter(v => factsOf(v).underdog).length,
+        closeMatchVotes: allVotes.filter(v => factsOf(v).close).length,
+        earlyVotes: allVotes.filter(v => factsOf(v).early).length,
+        votingStreak: streakFromVotes(allVotes),           // from the vote days themselves (the saved counter was reset by every vote)
         furthestRound: Math.max(...allVotes.map(v => v.round), 0),
         roundsParticipated: new Set(allVotes.map(v => v.round)).size,
         uniqueMatches: new Set(allVotes.map(v => v.matchId)).size,
@@ -235,22 +263,15 @@ export async function calculateAchievementStats(allVotes) {
         sharesCount: parseInt(localStorage.getItem('sharesCount') || '0'),
         uniqueArtists: 0,
         uniqueYears: 0,
-        comebackVotes: 0,
+        comebackVotes: allVotes.filter(v => factsOf(v).againstTide).length,   // "Against the Tide": backed the edit that was behind 60-40
         isFoundingMember: isFoundingMember,
         votesInSession: votesThisSession.length,
+        byChampion: championStats(allVotes),   // per-champion numbers for champion achievements (js/champion-achievements)
         ...companionStats(allVotes)
     };
   
   
 
-  
-    // Calculate early votes (match had <10 votes when user voted)
-    stats.earlyVotes = allVotes.filter(v => {
-        const match = v.match;
-        if (!match) return false;
-        const totalAtTimeOfVote = (match.song1?.votes || 0) + (match.song2?.votes || 0);
-        return totalAtTimeOfVote <= 10;
-    }).length;
   
     // Calculate late night votes (midnight to 5am)
     stats.lateNightVotes = allVotes.filter(v => {
@@ -258,15 +279,12 @@ export async function calculateAchievementStats(allVotes) {
         return hour >= 0 && hour < 5;
     }).length;
   
-    // Calculate comeback votes (voted for song that was losing <40%)
-    stats.comebackVotes = allVotes.filter(v => {
-        return v.votedSongPercentage < 40;
-    }).length;
-  
     // Calculate max votes for a single song
     const songVoteCounts = {};
     allVotes.forEach(v => {
-        const songId = v.votedForSeed || v.votedForName;
+        // The edit itself: its video id, else its name. A seed alone is only a rank inside one cup, so two different edits
+        // (seed 5 in two cups) must not count as one.
+        const songId = v.votedForVideoId || v.votedForName || (v.votedForSeed != null ? `seed:${v.votedForSeed}` : null);
         if (songId) {
             songVoteCounts[songId] = (songVoteCounts[songId] || 0) + 1;
         }
@@ -304,7 +322,15 @@ export async function calculateAchievementStats(allVotes) {
  * @param {Object} context - Context for when this is being called (e.g., { afterVote: true })
  * @returns {Object} - Achievement status
  */
-export async function checkAchievements(allVotes, context = {}) {
+let _awardChain = Promise.resolve();
+export function checkAchievements(allVotes, context = {}) {
+    // One check at a time: two overlapping checks (vote + share) would each see the same achievement as new and toast it twice.
+    const run = _awardChain.then(() => _checkAchievements(allVotes, context));
+    _awardChain = run.catch(() => {});
+    return run;
+}
+
+async function _checkAchievements(allVotes, context = {}) {
     const stats = await calculateAchievementStats(allVotes);
     const unlocked = [];
     const locked = [];
@@ -388,20 +414,53 @@ export async function checkAchievements(allVotes, context = {}) {
                     console.log(`✨ +${achievement.xp} XP from "${achievement.name}"`);
                 }
       
-                showAchievementUnlock(achievement);
+                // During a vote the post-vote modal lists the unlock; otherwise it toasts as before
+                const captured = recordProgress({
+                    type: 'achievement', id: achievement.id, name: achievement.name, icon: achievement.icon,
+                    xp: achievement.xp, rarity: achievement.rarity
+                });
+                if (captured) saveAchievementToBell(achievement); else showAchievementUnlock(achievement);
             } else {
                 console.log(`⏭️ Skipping duplicate achievement: ${achievement.name}`);
             }
         }
     }
   
+    const completion = achievementCompletion(unlocked.map(a => a.id));
     return {
         unlocked,
         locked,
         newlyUnlocked,
         totalXPFromAchievements: unlocked.reduce((sum, a) => sum + a.xp, 0),
-        completionPercentage: Math.round((unlocked.length / Object.keys(ACHIEVEMENTS).length) * 100)
+        // general set only: a new champion's achievements must not lower it (see completion for the per-champion numbers)
+        completionPercentage: completion.general.percentage,
+        completion
     };
+}
+
+/**
+ * Keep an unlocked achievement in the bell (notification history). Called for every unlock, whether it toasts or is shown in the
+ * post-vote modal instead (js/vote-progress.js). Saved as already shown, so it does not pop up a second time.
+ */
+export function saveAchievementToBell(achievement) {
+    // (the toast alone vanished after a few seconds and the Achievements tab stayed empty)
+    try {
+        const userId = localStorage.getItem('tournamentUserId');
+        if (userId) {
+            import('./notification-storage.js').then(({ saveNotification }) => saveNotification(userId, {
+                type: 'achievement',
+                priority: 2,
+                message: `Achievement unlocked: ${achievement.name}`,
+                detail: `${achievement.description || ''} • +${achievement.xp || 0} XP`.trim(),
+                icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
+                eventType: achievement.id,
+                ctaText: 'View achievements',
+                targetUrl: '/profile.html#achievements',
+                shownAsToast: true
+            })).catch(() => {});
+        }
+    } catch (e) { /* the toast already showed; the bell copy is a bonus */ }
+
 }
 
 /**
@@ -442,24 +501,7 @@ export function showAchievementUnlock(achievement) {
         });
     }
     
-    // Keep it in the bell too (the toast alone vanished after a few seconds and the Achievements tab stayed empty).
-    // Saved as already shown, so it does not pop up a second time.
-    try {
-        const userId = localStorage.getItem('tournamentUserId');
-        if (userId) {
-            import('./notification-storage.js').then(({ saveNotification }) => saveNotification(userId, {
-                type: 'achievement',
-                priority: 2,
-                message: `Achievement unlocked: ${achievement.name}`,
-                detail: `${achievement.description || ''} • +${achievement.xp || 0} XP`.trim(),
-                icon: achievement.rarity === 'legendary' || achievement.rarity === 'mythic' ? '⭐' : '🏆',
-                eventType: achievement.id,
-                ctaText: 'View achievements',
-                targetUrl: '/profile.html#achievements',
-                shownAsToast: true
-            })).catch(() => {});
-        }
-    } catch (e) { /* the toast already showed; the bell copy is a bonus */ }
+    saveAchievementToBell(achievement);
 
     console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP) [${achievement.rarity}]`);
 }

@@ -76,7 +76,7 @@
               "eq": 0
             }
           },
-          "message": "Dead level. Both targets locked. Pick one and fire.",
+          "message": "Dead level. Both targets locked. Hold your aim and fire.",
           "cta": "Fire"
         },
         {

@@ -1022,15 +1022,27 @@
     "default": {
       "messages": [
         "Achievement unlocked: {name}. Not bad.",
-        "Another one: {name}."
+        "Another one: {name}.",
+        "{name}. Ooh, shiny.",
+        "{name}. Didn't see that coming. Okay, I did.",
+        "You got {name}. I'm putting it on the fridge.",
+        "{name}! Look at you, collecting things.",
+        "Ha. {name}. Keep going, you're on a roll.",
+        "{name}. That's going straight on the pile.",
+        "Fine, {name} is pretty good. Don't let it go to your head.",
+        "{name}. I'd high-five you but I'm holding something."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description} +{xp} XP"
+        "{description} +{xp} XP",
+        "Shiny new thing. +{xp} XP",
+        "{description}. Easy, right? +{xp} XP"
       ],
       "buttons": [
         "View achievements",
-        "See all"
+        "See all",
+        "Show me",
+        "More, more"
       ]
     },
     "mastery-up": {
@@ -1115,6 +1127,76 @@
       "buttons": [
         "View champions",
         "Let's go"
+      ]
+    },
+    "jinx-troublemaker": {
+      "messages": [
+        "Five different days of backing the long shot. That's not luck, that's a habit.",
+        "Trouble on five separate days. I'm so proud I could blow something up."
+      ],
+      "details": [
+        "Troublemaker, officially. +{xp} XP",
+        "Underdogs on five days. +{xp} XP"
+      ],
+      "buttons": [
+        "More trouble",
+        "Keep going"
+      ]
+    },
+    "jinx-chaos-agent": {
+      "messages": [
+        "You backed five edits that were losing 60 to 40. Wonderfully unreasonable.",
+        "Against the tide five times. Chaos agent suits you."
+      ],
+      "details": [
+        "You swim the wrong way on purpose. +{xp} XP",
+        "Five against-the-odds picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Make more noise"
+      ]
+    },
+    "vi-door-breaker": {
+      "messages": [
+        "Ten votes in before the crowd showed up. Vi would knock first. You didn't bother.",
+        "First through the door, ten times. Okay, I'm a little impressed."
+      ],
+      "details": [
+        "Door Breaker unlocked. +{xp} XP",
+        "Ten early votes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Be early again"
+      ]
+    },
+    "vi-heavy-hitter": {
+      "messages": [
+        "Thirty votes for Vi's corner. That's a lot of punching, even for you.",
+        "Thirty rounds with the big gloves. Not bad, not bad."
+      ],
+      "details": [
+        "Heavy Hitter, earned. +{xp} XP",
+        "Thirty votes cast. +{xp} XP"
+      ],
+      "buttons": [
+        "Keep swinging",
+        "See all"
+      ]
+    },
+    "vi-right-call": {
+      "messages": [
+        "Fifteen winners picked. Fine, you can be smug about it for a minute.",
+        "You keep backing the edit that wins. Suspiciously good."
+      ],
+      "details": [
+        "Right Call, fifteen times over. +{xp} XP",
+        "Fifteen winners backed. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Do it again"
       ]
     }
   },

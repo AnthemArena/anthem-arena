@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few correct answers and the grade recovers.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",

@@ -68,11 +68,60 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
  * view: { situationType, line, tag, championName, portraitUrl, splashUrl, voteTitle, songNameRaw, shareContext,
  *         xp: { totalXP, baseXP, bonuses: [{type, xp}] }, rank, next: { href, label } | null, bracketHref, kofiUrl }
  */
+const capital = t => String(t || '').charAt(0).toUpperCase() + String(t || '').slice(1);
+const isUrl = t => /^(https?:)?\//.test(String(t || ''));
+
+// What this vote changed beyond the vote XP: level-up, mastery and the things unlocked (see js/vote-progress.js).
+// progress: buildProgressSummary(); skin entries may carry a `thumb` image url.
+export function buildProgressHtml(progress, championName = '') {
+    if (!progress) return '';
+    const parts = [];
+    if (progress.levelUp) {
+        parts.push(`<div class="pvm-up pvm-up--level"><span class="pvm-up-tag">Level up</span> <strong>Level ${progress.levelUp.from} &rarr; ${progress.levelUp.to}</strong> <span class="pvm-up-sub">${esc(progress.levelUp.title)}</span></div>`);
+    }
+    const m = progress.mastery;
+    if (m) {
+        const name = esc(championName || capital(m.packId));
+        const raised = (progress.masteryUps || []).find(x => x.packId === m.packId);
+        const bar = m.isMax
+            ? `<div class="pvm-level-next">Top mastery reached</div>`
+            : `<div class="pvm-bar pvm-bar--mastery" role="progressbar" aria-valuenow="${m.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${m.percent}%"></span></div>
+               <div class="pvm-level-next">${m.progressXp.toLocaleString()} / ${m.neededXp.toLocaleString()} XP to mastery ${m.level + 1}${m.nextSkins.length ? ` &middot; unlocks ${esc(m.nextSkins.map(x => x.name).join(', '))}` : ''}</div>`;
+        parts.push(`<div class="pvm-mastery${raised ? ' pvm-mastery--up' : ''}">
+            <span class="pvm-level-title">${name} mastery <small>Level ${m.level}</small>${raised ? ` <span class="pvm-up-tag">Up from ${raised.from}</span>` : ''}</span>${bar}</div>`);
+    }
+    const items = [];
+    for (const mu of progress.masteryUps || []) {
+        for (const sk of mu.skins || []) {
+            items.push(`<li class="pvm-unlock pvm-unlock--skin">
+                ${sk.thumb ? `<img class="pvm-unlock-img" src="${esc(sk.thumb)}" alt="" width="44" height="44" loading="lazy">` : '<span class="pvm-unlock-icon" aria-hidden="true">&#127917;</span>'}
+                <span class="pvm-unlock-text"><strong>New skin: ${esc(sk.name)}</strong><small>${esc(capital(mu.packId))} mastery ${mu.to}</small></span>
+                <button type="button" class="pvm-wear" data-wear-pack="${esc(mu.packId)}" data-wear-skin="${Number(sk.num)}">Wear it</button></li>`);
+        }
+    }
+    for (const a of progress.achievements || []) {
+        const icon = isUrl(a.icon) ? `<img class="pvm-unlock-img" src="${esc(a.icon)}" alt="" width="44" height="44" loading="lazy" onerror="this.outerHTML='<span class=&quot;pvm-unlock-icon&quot; aria-hidden=&quot;true&quot;>&#127942;</span>'">` : `<span class="pvm-unlock-icon" aria-hidden="true">${esc(a.icon || '\u{1F3C6}')}</span>`;
+        const skinLine = (a.skins || []).map(sk => `Unlocks the ${esc(sk.name)} skin for ${esc(capital(sk.packId))}`).join('; ');
+        const wear = (a.skins || [])[0];
+        items.push(`<li class="pvm-unlock pvm-unlock--achievement${a.rarity ? ` pvm-unlock--${esc(a.rarity)}` : ''}">
+            ${icon}
+            <span class="pvm-unlock-text"><strong>Achievement: ${esc(a.name)}</strong><small>${a.xp ? `+${a.xp} XP` : 'Profile badge'}${skinLine ? ` &middot; ${skinLine}` : ''}</small></span>
+            ${wear ? `<button type="button" class="pvm-wear" data-wear-pack="${esc(wear.packId)}" data-wear-skin="${Number(wear.num)}">Wear it</button>` : ''}</li>`);
+    }
+    if (items.length) {
+        parts.push(`<div class="pvm-unlocked"><div class="pvm-unlocked-title">Unlocked</div><ul class="pvm-unlock-list">${items.join('')}</ul>${(progress.achievements || []).length ? '<a class="pvm-unlock-link" href="/profile#achievements">See all achievements</a>' : ''}</div>`);
+    }
+    return parts.join('');
+}
+
 export function buildPostVoteModalHtml(view) {
     const xp = view.xp || { totalXP: 0, baseXP: 0, bonuses: [] };
+    const progress = view.progress || null;
+    const shownXp = progress ? progress.totalXp : xp.totalXP;
     const rank = view.rank || { currentLevel: { title: '', level: 1 }, nextLevel: null };
     const chips = [`<span class="pvm-chip">+${xp.baseXP} vote</span>`]
-        .concat((xp.bonuses || []).map(b => `<span class="pvm-chip pvm-chip--bonus">+${b.xp} ${esc(b.type)}</span>`)).join('');
+        .concat((xp.bonuses || []).map(b => `<span class="pvm-chip pvm-chip--bonus">+${b.xp} ${esc(b.type)}</span>`))
+        .concat(progress && progress.achievementXp ? [`<span class="pvm-chip pvm-chip--bonus">+${progress.achievementXp} achievements</span>`] : []).join('');
     const level = rank.nextLevel
         ? `<div class="pvm-bar" role="progressbar" aria-valuenow="${Math.round(rank.progressPercentage || 0)}" aria-valuemin="0" aria-valuemax="100"><span style="width:${rank.progressPercentage || 0}%"></span></div>
            <div class="pvm-level-next">${(rank.progressXP || 0).toLocaleString()} / ${(rank.xpForNextLevel || 0).toLocaleString()} XP to level ${rank.nextLevel.level}</div>`
@@ -102,9 +151,10 @@ export function buildPostVoteModalHtml(view) {
             <div class="pvm-body">
                 <p class="pvm-voted">You voted for <strong>${esc(view.voteTitle)}</strong>${view.tag ? ` <span class="pvm-tag">${esc(view.tag)}</span>` : ''}</p>
                 <div class="pvm-xp">
-                    <div class="pvm-xp-row"><span class="pvm-xp-total">+${xp.totalXP} XP</span><span class="pvm-chips">${chips}</span></div>
+                    <div class="pvm-xp-row"><span class="pvm-xp-total">+${shownXp} XP</span><span class="pvm-chips">${chips}</span></div>
                     <div class="pvm-level"><span class="pvm-level-title">${esc(rank.currentLevel.title)} <small>Level ${rank.currentLevel.level}</small></span></div>
                     ${level}
+                    ${buildProgressHtml(progress, view.championName)}
                 </div>
                 <div class="pvm-actions">
                     ${primary}

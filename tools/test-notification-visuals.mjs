@@ -1,5 +1,6 @@
 // node tools/test-notification-visuals.mjs
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { withoutLeadingGlyph, eventLeadHtml, eventRowHtml, eventToastHtml, eventEdits, hexToRgba, darken, socialRowHtml, contentRowHtml, contentToastHtml, followRowHtml, followToastHtml, toastHeadlineHtml, avatarSrc, viewerAvatarSrc, championBadgeUrl, fallbackAvatarFor, matchEdits, editsPairHtml, accentFor, markFor, escapeHtml, circleHtml, pairHtml, stackHtml, toastHtml, profileSplashUrl, splashFromAvatarSrc } from '../js/notification-visuals.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 
@@ -143,13 +144,13 @@ t('event pictures: your pick ringed and the other dimmed; a match with no vote s
     assert.ok(/nv-edit nv-dim"[^>]*><img src="[^"]*aaaaaaaaaaa/.test(html) && /nv-edit nv-pick"[^>]*--nv-ring:#4ade80/.test(html), html);
     assert.ok(!editsPairHtml({ edits: eventEdits(m, undefined), relationship: 'event', size: 40, accent: '#fff' }).includes('nv-dim'));
 });
-t('event toast: tag, bubble, chips, one button; the whole card and the button both call handleBulletinCTA', () => {
+t('event toast: tag, bubble, no pills, one button; the whole card and the button both call handleBulletinCTA', () => {
     const html = eventToastHtml({ type: 'danger' }, { tag: 'Your pick is behind', glyph: '▼', edits: eventEdits({ song1: { videoId: 'aaaaaaaaaaa' }, song2: { videoId: 'bbbbbbbbbbb' } }, 'song1'), accent: '#ff5a5f', jinxSrc: 'https://x/j.png', quip: 'Down 12. <b>hi</b>', detail: 'Fix it', chips: ['38% vs 62%'], cta: 'Share the match' });
     assert.ok(!html.includes('nv-event-tag'), 'no heading line');
     assert.ok(/aria-label="Your pick is behind"/.test(html) && html.includes('nv-mark-event') && html.includes('>▼<'), 'the symbol sits between the two edits');
-    assert.ok(html.includes('Share the match') && html.includes('38% vs 62%') && html.includes('Fix it'));
+    assert.ok(html.includes('Share the match') && !html.includes('38% vs 62%') && !html.includes('nv-chip') && html.includes('Fix it'));
     assert.ok(html.includes('Down 12. &lt;b&gt;hi&lt;/b&gt;'), 'text is escaped');
-    assert.equal((html.match(/handleBulletinCTA/g) || []).length, 2); assert.equal((html.match(/<button/g) || []).length, 2);
+    assert.equal((html.match(/handleBulletinCTA/g) || []).length, 1); assert.equal((html.match(/openBulletinMatch/g) || []).length, 1); assert.equal((html.match(/<button(?![^>]*nv-bubble-x)/g) || []).length, 2, 'one close and one action button (the bubble also carries a dismiss that only the Minimal style shows)'); assert.equal((html.match(/nv-bubble-x/g) || []).length, 1);
     const bare = eventToastHtml({ type: 'round-opening' }, { tag: 'Round 2 is open', edits: null, accent: '#ff69b4', jinxSrc: null, quip: 'Go', cta: 'Start' });
     assert.ok(!bare.includes('nv-edits') && bare.includes('nv-glyph'), 'no match: the symbol alone in a circle');
 });
@@ -176,5 +177,22 @@ t('event row: opens the match from the row and from the button, with the tag, th
     assert.ok(/class="notification-item nv-row nv-event-row unread"[^>]*data-url="\/vote\.html\?match=m1"/.test(html));
     assert.ok(html.includes('Your pick won') && html.includes('2m ago · A vs B') && html.includes('Told you.'));
     assert.ok(/data-action="navigate" data-url="\/vote\.html\?match=m1">Nice<\/button>/.test(html));
+});
+t('pop-up inner colours follow the toast accent: the bubble and pills never hard-code pink', () => {
+    const css = fs.readFileSync(new URL('../js/notification-visuals.js', import.meta.url), 'utf8');
+    const rule = sel => css.split('\n').find(l => l.startsWith(sel)) || '';
+    assert.ok(rule('.versus-toast .nv-bubble{').includes('var(--nv-line,var(--nv-line-auto))'), 'bubble border follows the accent');
+    assert.ok(rule('.versus-toast .nv-bubble::before{').includes('var(--nv-line,var(--nv-line-auto))'), 'bubble tail follows the accent');
+    const chip = rule('.versus-toast .nv-chip{');
+    assert.ok(chip.includes('var(--nv-line-auto)') && chip.includes('var(--nv-chip-bg-auto)') && !/255,\s*79,\s*180/.test(chip), 'pills follow the accent');
+    assert.ok(/@supports \(color:color-mix/.test(css), 'accent-derived colours, with a plain fallback');
+});
+t('no-votes / low-votes toasts drop the grey sub-line; other events keep theirs', () => {
+    const base = { tag: 'x', glyph: 'VS', accent: '#1e3a8a', jinxSrc: 'https://x/j.png', quip: 'hi', detail: 'GODS vs RISE • Closes in 4h', cta: 'Go' };
+    for (const type of ['novotes', 'lowvotes']) assert.ok(!eventToastHtml({ type }, base).includes('GODS vs RISE'), type);
+    assert.ok(eventToastHtml({ type: 'closing' }, base).includes('GODS vs RISE'));
+});
+t('header action text uses a lightened accent so dark packs stay readable', () => {
+    assert.ok(/\.nv-toast-action\{[^}]*color:var\(--nv-readable-auto\)/.test(fs.readFileSync(new URL('../js/notification-visuals.js', import.meta.url), 'utf8')));
 });
 console.log(`${pass} passed`);

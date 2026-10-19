@@ -1,6 +1,6 @@
 // node tools/test-notification-prefs.mjs   (prefs + relationship-aware grouping)
 import assert from 'node:assert/strict';
-import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from '../js/notification-prefs.js';
+import { readNotificationPrefs, readToastStyle, TOAST_STYLES, shouldSaveSocial, shouldToastSocial } from '../js/notification-prefs.js';
 import { groupNotifications, groupHeadline, socialHeadline } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const store = o => ({ getItem: k => (k in o ? o[k] : null) });
@@ -21,6 +21,16 @@ t('toast rule (never toasts what is not saved)', () => {
     assert.ok(shouldToastSocial(p(), false)); assert.ok(!shouldToastSocial(p({ toastFrom: 'off' }), true));
     assert.ok(!shouldToastSocial(p({ toastFrom: 'following' }), false)); assert.ok(shouldToastSocial(p({ toastFrom: 'following' }), true));
     assert.ok(!shouldToastSocial(p({ notifyFrom: 'following', toastFrom: 'everyone' }), false));
+});
+
+t('toast style: classic by default, saved choice kept, junk ignored', () => {
+    assert.deepEqual(TOAST_STYLES, ['classic', 'full', 'side', 'minimal']);
+    assert.equal(readToastStyle(store({})), 'classic');
+    assert.equal(readToastStyle(store({ toastStyle: 'full' })), 'full');
+    assert.equal(readToastStyle(store({ toastStyle: 'side' })), 'side');
+    assert.equal(readToastStyle(store({ toastStyle: 'minimal' })), 'minimal');
+    assert.equal(readToastStyle(store({ toastStyle: 'banana' })), 'classic');
+    assert.equal(readToastStyle(null), 'classic');
 });
 
 const n = (id, who, uid, match, rel, ts) => ({ id, triggerUsername: who, triggerUserId: uid, matchId: match, matchTitle: `T-${match}`, relationship: rel, type: 'live-activity', timestamp: ts });

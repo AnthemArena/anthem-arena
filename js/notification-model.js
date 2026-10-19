@@ -169,10 +169,11 @@ export const isRoundAlert = n => !!n && (n.type === 'round-opening' || n.type ==
 // It says the state at a glance so the alert needs no heading: ▼ behind, ▲ ahead, = too close, ⇄ flipped, ✓ won, ✕ lost.
 const EVENT_GLYPHS = {
     danger: '▼', 'danger-repeat': '▼', nailbiter: '=', winning: '▲', comeback: '⇄',
-    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '▶', 'new-matches': '+',
+    closing: '⏳', tiebreaker: '=', novotes: 'VS', lowvotes: 'VS', 'round-opening': '', 'new-matches': '+',
     'match-won': '✓', 'match-lost': '✕', welcome: '👋', encouragement: '👀'
 };
-export const eventGlyph = n => (n && EVENT_GLYPHS[n.type]) || 'VS';
+// '' means no symbol at all (round-opening: the strip of entering edits says it); anything unknown falls back to VS.
+export const eventGlyph = n => (n && n.type in EVENT_GLYPHS ? EVENT_GLYPHS[n.type] : 'VS');
 
 // Matches you have not voted in that are exactly level and still open. covered = every such match (the closing-soon alert leaves
 // them alone); ties = the ones not yet announced at their current step ('tied', or 'final' inside the last hours), soonest first.
@@ -202,6 +203,39 @@ export function eventUrl(n) {
     if (k?.share && n?.matchId && /^\/vote(\.html)?\?/.test(url) && !/[?&]share=/.test(url)) url += '&share=1';
     return url;
 }
+
+// Pack button labels come in two kinds: "look at this" (See the result, View achievements, Gloat) and "move on" (Next match, Keep going,
+// Carry on). A move-on label must not open the thing that was just announced, so its button goes to the matches list instead; the
+// alert itself (the card) still opens the thing it is about.
+export const isMoveOnCta = t => /^(next\b|on to the next|keep\b|continue\b|carry on|press on|onward|encore|again\b|run it again|go again|light another|rebel on)/i.test(String(t || '').trim());
+export const ctaLabel = n => String(n?.ctaText || n?.cta || '');
+// Where the button goes (the card goes to eventUrl / the alert's own targetUrl).
+export function eventButtonUrl(n) {
+    if ((n?.type === 'match-won' || n?.type === 'match-lost')) {
+        if (isMoveOnCta(ctaLabel(n))) return '/matches.html';
+        if (/bracket/i.test(ctaLabel(n))) return '/brackets.html';
+    }
+    return eventUrl(n);
+}
+export function achievementButtonUrl(n) {
+    return isMoveOnCta(ctaLabel(n)) ? '/matches.html' : (n?.targetUrl || '/profile#achievements');
+}
+
+// ---------- When an alert may fire again (the rules the poller in js/global-notifications.js uses) ----------
+// "Your pick is behind" is announced when the gap gets worse than what was last announced, not when it merely changes: climbing from
+// 12 behind to 8 behind is good news, not a new warning. Tiers are ordered mild to severe.
+export const DANGER_TIERS = ['trailing-1', 'trailing-2-3', 'trailing-4-5', 'trailing-6-10', 'trailing-11plus'];
+export function dangerShouldAlert(previousTier, tier) {
+    if (!previousTier) return true;
+    return DANGER_TIERS.indexOf(tier) > DANGER_TIERS.indexOf(previousTier);
+}
+// "Told once" memory for steps like closing 24h / 3h / final or winning small / large: a map { 'matchId:step': timestamp }.
+export const onceKey = (matchId, step) => `${matchId}:${step}`;
+export const wasShownOnce = (map, matchId, step) => !!map && Object.prototype.hasOwnProperty.call(map, onceKey(matchId, step));
+export const markShownOnce = (map, matchId, step, at = Date.now()) => ({ ...(map || {}), [onceKey(matchId, step)]: at });
+// The nudges for people who have not voted yet: a gentle one at most every 45 minutes, the closing-soon one every 30.
+export const ENCOURAGEMENT_GAP_MS = { gentle: 45 * 60000, urgent: 30 * 60000 };
+export const encouragementDue = (kind, msSinceLast) => msSinceLast >= (ENCOURAGEMENT_GAP_MS[kind] ?? ENCOURAGEMENT_GAP_MS.gentle);
 
 // A few facts as small chips under the champion's words (percentages for a match you voted in, the number of new matches).
 export function eventChips(n) {

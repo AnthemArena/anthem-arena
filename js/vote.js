@@ -31,8 +31,10 @@ import { mountShareBox } from './share-box.js';
 import { pickModalKey, chooseModalLine, buildPostVoteModalHtml, buildShareModalHtml, TAG_FOR_KEY } from './champion-modal.js';
 import { getChampionImageUrl, getCupChampionId, getCompanionPack, getChampionTileUrl, getChampionSplashUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
-import { activePackId } from './xp-ledger.js';
-import { checkAchievements, showAchievementUnlock } from './achievement-tracker.js';
+import { activePackId, streakFromVotes, readPackXp } from './xp-ledger.js';
+import { beginVoteProgress, endVoteProgress, buildProgressSummary } from './vote-progress.js';
+import { voteFacts, achievementVote, utcDay, buildVoteRecord } from './vote-facts.js';
+import { checkAchievements } from './achievement-tracker.js';
 import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingMemberXP  } from './founding-member-tracker.js';
 
 
@@ -139,42 +141,6 @@ async function getGuaranteedProfile() {
         avatar: JSON.parse(localStorage.getItem('avatar') || 'null')
     };
 }
-// ========================================
-// VOTING STREAK TRACKER
-// ========================================
-
-function updateVotingStreak() {
-    const today = new Date().toDateString();
-    const lastVoteDate = localStorage.getItem('lastVoteDate');
-    const currentStreak = parseInt(localStorage.getItem('votingStreak') || '0');
-
-    if (lastVoteDate === today) {
-        // Already voted today, keep streak
-        return;
-    }
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
-
-    if (lastVoteDate === yesterdayStr) {
-        // Consecutive day - increment streak
-        localStorage.setItem('votingStreak', (currentStreak + 1).toString());
-        console.log(`🔥 Voting streak: ${currentStreak + 1} days`);
-    } else if (!lastVoteDate || currentStreak === 0) {
-        // First vote or starting new streak
-        localStorage.setItem('votingStreak', '1');
-        console.log('🔥 Voting streak started: 1 day');
-    } else {
-        // Streak broken - reset to 1
-        console.log(`❌ Streak broken after ${currentStreak} days. Starting fresh.`);
-        localStorage.setItem('votingStreak', '1');
-    }
-
-    localStorage.setItem('lastVoteDate', today);
-}
-
-
 // ========================================
 // COUNTDOWN TIMER HELPER
 // ========================================
@@ -680,6 +646,7 @@ currentMatch = {
     competitor1: {
         id: 'song1',
         seed: matchData.song1?.seed ?? matchData.competitor1?.seed ?? null,  // null = unseeded (random draw)
+        pot: matchData.song1?.pot ?? matchData.competitor1?.pot ?? null,
         name: matchData.song1?.shortTitle ?? matchData.competitor1?.shortTitle,
         source: `${matchData.song1?.artist ?? matchData.competitor1?.artist} • ${matchData.song1?.year ?? matchData.competitor1?.year}`,
         videoId: matchData.song1?.videoId ?? matchData.competitor1?.videoId,
@@ -689,6 +656,7 @@ currentMatch = {
     competitor2: {
         id: 'song2',
         seed: matchData.song2?.seed ?? matchData.competitor2?.seed ?? null,  // null = unseeded (random draw)
+        pot: matchData.song2?.pot ?? matchData.competitor2?.pot ?? null,
         name: matchData.song2?.shortTitle ?? matchData.competitor2?.shortTitle,
         source: `${matchData.song2?.artist ?? matchData.competitor2?.artist} • ${matchData.song2?.year ?? matchData.competitor2?.year}`,
         videoId: matchData.song2?.videoId ?? matchData.competitor2?.videoId,
@@ -948,7 +916,12 @@ async function checkVoteStatus() {
 
             // Store in localStorage for next time
             localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, voteData.choice);
-            saveVoteForOtherPages(currentMatch.id, voteData.choice);
+            saveVoteForOtherPages(currentMatch.id, voteData.choice, {
+                // facts saved with the vote (documents from before this have none and are read the old, share-based way)
+                facts: voteData.facts ? { ...voteData.facts, sharePct: voteData.sharePct, totalVotesAtTime: voteData.totalVotesAtTime } : null,
+                timestamp: voteData.timestamp, championId: voteData.championId,
+                votedForSeed: voteData.votedForSeed ?? null, votedForVideoId: voteData.votedForVideoId ?? null
+            });
 
             updateVoteCountsUI();
             disableVoting(voteData.choice);
@@ -1494,48 +1467,33 @@ const description = `Cast your vote between ${song1} and ${song2} in Arcane Mome
  * Track share and award XP
  */
 function trackShare(platform, context) {
-    // Increment share count in localStorage
+    // XP and the share count are paid once per match per day, so re-tapping share on the same match earns nothing
+    const shareKey = `shareDay_${currentMatch?.id || 'page'}`;
+    const today = utcDay();
+    if (localStorage.getItem(shareKey) === today) return;
+    localStorage.setItem(shareKey, today);
+
     const currentShares = parseInt(localStorage.getItem('sharesCount') || '0');
     localStorage.setItem('sharesCount', (currentShares + 1).toString());
 
-    // Award XP using rank system
     const SHARE_XP = 5; // Matches rank-system.js xpSources.share
-    const newTotalXP = addXP(SHARE_XP, 'share');
+    addXP(SHARE_XP, 'share');
 
     console.log(`📤 Share tracked: ${platform} (${context}) - Share #${currentShares + 1} - +${SHARE_XP} XP`);
-
-    // Show notification
     showNotification(`+${SHARE_XP} XP for sharing! 📤 (${currentShares + 1} total shares)`, 'success');
 
-    // Check for achievement unlocks (social achievements)
+    // Social achievements (the tracker shows each unlock's toast)
     setTimeout(async () => {
-        const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-        const voteIds = Object.keys(userVotes);
-
-        if (voteIds.length > 0) {
+        try {
+            const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+            const voteIds = Object.keys(userVotes);
+            if (!voteIds.length) return;
             const allMatches = await getAllMatches();
             const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
-
-            const allVotes = voteIds.map(matchId => {
-                const voteData = userVotes[matchId];
-                const matchData = matchMap.get(matchId);
-                return {
-                    matchId,
-                    timestamp: voteData.timestamp || new Date().toISOString(),
-                    match: matchData || {}
-                };
-            });
-
-            const { newlyUnlocked } = checkAchievements(allVotes);
-
-            // Show social achievement notifications
-            newlyUnlocked
-                .filter(a => a.category === 'social')
-                .forEach((achievement, index) => {
-                    setTimeout(() => {
-                        showAchievementUnlock(achievement);
-                    }, (index + 1) * 2000);
-                });
+            const allVotes = voteIds.map(matchId => achievementVote(matchId, userVotes[matchId], matchMap.get(matchId)));
+            await checkAchievements(allVotes);
+        } catch (e) {
+            console.warn('Share achievement check failed:', e);
         }
     }, 500);
 }
@@ -1787,6 +1745,12 @@ async function submitVote(songId) {
 // The vote document and the match counters are written in ONE batch:
 // firestore.rules only allows the +1 when the same batch creates the vote doc.
 const voteBatch = writeBatch(db);
+// What was true at the moment of this vote, judged from the counts before it is counted (see js/vote-facts.js). Saved on the
+// vote document too, so a new device (or cleared storage) gets the same facts back instead of losing them.
+const castVotedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
+const castOtherSong = votedForSong1 ? currentMatch.competitor2 : currentMatch.competitor1;
+const castFacts = voteFacts({ voted: castVotedSong, other: castOtherSong });
+const castTimestamp = Date.now();
 voteBatch.set(voteRef, {
     tournament: ACTIVE_TOURNAMENT,
     matchId: currentMatch.id,
@@ -1795,11 +1759,15 @@ voteBatch.set(voteRef, {
     avatar: avatar,      // ✅ From guaranteed profile
     championId: profile.championPackId || 'jinx',  // ✅ ADD THIS LINE
     choice: songId,
-    timestamp: Date.now(),
+    timestamp: castTimestamp,
     round: currentMatch.round,
     // Store song details for analytics
     votedForSeed: (votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed) ?? null,
-    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name
+    votedForName: votedForSong1 ? currentMatch.competitor1.name : currentMatch.competitor2.name,
+    votedForVideoId: castVotedSong.videoId ?? null,
+    facts: { underdog: castFacts.underdog, close: castFacts.close, againstTide: castFacts.againstTide, early: castFacts.early, tiedBefore: castFacts.tiedBefore },
+    sharePct: castFacts.sharePct,
+    totalVotesAtTime: castFacts.totalVotesAtTime
 });
 
         // Counter increment for the edit that was voted for (same batch as the vote doc)
@@ -1816,7 +1784,7 @@ voteBatch.set(voteRef, {
         localStorage.setItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`, songId);
 
         // ✅ Also save in userVotes format for homepage/matches pages
-        saveVoteForOtherPages(currentMatch.id, songId);
+        saveVoteForOtherPages(currentMatch.id, songId, { facts: castFacts, timestamp: castTimestamp, votedForSeed: castVotedSong.seed ?? null, votedForVideoId: castVotedSong.videoId ?? null });
         console.log('✅ CHECKPOINT 3: LocalStorage saved');
         console.log('✅ CHECKPOINT 4: About to enter activity block');
 
@@ -1930,21 +1898,27 @@ const activityData = {
      // ========================================
 // ✅ NEW: CALCULATE AND AWARD XP
 // ========================================
-const xpData = calculateVoteXP({
-    isUnderdog: checkIfUnderdog(votedForSong1),
-    isCloseMatch: checkIfCloseMatch(),
-    isFirstVoteInMatch: checkIfFirstVoter()
-});
+const savedVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
+const thisVote = savedVotes[currentMatch.id] || {};
+const voteStreak = streakFromVotes(Object.values(savedVotes));
+const xpData = calculateVoteXP({ facts: thisVote.facts || {}, streak: voteStreak });
 
+// Level-ups, mastery-ups and achievement unlocks from here on are collected for the post-vote modal instead of toasting
+beginVoteProgress();
 const newTotalXP = addXP(xpData.totalXP);
 
-// ✅ Track voting streak
-updateVotingStreak();
+// Kept for the profile and the post-vote line
+localStorage.setItem('votingStreak', String(voteStreak));
 
 // ✅ Check for achievement unlocks
 // Achievements can award additional XP, so do this before the
 // final profile sync and final rank calculation.
 await checkForAchievementUnlocks();
+
+// Founding Member badge (first 1,000 voters): inside the capture, so its XP and its unlock appear in the post-vote modal
+try {
+    if (await awardFoundingMemberBadge(userId)) console.log('👑 User earned Founding Member badge!');
+} catch (e) { console.warn('Founding member check failed:', e); }
 
 // ✅ Recalculate final XP/rank after achievement rewards
 const finalTotalXP = parseInt(
@@ -1953,6 +1927,7 @@ const finalTotalXP = parseInt(
 );
 
 const rank = getUserRank(finalTotalXP);
+const progressEvents = endVoteProgress();
 
 console.log(
     `📈 Final XP after achievements: ${finalTotalXP} XP (Level ${rank.currentLevel.level})`
@@ -1995,13 +1970,6 @@ console.log(
             console.warn('⚠️ updateNavProfile not available yet');
         }
 
-        // ✅ ADD THIS: Check for founding member badge
-        const earnedFoundingBadge = await awardFoundingMemberBadge(userId);
-        if (earnedFoundingBadge) {
-            console.log('👑 User earned Founding Member badge!');
-            // Toast will show automatically from founding-member-tracker.js
-        }
-
         // ✅ CAPTURE SONG DATA BEFORE RELOAD (data might change after reload)
         const votedSong = votedForSong1 ? currentMatch.competitor1 : currentMatch.competitor2;
         const songSeed = votedSong.seed;
@@ -2042,9 +2010,10 @@ console.log(
                 rank: !!rank
             });
             showNotification(`Vote cast for "${cleanTitle(songName || '')}"`, 'success');
+            replayProgressAsToasts(progressEvents);   // no modal to carry them, so they toast
         } else {
             // Show modal with correct numbers
-            showPostVoteModal(songName, songData, xpData, rank);
+            showPostVoteModal(songName, songData, xpData, rank, progressEvents);
         } // ✅ CLOSE THE ELSE BLOCK HERE
 
 
@@ -2052,6 +2021,7 @@ console.log(
         console.log('✅ Vote submitted successfully!');
 
     } catch (error) { // ✅ NOW THE CATCH PROPERLY PAIRS WITH TRY
+        replayProgressAsToasts(endVoteProgress());   // never leave a capture open (it would hide later toasts) and never lose what it caught
         hideLoadingSpinner(); // ✅ Hide spinner on error
         console.error('❌ Error submitting vote:', error);
         showNotification('Error submitting vote. Please try again.', 'error');
@@ -2126,63 +2096,7 @@ export async function checkForAchievementUnlocks() {
         const matchMap = new Map(allMatches.map(m => [m.id || m.matchId, m]));
 
         // Build proper vote history with match context
-        const allVotes = voteIds.map(matchId => {
-            const voteData = userVotes[matchId];
-            const matchData = matchMap.get(matchId);
-
-            if (!matchData) {
-                return {
-                    matchId,
-                    timestamp: voteData.timestamp || new Date().toISOString(),
-                    voteType: 'balanced',
-                    championId: voteData.championId,
-                    tiedBefore: !!voteData.tiedBefore,
-                    round: 1,
-                    votedForSeed: null,
-                    votedForName: null,
-                    choice: voteData.songId,
-                    match: {}
-                };
-            }
-
-            // Determine vote type based on match data
-            const votedForSong = voteData.songId === 'song1' ? matchData.song1 : matchData.song2;
-            const opponentSong = voteData.songId === 'song1' ? matchData.song2 : matchData.song1;
-
-            const song1Votes = matchData.song1?.votes || 0;
-            const song2Votes = matchData.song2?.votes || 0;
-            const totalMatchVotes = song1Votes + song2Votes;
-
-            const votedSongVotes = voteData.songId === 'song1' ? song1Votes : song2Votes;
-            const votedSongPercentage = totalMatchVotes > 0
-                ? Math.round((votedSongVotes / totalMatchVotes) * 100)
-                : 50;
-
-            // Categorize vote type
-            let voteType = 'balanced';
-            if (votedSongPercentage < 40) {
-                voteType = 'underdog';
-            } else if (votedSongPercentage > 60) {
-                voteType = 'mainstream';
-            } else {
-                voteType = 'closeCall';
-            }
-
-            return {
-                matchId,
-                timestamp: voteData.timestamp || new Date().toISOString(),
-                voteType,
-                championId: voteData.championId,
-                tiedBefore: !!voteData.tiedBefore,
-                round: matchData.round || 1,
-                votedForSeed: votedForSong?.seed ?? null,
-                votedForName: votedForSong?.shortTitle || votedForSong?.title,
-                votedForArtist: votedForSong?.artist,
-                votedSongPercentage,
-                choice: voteData.songId,
-                match: matchData
-            };
-        });
+        const allVotes = voteIds.map(matchId => achievementVote(matchId, userVotes[matchId], matchMap.get(matchId)));
 
       // ✅ DEFENSIVE: Import and check achievements safely
 const { checkAchievements } = await import('./achievement-tracker.js');
@@ -2208,37 +2122,7 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
         if (newlyUnlocked && newlyUnlocked.length > 0) {
             console.log(`🎉 ${newlyUnlocked.length} achievement(s) unlocked!`);
 
-            // ✅ Limit to 3 toasts max per vote session to prevent spam
-            const MAX_TOASTS_PER_SESSION = 3;
-            const toastsToShow = newlyUnlocked.slice(0, MAX_TOASTS_PER_SESSION);
-
-            // Stagger notifications by 2.5 seconds each
-            toastsToShow.forEach((achievement, index) => {
-                setTimeout(() => {
-                    if (window.showAchievementUnlock && typeof window.showAchievementUnlock === 'function') {
-                        window.showAchievementUnlock(achievement);
-                    }
-                }, index * 2500);
-            });
-
-            // Log if any were skipped
-            if (newlyUnlocked.length > MAX_TOASTS_PER_SESSION) {
-                console.log(`📝 Note: ${newlyUnlocked.length - MAX_TOASTS_PER_SESSION} more achievements unlocked (view in My Votes page)`);
-
-                // Optional: Show a summary toast after the individual ones
-                setTimeout(() => {
-                    if (window.showBulletin && typeof window.showBulletin === 'function') {
-                        window.showBulletin({
-                            type: 'achievement',
-                            message: `🏆 ${newlyUnlocked.length} Achievements Unlocked!`,
-                            detail: `You earned ${newlyUnlocked.length} achievements! Check My Votes to see them all.`,
-                            cta: 'View All Achievements',
-                            ctaAction: () => window.location.href = '/profile#votes',
-                            duration: 4000
-                        });
-                    }
-                }, MAX_TOASTS_PER_SESSION * 2500 + 1000);
-            }
+            // The tracker already showed each unlock's toast
 
             // Update navigation rank (achievements award XP)
             if (window.updateNavProfile && typeof window.updateNavProfile === 'function') {
@@ -2261,69 +2145,49 @@ const newlyUnlocked = achievementResult.newlyUnlocked || [];
  * ✅ FIXED: Save vote to userVotes format for homepage/matches pages
  * Now includes songTitle and opponentTitle for alert messages
  */
-function saveVoteForOtherPages(matchId, songId) {
+// `cast` carries what was true when the vote was cast: { facts, timestamp, championId, votedForSeed, votedForVideoId }. For the
+// vote just cast it is judged from the counts before the vote; on a revisit it comes from the saved vote document. With no
+// `cast` (a plain revisit) an existing record is left exactly as it is, so a vote keeps the facts it had when it was cast.
+function saveVoteForOtherPages(matchId, songId, cast = null) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-
     const votedSong = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
     const opponentSong = songId === 'song1' ? currentMatch.competitor2 : currentMatch.competitor1;
-
-    // ✅ Calculate voteType at time of voting
-    const votedSongPercentage = currentMatch.totalVotes > 0
-        ? Math.round((votedSong.votes / currentMatch.totalVotes) * 100)
-        : 50;
-
-    let voteType = 'balanced';
-    if (votedSongPercentage < 40) {
-        voteType = 'underdog';
-    } else if (votedSongPercentage > 60) {
-        voteType = 'mainstream';
-    } else {
-        voteType = 'closeCall';
+    const record = buildVoteRecord({
+        existing: userVotes[matchId], songId, votedSong, opponentSong, round: currentMatch.round, cast,
+        activePack: activePackId(localStorage)   // the companion that was active (pack achievements, Champions tab)
+    });
+    if (record !== userVotes[matchId]) {
+        userVotes[matchId] = record;
+        localStorage.setItem('userVotes', JSON.stringify(userVotes));
     }
+    return record;
+}
 
-    userVotes[matchId] = {
-        songId: songId,
-        songTitle: votedSong.name,
-        opponentTitle: opponentSong.name,
-        timestamp: Date.now(),
-        voteType: voteType,  // ✅ NEW
-        championId: activePackId(localStorage),   // the companion that was active (pack achievements, Champions tab)
-        tiedBefore: (currentMatch.competitor1.votes || 0) === (currentMatch.competitor2.votes || 0) && (currentMatch.totalVotes || 0) >= 10,
-        round: currentMatch.round,  // ✅ NEW
-        totalVotesAtTime: currentMatch.totalVotes  // ✅ NEW (for early voter tracking)
-    };
-
-    localStorage.setItem('userVotes', JSON.stringify(userVotes));
+// If the post-vote modal cannot be shown (missing data, an error after XP was paid), what the vote earned still has to reach the
+// person: the events collected during the vote (js/vote-progress.js) are shown as ordinary toasts, one after another.
+async function replayProgressAsToasts(events) {
+    try {
+        if (!events || !events.length) return;
+        const { getAchievementById } = await import('./achievements.js');
+        const { showAchievementUnlock } = await import('./achievement-tracker.js');
+        events.forEach((e, i) => setTimeout(() => {
+            try {
+                if (e.type === 'achievement') {
+                    showAchievementUnlock(getAchievementById(e.id) || { id: e.id, name: e.name, description: '', xp: e.xp, rarity: e.rarity, icon: e.icon });
+                } else if (e.type === 'level' && window.showBulletin) {
+                    window.showBulletin({ type: 'level-up', level: e.to, message: '⬆️ New Arcane Rank!', detail: `You've reached ${e.title}!`, cta: 'View Progress', ctaAction: () => { window.location.href = '/profile#overview'; }, duration: 5000 });
+                } else if (e.type === 'mastery' && window.showBulletin) {
+                    const names = (e.skins || []).map(x => x.name).join(', ');
+                    window.showBulletin({ type: 'mastery-up', level: e.to, packId: e.packId, message: `${e.packId.charAt(0).toUpperCase() + e.packId.slice(1)} Mastery ${e.to}!`, detail: names ? `Unlocked: ${names}` : `Mastery ${e.to}`, cta: 'View champions', ctaAction: () => { window.location.href = '/profile#champions'; }, duration: 6000 });
+                }
+            } catch (err) { console.warn('Could not replay a progress toast:', err); }
+        }, i * 2500));
+    } catch (err) { console.warn('Could not replay progress toasts:', err); }
 }
 
 // ========================================
 // ✅ NEW: XP CALCULATION HELPERS
 // ========================================
-
-/**
- * Check if user voted for the underdog (lower-seeded song)
- */
-function checkIfUnderdog(votedForSong1) {
-    const votedSeed = votedForSong1 ? currentMatch.competitor1.seed : currentMatch.competitor2.seed;
-    const opponentSeed = votedForSong1 ? currentMatch.competitor2.seed : currentMatch.competitor1.seed;
-    if (votedSeed == null || opponentSeed == null) return false; // unseeded (random draw): no underdog
-    return votedSeed > opponentSeed; // Higher seed number = underdog
-}
-
-/**
- * Check if the match is close (within 5 votes)
- */
-function checkIfCloseMatch() {
-    const voteDiff = Math.abs(currentMatch.competitor1.votes - currentMatch.competitor2.votes);
-    return voteDiff <= 5;
-}
-
-/**
- * Check if user is among first 10 voters
- */
-function checkIfFirstVoter() {
-    return currentMatch.totalVotes <= 10;
-}
 
     // ========================================
     // RELOAD MATCH DATA
@@ -2641,7 +2505,7 @@ function showNotification(message, type = 'success') {
  * @param {object} xpData - XP earned data from calculateVoteXP
  * @param {object} rank - User's rank data from getUserRank
  */
-async function showPostVoteModal(songName, songData, xpData, rank) {
+async function showPostVoteModal(songName, songData, xpData, rank, progressEvents = []) {
 
     // ✨ Calculate voting situation
     // Prefer the explicit slot; fall back to seed only when both seeds exist and differ.
@@ -2982,7 +2846,7 @@ else {
     const modalKey = pickModalKey({
         isFirstEver: Object.keys(userVotesMap).length <= 1,
         streak: parseInt(localStorage.getItem('votingStreak') || '0', 10),
-        isUnderdog: checkIfUnderdog(votedFor === 'song1'),
+        isUnderdog: !!(userVotesMap[currentMatch.id]?.facts?.underdog),
         isEarly: isEarlyVoting,
         situationType
     });
@@ -2996,13 +2860,24 @@ else {
     const nextEl = document.querySelector('#next-match-bar [data-next-match]');
     const next = nextEl ? { href: nextEl.getAttribute('href'), label: 'Next match' } : null;
 
+    // What this vote changed: level, mastery, skins and achievements (events were collected while the vote was processed)
+    const progressPack = activePackId(localStorage);
+    const progress = buildProgressSummary({ events: progressEvents, xpData, packId: progressPack, packXp: readPackXp(localStorage)[progressPack] || 0 });
+    const thumbFor = (packId, num) => getChampionTileUrl(getCompanionPack(packId)?.championId || (packId.charAt(0).toUpperCase() + packId.slice(1)), num);
+    for (const mu of progress.masteryUps) for (const sk of mu.skins) sk.thumb = thumbFor(mu.packId, sk.num);
+
     const modal = document.getElementById('vote-modal');
     modal.innerHTML = buildPostVoteModalHtml({
         situationType, line, tag: TAG_FOR_KEY[modalKey] || '', championName: pack?.name || champKey,
         portraitUrl: getChampionTileUrl(champKey, skin), splashUrl: getChampionSplashUrl(champKey, skin),
         voteTitle: shortTitle(songName, 46), songNameRaw: songName, shareContext,
-        xp: xpData, rank, next, bracketHref: 'brackets'
+        xp: xpData, rank, next, bracketHref: 'brackets', progress
     });
+    modal.querySelectorAll('[data-wear-pack]').forEach(btn => btn.addEventListener('click', () => {
+        const opts = { champion: btn.dataset.wearPack, skin: Number(btn.dataset.wearSkin) };
+        if (window.openSettingsModal) { window.closePostVoteModal?.(); window.openSettingsModal(opts); }
+        else window.location.href = '/profile#champions';
+    }));
     const portraitImg = modal.querySelector('.pvm-portrait');
     if (portraitImg) portraitImg.onerror = () => { portraitImg.onerror = null; portraitImg.src = getChampionTileUrl(champKey, 0); };
     const modalShare = modal.querySelector('[data-share-box]');

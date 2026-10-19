@@ -3016,3 +3016,18 @@
     font-weight: 600;
     font-size: 0.9rem;
 }
+
+/* ---------- achievements tab: sections per champion, locked cards ---------- */
+.ach-sections { display: flex; flex-direction: column; gap: 2rem; }
+.ach-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(200, 170, 110, 0.3); }
+.ach-section-head h3 { margin: 0; font-family: 'Cinzel', serif; color: #f0e6d2; font-size: 1.15rem; letter-spacing: 1px; text-transform: uppercase; }
+.ach-section-count { color: #c8aa6e; font-weight: 700; }
+.ach-hidden-note { margin: .9rem 0 0; color: rgba(240, 230, 210, 0.55); font-size: .9rem; font-style: italic; }
+.achievement-card--locked { opacity: .6; border-color: rgba(200, 170, 110, 0.15); }
+.achievement-card--locked .achievement-icon { filter: grayscale(1); }
+.achievement-card--locked:hover { transform: none; box-shadow: none; }
+.ach-skin-note { margin-bottom: .75rem; color: #f0e6d2; font-size: .85rem; font-weight: 600; }
+.ach-progress { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; margin-bottom: .35rem; }
+.ach-progress span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #8c7340, #c8aa6e); }
+.ach-progress-text { margin-bottom: .75rem; color: rgba(240, 230, 210, 0.65); font-size: .8rem; }
+@media (max-width: 600px) { .ach-section-head { flex-wrap: wrap; } }

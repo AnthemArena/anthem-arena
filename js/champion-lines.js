@@ -11,3 +11,13 @@ export function dialogFor(pack, type) {
     if (!pack || !type) return null;
     return usable(find(pack, type)) || (/^welcome-/.test(type) ? usable(find(pack, 'welcome-back')) : null);
 }
+
+// The welcome lines can carry {days} (comeback) and {liveCount} (first visit). Every pack uses only these two, and the toast code must fill both:
+// a line that shows its placeholder on screen ("{liveCount} matches. Have fun.") looks broken. tools/test-champion-lines.mjs checks every pack.
+export const WELCOME_PLACEHOLDERS = ['days', 'liveCount'];
+export function fillWelcomeText(text, { days, liveCount } = {}) {
+    let out = String(text ?? '');
+    if (days !== undefined && days !== null) out = out.replace(/\{days\}/g, String(days));
+    if (liveCount !== undefined && liveCount !== null) out = out.replace(/\{liveCount\}/g, String(liveCount));
+    return out;
+}

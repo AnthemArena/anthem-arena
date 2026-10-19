@@ -94,8 +94,8 @@
               "lte": 3
             }
           },
-          "message": "{voteDiff} votes between them. The candles gutter. Choose.",
-          "cta": "Choose a fate"
+          "message": "{voteDiff} votes between them. The candles gutter. Hold your nerve.",
+          "cta": "Find one more vote"
         },
         {
           "condition": "default",

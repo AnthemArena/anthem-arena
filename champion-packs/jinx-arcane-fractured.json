@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Two designs, identical results. That's not science, that's rude. Somebody break the tie!",
+          "message": "Dead even! Two designs, identical results. That's not science, that's rude. Somebody find that one vote!",
           "cta": "Break the tie"
         },
         {
@@ -77,7 +77,7 @@
             }
           },
           "message": "One vote apart! One! Say it with me: ONE! I'm laughing and I don't know why!",
-          "cta": "Laugh and vote"
+          "cta": "Find one more vote"
         },
         {
           "condition": {

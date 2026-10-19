@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. I've got eight lives left and a lot of attitude. Go vote!",
+          "message": "Down {voteDiff}. I've got eight lives left and a lot of attitude. Rally some votes!",
           "cta": "Yowl about it"
         }
       ]

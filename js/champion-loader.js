@@ -231,7 +231,7 @@ function getChampionMessage(alertType, data) {
     return {
         message: replacePlaceholders(message, data),
         detail: replacePlaceholders(detail, data),
-        cta: button,
+        cta: replacePlaceholders(button, data),   // "See round {round}"
         emoji: currentChampionPack.emoji
     };
 }

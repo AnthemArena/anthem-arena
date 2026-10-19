@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Underwrapped, that's all. Go vote and I'll fetch more ribbon!",
+          "message": "Down {voteDiff}. Underwrapped, that's all. Rally some votes and I'll fetch more ribbon!",
           "cta": "Spread the cheer"
         }
       ]
@@ -67,8 +67,8 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Two presents, one bow, and a very long chimney. Decide for me!",
-          "cta": "Pick a present"
+          "message": "Dead even! Two presents, one bow, and a very long chimney. Rally for me!",
+          "cta": "Find one more vote"
         },
         {
           "condition": {

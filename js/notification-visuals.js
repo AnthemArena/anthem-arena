@@ -2,6 +2,7 @@ import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
 import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
+import { readToastStyle } from './notification-prefs.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -65,16 +66,16 @@ export function splashFromAvatarSrc(src) {
 // The champion's speech bubble used inside pop-ups: same look as the vote modal (dark card, pink edge, tail at the portrait).
 export function bubbleHtml(text, jinxSrc, accent) {
     if (!text) return '';
-    return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}</div></div>`;
+    return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}<button class="nv-bubble-x" aria-label="Dismiss" onclick="event.stopPropagation(); window.dismissBulletin && window.dismissBulletin()">×</button></div></div>`;
 }
 
 // Achievement pop-up in the same family as the other alerts: icon, "Achievement unlocked", name, the champion's line, button.
 export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc, accent, cta }) {
     return `
-    <div class="nv-body" onclick="window.handleBulletinCTA()">
+    <div class="nv-body" onclick="window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
-        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div>
+        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
+        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div></div>
         ${xp || rarity ? `<div class="nv-chips">${xp ? `<span class="nv-chip">+${escapeHtml(xp)} XP</span>` : ''}${rarity ? `<span class="nv-chip">${escapeHtml(rarity)}</span>` : ''}</div>` : ''}
         ${bubbleHtml(line, jinxSrc, accent)}
     </div>
@@ -160,9 +161,10 @@ export function toastHeadlineHtml(headline, src, name, accent, { avatar = true }
 
 export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, quip, cta }) {
     return `
-    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
+    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
         ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
+        ${n.matchTitle ? `<div class="nv-caption">${escapeHtml(n.matchTitle)}</div>` : ''}
         ${toastHeadlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent)}
         ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
@@ -257,8 +259,8 @@ export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headl
     return `
     <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
-        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}
+        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
+        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}</div>
         ${bubbleHtml(quip, jinxSrc, accent)}
     </div>
     <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
@@ -366,6 +368,7 @@ export function withoutLeadingGlyph(text, glyph) {
 // The picture at the top of a match-event card: the two edits with the state symbol between them, or, with no match to show,
 // the symbol alone in a ringed circle (same size, so the card does not jump when the edits arrive). label = hover / screen-reader text.
 export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
+    if (!edits && glyph === '') return '';   // an alert that wants no symbol (round opening, champion selected) gets no circle
     const g = glyph && glyph !== 'VS' ? glyph : null;
     const inner = edits
         ? editsPairHtml({ edits, relationship: 'event', size, accent, mark: g })
@@ -373,17 +376,17 @@ export function eventLeadHtml({ glyph, label, edits, accent, size = 60 }) {
     return `<div class="nv-lead nv-follow-face" role="img" aria-label="${escapeHtml(label || '')}" title="${escapeHtml(label || '')}">${inner}</div>`;
 }
 
-// Pop-up: [edit A] VS [edit B], a small tag line, the champion's words in a bubble, a few chips, one button. The whole card opens the match.
+// Pop-up: [edit A] VS [edit B], the champion's words in a bubble, one button. The whole card opens the match. (No pills: the vote page already
+// shows the percentages, so `chips` is accepted for old callers but not drawn.)
 export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, detail, chips = [], cta, leadHtml = '' }) {
-    if (strip) chips = chips.filter(c => !/^\d+ matches?$/.test(c));   // the picture strip says it better
     return `
-    <div class="nv-body" onclick="window.handleBulletinCTA()">
+    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.openBulletinMatch()">
         <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
+        ${n.matchTitle || (!leadHtml && tag) ? `<div class="nv-caption">${escapeHtml(n.matchTitle || tag)}</div>` : ''}
         ${leadHtml || eventLeadHtml({ glyph, label: tag, edits, accent, size: 60 })}
         ${bubbleHtml(withoutLeadingGlyph(quip, glyph), jinxSrc, accent)}
-        ${detail ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
+        ${detail && n.type !== 'novotes' && n.type !== 'lowvotes' ? `<div class="nv-event-detail">${escapeHtml(detail)}</div>` : ''}
         ${stripHtml(strip, accent, 34)}
-        ${chips.length ? `<div class="nv-chips">${chips.map(c => `<span class="nv-chip nv-chip-plain">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
     </div>
     <button class="bulletin-toast-cta nv-cta event" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View match')}</button>`;
 }
@@ -422,7 +425,26 @@ function socialHeadlineFor(n) {
 
 
 let stylesAdded = false;
+// The viewer's chosen toast style goes on <html> so the CSS below can restyle every pop-up without touching their markup.
+// Side art wants the splash cropped around the champion (Data Dragon's "centered" version of the same skin); falls back to the normal splash if that file is missing.
+export function setCenteredSplash(banner) {
+    const normal = banner?.style?.getPropertyValue('--nv-splash') || '';
+    const m = /url\(["']?([^"')]+)["']?\)/.exec(normal);
+    if (!m || typeof Image === 'undefined') return;
+    const centered = m[1].replace('/champion/splash/', '/champion/centered/');
+    if (centered === m[1]) { banner.style.setProperty('--nv-splash-c', normal); return; }
+    banner.style.setProperty('--nv-splash-c', normal);
+    const img = new Image();
+    img.onload = () => banner.style.setProperty('--nv-splash-c', `url("${centered}")`);
+    img.src = centered;
+}
+
+export function applyToastStyle(style = readToastStyle()) {
+    if (typeof document !== 'undefined') document.documentElement.dataset.toastStyle = style;
+}
+
 export function ensureVersusStyles() {
+    applyToastStyle();
     if (stylesAdded || typeof document === 'undefined' || document.getElementById('versus-styles')) { stylesAdded = true; return; }
     stylesAdded = true;
     const s = document.createElement('style');
@@ -452,21 +474,78 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-.versus-toast .nv-body{position:relative;cursor:pointer;padding:18px 16px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(18,10,24,.12) 0%,rgba(18,10,24,.55) 48%,rgba(18,10,24,.95) 100%),var(--nv-splash,none) center 20%/cover no-repeat,linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint))}
-.versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.22);box-shadow:none}
+/* the splash is its own header strip (--nv-art tall, full toast width); it fades out smoothly and the content overlaps its lower part so the two read as one card */
+.versus-toast .nv-body{position:relative;cursor:pointer;padding:calc(var(--nv-art,160px) - 46px) 16px 14px;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;gap:10px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint)),#120a18}
+.versus-toast .nv-body::before{content:'';position:absolute;top:0;left:0;right:0;height:var(--nv-art,160px);pointer-events:none;z-index:-1;background:var(--nv-splash,none) center 20%/cover no-repeat;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%)}
+/* the same splash, stretched and heavily blurred, tints the card body so the fade picks up the art's own colours (kept dim so the text stays readable) */
+.versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
+@media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
+/* inner colours follow the toast's own accent (green for allies, amber for tie-breakers...) so the bubble, pills and ring always match the outer border; plain pink where color-mix is unsupported */
+.bulletin-banner.versus-toast{--nv-line-auto:rgba(255,105,180,.4);--nv-chip-bg-auto:rgba(255,79,180,.18);--nv-chip-text-auto:#ffd6ee;--nv-readable-auto:#ffd6ee}
+@supports (color:color-mix(in srgb,red,blue)){.bulletin-banner.versus-toast{--nv-line-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 40%,transparent);--nv-chip-bg-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 18%,transparent);--nv-chip-text-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 30%,#fff);--nv-readable-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 42%,#fff)}}
+/* toast styles (Settings > Notifications): classic is the rules above; the others override them */
+.versus-toast .nv-head-row{display:contents}
+.versus-toast .nv-bubble-x{display:none}
+.versus-toast .nv-caption{display:none}
+/* full art: the splash is the whole card; no match thumbnails, captions, sub-lines or pills, and the champion's words in a frosted bubble over it */
+html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
+html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 14%}
+html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 42%,rgba(18,10,24,.38) 64%,rgba(18,10,24,.82) 100%)}
+html[data-toast-style="full"] .versus-toast .nv-edits,html[data-toast-style="full"] .versus-toast .nv-strip,html[data-toast-style="full"] .versus-toast .nv-lead:has(.nv-edits){display:none}
+html[data-toast-style="full"] .versus-toast .nv-caption,html[data-toast-style="full"] .versus-toast .nv-event-detail,html[data-toast-style="full"] .versus-toast .nv-chips{display:none}
+html[data-toast-style="full"] .versus-toast .nv-bubble{background:rgba(11,13,24,.55);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2)}
+html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(11,13,24,.55)}
+html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:110px}}
+/* side art: a tall column of centred art on the left (faded into the card); caption, bubble and pills on the right */
+html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:100px;padding:12px 12px 10px 114px;gap:8px;min-height:136px;justify-content:center}
+html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;filter:brightness(1.18) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
+html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx .nv-av{display:none}
+html[data-toast-style="side"] .versus-toast .nv-caption,html[data-toast-style="side"] .versus-toast .nv-event-detail,html[data-toast-style="side"] .versus-toast .nv-chips{display:none}
+html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
+@media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:70px;padding-left:84px}}
+/* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
+   a small arrow says so and the match name is the hover text. */
+html[data-toast-style="minimal"] .bulletin-banner.versus-toast{width:fit-content !important;max-width:min(440px,calc(100vw - 24px)) !important;margin-left:auto !important;background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0;gap:0;background:transparent;overflow:visible;isolation:auto}
+html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-pair,html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0;gap:12px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx .nv-circle{width:78px !important;height:78px !important;font-size:32px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px 16px;background:rgba(14,10,24,.94)}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:10px;bottom:6px;font-size:22px;line-height:1;color:var(--nv-accent,#ff69b4)}
+html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0}
+html[data-toast-style="minimal"] .versus-toast .nv-follow-face,html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{order:-2}
+html[data-toast-style="minimal"] .versus-toast .bulletin-close{display:none}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x{display:flex;position:absolute;top:-9px;right:-9px;z-index:4;width:22px;height:22px;padding:0;align-items:center;justify-content:center;border-radius:50%;font-size:14px;line-height:1;cursor:pointer;color:rgba(255,255,255,.9);background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.22)}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x:hover{background:rgba(0,0,0,.85);color:#fff}
+/* the "who did what" line (ally / rival / follow / achievement): no box, just their face and the words with a shadow, lined up with the bubble's left edge */
+html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{display:flex;width:fit-content;max-width:100%;align-items:center;justify-content:flex-start !important;text-align:left !important;gap:10px;margin:0 0 6px 90px;padding:0;background:none;border:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 12px rgba(0,0,0,.85)}
+html[data-toast-style="minimal"] .versus-toast .nv-toast-headline .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-follow-face{justify-content:flex-start;margin-left:90px;padding-bottom:6px}
+/* achievement / follow: their icon or face small beside the words, like the social alerts; event alerts lose their emoji circle */
+html[data-toast-style="minimal"] .versus-toast .nv-head-row{display:flex;align-items:center;gap:10px;margin:0 0 6px 90px;order:-2}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-follow-face{margin:0;padding:0}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-toast-headline{margin:0}
+html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-glyph){display:none}
+/* the bubble hugs its words (the toast shrinks to fit, staying on the right edge) */
+html[data-toast-style="minimal"] .versus-toast .nv-bubble{flex:0 1 auto}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx{width:fit-content;max-width:100%}
+.versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}
 .versus-toast .nv-headline{font-size:19px}
 .versus-toast .nv-toast-headline{justify-content:flex-start;gap:10px;text-align:left}
 .versus-toast .nv-toast-headline .nv-headline-text{display:flex;flex-direction:column;min-width:0;line-height:1.2}
 .versus-toast .nv-toast-name{font-size:18px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-accent);letter-spacing:.03em}
+.versus-toast .nv-toast-action{font-size:13px;font-weight:600;color:var(--nv-readable-auto);letter-spacing:.03em}
 .versus-toast .nv-jinx{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
 .versus-toast .nv-jinx-face{box-shadow:0 0 18px var(--nv-glow)}
-.versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,rgba(255,79,180,.35));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}
-.versus-toast .nv-bubble::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:rgba(11,13,24,.88);border-left:1px solid var(--nv-line,rgba(255,79,180,.35));border-bottom:1px solid var(--nv-line,rgba(255,79,180,.35));transform:rotate(45deg)}
+.versus-toast .nv-bubble{position:relative;flex:1;min-width:0;background:rgba(11,13,24,.88);color:#f6f3f7;border:1px solid var(--nv-line,var(--nv-line-auto));border-radius:16px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.4;margin-bottom:0;align-self:center;backdrop-filter:blur(6px)}
+.versus-toast .nv-bubble::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:rgba(11,13,24,.88);border-left:1px solid var(--nv-line,var(--nv-line-auto));border-bottom:1px solid var(--nv-line,var(--nv-line-auto));transform:rotate(45deg)}
 .versus-toast .nv-jinx{align-items:center;gap:14px}
 .versus-toast .nv-chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
-.versus-toast .nv-chip{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#ffd6ee;background:rgba(255,79,180,.18);border:1px solid rgba(255,79,180,.4);text-transform:capitalize}
+.versus-toast .nv-chip{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;color:var(--nv-chip-text-auto);background:var(--nv-chip-bg-auto);border:1px solid var(--nv-line-auto);text-transform:capitalize}
 .versus-toast .nv-cta{display:block;width:100%;border:0;border-radius:0;padding:11px;font-weight:700;letter-spacing:.04em;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--nv-accent),var(--nv-accent-dark))}
 .versus-toast .nv-cta.ally{color:#0f0b18}
 .versus-toast .nv-follow-face{display:flex;justify-content:center;padding-top:2px}

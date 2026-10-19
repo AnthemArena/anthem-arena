@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Slightly underbaked, that's all. Go vote and I'll fix the temperature!",
+          "message": "Down {voteDiff}. Slightly underbaked, that's all. Rally some votes and I'll fix the temperature!",
           "cta": "Spread the word"
         }
       ]
@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Two plates, one fork, and a judge who can't decide. Taste it for me!",
+          "message": "Dead even! Two plates, one fork, and a judge who can't decide. Bring a friend to taste it!",
           "cta": "Be the judge"
         },
         {

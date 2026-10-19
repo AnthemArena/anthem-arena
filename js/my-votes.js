@@ -476,10 +476,10 @@ async function loadAchievements() {
     // Update achievements section header with count
     const achievementsSection = document.getElementById('achievementsSection');
     if (achievementsSection) {
-        const totalAchievements = Object.keys(ACHIEVEMENTS).length;
+        const totalAchievements = Object.values(ACHIEVEMENTS).filter(a => !a.champion).length;   // general set; champion ones are counted per champion
         const sectionHeader = achievementsSection.querySelector('.section-header h2');
         if (sectionHeader) {
-            sectionHeader.textContent = `Achievements (${unlockedAchievements.length}/${totalAchievements})`;
+            sectionHeader.textContent = `Achievements (${unlockedAchievements.filter(id => !ACHIEVEMENTS[id]?.champion).length}/${totalAchievements})`;
         }
     }
 }

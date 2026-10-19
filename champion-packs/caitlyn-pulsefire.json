@@ -59,7 +59,7 @@
             }
           },
           "message": "{voteDiff} behind. A few precise edits and history corrects itself.",
-          "cta": "Cast a vote"
+          "cta": "Rally some votes"
         },
         {
           "condition": "default",

@@ -92,7 +92,7 @@
               "eq": 0
             }
           },
-          "message": "Level. One vote decides it, and it has not been cast yet.",
+          "message": "Level. One more vote decides it.",
           "cta": "Rally support"
         },
         {
@@ -1088,15 +1088,27 @@
     "default": {
       "messages": [
         "Achievement unlocked: {name}. Well done.",
-        "Another one on record: {name}."
+        "Another one on record: {name}.",
+        "{name}. Well earned.",
+        "{name}. Noted, and entered in the file.",
+        "That's {name}. A clean result.",
+        "{name}. Consistent work.",
+        "Good. {name} is yours.",
+        "{name}. I expected nothing less.",
+        "Another entry for the record: {name}.",
+        "{name}. Quietly done, and done well."
       ],
       "details": [
         "{description}. +{xp} XP",
-        "{description} +{xp} XP"
+        "{description} +{xp} XP",
+        "Entered in the record. +{xp} XP",
+        "A fair result. +{xp} XP"
       ],
       "buttons": [
         "View achievements",
-        "See all"
+        "See all",
+        "Review",
+        "Continue"
       ]
     },
     "mastery-up": {
@@ -1180,6 +1192,76 @@
       ],
       "buttons": [
         "View champions",
+        "Continue"
+      ]
+    },
+    "jinx-troublemaker": {
+      "messages": [
+        "Underdogs on five different days. Jinx would call it trouble. I'd call it persistence.",
+        "Five days, five long shots. I'll keep an eye on you."
+      ],
+      "details": [
+        "A pattern of daring. +{xp} XP",
+        "Underdogs across five days. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "jinx-chaos-agent": {
+      "messages": [
+        "Five edits you backed while they trailed. Against the odds, on purpose.",
+        "You stood with the losing side five times. Unconventional, but deliberate."
+      ],
+      "details": [
+        "Conviction against the tide. +{xp} XP",
+        "Five trailing picks. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-door-breaker": {
+      "messages": [
+        "Ten votes before anyone else arrived. That takes nerve.",
+        "First on the scene, ten times. Vi would approve."
+      ],
+      "details": [
+        "Ahead of the crowd. +{xp} XP",
+        "Ten early votes. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-heavy-hitter": {
+      "messages": [
+        "Thirty votes. That's real commitment.",
+        "Thirty votes cast, every one with intent."
+      ],
+      "details": [
+        "Thirty and counting. +{xp} XP",
+        "A heavy hand with the ballot. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
+        "Continue"
+      ]
+    },
+    "vi-right-call": {
+      "messages": [
+        "Fifteen winners backed. You read these matches well.",
+        "Fifteen correct calls. A good eye."
+      ],
+      "details": [
+        "A sharp read. +{xp} XP",
+        "Fifteen winners picked. +{xp} XP"
+      ],
+      "buttons": [
+        "Next match",
         "Continue"
       ]
     }

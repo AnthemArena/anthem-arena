@@ -23,7 +23,7 @@
             }
           },
           "message": "Down {voteDiff}? Their draft read ours. Fine. Time for the pick they'll never ban!",
-          "cta": "Make the pick"
+          "cta": "Rally some votes"
         },
         {
           "condition": {
@@ -54,7 +54,7 @@
         },
         {
           "condition": "default",
-          "message": "Down {voteDiff}. Slow early game, that's all. Go vote and we'll scale!",
+          "message": "Down {voteDiff}. Slow early game, that's all. Rally some votes and we'll scale!",
           "cta": "Rally the team"
         }
       ]
@@ -67,7 +67,7 @@
               "eq": 0
             }
           },
-          "message": "Dead even! Game five, final minute, nexus on the line. Somebody make the call!",
+          "message": "Dead even! Game five, final minute, nexus on the line. Somebody find the vote!",
           "cta": "Make the call"
         },
         {
