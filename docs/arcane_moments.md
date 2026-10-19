@@ -999,6 +999,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
   and a closing match is sundown. Written from the theme only, not from the card's text; no character names.
 - **Done:** Safari Caitlyn (`caitlyn-safari`, skin 3): a dry-witted scholar-explorer in ancient ruins. Field notes, relics, torches and traps; votes are finds logged,
   ties are forked tunnels and a closing match is the dig site shutting for the season. Written from the theme only, not from the card's text; no character names.
+- **Done:** Lunar Wraith Caitlyn (`caitlyn-lunar-wraith`, skin 10): a hushed, ill-omened spirit haunting by moonlight. Candles, crypts, mist and fading light; votes are omens cast,
+  ties are balanced curses and a closing match is the moon setting. Written from the theme only, not from the card's text; no character names.
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
