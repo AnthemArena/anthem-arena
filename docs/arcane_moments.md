@@ -1024,3 +1024,42 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
+
+## Progression audit 2: XP, levels, achievements (19 October 2026)
+A read-only review of how XP, levels, achievements and mastery behave today (code read, plus a small simulation of the vote flow). Nothing was changed. The 18 October audit above is partly fixed (one saved XP total, hydration, pack mastery, pack achievements); this one is about what is still wrong.
+
+**What exists.** 10 levels (0 to 12,000 XP). Per vote: 10, plus a daily bonus 20, early voter 5 (in the recompute only), close match 10, underdog 5, streak 10 per day (recompute only), share 5 (live, per click). 37 achievements worth 8,050 XP in total (milestones 1,050, streaks 925, underdog 600, early 350, clutch 575, loyalty 700, journey 675, completionist 700, special 925, social 350, companions 1,200). Mastery per companion up to 7,500 XP, skins at each level, four prestige skins from achievements.
+
+**Bugs (the awards do not do what the table says)**
+1. **Every vote earns the daily bonus, and the voting streak never grows.** `calculateVoteXP` (rank-system.js) stores `lastVoteDate` as an ISO date (`2026-10-19`), then `updateVotingStreak` (vote.js) reads the same key expecting `toDateString()` format (`Mon Oct 19 2026`) and writes that format back. The two never match, so each vote pays +30 instead of 10 (+20 "first vote today" every time), and the streak is reset to 1 on every vote. Simulated: 4 votes on one day = +30 each, streak stays 1; next day the same. Result: the four streak achievements (Spark 3 days, On a Roll 7, Unstoppable 14, Arcane Dedication 30; 925 XP) can never unlock, and XP runs about a third to a half ahead of the intended pace.
+2. **"Early voter" never counts.** `earlyVotes` asks whether the match's vote total is 10 or fewer *now* (match data fetched at check time), not when the person voted. The vote record already saves `totalVotesAtTime`, which is ignored. First on the Scene and Ahead of the Curve (350 XP) are effectively unreachable once a match has more than 10 votes.
+3. **Underdog and close-call votes use today's standing, not the vote-time one.** `voteType` is recomputed at check time from the match's current percentages (under 40% = underdog, 40-60% = close call) and ignores the `voteType` saved when the vote was cast. A vote can count as an underdog today and not tomorrow, and the standing of a finished match decides it. Achievements never un-unlock, so it drifts upward.
+4. **Comeback Believer is the same number as the underdog count.** `comebackVotes` is "voted song under 40%" which is exactly the underdog test, so Against the Grain (5) and Comeback Believer (5), and Rebel Heart/Loose Cannon, trip together for the same behaviour and pay twice.
+5. **"Long session" and "Deep dive" need one vote more than they say.** `sessionStart` is set on the first achievement check, which runs after the first vote, so that vote is not counted: 5 votes in a session needs 6, 10 needs 11.
+6. **Four different meanings of "close" and two of "underdog".** XP close match: 5 votes apart (live count). Achievements close call: 40-60% share. Tie-breaker: exactly level with 10+ votes. Nailbiter alert: within 3 votes with over 10. Underdog: lower *seed* (XP; false in random-draw cups where seeds are null) versus under 40% (achievements). Players cannot learn the rule when it differs per reward.
+7. **Share XP is farmable and mislabelled.** `trackShare` pays 5 XP per click on any share button (copy link included), with no cap and no check that anything was shared, and counts toward Signal Boost / Spreading the Word. `xpSources.share` says 10 while the code pays 5.
+8. **Possible double award.** `checkAchievements` can run from several places at once (after a vote, after a match result, after a share); the "already unlocked?" check and the write are not one step, so two runs can both pay the XP and both toast. Low odds, never seen.
+
+**Smaller things**
+- `all-the-way` (vote in 6 rounds) only fits a 64-entry cup with a group stage (group + 5 knockout rounds). A 16-entry cup has 4 rounds, so it cannot unlock. `arcane-legend` (100 votes) and `bracket-veteran` (50 unique matches) also depend on cup size.
+- The vote history used for achievements is this browser's `userVotes`, including votes from old cups (they count as "balanced", round 1, when the match is gone). Fine for now; the recoverable sign-in will need a Firestore-based history.
+- When the recoverable sign-in arrives, "larger XP wins" will lose XP earned on two devices at once. Today a new device is a new account, so it does not bite yet. The robust fix is to derive XP from records (votes + unlocked achievement ids + shares) instead of a counter.
+- Dead references: `daily-comeback`, and the vote-only list names (`opening-act`, `first-blood`, `lightning-fast`...) are not in the achievement table. Two copies of `unlockAchievementInFirebase`.
+- "Arcane Legend" is both the level-10 rank and the 100-votes achievement, so a toast can say it twice with different meanings.
+- 32 of 37 achievements are hidden until unlocked, so players cannot aim at them. Only First Choice and the four companion ones are visible.
+
+**Pace today versus once bug 1 is fixed** (5 votes a day, milestones and completionist achievements only):
+
+| Player | Now | After fix |
+|---|---|---|
+| Casual: 10 votes, 2 days | 550 XP, level 4 | 390 XP, level 3 |
+| Regular: 50 votes, 10 days | 2,750 XP, level 6 | 2,125 XP, level 6 |
+| Dedicated: 120 votes, 24 days | 5,350 XP, level 8 | 3,855 XP, level 7 |
+
+All 37 achievements plus every vote in a 64-entry group cup (about 127 matches) still lands under 12,000 XP, so level 10 (Arcane Legend) and mastery 10 on one champion (7,500 XP of that champion's own XP) need more than one cup. That may be intended; it should be a deliberate choice.
+
+**Proposed order of work**
+1. Fix XP correctness (bugs 1, 2, 3, 4, 5, 8 and the share cap): one daily-bonus rule, a real streak derived from vote days, vote-time facts used for early / underdog / close, comeback separated or dropped, session off-by-one, a lock around achievement awards, share XP once per match per day. Tests for each.
+2. One written definition of "close" and "underdog", shown on the achievements page.
+3. Decide the pace (levels 8-10, mastery 10, prestige skins) and cup-size-aware achievements.
+4. Then new content: Jinx achievement set with ability icons, Ekko unlock, Vi achievement skin, past-tournament accolades.
