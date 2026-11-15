@@ -66,11 +66,10 @@ export const COMPANION_PACKS = [
         enabled: true
     },
     {
-        // Ekko's lines are still being written: keep this false until champion-packs/ekko.json has no "TODO" left
         id: 'ekko',
         name: 'Ekko',
         championId: 'Ekko',
-        enabled: false
+        enabled: true
     }
 ];
 

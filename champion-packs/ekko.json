@@ -1,24 +1,24 @@
 {
   "id": "ekko",
   "name": "Ekko",
-  "displayName": "Ekko",
+  "displayName": "The Boy Who Shattered Time ⏳",
   "emoji": "⏳",
   "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Ekko.png",
-  "description": "TODO",
+  "description": "Inventive, quick-witted and fiercely loyal. A better future is worth fighting for.",
   "buttonPrefix": "⏳",
-  "color": "#0f766e",
+  "color": "#14b8a6",
   "theme": {
-    "background": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_36.jpg')",
+    "background": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg')",
     "backgroundSize": "cover",
-    "backgroundPosition": "center 30%",
-    "borderColor": "rgba(15, 118, 110, 0.85)",
-    "borderGlow": "0 0 30px rgba(45, 212, 191, 0.6), 0 0 60px rgba(153, 246, 228, 0.3)",
+    "backgroundPosition": "center 28%",
+    "borderColor": "rgba(20, 184, 166, 0.85)",
+    "borderGlow": "0 0 28px rgba(45, 212, 191, 0.65), 0 0 56px rgba(34, 211, 238, 0.28), inset 0 0 20px rgba(0, 0, 0, 0.5)",
     "titleColor": "#ffffff",
     "detailColor": "rgba(255, 255, 255, 0.95)",
-    "buttonBackground": "linear-gradient(135deg, #0f766e, #0d9488)",
-    "buttonHover": "linear-gradient(135deg, #0d9488, #14b8a6)",
+    "buttonBackground": "linear-gradient(135deg, #0f766e, #0891b2)",
+    "buttonHover": "linear-gradient(135deg, #0e7490, #0f766e)",
     "buttonText": "#ffffff",
-    "textShadow": "0 3px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 1)"
+    "textShadow": "0 3px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(45, 212, 191, 0.45), 0 1px 3px rgba(0, 0, 0, 1)"
   },
   "alerts": {
     "danger": {
@@ -29,8 +29,8 @@
               "gte": 50
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{momentTitle} is down {voteDiff}. That's a long way back, but I've seen harder problems get solved.",
+          "cta": "Rally some votes"
         },
         {
           "condition": {
@@ -38,8 +38,8 @@
               "gte": 30
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Down {voteDiff}. They're getting comfortable. Let's give them a reason not to.",
+          "cta": "Call for backup"
         },
         {
           "condition": {
@@ -47,17 +47,8 @@
               "gte": 20
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
-        },
-        {
-          "condition": {
-            "voteDiff": {
-              "gte": 15
-            }
-          },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Losing by {voteDiff}? Don't count it out. We just need to get more people in the room.",
+          "cta": "Spread the word"
         },
         {
           "condition": {
@@ -65,8 +56,8 @@
               "gte": 10
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Trailing by {voteDiff}. Time to change the equation.",
+          "cta": "See the damage"
         },
         {
           "condition": {
@@ -74,13 +65,13 @@
               "gte": 5
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Only {voteDiff} behind. That's within reach. Let's move.",
+          "cta": "Get some help"
         },
         {
-          "condition": "TODO",
-          "message": "TODO",
-          "cta": "TODO"
+          "condition": "default",
+          "message": "Down {voteDiff}. Still time to turn this around. You with me?",
+          "cta": "Share it around"
         }
       ]
     },
@@ -92,8 +83,8 @@
               "eq": 0
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Dead even. One vote tips it. This is where it gets interesting.",
+          "cta": "Rally the troops"
         },
         {
           "condition": {
@@ -101,8 +92,8 @@
               "eq": 1
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "One vote apart. I should probably stop watching the numbers. Probably.",
+          "cta": "Get another vote"
         },
         {
           "condition": {
@@ -110,13 +101,13 @@
               "lte": 3
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{voteDiff} votes apart. Nobody's getting much breathing room.",
+          "cta": "Watch it close"
         },
         {
-          "condition": "TODO",
-          "message": "TODO",
-          "cta": "TODO"
+          "condition": "default",
+          "message": "{voteDiff} votes in it. Could go either way. That's the good part.",
+          "cta": "See the match"
         }
       ]
     },
@@ -128,8 +119,8 @@
               "gte": 85
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{userPct}% for {momentTitle}. That's a serious lead. Don't waste it.",
+          "cta": "Gloat a little"
         },
         {
           "condition": {
@@ -137,17 +128,8 @@
               "gte": 75
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
-        },
-        {
-          "condition": {
-            "userPct": {
-              "gte": 70
-            }
-          },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{userPct}%. Looks like people are starting to see what you saw.",
+          "cta": "Enjoy it"
         },
         {
           "condition": {
@@ -155,13 +137,13 @@
               "gte": 65
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{userPct}%. We're ahead. Keep the momentum moving.",
+          "cta": "Keep it going"
         },
         {
-          "condition": "TODO",
-          "message": "TODO",
-          "cta": "TODO"
+          "condition": "default",
+          "message": "Still in front at {userPct}%. The future's looking good. For now.",
+          "cta": "Keep an eye on it"
         }
       ]
     },
@@ -173,8 +155,8 @@
               "gte": 30
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "{momentTitle} was down {voteDiff} and pulled ahead? That's what happens when people don't give up.",
+          "cta": "Take a bow"
         },
         {
           "condition": {
@@ -182,17 +164,8 @@
               "gte": 15
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
-        },
-        {
-          "condition": {
-            "voteDiff": {
-              "gte": 10
-            }
-          },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "A {voteDiff}-vote hole, and now they're in front. I like a good reversal.",
+          "cta": "Enjoy this"
         },
         {
           "condition": {
@@ -200,1347 +173,1309 @@
               "gte": 5
             }
           },
-          "message": "TODO",
-          "cta": "TODO"
+          "message": "Came back from {voteDiff} behind. That took more than luck.",
+          "cta": "Nice one"
         },
         {
-          "condition": "TODO",
-          "message": "TODO",
-          "cta": "TODO"
+          "condition": "default",
+          "message": "{momentTitle} just took the lead. Guess it wasn't finished after all.",
+          "cta": "See where it stands"
         }
       ]
     },
     "ally": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{username} picked {momentTitle} too. Good. Always better when the crew sees it the same way.",
+        "You and {username} agree on {momentTitle}. Not a bad team, the two of you.",
+        "{username} backed {momentTitle}. Looks like you've got another set of eyes on your side.",
+        "Same pick as {username}: {momentTitle}. That's a little more support for the cause.",
+        "{username} chose {momentTitle}. I can work with that.",
+        "{username} is with you on {momentTitle}. Keep good people close.",
+        "{username} picked {momentTitle}. That's how a small idea starts getting somewhere.",
+        "{username} has the same read as you. Huh. You might be onto something."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "A good crew makes the hard stuff possible.",
+        "Two people can start a movement.",
+        "Don't underestimate a little backup.",
+        "Keep your people close. They matter.",
+        "Good instincts tend to find each other.",
+        "That's one more person in your corner.",
+        "Now we're getting somewhere.",
+        "Not bad. The crew's coming together."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Say hi",
+        "Send a fist bump",
+        "See the match",
+        "Back them up",
+        "Nice one",
+        "Team up"
       ]
     },
     "rival": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{username} picked {theirMoment} over {yourMoment}. Different read. Let's see how it plays out.",
+        "{username} voted against {yourMoment}. Okay. A little competition never hurt.",
+        "{username} chose {theirMoment}. I'll remember that when the results come in.",
+        "{username} went for {theirMoment}. Bold move. Let's see if it works.",
+        "{username} is against you on {yourMoment}. Guess we've got a race.",
+        "{username} thinks {theirMoment} is better? Hm. I'd like to see the proof.",
+        "{username} voted the other way. No hard feelings. Yet.",
+        "You versus {username}. All right. Let's make this interesting."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "A little competition keeps everybody sharp.",
+        "No need to make it personal. Unless they do.",
+        "Let the votes do the talking.",
+        "Different opinions. Same game.",
+        "They might still come around.",
+        "A fair challenge is worth taking.",
+        "Keep your head. Then make your move."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See the match",
+        "Go and look",
+        "Watch it go up",
+        "Face them",
+        "Settle it",
+        "Front row"
       ]
     },
     "streak-ally-10": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Ten matches in a row with {username}. You two have a pretty good read on each other.",
+        "{username} has agreed with you ten times running. That's a partnership taking shape.",
+        "Ten straight with {username}. Not bad. The crew's stronger together."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Good people make a difference.",
+        "That's a solid little team.",
+        "Keep building on it.",
+        "Ten in a row. Respect."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See their profile",
+        "Say hi",
+        "Nice"
       ]
     },
     "streak-ally-20": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{streakCount} matches in a row with {username}. That's not just a streak. That's trust.",
+        "{streakCount} with {username}, same side every time. You make a good team.",
+        "{streakCount} straight with {username}. Some things work better together."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "That's a crew worth keeping.",
+        "Trust takes time. You've built it.",
+        "A lot of matches. A lot of teamwork."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See their profile",
+        "Wow",
+        "Say hi"
       ]
     },
     "streak-rival-10": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Ten matches against {username}. You two keep ending up on opposite sides.",
+        "{username} has disagreed with you ten times running. That's some commitment.",
+        "Ten battles with {username}. At this point, you know each other's moves."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "This rivalry has legs.",
+        "I'm curious who changes their mind first.",
+        "Keep it competitive. Keep it clever."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See their profile",
+        "Face them",
+        "Fight again"
       ]
     },
     "streak-rival-20": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{streakCount} matches against {username}. This has become a whole thing.",
+        "{streakCount} battles with {username}. Neither of you is giving an inch.",
+        "{streakCount} against {username}. That's a rivalry with staying power."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "You both know the other's playbook by now.",
+        "A long-running disagreement. Impressive.",
+        "Somebody's going to have to make a move."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See their profile",
+        "Face them",
+        "Keep going"
       ]
     },
     "closing-24h": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO"
+        "{matchTitle} closes in {timeLeft}, and you haven't voted yet. There's still time to make your mark.",
+        "{timeLeft} left on {matchTitle}. Don't let the decision pass you by.",
+        "{matchTitle} is decided in {timeLeft}. Get your vote in before the window closes."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO"
+        "Vote now",
+        "Beat the clock"
       ]
     },
     "closing-3h": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO"
+        "{timeLeft} left on {matchTitle}. Time to make your call.",
+        "{matchTitle} closes in {timeLeft}. Don't leave it to chance.",
+        "Only {timeLeft} until {matchTitle} ends. Your vote's still missing."
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Vote now",
+        "Fine, I'll do it"
       ]
     },
     "closing-final": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO"
+        "{matchTitle} closes in {timeLeft}. Last chance to make your voice count.",
+        "{timeLeft} left on {matchTitle}. Make the call.",
+        "Final window on {matchTitle}. {timeLeft} to go. Don't miss it."
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Last chance",
+        "Go go go"
       ]
     },
     "closing-multi": {
       "messages": [
-        "TODO",
-        "TODO"
+        "{matchCount} matches are closing and you haven't voted in them. The first goes in {timeLeft}.",
+        "{matchCount} unvoted matches are nearly done. You've got {timeLeft} before the first one closes."
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Show me",
+        "Fine, let's go"
       ]
     },
     "novotes": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Zero votes on {matchTitle}. Quiet start. Somebody's got to break it.",
+        "{moment1} versus {moment2}, and nobody's weighed in. You could start the whole thing.",
+        "A new match, no votes. First move is yours.",
+        "{matchTitle} is wide open. Make the first call."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Vote first",
+        "Light the fuse",
+        "Be the first",
+        "Fine, me then"
+      ]
+    },
+    "lowvotes": {
+      "messages": [
+        "{totalVotes} vote{votesPlural} on this one. There's more to this match than that.",
+        "Not many votes yet. Maybe the crew hasn't seen it.",
+        "Low turnout. Let's get a few more people in here.",
+        "This match deserves a better look. Know anyone who'd have an opinion?"
+      ],
+      "details": [
+        "A small start can still become something big.",
+        "Bring a few more people into it.",
+        "Every voice changes the picture.",
+        "Let's get the word out."
+      ],
+      "ctas": [
+        "Vote",
+        "Fix it",
+        "Go on",
+        "Help"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "{matchTitle} is tied. One vote breaks it. Want to be the one who changes the course?",
+        "Perfect tie on {matchTitle}. Your vote could be the turning point.",
+        "Dead even. Somebody has to make the next move. Could be you.",
+        "{moment1} and {moment2} are level. One decision changes everything."
+      ],
+      "buttons": [
+        "Break the tie",
+        "Be the deciding vote",
+        "Tip it",
+        "Pick a side"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "{matchTitle} is still tied and the clock is nearly out. This is your moment.",
+        "Dead level, almost out of time. Your vote could settle it.",
+        "Still tied with the clock running down. Don't let the chance slip."
+      ],
+      "buttons": [
+        "Pick a side",
+        "Break it now",
+        "Decide it",
+        "Cast the vote"
       ]
     },
     "round-opening": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Round {round} is open. {matchCount} new matches. Let's see what the crowd thinks.",
+        "{matchCount} fresh matches in round {round}. New stories, new decisions.",
+        "Round {round} just started. {matchCount} matches are ready for a first look.",
+        "New round. {matchCount} matches. Plenty of room to make a difference."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Start voting",
+        "See round {round}",
+        "Let's go",
+        "Show me"
       ]
     },
     "match-won": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{momentTitle} just advanced. You saw something in it before the crowd did.",
+        "{momentTitle} made it through. Good eye.",
+        "{momentTitle} survived the round. Sometimes the right choice just needs time.",
+        "{momentTitle} is through. That's one more step forward.",
+        "{momentTitle} moves up. The next round won't be easy.",
+        "{momentTitle} won. Looks like your read was right."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Your pick is still in the race.",
+        "One round down. Keep looking ahead.",
+        "The bracket gets tighter from here."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Gloat",
+        "See the result",
+        "Next match",
+        "On to the next round"
       ]
     },
     "match-lost": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{momentTitle} is out. Doesn't make the moment any less worth remembering.",
+        "{momentTitle} lost. The result's settled, but the argument isn't.",
+        "Well, {momentTitle} is gone. Take the lesson, then look ahead.",
+        "{momentTitle} didn't make it. Some things don't get the ending we wanted.",
+        "{momentTitle} is out. Keep the good parts. That's what matters.",
+        "{momentTitle} is finished for this round. There's always another chance to get it right."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "A setback isn't the end of the story.",
+        "It made it this far. That counts.",
+        "There's another round to look forward to.",
+        "Learn from it. Keep moving."
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "See the result",
+        "Next match",
+        "Revenge",
+        "I'm fine"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "Still deciding? Take another look. Sometimes the little details make the difference.",
+        "You've watched them both. Trust your instincts and make the call.",
+        "No rush. Just don't let the moment pass without a vote.",
+        "You can run the possibilities all day. Eventually, you've got to choose."
+      ],
+      "details": [
+        "Every vote moves the picture.",
+        "Your perspective belongs here.",
+        "Look closely. Trust what you see.",
+        "Make your call. Then own it."
+      ],
+      "buttons": [
+        "Vote now",
+        "Pick one",
+        "Do it",
+        "Go on"
       ]
     },
     "welcome": {
       "welcome-first-time": {
         "messages": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "New face? Welcome. {liveCount} matches are live. Find one that catches your eye.",
+          "Good timing. {liveCount} matches are waiting. Let's see what you think.",
+          "First time here? Take a look around. {liveCount} live matches to start with.",
+          "{liveCount} matches, plenty of opinions. There's room for yours."
         ],
         "buttons": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "Start voting",
+          "Show me",
+          "Let's go",
+          "Light it up"
         ]
       },
       "welcome-streak": {
         "messages": [
-          "TODO",
-          "TODO",
-          "TODO"
+          "Day two. You're back. Good to see you again.",
+          "Two days running. Looks like this has your attention.",
+          "Back for another round? I had a feeling you'd be."
         ],
         "buttons": [
-          "TODO",
-          "TODO",
-          "TODO"
+          "Keep going",
+          "More matches"
         ]
       },
       "welcome-comeback": {
         "messages": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "{days} days away. Welcome back. A lot can change while you're gone.",
+          "After {days} days, you're back. No need to explain. Let's catch you up.",
+          "{days} days. Thought we'd lost you for a second. Glad we didn't."
         ],
         "buttons": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "Catch up",
+          "Show me"
         ]
       },
       "welcome-back": {
         "messages": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "You're back. Good. Let's see what's changed.",
+          "Welcome back. The next decision's waiting.",
+          "Back again. Ready to pick up where you left off?"
         ],
         "buttons": [
-          "TODO",
-          "TODO",
-          "TODO",
-          "TODO"
+          "Let's go",
+          "Show me"
         ]
       }
-    },
-    "lowvotes": {
-      "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "ctas": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ]
-    },
-    "tiebreaker": {
-      "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ]
-    },
-    "tiebreaker-final": {
-      "messages": [
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ]
-    },
-    "encouragement": {
-      "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ],
-      "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
-      ]
     }
   },
   "achievements": {
     "first-choice": {
       "messages": [
-        "TODO",
-        "TODO"
+        "First vote. That's the first step. The rest is up to you.",
+        "You made your first call. Good place to start."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "One decision on the board. +{xp} XP",
+        "Every big change starts somewhere. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "getting-started": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five votes. You're getting a feel for it.",
+        "Five already. Looks like you're finding your rhythm."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A good start. Keep building. +{xp} XP",
+        "Five choices made. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "arcane-regular": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten votes. You're becoming part of the crew.",
+        "Ten in. You know your way around now."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A familiar face. +{xp} XP",
+        "Ten and counting. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "crowd-voice": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Twenty-five votes. That's a lot of voices you've added.",
+        "Twenty-five. You're helping shape the conversation."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The crew can hear you. +{xp} XP",
+        "Twenty-five on the board. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "deep-in-the-story": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifty votes. You're seeing the whole picture now.",
+        "Fifty. You didn't just stop at the first impression."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "You looked beyond the surface. +{xp} XP",
+        "Fifty decisions made. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "arcane-legend": {
       "messages": [
-        "TODO",
-        "TODO"
+        "A hundred votes. That's a serious run. Respect.",
+        "One hundred. You've made your mark on this tournament."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A milestone worth remembering. +{xp} XP",
+        "One hundred and still going. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "spark": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Three days running. Something's caught your attention.",
+        "Three straight days. You're building a habit."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The spark is there. +{xp} XP",
+        "Three days in a row. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "on-a-roll": {
       "messages": [
-        "TODO",
-        "TODO"
+        "A whole week. You're finding your rhythm.",
+        "Seven days straight. That's some consistency."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A week of showing up. +{xp} XP",
+        "Seven days, no pause. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "unstoppable": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Two weeks. You keep finding a reason to come back.",
+        "Fourteen days running. That's dedication."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Two weeks in motion. +{xp} XP",
+        "Fourteen days strong. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "arcane-dedication": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Thirty days. That's a whole lot of time well spent. Thank you.",
+        "A month of showing up. People like you keep this place moving."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Thirty days in the crew. +{xp} XP",
+        "A full month. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "against-the-grain": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five underdogs. You don't just follow the crowd.",
+        "Five times you backed the one nobody expected. I respect that."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Independent thinking. +{xp} XP",
+        "Five against-the-odds picks. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "rebel-heart": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifteen underdogs. You know a long shot isn't a lost cause.",
+        "Fifteen. You're not afraid to see things differently."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A mind of your own. +{xp} XP",
+        "Fifteen underdog votes. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "dark-horse": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Thirty underdogs. You keep seeing potential where others don't.",
+        "Thirty. The crowd hasn't figured out your way of thinking yet."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A different perspective. +{xp} XP",
+        "Thirty long shots backed. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "first-on-the-scene": {
       "messages": [
-        "TODO",
-        "TODO"
+        "First to vote in five matches. You don't wait for the crowd.",
+        "Five times you made the first move."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "You were there early. +{xp} XP",
+        "Five first votes. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "ahead-of-the-curve": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifteen matches where you got there first. Always a step ahead.",
+        "Early again and again. You like to see things for yourself."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Fifteen early decisions. +{xp} XP",
+        "Ahead of the crowd. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "nail-biter": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten close matches. You don't mind a little uncertainty.",
+        "Another tight finish. You seem to find the interesting ones."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Close calls are your thing. +{xp} XP",
+        "Ten matches down to the wire. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "deciding-voice": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Twenty-five close matches. Your vote keeps showing up when it matters.",
+        "You've tipped the balance more than once. That's influence."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A difference-maker. +{xp} XP",
+        "Twenty-five close calls. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "comeback-believer": {
       "messages": [
-        "TODO",
-        "TODO"
+        "You backed the one that was behind, five times. You believe in second chances.",
+        "Five comebacks backed. You know the first result isn't always the final one."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Never count anyone out. +{xp} XP",
+        "Five comebacks believed in. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "repeat-favourite": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Same moment, three times. Something about that one keeps bringing you back.",
+        "That one again? Guess it still holds up."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "You know what you like. +{xp} XP",
+        "Three votes for one favourite. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "die-hard": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five votes for the same moment. That's commitment.",
+        "You keep backing that one. I admire the conviction."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Sticking with your choice. +{xp} XP",
+        "Five votes, one favourite. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "obsession": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten votes for one moment. At this point, it's part of your story.",
+        "Ten times, same pick. When you know, you know."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A favourite worth fighting for. +{xp} XP",
+        "Ten votes for one moment. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "two-round-journey": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Two rounds in. You're seeing this thing through.",
+        "You stayed for round two. Let's see where it goes."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The journey continues. +{xp} XP",
+        "Two rounds down. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "deep-into-the-bracket": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Four rounds. You're deep in the bracket now.",
+        "Four rounds in. Every choice starts to matter more."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Four rounds forward. +{xp} XP",
+        "Further into the tournament. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "all-the-way": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Six rounds. You stayed for the whole ride.",
+        "All six rounds. You saw it through. That's worth something."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "From start to finish. +{xp} XP",
+        "The whole journey. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "match-explorer": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten matches. You're checking out every corner of the bracket.",
+        "Ten different matches. Curious minds make things happen."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Exploring the possibilities. +{xp} XP",
+        "Ten matches viewed. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "every-corner": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Twenty-five matches. You don't leave much unexplored.",
+        "Twenty-five. You've seen a lot of this tournament."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Nothing missed. +{xp} XP",
+        "Twenty-five matches explored. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "bracket-veteran": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifty matches. You know this bracket inside out.",
+        "Fifty. You're practically part of the tournament crew."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A true bracket regular. +{xp} XP",
+        "Fifty matches in the books. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "long-session": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five matches in one sitting. You're in the zone.",
+        "Five back to back. Don't forget to take a breath."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "One focused session. +{xp} XP",
+        "Five in a row. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "deep-dive": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten in one go. That's a deep dive.",
+        "Ten matches in one sitting. You really wanted the full picture."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "You went all in. +{xp} XP",
+        "Ten at once. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "night-owl": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Voting this late? Sometimes the best ideas show up after everyone else is asleep.",
+        "Middle of the night. Quiet enough to think, at least."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The late shift. +{xp} XP",
+        "A midnight decision. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "signal-boost": {
       "messages": [
-        "TODO",
-        "TODO"
+        "You told people about us. That's how good things get started. Thank you.",
+        "Five shares. You're bringing more people into the picture."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Word is getting around. +{xp} XP",
+        "Five shares made. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "spreading-the-word": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifteen shares. You're helping this little community grow.",
+        "Fifteen times you've passed it on. That's how a crew gets bigger."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A bigger circle. +{xp} XP",
+        "Fifteen shares. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all"
       ]
     },
     "founding-member": {
       "messages": [
-        "TODO",
-        "TODO"
+        "You were here at the beginning. That's a piece of this story nobody can take away.",
+        "One of the first thousand. You helped give this place its start."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Here from the first spark. +{xp} XP",
+        "A place in the beginning. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "See the badge",
+        "Show me"
       ]
     },
     "level-up": {
       "messages": [
-        "TODO",
-        "TODO"
+        "New rank. Looks like all that work paid off.",
+        "You've moved up. Keep looking ahead."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "{rank}. That's progress. +{xp} XP",
+        "You've reached {rank}. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View progress",
+        "Show me"
       ]
     },
     "default": {
       "messages": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "Achievement unlocked: {name}. Another step forward.",
+        "{name}. You put in the work. It shows.",
+        "That's {name}. Nice. Keep building.",
+        "{name}. One more thing you've made happen.",
+        "Another mark on the board: {name}.",
+        "{name}. Good timing, good work.",
+        "{name}. That's yours now.",
+        "A new milestone: {name}. Not bad at all.",
+        "{name}. The result of showing up.",
+        "{name}. Keep making things happen."
       ],
       "details": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "{description}. +{xp} XP",
+        "{description} +{xp} XP",
+        "Another step forward. +{xp} XP",
+        "{description}. Well earned. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO",
-        "TODO",
-        "TODO"
+        "View achievements",
+        "See all",
+        "Show me",
+        "More, more"
       ]
     },
     "mastery-up": {
       "messages": [
-        "TODO",
-        "TODO"
+        "{rank}. You're getting better every time.",
+        "New mastery level. That's no accident."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "{rank}. Keep at it. +{xp} XP",
+        "You've reached {rank}. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View champions",
+        "Show me"
       ]
     },
     "jinx-loose-cannon": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten underdogs. Jinx would call that chaos. I'd call it an interesting way to think.",
+        "Ten long shots. You don't always take the obvious route. I get that."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Ten against the odds. +{xp} XP",
+        "A taste for the unexpected. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "caitlyn-close-calls": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten close matches with Caitlyn. You seem to enjoy keeping her on her toes.",
+        "Ten tight finishes. Caitlyn would call that a pattern."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Ten close calls. +{xp} XP",
+        "Steady under pressure. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "caitlyn-steady-aim": {
       "messages": [
-        "TODO",
-        "TODO"
+        "A week with Caitlyn. She's got a sharp eye for details.",
+        "Seven days alongside Caitlyn. Consistency counts."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A week at her side. +{xp} XP",
+        "Seven days running. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "caitlyn-deciding-shot": {
       "messages": [
-        "TODO",
-        "TODO"
+        "You broke the tie. Caitlyn would appreciate the precision.",
+        "A deciding vote, right on target. Nice work."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The deciding vote. +{xp} XP",
+        "Tie broken. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
     "champion-selected": {
       "messages": [
-        "TODO",
-        "TODO"
+        "You picked me? All right. Let's see what we can make happen.",
+        "Ekko's in. I've got a few ideas."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "{rank}",
+        "{rank} · your champion"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "View champions",
+        "Let's go"
       ]
     },
     "jinx-troublemaker": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Underdogs on five different days. Jinx would probably call that trouble. I call it conviction.",
+        "Five days, five long shots. You're not afraid to surprise people."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Five days of bold choices. +{xp} XP",
+        "Underdogs across five days. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "More trouble",
+        "Keep going"
       ]
     },
     "jinx-chaos-agent": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five times you backed an edit while it was trailing. Jinx would approve. I respect the nerve.",
+        "Against the crowd five times. Sometimes a different angle is all you need."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Conviction against the tide. +{xp} XP",
+        "Five against-the-odds picks. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Make more noise"
       ]
     },
     "vi-door-breaker": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten votes before the crowd arrived. Vi would probably call that getting there first.",
+        "First on the scene ten times. You and Vi have that in common."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Ahead of the crowd. +{xp} XP",
+        "Ten early votes. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Be early again"
       ]
     },
     "vi-heavy-hitter": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Thirty votes. Vi would call that a warm-up.",
+        "Thirty decisions made. You know how to commit."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Thirty and counting. +{xp} XP",
+        "A heavy hand with the vote. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Keep swinging",
+        "See all"
       ]
     },
     "vi-right-call": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifteen winners backed. Vi trusts her instincts. Looks like you do too.",
+        "Fifteen correct calls. You and Vi make a pretty good team."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "A sharp read. +{xp} XP",
+        "Fifteen winners picked. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Do it again"
       ]
     },
-    "ekko-ahead-of-time": {
+    "ekko-timekeeper": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Ten close calls. You know when to wait and when to make your move.",
+        "Ten tight finishes. You always seem to find the right moment."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Timing is everything. +{xp} XP",
+        "Ten moments read just right. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
-    "ekko-second-chances": {
+    "ekko-firelight": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Fifteen shares. You're bringing more people into the crew.",
+        "Fifteen times you've passed the word along. That's how a movement grows."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "The Firelights would approve. +{xp} XP",
+        "A bigger crew. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     },
-    "ekko-zero-hour": {
+    "ekko-second-chance": {
       "messages": [
-        "TODO",
-        "TODO"
+        "Five comebacks backed. You know one bad moment doesn't decide the whole story.",
+        "Five times you believed a losing pick could turn it around. That's the spirit."
       ],
       "details": [
-        "TODO",
-        "TODO"
+        "Never count it out. +{xp} XP",
+        "Five second chances backed. +{xp} XP"
       ],
       "buttons": [
-        "TODO",
-        "TODO"
+        "Next match",
+        "Keep going"
       ]
     }
   },
+  "portrait": {
+    "skin": 0
+  },
   "bubble": {
     "upcoming": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Not open yet. Good things take a little time.",
+      "Voting hasn't started. I'll give you a heads-up when it does.",
+      "Locked for now. Plenty of time to get ready."
     ],
     "prevote": [
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO"
+      "Two edits, one vote. Give both a proper look.",
+      "Watch them both. The details are usually where the answer is.",
+      "I won't pick for you. That's your call.",
+      "Take a second. A good decision is worth it.",
+      "Trust what you see, not just what everyone else says.",
+      "The small details can change the whole picture."
     ],
     "prevote-empty": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "No votes yet. You could make the first move.",
+      "Quiet so far. Someone has to get things started.",
+      "First mark is yours, if you want it."
     ],
     "closing-24h": [
-      "TODO",
-      "TODO"
+      "Less than a day left and you haven't voted. There's still time to get in.",
+      "The window's closing. Make your choice while you can."
     ],
     "closing-3h": [
-      "TODO",
-      "TODO"
+      "Three hours or less. Time to make the call.",
+      "Clock's running. Don't leave your vote behind."
     ],
     "closing-final": [
-      "TODO",
-      "TODO"
+      "Last hour. This is your moment.",
+      "Only minutes left. Make it count."
     ],
     "voted-early": [
-      "TODO",
-      "TODO"
+      "You got in early. First look, first decision. I like that.",
+      "Hardly any votes in, and you made yours. That's initiative."
     ],
     "voted-ahead": [
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO"
+      "Your pick's ahead. Good start. Keep watching the numbers.",
+      "{pct}% with you. Looks like others see it too.",
+      "Out in front for now. A lot can change between here and the finish.",
+      "{pick} is pulling ahead. Nice read.",
+      "A lead is a good thing. Just don't mistake it for the finish line."
     ],
     "voted-close": [
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO"
+      "That's close. One little shift and the whole thing changes.",
+      "A narrow margin. One more vote could turn it around. Tell somebody.",
+      "Neck and neck. Your pick could use a few more people behind it.",
+      "{pct} to {otherPct}. This one's balanced on a knife edge."
     ],
     "voted-tied": [
-      "TODO",
-      "TODO"
+      "Dead even. No advantage yet.",
+      "Perfect tie. Guess it's waiting for somebody to make a move."
     ],
     "voted-behind": [
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO",
-      "TODO"
+      "You're behind. Doesn't mean the idea was wrong.",
+      "{pick} is trailing. Every good comeback starts somewhere.",
+      "They're ahead. That's just where the numbers are right now.",
+      "Behind by {diff} points. Get a few more people to take a look.",
+      "Most people picked the other way. Doesn't mean they saw everything."
     ],
     "closed-won": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Your pick won. Good eye.",
+      "That's a win. Nice to see a good call pay off.",
+      "{pick} made it through. You read that one well."
     ],
     "closed-lost": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Your pick lost. It happens. Take what you can from it and keep moving.",
+      "Didn't make it this time. There's another match ahead.",
+      "{pick} is out. Sorry. Still a good choice to have backed."
     ],
     "closed-tied": [
-      "TODO"
+      "A tie. Nobody found a way past the other."
     ],
     "closed-unvoted": [
-      "TODO",
-      "TODO"
+      "Voting's closed and you missed this one. There'll be another chance.",
+      "The match is over. {winner} took it. Next time, get your vote in."
     ]
   },
   "modal": {
     "first-vote": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "First vote. Welcome aboard. Everybody starts somewhere.",
+      "That's your first decision. Let's see where it takes you.",
+      "You're part of the conversation now. Good to have you here."
     ],
     "streak": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Back again. Nice. The crew's better with you around.",
+      "{streak} days running. You're making this a habit.",
+      "You keep coming back. That means something."
     ],
     "underdog": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "You backed the one nobody else did. Sometimes that's where the best stories start.",
+      "Not the obvious choice. I respect that.",
+      "An underdog pick takes a little conviction. You had it."
     ],
     "early": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Early. Your vote helps shape the result before the crowd arrives.",
+      "Not many votes in yet. Yours carries a little extra weight.",
+      "First through the door. Good initiative."
     ],
     "close": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "That vote could have tipped it. Everything's still in play.",
+      "A razor-thin margin. One more person could change the whole picture.",
+      "Close one. Your vote mattered there."
     ],
     "behind": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} is behind. That's a position, not a conclusion. Bring a few more people in.",
+      "Not ahead yet. Doesn't mean it's finished.",
+      "Behind isn't beaten. There's still a way forward."
     ],
     "ahead": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} is ahead. Good. Keep an eye on it.",
+      "Winning for now. Enjoy the moment, but stay sharp.",
+      "Looks like you saw something worth backing."
     ],
     "default": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Got it. Your call, and I'll respect it.",
+      "Vote's in. Let's see what happens next.",
+      "Decision made. There's more to explore."
     ]
   },
   "pages": {
     "live-fresh": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{unvoted} matches and you haven't voted yet. Start with the one that catches your eye.",
+      "Everything's open. Take a look, see what stands out, and make your call.",
+      "{unvoted} left to vote on. Plenty of chances to shape the bracket."
     ],
     "live-some": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{voted} done, {unvoted} to go. You're making progress.",
+      "You've started. {unvoted} more matches are waiting.",
+      "Good start. Keep the momentum going."
     ],
     "live-few": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Only {unvoted} left. You're nearly through.",
+      "Just {unvoted} more. You can finish this.",
+      "Almost there. Don't stop now."
     ],
     "live-one": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "One left. Just one more decision.",
+      "Last match. Make it count.",
+      "One vote between you and a clean sweep."
     ],
     "live-closing": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Some matches close in {timeLeft}. {unvoted} still need your vote.",
+      "The clock's running. {unvoted} left, and {timeLeft} to go.",
+      "Time's nearly up. Get those last decisions in."
     ],
     "live-done": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "You've voted in everything. Nice work. Now see how the bracket's shaping up.",
+      "Nothing left to vote on right now. Come back when the next round opens.",
+      "All done. You helped move every match forward. Thanks."
     ],
     "live-none": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Nothing's live right now. The next round will open soon. Check the bracket in the meantime.",
+      "Quiet for now. Keep an eye out for the next round.",
+      "No matches open. Even the fastest minds need a moment between rounds."
     ],
     "brackets-groups": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Groups first. The top two from each move on. Every vote helps decide who gets there.",
+      "Everyone starts in a group. The hard part is earning the next step.",
+      "Watch the tables. One result can change the whole picture."
     ],
     "brackets-knockout-soon": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Knockouts are coming. The top two from each group make it through.",
+      "No knockout yet. The groups need to finish first.",
+      "The next stage takes shape when the groups are done. We're getting close."
     ],
     "brackets-knockout-live": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Knockouts are live. One loss and the run is over.",
+      "Single elimination. No easy way back from here.",
+      "Every match matters now. Think it through, then make your call."
     ],
     "brackets-bracket": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "Round by round. One loss and the journey ends.",
+      "Follow the bracket. The path gets narrower every round.",
+      "Every line here is a match someone helped decide."
     ],
     "brackets-complete": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "That's the cup. Look at what this community helped decide. Thanks for being part of it.",
+      "It's over. What a run. I'll remember this one.",
+      "The champion's decided. All those moments brought us here."
     ],
     "brackets-empty": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "No bracket yet. The draw hasn't happened. Check back soon.",
+      "Empty for now. The next draw will give us something to follow.",
+      "Nothing here yet. Good things take a little time."
     ]
   },
   "share": {
     "invite": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{a} or {b}. One vote makes the difference. What's your read?",
+      "Two edits, one decision: {a} against {b}. Come weigh in.",
+      "{a} versus {b}. Bring your perspective into it."
     ],
     "voted": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "I voted {pick} over {other}. What's your take?",
+      "{pick} got my vote over {other}. See it differently?",
+      "I picked {pick} instead of {other}. Tell me what you would've chosen."
     ],
     "early": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "One of the first votes on {pick} against {other}. There's room for more voices.",
+      "I voted early for {pick} over {other}. Come add your take.",
+      "Not many votes on {pick} versus {other} yet. Yours could make a difference."
     ],
     "tied": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} and {other} are dead even. One vote could change the whole thing.",
+      "A tie: {pick} against {other}. Want to be the one who breaks it?",
+      "{pick} and {other} can't be separated. Your vote might do it."
     ],
     "nailbiter": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} and {other} are {voteDiff} votes apart. Every vote matters now.",
+      "Only {voteDiff} votes between {pick} and {other}. Get in while it's close.",
+      "{pick} against {other}, {voteDiff} apart. This could go either way."
     ],
     "losing-close": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} is {voteDiff} behind {other}. A few votes could turn that around.",
+      "Down {voteDiff} against {other}, but {pick} is still in it. Add your vote.",
+      "{pick} trails {other} by {voteDiff}. There's still a way back."
     ],
     "losing-bad": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} is behind {other} by {voteDiff}. It could use a few more people in its corner.",
+      "Down {voteDiff} against {other}. Don't count {pick} out yet.",
+      "{pick} is losing to {other} by {voteDiff}. Let's get a few more eyes on it."
     ],
     "winning-close": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} leads {other} at {pct}%, but it's close. Help it keep the lead.",
+      "{pick} is ahead of {other} at {pct}%. Not settled yet.",
+      "{pct}% for {pick} over {other}. A slim lead can change quickly."
     ],
     "dominating": [
-      "TODO",
-      "TODO",
-      "TODO"
+      "{pick} is ahead of {other} at {pct}%. Come see what people are seeing.",
+      "{pct}% for {pick}. {other} has some catching up to do.",
+      "{pick} leads {other} by a long way at {pct}%. Cast your own vote."
     ]
-  },
-  "portrait": {
-    "skin": 28
   }
 }

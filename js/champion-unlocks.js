@@ -77,7 +77,7 @@ export const SKIN_UNLOCKS = {
             m(8, 56, 'Breakout True Damage'),
             m(9, 11, 'SKT T1'),
             m(10, 57, 'Arcane Last Stand'),
-            a('ekko-zero-hour', 46, 'Prestige Star Guardian')
+            a('ekko-firelight', 46, 'Prestige Star Guardian')
         ]
     }
 };

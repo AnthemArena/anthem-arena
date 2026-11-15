@@ -29,7 +29,8 @@ t('the note left by Save is read once, then gone; junk and champions without lev
     markChampionSelected('caitlyn', 28, s);
     assert.deepEqual(takePendingChampion(s), { packId: 'caitlyn', skinNum: 28 });
     assert.equal(takePendingChampion(s), null);
-    markChampionSelected('ekko', 0, s); assert.equal(takePendingChampion(s), null);
+    markChampionSelected('nobody', 0, s); assert.equal(takePendingChampion(s), null);
+    markChampionSelected('ekko', 36, s); assert.deepEqual(takePendingChampion(s), { packId: 'ekko', skinNum: 36 });
     s.setItem('championSelectedPending', '{bad'); assert.equal(takePendingChampion(s), null);
     assert.equal(takePendingChampion({ getItem() { throw new Error('blocked'); } }), null);
 });

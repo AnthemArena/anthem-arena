@@ -17,7 +17,8 @@ export const METRICS = {
     againstTide: { champion: 'againstTideVotes', all: 'comebackVotes' },
     early:       { champion: 'earlyVotes',     all: 'earlyVotes' },
     deciding:    { champion: 'decidingVotes',  all: 'decidingVotes' },
-    streak:      { champion: 'streak',         all: 'votingStreak' }
+    streak:      { champion: 'streak',         all: 'votingStreak' },
+    shares:      { all: 'sharesCount' }   // times the person shared something (all votes, whoever the companion was)
 };
 
 export function rule(metric, target, { packId, scope = 'champion' } = {}) {

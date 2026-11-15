@@ -6,15 +6,16 @@ const votes = (spec) => Object.entries(spec).flatMap(([id, c]) => Array.from({ l
 t('vote shares: whole percentages that add to 100, old votes count as Jinx, unknown packs ignored', () => {
     const s = voteShares([...votes({ jinx: 1, vi: 1, caitlyn: 1 })]);
     assert.equal(s.reduce((a, r) => a + r.percent, 0), 100);
-    assert.deepEqual(voteShares(votes({ none: 2, vi: 2 })).map(r => [r.packId, r.votes, r.percent]), [['jinx', 2, 50], ['vi', 2, 50], ['caitlyn', 0, 0]]);
-    assert.equal(voteShares([{ championId: 'ekko' }, { championId: 'vi' }]).find(r => r.packId === 'vi').percent, 100);
-    assert.deepEqual(voteShares([]).map(r => r.percent), [0, 0, 0]);
-    assert.deepEqual(voteShares(votes({ jinx: 6, vi: 3, caitlyn: 1 })).map(r => r.percent), [60, 30, 10]);
+    assert.deepEqual(voteShares(votes({ none: 2, vi: 2 })).map(r => [r.packId, r.votes, r.percent]), [['jinx', 2, 50], ['vi', 2, 50], ['caitlyn', 0, 0], ['ekko', 0, 0]]);
+    assert.equal(voteShares([{ championId: 'nobody' }, { championId: 'vi' }]).find(r => r.packId === 'vi').percent, 100);
+    assert.deepEqual(voteShares([]).map(r => r.percent), [0, 0, 0, 0]);
+    assert.deepEqual(voteShares(votes({ jinx: 6, vi: 3, caitlyn: 1 })).map(r => r.percent), [60, 30, 10, 0]);
 });
 t('avatar key reads champion and skin from the picture address', () => {
     assert.equal(avatarKeyOf({ type: 'url', value: 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Jinx_37.jpg' }), 'jinx:37');
     assert.equal(avatarKeyOf({ type: 'url', value: 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Vi.png' }), 'vi:0');
-    assert.equal(avatarKeyOf({ type: 'url', value: 'https://x/champion/Ekko.png' }), null);
+    assert.equal(avatarKeyOf({ type: 'url', value: 'https://x/champion/Jayce.png' }), null);   // a champion without levels is just a picture
+    assert.equal(avatarKeyOf({ type: 'url', value: 'https://x/champion/Ekko.png' }), 'ekko:0');
     assert.equal(avatarKeyOf({ type: 'emoji', value: '🎵' }), null);
     assert.equal(avatarKeyOf(null), null);
     assert.equal(avatarKeyOf(skinAvatar('caitlyn', 28)), 'caitlyn:28');

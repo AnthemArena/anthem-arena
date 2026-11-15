@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { lookSkin, saveLook, readLooks, lookState, TEST_UNLOCK_KEY } from '../js/companion-look.js';
+import { lookSkin, saveLook, readLooks, lookState, TEST_UNLOCK_KEY, testUnlockOn, enableTestUnlock, TEST_UNLOCK_HOURS } from '../js/companion-look.js';
 import { companionStats } from '../js/achievement-tracker.js';
 import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES } from '../js/achievements.js';
 import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
-const store = (o = {}) => { const m = { ...o }; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; };
+const store = (o = {}) => { const m = { ...o }; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; };
 
 t('look: classic at mastery 1, Arcane at 2, the saved choice after that', () => {
     const J = { id: 'jinx' };
@@ -43,7 +43,7 @@ t('the five pack achievements exist, are visible, belong to a category and match
     for (const id of ids) {
         const a = ACHIEVEMENTS[id];
         assert.ok(a, id + ' missing'); assert.equal(a.hidden, false); assert.ok(ACHIEVEMENT_CATEGORIES[a.category], id + ' category');
-        assert.equal(a.condition({ underdogVotes: 99, decidingVotes: 99, byChampion: { caitlyn: { closeVotes: 99, streak: 99 }, jinx: { underdogVotes: 99 } } }), true);
+        assert.equal(a.condition({ underdogVotes: 99, decidingVotes: 99, sharesCount: 99, byChampion: { caitlyn: { closeVotes: 99, streak: 99 }, jinx: { underdogVotes: 99 } } }), true);
         assert.equal(a.condition({ decidingVotes: 0, byChampion: { caitlyn: { closeVotes: 0, streak: 0 } } }), false);
         assert.ok(a.progress({ underdogVotes: 1, decidingVotes: 0, byChampion: { caitlyn: { closeVotes: 1, streak: 1 }, jinx: { underdogVotes: 1 } } }).target >= 1);
     }
@@ -51,9 +51,18 @@ t('the five pack achievements exist, are visible, belong to a category and match
 t('look: the test-page switch opens every skin, including the prestige one, and only when set to 1', () => {
     const locked = store({ companionSkins: '{"jinx":40,"vi":48}' });
     assert.equal(lookSkin({ id: 'jinx' }, locked), 0);
-    for (const v of ['0', 'yes']) assert.equal(lookSkin({ id: 'jinx' }, store({ companionSkins: '{"jinx":40}', [TEST_UNLOCK_KEY]: v })), 0);
-    const open = store({ companionSkins: '{"jinx":40,"vi":48}', [TEST_UNLOCK_KEY]: '1' });
+    for (const v of ['0', 'yes']) assert.equal(lookSkin({ id: 'jinx' }, store({ companionSkins: '{"jinx":40}', [TEST_UNLOCK_KEY]: v, [TEST_UNLOCK_KEY + 'At']: String(Date.now()) })), 0);
+    const open = store({ companionSkins: '{"jinx":40,"vi":48}' }); enableTestUnlock(open);
     assert.equal(lookSkin({ id: 'jinx' }, open), 40);
     assert.equal(lookSkin({ id: 'vi' }, open), 48);
+});
+t('look: the test-page switch expires after an hour, and one without a time stamp counts as off (and is cleared)', () => {
+    const now = Date.now(), hour = 3600 * 1000;
+    const s = store({ companionSkins: '{"jinx":40}' }); enableTestUnlock(s, now);
+    assert.equal(testUnlockOn(s, now + hour - 1000), true);
+    assert.equal(testUnlockOn(s, now + hour + 1000), false); assert.equal(s.getItem(TEST_UNLOCK_KEY), null);   // expired: cleared
+    const old = store({ companionSkins: '{"jinx":40}', [TEST_UNLOCK_KEY]: '1' });   // a switch left over from before the time limit
+    assert.equal(lookSkin({ id: 'jinx' }, old), 0); assert.equal(old.getItem(TEST_UNLOCK_KEY), null);
+    assert.equal(TEST_UNLOCK_HOURS, 1);
 });
 console.log(`\n${n} passed`);

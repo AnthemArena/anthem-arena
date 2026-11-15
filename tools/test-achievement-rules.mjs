@@ -16,7 +16,7 @@ assert.throws(() => rule('nope', 1, { packId: 'x' }));
 assert.throws(() => rule('early', 1));
 // every metric has a champion stat that championStats really produces
 const sample = championStats([{ championId: 'x', timestamp: 1, facts: {} }]).x;
-for (const [name, m] of Object.entries(METRICS)) assert.ok(m.champion in sample, `championStats has no ${m.champion} (rule ${name})`);
+for (const [name, m] of Object.entries(METRICS)) assert.ok(!m.champion || m.champion in sample, `championStats has no ${m.champion} (rule ${name})`);
 
 // the new achievements, end to end
 const day = n => Date.UTC(2026, 0, n);

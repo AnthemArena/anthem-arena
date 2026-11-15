@@ -559,12 +559,12 @@
     
     <script type="module">
         import { SKIN_UNLOCKS } from '/js/champion-unlocks.js';
-        import { lookSkin, saveLook, TEST_UNLOCK_KEY } from '/js/companion-look.js';
+        import { lookSkin, saveLook, testUnlockOn, enableTestUnlock, disableTestUnlock } from '/js/companion-look.js';
         import { getChampionTileUrl, getChampionSplashUrl } from '/js/arcane-config.js';
 
         const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const unlockBox = document.getElementById('unlockAllSkins');
-        try { unlockBox.checked = localStorage.getItem(TEST_UNLOCK_KEY) === '1'; } catch { /* storage blocked */ }
+        unlockBox.checked = testUnlockOn();
         let shownPack = null;
 
         window.wornSkin = packId => lookSkin({ id: packId }, localStorage);
@@ -605,7 +605,7 @@
         };
 
         unlockBox.addEventListener('change', () => {
-            try { unlockBox.checked ? localStorage.setItem(TEST_UNLOCK_KEY, '1') : localStorage.removeItem(TEST_UNLOCK_KEY); } catch { /* storage blocked */ }
+            unlockBox.checked ? enableTestUnlock() : disableTestUnlock();
             if (shownPack) window.buildSkinPicker(shownPack);
         });
     </script>

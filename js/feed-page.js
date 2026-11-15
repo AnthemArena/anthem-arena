@@ -1179,6 +1179,15 @@ function renderPostContent(post) {
         const voteLineHtml = showResults
             ? `${vp.lead} <strong>${escapeHtml(vp.voted)}</strong> ${vp.joiner} <span class="vote-opponent">${escapeHtml(vp.opponent)}</span>`
             : `voted in a live match <span class="vote-locked-note">Vote in it to see who they picked.</span>`;
+        // The two edits as small pictures. While results are locked the order must not say which was picked (the picked one used to
+        // always come first), so it follows the video id instead; once results are visible the pick is first and ringed.
+        const thumbs = [
+            { id: post.votedMomentId || post.votedSongId || '', name: votedMomentName, src: votedThumbnail, picked: true },
+            { id: post.opponentMomentId || post.opponentSongId || '', name: opponentMomentName, src: opponentThumbnail, picked: false }
+        ];
+        if (!showResults) thumbs.sort((a, b) => String(a.id || a.name).localeCompare(String(b.id || b.name)));
+        const thumbsHtml = `<div class="vote-thumbs" role="img" aria-label="The two edits in this match">${thumbs.map((t, i) =>
+            `${i ? '<span class="vote-thumbs-vs">VS</span>' : ''}<span class="vote-thumb${showResults && t.picked ? ' picked' : ''}" title="${escapeHtml(t.name)}">${t.src ? `<img src="${t.src}" alt="" loading="lazy">` : ''}</span>`).join('')}</div>`;
         let statusChip = '';
         let ctaLabel = 'View match';
         if (matchStatus === 'live') {
@@ -1197,6 +1206,7 @@ function renderPostContent(post) {
 </p>
 
             <div class="vote-compact" data-match-id="${post.matchId}">
+                ${thumbsHtml}
                 ${showResults ? `<div class="vote-split" title="${userPct}% / ${opponentPct}%">
                     <div class="vote-split-bar"><span style="width: ${userPct}%"></span></div>
                     <span class="vote-split-pct">${userPct}% &middot; ${opponentPct}%</span>

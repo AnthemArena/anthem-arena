@@ -24,7 +24,7 @@ t('skin ladder: Classic first, Arcane at 2 and 10, one prestige skin tied to its
     assert.equal(new Set(s.map(x => x.num)).size, s.length, 'duplicate skin number');
     assert.deepEqual(s.filter(x => x.mastery === 1).map(x => x.num), [0]);
     assert.equal(s.find(x => x.num === 36).mastery, 2); assert.equal(s.find(x => x.num === 57).mastery, 10);
-    assert.deepEqual(s.filter(x => x.achievement).map(x => [x.num, x.achievement]), [[46, 'ekko-zero-hour']]);
+    assert.deepEqual(s.filter(x => x.achievement).map(x => [x.num, x.achievement]), [[46, 'ekko-firelight']]);
 });
 
 t('achievements follow the registry budget', () => {

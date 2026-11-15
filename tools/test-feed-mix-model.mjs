@@ -47,6 +47,7 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
         && resultsVisible({ status: 'live', viewerVoted: true }) === true && resultsVisible({ status: 'live', isOwn: true }) === true
         && resultsVisible({ status: 'completed' }) === true && resultsVisible({ status: null }) === true);
     t('feed vote card hides the split and the bar when results are locked', /showResults \? `<div class="vote-split"/.test(src));
+    t('feed vote row shows both edits as thumbnails; while results are locked their order ignores the pick and nothing is ringed', /const thumbs = \[/.test(src) && /if \(!showResults\) thumbs\.sort\(/.test(src) && /showResults && t\.picked \? ' picked'/.test(src));
     t('feed vote row does not say who was picked while results are locked', /: `voted in a live match <span class="vote-locked-note">/.test(src));
     { const prof = fs.readFileSync(new URL('../js/profile-page.js', import.meta.url), 'utf8'); t('profile vote posts by others in a live match do not say who was picked until the viewer has voted', /liveMatchIds\.has\(post\.matchId\) && post\.userId !== me && !viewerHasVoted\(post\.matchId\)/.test(prof)); }
     t('stored vote posts get the live split and match state in every tab (one source for the same match)', !/[^e]getFeed\('(all|following)'/.test(src.replace(/const getFeedLive[^\n]*/, '')) && /async function refreshVoteSplits/.test(src));
