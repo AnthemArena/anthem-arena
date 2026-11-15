@@ -1438,6 +1438,7 @@ async function setupPostInteractions(postElement, post) {
     
     const goToProfile = () => {
         const targetUserId = post.userId;
+        if (post.announcement) return;   // the site account has no profile page
         
         if (targetUserId === currentUserId) {
             // Go to own profile
@@ -2574,6 +2575,7 @@ function createPostElement(post) {
             <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(post.username)}" class="user-avatar" data-user-id="${escapeHtml(post.userId)}">
             <div class="post-meta">
                 <span class="username" data-user-id="${escapeHtml(post.userId)}">${escapeHtml(post.username)}</span>
+                ${post.announcement ? '<span class="announce-badge">Announcement</span>' : ''}
                 <span class="post-time" title="${escapeHtml(fullTime(post.timestamp))}">${timeAgo}${editedIndicator}</span>
             </div>
             ${isOwnPost ? `

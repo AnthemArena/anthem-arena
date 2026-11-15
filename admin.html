@@ -101,6 +101,19 @@
                 <p id="tidyPostsResult" role="status"></p>
             </section>
 
+            <section class="reports-queue" id="announcements">
+                <h2>Feed announcements</h2>
+                <p>Post to the Feed as the site itself (tournament news, results, reminders). It shows an Announcement badge, appears for everyone, and can be liked and commented on. You must be signed in here as admin.</p>
+                <label for="announceName">Posted as</label>
+                <input type="text" id="announceName" value="Arcane Moments" maxlength="40">
+                <label for="announceText">Announcement</label>
+                <textarea id="announceText" rows="4" maxlength="1000" placeholder="Round 2 opens tonight at 8pm GMT..."></textarea>
+                <button type="button" id="announceBtn" class="btn btn-info">Post announcement</button>
+                <p id="announceResult" role="status"></p>
+                <h3>Recent announcements</h3>
+                <div id="announceList"></div>
+            </section>
+
             <section class="reports-queue" id="reportsQueue">
                 <h2>Reports <span id="reportsCount" class="reports-count"></span></h2>
                 <p class="warning-text">Posts and comments that people have reported. Three reports hide an item from everyone but its author until you decide here.</p>

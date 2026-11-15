@@ -10,7 +10,7 @@ import { deadlineInfo } from './vote-closed.js';
 import { groupReports, reasonSummary } from './moderation-model.js';
 import { votePostText } from './vote-post-text.js';
 
-import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, deleteField, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // ========================================
@@ -895,3 +895,54 @@ document.getElementById('tidyPostsBtn')?.addEventListener('click', async () => {
     }
     btn.disabled = false;
 });
+
+
+// ========================================
+// FEED ANNOUNCEMENTS (posted as the admin account; the rules need userId == auth uid)
+// ========================================
+function escAnnounce(t) { return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+async function loadAnnouncements() {
+    const list = document.getElementById('announceList');
+    if (!list) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'posts'), where('privacy', '==', 'public'), where('announcement', '==', true)));
+        const rows = snap.docs.map(d => d.data()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 10);
+        list.innerHTML = rows.length ? rows.map(p => `<div class="announce-row"><small>${new Date(p.timestamp).toLocaleString()}</small> ${escAnnounce(p.content)} <button type="button" class="btn btn-danger announce-del" data-id="${escAnnounce(p.postId)}">Delete</button></div>`).join('') : '<p>None yet.</p>';
+    } catch (e) {
+        list.textContent = 'Could not load announcements: ' + (e.message || e);
+    }
+}
+document.getElementById('announceList')?.addEventListener('click', async e => {
+    const btn = e.target.closest('.announce-del');
+    if (!btn || !confirm('Delete this announcement?')) return;
+    try { await deleteDoc(doc(db, 'posts', btn.dataset.id)); } catch (err) { alert('Could not delete: ' + (err.message || err)); }
+    loadAnnouncements();
+});
+document.getElementById('announceBtn')?.addEventListener('click', async () => {
+    const out = document.getElementById('announceResult'), btn = document.getElementById('announceBtn');
+    const content = document.getElementById('announceText').value.trim();
+    const username = (document.getElementById('announceName').value.trim() || 'Arcane Moments').slice(0, 40).replace(/[<>"&`']/g, '');
+    const user = auth.currentUser;
+    if (!user || user.isAnonymous) { out.textContent = 'Sign in as admin first.'; return; }
+    if (!content) { out.textContent = 'Write something first.'; return; }
+    btn.disabled = true; out.textContent = 'Posting...';
+    try {
+        const postId = `announce_${user.uid}_${Date.now()}`;
+        await setDoc(doc(db, 'posts', postId), {
+            postId, userId: user.uid, username,
+            avatar: { type: 'emoji', value: '📣' },
+            type: 'user_post', announcement: true, content,
+            timestamp: Date.now(), privacy: 'public',
+            likeCount: 0, commentCount: 0, createdAt: Timestamp.now()
+        });
+        document.getElementById('announceText').value = '';
+        out.textContent = 'Posted. It is on the Feed now.';
+        loadAnnouncements();
+    } catch (e) {
+        console.error(e);
+        out.textContent = 'Could not post: ' + (e.message || e);
+    }
+    btn.disabled = false;
+});
+onAuthStateChanged(auth, u => { if (u && !u.isAnonymous) loadAnnouncements(); });
