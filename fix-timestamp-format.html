@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fix Timestamp Format</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #C8AA6E;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #C8AA6E; }
+        .info {
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid #C8AA6E;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        button {
+            background: #C8AA6E;
+            color: #0a0a0a;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #D4B87A;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: none;
+        }
+        .progress.active {
+            display: block;
+        }
+        .log {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .log-success { color: #4caf50; }
+        .log-warning { color: #ff9800; }
+        .log-error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix Timestamp Format (String → Number)</h1>
+    
+    <div class="info">
+        <p><strong>This script will:</strong></p>
+        <p>✅ Find timestamps stored as ISO strings</p>
+        <p>✅ Convert them to millisecond numbers</p>
+        <p>✅ Fix "NaNw ago" display issues</p>
+        <p>✅ Update both votes and activity collections</p>
+        <p><strong>⚠️ Safe to run multiple times</strong></p>
+    </div>
+    
+    <button id="fix-btn">🚀 Fix Format Now</button>
+    
+    <div id="progress" class="progress">
+        <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { collection, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // ========================================
+        // LOGGING
+        // ========================================
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const line = document.createElement('div');
+            
+            if (type === 'success') line.className = 'log-success';
+            if (type === 'warning') line.className = 'log-warning';
+            if (type === 'error') line.className = 'log-error';
+            
+            line.textContent = message;
+            logDiv.appendChild(line);
+            console.log(message);
+            
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // ========================================
+        // CONVERT TIMESTAMP TO NUMBER
+        // ========================================
+        function normalizeTimestamp(timestamp) {
+            // Already a valid number
+            if (typeof timestamp === 'number' && timestamp > 1000000000000) {
+                return timestamp;
+            }
+            
+            // ISO string - convert to number
+            if (typeof timestamp === 'string') {
+                const date = new Date(timestamp);
+                if (!isNaN(date.getTime())) {
+                    return date.getTime();
+                }
+            }
+            
+            // Invalid - return current time
+            return Date.now();
+        }
+        
+        // ========================================
+        // MAIN FIX FUNCTION
+        // ========================================
+        async function fixTimestampFormat() {
+            const btn = document.getElementById('fix-btn');
+            const progress = document.getElementById('progress');
+            const logDiv = document.getElementById('log');
+            
+            btn.disabled = true;
+            progress.classList.add('active');
+            logDiv.innerHTML = '';
+            
+            log('🔧 Starting timestamp format fix...');
+            
+            try {
+                let totalFixed = 0;
+                
+                // ========================================
+                // STEP 1: Fix VOTES collection
+                // ========================================
+                log('\n🗳️ Fixing votes collection...');
+                const votesRef = collection(db, 'votes');
+                const votesSnapshot = await getDocs(votesRef);
+                
+                let votesFixed = 0;
+                
+                for (const voteDoc of votesSnapshot.docs) {
+                    const vote = voteDoc.data();
+                    const timestamp = vote.timestamp;
+                    
+                    // Check if it's a string
+                    if (typeof timestamp === 'string') {
+                        const fixedTimestamp = normalizeTimestamp(timestamp);
+                        
+                        await updateDoc(doc(db, 'votes', voteDoc.id), {
+                            timestamp: fixedTimestamp
+                        });
+                        
+                        votesFixed++;
+                        
+                        if (votesFixed % 10 === 0) {
+                            log(`  ✅ Fixed ${votesFixed} votes...`);
+                        }
+                    }
+                }
+                
+                log(`✅ Fixed ${votesFixed} vote timestamps`, 'success');
+                totalFixed += votesFixed;
+                
+                // ========================================
+                // STEP 2: Fix ACTIVITY collection
+                // ========================================
+                log('\n📄 Fixing activity collection...');
+                const activityRef = collection(db, 'activity');
+                const activitySnapshot = await getDocs(activityRef);
+                
+                let activityFixed = 0;
+                
+                for (const activityDoc of activitySnapshot.docs) {
+                    const activity = activityDoc.data();
+                    const timestamp = activity.timestamp;
+                    
+                    // Check if it's a string
+                    if (typeof timestamp === 'string') {
+                        const fixedTimestamp = normalizeTimestamp(timestamp);
+                        
+                        await updateDoc(doc(db, 'activity', activityDoc.id), {
+                            timestamp: fixedTimestamp
+                        });
+                        
+                        activityFixed++;
+                        
+                        if (activityFixed % 10 === 0) {
+                            log(`  ✅ Fixed ${activityFixed} activities...`);
+                        }
+                    }
+                }
+                
+                log(`✅ Fixed ${activityFixed} activity timestamps`, 'success');
+                totalFixed += activityFixed;
+                
+                // ========================================
+                // COMPLETE
+                // ========================================
+                log('\n🎉 FORMAT FIX COMPLETE!', 'success');
+                log(`✅ Total records fixed: ${totalFixed}`, 'success');
+                log(`📊 Votes: ${votesSnapshot.size} (${votesFixed} fixed)`, 'success');
+                log(`📊 Activity: ${activitySnapshot.size} (${activityFixed} fixed)`, 'success');
+                
+                alert(
+                    `Timestamp format fix complete!\n\n` +
+                    `✅ Fixed: ${totalFixed} records\n` +
+                    `🗳️ Votes: ${votesFixed}\n` +
+                    `📄 Activity: ${activityFixed}`
+                );
+                
+            } catch (error) {
+                console.error('❌ Fatal error:', error);
+                log(`❌ Error: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Attach event listener
+        document.getElementById('fix-btn').addEventListener('click', fixTimestampFormat);
+    </script>
+</body>
+</html>

@@ -1024,3 +1024,8 @@ through it, using the skin the person wears (`lookSkin`). Several skins share a 
 - **test-toasts.html** has a skin picker for the loaded champion (built from `js/champion-unlocks.js`, so every new skin shows up by itself): it shows the
   voice set the skin uses and the skin the alerts really wear. "Unlock every skin for testing" sets `localStorage.testUnlockAllSkins` (this browser
   only; nothing else sets it), switch it off when done.
+
+## Decision, 15 Nov 2026: one voice per champion
+
+- Every skin of a champion now speaks with that champion's own pack (`jinx.json`, `vi.json`, `caitlyn.json`, `ekko.json`). The per-skin voice sets (`jinx-original`, `caitlyn-sheriff`, `vi-t1` and the rest) were removed from `champion-packs/`; the "Done" entries above describe the history. They are recoverable from git (the commit before this one).
+- The loading machinery in `js/champion-voice.js` stays (`VOICES` is now empty per champion), so skin voices could return later; `tools/test-champion-voice.mjs` covers that path.

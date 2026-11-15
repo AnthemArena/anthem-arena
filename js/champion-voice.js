@@ -2,15 +2,15 @@
 // set instead (champion-packs/<voice>.json holds only the sections it rewrites). Several skins can share one set, so a
 // skin never needs its own copy of the lines. Pure helpers (no DOM, no fetch), tested by tools/test-champion-voice.mjs.
 
-// Jinx: the Arcane skins keep the base (Arcane) voice, every other skin speaks with the original, louder Jinx unless it has
-// a set of its own (`skins`: skin number -> set). A set can name the set it builds on with "extends" ("jinx-original"), so it only
-// has to rewrite what its theme gives it.
+// A champion pack (champion-packs/<id>.json) is the voice. Every skin uses it (see VOICES).
 export const VOICES = {
-    jinx: { baseSkins: [37], skins: { 60: 'jinx-arcane-fractured', 1: 'jinx-crime-city', 2: 'jinx-firecracker', 4: 'jinx-star-guardian', 13: 'jinx-odyssey', 20: 'jinx-project', 51: 'jinx-cafe-cuties', 65: 'jinx-ocean-song', 3: 'jinx-zombie-slayer', 12: 'jinx-ambitious-elf', 29: 'jinx-heartseeker', 62: 'jinx-t1', 38: 'jinx-battle-cat', 40: 'jinx-battle-cat' }, other: 'jinx-original' },
-    vi: { baseSkins: [29], skins: { 1: 'vi-neon-strike', 2: 'vi-officer', 3: 'vi-debonair', 4: 'vi-demon', 11: 'vi-project', 5: 'vi-warring-kingdoms', 12: 'vi-heartbreaker', 20: 'vi-psyops', 30: 'vi-heartache', 39: 'vi-primal-ambush', 48: 'vi-arcane-brawler', 49: 'vi-t1' }, other: 'vi-original' },
-    // Caitlyn: the Arcane skins (Enforcer 28, Commander 50) keep the base voice, every other skin speaks with the original.
-    // The prestige skins (20, 29, 51) speak with the voice of the skin they are a prestige version of
-    caitlyn: { baseSkins: [28], skins: { 1: 'caitlyn-resistance', 2: 'caitlyn-sheriff', 3: 'caitlyn-safari', 4: 'caitlyn-arctic-warfare', 5: 'caitlyn-officer', 6: 'caitlyn-headhunter', 10: 'caitlyn-lunar-wraith', 11: 'caitlyn-pulsefire', 13: 'caitlyn-pool-party', 19: 'caitlyn-arcade', 22: 'caitlyn-battle-academia', 30: 'caitlyn-snow-moon', 39: 'caitlyn-heartthrob', 48: 'caitlyn-drx', 50: 'caitlyn-arcane-commander', 54: 'caitlyn-firecracker', 20: 'caitlyn-arcade', 29: 'caitlyn-arcade', 51: 'caitlyn-arcane-commander' }, other: 'caitlyn-original' }
+    // One voice per champion: every skin speaks with the champion's own pack (champion-packs/<id>.json).
+    // The machinery below is kept so a champion could get skin voice sets again: add `skins: { <skinNum>: '<voice-file-id>' }` (and
+    // `other` for a default set), put the voice file in champion-packs/, and tools/test-champion-voice.mjs shows what a set must cover.
+    jinx: { baseSkins: [], skins: {}, other: null },
+    vi: { baseSkins: [], skins: {}, other: null },
+    caitlyn: { baseSkins: [], skins: {}, other: null },
+    ekko: { baseSkins: [], skins: {}, other: null }
 };
 
 // The sections a voice set may rewrite; anything it leaves out falls back to the base pack.

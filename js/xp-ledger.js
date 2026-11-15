@@ -4,7 +4,11 @@
 // One XP total per person lives on their profile document (profiles/<uid>.xp, plus profiles/<uid>.packXp = XP earned per
 // companion). The browser keeps a copy; XP only ever goes up, so when two copies disagree the larger one wins.
 
-export const PACK_IDS = ['jinx', 'vi', 'caitlyn'];
+import { COMPANION_PACKS } from './arcane-config.js';
+
+// The champions people can pick: only the enabled ones (COMPANION_PACKS in arcane-config.js). A champion whose lines are
+// still being written stays out of every list until its `enabled` flag is turned on there.
+export const PACK_IDS = COMPANION_PACKS.filter(p => p.enabled).map(p => p.id);
 
 const num = v => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : 0);
 

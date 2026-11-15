@@ -35,7 +35,7 @@ export function endVoteProgress() {
 // The prestige skins an achievement unlocks, as [{ packId, num, name }].
 export function skinsForAchievement(achievementId) {
     const out = [];
-    for (const packId of ['jinx', 'vi', 'caitlyn']) {
+    for (const packId of ['jinx', 'vi', 'caitlyn', 'ekko']) {
         for (const s of skinsFor(packId)) if (s.achievement === achievementId) out.push({ packId, num: s.num, name: s.name });
     }
     return out;

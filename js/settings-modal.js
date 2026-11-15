@@ -738,7 +738,7 @@ function handleChampionClick(e) {
     hasChanges = true;
     markSelectedInGrid();
 
-    // Jinx, Vi and Caitlyn have levels: they become your champion (and wear your chosen skin). Anyone else is just your picture.
+    // Jinx, Vi, Caitlyn and Ekko have levels: they become your champion (and wear your chosen skin). Anyone else is just your picture.
     const packId = champion.toLowerCase();
     if (PACK_IDS.includes(packId)) selectChampionPack(packId);
     else renderYourChampion();

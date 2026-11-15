@@ -2,9 +2,10 @@
 // Pure (no Firebase, no DOM) so it can be tested: tools/test-champions-tab.mjs.
 import { SKIN_UNLOCKS, masteryLevel, skinsFor, isSkinUnlocked, nextUnlock, resolveLook } from './champion-unlocks.js';
 import { getChampionTileUrl } from './arcane-config.js';
+import { PACK_IDS } from './xp-ledger.js';
 
-export const PACK_ORDER = ['jinx', 'vi', 'caitlyn'];
-const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' };
+export const PACK_ORDER = PACK_IDS;
+const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn', ekko: 'Ekko' };
 
 const tile = (packId, num) => getChampionTileUrl(SKIN_UNLOCKS[packId].championId, num);
 

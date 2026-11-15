@@ -37,9 +37,9 @@ t('companion stats: close calls and streak are per companion (old votes count as
     assert.deepEqual(companionStats(votes), { caitlynCloseVotes: 5, caitlynStreak: 6, decidingVotes: 2 });   // ties count for any champion
     assert.deepEqual(companionStats([]), { caitlynCloseVotes: 0, caitlynStreak: 0, decidingVotes: 0 });
 });
-t('the four pack achievements exist, are visible, belong to a category and match the unlock table', () => {
+t('the five pack achievements exist, are visible, belong to a category and match the unlock table', () => {
     const ids = Object.values(SKIN_UNLOCKS).flatMap(p => p.skins.filter(s => s.achievement).map(s => s.achievement));
-    assert.equal(ids.length, 4);
+    assert.equal(ids.length, 5);
     for (const id of ids) {
         const a = ACHIEVEMENTS[id];
         assert.ok(a, id + ' missing'); assert.equal(a.hidden, false); assert.ok(ACHIEVEMENT_CATEGORIES[a.category], id + ' category');

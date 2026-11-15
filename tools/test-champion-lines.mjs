@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { dialogFor, fillWelcomeText, WELCOME_PLACEHOLDERS } from '../js/champion-lines.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const TYPES = ['welcome-first-time', 'welcome-streak', 'welcome-comeback', 'welcome-back', 'encouragement'];
-for (const id of ['jinx', 'vi', 'caitlyn', 'default']) {
+for (const id of ['jinx', 'vi', 'caitlyn', 'ekko', 'default']) {
     const pack = JSON.parse(fs.readFileSync(new URL(`../champion-packs/${id}.json`, import.meta.url), 'utf8'));
     t(`${id}: every welcome type and encouragement resolves to lines and buttons`, () => {
         for (const type of TYPES) {

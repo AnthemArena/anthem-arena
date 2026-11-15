@@ -1,7 +1,7 @@
 // ========================================
 // CHAMPION MASTERY + SKIN UNLOCKS (data and pure helpers)
 // ========================================
-// Each companion pack (Jinx, Vi, Caitlyn) has its own mastery level 1-10, filled by the XP earned while that companion is
+// Each companion pack (Jinx, Vi, Caitlyn, Ekko) has its own mastery level 1-10, filled by the XP earned while that companion is
 // active (profile.packXp, see xp-ledger.js). Mastery unlocks that champion's skins; the rarest ones need a pack achievement.
 // Skin numbers are Data Dragon's `num` (splash: .../champion/splash/<Id>_<num>.jpg). Chromas are never listed.
 // The design and the reasons for the order are in docs/arcane_moments.md ("Champion mastery and skin unlocks").
@@ -62,6 +62,22 @@ export const SKIN_UNLOCKS = {
             a('caitlyn-close-calls', 20, 'Prestige Arcade'),
             a('caitlyn-steady-aim', 29, 'Prestige Arcade (2022)'),
             a('caitlyn-deciding-shot', 51, 'Prestige Arcane Commander')
+        ]
+    },
+    ekko: {
+        championId: 'Ekko',
+        skins: [
+            m(1, 0, 'Classic'),
+            m(2, 36, 'Arcane Firelight'),
+            m(3, 1, 'Sandstorm'), m(3, 2, 'Academy'),
+            m(4, 12, 'Trick or Treat'), m(4, 3, 'PROJECT'),
+            m(5, 28, 'Pulsefire'),
+            m(6, 19, 'True Damage'),
+            m(7, 45, 'Star Guardian'),
+            m(8, 56, 'Breakout True Damage'),
+            m(9, 11, 'SKT T1'),
+            m(10, 57, 'Arcane Last Stand'),
+            a('ekko-zero-hour', 46, 'Prestige Star Guardian')
         ]
     }
 };

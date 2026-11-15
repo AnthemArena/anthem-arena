@@ -15,6 +15,7 @@
 import { JINX_ACHIEVEMENTS } from './jinx.js';
 import { CAITLYN_ACHIEVEMENTS } from './caitlyn.js';
 import { VI_ACHIEVEMENTS } from './vi.js';
+import { EKKO_ACHIEVEMENTS } from './ekko.js';
 
 export const MAX_PER_CHAMPION = 5;
 export const MAX_XP_PER_CHAMPION = 1000;
@@ -22,7 +23,8 @@ export const MAX_XP_PER_CHAMPION = 1000;
 const FILES = {
     jinx: JINX_ACHIEVEMENTS,
     caitlyn: CAITLYN_ACHIEVEMENTS,
-    vi: VI_ACHIEVEMENTS
+    vi: VI_ACHIEVEMENTS,
+    ekko: EKKO_ACHIEVEMENTS
 };
 
 export const CHAMPION_IDS = Object.keys(FILES);

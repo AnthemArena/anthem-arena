@@ -27,6 +27,15 @@
       "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Caitlyn.png",
       "description": "Precise, observant, and calmly keeping you informed.",
       "enabled": true
+    },
+    {
+      "id": "ekko",
+      "name": "Ekko",
+      "displayName": "Ekko",
+      "emoji": "⏳",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Ekko.png",
+      "description": "TODO (Ekko's lines are still being written)",
+      "enabled": false
     }
   ]
 }

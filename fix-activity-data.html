@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backfill Legacy Users</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #C8AA6E;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #C8AA6E; }
+        .info {
+            background: rgba(200, 170, 110, 0.1);
+            border: 1px solid #C8AA6E;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        button {
+            background: #C8AA6E;
+            color: #0a0a0a;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #D4B87A;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: none;
+        }
+        .progress.active {
+            display: block;
+        }
+        .log {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Backfill Legacy Users</h1>
+    
+    <div class="info">
+        <p><strong>This script will:</strong></p>
+        <p>✅ Find users who voted before auto-generation</p>
+        <p>✅ Create profiles with generated usernames (e.g., "EpicSummoner42")</p>
+        <p>✅ Assign random champion avatars</p>
+        <p>✅ Update all their activity records</p>
+        <p>✅ Update all their vote records</p>
+        <p><strong>⚠️ Safe to run multiple times - skips existing profiles</strong></p>
+    </div>
+    
+    <button id="backfill-btn">🚀 Run Backfill Now</button>
+    
+    <div id="progress" class="progress">
+        <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { collection, getDocs, doc, setDoc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // ========================================
+        // USERNAME GENERATOR (same as vote.js)
+        // ========================================
+        const ADJECTIVES = [
+            'Epic', 'Legendary', 'Supreme', 'Elite', 'Mystic', 
+            'Shadow', 'Golden', 'Silver', 'Radiant', 'Ancient',
+            'Mighty', 'Swift', 'Brave', 'Bold', 'Fierce',
+            'Noble', 'Royal', 'Divine', 'Cosmic', 'Thunder'
+        ];
+        
+        const NOUNS = [
+            'Warrior', 'Knight', 'Mage', 'Hunter', 'Assassin',
+            'Champion', 'Legend', 'Hero', 'Guardian', 'Summoner',
+            'Slayer', 'Duelist', 'Ranger', 'Striker', 'Blade',
+            'Storm', 'Phoenix', 'Dragon', 'Tiger', 'Wolf'
+        ];
+        
+        const CHAMPIONS = [
+            'Aatrox', 'Ahri', 'Akali', 'Akshan', 'Alistar', 'Amumu', 'Anivia', 'Annie',
+            'Aphelios', 'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Blitzcrank', 'Brand',
+            'Braum', 'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki', 'Darius',
+            'Diana', 'Draven', 'DrMundo', 'Ekko', 'Elise', 'Evelynn', 'Ezreal', 'Fiddlesticks',
+            'Fiora', 'Fizz', 'Galio', 'Gangplank', 'Garen', 'Gnar', 'Gragas', 'Graves',
+            'Gwen', 'Hecarim', 'Heimerdinger', 'Illaoi', 'Irelia', 'Ivern', 'Janna', 'JarvanIV',
+            'Jax', 'Jayce', 'Jhin', 'Jinx', 'Kaisa', 'Kalista', 'Karma', 'Karthus',
+            'Kassadin', 'Katarina', 'Kayle', 'Kayn', 'Kennen', 'Khazix', 'Kindred', 'Kled',
+            'KogMaw', 'Leblanc', 'LeeSin', 'Leona', 'Lillia', 'Lissandra', 'Lucian', 'Lulu',
+            'Lux', 'Malphite', 'Malzahar', 'Maokai', 'MasterYi', 'Milio', 'MissFortune', 'MonkeyKing',
+            'Mordekaiser', 'Morgana', 'Naafiri', 'Nami', 'Nasus', 'Nautilus', 'Neeko', 'Nidalee',
+            'Nilah', 'Nocturne', 'Nunu', 'Olaf', 'Orianna', 'Ornn', 'Pantheon', 'Poppy',
+            'Pyke', 'Qiyana', 'Quinn', 'Rakan', 'Rammus', 'RekSai', 'Rell', 'Renata',
+            'Renekton', 'Rengar', 'Riven', 'Rumble', 'Ryze', 'Samira', 'Sejuani', 'Senna',
+            'Seraphine', 'Sett', 'Shaco', 'Shen', 'Shyvana', 'Singed', 'Sion', 'Sivir',
+            'Skarner', 'Sona', 'Soraka', 'Swain', 'Sylas', 'Syndra', 'TahmKench', 'Taliyah',
+            'Talon', 'Taric', 'Teemo', 'Thresh', 'Tristana', 'Trundle', 'Tryndamere', 'TwistedFate',
+            'Twitch', 'Udyr', 'Urgot', 'Varus', 'Vayne', 'Veigar', 'Velkoz', 'Vex',
+            'Vi', 'Viego', 'Viktor', 'Vladimir', 'Volibear', 'Warwick', 'Xayah', 'Xerath',
+            'XinZhao', 'Yasuo', 'Yone', 'Yorick', 'Yuumi', 'Zac', 'Zed', 'Zeri',
+            'Ziggs', 'Zilean', 'Zoe', 'Zyra'
+        ];
+        
+        const CHAMPION_CDN = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/';
+        
+        function generateUsername() {
+            const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+            const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+            const number = Math.floor(Math.random() * 100);
+            return `${adjective}${noun}${number}`;
+        }
+        
+        function getRandomChampion() {
+            const champion = CHAMPIONS[Math.floor(Math.random() * CHAMPIONS.length)];
+            return {
+                type: 'champion',
+                championId: champion,
+                imageUrl: `${CHAMPION_CDN}${champion}.png`
+            };
+        }
+        
+        // ========================================
+        // LOGGING
+        // ========================================
+        function log(message, color = '#C8AA6E') {
+            const logDiv = document.getElementById('log');
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = message;
+            logDiv.appendChild(line);
+            console.log(message);
+        }
+        
+        // ========================================
+        // MAIN BACKFILL FUNCTION
+        // ========================================
+        async function backfillLegacyUsers() {
+            const btn = document.getElementById('backfill-btn');
+            const progress = document.getElementById('progress');
+            const logDiv = document.getElementById('log');
+            
+            btn.disabled = true;
+            progress.classList.add('active');
+            logDiv.innerHTML = '';
+            
+            log('🔧 Starting legacy user backfill...');
+            
+            try {
+                // ========================================
+                // STEP 1: Load existing profiles
+                // ========================================
+                log('👤 Loading existing profiles...');
+                const profilesRef = collection(db, 'profiles');
+                const profilesSnapshot = await getDocs(profilesRef);
+                
+                const existingProfiles = new Set();
+                profilesSnapshot.forEach(profileDoc => {
+                    existingProfiles.add(profileDoc.id);
+                });
+                
+                log(`✅ Found ${existingProfiles.size} existing profiles`);
+                
+                // ========================================
+                // STEP 2: Find all unique userIds from activity
+                // ========================================
+                log('📄 Loading activity documents...');
+                const activityRef = collection(db, 'activity');
+                const activitySnapshot = await getDocs(activityRef);
+                
+                const allUserIds = new Set();
+                activitySnapshot.forEach(activityDoc => {
+                    const activity = activityDoc.data();
+                    if (activity.userId) {
+                        allUserIds.add(activity.userId);
+                    }
+                });
+                
+                log(`✅ Found ${allUserIds.size} unique users in activity`);
+                
+                // ========================================
+                // STEP 3: Find legacy users (no profile)
+                // ========================================
+                const legacyUserIds = Array.from(allUserIds).filter(
+                    userId => !existingProfiles.has(userId)
+                );
+                
+                log(`🔍 Found ${legacyUserIds.length} legacy users without profiles`, '#ff9800');
+                
+                if (legacyUserIds.length === 0) {
+                    log('✨ No legacy users to backfill!', '#4caf50');
+                    alert('All users already have profiles!');
+                    btn.disabled = false;
+                    return;
+                }
+                
+// ========================================
+// STEP 4: Create profiles for legacy users
+// ========================================
+log('\n👤 Creating profiles for legacy users...');
+const createdProfiles = new Map();
+
+// First, gather all activities per user to find their earliest timestamp
+const userActivityMap = new Map();
+
+activitySnapshot.forEach(activityDoc => {
+    const activity = activityDoc.data();
+    const userId = activity.userId;
+    
+    if (!userActivityMap.has(userId)) {
+        userActivityMap.set(userId, []);
+    }
+    userActivityMap.get(userId).push(activity);
+});
+
+for (const userId of legacyUserIds) {
+    const username = generateUsername();
+    const avatar = getRandomChampion();
+    
+    // Find the earliest timestamp from this user's activities
+    const userActivities = userActivityMap.get(userId) || [];
+    let joinedAt = Date.now();
+    
+    if (userActivities.length > 0) {
+        joinedAt = Math.min(...userActivities.map(a => a.timestamp || Date.now()));
+    }
+    
+    const profile = {
+        userId: userId,
+        username: username,
+        avatar: avatar,
+        bio: '',
+        joinedAt: joinedAt, // ✅ Use earliest vote timestamp
+        privacy: {
+            isPublic: true,
+            showOnlineStatus: true,
+            emotePrivacy: 'everyone'
+        },
+        stats: {
+            totalVotes: 0,
+            winStreak: 0
+        }
+    };
+    
+    await setDoc(doc(db, 'profiles', userId), profile);
+    createdProfiles.set(userId, profile);
+    
+    log(`✅ Created: ${username} (${avatar.championId})`, '#4caf50');
+}
+
+log(`\n🎉 Created ${createdProfiles.size} profiles!`);
+
+// ========================================
+// STEP 5: Update activity records
+// ========================================
+log('\n📝 Updating activity records...');
+let updatedActivity = 0;
+
+for (const activityDoc of activitySnapshot.docs) {
+    const activity = activityDoc.data();
+    const userId = activity.userId;
+    
+    if (createdProfiles.has(userId)) {
+        const profile = createdProfiles.get(userId);
+        
+        await updateDoc(doc(db, 'activity', activityDoc.id), {
+            username: profile.username,
+            avatar: profile.avatar,
+            isPublic: profile.privacy.isPublic
+        });
+        
+        updatedActivity++;
+    }
+}
+
+log(`✅ Updated ${updatedActivity} activity records`);
+                // ========================================
+                // STEP 6: Update vote records
+                // ========================================
+                log('\n🗳️ Updating vote records...');
+                const votesRef = collection(db, 'votes');
+                const votesSnapshot = await getDocs(votesRef);
+                
+                let updatedVotes = 0;
+                
+                for (const voteDoc of votesSnapshot.docs) {
+                    const vote = voteDoc.data();
+                    const userId = vote.userId;
+                    
+                    if (createdProfiles.has(userId)) {
+                        const profile = createdProfiles.get(userId);
+                        
+                        await updateDoc(doc(db, 'votes', voteDoc.id), {
+                            username: profile.username
+                        });
+                        
+                        updatedVotes++;
+                    }
+                }
+                
+                log(`✅ Updated ${updatedVotes} vote records`);
+                
+                // ========================================
+                // COMPLETE
+                // ========================================
+                log('\n🎉 BACKFILL COMPLETE!', '#4caf50');
+                log(`👤 Profiles created: ${createdProfiles.size}`, '#4caf50');
+                log(`📝 Activity records updated: ${updatedActivity}`, '#4caf50');
+                log(`🗳️ Vote records updated: ${updatedVotes}`, '#4caf50');
+                
+                alert(
+                    `Backfill complete!\n\n` +
+                    `👤 Profiles created: ${createdProfiles.size}\n` +
+                    `📝 Activity updated: ${updatedActivity}\n` +
+                    `🗳️ Votes updated: ${updatedVotes}`
+                );
+                
+            } catch (error) {
+                console.error('❌ Fatal error:', error);
+                log(`❌ Error: ${error.message}`, '#f44336');
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Attach event listener
+        document.getElementById('backfill-btn').addEventListener('click', backfillLegacyUsers);
+    </script>
+</body>
+</html>

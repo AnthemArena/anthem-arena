@@ -11,7 +11,7 @@ const current = /DATA_DRAGON_VERSION = '([\d.]+)'/.exec(cfg)?.[1];
 const arcaneTags = /characters: \[([\s\S]*?)\]/.exec(cfg)?.[1];
 const usedChampions = [...new Set([
     ...listIn(read('../js/champion-list.js'), 'CHAMPIONS'),   // the avatar pick list
-    ...quoted(arcaneTags || ''), 'Jinx', 'Vi', 'Caitlyn'
+    ...quoted(arcaneTags || ''), 'Jinx', 'Vi', 'Caitlyn', 'Ekko'
 ])];
 
 // Network calls retry a few times (a single slow connection should not end the check) and run a few at a time.
@@ -48,7 +48,7 @@ const icons = usedChampions.filter(id => real.has(id));
 console.log(`checking ${icons.length} champion icons...`);
 const missing = (await allSettled(icons, async id => ((await call(`https://ddragon.leagueoflegends.com/cdn/${target}/img/champion/${id}.png`, 'HEAD')).ok ? null : id))).filter(Boolean);
 // the skin art we use is not versioned: spot-check it too
-const art = ['splash/Jinx_37.jpg', 'splash/Vi_29.jpg', 'splash/Caitlyn_28.jpg', 'tiles/Jinx_37.jpg'];
+const art = ['splash/Jinx_37.jpg', 'splash/Vi_29.jpg', 'splash/Caitlyn_28.jpg', 'splash/Ekko_36.jpg', 'tiles/Jinx_37.jpg'];
 missing.push(...(await allSettled(art, async u => ((await call(`https://ddragon.leagueoflegends.com/cdn/img/champion/${u}`, 'HEAD')).ok ? null : u))).filter(Boolean));
 const pickList = new Set(listIn(read('../js/champion-list.js'), 'CHAMPIONS'));
 const newer = [...real].filter(id => !pickList.has(id));

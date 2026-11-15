@@ -6,7 +6,7 @@ import { SKIN_UNLOCKS } from './champion-unlocks.js';
 import { getChampionSplashUrl, ddragonUrl } from './arcane-config.js';
 
 const THUMB = 'https://img.youtube.com/vi/C3GouGa0noM/mqdefault.jpg';
-const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' };
+const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn', ekko: 'Ekko' };
 
 const matchAlert = (type, data, extra) => ({ voice, dismiss }) => {
     const m = voice.alert(type, { songTitle: 'GODS', ...data });

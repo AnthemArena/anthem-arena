@@ -9,6 +9,7 @@
 import { GENERAL_ACHIEVEMENTS } from './achievements.js';
 import { CHAMPION_ACHIEVEMENTS } from './champion-achievements/index.js';
 import { skinsForAchievement } from './vote-progress.js';
+import { PACK_IDS } from './xp-ledger.js';
 
 const RARITY_ORDER = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5 };
 const capital = t => String(t || '').charAt(0).toUpperCase() + String(t || '').slice(1);
@@ -48,6 +49,7 @@ export function buildAchievementsView({ unlockedIds = [], own = false, stats = n
         if (!all.length) continue;
         const s = section(packId, packName(packId), all, have, own, stats);
         // someone else's profile: only champions they have earned something with; own profile: every champion
+        if (!PACK_IDS.includes(packId) && s.unlocked === 0) continue;   // a champion that is not live yet stays hidden
         if (own || s.unlocked > 0) sections.push(s);
     }
     // ids saved on the profile that no longer exist in the code are ignored (they used to render as "undefined")

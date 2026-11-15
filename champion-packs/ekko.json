@@ -1,0 +1,1546 @@
+{
+  "id": "ekko",
+  "name": "Ekko",
+  "displayName": "Ekko",
+  "emoji": "⏳",
+  "icon": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Ekko.png",
+  "description": "TODO",
+  "buttonPrefix": "⏳",
+  "color": "#0f766e",
+  "theme": {
+    "background": "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_36.jpg')",
+    "backgroundSize": "cover",
+    "backgroundPosition": "center 30%",
+    "borderColor": "rgba(15, 118, 110, 0.85)",
+    "borderGlow": "0 0 30px rgba(45, 212, 191, 0.6), 0 0 60px rgba(153, 246, 228, 0.3)",
+    "titleColor": "#ffffff",
+    "detailColor": "rgba(255, 255, 255, 0.95)",
+    "buttonBackground": "linear-gradient(135deg, #0f766e, #0d9488)",
+    "buttonHover": "linear-gradient(135deg, #0d9488, #14b8a6)",
+    "buttonText": "#ffffff",
+    "textShadow": "0 3px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 1)"
+  },
+  "alerts": {
+    "danger": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 50
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 20
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": "TODO",
+          "message": "TODO",
+          "cta": "TODO"
+        }
+      ]
+    },
+    "nailbiter": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 0
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "eq": 1
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "lte": 3
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": "TODO",
+          "message": "TODO",
+          "cta": "TODO"
+        }
+      ]
+    },
+    "winning": {
+      "messages": [
+        {
+          "condition": {
+            "userPct": {
+              "gte": 85
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 75
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 70
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "userPct": {
+              "gte": 65
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": "TODO",
+          "message": "TODO",
+          "cta": "TODO"
+        }
+      ]
+    },
+    "comeback": {
+      "messages": [
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 30
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 15
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 10
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": {
+            "voteDiff": {
+              "gte": 5
+            }
+          },
+          "message": "TODO",
+          "cta": "TODO"
+        },
+        {
+          "condition": "TODO",
+          "message": "TODO",
+          "cta": "TODO"
+        }
+      ]
+    },
+    "ally": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "rival": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "streak-ally-10": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "streak-ally-20": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "streak-rival-10": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "streak-rival-20": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "closing-24h": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "closing-3h": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "closing-final": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "closing-multi": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "novotes": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "round-opening": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "match-won": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "match-lost": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "welcome": {
+      "welcome-first-time": {
+        "messages": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ],
+        "buttons": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ]
+      },
+      "welcome-streak": {
+        "messages": [
+          "TODO",
+          "TODO",
+          "TODO"
+        ],
+        "buttons": [
+          "TODO",
+          "TODO",
+          "TODO"
+        ]
+      },
+      "welcome-comeback": {
+        "messages": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ],
+        "buttons": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ]
+      },
+      "welcome-back": {
+        "messages": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ],
+        "buttons": [
+          "TODO",
+          "TODO",
+          "TODO",
+          "TODO"
+        ]
+      }
+    },
+    "lowvotes": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "ctas": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "tiebreaker": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "tiebreaker-final": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "encouragement": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    }
+  },
+  "achievements": {
+    "first-choice": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "getting-started": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "arcane-regular": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "crowd-voice": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "deep-in-the-story": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "arcane-legend": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "spark": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "on-a-roll": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "unstoppable": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "arcane-dedication": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "against-the-grain": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "rebel-heart": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "dark-horse": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "first-on-the-scene": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "ahead-of-the-curve": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "nail-biter": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "deciding-voice": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "comeback-believer": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "repeat-favourite": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "die-hard": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "obsession": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "two-round-journey": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "deep-into-the-bracket": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "all-the-way": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "match-explorer": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "every-corner": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "bracket-veteran": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "long-session": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "deep-dive": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "night-owl": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "signal-boost": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "spreading-the-word": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "founding-member": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "level-up": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "default": {
+      "messages": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO",
+        "TODO",
+        "TODO"
+      ]
+    },
+    "mastery-up": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "jinx-loose-cannon": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "caitlyn-close-calls": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "caitlyn-steady-aim": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "caitlyn-deciding-shot": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "champion-selected": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "jinx-troublemaker": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "jinx-chaos-agent": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "vi-door-breaker": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "vi-heavy-hitter": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "vi-right-call": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "ekko-ahead-of-time": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "ekko-second-chances": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    },
+    "ekko-zero-hour": {
+      "messages": [
+        "TODO",
+        "TODO"
+      ],
+      "details": [
+        "TODO",
+        "TODO"
+      ],
+      "buttons": [
+        "TODO",
+        "TODO"
+      ]
+    }
+  },
+  "bubble": {
+    "upcoming": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "prevote": [
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "prevote-empty": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "closing-24h": [
+      "TODO",
+      "TODO"
+    ],
+    "closing-3h": [
+      "TODO",
+      "TODO"
+    ],
+    "closing-final": [
+      "TODO",
+      "TODO"
+    ],
+    "voted-early": [
+      "TODO",
+      "TODO"
+    ],
+    "voted-ahead": [
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "voted-close": [
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "voted-tied": [
+      "TODO",
+      "TODO"
+    ],
+    "voted-behind": [
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "closed-won": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "closed-lost": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "closed-tied": [
+      "TODO"
+    ],
+    "closed-unvoted": [
+      "TODO",
+      "TODO"
+    ]
+  },
+  "modal": {
+    "first-vote": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "streak": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "underdog": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "early": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "close": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "behind": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "ahead": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "default": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ]
+  },
+  "pages": {
+    "live-fresh": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-some": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-few": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-one": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-closing": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-done": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "live-none": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-groups": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-knockout-soon": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-knockout-live": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-bracket": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-complete": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "brackets-empty": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ]
+  },
+  "share": {
+    "invite": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "voted": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "early": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "tied": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "nailbiter": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "losing-close": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "losing-bad": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "winning-close": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ],
+    "dominating": [
+      "TODO",
+      "TODO",
+      "TODO"
+    ]
+  },
+  "portrait": {
+    "skin": 28
+  }
+}

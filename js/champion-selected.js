@@ -2,9 +2,9 @@
 // that champion's voice, with the skin they now wear. Same card family as level-up and mastery-up (js/global-notifications.js).
 import { SKIN_UNLOCKS, masteryLevel } from './champion-unlocks.js';
 import { getChampionSplashUrl } from './arcane-config.js';
-import { readPackXp } from './xp-ledger.js';
+import { readPackXp, PACK_IDS } from './xp-ledger.js';
 
-const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn' };
+const NAMES = { jinx: 'Jinx', vi: 'Vi', caitlyn: 'Caitlyn', ekko: 'Ekko' };
 
 // Pure: the bulletin object. `voiced` = what the champion's pack says ({ message, detail, cta }, may be null).
 export function championSelectedBulletin({ packId, skinNum = 0, mastery = 1, voiced = null }) {
@@ -47,7 +47,7 @@ export function takePendingChampion(storage = globalThis.sessionStorage) {
         if (!raw) return null;
         storage.removeItem(PENDING_KEY);
         const { packId, skinNum } = JSON.parse(raw);
-        return SKIN_UNLOCKS[packId] ? { packId, skinNum: Number.isFinite(Number(skinNum)) ? Number(skinNum) : 0 } : null;
+        return SKIN_UNLOCKS[packId] && PACK_IDS.includes(packId) ? { packId, skinNum: Number.isFinite(Number(skinNum)) ? Number(skinNum) : 0 } : null;
     } catch { return null; }
 }
 
